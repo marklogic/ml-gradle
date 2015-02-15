@@ -63,7 +63,7 @@ Then just run "gradle mlDeploy" in the directory containing these two files. You
 
 Digging deeper into ml-gradle
 =========
-The best way to dig deeper into what ml-gradle provies is to clone [the marklogic-java repository]((https://github.com/rjrudin/marklogic-java) and 
+The best way to dig deeper into what ml-gradle provies is to clone [the marklogic-java repository](https://github.com/rjrudin/marklogic-java) and 
 [examine the build.gradle file](https://github.com/rjrudin/marklogic-java/blob/master/sample-project/build.gradle) in the 
 sample-project directory. This is intended to show all the different features of ml-gradle, with comments explaining 
 each one. Most tasks have Wiki pages as well to provide further information, and of course there's always 

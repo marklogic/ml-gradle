@@ -65,7 +65,8 @@ public class DefaultModulesFinder implements ModulesFinder {
         List<File> queryOptions = new ArrayList<>();
         if (queryOptionsBaseDir.exists()) {
             for (File f : queryOptionsBaseDir.listFiles()) {
-                if (f.getName().endsWith(".xml")) {
+                String filename = f.getName();
+                if (filename.endsWith(".xml") || filename.endsWith(".json")) {
                     queryOptions.add(f);
                 }
             }

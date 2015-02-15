@@ -32,9 +32,37 @@ Here are some of the main features of ml-gradle:
 1. Can perform most tasks related to CPF
 1. Can manage security resources such as users, roles, and amps
 
-Getting started with ml-gradle
----------------
-The best way to get started is to clone [the marklogic-java repository]((https://github.com/rjrudin/marklogic-java) and 
+ml-gradle quick start
+=========
+To use ml-gradle right away, you'll need Gradle installed first. And of course you'll need Marklogic installed somewhere - it doesn't have to be the same computer as the one you're running Gradle on. Then create a directory for your project and add a build.gradle file and a gradle.properties file. Here's the simplest build.gradle file possible:
+
+    buildscript {
+      repositories {
+        mavenCentral()
+        maven {url "http://developer.marklogic.com/maven2/"}
+        maven {url "http://rjrudin.github.io/marklogic-java/releases"}
+      }
+  
+      dependencies {
+        classpath "com.marklogic:ml-gradle:0.9.9"
+      }
+    }
+
+And here's the simplest gradle.properties file possible (you can of course customize these properties as needed, particularly the ports - make sure that they're open on the host you're deploying to):
+
+    mlHost=localhost
+    mlUsername=admin
+    mlPassword=admin
+    mlRestPort=8200
+    mlXdbcPort=8201
+    mlAppName=quick-start
+
+Then just run "gradle mlDeploy" in the directory containing these two files. You'll end up with a new REST API server on port 8200, an XDBC server on 8201, and two databases - a content database and a modules database, with one forest for each. 
+
+
+Digging deeper into ml-gradle
+=========
+The best way to dig deeper into what ml-gradle provies is to clone [the marklogic-java repository]((https://github.com/rjrudin/marklogic-java) and 
 [examine the build.gradle file](https://github.com/rjrudin/marklogic-java/blob/master/sample-project/build.gradle) in the 
 sample-project directory. This is intended to show all the different features of ml-gradle, with comments explaining 
 each one. Most tasks have Wiki pages as well to provide further information, and of course there's always 

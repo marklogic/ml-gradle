@@ -42,11 +42,12 @@ To use ml-gradle right away, you'll need Gradle installed first. And of course y
         maven {url "http://developer.marklogic.com/maven2/"}
         maven {url "http://rjrudin.github.io/marklogic-java/releases"}
       }
-  
       dependencies {
         classpath "com.marklogic:ml-gradle:0.9.9"
       }
     }
+    
+    apply plugin: 'ml-gradle'
 
 And here's the simplest gradle.properties file possible (you can of course customize these properties as needed, particularly the ports - make sure that they're open on the host you're deploying to):
 

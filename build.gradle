@@ -1,0 +1,34 @@
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+apply plugin: 'eclipse'
+
+repositories {
+  mavenCentral()
+  maven {url "http://developer.marklogic.com/maven2/"}
+  maven {url "http://rjrudin.github.io/marklogic-java/releases"}
+}
+
+dependencies {
+  compile 'com.marklogic:client-api-java:2.0-3'
+  compile 'com.marklogic:marklogic-xcc:7.0.4'
+  compile 'com.marklogic:ml-xcc-util:1.0'
+  compile 'org.jdom:jdom2:2.0.5'
+  compile 'org.springframework:spring-context:4.0.6.RELEASE'
+  compile 'org.slf4j:slf4j-api:1.7.7'
+  compile 'org.slf4j:jcl-over-slf4j:1.7.7'
+  runtime 'ch.qos.logback:logback-classic:1.1.2'
+  testCompile 'junit:junit:4+'
+}
+
+publishing {
+  publications {
+    mainJava(MavenPublication) {
+      from components.java
+    }
+  }
+  repositories {
+    maven {
+      url publishUrl
+    }
+  }
+}

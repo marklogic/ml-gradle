@@ -1,0 +1,1 @@
+This is just for testing purposes, doesn't yet need to be a valid resource extension.

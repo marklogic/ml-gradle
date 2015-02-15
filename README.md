@@ -67,7 +67,7 @@ The best way to dig deeper into what ml-gradle provies is to clone [the marklogi
 [examine the build.gradle file](https://github.com/rjrudin/marklogic-java/blob/master/sample-project/build.gradle) in the 
 sample-project directory. This is intended to show all the different features of ml-gradle, with comments explaining 
 each one. Most tasks have Wiki pages as well to provide further information, and of course there's always 
-the source code, with [the MarkLogicPlugin](https://github.com/rjrudin/marklogic-java/blob/master/ml-gradle/src/main/groovy/com/marklogic/gradle/MarkLogicPlugin.groovy) being a 
+the source code, with [the MarkLogicPlugin](https://github.com/rjrudin/ml-gradle/blob/master/src/main/groovy/com/marklogic/gradle/MarkLogicPlugin.groovy) being a 
 good place to start, as it lists out all the registered tasks. 
 
 If you have a project already, then a good way to start is by copying the aforementioned build.gradle file into your project. You can remove all the optional stuff to start with a bare minimum Gradle file, and then start adding things back in as you realize a need for them.

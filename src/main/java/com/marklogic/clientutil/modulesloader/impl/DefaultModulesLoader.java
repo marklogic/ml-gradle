@@ -244,7 +244,11 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
         String name = getExtensionNameFromFile(f);
         logger.info(String.format("Loading %s query options from file %s", name, f.getName()));
         QueryOptionsManager mgr = client.newServerConfigManager().newQueryOptionsManager();
-        mgr.writeOptions(name, new FileHandle(f));
+        if (f.getName().endsWith(".json")) {
+            mgr.writeOptions(name, new FileHandle(f).withFormat(Format.JSON));
+        } else {
+            mgr.writeOptions(name, new FileHandle(f));
+        }
         modulesManager.saveLastInstalledTimestamp(f, new Date());
         return f;
     }

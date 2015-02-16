@@ -39,7 +39,7 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
     private ModulesFinder modulesFinder;
     private ModulesManager modulesManager;
     private ExtensionLibraryDescriptorBuilder extensionLibraryDescriptorBuilder;
-    
+
     /**
      * When set to true, exceptions thrown while loading transforms and resources will be caught and logged, and the
      * module will be updated as having been loaded. This is useful when running a program like ModulesWatcher, as it
@@ -48,7 +48,7 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
     private boolean catchExceptions = false;
 
     public DefaultModulesLoader() {
-        this.extensionMetadataProvider = new XmlExtensionMetadataProvider();
+        //this.extensionMetadataProvider = new XmlExtensionMetadataProvider();
         this.modulesFinder = new DefaultModulesFinder();
         this.modulesManager = new PropertiesModuleManager();
     }
@@ -91,7 +91,17 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
 
     protected void loadTransforms(Modules modules, Set<File> loadedModules) {
         for (File f : modules.getTransforms()) {
+            if (FilenameUtil.isXqueryFile(f.getName())) {
+                this.extensionMetadataProvider = new XmlExtensionMetadataProvider();
+            } else if (FilenameUtil.isJavascriptFile(f.getName())) {
+                this.extensionMetadataProvider = new JavascriptExtensionMetadataProvider();
+            } else {
+                // ignore whatever this other file type is
+                continue;
+            }
+
             ExtensionMetadataAndParams emap = extensionMetadataProvider.provideExtensionMetadataAndParams(f);
+
             try {
                 f = installTransform(f, emap.metadata);
                 if (f != null) {
@@ -111,7 +121,17 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
 
     protected void loadResources(Modules modules, Set<File> loadedModules) {
         for (File f : modules.getServices()) {
+            if (FilenameUtil.isXqueryFile(f.getName())) {
+                this.extensionMetadataProvider = new XmlExtensionMetadataProvider();
+            } else if (FilenameUtil.isJavascriptFile(f.getName())) {
+                this.extensionMetadataProvider = new JavascriptExtensionMetadataProvider();
+            } else {
+                // ignore whatever this other file type is
+                continue;
+            }
+
             ExtensionMetadataAndParams emap = extensionMetadataProvider.provideExtensionMetadataAndParams(f);
+
             try {
                 f = installResource(f, emap.metadata, emap.methods.toArray(new MethodParameters[] {}));
             } catch (Exception e) {
@@ -142,7 +162,7 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
      * This can be used by projects that use MLCP to load many modules in the assets directory. In such a case, it's
      * usually desirable to pretend to load all of the assets so that the timestamp at which each asset was last loaded
      * is updated to the current time.
-     * 
+     *
      * @param baseDir
      */
     public void simulateLoadingOfAllAssets(File baseDir, DatabaseClient client) {
@@ -157,6 +177,9 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
 
     public File installAsset(Asset asset) {
         File file = asset.getFile();
+
+        logger.debug("INSTALL ASSET FILE => " + file.getName());
+
         if (!modulesManager.hasFileBeenModifiedSinceLastInstalled(file)) {
             return null;
         }
@@ -190,7 +213,7 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
     /**
      * TODO Need something pluggable here - probably should delegate this to a separate object so that a client could
      * easily provide a different implementation in case the assumptions below aren't correct.
-     * 
+     *
      * @param file
      * @return
      */
@@ -210,12 +233,18 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
         if (!modulesManager.hasFileBeenModifiedSinceLastInstalled(file)) {
             return null;
         }
+
+        logger.debug("INSTALL RESOURCE FILE => " + file.getName());
+
         ResourceExtensionsManager extMgr = client.newServerConfigManager().newResourceExtensionsManager();
         String resourceName = getExtensionNameFromFile(file);
         if (metadata.getTitle() == null) {
             metadata.setTitle(resourceName + " resource extension");
         }
+
+        logger.debug("    METADATA (script-language) => " + metadata.getScriptLanguage());
         logger.info(String.format("Loading %s resource extension from file %s", resourceName, file));
+
         extMgr.writeServices(resourceName, new FileHandle(file), metadata, methodParams);
         modulesManager.saveLastInstalledTimestamp(file, new Date());
         return file;

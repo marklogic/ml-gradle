@@ -13,7 +13,7 @@ class WatchTask extends JavaExec {
     @TaskAction
     @Override
     public void exec() {
-        setMain("com.marklogic.client.modulesloader.ModulesWatcher")
+        setMain("com.marklogic.clientutil.modulesloader.ModulesWatcher")
         setClasspath(getProject().sourceSets.main.runtimeClasspath)
 
         AppConfig config = getProject().property("mlAppConfig")

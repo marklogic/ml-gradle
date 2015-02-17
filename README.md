@@ -80,3 +80,9 @@ To see ml-gradle in action, you can deploy the sample-project application by doi
 1. gradle mlDeploy
 
 Then watch the logging scroll by as a number of ml-gradle tasks are executed, resulting in new databases and app servers prefixed with "sample-project" as the name, all of which you can of course inspect via the MarkLogic Admin app. 
+
+What about MarkLogic 8 and all those new REST endpoints?
+=========
+One of the best aspects of MarkLogic 8 is the addition of so many new capabilities to the REST management API. This will allow for a number of tasks to be accomplished via HTTP calls rather than XQuery statements over XCC. 
+
+The plan with ml-gradle is for it support both MarkLogic 7 and 8 seamlessly, with a REST endpoint being used if available, and XCC used as a fallback. You should see support for ML8 in the 2.0 release of ml-gradle. 

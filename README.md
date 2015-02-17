@@ -3,12 +3,6 @@ What is Gradle?
 
 Gradle is a standard build tool that is used for building and deploying primarily Java applications, but it can be used for any codebase. The full user guide for Gradle is available at http://www.gradle.org/docs/current/userguide/userguide.html. 
 
-This Wiki assumes a general understanding of the following topics.
-
-- [General Understanding of Gradle](http://www.gradle.org/docs/current/userguide/tutorial_using_tasks.html "")
-- Understands the MarkLogic Package REST API
-- Understands the MarkLogic Client REST API
-
 What is ml-gradle?
 =========
 ml-gradle is a [Gradle plugin](http://www.gradle.org/plugins "") that supports a number of tasks pertaining to deploying an application to MarkLogic and interacting with other features of MarkLogic via a Gradle build file. In general, ml-gradle tries to get as many things done as possible by making HTTP calls to the MarkLogic REST API services, particularly the [packaging API](http://docs.marklogic.com/REST/packaging ""). When a REST API endpoint doesn't exist, ml-gradle will use XCC. ml-gradle also provides support for using tools such as MarkLogic Content Pump from a Gradle build file. 

@@ -11,13 +11,13 @@ import org.springframework.core.io.ClassPathResource;
 import com.marklogic.client.admin.MethodType;
 import com.marklogic.client.admin.ResourceExtensionsManager.MethodParameters;
 import com.marklogic.clientutil.modulesloader.ExtensionMetadataAndParams;
-import com.marklogic.clientutil.modulesloader.impl.XmlExtensionMetadataProvider;
+import com.marklogic.clientutil.modulesloader.impl.DefaultExtensionMetadataProvider;
 
 public class XmlExtensionMetadataProviderTest extends Assert {
 
     @Test
     public void test() throws IOException {
-        XmlExtensionMetadataProvider p = new XmlExtensionMetadataProvider();
+        DefaultExtensionMetadataProvider p = new DefaultExtensionMetadataProvider();
         File resourceFile = new ClassPathResource("sample-base-dir/services/sample.xqy").getFile();
         ExtensionMetadataAndParams emap = p.provideExtensionMetadataAndParams(resourceFile);
 

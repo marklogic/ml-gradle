@@ -48,7 +48,7 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
     private boolean catchExceptions = false;
 
     public DefaultModulesLoader() {
-        //this.extensionMetadataProvider = new XmlExtensionMetadataProvider();
+        this.extensionMetadataProvider = new DefaultExtensionMetadataProvider();
         this.modulesFinder = new DefaultModulesFinder();
         this.modulesManager = new PropertiesModuleManager();
     }
@@ -91,15 +91,6 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
 
     protected void loadTransforms(Modules modules, Set<File> loadedModules) {
         for (File f : modules.getTransforms()) {
-            if (FilenameUtil.isXqueryFile(f.getName())) {
-                this.extensionMetadataProvider = new XmlExtensionMetadataProvider();
-            } else if (FilenameUtil.isJavascriptFile(f.getName())) {
-                this.extensionMetadataProvider = new JavascriptExtensionMetadataProvider();
-            } else {
-                // ignore whatever this other file type is
-                continue;
-            }
-
             ExtensionMetadataAndParams emap = extensionMetadataProvider.provideExtensionMetadataAndParams(f);
 
             try {
@@ -121,15 +112,6 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
 
     protected void loadResources(Modules modules, Set<File> loadedModules) {
         for (File f : modules.getServices()) {
-            if (FilenameUtil.isXqueryFile(f.getName())) {
-                this.extensionMetadataProvider = new XmlExtensionMetadataProvider();
-            } else if (FilenameUtil.isJavascriptFile(f.getName())) {
-                this.extensionMetadataProvider = new JavascriptExtensionMetadataProvider();
-            } else {
-                // ignore whatever this other file type is
-                continue;
-            }
-
             ExtensionMetadataAndParams emap = extensionMetadataProvider.provideExtensionMetadataAndParams(f);
 
             try {

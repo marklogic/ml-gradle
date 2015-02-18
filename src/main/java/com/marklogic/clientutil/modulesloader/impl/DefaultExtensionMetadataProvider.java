@@ -10,13 +10,16 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 
 import com.marklogic.client.admin.ExtensionMetadata;
+import com.marklogic.client.admin.ExtensionMetadata.ScriptLanguage;
 import com.marklogic.client.admin.MethodType;
 import com.marklogic.client.admin.ResourceExtensionsManager.MethodParameters;
+import com.marklogic.clientutil.FilenameUtil;
 import com.marklogic.clientutil.LoggingObject;
 import com.marklogic.clientutil.modulesloader.ExtensionMetadataAndParams;
 import com.marklogic.clientutil.modulesloader.ExtensionMetadataProvider;
 
-public class XmlExtensionMetadataProvider extends LoggingObject implements ExtensionMetadataProvider {
+
+public class DefaultExtensionMetadataProvider extends LoggingObject implements ExtensionMetadataProvider {
 
     @Override
     public ExtensionMetadataAndParams provideExtensionMetadataAndParams(File resourceFile) {
@@ -25,6 +28,12 @@ public class XmlExtensionMetadataProvider extends LoggingObject implements Exten
 
         ExtensionMetadata m = new ExtensionMetadata();
         List<MethodParameters> paramList = new ArrayList<>();
+
+        // JAVA API defaults to the script language of XQuery
+        if (FilenameUtil.isJavascriptFile(resourceFile.getName())) {
+            m.setScriptLanguage(ScriptLanguage.JAVASCRIPT);
+            m.setVersion("1.0");
+        }
 
         if (metadataFile.exists()) {
             try {

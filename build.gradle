@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-  compile 'com.marklogic:client-api-java:2.0-3'
+  compile 'com.marklogic:java-client-api:3.0.1'
   compile 'com.marklogic:marklogic-xcc:7.0.4'
   compile 'com.marklogic:ml-xcc-util:1.0'
   compile 'org.jdom:jdom2:2.0.5'

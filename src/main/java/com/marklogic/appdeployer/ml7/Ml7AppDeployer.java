@@ -1,15 +1,10 @@
 package com.marklogic.appdeployer.ml7;
 
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.web.client.RestTemplate;
+import java.io.File;
 
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.AppDeployer;
+import com.marklogic.appdeployer.ManageClient;
 import com.marklogic.appdeployer.ManageConfig;
 import com.marklogic.clientutil.LoggingObject;
 
@@ -17,14 +12,14 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
 
     private AppConfig appConfig;
     private ManageConfig manageConfig;
-    private RestTemplate restTemplate;
+    private ManageClient manageClient;
 
     public static void main(String[] args) {
         AppConfig appConfig = new AppConfig();
         appConfig.setName("appdeployer");
+        appConfig.setRestPort(8123);
         Ml7AppDeployer sut = new Ml7AppDeployer(appConfig);
-        sut.deletePackage();
-        sut.createPackage();
+        sut.installPackages();
     }
 
     public Ml7AppDeployer(AppConfig appConfig) {
@@ -34,45 +29,34 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
     public Ml7AppDeployer(AppConfig appConfig, ManageConfig manageConfig) {
         this.appConfig = appConfig;
         this.manageConfig = manageConfig;
-        this.restTemplate = buildRestTemplate(manageConfig);
+        this.manageClient = new Ml7ManageClient(manageConfig);
     }
 
     @Override
-    public void deletePackage() {
-        logger.info("Deleting package if it exists: " + getPackageName());
-        restTemplate.delete(buildUri("/manage/v2/packages/" + getPackageName()));
-    }
+    public void installPackages() {
+        String name = appConfig.getName();
+        String packageName = name + "-package";
+        manageClient.deletePackage(packageName);
+        manageClient.createPackage(packageName);
 
-    @Override
-    public void createPackage() {
-        String name = getPackageName();
-        logger.info("Creating package: " + name);
-        try {
-            restTemplate.getForEntity(buildUri("/manage/v2/packages/" + name), String.class);
-            logger.info("Package already exists");
-        } catch (Exception e) {
-            restTemplate.postForLocation(buildUri("/manage/v2/packages?pkgname=" + name), null);
+        boolean installPackage = false;
+        // boolean installTestResources = appConfig.isTestPortSet();
+
+        if (new File(manageConfig.getTriggersDatabaseFilePath()).exists()) {
+            manageClient.addDatabase(packageName, name + "-triggers", manageConfig.getTriggersDatabaseFilePath());
+            installPackage = true;
         }
-    }
 
-    @Override
-    public void installPackage() {
-        String name = getPackageName();
-        logger.info("Installing package: " + name);
-        restTemplate.postForLocation(buildUri("/manage/v2/packages/" + name + "/install"), null);
-    }
+        if (new File(manageConfig.getSchemasDatabaseFilePath()).exists()) {
+            manageClient.addDatabase(packageName, name + "-schemas", manageConfig.getSchemasDatabaseFilePath());
+            installPackage = true;
+        }
 
-    protected RestTemplate buildRestTemplate(ManageConfig manageConfig) {
-        BasicCredentialsProvider prov = new BasicCredentialsProvider();
-        prov.setCredentials(new AuthScope(manageConfig.getHost(), manageConfig.getPort(), AuthScope.ANY_REALM),
-                new UsernamePasswordCredentials(manageConfig.getUsername(), manageConfig.getPassword()));
-        HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(prov).build();
-        HttpComponentsClientHttpRequestFactory f = new HttpComponentsClientHttpRequestFactory(client);
-        return new RestTemplate(f);
-    }
+        if (installPackage) {
+            manageClient.installPackage(packageName);
+        }
 
-    protected String buildUri(String path) {
-        return manageConfig.getUri() + path;
+        manageClient.createRestApiServer(name, null, appConfig.getRestPort(), null);
     }
 
     protected String getPackageName() {
@@ -85,9 +69,5 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
 
     public ManageConfig getManageConfig() {
         return manageConfig;
-    }
-
-    public RestTemplate getRestTemplate() {
-        return restTemplate;
     }
 }

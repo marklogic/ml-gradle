@@ -7,9 +7,5 @@ package com.marklogic.appdeployer;
  */
 public interface AppDeployer {
 
-    public void deletePackage();
-
-    public void createPackage();
-    
-    public void installPackage();
+    public void installPackages();
 }

@@ -7,8 +7,12 @@ public class ManageConfig {
     private String username = "admin";
     private String password = "admin";
 
+    private String groupName = "Default";
     private String contentDatabaseFilePath = "src/main/xqy/packages/content-database.xml";
     private String httpServerFilePath = "src/main/xqy/packages/http-server.xml";
+    private String triggersDatabaseFilePath = "src/main/xqy/packages/triggers-database.xml";
+    private String schemasDatabaseFilePath = "src/main/xqy/packages/schemas-database.xml";
+    private String xdbcServerFilePath = "src/main/xqy/packages/xdbc-server.xml";
 
     public String getUri() {
         return String.format("http://%s:%d", host, port);
@@ -60,5 +64,37 @@ public class ManageConfig {
 
     public void setHttpServerFilePath(String httpServerFilePath) {
         this.httpServerFilePath = httpServerFilePath;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public String getTriggersDatabaseFilePath() {
+        return triggersDatabaseFilePath;
+    }
+
+    public void setTriggersDatabaseFilePath(String triggersDatabaseFilePath) {
+        this.triggersDatabaseFilePath = triggersDatabaseFilePath;
+    }
+
+    public String getSchemasDatabaseFilePath() {
+        return schemasDatabaseFilePath;
+    }
+
+    public void setSchemasDatabaseFilePath(String schemasDatabaseFilePath) {
+        this.schemasDatabaseFilePath = schemasDatabaseFilePath;
+    }
+
+    public String getXdbcServerFilePath() {
+        return xdbcServerFilePath;
+    }
+
+    public void setXdbcServerFilePath(String xdbcServerFilePath) {
+        this.xdbcServerFilePath = xdbcServerFilePath;
     }
 }

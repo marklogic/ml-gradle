@@ -24,6 +24,10 @@ public class AppConfig {
         modulePaths.add(defaultModulePath);
     }
 
+    public boolean isTestPortSet() {
+        return testRestPort != null && testRestPort > 0;
+    }
+    
     public String getXccUrl() {
         return "xcc://${username}:${password}@${host}:${xdbcPort}";
     }

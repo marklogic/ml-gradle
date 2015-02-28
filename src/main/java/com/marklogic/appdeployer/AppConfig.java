@@ -19,6 +19,13 @@ public class AppConfig {
     private String defaultModulePath = "src/main/xqy";
     private List<String> modulePaths;
 
+    private String groupName = "Default";
+    private String contentDatabaseFilePath = "src/main/xqy/packages/content-database.xml";
+    private String httpServerFilePath = "src/main/xqy/packages/http-server.xml";
+    private String triggersDatabaseFilePath = "src/main/xqy/packages/triggers-database.xml";
+    private String schemasDatabaseFilePath = "src/main/xqy/packages/schemas-database.xml";
+    private String xdbcServerFilePath = "src/main/xqy/packages/xdbc-server.xml";
+
     public AppConfig() {
         modulePaths = new ArrayList<String>();
         modulePaths.add(defaultModulePath);
@@ -26,6 +33,18 @@ public class AppConfig {
 
     public boolean isTestPortSet() {
         return testRestPort != null && testRestPort > 0;
+    }
+
+    public String getPackageName() {
+        return name + "-package";
+    }
+    
+    public String getContentDatabaseName() {
+        return name + "-content";
+    }
+    
+    public String getTestContentDatabaseName() {
+        return name + "-test-content";
     }
     
     public String getXccUrl() {
@@ -127,4 +146,53 @@ public class AppConfig {
     public void setModulePaths(List<String> modulePaths) {
         this.modulePaths = modulePaths;
     }
+
+    public String getContentDatabaseFilePath() {
+        return contentDatabaseFilePath;
+    }
+
+    public void setContentDatabaseFilePath(String contentDatabaseFilePath) {
+        this.contentDatabaseFilePath = contentDatabaseFilePath;
+    }
+
+    public String getHttpServerFilePath() {
+        return httpServerFilePath;
+    }
+
+    public void setHttpServerFilePath(String httpServerFilePath) {
+        this.httpServerFilePath = httpServerFilePath;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public String getTriggersDatabaseFilePath() {
+        return triggersDatabaseFilePath;
+    }
+
+    public void setTriggersDatabaseFilePath(String triggersDatabaseFilePath) {
+        this.triggersDatabaseFilePath = triggersDatabaseFilePath;
+    }
+
+    public String getSchemasDatabaseFilePath() {
+        return schemasDatabaseFilePath;
+    }
+
+    public void setSchemasDatabaseFilePath(String schemasDatabaseFilePath) {
+        this.schemasDatabaseFilePath = schemasDatabaseFilePath;
+    }
+
+    public String getXdbcServerFilePath() {
+        return xdbcServerFilePath;
+    }
+
+    public void setXdbcServerFilePath(String xdbcServerFilePath) {
+        this.xdbcServerFilePath = xdbcServerFilePath;
+    }
+
 }

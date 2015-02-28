@@ -19,27 +19,23 @@ import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.RestTemplate;
 
 import com.marklogic.appdeployer.ManageClient;
-import com.marklogic.appdeployer.ManageConfig;
 import com.marklogic.clientutil.LoggingObject;
 
 public class Ml7ManageClient extends LoggingObject implements ManageClient {
 
     private RestTemplate restTemplate;
-    private ManageConfig manageConfig;
+    private String baseUri;
 
-    public Ml7ManageClient(ManageConfig manageConfig) {
+    public Ml7ManageClient(String host, int port, String username, String password) {
         super();
-        this.manageConfig = manageConfig;
-        this.restTemplate = buildRestTemplate(manageConfig);
-    }
 
-    protected RestTemplate buildRestTemplate(ManageConfig manageConfig) {
+        this.baseUri = "http://" + host + ":" + port;
         BasicCredentialsProvider prov = new BasicCredentialsProvider();
-        prov.setCredentials(new AuthScope(manageConfig.getHost(), manageConfig.getPort(), AuthScope.ANY_REALM),
-                new UsernamePasswordCredentials(manageConfig.getUsername(), manageConfig.getPassword()));
+        prov.setCredentials(new AuthScope(host, port, AuthScope.ANY_REALM), new UsernamePasswordCredentials(username,
+                password));
         HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(prov).build();
         HttpComponentsClientHttpRequestFactory f = new HttpComponentsClientHttpRequestFactory(client);
-        return new RestTemplate(f);
+        this.restTemplate = new RestTemplate(f);
     }
 
     @Override
@@ -66,7 +62,7 @@ public class Ml7ManageClient extends LoggingObject implements ManageClient {
     }
 
     protected String buildUri(String path) {
-        return manageConfig.getUri() + path;
+        return baseUri + path;
     }
 
     @Override

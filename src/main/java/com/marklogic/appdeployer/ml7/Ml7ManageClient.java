@@ -10,12 +10,9 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.RestTemplate;
 
 import com.marklogic.appdeployer.ManageClient;
@@ -65,22 +62,31 @@ public class Ml7ManageClient extends LoggingObject implements ManageClient {
         return baseUri + path;
     }
 
+    // TODO Move the XML replace stuff out of here
     @Override
     public void addDatabase(String packageName, String databaseName, String packageFilePath) {
         try {
             String xml = FileCopyUtils.copyToString(new FileReader(packageFilePath));
             xml = xml.replace("%%DATABASE_NAME%%", databaseName);
             logger.info("Adding database " + databaseName + " to package " + packageName);
-            restTemplate.execute(buildUri("/manage/v2/packages/" + packageName + "/databases/" + databaseName),
-                    HttpMethod.POST, new RequestCallback() {
-                        @Override
-                        public void doWithRequest(ClientHttpRequest request) throws IOException {
-                            request.getHeaders().setContentType(MediaType.APPLICATION_XML);
-                        }
-                    }, null);
+            postXml("/manage/v2/packages/" + packageName + "/databases/" + databaseName, xml);
         } catch (IOException ie) {
             throw new RuntimeException(ie);
         }
+    }
+
+    protected void postXml(String path, String xml) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_XML);
+        HttpEntity<String> entity = new HttpEntity<String>(xml, headers);
+        restTemplate.postForLocation(buildUri(path), entity);
+    }
+
+    protected void postJson(String path, String json) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<String>(json, headers);
+        restTemplate.postForLocation(buildUri(path), entity);
     }
 
     @Override
@@ -97,12 +103,8 @@ public class Ml7ManageClient extends LoggingObject implements ManageClient {
                 json += ", modulesDatabase: \"" + modulesDatabase + "\"";
             }
             json += "}}";
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<String> entity = new HttpEntity<String>(json, headers);
             logger.info("Creating new REST API server: " + json);
-            restTemplate.postForLocation(buildUri("/v1/rest-apis"), entity);
+            postJson("/v1/rest-apis", json);
         } else {
             logger.info("REST API instance already exists with name: " + serverName);
         }
@@ -115,4 +117,10 @@ public class Ml7ManageClient extends LoggingObject implements ManageClient {
         String xml = restTemplate.getForEntity(buildUri("/v1/rest-apis/"), String.class).getBody();
         return xml.contains("<rapi:name>" + serverName + "</rapi:name>");
     }
+
+    @Override
+    public void addServer(String packageName, String serverName, String group, String packageXml) {
+        postXml("/manage/v2/packages/" + packageName + "/servers/" + serverName + "?group-id=" + group, packageXml);
+    }
+
 }

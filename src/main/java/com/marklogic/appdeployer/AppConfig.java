@@ -39,12 +39,40 @@ public class AppConfig {
         return name + "-package";
     }
     
+    public String getRestServerName() {
+        return name;
+    }
+    
+    public String getTestRestServerName() {
+        return name + "-test";
+    }
+    
+    public String getXdbcServerName() {
+        return getContentDatabaseName() + "-xdbc";
+    }
+    
+    public String getTestXdbcServerName() {
+        return getTestContentDatabaseName() + "-xdbc";
+    }
+    
     public String getContentDatabaseName() {
         return name + "-content";
     }
     
     public String getTestContentDatabaseName() {
         return name + "-test-content";
+    }
+    
+    public String getModulesDatabaseName() {
+        return name + "-modules";
+    }
+    
+    public String getTriggersDatabaseName() {
+        return name + "-triggers";
+    }
+    
+    public String getSchemasDatabaseName() {
+        return name + "-schemas";
     }
     
     public String getXccUrl() {

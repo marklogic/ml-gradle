@@ -14,4 +14,6 @@ public interface ManageClient {
     public void addDatabase(String packageName, String databaseName, String packageFilePath);
 
     public void createRestApiServer(String serverName, String database, Integer port, String modulesDatabase);
+
+    public void addServer(String packageName, String serverName, String group, String packageXml);
 }

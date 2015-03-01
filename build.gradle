@@ -15,7 +15,7 @@ dependencies {
   compile localGroovy()
   compile 'com.marklogic:ml-javaclient-util:1.0'
   compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7'
-  
+  compile 'com.marklogic:ml-app-deployer:0.1'
   testCompile 'com.marklogic:ml-junit:1.0'
 }
 

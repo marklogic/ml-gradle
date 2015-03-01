@@ -1,4 +1,4 @@
-package com.marklogic.gradle.task.client.service
+package com.marklogic.gradle.task.client
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction

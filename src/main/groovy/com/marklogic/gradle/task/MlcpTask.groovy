@@ -3,6 +3,8 @@ package com.marklogic.gradle.task
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.TaskAction
 
+import com.marklogic.appdeployer.AppConfig
+
 /**
  * Provides parameters for some, but not all, mlcp arguments. Arguments that aren't supported can be passed in
  * via JavaExec's "args" property. The main benefit of using this class is that it assumes usage of the connection
@@ -38,7 +40,7 @@ class MlcpTask extends JavaExec {
     @Override
     public void exec() {
         setMain("com.marklogic.contentpump.ContentPump")
-        com.marklogic.gradle.AppConfig config = getProject().property("mlAppConfig")
+        AppConfig config = getProject().property("mlAppConfig")
 
         
         List<String> newArgs = new ArrayList<>()

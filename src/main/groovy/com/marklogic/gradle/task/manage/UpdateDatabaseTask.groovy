@@ -8,6 +8,6 @@ class UpdateDatabaseTask extends MarkLogicTask {
 
     @TaskAction
     void updateDatabase() {
-        newAppDeployer().updateContentDatabases(getAppConfig())
+        getAppDeployer().updateContentDatabases(getAppConfig())
     }
 }

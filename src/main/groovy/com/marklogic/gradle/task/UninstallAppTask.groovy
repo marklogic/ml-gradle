@@ -6,6 +6,6 @@ class UninstallAppTask extends MarkLogicTask {
 
     @TaskAction
     void uninstallApp() {
-        newAppDeployer().uninstallApp(getAppConfig())
+        getAppDeployer().uninstallApp(getAppConfig())
     }
 }

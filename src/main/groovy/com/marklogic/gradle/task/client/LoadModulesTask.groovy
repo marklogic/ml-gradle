@@ -11,6 +11,6 @@ class LoadModulesTask extends MarkLogicTask {
 
     @TaskAction
     void loadModules() {
-        newAppDeployer().loadModules(getAppConfig(), assetRolesAndCapabilities)
+        getAppDeployer().loadModules(getAppConfig(), assetRolesAndCapabilities)
     }
 }

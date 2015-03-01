@@ -9,6 +9,6 @@ class InstallPackagesTask extends MarkLogicTask {
 
     @TaskAction
     void installPackages() {
-        newAppDeployer().installPackages(getAppConfig())
+        getAppDeployer().installPackages(getAppConfig())
     }
 }

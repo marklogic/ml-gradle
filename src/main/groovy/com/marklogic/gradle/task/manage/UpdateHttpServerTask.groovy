@@ -8,6 +8,6 @@ class UpdateHttpServerTask extends MarkLogicTask {
 
     @TaskAction
     void updateHttpServers() {
-        newAppDeployer().updateHttpServers(getAppConfig())
+        getAppDeployer().updateHttpServers(getAppConfig())
     }
 }

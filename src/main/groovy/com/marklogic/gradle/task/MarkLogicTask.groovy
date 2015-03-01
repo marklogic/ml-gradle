@@ -17,6 +17,16 @@ class MarkLogicTask extends DefaultTask {
         getProject().property("mlAppConfig")
     }
     
+    AppDeployer getAppDeployer() {
+        String propName = "mlAppDeployer"
+        if (getProject().hasProperty(propName)) {
+            return getProject().property(propName)
+        }
+        AppDeployer d = newAppDeployer()
+        getProject().getExtensions().add(propName, d)
+        return d
+    }
+    
     AppDeployer newAppDeployer() {
         ManageConfig config = getProject().property("mlManageConfig")
         Ml7ManageClient client = new Ml7ManageClient(config.getHost(), config.getPort(), config.getUsername(), config.getPassword())

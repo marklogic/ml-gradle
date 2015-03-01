@@ -1,9 +1,9 @@
 package com.marklogic.appdeployer;
 
 /**
- * I think these interface methods should assume config has already been set on the implementation. The impl can always
- * expose something like a RestTemplate so the client can make any REST API calls that they'd like, in case these
- * methods don't accomplish what the client wants.
+ * The intent of these methods is to provide high-level operations that abstract away one or more REST API calls for
+ * installing and configuring an application. Each method should take an AppConfig instance, which provides general
+ * application configuration data, and any parameters that are specific to the operation.
  */
 public interface AppDeployer {
 
@@ -22,7 +22,7 @@ public interface AppDeployer {
     public void clearContentDatabase(AppConfig config, String collection);
 
     public void clearModulesDatabase(AppConfig config, String... excludeUris);
-    
+
     public void loadModules(AppConfig config, String assetRolesAndCapabilities);
 
 }

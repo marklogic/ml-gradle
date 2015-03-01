@@ -13,6 +13,7 @@ import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.AppDeployer;
 import com.marklogic.appdeployer.ManageClient;
 import com.marklogic.appdeployer.pkg.DatabasePackageMerger;
+import com.marklogic.appdeployer.pkg.HttpServerPackageMerger;
 import com.marklogic.clientutil.LoggingObject;
 import com.marklogic.xccutil.template.XccTemplate;
 
@@ -66,6 +67,30 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
             try {
                 FileCopyUtils.copy(xml, new FileWriter(outputFile));
                 appConfig.setContentDatabaseFilePath(appConfig.getMergedDatabasePackageFilePath());
+            } catch (IOException ie) {
+                throw new RuntimeException(ie);
+            }
+        }
+    }
+
+    @Override
+    public void mergeHttpServerPackages() {
+        List<String> paths = appConfig.getHttpServerPackageFilePaths();
+        if (paths != null && !paths.isEmpty()) {
+            File outputFile = new File(appConfig.getMergedHttpServerPackageFilePath());
+            if (outputFile.exists()) {
+                logger.info("Deleting existing merged http server package file: " + outputFile.getAbsolutePath());
+                outputFile.delete();
+            }
+
+            String xml = new HttpServerPackageMerger().mergeHttpServerPackages(paths);
+            File dir = outputFile.getParentFile();
+            if (dir != null) {
+                dir.mkdirs();
+            }
+            try {
+                FileCopyUtils.copy(xml, new FileWriter(outputFile));
+                appConfig.setHttpServerFilePath(appConfig.getMergedHttpServerPackageFilePath());
             } catch (IOException ie) {
                 throw new RuntimeException(ie);
             }

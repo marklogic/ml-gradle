@@ -29,6 +29,9 @@ public class AppConfig {
     private List<String> databasePackageFilePaths;
     private String mergedDatabasePackageFilePath = "build/ml-app-deployer/merged-database-package.xml";
 
+    private List<String> httpServerPackageFilePaths;
+    private String mergedHttpServerPackageFilePath = "build/ml-app-deployer/merged-http-server-package.xml";
+    
     public AppConfig() {
         this("src/main/xqy");
     }
@@ -255,6 +258,22 @@ public class AppConfig {
 
     public void setMergedDatabasePackageFilePath(String mergedDatabasePackageFilePath) {
         this.mergedDatabasePackageFilePath = mergedDatabasePackageFilePath;
+    }
+
+    public List<String> getHttpServerPackageFilePaths() {
+        return httpServerPackageFilePaths;
+    }
+
+    public void setHttpServerPackageFilePaths(List<String> httpServerPackageFilePaths) {
+        this.httpServerPackageFilePaths = httpServerPackageFilePaths;
+    }
+
+    public String getMergedHttpServerPackageFilePath() {
+        return mergedHttpServerPackageFilePath;
+    }
+
+    public void setMergedHttpServerPackageFilePath(String mergedHttpServerPackageFilePath) {
+        this.mergedHttpServerPackageFilePath = mergedHttpServerPackageFilePath;
     }
 
 }

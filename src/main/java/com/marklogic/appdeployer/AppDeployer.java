@@ -8,9 +8,11 @@ package com.marklogic.appdeployer;
 public interface AppDeployer {
 
     public void installPackages();
-    
+
     public void uninstallApp();
-    
+
     public void mergeDatabasePackages();
-    
+
+    public void mergeHttpServerPackages();
+
 }

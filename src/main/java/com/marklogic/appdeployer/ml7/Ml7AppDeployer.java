@@ -97,6 +97,12 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
         }
     }
 
+    @Override
+    public void updateContentDatabase() {
+        installContentDatabases();
+        manageClient.installPackage(appConfig.getPackageName());
+    }
+
     protected void installDatabases() {
         boolean installPackage = false;
         if (new File(appConfig.getTriggersDatabaseFilePath()).exists()) {
@@ -112,16 +118,23 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
         }
 
         if (new File(appConfig.getContentDatabaseFilePath()).exists()) {
-            manageClient.addDatabase(appConfig.getPackageName(), appConfig.getContentDatabaseName(),
-                    appConfig.getContentDatabaseFilePath());
+            installContentDatabases();
             installPackage = true;
-            if (appConfig.isTestPortSet()) {
-                manageClient.addDatabase(appConfig.getPackageName(), appConfig.getTestContentDatabaseName(),
-                        appConfig.getContentDatabaseFilePath());
-            }
         }
+
         if (installPackage) {
             manageClient.installPackage(appConfig.getPackageName());
+        }
+    }
+
+    protected void installContentDatabases() {
+        mergeDatabasePackages();
+
+        manageClient.addDatabase(appConfig.getPackageName(), appConfig.getContentDatabaseName(),
+                appConfig.getContentDatabaseFilePath());
+        if (appConfig.isTestPortSet()) {
+            manageClient.addDatabase(appConfig.getPackageName(), appConfig.getTestContentDatabaseName(),
+                    appConfig.getContentDatabaseFilePath());
         }
     }
 

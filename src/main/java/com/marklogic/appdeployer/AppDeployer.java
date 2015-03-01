@@ -14,5 +14,7 @@ public interface AppDeployer {
     public void mergeDatabasePackages();
 
     public void mergeHttpServerPackages();
+    
+    public void updateContentDatabase();
 
 }

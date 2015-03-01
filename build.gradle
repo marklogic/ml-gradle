@@ -13,7 +13,7 @@ repositories {
 dependencies {
   compile gradleApi()
   compile localGroovy()
-  compile 'com.marklogic:ml-app-deployer:0.1'
+  compile 'com.marklogic:ml-app-deployer:0.2'
 }
 
 publishing {

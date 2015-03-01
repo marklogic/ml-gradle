@@ -7,14 +7,14 @@ package com.marklogic.appdeployer;
  */
 public interface AppDeployer {
 
-    public void installPackages();
+    public void installPackages(AppConfig config);
 
-    public void uninstallApp();
+    public void uninstallApp(AppConfig config);
 
-    public void mergeDatabasePackages();
+    public void mergeDatabasePackages(AppConfig config);
 
-    public void mergeHttpServerPackages();
-    
-    public void updateContentDatabase();
+    public void mergeHttpServerPackages(AppConfig config);
+
+    public void updateContentDatabase(AppConfig config);
 
 }

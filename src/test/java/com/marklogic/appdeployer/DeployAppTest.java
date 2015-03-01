@@ -15,10 +15,11 @@ public class DeployAppTest extends Assert {
         appConfig.setRestPort(8123);
         appConfig.setXdbcPort(8124);
 
-        Ml7AppDeployer sut = new Ml7AppDeployer(appConfig, new Ml7ManageClient("localhost", 8002, "admin", "admin"));
+        Ml7AppDeployer sut = new Ml7AppDeployer(new Ml7ManageClient("localhost", 8002, "admin", "admin"));
 
-        sut.installPackages();
-        sut.uninstallApp();
+        sut.installPackages(appConfig);
+
+        sut.uninstallApp(appConfig);
     }
 
 }

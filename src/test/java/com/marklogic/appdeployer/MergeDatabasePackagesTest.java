@@ -25,9 +25,9 @@ public class MergeDatabasePackagesTest extends XmlHelper {
 
         AppConfig config = new AppConfig();
         config.setDatabasePackageFilePaths(mergeFilePaths);
-        Ml7AppDeployer sut = new Ml7AppDeployer(config, null);
+        Ml7AppDeployer sut = new Ml7AppDeployer(null);
 
-        sut.mergeDatabasePackages();
+        sut.mergeDatabasePackages(config);
 
         String xml = new String(FileCopyUtils.copyToByteArray(new File(config.getContentDatabaseFilePath())));
         Fragment db = parse(xml);

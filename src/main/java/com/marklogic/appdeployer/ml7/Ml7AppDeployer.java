@@ -19,29 +19,27 @@ import com.marklogic.xccutil.template.XccTemplate;
 
 public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
 
-    private AppConfig appConfig;
     private ManageClient manageClient;
 
-    public Ml7AppDeployer(AppConfig appConfig, ManageClient manageClient) {
-        this.appConfig = appConfig;
+    public Ml7AppDeployer(ManageClient manageClient) {
         this.manageClient = manageClient;
     }
 
     @Override
-    public void installPackages() {
-        String packageName = appConfig.getPackageName();
+    public void installPackages(AppConfig config) {
+        String packageName = config.getPackageName();
         manageClient.deletePackage(packageName);
         manageClient.createPackage(packageName);
 
-        installDatabases();
-        createRestApiServers();
-        installXdbcServers();
+        installDatabases(config);
+        createRestApiServers(config);
+        installXdbcServers(config);
 
-        logger.info("Finished installing packages for application: " + appConfig.getName());
+        logger.info("Finished installing packages for application: " + config.getName());
     }
 
     @Override
-    public void uninstallApp() {
+    public void uninstallApp(AppConfig appConfig) {
         String xquery = loadStringFromClassPath("ml-app-deployer/uninstall-app.xqy");
         xquery = xquery.replace("%%APP_NAME%%", appConfig.getName());
         XccTemplate t = new XccTemplate(appConfig.getXccUrl());
@@ -50,7 +48,7 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
     }
 
     @Override
-    public void mergeDatabasePackages() {
+    public void mergeDatabasePackages(AppConfig appConfig) {
         List<String> paths = appConfig.getDatabasePackageFilePaths();
         if (paths != null && !paths.isEmpty()) {
             File outputFile = new File(appConfig.getMergedDatabasePackageFilePath());
@@ -74,7 +72,7 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
     }
 
     @Override
-    public void mergeHttpServerPackages() {
+    public void mergeHttpServerPackages(AppConfig appConfig) {
         List<String> paths = appConfig.getHttpServerPackageFilePaths();
         if (paths != null && !paths.isEmpty()) {
             File outputFile = new File(appConfig.getMergedHttpServerPackageFilePath());
@@ -98,12 +96,12 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
     }
 
     @Override
-    public void updateContentDatabase() {
-        installContentDatabases();
+    public void updateContentDatabase(AppConfig appConfig) {
+        installContentDatabases(appConfig);
         manageClient.installPackage(appConfig.getPackageName());
     }
 
-    protected void installDatabases() {
+    protected void installDatabases(AppConfig appConfig) {
         boolean installPackage = false;
         if (new File(appConfig.getTriggersDatabaseFilePath()).exists()) {
             manageClient.addDatabase(appConfig.getPackageName(), appConfig.getTriggersDatabaseName(),
@@ -118,7 +116,7 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
         }
 
         if (new File(appConfig.getContentDatabaseFilePath()).exists()) {
-            installContentDatabases();
+            installContentDatabases(appConfig);
             installPackage = true;
         }
 
@@ -127,8 +125,8 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
         }
     }
 
-    protected void installContentDatabases() {
-        mergeDatabasePackages();
+    protected void installContentDatabases(AppConfig appConfig) {
+        mergeDatabasePackages(appConfig);
 
         manageClient.addDatabase(appConfig.getPackageName(), appConfig.getContentDatabaseName(),
                 appConfig.getContentDatabaseFilePath());
@@ -138,7 +136,7 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
         }
     }
 
-    protected void createRestApiServers() {
+    protected void createRestApiServers(AppConfig appConfig) {
         manageClient.createRestApiServer(appConfig.getRestServerName(), appConfig.getContentDatabaseName(),
                 appConfig.getRestPort(), appConfig.getModulesDatabaseName());
 
@@ -148,22 +146,23 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
         }
     }
 
-    protected void installXdbcServers() {
+    protected void installXdbcServers(AppConfig appConfig) {
         boolean installPackage = false;
 
         if (appConfig.getXdbcPort() != null && appConfig.getXdbcPort() > 0) {
-            addXdbcServer(appConfig.getXdbcServerName(), appConfig.getXdbcPort(), appConfig.getContentDatabaseName());
+            addXdbcServer(appConfig, appConfig.getXdbcServerName(), appConfig.getXdbcPort(),
+                    appConfig.getContentDatabaseName());
             installPackage = true;
         }
 
         if (appConfig.isTestPortSet()) {
-            addXdbcServer(appConfig.getTestXdbcServerName(), appConfig.getTestXdbcPort(),
+            addXdbcServer(appConfig, appConfig.getTestXdbcServerName(), appConfig.getTestXdbcPort(),
                     appConfig.getTestContentDatabaseName());
             installPackage = true;
         }
 
         if (appConfig.getModulesXdbcPort() != null && appConfig.getModulesXdbcPort() > 0) {
-            addXdbcServer(appConfig.getModulesXdbcServerName(), appConfig.getModulesXdbcPort(),
+            addXdbcServer(appConfig, appConfig.getModulesXdbcServerName(), appConfig.getModulesXdbcPort(),
                     appConfig.getModulesDatabaseName());
             installPackage = true;
         }
@@ -173,7 +172,7 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
         }
     }
 
-    protected void addXdbcServer(String serverName, Integer serverPort, String databaseName) {
+    protected void addXdbcServer(AppConfig appConfig, String serverName, Integer serverPort, String databaseName) {
         String xml = null;
         String file = appConfig.getXdbcServerFilePath();
         try {
@@ -185,18 +184,18 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
         } catch (IOException ie) {
             throw new RuntimeException(ie);
         }
-        addServer(xml, serverName, serverPort, databaseName);
+        addServer(appConfig, xml, serverName, serverPort, databaseName);
     }
 
-    protected void addServer(String xml, String serverName, Integer serverPort, String databaseName) {
-        xml = replaceTokensInServerPackageXml(xml, serverName, serverPort, databaseName);
+    protected void addServer(AppConfig appConfig, String xml, String serverName, Integer serverPort, String databaseName) {
+        xml = replaceTokensInServerPackageXml(appConfig, xml, serverName, serverPort, databaseName);
         logger.info(String.format("Adding server %s in group %s to package %s", serverName, appConfig.getGroupName(),
                 appConfig.getPackageName()));
         manageClient.addServer(appConfig.getPackageName(), serverName, appConfig.getGroupName(), xml);
     }
 
-    protected String replaceTokensInServerPackageXml(String xml, String serverName, Integer serverPort,
-            String databaseName) {
+    protected String replaceTokensInServerPackageXml(AppConfig appConfig, String xml, String serverName,
+            Integer serverPort, String databaseName) {
         xml = xml.replace("%%GROUP_NAME%%", appConfig.getGroupName());
         xml = xml.replace("%%SERVER_NAME%%", serverName);
         xml = xml.replace("%%PORT%%", serverPort.toString());
@@ -212,13 +211,5 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
             throw new RuntimeException("Unable to load string from classpath resource at: " + path + "; cause: "
                     + ie.getMessage(), ie);
         }
-    }
-
-    protected String getPackageName() {
-        return appConfig.getName() + "-package";
-    }
-
-    public AppConfig getAppConfig() {
-        return appConfig;
     }
 }

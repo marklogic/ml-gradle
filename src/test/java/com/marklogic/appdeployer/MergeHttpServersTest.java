@@ -24,8 +24,8 @@ public class MergeHttpServersTest extends XmlHelper {
 
         AppConfig config = new AppConfig();
         config.setHttpServerPackageFilePaths(mergeFilePaths);
-        Ml7AppDeployer sut = new Ml7AppDeployer(config, null);
-        sut.mergeHttpServerPackages();
+        Ml7AppDeployer sut = new Ml7AppDeployer(null);
+        sut.mergeHttpServerPackages(config);
 
         String xml = new String(FileCopyUtils.copyToByteArray(new File(config.getHttpServerFilePath())));
         Fragment pkg = parse(xml);

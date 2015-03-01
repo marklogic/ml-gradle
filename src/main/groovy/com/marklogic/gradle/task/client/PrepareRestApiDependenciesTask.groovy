@@ -4,11 +4,13 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.internal.project.DefaultAntBuilder
 import org.gradle.api.tasks.TaskAction
 
+import com.marklogic.gradle.task.MarkLogicTask
+
 /**
  * Purpose of this task is to unzip each restApi dependency to the build directory and then register the path of each
  * unzipped directory in AppConfig.modulePaths. 
  */
-class PrepareRestApiDependenciesTask extends ClientTask {
+class PrepareRestApiDependenciesTask extends MarkLogicTask {
 
     @TaskAction
     void prepareRestApiDependencies() {

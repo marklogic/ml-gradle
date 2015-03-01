@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer;
+package com.marklogic.appdeployer.ml7;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.Test;
 import org.springframework.util.FileCopyUtils;
 
+import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.ml7.Ml7AppDeployer;
 import com.marklogic.junit.Fragment;
 

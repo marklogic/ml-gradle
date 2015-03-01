@@ -1,8 +1,9 @@
-package com.marklogic.appdeployer;
+package com.marklogic.appdeployer.ml7;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.ml7.Ml7AppDeployer;
 import com.marklogic.appdeployer.ml7.Ml7ManageClient;
 

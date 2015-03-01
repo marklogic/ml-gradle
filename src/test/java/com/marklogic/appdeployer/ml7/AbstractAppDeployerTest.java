@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer;
+package com.marklogic.appdeployer.ml7;
 
 import java.util.List;
 

@@ -96,9 +96,25 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
     }
 
     @Override
-    public void updateContentDatabase(AppConfig appConfig) {
+    public void updateContentDatabases(AppConfig appConfig) {
         installContentDatabases(appConfig);
         manageClient.installPackage(appConfig.getPackageName());
+    }
+
+    @Override
+    public void updateHttpServers(AppConfig config) {
+        mergeHttpServerPackages(config);
+
+        String path = config.getHttpServerFilePath();
+        String xml = readFile(path);
+
+        addServer(config, xml, config.getRestServerName(), config.getRestPort(), config.getContentDatabaseName());
+        if (config.isTestPortSet()) {
+            addServer(config, xml, config.getTestRestServerName(), config.getTestRestPort(),
+                    config.getTestContentDatabaseName());
+        }
+
+        manageClient.installPackage(config.getPackageName());
     }
 
     protected void installDatabases(AppConfig appConfig) {
@@ -175,16 +191,20 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
     protected void addXdbcServer(AppConfig appConfig, String serverName, Integer serverPort, String databaseName) {
         String xml = null;
         String file = appConfig.getXdbcServerFilePath();
+        if (file != null && new File(file).exists()) {
+            xml = readFile(file);
+        } else {
+            xml = loadStringFromClassPath("ml-app-deployer/xdbc-server-template.xml");
+        }
+        addServer(appConfig, xml, serverName, serverPort, databaseName);
+    }
+
+    protected String readFile(String path) {
         try {
-            if (file != null && new File(file).exists()) {
-                xml = FileCopyUtils.copyToString(new FileReader(file));
-            } else {
-                xml = loadStringFromClassPath("ml-app-deployer/xdbc-server-template.xml");
-            }
+            return FileCopyUtils.copyToString(new FileReader(path));
         } catch (IOException ie) {
             throw new RuntimeException(ie);
         }
-        addServer(appConfig, xml, serverName, serverPort, databaseName);
     }
 
     protected void addServer(AppConfig appConfig, String xml, String serverName, Integer serverPort, String databaseName) {

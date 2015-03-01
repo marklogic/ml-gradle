@@ -15,6 +15,8 @@ public interface AppDeployer {
 
     public void mergeHttpServerPackages(AppConfig config);
 
-    public void updateContentDatabase(AppConfig config);
+    public void updateContentDatabases(AppConfig config);
+    
+    public void updateHttpServers(AppConfig config);
 
 }

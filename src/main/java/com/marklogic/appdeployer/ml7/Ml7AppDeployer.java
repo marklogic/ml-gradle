@@ -11,19 +11,12 @@ import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.AppDeployer;
 import com.marklogic.appdeployer.ManageClient;
 import com.marklogic.clientutil.LoggingObject;
+import com.marklogic.xccutil.template.XccTemplate;
 
 public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
 
     private AppConfig appConfig;
     private ManageClient manageClient;
-
-    public static void main(String[] args) {
-        AppConfig appConfig = new AppConfig();
-        appConfig.setName("appdeployer");
-        appConfig.setRestPort(8123);
-        Ml7AppDeployer sut = new Ml7AppDeployer(appConfig, new Ml7ManageClient("localhost", 8002, "admin", "admin"));
-        sut.installPackages();
-    }
 
     public Ml7AppDeployer(AppConfig appConfig, ManageClient manageClient) {
         this.appConfig = appConfig;
@@ -36,62 +29,98 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
         manageClient.deletePackage(packageName);
         manageClient.createPackage(packageName);
 
-        boolean installPackage = false;
-        boolean installTestResources = appConfig.isTestPortSet();
+        installDatabases();
+        createRestApiServers();
+        installXdbcServers();
 
+        logger.info("Finished installing packages for application: " + appConfig.getName());
+    }
+
+    @Override
+    public void uninstallApp() {
+        String xquery = loadStringFromClassPath("ml-app-deployer/uninstall-app.xqy");
+        xquery = xquery.replace("%%APP_NAME%%", appConfig.getName());
+        XccTemplate t = new XccTemplate(appConfig.getXccUrl());
+        logger.info("Uninstalling app with name: " + appConfig.getName());
+        t.executeAdhocQuery(xquery);
+    }
+
+    protected void installDatabases() {
+        boolean installPackage = false;
         if (new File(appConfig.getTriggersDatabaseFilePath()).exists()) {
-            manageClient.addDatabase(packageName, appConfig.getTriggersDatabaseName(),
+            manageClient.addDatabase(appConfig.getPackageName(), appConfig.getTriggersDatabaseName(),
                     appConfig.getTriggersDatabaseFilePath());
             installPackage = true;
         }
 
         if (new File(appConfig.getSchemasDatabaseFilePath()).exists()) {
-            manageClient.addDatabase(packageName, appConfig.getSchemasDatabaseName(),
+            manageClient.addDatabase(appConfig.getPackageName(), appConfig.getSchemasDatabaseName(),
                     appConfig.getSchemasDatabaseFilePath());
             installPackage = true;
         }
 
         if (new File(appConfig.getContentDatabaseFilePath()).exists()) {
-            manageClient.addDatabase(packageName, appConfig.getContentDatabaseName(),
+            manageClient.addDatabase(appConfig.getPackageName(), appConfig.getContentDatabaseName(),
                     appConfig.getContentDatabaseFilePath());
-            if (installTestResources) {
-                manageClient.addDatabase(packageName, appConfig.getTestContentDatabaseName(),
+            installPackage = true;
+            if (appConfig.isTestPortSet()) {
+                manageClient.addDatabase(appConfig.getPackageName(), appConfig.getTestContentDatabaseName(),
                         appConfig.getContentDatabaseFilePath());
             }
         }
-
         if (installPackage) {
-            manageClient.installPackage(packageName);
-        }
-
-        manageClient.createRestApiServer(appConfig.getRestServerName(), appConfig.getContentDatabaseName(),
-                appConfig.getRestPort(), null);
-
-        if (installTestResources) {
-            manageClient.createRestApiServer(appConfig.getRestServerName(), appConfig.getTestContentDatabaseName(),
-                    appConfig.getTestRestPort(), appConfig.getModulesDatabaseName());
-        }
-
-        if (appConfig.getModulesXdbcPort() != null && appConfig.getModulesXdbcPort() > 0) {
-
+            manageClient.installPackage(appConfig.getPackageName());
         }
     }
 
-    public void addXdbcServer() {
+    protected void createRestApiServers() {
+        manageClient.createRestApiServer(appConfig.getRestServerName(), appConfig.getContentDatabaseName(),
+                appConfig.getRestPort(), appConfig.getModulesDatabaseName());
+
+        if (appConfig.isTestPortSet()) {
+            manageClient.createRestApiServer(appConfig.getRestServerName(), appConfig.getTestContentDatabaseName(),
+                    appConfig.getTestRestPort(), appConfig.getModulesDatabaseName());
+        }
+    }
+
+    protected void installXdbcServers() {
+        boolean installPackage = false;
+
+        if (appConfig.getXdbcPort() != null && appConfig.getXdbcPort() > 0) {
+            addXdbcServer(appConfig.getXdbcServerName(), appConfig.getXdbcPort(), appConfig.getContentDatabaseName());
+            installPackage = true;
+        }
+
+        if (appConfig.isTestPortSet()) {
+            addXdbcServer(appConfig.getTestXdbcServerName(), appConfig.getTestXdbcPort(),
+                    appConfig.getTestContentDatabaseName());
+            installPackage = true;
+        }
+
+        if (appConfig.getModulesXdbcPort() != null && appConfig.getModulesXdbcPort() > 0) {
+            addXdbcServer(appConfig.getModulesXdbcServerName(), appConfig.getModulesXdbcPort(),
+                    appConfig.getModulesDatabaseName());
+            installPackage = true;
+        }
+
+        if (installPackage) {
+            manageClient.installPackage(appConfig.getPackageName());
+        }
+    }
+
+    protected void addXdbcServer(String serverName, Integer serverPort, String databaseName) {
         String xml = null;
         String file = appConfig.getXdbcServerFilePath();
         try {
             if (file != null && new File(file).exists()) {
                 xml = FileCopyUtils.copyToString(new FileReader(file));
             } else {
-                xml = FileCopyUtils.copyToString(new FileReader(new ClassPathResource(
-                        "ml-appdeployer/xdbc-server-template.xml").getFile()));
+                xml = loadStringFromClassPath("ml-app-deployer/xdbc-server-template.xml");
             }
         } catch (IOException ie) {
             throw new RuntimeException(ie);
         }
-
-        addServer(xml, appConfig.getXdbcServerName(), appConfig.getXdbcPort(), appConfig.getContentDatabaseName());
+        addServer(xml, serverName, serverPort, databaseName);
     }
 
     protected void addServer(String xml, String serverName, Integer serverPort, String databaseName) {
@@ -109,6 +138,15 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
         xml = xml.replace("%%DATABASE_NAME%%", databaseName);
         xml = xml.replace("%%MODULES_DATABASE_NAME%%", appConfig.getName() + "-modules");
         return xml;
+    }
+
+    protected String loadStringFromClassPath(String path) {
+        try {
+            return new String(FileCopyUtils.copyToByteArray(new ClassPathResource(path).getInputStream()));
+        } catch (IOException ie) {
+            throw new RuntimeException("Unable to load string from classpath resource at: " + path + "; cause: "
+                    + ie.getMessage(), ie);
+        }
     }
 
     protected String getPackageName() {

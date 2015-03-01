@@ -37,8 +37,11 @@ public class Ml7ManageClient extends LoggingObject implements ManageClient {
 
     @Override
     public void deletePackage(String name) {
-        logger.info("Deleting package if it exists: " + name);
-        restTemplate.delete(buildUri("/manage/v2/packages/" + name));
+        String xml = restTemplate.getForEntity(buildUri("/manage/v2/packages"), String.class).getBody();
+        if (xml.contains(name)) {
+            logger.info("Deleting package: " + name);
+            restTemplate.delete(buildUri("/manage/v2/packages/" + name));
+        }
     }
 
     @Override

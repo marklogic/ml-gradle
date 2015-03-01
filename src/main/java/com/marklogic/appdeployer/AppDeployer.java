@@ -8,4 +8,6 @@ package com.marklogic.appdeployer;
 public interface AppDeployer {
 
     public void installPackages();
+    
+    public void uninstallApp();
 }

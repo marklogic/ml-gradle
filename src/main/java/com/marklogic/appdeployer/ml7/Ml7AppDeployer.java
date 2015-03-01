@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.FileCopyUtils;
 
 import com.marklogic.appdeployer.AppConfig;
@@ -48,10 +49,14 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
 
     @Override
     public void uninstallApp(AppConfig appConfig) {
-        String xquery = loadStringFromClassPath("ml-app-deployer/uninstall-app.xqy");
+        String xquery = loadStringFromClassPath("uninstall-app.xqy");
         xquery = xquery.replace("%%APP_NAME%%", appConfig.getName());
         logger.info("Uninstalling app with name: " + appConfig.getName());
-        executeXquery(appConfig, xquery);
+        try {
+            executeXquery(appConfig, xquery);
+        } catch (Exception e) {
+            logger.warn("Could not uninstall app; it may not be installed yet? Cause: " + e.getMessage());
+        }
     }
 
     @Override
@@ -148,7 +153,11 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
         }
         xquery += "return xdmp:document-delete($uri)\"";
         xquery += ", (), <options xmlns='xdmp:eval'><database>{xdmp:modules-database()}</database></options>)";
-        executeXquery(config, xquery);
+        try {
+            executeXquery(config, xquery);
+        } catch (Exception e) {
+            logger.warn("Unable to clear the modules database; it may not exist yet? Cause: " + e.getMessage());
+        }
     }
 
     @Override
@@ -256,7 +265,7 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
         if (file != null && new File(file).exists()) {
             xml = readFile(file);
         } else {
-            xml = loadStringFromClassPath("ml-app-deployer/xdbc-server-template.xml");
+            xml = loadStringFromClassPath("xdbc-server-template.xml");
         }
         addServer(appConfig, xml, serverName, serverPort, databaseName);
     }
@@ -287,6 +296,7 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
     }
 
     protected String loadStringFromClassPath(String path) {
+        path = ClassUtils.addResourcePathToPackagePath(getClass(), path);
         try {
             return new String(FileCopyUtils.copyToByteArray(new ClassPathResource(path).getInputStream()));
         } catch (IOException ie) {

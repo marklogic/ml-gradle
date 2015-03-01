@@ -43,10 +43,10 @@ class MarkLogicPlugin implements Plugin<Project> {
 
         project.task("mlPrepareRestApiDependencies", type: PrepareRestApiDependenciesTask, group: group, dependsOn: project.configurations["mlRestApi"], description: "Downloads (if necessary) and unzips in the build directory all mlRestApi dependencies")
 
-        project.task("mlMergeDatabasePackages", type: MergeDatabasePackagesTask, group: group, dependsOn:"mlPrepareRestApiDependencies", description: "Merges together the database packages that are defined by a property on this task; the result is written to the build directory")
-        project.task("mlMergeHttpServerPackages", type: MergeHttpServerPackagesTask, group: group, description:"Merges together the HTTP server packages that are defined by a property on this task; the result is written to the build directory")
+        project.task("mlMergeDatabasePackages", type: MergeDatabasePackagesTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Merges together the database packages that are defined by a property on this task; the result is written to the build directory")
+        project.task("mlMergeHttpServerPackages", type: MergeHttpServerPackagesTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description:"Merges together the HTTP server packages that are defined by a property on this task; the result is written to the build directory")
 
-        project.task("mlInstallPackages", type: InstallPackagesTask, group: group, description: "Installs the application's packages (servers and databases); does not load any modules").mustRunAfter("mlClearModules")
+        project.task("mlInstallPackages", type: InstallPackagesTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Installs the application's packages (servers and databases); does not load any modules").mustRunAfter("mlClearModules")
 
         project.task("mlPostInstallPackages", group: group, description: "Add dependsOn to this task to add tasks after mlInstallPackages finishes within mlDeploy").mustRunAfter("mlInstallPackages")
 
@@ -70,8 +70,8 @@ class MarkLogicPlugin implements Plugin<Project> {
             "mlLoadModules"
         ], description: "Reloads modules by first clearing the modules database and then loading modules")
 
-        project.task("mlUpdateContentDatabase", type: UpdateDatabaseTask, group: group, description: "Updates the content database by building a new database package and then installing it")
-        project.task("mlUpdateHttpServers", type: UpdateHttpServerTask, group: group, description: "Updates the HTTP servers by building a new HTTP server package and then installing it")
+        project.task("mlUpdateContentDatabase", type: UpdateDatabaseTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the content database by building a new database package and then installing it")
+        project.task("mlUpdateHttpServers", type: UpdateHttpServerTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the HTTP servers by building a new HTTP server package and then installing it")
 
         project.task("mlCreateResource", type: CreateResourceTask, group: group, description: "Create a new resource extension in the src/main/xqy/services directory")
         project.task("mlCreateTransform", type: CreateTransformTask, group: group, description: "Create a new transform in the src/main/xqy/transforms directory")

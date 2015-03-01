@@ -22,5 +22,7 @@ public interface AppDeployer {
     public void clearContentDatabase(AppConfig config, String collection);
 
     public void clearModulesDatabase(AppConfig config, String... excludeUris);
+    
+    public void loadModules(AppConfig config, String assetRolesAndCapabilities);
 
 }

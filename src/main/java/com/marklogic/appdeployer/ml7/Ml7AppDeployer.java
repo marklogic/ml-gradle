@@ -14,15 +14,23 @@ import com.marklogic.appdeployer.AppDeployer;
 import com.marklogic.appdeployer.ManageClient;
 import com.marklogic.appdeployer.pkg.DatabasePackageMerger;
 import com.marklogic.appdeployer.pkg.HttpServerPackageMerger;
+import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.DatabaseClientFactory;
+import com.marklogic.client.DatabaseClientFactory.Authentication;
 import com.marklogic.clientutil.LoggingObject;
+import com.marklogic.clientutil.modulesloader.ModulesLoader;
+import com.marklogic.clientutil.modulesloader.impl.DefaultExtensionLibraryDescriptorBuilder;
+import com.marklogic.clientutil.modulesloader.impl.DefaultModulesLoader;
 import com.marklogic.xccutil.template.XccTemplate;
 
 public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
 
     private ManageClient manageClient;
+    private ModulesLoader modulesLoader;
 
     public Ml7AppDeployer(ManageClient manageClient) {
         this.manageClient = manageClient;
+        modulesLoader = new DefaultModulesLoader();
     }
 
     @Override
@@ -141,6 +149,34 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
         xquery += "return xdmp:document-delete($uri)\"";
         xquery += ", (), <options xmlns='xdmp:eval'><database>{xdmp:modules-database()}</database></options>)";
         executeXquery(config, xquery);
+    }
+
+    @Override
+    public void loadModules(AppConfig config, String assetRolesAndCapabilities) {
+        DatabaseClient dbClient = newDatabaseClient(config);
+        if (assetRolesAndCapabilities != null && modulesLoader instanceof DefaultModulesLoader) {
+            logger.info("Will load assets with roles and capabilities: " + assetRolesAndCapabilities);
+            ((DefaultModulesLoader) modulesLoader)
+                    .setExtensionLibraryDescriptorBuilder(new DefaultExtensionLibraryDescriptorBuilder(
+                            assetRolesAndCapabilities));
+        }
+
+        List<String> paths = config.getModulePaths();
+        logger.info("Module paths: " + paths);
+
+        try {
+            for (String path : paths) {
+                logger.info("Loading modules from: " + path);
+                modulesLoader.loadModules(new File(path), dbClient);
+            }
+        } finally {
+            dbClient.release();
+        }
+    }
+
+    protected DatabaseClient newDatabaseClient(AppConfig config) {
+        return DatabaseClientFactory.newClient(config.getHost(), config.getRestPort(), config.getUsername(),
+                config.getPassword(), Authentication.DIGEST);
     }
 
     protected void installDatabases(AppConfig appConfig) {

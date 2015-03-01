@@ -16,9 +16,11 @@ public interface AppDeployer {
     public void mergeHttpServerPackages(AppConfig config);
 
     public void updateContentDatabases(AppConfig config);
-    
+
     public void updateHttpServers(AppConfig config);
-    
+
     public void clearContentDatabase(AppConfig config, String collection);
+
+    public void clearModulesDatabase(AppConfig config, String... excludeUris);
 
 }

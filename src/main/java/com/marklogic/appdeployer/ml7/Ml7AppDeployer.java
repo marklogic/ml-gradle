@@ -124,6 +124,25 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
         executeXquery(config, xquery);
     }
 
+    @Override
+    public void clearModulesDatabase(AppConfig config, String... excludeUris) {
+        String xquery = "xdmp:eval(\"for $uri in cts:uris((), (), cts:and-query(())) ";
+        if (excludeUris != null && excludeUris.length > 0) {
+            String expr = " where fn:not($uri = (";
+            for (int i = 0; i < excludeUris.length; i++) {
+                if (i > 1) {
+                    expr += ", ";
+                }
+                expr += "'" + excludeUris[i] + "'";
+            }
+            expr += "))";
+            xquery += expr;
+        }
+        xquery += "return xdmp:document-delete($uri)\"";
+        xquery += ", (), <options xmlns='xdmp:eval'><database>{xdmp:modules-database()}</database></options>)";
+        executeXquery(config, xquery);
+    }
+
     protected void installDatabases(AppConfig appConfig) {
         boolean installPackage = false;
         if (new File(appConfig.getTriggersDatabaseFilePath()).exists()) {
@@ -244,5 +263,4 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
         XccTemplate t = new XccTemplate(config.getXccUrl());
         t.executeAdhocQuery(xquery);
     }
-
 }

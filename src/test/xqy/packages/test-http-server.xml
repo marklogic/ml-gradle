@@ -6,7 +6,7 @@
       <url-rewriter>/MarkLogic/rest-api/rewriter.xqy</url-rewriter>
     </package-http-properties>
     <links>
-      <modules-database>test-modules</modules-database>
+      <modules-database>%%MODULES_DATABASE_NAME%%</modules-database>
       <default-user>testuser</default-user>
     </links>
   </config>

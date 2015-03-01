@@ -5,26 +5,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jdom2.Namespace;
 import org.junit.Test;
 import org.springframework.util.FileCopyUtils;
 
 import com.marklogic.appdeployer.ml7.Ml7AppDeployer;
 import com.marklogic.junit.Fragment;
-import com.marklogic.junit.MarkLogicNamespaceProvider;
-import com.marklogic.junit.NamespaceProvider;
-import com.marklogic.junit.XmlHelper;
 
-public class MergeDatabasePackagesTest extends XmlHelper {
+public class MergeDatabasePackagesTest extends AbstractAppDeployerTest {
 
     @Test
     public void mergePackages() throws IOException {
-        List<String> mergeFilePaths = new ArrayList<>();
-        mergeFilePaths.add("src/test/resources/test-content-database.xml");
-        mergeFilePaths.add("src/test/resources/test-content-database2.xml");
+        List<String> packagePaths = new ArrayList<>();
+        packagePaths.add("src/test/xqy/packages/test-content-database.xml");
+        packagePaths.add("src/test/xqy/packages/test-content-database2.xml");
 
         AppConfig config = new AppConfig();
-        config.setDatabasePackageFilePaths(mergeFilePaths);
+        config.setDatabasePackageFilePaths(packagePaths);
         Ml7AppDeployer sut = new Ml7AppDeployer(null);
 
         sut.mergeDatabasePackages(config);
@@ -47,9 +43,9 @@ public class MergeDatabasePackagesTest extends XmlHelper {
 
         assertGeospatialIndexesExist(db);
 
-        db.assertElementExists("/db:package-database/db:config/db:links/db:schema-database[. = 'my-schemas-database']");
-        db.assertElementExists("/db:package-database/db:config/db:links/db:security-database[. = 'my-security-database']");
-        db.assertElementExists("/db:package-database/db:config/db:links/db:triggers-database[. = 'my-triggers-database']");
+        db.assertElementExists("/db:package-database/db:config/db:links/db:schema-database[. = '%%SCHEMAS_DATABASE_NAME%%']");
+        db.assertElementExists("/db:package-database/db:config/db:links/db:security-database[. = 'Security']");
+        db.assertElementExists("/db:package-database/db:config/db:links/db:triggers-database[. = '%%TRIGGERS_DATABASE_NAME%%']");
 
         db.assertElementExists("/db:package-database/db:config/db:package-database-properties/db:word-lexicons/db:word-lexicon[. = 'http://marklogic.com/collation/codepoint']");
 
@@ -73,19 +69,6 @@ public class MergeDatabasePackagesTest extends XmlHelper {
         db.assertElementExists("//db:element-word-query-throughs/db:element-word-query-through[db:namespace-uri = 'urn:second:namespace' and db:localname = 'SecondElement']");
 
         // db.prettyPrint();
-    }
-
-    @Override
-    protected NamespaceProvider getNamespaceProvider() {
-        return new MarkLogicNamespaceProvider() {
-            @Override
-            protected List<Namespace> buildListOfNamespaces() {
-                List<Namespace> list = super.buildListOfNamespaces();
-                list.add(Namespace.getNamespace("db", "http://marklogic.com/manage/package/databases"));
-                return list;
-            }
-
-        };
     }
 
     /**

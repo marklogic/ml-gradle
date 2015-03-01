@@ -83,8 +83,8 @@
       </element-word-query-throughs>
     </package-database-properties>
     <links>
-      <schema-database>my-schemas-database</schema-database>
-      <triggers-database>my-triggers-database</triggers-database>
+      <schema-database>%%SCHEMAS_DATABASE_NAME%%</schema-database>
+      <triggers-database>%%TRIGGERS_DATABASE_NAME%%</triggers-database>
     </links>
   </config>
 </package-database>

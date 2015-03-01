@@ -107,7 +107,7 @@
       </fields>
     </package-database-properties>
     <links>
-      <security-database>my-security-database</security-database>
+      <security-database>Security</security-database>
     </links>
   </config>
 </package-database>

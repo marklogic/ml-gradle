@@ -118,7 +118,7 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
         mergeHttpServerPackages(config);
 
         String path = config.getHttpServerFilePath();
-        String xml = readFile(path);
+        String xml = loadStringFromFile(path);
 
         addServer(config, xml, config.getRestServerName(), config.getRestPort(), config.getContentDatabaseName());
         if (config.isTestPortSet()) {
@@ -197,14 +197,12 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
     protected void installDatabases(AppConfig appConfig) {
         boolean installPackage = false;
         if (new File(appConfig.getTriggersDatabaseFilePath()).exists()) {
-            manageClient.addDatabase(appConfig.getPackageName(), appConfig.getTriggersDatabaseName(),
-                    appConfig.getTriggersDatabaseFilePath());
+            addDatabase(appConfig, appConfig.getTriggersDatabaseFilePath(), appConfig.getTriggersDatabaseName());
             installPackage = true;
         }
 
         if (new File(appConfig.getSchemasDatabaseFilePath()).exists()) {
-            manageClient.addDatabase(appConfig.getPackageName(), appConfig.getSchemasDatabaseName(),
-                    appConfig.getSchemasDatabaseFilePath());
+            addDatabase(appConfig, appConfig.getSchemasDatabaseFilePath(), appConfig.getSchemasDatabaseName());
             installPackage = true;
         }
 
@@ -221,11 +219,10 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
     protected void installContentDatabases(AppConfig appConfig) {
         mergeDatabasePackages(appConfig);
 
-        manageClient.addDatabase(appConfig.getPackageName(), appConfig.getContentDatabaseName(),
-                appConfig.getContentDatabaseFilePath());
+        addDatabase(appConfig, appConfig.getContentDatabaseFilePath(), appConfig.getContentDatabaseName());
+
         if (appConfig.isTestPortSet()) {
-            manageClient.addDatabase(appConfig.getPackageName(), appConfig.getTestContentDatabaseName(),
-                    appConfig.getContentDatabaseFilePath());
+            addDatabase(appConfig, appConfig.getContentDatabaseFilePath(), appConfig.getTestContentDatabaseName());
         }
     }
 
@@ -269,36 +266,49 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
         String xml = null;
         String file = appConfig.getXdbcServerFilePath();
         if (file != null && new File(file).exists()) {
-            xml = readFile(file);
+            xml = loadStringFromFile(file);
         } else {
             xml = loadStringFromClassPath("xdbc-server-template.xml");
         }
         addServer(appConfig, xml, serverName, serverPort, databaseName);
     }
 
-    protected String readFile(String path) {
-        try {
-            return FileCopyUtils.copyToString(new FileReader(path));
-        } catch (IOException ie) {
-            throw new RuntimeException(ie);
-        }
-    }
-
     protected void addServer(AppConfig appConfig, String xml, String serverName, Integer serverPort, String databaseName) {
-        xml = replaceTokensInServerPackageXml(appConfig, xml, serverName, serverPort, databaseName);
+        xml = replaceTokensInServerPackage(appConfig, xml, serverName, serverPort, databaseName);
         logger.info(String.format("Adding server %s in group %s to package %s", serverName, appConfig.getGroupName(),
                 appConfig.getPackageName()));
         manageClient.addServer(appConfig.getPackageName(), serverName, appConfig.getGroupName(), xml);
     }
 
-    protected String replaceTokensInServerPackageXml(AppConfig appConfig, String xml, String serverName,
+    protected String replaceTokensInServerPackage(AppConfig appConfig, String xml, String serverName,
             Integer serverPort, String databaseName) {
         xml = xml.replace("%%GROUP_NAME%%", appConfig.getGroupName());
         xml = xml.replace("%%SERVER_NAME%%", serverName);
         xml = xml.replace("%%PORT%%", serverPort.toString());
         xml = xml.replace("%%DATABASE_NAME%%", databaseName);
-        xml = xml.replace("%%MODULES_DATABASE_NAME%%", appConfig.getName() + "-modules");
+        xml = xml.replace("%%MODULES_DATABASE_NAME%%", appConfig.getModulesDatabaseName());
         return xml;
+    }
+
+    protected void addDatabase(AppConfig appConfig, String packageFilePath, String databaseName) {
+        String xml = loadStringFromFile(packageFilePath);
+        xml = replaceTokensInDatabasePackage(appConfig, xml, databaseName);
+        manageClient.addDatabase(appConfig.getPackageName(), databaseName, xml);
+    }
+
+    protected String replaceTokensInDatabasePackage(AppConfig appConfig, String xml, String databaseName) {
+        xml = xml.replace("%%DATABASE_NAME%%", databaseName);
+        xml = xml.replace("%%SCHEMAS_DATABASE_NAME%%", appConfig.getSchemasDatabaseName());
+        xml = xml.replace("%%TRIGGERS_DATABASE_NAME%%", appConfig.getTriggersDatabaseName());
+        return xml;
+    }
+
+    protected String loadStringFromFile(String path) {
+        try {
+            return FileCopyUtils.copyToString(new FileReader(path));
+        } catch (IOException ie) {
+            throw new RuntimeException(ie);
+        }
     }
 
     protected String loadStringFromClassPath(String path) {

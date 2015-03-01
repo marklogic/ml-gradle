@@ -5,22 +5,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jdom2.Namespace;
 import org.junit.Test;
 import org.springframework.util.FileCopyUtils;
 
 import com.marklogic.appdeployer.ml7.Ml7AppDeployer;
 import com.marklogic.junit.Fragment;
-import com.marklogic.junit.MarkLogicNamespaceProvider;
-import com.marklogic.junit.NamespaceProvider;
-import com.marklogic.junit.XmlHelper;
 
-public class MergeHttpServersTest extends XmlHelper {
+public class MergeHttpServersTest extends AbstractAppDeployerTest {
 
     @Test
     public void test() throws IOException {
         List<String> mergeFilePaths = new ArrayList<>();
-        mergeFilePaths.add("src/test/resources/test-http-server.xml");
+        mergeFilePaths.add("src/test/xqy/packages/test-http-server.xml");
 
         AppConfig config = new AppConfig();
         config.setHttpServerPackageFilePaths(mergeFilePaths);
@@ -38,18 +34,5 @@ public class MergeHttpServersTest extends XmlHelper {
         pkg.assertElementExists("//srv:links/srv:default-user[. = 'testuser']");
 
         pkg.prettyPrint();
-    }
-
-    @Override
-    protected NamespaceProvider getNamespaceProvider() {
-        return new MarkLogicNamespaceProvider() {
-            @Override
-            protected List<Namespace> buildListOfNamespaces() {
-                List<Namespace> list = super.buildListOfNamespaces();
-                list.add(Namespace.getNamespace("srv", "http://marklogic.com/manage/package/servers"));
-                return list;
-            }
-
-        };
     }
 }

@@ -1,8 +1,5 @@
 package com.marklogic.appdeployer.ml7;
 
-import java.io.FileReader;
-import java.io.IOException;
-
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
@@ -12,7 +9,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.client.RestTemplate;
 
 import com.marklogic.appdeployer.ManageClient;
@@ -65,17 +61,10 @@ public class Ml7ManageClient extends LoggingObject implements ManageClient {
         return baseUri + path;
     }
 
-    // TODO Move the XML replace stuff out of here
     @Override
-    public void addDatabase(String packageName, String databaseName, String packageFilePath) {
-        try {
-            String xml = FileCopyUtils.copyToString(new FileReader(packageFilePath));
-            xml = xml.replace("%%DATABASE_NAME%%", databaseName);
-            logger.info("Adding database " + databaseName + " to package " + packageName);
-            postXml("/manage/v2/packages/" + packageName + "/databases/" + databaseName, xml);
-        } catch (IOException ie) {
-            throw new RuntimeException(ie);
-        }
+    public void addDatabase(String packageName, String databaseName, String packageXml) {
+        logger.info("Adding database " + databaseName + " to package " + packageName);
+        postXml("/manage/v2/packages/" + packageName + "/databases/" + databaseName, packageXml);
     }
 
     protected void postXml(String path, String xml) {

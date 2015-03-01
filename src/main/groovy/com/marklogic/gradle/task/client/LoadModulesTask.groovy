@@ -11,6 +11,7 @@ class LoadModulesTask extends MarkLogicTask {
 
     @TaskAction
     void loadModules() {
+        println "Loading modules from paths: " + getAppConfig().getModulePaths()
         getAppDeployer().loadModules(getAppConfig(), assetRolesAndCapabilities)
     }
 }

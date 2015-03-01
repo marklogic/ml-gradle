@@ -42,9 +42,8 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
     public void uninstallApp(AppConfig appConfig) {
         String xquery = loadStringFromClassPath("ml-app-deployer/uninstall-app.xqy");
         xquery = xquery.replace("%%APP_NAME%%", appConfig.getName());
-        XccTemplate t = new XccTemplate(appConfig.getXccUrl());
         logger.info("Uninstalling app with name: " + appConfig.getName());
-        t.executeAdhocQuery(xquery);
+        executeXquery(appConfig, xquery);
     }
 
     @Override
@@ -115,6 +114,14 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
         }
 
         manageClient.installPackage(config.getPackageName());
+    }
+
+    @Override
+    public void clearContentDatabase(AppConfig config, String collection) {
+        String xquery = collection != null ? "xdmp:collection-delete('" + collection + "')"
+                : "for $forest-id in xdmp:database-forests(xdmp:database()) return xdmp:forest-clear($forest-id)";
+        logger.info("Clearing content: " + xquery);
+        executeXquery(config, xquery);
     }
 
     protected void installDatabases(AppConfig appConfig) {
@@ -232,4 +239,10 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
                     + ie.getMessage(), ie);
         }
     }
+
+    protected void executeXquery(AppConfig config, String xquery) {
+        XccTemplate t = new XccTemplate(config.getXccUrl());
+        t.executeAdhocQuery(xquery);
+    }
+
 }

@@ -18,5 +18,7 @@ public interface AppDeployer {
     public void updateContentDatabases(AppConfig config);
     
     public void updateHttpServers(AppConfig config);
+    
+    public void clearContentDatabase(AppConfig config, String collection);
 
 }

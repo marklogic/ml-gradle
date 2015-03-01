@@ -7,13 +7,10 @@ import com.marklogic.gradle.task.MarkLogicTask
 
 class LoadModulesTask extends MarkLogicTask {
 
-    List<String> modulePaths
     String assetRolesAndCapabilities
 
     @TaskAction
     void loadModules() {
-        AppConfig config = getAppConfig()
-        config.setModulePaths(modulePaths)
-        newAppDeployer().loadModules(config, assetRolesAndCapabilities)
+        newAppDeployer().loadModules(getAppConfig(), assetRolesAndCapabilities)
     }
 }

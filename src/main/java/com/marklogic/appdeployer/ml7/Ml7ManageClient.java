@@ -126,4 +126,13 @@ public class Ml7ManageClient extends LoggingObject implements ManageClient {
         postXml("/manage/v2/packages/" + packageName + "/servers/" + serverName + "?group-id=" + group, packageXml);
     }
 
+    public boolean xdbcServerExists(String serverName, String groupName) {
+        String path = "/manage/v2/servers/" + serverName + "?group-id=" + groupName;
+        try {
+            restTemplate.getForEntity(buildUri(path), String.class);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

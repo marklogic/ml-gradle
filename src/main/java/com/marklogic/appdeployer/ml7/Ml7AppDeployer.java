@@ -139,6 +139,12 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
 
     @Override
     public void clearModulesDatabase(AppConfig config, String... excludeUris) {
+        logger.info("Clearing modules database; first verifying that an XDBC server exists");
+        if (!manageClient.xdbcServerExists(config.getXdbcServerName(), config.getGroupName())) {
+            logger.info("Could not find XDBC server to use to clear modules database; perhaps the application has not been installed yet?");
+            return;
+        }
+
         String xquery = "xdmp:eval(\"for $uri in cts:uris((), (), cts:and-query(())) ";
         if (excludeUris != null && excludeUris.length > 0) {
             String expr = " where fn:not($uri = (";

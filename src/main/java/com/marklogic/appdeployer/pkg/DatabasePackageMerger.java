@@ -10,7 +10,7 @@ import org.springframework.util.ClassUtils;
 public class DatabasePackageMerger extends AbstractPackageMerger {
 
     public String mergeDatabasePackages(List<String> mergePackageFilePaths) {
-        String transformPath = ClassUtils.addResourcePathToPackagePath(getClass(), "content-database-transform.xml");
+        String transformPath = ClassUtils.addResourcePathToPackagePath(getClass(), "content-database-transform.xsl");
         try {
             String xml = loadStringFromClasspath("default-content-database.xml");
             StreamSource stylesheetSource = new StreamSource(new ClassPathResource(transformPath).getInputStream());

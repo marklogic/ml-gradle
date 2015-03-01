@@ -16,4 +16,6 @@ public interface ManageClient {
     public void createRestApiServer(String serverName, String database, Integer port, String modulesDatabase);
 
     public void addServer(String packageName, String serverName, String group, String packageXml);
+    
+    public boolean xdbcServerExists(String serverName, String group);
 }

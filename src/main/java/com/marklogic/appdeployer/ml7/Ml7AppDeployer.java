@@ -2,7 +2,9 @@ package com.marklogic.appdeployer.ml7;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.FileCopyUtils;
@@ -10,6 +12,7 @@ import org.springframework.util.FileCopyUtils;
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.AppDeployer;
 import com.marklogic.appdeployer.ManageClient;
+import com.marklogic.appdeployer.pkg.DatabasePackageMerger;
 import com.marklogic.clientutil.LoggingObject;
 import com.marklogic.xccutil.template.XccTemplate;
 
@@ -43,6 +46,30 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
         XccTemplate t = new XccTemplate(appConfig.getXccUrl());
         logger.info("Uninstalling app with name: " + appConfig.getName());
         t.executeAdhocQuery(xquery);
+    }
+
+    @Override
+    public void mergeDatabasePackages() {
+        List<String> paths = appConfig.getDatabasePackageFilePaths();
+        if (paths != null && !paths.isEmpty()) {
+            File outputFile = new File(appConfig.getMergedDatabasePackageFilePath());
+            if (outputFile.exists()) {
+                logger.info("Deleting existing merged database package file: " + outputFile.getAbsolutePath());
+                outputFile.delete();
+            }
+
+            String xml = new DatabasePackageMerger().mergeDatabasePackages(paths);
+            File dir = outputFile.getParentFile();
+            if (dir != null) {
+                dir.mkdirs();
+            }
+            try {
+                FileCopyUtils.copy(xml, new FileWriter(outputFile));
+                appConfig.setContentDatabaseFilePath(appConfig.getMergedDatabasePackageFilePath());
+            } catch (IOException ie) {
+                throw new RuntimeException(ie);
+            }
+        }
     }
 
     protected void installDatabases() {

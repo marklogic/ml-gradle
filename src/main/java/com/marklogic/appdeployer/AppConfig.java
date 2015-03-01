@@ -16,19 +16,33 @@ public class AppConfig {
     private Integer testXdbcPort;
     private Integer modulesXdbcPort;
 
-    private String defaultModulePath = "src/main/xqy";
+    private String defaultModulePath;
     private List<String> modulePaths;
 
     private String groupName = "Default";
-    private String contentDatabaseFilePath = "src/main/xqy/packages/content-database.xml";
-    private String httpServerFilePath = "src/main/xqy/packages/http-server.xml";
-    private String triggersDatabaseFilePath = "src/main/xqy/packages/triggers-database.xml";
-    private String schemasDatabaseFilePath = "src/main/xqy/packages/schemas-database.xml";
-    private String xdbcServerFilePath = "src/main/xqy/packages/xdbc-server.xml";
+    private String contentDatabaseFilePath;
+    private String httpServerFilePath;
+    private String triggersDatabaseFilePath;
+    private String schemasDatabaseFilePath;
+    private String xdbcServerFilePath;
+
+    private List<String> databasePackageFilePaths;
+    private String mergedDatabasePackageFilePath = "build/ml-app-deployer/merged-database-package.xml";
 
     public AppConfig() {
+        this("src/main/xqy");
+    }
+
+    public AppConfig(String defaultModulePath) {
+        this.defaultModulePath = defaultModulePath;
+
         modulePaths = new ArrayList<String>();
         modulePaths.add(defaultModulePath);
+        contentDatabaseFilePath = defaultModulePath + "/packages/content-database.xml";
+        httpServerFilePath = defaultModulePath + "/packages/http-server.xml";
+        triggersDatabaseFilePath = defaultModulePath + "/packages/triggers-database.xml";
+        schemasDatabaseFilePath = defaultModulePath + "/packages/schemas-database.xml";
+        xdbcServerFilePath = defaultModulePath + "/packages/xdbc-server.xml";
     }
 
     public boolean isTestPortSet() {
@@ -225,6 +239,22 @@ public class AppConfig {
 
     public void setXdbcServerFilePath(String xdbcServerFilePath) {
         this.xdbcServerFilePath = xdbcServerFilePath;
+    }
+
+    public List<String> getDatabasePackageFilePaths() {
+        return databasePackageFilePaths;
+    }
+
+    public void setDatabasePackageFilePaths(List<String> databasePackageFilePaths) {
+        this.databasePackageFilePaths = databasePackageFilePaths;
+    }
+
+    public String getMergedDatabasePackageFilePath() {
+        return mergedDatabasePackageFilePath;
+    }
+
+    public void setMergedDatabasePackageFilePath(String mergedDatabasePackageFilePath) {
+        this.mergedDatabasePackageFilePath = mergedDatabasePackageFilePath;
     }
 
 }

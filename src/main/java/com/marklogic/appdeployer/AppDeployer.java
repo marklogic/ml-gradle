@@ -10,4 +10,7 @@ public interface AppDeployer {
     public void installPackages();
     
     public void uninstallApp();
+    
+    public void mergeDatabasePackages();
+    
 }

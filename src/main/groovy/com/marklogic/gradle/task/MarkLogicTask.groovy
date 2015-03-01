@@ -17,6 +17,10 @@ class MarkLogicTask extends DefaultTask {
         getProject().property("mlAppConfig")
     }
     
+    /**
+     * Look for an instance of AppDeployer in the project. In addition to avoiding creating an AppDeployer many times,
+     * I think this also provides a way for a client to override the implementation. 
+     */
     AppDeployer getAppDeployer() {
         String propName = "mlAppDeployer"
         if (getProject().hasProperty(propName)) {

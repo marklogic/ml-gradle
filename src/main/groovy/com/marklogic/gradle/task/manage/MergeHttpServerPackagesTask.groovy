@@ -8,6 +8,6 @@ class MergeHttpServerPackagesTask extends MarkLogicTask {
 
     @TaskAction
     void mergeHttpServerPackages() {
-        newAppDeployer().mergeHttpServerPackages(getAppConfig())
+        getAppDeployer().mergeHttpServerPackages(getAppConfig())
     }
 }

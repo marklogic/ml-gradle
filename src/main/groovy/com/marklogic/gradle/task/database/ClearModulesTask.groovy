@@ -10,6 +10,6 @@ class ClearModulesTask extends MarkLogicTask {
 
     @TaskAction
     void clearModules() {
-        newAppDeployer().clearModulesDatabase(getAppConfig(), excludes)
+        getAppDeployer().clearModulesDatabase(getAppConfig(), excludes)
     }
 }

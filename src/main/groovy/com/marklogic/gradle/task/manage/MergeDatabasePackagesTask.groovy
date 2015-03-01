@@ -9,6 +9,6 @@ class MergeDatabasePackagesTask extends MarkLogicTask {
 
     @TaskAction
     void mergeDatabasePackages() {
-        newAppDeployer().mergeDatabasePackages(getAppConfig())
+        getAppDeployer().mergeDatabasePackages(getAppConfig())
     }
 }

@@ -69,6 +69,7 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
                 outputFile.delete();
             }
 
+            logger.info("Merging database packages from paths: " + paths);
             String xml = new DatabasePackageMerger().mergeDatabasePackages(paths);
             File dir = outputFile.getParentFile();
             if (dir != null) {
@@ -76,6 +77,7 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
             }
             try {
                 FileCopyUtils.copy(xml, new FileWriter(outputFile));
+                logger.info("Wrote merged database package file: " + appConfig.getMergedDatabasePackageFilePath());
                 appConfig.setContentDatabaseFilePath(appConfig.getMergedDatabasePackageFilePath());
             } catch (IOException ie) {
                 throw new RuntimeException(ie);
@@ -93,6 +95,7 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
                 outputFile.delete();
             }
 
+            logger.info("Merging HTTP server packages from paths: " + paths);
             String xml = new HttpServerPackageMerger().mergeHttpServerPackages(paths);
             File dir = outputFile.getParentFile();
             if (dir != null) {
@@ -100,6 +103,7 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
             }
             try {
                 FileCopyUtils.copy(xml, new FileWriter(outputFile));
+                logger.info("Wrote merged HTTP server package file: " + appConfig.getMergedHttpServerPackageFilePath());
                 appConfig.setHttpServerFilePath(appConfig.getMergedHttpServerPackageFilePath());
             } catch (IOException ie) {
                 throw new RuntimeException(ie);
@@ -206,8 +210,7 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
             installPackage = true;
         }
 
-        if (new File(appConfig.getContentDatabaseFilePath()).exists()) {
-            installContentDatabases(appConfig);
+        if (installContentDatabases(appConfig)) {
             installPackage = true;
         }
 
@@ -216,21 +219,29 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
         }
     }
 
-    protected void installContentDatabases(AppConfig appConfig) {
+    protected boolean installContentDatabases(AppConfig appConfig) {
         mergeDatabasePackages(appConfig);
 
-        addDatabase(appConfig, appConfig.getContentDatabaseFilePath(), appConfig.getContentDatabaseName());
-
-        if (appConfig.isTestPortSet()) {
-            addDatabase(appConfig, appConfig.getContentDatabaseFilePath(), appConfig.getTestContentDatabaseName());
+        if (new File(appConfig.getContentDatabaseFilePath()).exists()) {
+            addDatabase(appConfig, appConfig.getContentDatabaseFilePath(), appConfig.getContentDatabaseName());
+            if (appConfig.isTestPortSet()) {
+                addDatabase(appConfig, appConfig.getContentDatabaseFilePath(), appConfig.getTestContentDatabaseName());
+            }
+            return true;
         }
+
+        return false;
     }
 
     protected void createRestApiServers(AppConfig appConfig) {
+        // Don't need to pass in a modules database names, the REST API will create it automatically with the name we
+        // want
+        logger.info("Creating main REST API server with name: " + appConfig.getRestServerName());
         manageClient.createRestApiServer(appConfig.getRestServerName(), appConfig.getContentDatabaseName(),
-                appConfig.getRestPort(), appConfig.getModulesDatabaseName());
+                appConfig.getRestPort(), null);
 
         if (appConfig.isTestPortSet()) {
+            logger.info("Creating test REST API server with name: " + appConfig.getTestRestServerName());
             manageClient.createRestApiServer(appConfig.getRestServerName(), appConfig.getTestContentDatabaseName(),
                     appConfig.getTestRestPort(), appConfig.getModulesDatabaseName());
         }
@@ -275,6 +286,9 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
 
     protected void addServer(AppConfig appConfig, String xml, String serverName, Integer serverPort, String databaseName) {
         xml = replaceTokensInServerPackage(appConfig, xml, serverName, serverPort, databaseName);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Server package XML:\n" + xml);
+        }
         logger.info(String.format("Adding server %s in group %s to package %s", serverName, appConfig.getGroupName(),
                 appConfig.getPackageName()));
         manageClient.addServer(appConfig.getPackageName(), serverName, appConfig.getGroupName(), xml);
@@ -293,6 +307,9 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
     protected void addDatabase(AppConfig appConfig, String packageFilePath, String databaseName) {
         String xml = loadStringFromFile(packageFilePath);
         xml = replaceTokensInDatabasePackage(appConfig, xml, databaseName);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Database package XML:\n" + xml);
+        }
         manageClient.addDatabase(appConfig.getPackageName(), databaseName, xml);
     }
 

@@ -35,26 +35,33 @@ public class Ml7ManageClient extends LoggingObject implements ManageClient {
     public void deletePackage(String name) {
         String xml = restTemplate.getForEntity(buildUri("/manage/v2/packages"), String.class).getBody();
         if (xml.contains(name)) {
-            logger.info("Deleting package: " + name);
+            String msg = String.format("package %s", name);
+            logger.info("Deleting " + msg);
             restTemplate.delete(buildUri("/manage/v2/packages/" + name));
+            logger.info("Finished deleting " + msg);
         }
     }
 
     @Override
     public void createPackage(String name) {
-        logger.info("Creating package: " + name);
+        String msg = String.format("package %s", name);
+        logger.info("Checking to see if package exists yet; can't create it again if it already does");
         try {
             restTemplate.getForEntity(buildUri("/manage/v2/packages/" + name), String.class);
             logger.info("Package already exists");
         } catch (Exception e) {
+            logger.info("Creating " + msg);
             restTemplate.postForLocation(buildUri("/manage/v2/packages?pkgname=" + name), null);
+            logger.info("Finished creating " + msg);
         }
     }
 
     @Override
     public void installPackage(String name) {
-        logger.info("Installing package: " + name);
+        String msg = String.format("package %s", name);
+        logger.info("Installing " + msg);
         restTemplate.postForLocation(buildUri("/manage/v2/packages/" + name + "/install"), null);
+        logger.info("Finished installing " + msg);
     }
 
     protected String buildUri(String path) {
@@ -63,8 +70,10 @@ public class Ml7ManageClient extends LoggingObject implements ManageClient {
 
     @Override
     public void addDatabase(String packageName, String databaseName, String packageXml) {
-        logger.info("Adding database " + databaseName + " to package " + packageName);
+        String msg = String.format("database %s to package %s", databaseName, packageName);
+        logger.info("Adding " + msg);
         postXml("/manage/v2/packages/" + packageName + "/databases/" + databaseName, packageXml);
+        logger.info("Finished adding " + msg);
     }
 
     protected void postXml(String path, String xml) {
@@ -97,6 +106,7 @@ public class Ml7ManageClient extends LoggingObject implements ManageClient {
             json += "}}";
             logger.info("Creating new REST API server: " + json);
             postJson("/v1/rest-apis", json);
+            logger.info("Finished creating REST API server");
         } else {
             logger.info("REST API instance already exists with name: " + serverName);
         }
@@ -112,7 +122,10 @@ public class Ml7ManageClient extends LoggingObject implements ManageClient {
 
     @Override
     public void addServer(String packageName, String serverName, String group, String packageXml) {
+        String msg = String.format("server %s to package %s", serverName, packageName);
+        logger.info("Adding " + msg);
         postXml("/manage/v2/packages/" + packageName + "/servers/" + serverName + "?group-id=" + group, packageXml);
+        logger.info("Finished adding " + msg);
     }
 
     public boolean xdbcServerExists(String serverName, String groupName) {

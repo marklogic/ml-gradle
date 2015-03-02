@@ -42,18 +42,17 @@ public class Ml7ManageClient extends LoggingObject implements ManageClient {
         }
     }
 
+    /**
+     * This used to check for the existence of the package first, but that results in an ugly Spring RestTemplate WARN
+     * statement that could confuse users. It's up to the caller to verify that the package doesn't exist yet (i.e. call
+     * deletePackage first).
+     */
     @Override
     public void createPackage(String name) {
         String msg = String.format("package %s", name);
-        logger.info("Checking to see if package exists yet; can't create it again if it already does");
-        try {
-            restTemplate.getForEntity(buildUri("/manage/v2/packages/" + name), String.class);
-            logger.info("Package already exists");
-        } catch (Exception e) {
-            logger.info("Creating " + msg);
-            restTemplate.postForLocation(buildUri("/manage/v2/packages?pkgname=" + name), null);
-            logger.info("Finished creating " + msg);
-        }
+        logger.info("Creating " + msg);
+        restTemplate.postForLocation(buildUri("/manage/v2/packages?pkgname=" + name), null);
+        logger.info("Finished creating " + msg);
     }
 
     @Override

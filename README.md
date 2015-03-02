@@ -7,3 +7,15 @@ override how the library works.
 
 AppDeployer is currently only taking advantage of REST API endpoints in MarkLogic 7; it will soon be enhanced to leverage all
 the new management endpoints in MarkLogic 8. 
+
+Using AppDeployer is simple - just instantiate AppConfig, set whatever properties you need to, and then pass it into an implementation of AppDeployer.java (currently, Ml7AppDeployer.java). [DeployAppTest](https://github.com/rjrudin/ml-app-deployer/blob/master/src/test/java/com/marklogic/appdeployer/ml7/DeployAppTest.java) shows an example of this, which is shown below as well:
+
+    AppConfig appConfig = new AppConfig();
+    appConfig.setName("myAppName");
+    appConfig.setRestPort(8123);
+    appConfig.setXdbcPort(8124);
+  
+    AppDeployer deployer = new Ml7AppDeployer(new Ml7ManageClient("localhost", 8002, "admin", "admin"));
+    deployer.installPackages(appConfig);
+    deployer.loadModules(appConfig, null);
+

@@ -20,3 +20,5 @@ Using AppDeployer is simple - just instantiate AppConfig, set whatever propertie
     deployer.loadModules(appConfig, null);
 
 The idea then is you define all your application configuration in AppConfig and then pass it into each high-level method in AppDeployer, along with any other parameters specific to that particular operation. You can then run this in a simple Java program, or more likely, bake it into a plugin for a tool like Ant, Gradle, or Maven. 
+
+You can also easily extend/override behavior. You can extend AppConfig to add new properties to control how a deployment is performed, and you can utilize those properties by extending an impl of AppDeployer. All of the methods in Ml7AppDeployer are public or protected, so it's easy to override the behavior. If you find you need a method extracted to make it easier to extend an AppDeployer impl, just submit an issue and/or pull request. 

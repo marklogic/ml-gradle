@@ -19,3 +19,4 @@ Using AppDeployer is simple - just instantiate AppConfig, set whatever propertie
     deployer.installPackages(appConfig);
     deployer.loadModules(appConfig, null);
 
+The idea then is you define all your application configuration in AppConfig and then pass it into each high-level method in AppDeployer, along with any other parameters specific to that particular operation. You can then run this in a simple Java program, or more likely, bake it into a plugin for a tool like Ant, Gradle, or Maven. 

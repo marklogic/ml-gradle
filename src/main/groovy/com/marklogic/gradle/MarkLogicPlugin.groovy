@@ -47,7 +47,8 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlMergeHttpServerPackages", type: MergeHttpServerPackagesTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description:"Merges together the HTTP server packages that are defined by a property on this task; the result is written to the build directory")
 
         project.task("mlInstallPackages", type: InstallPackagesTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Installs the application's packages (servers and databases); does not load any modules").mustRunAfter("mlClearModules")
-
+        project.task("mlBootstrap", dependsOn: "mlInstallPackages", description: "Roxy-influenced alias for mlInstallPackages")
+        
         project.task("mlPostInstallPackages", group: group, description: "Add dependsOn to this task to add tasks after mlInstallPackages finishes within mlDeploy").mustRunAfter("mlInstallPackages")
 
         project.task("mlLoadModules", type: LoadModulesTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Loads modules from directories defined by mlAppConfig or via a property on this task").mustRunAfter([

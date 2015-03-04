@@ -116,7 +116,10 @@ public class Ml7ManageClient extends LoggingObject implements ManageClient {
      */
     public boolean restApiServerExists(String serverName) {
         String xml = restTemplate.getForEntity(buildUri("/v1/rest-apis/"), String.class).getBody();
-        return xml.contains("<rapi:name>" + serverName + "</rapi:name>");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Rest API XML: " + xml);
+        }
+        return xml.contains(">" + serverName + "<");
     }
 
     @Override

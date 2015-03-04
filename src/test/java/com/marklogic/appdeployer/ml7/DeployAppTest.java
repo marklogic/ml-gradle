@@ -20,7 +20,7 @@ public class DeployAppTest extends Assert {
 
         sut.installPackages(appConfig);
 
-        sut.uninstallApp(appConfig);
+        //sut.uninstallApp(appConfig);
     }
 
 }

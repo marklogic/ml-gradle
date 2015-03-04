@@ -116,7 +116,7 @@ public class Ml7ManageClient extends LoggingObject implements ManageClient {
         if (logger.isDebugEnabled()) {
             logger.debug("Rest API XML: " + xml);
         }
-        return xml.contains(">" + serverName + "<");
+        return xml != null && xml.contains(">" + serverName + "<");
     }
 
     @Override

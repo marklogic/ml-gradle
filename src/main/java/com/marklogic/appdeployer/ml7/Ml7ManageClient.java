@@ -33,13 +33,10 @@ public class Ml7ManageClient extends LoggingObject implements ManageClient {
 
     @Override
     public void deletePackage(String name) {
-        String xml = restTemplate.getForEntity(buildUri("/manage/v2/packages"), String.class).getBody();
-        if (xml.contains(name)) {
-            String msg = String.format("package %s", name);
-            logger.info("Deleting " + msg);
-            restTemplate.delete(buildUri("/manage/v2/packages/" + name));
-            logger.info("Finished deleting " + msg);
-        }
+        String msg = String.format("package %s", name);
+        logger.info("Deleting " + msg);
+        restTemplate.delete(buildUri("/manage/v2/packages/" + name));
+        logger.info("Finished deleting " + msg);
     }
 
     /**

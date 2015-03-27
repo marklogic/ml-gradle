@@ -1,10 +1,7 @@
-ml-gradle releases
-===============
-
+# ml-gradle releases
 This changelog is in its infancy, but the plan is to start tracking all changes via issues and then associating them
 with releases. 
 
+## 1.2
 
-1.2
-===============
-#5 Added CorbTask
+* [#5](https://github.com/rjrudin/ml-gradle/issues/5) Added Corb Task

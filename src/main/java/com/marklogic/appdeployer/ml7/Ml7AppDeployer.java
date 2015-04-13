@@ -342,4 +342,20 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
         XccTemplate t = new XccTemplate(config.getXccUrl());
         t.executeAdhocQuery(xquery);
     }
+
+    public void setManageClient(ManageClient manageClient) {
+        this.manageClient = manageClient;
+    }
+
+    public void setModulesLoader(ModulesLoader modulesLoader) {
+        this.modulesLoader = modulesLoader;
+    }
+
+    public ManageClient getManageClient() {
+        return manageClient;
+    }
+
+    public ModulesLoader getModulesLoader() {
+        return modulesLoader;
+    }
 }

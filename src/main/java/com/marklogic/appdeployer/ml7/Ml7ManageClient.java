@@ -136,4 +136,12 @@ public class Ml7ManageClient extends LoggingObject implements ManageClient {
             return false;
         }
     }
+
+    public RestTemplate getRestTemplate() {
+        return restTemplate;
+    }
+
+    public void setRestTemplate(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 }

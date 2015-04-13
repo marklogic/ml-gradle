@@ -16,6 +16,12 @@ public class DefaultModulesFinder implements ModulesFinder {
     private FilenameFilter transformFilenameFilter = new TransformFilenameFilter();
     private FilenameFilter namespaceFilenameFilter = new NamespaceFilenameFilter();
 
+    private String servicesPath = "services";
+    private String assetsPath = "ext";
+    private String optionsPath = "options";
+    private String namespacesPath = "namespaces";
+    private String transformsPath = "transforms";
+
     @Override
     public Modules findModules(File baseDir) {
         Modules modules = new Modules();
@@ -28,21 +34,20 @@ public class DefaultModulesFinder implements ModulesFinder {
     }
 
     protected void addServices(Modules modules, File baseDir) {
-        File servicesBaseDir = new File(baseDir, "services");
+        File servicesBaseDir = new File(baseDir, servicesPath);
         List<File> services = new ArrayList<>();
         if (servicesBaseDir.exists()) {
             for (File f : servicesBaseDir.listFiles()) {
-              if (FilenameUtil.isXqueryFile(f.getName()) ||
-                  FilenameUtil.isJavascriptFile(f.getName())) {
-                services.add(f);
-              }
+                if (FilenameUtil.isXqueryFile(f.getName()) || FilenameUtil.isJavascriptFile(f.getName())) {
+                    services.add(f);
+                }
             }
         }
         modules.setServices(services);
     }
 
     protected void addAssets(Modules modules, File baseDir) {
-        File assetsBaseDir = new File(baseDir, "ext");
+        File assetsBaseDir = new File(baseDir, assetsPath);
         List<Asset> assets = new ArrayList<>();
         addAssetFiles(assetsBaseDir, "", assets);
         modules.setAssets(assets);
@@ -62,7 +67,7 @@ public class DefaultModulesFinder implements ModulesFinder {
     }
 
     protected void addOptions(Modules modules, File baseDir) {
-        File queryOptionsBaseDir = new File(baseDir, "options");
+        File queryOptionsBaseDir = new File(baseDir, optionsPath);
         List<File> queryOptions = new ArrayList<>();
         if (queryOptionsBaseDir.exists()) {
             for (File f : queryOptionsBaseDir.listFiles()) {
@@ -76,7 +81,7 @@ public class DefaultModulesFinder implements ModulesFinder {
     }
 
     protected void addNamespaces(Modules modules, File baseDir) {
-        File namespacesDir = new File(baseDir, "namespaces");
+        File namespacesDir = new File(baseDir, namespacesPath);
         List<File> namespaces = new ArrayList<>();
         if (namespacesDir.exists()) {
             for (File f : namespacesDir.listFiles(namespaceFilenameFilter)) {
@@ -87,7 +92,7 @@ public class DefaultModulesFinder implements ModulesFinder {
     }
 
     protected void addTransforms(Modules modules, File baseDir) {
-        File transformsBaseDir = new File(baseDir, "transforms");
+        File transformsBaseDir = new File(baseDir, transformsPath);
         List<File> transforms = new ArrayList<>();
         if (transformsBaseDir.exists()) {
             for (File f : transformsBaseDir.listFiles(transformFilenameFilter)) {
@@ -120,6 +125,26 @@ public class DefaultModulesFinder implements ModulesFinder {
     public void setNamespaceFilenameFilter(FilenameFilter namespaceFilenameFilter) {
         this.namespaceFilenameFilter = namespaceFilenameFilter;
     }
+
+    public void setServicesPath(String servicesPath) {
+        this.servicesPath = servicesPath;
+    }
+
+    public void setAssetsPath(String assetsPath) {
+        this.assetsPath = assetsPath;
+    }
+
+    public void setOptionsPath(String optionsPath) {
+        this.optionsPath = optionsPath;
+    }
+
+    public void setNamespacesPath(String namespacesPath) {
+        this.namespacesPath = namespacesPath;
+    }
+
+    public void setTransformsPath(String transformsPath) {
+        this.transformsPath = transformsPath;
+    }
 }
 
 class AssetFilenameFilter implements FilenameFilter {
@@ -135,9 +160,7 @@ class TransformFilenameFilter implements FilenameFilter {
 
     @Override
     public boolean accept(File dir, String name) {
-        return  FilenameUtil.isXslFile(name) ||
-                FilenameUtil.isXqueryFile(name) ||
-                FilenameUtil.isJavascriptFile(name);
+        return FilenameUtil.isXslFile(name) || FilenameUtil.isXqueryFile(name) || FilenameUtil.isJavascriptFile(name);
     }
 }
 

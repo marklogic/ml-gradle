@@ -174,6 +174,7 @@ class MarkLogicPlugin implements Plugin<Project> {
     void initializeAppDeployer(Project project) {
         ManageConfig manageConfig = project.extensions.getByName("mlManageConfig")
         Ml7ManageClient client = new Ml7ManageClient(manageConfig.getHost(), manageConfig.getPort(), manageConfig.getUsername(), manageConfig.getPassword())
+        project.extensions.add("mlManageClient", client)
         project.extensions.add("mlAppDeployer", new Ml7AppDeployer(client))
     }
 }

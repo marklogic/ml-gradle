@@ -97,7 +97,7 @@ public class Ml7ManageClient extends LoggingObject implements ManageClient {
                 json += ", port: " + port;
             }
             if (modulesDatabase != null) {
-                json += ", modulesDatabase: \"" + modulesDatabase + "\"";
+                json += ", modules-database: \"" + modulesDatabase + "\"";
             }
             json += "}}";
             logger.info("Creating new REST API server: " + json);

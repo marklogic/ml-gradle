@@ -242,7 +242,7 @@ public class Ml7AppDeployer extends LoggingObject implements AppDeployer {
 
         if (appConfig.isTestPortSet()) {
             logger.info("Creating test REST API server with name: " + appConfig.getTestRestServerName());
-            manageClient.createRestApiServer(appConfig.getRestServerName(), appConfig.getTestContentDatabaseName(),
+            manageClient.createRestApiServer(appConfig.getTestRestServerName(), appConfig.getTestContentDatabaseName(),
                     appConfig.getTestRestPort(), appConfig.getModulesDatabaseName());
         }
     }

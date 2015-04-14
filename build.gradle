@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-  compile 'com.marklogic:ml-javaclient-util:1.0'
+  compile 'com.marklogic:ml-javaclient-util:1.0.1'
   compile 'org.apache.httpcomponents:httpclient:4.3.5'
   compile 'org.springframework:spring-web:4.1.5.RELEASE'
   testCompile 'com.marklogic:ml-junit:1.0'

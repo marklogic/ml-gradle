@@ -6,10 +6,12 @@ import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
 
 import com.marklogic.appdeployer.AppConfig
+import com.marklogic.appdeployer.ml7.Ml7AppDeployer
+import com.marklogic.appdeployer.ml7.Ml7ManageClient
 import com.marklogic.gradle.task.DeleteModuleTimestampsFileTask
 import com.marklogic.gradle.task.UninstallAppTask
-import com.marklogic.gradle.task.client.CreateResourceTask;
-import com.marklogic.gradle.task.client.CreateTransformTask;
+import com.marklogic.gradle.task.client.CreateResourceTask
+import com.marklogic.gradle.task.client.CreateTransformTask
 import com.marklogic.gradle.task.client.LoadAssetsViaMlcpTask
 import com.marklogic.gradle.task.client.LoadModulesTask
 import com.marklogic.gradle.task.client.PrepareRestApiDependenciesTask
@@ -30,7 +32,8 @@ class MarkLogicPlugin implements Plugin<Project> {
     void apply(Project project) {
         initializeAppConfig(project)
         initializeManageConfig(project)
-
+        initializeAppDeployer(project)
+        
         project.getConfigurations().create("mlRestApi")
 
         String group = "MarkLogic"
@@ -48,28 +51,16 @@ class MarkLogicPlugin implements Plugin<Project> {
 
         project.task("mlInstallPackages", type: InstallPackagesTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Installs the application's packages (servers and databases); does not load any modules").mustRunAfter("mlClearModules")
         project.task("mlBootstrap", dependsOn: "mlInstallPackages", description: "Roxy-influenced alias for mlInstallPackages")
-        
+
         project.task("mlPostInstallPackages", group: group, description: "Add dependsOn to this task to add tasks after mlInstallPackages finishes within mlDeploy").mustRunAfter("mlInstallPackages")
 
-        project.task("mlLoadModules", type: LoadModulesTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Loads modules from directories defined by mlAppConfig or via a property on this task").mustRunAfter([
-            "mlPostInstallPackages",
-            "mlClearModules"
-        ])
+        project.task("mlLoadModules", type: LoadModulesTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Loads modules from directories defined by mlAppConfig or via a property on this task").mustRunAfter(["mlPostInstallPackages", "mlClearModules"])
 
         project.task("mlPostDeploy", group: group, description: "Add dependsOn to this to add tasks to mlDeploy").mustRunAfter("mlLoadModules")
 
-        project.task("mlDeploy", group: group, dependsOn: [
-            "mlClearModules",
-            "mlInstallPackages",
-            "mlPostInstallPackages",
-            "mlLoadModules",
-            "mlPostDeploy"
-        ], description: "Deploys the application by first clearing the modules database (if it exists), installing packages, and then loading modules")
+        project.task("mlDeploy", group: group, dependsOn: ["mlClearModules", "mlInstallPackages", "mlPostInstallPackages", "mlLoadModules", "mlPostDeploy"], description: "Deploys the application by first clearing the modules database (if it exists), installing packages, and then loading modules")
 
-        project.task("mlReloadModules", group: group, dependsOn: [
-            "mlClearModules",
-            "mlLoadModules"
-        ], description: "Reloads modules by first clearing the modules database and then loading modules")
+        project.task("mlReloadModules", group: group, dependsOn: ["mlClearModules", "mlLoadModules"], description: "Reloads modules by first clearing the modules database and then loading modules")
 
         project.task("mlUpdateContentDatabase", type: UpdateDatabaseTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the content database by building a new database package and then installing it")
         project.task("mlUpdateHttpServers", type: UpdateHttpServerTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the HTTP servers by building a new HTTP server package and then installing it")
@@ -84,7 +75,7 @@ class MarkLogicPlugin implements Plugin<Project> {
             description = "Delete the directory of consolidated asset modules"
             delete "build/ml-gradle/consolidatedAssets"
         }
-        
+
         project.task("mlConsolidateAssets", type: Copy, group: group, dependsOn: ["mlDeleteConsolidatedAssets", "mlPrepareRestApiDependencies"]) {
             description = "Copy asset modules from each of the module paths in mlAppConfig to a temporarily build directory"
             doFirst {
@@ -95,9 +86,9 @@ class MarkLogicPlugin implements Plugin<Project> {
             into("build/ml-gradle/consolidatedAssets")
             include("ext/**")
         }
-        
+
         project.task("mlLoadAssetsViaMlcp", type: LoadAssetsViaMlcpTask, group: group, dependsOn: "mlConsolidateAssets", description: "Loads consolidated assets via MLCP, which is much faster than loading each asset module via the REST API")
-        
+
         // CPF tasks
         String cpfGroup = "MarkLogic CPF"
         project.task("mlInsertSchPipeline", type: InsertSchPipelineTask, group: cpfGroup, description: "Inserts the Status Change Handling pipeline")
@@ -172,5 +163,17 @@ class MarkLogicPlugin implements Plugin<Project> {
             manageConfig.setPassword(project.property("mlPassword"))
         }
         project.extensions.add("mlManageConfig", manageConfig)
+    }
+
+    /**
+     * Initializing this as part of the plugin allows a developer to immediately override the configuration of the 
+     * AppDeployer via a Gradle ext block - e.g. the paths for different kinds of modules could be modified.
+     * 
+     * @param project
+     */
+    void initializeAppDeployer(Project project) {
+        ManageConfig manageConfig = project.extensions.getByName("mlManageConfig")
+        Ml7ManageClient client = new Ml7ManageClient(manageConfig.getHost(), manageConfig.getPort(), manageConfig.getUsername(), manageConfig.getPassword())
+        project.extensions.add("mlAppDeployer", new Ml7AppDeployer(client))
     }
 }

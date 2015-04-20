@@ -112,7 +112,7 @@ public class Ml7ManageClient extends LoggingObject implements ManageClient {
      * TODO Rewrite this to get JSON or XML, parse it, and check for the server name.
      */
     public boolean restApiServerExists(String serverName) {
-        String xml = restTemplate.getForEntity(buildUri("/v1/rest-apis/"), String.class).getBody();
+        String xml = restTemplate.getForEntity(buildUri("/v1/rest-apis?format=xml"), String.class).getBody();
         if (logger.isDebugEnabled()) {
             logger.debug("Rest API XML: " + xml);
         }

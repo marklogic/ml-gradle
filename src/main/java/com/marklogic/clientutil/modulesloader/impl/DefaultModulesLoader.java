@@ -160,8 +160,6 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
     public File installAsset(Asset asset) {
         File file = asset.getFile();
 
-        logger.info("INSTALL ASSET FILE => " + file.getName());
-
         if (!modulesManager.hasFileBeenModifiedSinceLastInstalled(file)) {
             return null;
         }
@@ -216,17 +214,13 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
             return null;
         }
 
-        logger.info("INSTALL RESOURCE FILE => " + file.getName());
-
         ResourceExtensionsManager extMgr = client.newServerConfigManager().newResourceExtensionsManager();
         String resourceName = getExtensionNameFromFile(file);
         if (metadata.getTitle() == null) {
             metadata.setTitle(resourceName + " resource extension");
         }
 
-        logger.info("    METADATA (script-language) => " + metadata.getScriptLanguage());
         logger.info(String.format("Loading %s resource extension from file %s", resourceName, file));
-
         extMgr.writeServices(resourceName, new FileHandle(file), metadata, methodParams);
         modulesManager.saveLastInstalledTimestamp(file, new Date());
         return file;

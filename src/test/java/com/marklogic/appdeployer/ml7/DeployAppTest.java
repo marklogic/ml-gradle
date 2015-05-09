@@ -18,9 +18,9 @@ public class DeployAppTest extends Assert {
 
         Ml7AppDeployer sut = new Ml7AppDeployer(new Ml7ManageClient("localhost", 8002, "admin", "admin"));
 
-        sut.installPackages(appConfig);
+        //sut.installPackages(appConfig);
 
-        //sut.uninstallApp(appConfig);
+        sut.uninstallApp(appConfig);
     }
 
 }

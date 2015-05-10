@@ -15,5 +15,5 @@
   <logger name="ch.qos.logback" level="WARN" additivity="false" />
 
   <logger name="com.marklogic.client.io" level="WARN" additivity="false" />
-
+  
 </configuration>

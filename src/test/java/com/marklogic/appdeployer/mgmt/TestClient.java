@@ -1,30 +1,36 @@
 package com.marklogic.appdeployer.mgmt;
 
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import java.io.File;
+
 import org.springframework.web.client.RestTemplate;
+
+import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.util.RestTemplateUtil;
 
 public class TestClient {
 
-    public static void main(String[] args) {
-        String host = "localhost";
-        int port = 8002;
-        String username = "admin";
-        String password = "admin";
+    public static void main(String[] args) throws Exception {
 
-        BasicCredentialsProvider prov = new BasicCredentialsProvider();
-        prov.setCredentials(new AuthScope(host, port, AuthScope.ANY_REALM), new UsernamePasswordCredentials(username,
-                password));
-        HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(prov).build();
-        HttpComponentsClientHttpRequestFactory f = new HttpComponentsClientHttpRequestFactory(client);
-        RestTemplate rt = new RestTemplate(f);
+        // Define how to connect to the ML manage app
+        ManageConfig manageConfig = new ManageConfig("localhost", 8002, "admin", "admin");
 
-        DatabaseManager dbMgr = new DatabaseManager(rt, "http://" + host + ":" + port);
-        System.out.println(dbMgr.dbExists("sample-app-content"));
+        // Configure a Spring RestTemplate instance that can talk to the ML manage app
+        RestTemplate restTemplate = RestTemplateUtil.newRestTemplate(manageConfig);
 
+        // Define where configuration files for the ML app are
+        ConfigDir configDir = new ConfigDir(new File("src/test/resources/sample-app/src/main/ml-config"));
+
+        // Build a ConfigManager with all the fun method
+        ConfigManager configMgr = new ConfigManager(configDir, restTemplate, manageConfig.getBaseUrl());
+
+        // Define app configuration
+        AppConfig config = new AppConfig();
+        config.setName("sample-app");
+        config.setRestPort(8070);
+
+        // Now start calling fun methods that get things done
+        configMgr.createRestApi(config);
+
+        System.out.println("All done!");
     }
 }

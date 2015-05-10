@@ -4,17 +4,18 @@ import java.io.File;
 import java.io.IOException;
 
 import org.springframework.util.FileCopyUtils;
-import org.springframework.web.client.RestTemplate;
 
 import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.clientutil.LoggingObject;
 
-public class ConfigManager extends GenericManager {
+public class ConfigManager extends LoggingObject {
 
     private ConfigDir configDir;
+    private ManageClient client;
 
-    public ConfigManager(ConfigDir configDir, RestTemplate restTemplate, String baseUri) {
-        super(restTemplate, baseUri);
+    public ConfigManager(ConfigDir configDir, ManageClient client) {
         this.configDir = configDir;
+        this.client = client;
     }
 
     /**
@@ -28,6 +29,6 @@ public class ConfigManager extends GenericManager {
         } catch (IOException ie) {
             throw new RuntimeException(ie);
         }
-        new ServiceManager(getRestTemplate(), getBaseUrl()).createRestApi(config.getName(), json);
+        new ServiceManager(client).createRestApi(config.getName(), json);
     }
 }

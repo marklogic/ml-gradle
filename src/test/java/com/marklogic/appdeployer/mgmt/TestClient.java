@@ -2,26 +2,24 @@ package com.marklogic.appdeployer.mgmt;
 
 import java.io.File;
 
-import org.springframework.web.client.RestTemplate;
-
 import com.marklogic.appdeployer.AppConfig;
-import com.marklogic.appdeployer.util.RestTemplateUtil;
 
 public class TestClient {
 
     public static void main(String[] args) throws Exception {
 
-        // Define how to connect to the ML manage app
-        ManageConfig manageConfig = new ManageConfig("localhost", 8002, "admin", "admin");
+        // Define how to connect to the ML manage API - this defaults to localhost/8002/admin/admin
+        ManageConfig manageConfig = new ManageConfig();
 
-        // Configure a Spring RestTemplate instance that can talk to the ML manage app
-        RestTemplate restTemplate = RestTemplateUtil.newRestTemplate(manageConfig);
+        // Build a client for talking to the ML manage API - this wraps an instance of Spring RestTemplate with some
+        // convenience methods for talking to the manage API
+        ManageClient client = new ManageClient(manageConfig);
 
-        // Define where configuration files for the ML app are
+        // Define where configuration files for the ML app are - defaults to src/main/ml-config
         ConfigDir configDir = new ConfigDir(new File("src/test/resources/sample-app/src/main/ml-config"));
 
-        // Build a ConfigManager with all the fun method
-        ConfigManager configMgr = new ConfigManager(configDir, restTemplate, manageConfig.getBaseUrl());
+        // Build a ConfigManager with all the fun methods
+        ConfigManager configMgr = new ConfigManager(configDir, client);
 
         // Define app configuration
         AppConfig config = new AppConfig();

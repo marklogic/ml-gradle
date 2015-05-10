@@ -11,12 +11,23 @@ public class ManageConfig {
         super();
     }
 
+    public ManageConfig(String host, String password) {
+        super();
+        this.host = host;
+        this.password = password;
+    }
+
     public ManageConfig(String host, int port, String username, String password) {
         super();
         this.host = host;
         this.port = port;
         this.username = username;
         this.password = password;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("[host: %s, port: %d, username: %s]", host, port, username);
     }
 
     public String getBaseUrl() {

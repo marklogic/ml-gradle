@@ -1,18 +1,13 @@
 package com.marklogic.appdeployer.mgmt;
 
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
+import com.marklogic.appdeployer.util.RestTemplateUtil;
 import com.marklogic.clientutil.LoggingObject;
 
 /**
@@ -31,11 +26,8 @@ public class ManageClient extends LoggingObject {
         if (logger.isInfoEnabled()) {
             logger.info("Initializing with manage config of: " + config);
         }
-        BasicCredentialsProvider prov = new BasicCredentialsProvider();
-        prov.setCredentials(new AuthScope(config.getHost(), config.getPort(), AuthScope.ANY_REALM),
-                new UsernamePasswordCredentials(config.getUsername(), config.getPassword()));
-        HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(prov).build();
-        this.restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory(client));
+        this.restTemplate = RestTemplateUtil.newRestTemplate(config.getHost(), config.getPort(), config.getUsername(),
+                config.getPassword());
         this.baseUrl = config.getBaseUrl();
         if (logger.isInfoEnabled()) {
             logger.info("Initialized with base URL of: " + baseUrl);

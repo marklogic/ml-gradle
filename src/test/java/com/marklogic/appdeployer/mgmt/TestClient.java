@@ -27,7 +27,8 @@ public class TestClient {
         config.setRestPort(8070);
 
         // Now start calling fun methods that get things done
-        configMgr.createRestApi(config);
+        // configMgr.createRestApi(config);
+        configMgr.uninstallApp(config);
 
         System.out.println("All done!");
     }

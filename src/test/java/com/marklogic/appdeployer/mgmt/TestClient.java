@@ -23,12 +23,17 @@ public class TestClient {
 
         // Define app configuration
         AppConfig config = new AppConfig();
-        config.setName("sample-app");
-        config.setRestPort(8070);
+        config.setName("shorty");
+        config.setRestPort(8032);
 
         // Now start calling fun methods that get things done
-        // configMgr.createRestApi(config);
-        configMgr.uninstallApp(config);
+        configMgr.createRestApi(config);
+
+        // In order to uninstall, need to define how to talk to 8000/v1/eval
+        // AppServicesConfig defaults to localhost/8000/admin/admin
+        configMgr.setAppServicesConfig(new AppServicesConfig());
+
+        //configMgr.uninstallApp(config);
 
         System.out.println("All done!");
     }

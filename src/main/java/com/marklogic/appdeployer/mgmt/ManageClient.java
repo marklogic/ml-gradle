@@ -26,8 +26,7 @@ public class ManageClient extends LoggingObject {
         if (logger.isInfoEnabled()) {
             logger.info("Initializing with manage config of: " + config);
         }
-        this.restTemplate = RestTemplateUtil.newRestTemplate(config.getHost(), config.getPort(), config.getUsername(),
-                config.getPassword());
+        this.restTemplate = RestTemplateUtil.newRestTemplate(config);
         this.baseUrl = config.getBaseUrl();
         if (logger.isInfoEnabled()) {
             logger.info("Initialized with base URL of: " + baseUrl);

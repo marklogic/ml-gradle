@@ -22,15 +22,13 @@ public class ConfigManager extends LoggingObject {
 
     private ConfigDir configDir;
     private ManageClient client;
+    private AppServicesConfig appServicesConfig;
 
     public ConfigManager(ConfigDir configDir, ManageClient client) {
         this.configDir = configDir;
         this.client = client;
     }
 
-    /**
-     * Expect a single JSON/XML file in /rest-apis?
-     */
     public void createRestApi(AppConfig config) {
         File f = configDir.getRestApiFile();
         String json = null;
@@ -39,6 +37,11 @@ public class ConfigManager extends LoggingObject {
         } catch (IOException ie) {
             throw new RuntimeException(ie);
         }
+        json = json.replace("%%NAME%%", config.getName());
+        json = json.replace("%%GROUP%%", config.getGroupName());
+        json = json.replace("%%DATABASE%%", config.getContentDatabaseName());
+        json = json.replace("%%MODULES-DATABASE%%", config.getModulesDatabaseName());
+        json = json.replace("%%PORT%%", config.getRestPort() + "");
         new ServiceManager(client).createRestApi(config.getName(), json);
     }
 
@@ -49,16 +52,20 @@ public class ConfigManager extends LoggingObject {
      * @param config
      */
     public void uninstallApp(AppConfig config) {
+        if (appServicesConfig == null) {
+            throw new IllegalStateException("Cannot uninstall an app without an instance of AppServicesConfig set");
+        }
         String xquery = loadStringFromClassPath("uninstall-app.xqy");
         xquery = xquery.replace("%%APP_NAME%%", config.getName());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+        map.add("xquery", xquery);
+
         logger.info("Uninstalling app with name: " + config.getName());
         try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-            MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
-            map.add("xquery", xquery);
-
-            RestTemplate rt = RestTemplateUtil.newRestTemplate("localhost", 8000, "admin", "admin");
+            RestTemplate rt = RestTemplateUtil.newRestTemplate(appServicesConfig);
             rt.exchange("http://localhost:8000/v1/eval", HttpMethod.POST,
                     new HttpEntity<MultiValueMap<String, String>>(map, headers), String.class);
         } catch (Exception e) {
@@ -74,5 +81,9 @@ public class ConfigManager extends LoggingObject {
             throw new RuntimeException("Unable to load string from classpath resource at: " + path + "; cause: "
                     + ie.getMessage(), ie);
         }
+    }
+
+    public void setAppServicesConfig(AppServicesConfig appServicesConfig) {
+        this.appServicesConfig = appServicesConfig;
     }
 }

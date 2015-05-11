@@ -29,18 +29,30 @@ public class ConfigManager extends LoggingObject {
 
     public void createRestApi(ConfigDir configDir, AppConfig config) {
         File f = configDir.getRestApiFile();
-        String json = null;
+        String input = null;
         try {
-            json = new String(FileCopyUtils.copyToByteArray(f));
+            input = new String(FileCopyUtils.copyToByteArray(f));
         } catch (IOException ie) {
             throw new RuntimeException(ie);
         }
-        json = json.replace("%%NAME%%", config.getName());
+
+        ServiceManager mgr = new ServiceManager(client);
+
+        String json = input.replace("%%NAME%%", config.getRestServerName());
         json = json.replace("%%GROUP%%", config.getGroupName());
         json = json.replace("%%DATABASE%%", config.getContentDatabaseName());
         json = json.replace("%%MODULES-DATABASE%%", config.getModulesDatabaseName());
         json = json.replace("%%PORT%%", config.getRestPort() + "");
-        new ServiceManager(client).createRestApi(config.getName(), json);
+        mgr.createRestApi(config.getRestServerName(), json);
+
+        if (config.isTestPortSet()) {
+            json = input.replace("%%NAME%%", config.getTestRestServerName());
+            json = json.replace("%%GROUP%%", config.getGroupName());
+            json = json.replace("%%DATABASE%%", config.getTestContentDatabaseName());
+            json = json.replace("%%MODULES-DATABASE%%", config.getModulesDatabaseName());
+            json = json.replace("%%PORT%%", config.getTestRestPort() + "");
+            mgr.createRestApi(config.getTestRestServerName(), json);
+        }
     }
 
     /**

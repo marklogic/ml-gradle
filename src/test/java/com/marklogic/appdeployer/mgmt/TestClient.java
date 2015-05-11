@@ -19,15 +19,15 @@ public class TestClient {
         ConfigDir configDir = new ConfigDir(new File("src/test/resources/sample-app/src/main/ml-config"));
 
         // Build a ConfigManager with all the fun methods
-        ConfigManager configMgr = new ConfigManager(configDir, client);
+        ConfigManager configMgr = new ConfigManager(client);
 
         // Define app configuration
-        AppConfig config = new AppConfig();
-        config.setName("shorty");
-        config.setRestPort(8032);
+        AppConfig appConfig = new AppConfig();
+        appConfig.setName("shorty");
+        appConfig.setRestPort(8032);
 
         // Now start calling fun methods that get things done
-        configMgr.createRestApi(config);
+        configMgr.createRestApi(configDir, appConfig);
 
         // In order to uninstall, need to define how to talk to 8000/v1/eval
         // AppServicesConfig defaults to localhost/8000/admin/admin

@@ -20,16 +20,14 @@ import com.marklogic.clientutil.LoggingObject;
 
 public class ConfigManager extends LoggingObject {
 
-    private ConfigDir configDir;
     private ManageClient client;
     private AppServicesConfig appServicesConfig;
 
-    public ConfigManager(ConfigDir configDir, ManageClient client) {
-        this.configDir = configDir;
+    public ConfigManager(ManageClient client) {
         this.client = client;
     }
 
-    public void createRestApi(AppConfig config) {
+    public void createRestApi(ConfigDir configDir, AppConfig config) {
         File f = configDir.getRestApiFile();
         String json = null;
         try {

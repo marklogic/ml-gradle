@@ -23,7 +23,7 @@ public class TestClient {
 
         // Define app configuration
         AppConfig appConfig = new AppConfig();
-        appConfig.setName("some-app");
+        appConfig.setName("sample-app");
         appConfig.setRestPort(8100);
         appConfig.setTestRestPort(8101);
 

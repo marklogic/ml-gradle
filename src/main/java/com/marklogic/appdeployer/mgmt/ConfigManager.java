@@ -18,6 +18,11 @@ import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.util.RestTemplateUtil;
 import com.marklogic.clientutil.LoggingObject;
 
+/**
+ * Sequence - add security stuff, which is global to ML. Create a REST API. Update the content databases. Update the
+ * module databases (low priority). Update the REST servers. Then load the modules, or start doing things like CPF and
+ * scheduled tasks?
+ */
 public class ConfigManager extends LoggingObject {
 
     private ManageClient client;
@@ -29,38 +34,46 @@ public class ConfigManager extends LoggingObject {
 
     public void createRestApi(ConfigDir configDir, AppConfig config) {
         File f = configDir.getRestApiFile();
-        String input = null;
-        try {
-            input = new String(FileCopyUtils.copyToByteArray(f));
-        } catch (IOException ie) {
-            throw new RuntimeException(ie);
-        }
+        String input = copyFileToString(f);
 
         ServiceManager mgr = new ServiceManager(client);
 
-        String json = input.replace("%%NAME%%", config.getRestServerName());
-        json = json.replace("%%GROUP%%", config.getGroupName());
-        json = json.replace("%%DATABASE%%", config.getContentDatabaseName());
-        json = json.replace("%%MODULES-DATABASE%%", config.getModulesDatabaseName());
-        json = json.replace("%%PORT%%", config.getRestPort() + "");
-        mgr.createRestApi(config.getRestServerName(), json);
+        String body = replaceRestApiTokens(input, config);
+        mgr.createRestApi(config.getRestServerName(), body);
 
         if (config.isTestPortSet()) {
-            json = input.replace("%%NAME%%", config.getTestRestServerName());
-            json = json.replace("%%GROUP%%", config.getGroupName());
-            json = json.replace("%%DATABASE%%", config.getTestContentDatabaseName());
-            json = json.replace("%%MODULES-DATABASE%%", config.getModulesDatabaseName());
-            json = json.replace("%%PORT%%", config.getTestRestPort() + "");
-            mgr.createRestApi(config.getTestRestServerName(), json);
+            body = replaceRestApiTokens(input, config);
+            mgr.createRestApi(config.getTestRestServerName(), body);
         }
     }
 
-    /**
-     * TODO Need to run this against 8000/v1/eval, so we can't really assume that the manage username/password will
-     * work, but we'll use that for now.
-     * 
-     * @param config
-     */
+    public void updateDatabases(ConfigDir configDir, AppConfig config) {
+        File f = configDir.getContentDatabaseFile();
+        if (f.exists()) {
+
+        } else {
+            logger.info("Not updating content databases, no database file found at: " + f.getAbsolutePath());
+        }
+    }
+
+    protected String replaceRestApiTokens(String input, AppConfig config) {
+        input = input.replace("%%NAME%%", config.getRestServerName());
+        input = input.replace("%%GROUP%%", config.getGroupName());
+        input = input.replace("%%DATABASE%%", config.getContentDatabaseName());
+        input = input.replace("%%MODULES-DATABASE%%", config.getModulesDatabaseName());
+        input = input.replace("%%PORT%%", config.getRestPort() + "");
+        return input;
+    }
+
+    protected String replaceTestRestApiTokens(String input, AppConfig config) {
+        input = input.replace("%%NAME%%", config.getTestRestServerName());
+        input = input.replace("%%GROUP%%", config.getGroupName());
+        input = input.replace("%%DATABASE%%", config.getTestContentDatabaseName());
+        input = input.replace("%%MODULES-DATABASE%%", config.getModulesDatabaseName());
+        input = input.replace("%%PORT%%", config.getTestRestPort() + "");
+        return input;
+    }
+
     public void uninstallApp(AppConfig config) {
         if (appServicesConfig == null) {
             throw new IllegalStateException("Cannot uninstall an app without an instance of AppServicesConfig set");
@@ -89,6 +102,15 @@ public class ConfigManager extends LoggingObject {
             return new String(FileCopyUtils.copyToByteArray(new ClassPathResource(path).getInputStream()));
         } catch (IOException ie) {
             throw new RuntimeException("Unable to load string from classpath resource at: " + path + "; cause: "
+                    + ie.getMessage(), ie);
+        }
+    }
+
+    protected String copyFileToString(File f) {
+        try {
+            return new String(FileCopyUtils.copyToByteArray(f));
+        } catch (IOException ie) {
+            throw new RuntimeException("Unable to copy file to string from path: " + f.getAbsolutePath() + "; cause: "
                     + ie.getMessage(), ie);
         }
     }

@@ -14,8 +14,9 @@ public class ConfigDir {
         this.baseDir = baseDir;
     }
 
-    public File[] getDatabaseFiles() {
-        return new File(baseDir, "databases").listFiles();
+    public File getContentDatabaseFile() {
+        File dir = new File(baseDir, "databases");
+        return new File(dir, "content.json");
     }
 
     public File getRestApiFile() {

@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.mgmt;
+package com.marklogic.appdeployer.mgmt.databases;
 
 import org.jdom2.Namespace;
 import org.springframework.http.HttpEntity;

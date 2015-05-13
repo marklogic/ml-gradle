@@ -1,9 +1,12 @@
-package com.marklogic.appdeployer.mgmt;
+package com.marklogic.appdeployer.mgmt.security;
 
-import com.marklogic.appdeployer.mgmt.UserManager;
+import com.marklogic.appdeployer.mgmt.ManageClient;
+import com.marklogic.appdeployer.mgmt.ManageConfig;
+import com.marklogic.appdeployer.mgmt.security.UserManager;
 
 import org.junit.Before;
 import org.junit.Test;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 

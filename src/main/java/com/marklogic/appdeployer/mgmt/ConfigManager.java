@@ -15,13 +15,13 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.mgmt.services.ServiceManager;
 import com.marklogic.appdeployer.util.RestTemplateUtil;
 import com.marklogic.clientutil.LoggingObject;
 
 /**
- * Sequence - add security stuff, which is global to ML. Create a REST API. Update the content databases. Update the
- * module databases (low priority). Update the REST servers. Then load the modules, or start doing things like CPF and
- * scheduled tasks?
+ * This is an "uber" manager that provides high-level methods that depend on NounManager classes for getting things
+ * done.
  */
 public class ConfigManager extends LoggingObject {
 

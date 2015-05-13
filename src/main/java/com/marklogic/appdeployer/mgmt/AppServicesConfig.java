@@ -2,6 +2,10 @@ package com.marklogic.appdeployer.mgmt;
 
 import com.marklogic.appdeployer.util.RestConfig;
 
+/**
+ * For un-installing an application, we need to know how to invoke the host:8000/v1/eval endpoint - this class defines
+ * that configuration.
+ */
 public class AppServicesConfig extends RestConfig {
 
     public AppServicesConfig() {

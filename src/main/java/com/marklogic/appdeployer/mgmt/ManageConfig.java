@@ -2,6 +2,9 @@ package com.marklogic.appdeployer.mgmt;
 
 import com.marklogic.appdeployer.util.RestConfig;
 
+/**
+ * Defines the configuration data for talking to the Mgmt REST API.
+ */
 public class ManageConfig extends RestConfig {
 
     public ManageConfig() {

@@ -11,7 +11,8 @@ import com.marklogic.appdeployer.util.RestTemplateUtil;
 import com.marklogic.clientutil.LoggingObject;
 
 /**
- * Wraps a RestTemplate with methods that should simplify accessing the Manage API with RestTemplate.
+ * Wraps a RestTemplate with methods that should simplify accessing the Manage API with RestTemplate. Each NounManager
+ * should depend on an instance of ManageClient for accessing the Manage API.
  */
 public class ManageClient extends LoggingObject {
 

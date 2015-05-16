@@ -30,11 +30,7 @@ public class TestClient {
         // Now start calling fun methods that get things done
         configMgr.createRestApi(configDir, appConfig);
 
-        // In order to uninstall, need to define how to talk to 8000/v1/eval
-        // AppServicesConfig defaults to localhost/8000/admin/admin
-        configMgr.setAppServicesConfig(new AppServicesConfig());
-
-        //configMgr.uninstallApp(appConfig);
+        // configMgr.uninstallApp(appConfig, true, true);
 
         System.out.println("All done!");
     }

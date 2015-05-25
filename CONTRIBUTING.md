@@ -9,7 +9,7 @@ Note that in the instructions above, "gradlew" - the Gradle wrapper - is used to
 you already have Gradle installed in your environment, you can just run "gradle". I believe any version of Gradle 2.x should
 work, but I always recommend the latest one.
 
-To kick the tires on this library, try running any of the tests in src/test/java. 
+To kick the tires on this library, try running any of the tests in src/test/java. The tests currently assume that your ML admin username/password is admin/admin - there's an issue for making this configurable for your local environment. 
 
 To make contributions, check out the issues in the project and follow the below, subject-to-change process:
 

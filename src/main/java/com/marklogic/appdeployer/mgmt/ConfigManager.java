@@ -68,6 +68,13 @@ public class ConfigManager extends LoggingObject {
         return input;
     }
 
+    public void deleteRestApiAndWaitForRestart(AppConfig config, boolean includeModules, boolean includeContent) {
+        String timestamp = getLastRestartTimestamp();
+        logger.info("About to delete REST API, will then wait for MarkLogic to restart");
+        deleteRestApi(config, includeModules, includeContent);
+        waitForRestart(timestamp);
+    }
+
     public void deleteRestApi(AppConfig config, boolean includeModules, boolean includeContent) {
         String path = client.getBaseUrl() + "/v1/rest-apis/" + config.getName() + "?";
         if (includeModules) {
@@ -79,13 +86,6 @@ public class ConfigManager extends LoggingObject {
         logger.info("Deleting app, path: " + path);
         client.getRestTemplate().exchange(path, HttpMethod.DELETE, null, String.class);
         logger.info("Finished deleting app");
-    }
-
-    public void deleteRestApiAndWaitForRestart(AppConfig config, boolean includeModules, boolean includeContent) {
-        String timestamp = getLastRestartTimestamp();
-        logger.info("About to delete REST API, will then wait for MarkLogic to restart");
-        deleteRestApi(config, includeModules, includeContent);
-        waitForRestart(timestamp);
     }
 
     public void waitForRestart(String lastRestartTimestamp) {
@@ -111,6 +111,9 @@ public class ConfigManager extends LoggingObject {
         }
     }
 
+    /**
+     * TODO May want to extract this into an AdminManager that depends on AdminConfig.
+     */
     public String getLastRestartTimestamp() {
         if (adminConfig == null) {
             throw new IllegalStateException("Cannot access admin app, no admin config provided");

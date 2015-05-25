@@ -9,6 +9,10 @@ import org.slf4j.LoggerFactory;
 
 import com.marklogic.appdeployer.AppConfig;
 
+/**
+ * Base class for tests that run against the new management API in ML8. Main purpose is to provide convenience methods
+ * for quickly creating and deleting a sample application. 
+ */
 public abstract class AbstractMgmtTest extends Assert {
 
     public final static String SAMPLE_APP_NAME = "sample-app";

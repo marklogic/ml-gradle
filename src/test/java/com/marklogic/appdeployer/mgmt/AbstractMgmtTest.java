@@ -4,13 +4,17 @@ import java.io.File;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.marklogic.appdeployer.AppConfig;
 
 public abstract class AbstractMgmtTest extends Assert {
 
     public final static String SAMPLE_APP_NAME = "sample-app";
-    
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+
     protected ManageConfig manageConfig;
     protected ManageClient manageClient;
 
@@ -38,6 +42,6 @@ public abstract class AbstractMgmtTest extends Assert {
     }
 
     protected void deleteSampleApp() {
-        configMgr.deleteRestApi(appConfig, true, true);
+        configMgr.deleteRestApiAndWaitForRestart(appConfig, true, true);
     }
 }

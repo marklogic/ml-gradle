@@ -1,4 +1,9 @@
-# ml-app-deployer
+# ml-app-deployer for MarkLogic 8
+
+ml-app-deployer is being rebuilt to utilize the new Management REST API in MarkLogic 8. If you'd like to contribute to
+this effort, please read the CONTRIBUTING.md file and check out the issues on the right. 
+
+# ml-app-deployer for MarkLogic 7
 
 AppDeployer is a library for automating typical tasks involved in installing and configuring a MarkLogic application.
 It was extracted from the https://github.com/rjrudin/ml-gradle Gradle plugin for the primary purpose of making it easier

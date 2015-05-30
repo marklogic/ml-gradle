@@ -1,0 +1,11 @@
+{
+    "domain-name": "myDomain",
+    "restart-user-name": "admin",
+    "eval-module": "sample-app-modules",
+    "eval-root": "/",
+    "conversion-enabled": false,
+    "permission": [{
+        "role-name": "app-user",
+        "capability": "read"
+    }]
+}

@@ -1,6 +1,7 @@
 package com.marklogic.appdeployer.util;
 
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -38,6 +39,14 @@ public class Fragment {
 
     public boolean elementExists(String xpath) {
         return evaluateForElements(xpath).size() > 0;
+    }
+
+    public List<String> getElementValues(String xpath) {
+        List<String> values = new ArrayList<String>();
+        for (Element el : evaluateForElements(xpath)) {
+            values.add(el.getText());
+        }
+        return values;
     }
 
     protected List<Element> evaluateForElements(String xpath) {

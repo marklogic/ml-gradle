@@ -47,7 +47,7 @@ public class ManageClient extends LoggingObject {
     }
 
     public Fragment getXml(String path, String... namespacePrefixesAndUris) {
-        String xml = getRestTemplate().getForObject(getBaseUrl() + "/manage/v2/databases", String.class);
+        String xml = getRestTemplate().getForObject(getBaseUrl() + path, String.class);
         List<Namespace> list = new ArrayList<Namespace>();
         for (int i = 0; i < namespacePrefixesAndUris.length; i += 2) {
             list.add(Namespace.getNamespace(namespacePrefixesAndUris[i], namespacePrefixesAndUris[i + 1]));

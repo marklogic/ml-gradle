@@ -1,5 +1,9 @@
 package com.marklogic.appdeployer.mgmt;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jdom2.Namespace;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -7,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import com.marklogic.appdeployer.util.Fragment;
 import com.marklogic.appdeployer.util.RestTemplateUtil;
 import com.marklogic.clientutil.LoggingObject;
 
@@ -39,6 +44,15 @@ public class ManageClient extends LoggingObject {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<String>(json, headers);
         return restTemplate.exchange(baseUrl + path, HttpMethod.POST, request, String.class);
+    }
+
+    public Fragment getXml(String path, String... namespacePrefixesAndUris) {
+        String xml = getRestTemplate().getForObject(getBaseUrl() + "/manage/v2/databases", String.class);
+        List<Namespace> list = new ArrayList<Namespace>();
+        for (int i = 0; i < namespacePrefixesAndUris.length; i += 2) {
+            list.add(Namespace.getNamespace(namespacePrefixesAndUris[i], namespacePrefixesAndUris[i + 1]));
+        }
+        return new Fragment(xml, list.toArray(new Namespace[] {}));
     }
 
     public RestTemplate getRestTemplate() {

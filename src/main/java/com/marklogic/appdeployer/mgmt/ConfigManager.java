@@ -8,6 +8,7 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.web.client.RestTemplate;
 
 import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.mgmt.databases.DatabaseManager;
 import com.marklogic.appdeployer.mgmt.services.ServiceManager;
 import com.marklogic.appdeployer.util.RestTemplateUtil;
 import com.marklogic.clientutil.LoggingObject;
@@ -28,16 +29,28 @@ public class ConfigManager extends LoggingObject {
 
     public void createRestApi(ConfigDir configDir, AppConfig config) {
         File f = configDir.getRestApiFile();
-        String input = copyFileToString(f);
+        String payload = copyFileToString(f);
 
         ServiceManager mgr = new ServiceManager(client);
 
-        String body = replaceRestApiTokens(input, config);
-        mgr.createRestApi(config.getRestServerName(), body);
+        payload = replaceConfigTokens(payload, config, false);
+        mgr.createRestApi(config.getRestServerName(), payload);
 
         if (config.isTestPortSet()) {
-            body = replaceRestApiTokens(input, config);
-            mgr.createRestApi(config.getTestRestServerName(), body);
+            payload = replaceConfigTokens(payload, config, true);
+            mgr.createRestApi(config.getTestRestServerName(), payload);
+        }
+    }
+
+    public void createTriggersDatabase(ConfigDir configDir, AppConfig config) {
+        File f = configDir.getTriggersDatabaseFile();
+        if (f.exists()) {
+            String payload = copyFileToString(f);
+            payload = replaceConfigTokens(payload, config, false);
+            DatabaseManager mgr = new DatabaseManager(client);
+            mgr.createDatabase(config.getTriggersDatabaseName(), payload);
+        } else {
+            logger.info("Not creating a triggers database, no file found at: " + f.getAbsolutePath());
         }
     }
 
@@ -50,22 +63,17 @@ public class ConfigManager extends LoggingObject {
         }
     }
 
-    protected String replaceRestApiTokens(String input, AppConfig config) {
-        input = input.replace("%%NAME%%", config.getRestServerName());
-        input = input.replace("%%GROUP%%", config.getGroupName());
-        input = input.replace("%%DATABASE%%", config.getContentDatabaseName());
-        input = input.replace("%%MODULES-DATABASE%%", config.getModulesDatabaseName());
-        input = input.replace("%%PORT%%", config.getRestPort() + "");
-        return input;
-    }
-
-    protected String replaceTestRestApiTokens(String input, AppConfig config) {
-        input = input.replace("%%NAME%%", config.getTestRestServerName());
-        input = input.replace("%%GROUP%%", config.getGroupName());
-        input = input.replace("%%DATABASE%%", config.getTestContentDatabaseName());
-        input = input.replace("%%MODULES-DATABASE%%", config.getModulesDatabaseName());
-        input = input.replace("%%PORT%%", config.getTestRestPort() + "");
-        return input;
+    protected String replaceConfigTokens(String payload, AppConfig config, boolean isTestResource) {
+        payload = payload.replace("%%NAME%%",
+                isTestResource ? config.getTestRestServerName() : config.getRestServerName());
+        payload = payload.replace("%%GROUP%%", config.getGroupName());
+        payload = payload.replace("%%DATABASE%%",
+                isTestResource ? config.getTestContentDatabaseName() : config.getContentDatabaseName());
+        payload = payload.replace("%%MODULES-DATABASE%%", config.getModulesDatabaseName());
+        payload = payload.replace("%%TRIGGERS_DATABASE%%", config.getTriggersDatabaseName());
+        payload = payload.replace("%%PORT%%", isTestResource ? config.getTestRestPort().toString() : config
+                .getRestPort().toString());
+        return payload;
     }
 
     public void deleteRestApiAndWaitForRestart(AppConfig config, boolean includeModules, boolean includeContent) {

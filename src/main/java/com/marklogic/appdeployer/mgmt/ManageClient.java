@@ -68,6 +68,10 @@ public class ManageClient extends LoggingObject {
         return new Fragment(xml, list.toArray(new Namespace[] {}));
     }
 
+    public void delete(String path) {
+        restTemplate.delete(baseUrl + path);
+    }
+
     public RestTemplate getRestTemplate() {
         return restTemplate;
     }

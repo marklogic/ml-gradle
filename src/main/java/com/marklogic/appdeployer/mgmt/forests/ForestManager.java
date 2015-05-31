@@ -39,7 +39,6 @@ public class ForestManager extends AbstractManager {
         logger.info(format("Attaching forest %s to database %s", forestIdOrName, databaseIdOrName));
         String path = format("/manage/v2/forests/%s", forestIdOrName);
         client.postForm(path, "state", "attach", "database", databaseIdOrName);
-        client.getRestTemplate().postForObject(client.getBaseUrl() + path, "", String.class);
         logger.info(format("Attached forest %s to database %s", forestIdOrName, databaseIdOrName));
     }
 

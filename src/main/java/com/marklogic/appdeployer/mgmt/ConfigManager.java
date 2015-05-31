@@ -3,15 +3,8 @@ package com.marklogic.appdeployer.mgmt;
 import java.io.File;
 import java.io.IOException;
 
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import com.marklogic.appdeployer.AppConfig;
@@ -26,7 +19,8 @@ import com.marklogic.clientutil.LoggingObject;
 public class ConfigManager extends LoggingObject {
 
     private ManageClient client;
-    private AppServicesConfig appServicesConfig;
+    private AdminConfig adminConfig;
+    private int waitForRestartCheckInterval = 500;
 
     public ConfigManager(ManageClient client) {
         this.client = client;
@@ -74,36 +68,58 @@ public class ConfigManager extends LoggingObject {
         return input;
     }
 
-    public void uninstallApp(AppConfig config) {
-        if (appServicesConfig == null) {
-            throw new IllegalStateException("Cannot uninstall an app without an instance of AppServicesConfig set");
+    public void deleteRestApiAndWaitForRestart(AppConfig config, boolean includeModules, boolean includeContent) {
+        String timestamp = getLastRestartTimestamp();
+        logger.info("About to delete REST API, will then wait for MarkLogic to restart");
+        deleteRestApi(config, includeModules, includeContent);
+        waitForRestart(timestamp);
+    }
+
+    public void deleteRestApi(AppConfig config, boolean includeModules, boolean includeContent) {
+        String path = client.getBaseUrl() + "/v1/rest-apis/" + config.getName() + "?";
+        if (includeModules) {
+            path += "include=modules&";
         }
-        String xquery = loadStringFromClassPath("uninstall-app.xqy");
-        xquery = xquery.replace("%%APP_NAME%%", config.getName());
+        if (includeContent) {
+            path += "include=content";
+        }
+        logger.info("Deleting app, path: " + path);
+        client.getRestTemplate().exchange(path, HttpMethod.DELETE, null, String.class);
+        logger.info("Finished deleting app");
+    }
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
-        map.add("xquery", xquery);
-
-        logger.info("Uninstalling app with name: " + config.getName());
-        try {
-            RestTemplate rt = RestTemplateUtil.newRestTemplate(appServicesConfig);
-            rt.exchange("http://localhost:8000/v1/eval", HttpMethod.POST,
-                    new HttpEntity<MultiValueMap<String, String>>(map, headers), String.class);
-        } catch (Exception e) {
-            logger.warn("Could not uninstall app; it may not be installed yet? Cause: " + e.getMessage());
+    public void waitForRestart(String lastRestartTimestamp) {
+        logger.info("Waiting for MarkLogic to restart, last restart timestamp: " + lastRestartTimestamp);
+        logger.info("Ignore any HTTP client logging about socket exceptions and retries, those are expected while waiting for MarkLogic to restart");
+        while (true) {
+            sleepUntilNextRestartCheck();
+            String restart = getLastRestartTimestamp();
+            if (restart != null && !restart.equals(lastRestartTimestamp)) {
+                logger.info(String
+                        .format("MarkLogic has successfully restarted; new restart timestamp [%s] is greater than last restart timestamp [%s]",
+                                restart, lastRestartTimestamp));
+                break;
+            }
         }
     }
 
-    protected String loadStringFromClassPath(String path) {
-        path = ClassUtils.addResourcePathToPackagePath(getClass(), path);
+    protected void sleepUntilNextRestartCheck() {
         try {
-            return new String(FileCopyUtils.copyToByteArray(new ClassPathResource(path).getInputStream()));
-        } catch (IOException ie) {
-            throw new RuntimeException("Unable to load string from classpath resource at: " + path + "; cause: "
-                    + ie.getMessage(), ie);
+            Thread.sleep(getWaitForRestartCheckInterval());
+        } catch (Exception e) {
+            // ignore
         }
+    }
+
+    /**
+     * TODO May want to extract this into an AdminManager that depends on AdminConfig.
+     */
+    public String getLastRestartTimestamp() {
+        if (adminConfig == null) {
+            throw new IllegalStateException("Cannot access admin app, no admin config provided");
+        }
+        RestTemplate t = RestTemplateUtil.newRestTemplate(adminConfig);
+        return t.getForEntity(adminConfig.getBaseUrl() + "/admin/v1/timestamp", String.class).getBody();
     }
 
     protected String copyFileToString(File f) {
@@ -115,7 +131,19 @@ public class ConfigManager extends LoggingObject {
         }
     }
 
-    public void setAppServicesConfig(AppServicesConfig appServicesConfig) {
-        this.appServicesConfig = appServicesConfig;
+    public AdminConfig getAdminConfig() {
+        return adminConfig;
+    }
+
+    public void setAdminConfig(AdminConfig adminConfig) {
+        this.adminConfig = adminConfig;
+    }
+
+    public int getWaitForRestartCheckInterval() {
+        return waitForRestartCheckInterval;
+    }
+
+    public void setWaitForRestartCheckInterval(int waitForRestartCheckInterval) {
+        this.waitForRestartCheckInterval = waitForRestartCheckInterval;
     }
 }

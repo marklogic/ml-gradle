@@ -23,6 +23,6 @@ public class HostManager extends AbstractManager {
     }
 
     public Fragment getHosts() {
-        return client.getXml("/manage/v2/hosts", "h", "http://marklogic.com/manage/hosts");
+        return client.getXml("/manage/v2/hosts");
     }
 }

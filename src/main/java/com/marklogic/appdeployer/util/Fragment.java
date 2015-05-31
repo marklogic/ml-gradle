@@ -23,7 +23,13 @@ public class Fragment {
     public Fragment(String xml, Namespace... namespaces) {
         try {
             internalDoc = new SAXBuilder().build(new StringReader(xml));
-            this.namespaces = namespaces;
+            List<Namespace> list = new ArrayList<Namespace>();
+            list.add(Namespace.getNamespace("f", "http://marklogic.com/manage/forests"));
+            list.add(Namespace.getNamespace("h", "http://marklogic.com/manage/hosts"));
+            for (Namespace n : namespaces) {
+                list.add(n);
+            }
+            this.namespaces = list.toArray(new Namespace[] {});
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

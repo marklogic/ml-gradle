@@ -39,4 +39,15 @@ public class DatabaseManager extends AbstractManager {
             logger.info(format("Deleted database %s", name));
         }
     }
+    
+    /**
+     * This might be too fine-grained, we may want to just do this as part of updating the content database.
+     */
+    public void assignTriggersDatabase(String databaseIdOrName, String triggersDatabaseName) {
+        String json = format("{\"triggers-database\":\"%s\"}", triggersDatabaseName);
+        String path = format("/manage/v2/databases/%s/properties", databaseIdOrName);
+        logger.info(format("Assigning triggers database %s to database %s", triggersDatabaseName, databaseIdOrName));
+        client.putJson(path, json);
+        logger.info(format("Assigned triggers database %s to database %s", triggersDatabaseName, databaseIdOrName));
+    }
 }

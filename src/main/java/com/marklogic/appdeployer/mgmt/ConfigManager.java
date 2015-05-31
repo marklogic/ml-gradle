@@ -52,14 +52,16 @@ public class ConfigManager extends LoggingObject {
     public void createTriggersDatabase(AppConfig appConfig, ConfigDir configDir) {
         File f = configDir.getTriggersDatabaseFile();
         if (f.exists()) {
-            DatabaseManager mgr = new DatabaseManager(client);
+            DatabaseManager dbMgr = new DatabaseManager(client);
 
             String dbName = appConfig.getTriggersDatabaseName();
             String payload = copyFileToString(f);
             payload = replaceConfigTokens(payload, appConfig, false);
-            mgr.createDatabase(dbName, payload);
+            dbMgr.createDatabase(dbName, payload);
 
             createAndAttachForestOnEachHost(dbName);
+
+            dbMgr.assignTriggersDatabase(appConfig.getContentDatabaseName(), dbName);
         } else {
             logger.info("Not creating a triggers database, no file found at: " + f.getAbsolutePath());
         }

@@ -8,8 +8,12 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 import com.marklogic.appdeployer.mgmt.admin.AdminConfig;
 
+/**
+ * Defines configuration for the JUnit tests. The non-version-controlled user.properties file is imported second so that
+ * a developer can override what's in test.properties.
+ */
 @Configuration
-@PropertySource(value = { "classpath:sample-app/test.properties" }, ignoreResourceNotFound = true)
+@PropertySource(value = { "classpath:test.properties", "classpath:user.properties" }, ignoreResourceNotFound = true)
 public class MgmtTestConfig {
 
     @Value("${mlManageHost:localhost}")

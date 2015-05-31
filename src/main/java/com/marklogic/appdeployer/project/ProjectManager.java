@@ -7,6 +7,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.client.RestTemplate;
 
+import com.marklogic.appdeployer.AbstractManager;
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.mgmt.AdminConfig;
 import com.marklogic.appdeployer.mgmt.ManageClient;
@@ -15,14 +16,13 @@ import com.marklogic.appdeployer.mgmt.forests.ForestManager;
 import com.marklogic.appdeployer.mgmt.hosts.HostManager;
 import com.marklogic.appdeployer.mgmt.services.ServiceManager;
 import com.marklogic.appdeployer.util.RestTemplateUtil;
-import com.marklogic.clientutil.LoggingObject;
 
 /**
  * Manages a project - i.e. looks for files in the ConfigDir and makes the appropriate calls to the Mgmt API using
  * "NounManager" classes. This is the class that something like a Gradle plugin would interact with, and hopefully only
  * this class.
  */
-public class ProjectManager extends LoggingObject {
+public class ProjectManager extends AbstractManager {
 
     private ManageClient client;
     private AdminConfig adminConfig;
@@ -33,8 +33,11 @@ public class ProjectManager extends LoggingObject {
     }
 
     public void createApp(AppConfig appConfig, ConfigDir configDir) {
+        logger.info(format("Creating application %s with config dir of: %s", appConfig.getName(), configDir
+                .getBaseDir().getAbsolutePath()));
         createRestApi(configDir, appConfig);
         createTriggersDatabase(appConfig, configDir);
+        logger.info(format("Created application %s", appConfig.getName()));
     }
 
     public void createRestApi(ConfigDir configDir, AppConfig config) {
@@ -113,6 +116,9 @@ public class ProjectManager extends LoggingObject {
      * the app, and not just the REST API.
      */
     public void deleteApp(AppConfig appConfig, ConfigDir configDir) {
+        logger.info(format("Deleting app %s with config dir: %s", appConfig.getName(), configDir.getBaseDir()
+                .getAbsolutePath()));
+
         deleteRestApiAndWaitForRestart(appConfig, true, true);
 
         // TODO Use Spring's event publishing to decouple this?
@@ -120,6 +126,8 @@ public class ProjectManager extends LoggingObject {
             DatabaseManager dbMgr = new DatabaseManager(client);
             dbMgr.deleteDatabase(appConfig.getTriggersDatabaseName());
         }
+
+        logger.info(format("Finished deleting app %s", appConfig.getName()));
     }
 
     public void deleteRestApi(AppConfig appConfig, boolean includeModules, boolean includeContent) {
@@ -130,9 +138,9 @@ public class ProjectManager extends LoggingObject {
         if (includeContent) {
             path += "include=content";
         }
-        logger.info("Deleting app, path: " + path);
+        logger.info("Deleting REST API, path: " + path);
         client.getRestTemplate().exchange(path, HttpMethod.DELETE, null, String.class);
-        logger.info("Finished deleting app");
+        logger.info("Finished deleting REST API");
     }
 
     public void waitForRestart(String lastRestartTimestamp) {

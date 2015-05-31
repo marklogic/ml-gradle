@@ -44,4 +44,8 @@ public class ConfigDir {
     public void setRestApiPath(String restApiPath) {
         this.restApiPath = restApiPath;
     }
+
+    public File getBaseDir() {
+        return baseDir;
+    }
 }

@@ -1,59 +1,42 @@
 package com.marklogic.appdeployer.mgmt.databases;
 
-import org.jdom2.Namespace;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.web.client.RestTemplate;
-
+import com.marklogic.appdeployer.mgmt.AbstractManager;
+import com.marklogic.appdeployer.mgmt.ManageClient;
 import com.marklogic.appdeployer.util.Fragment;
-import com.marklogic.clientutil.LoggingObject;
 
-public class DatabaseManager extends LoggingObject {
+public class DatabaseManager extends AbstractManager {
 
-    private RestTemplate rt;
-    private String baseUrl;
+    private ManageClient client;
 
-    public DatabaseManager(RestTemplate rt, String baseUrl) {
-        this.rt = rt;
-        this.baseUrl = baseUrl;
+    public DatabaseManager(ManageClient client) {
+        this.client = client;
     }
 
-    /**
-     * The name is needed so we can easily determine if the database needs to be created or updated. The client should
-     * have easy access to the name - probably from AppConfig - so that this class doesn't have to extract it from the
-     * body.
-     * 
-     * @param name
-     * @param body
-     * @param format
-     */
-    public void createDatabase(String name, String body, String format) {
+    public void createDatabase(String name, String payload) {
         if (dbExists(name)) {
-            logger.warn("Database already exists: " + name);
+            logger.info(format("Database %s already exists", name));
         } else {
-            logger.info("Creating database: " + name);
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<String> request = new HttpEntity<String>(body, headers);
-            rt.exchange(baseUrl + "/manage/v2/databases?format=" + format, HttpMethod.POST, request, String.class);
-            logger.info("Created database: " + name);
+            logger.info(format("Creating database: %s", name));
+            client.postJson("/manage/v2/databases", payload);
+            logger.info(format("Created database: %s", name));
         }
     }
 
     public boolean dbExists(String name) {
-        String xml = rt.getForObject(baseUrl + "/manage/v2/databases", String.class);
-        Fragment f = new Fragment(xml, Namespace.getNamespace("db", "http://marklogic.com/manage/databases"));
+        Fragment f = client.getXml("/manage/v2/databases", "db", "http://marklogic.com/manage/databases");
         return f.elementExists(String.format("/db:database-default-list/db:list-items/db:list-item[db:nameref = '%s']",
                 name));
     }
 
-    public void setRt(RestTemplate rt) {
-        this.rt = rt;
-    }
-
-    public void setBaseUrl(String baseUri) {
-        this.baseUrl = baseUri;
+    public void deleteDatabase(String name) {
+        if (!dbExists(name)) {
+            logger.info(format("Database %s name does not exist, not deleting", name));
+        } else {
+            logger.info(format("Deleting database %s", name));
+            // This is deleting the forests too, though the docs -
+            // http://docs.marklogic.com/REST/DELETE/manage/v2/databases/[id-or-name] - suggest otherwise
+            client.delete(format("/manage/v2/databases/%s", name));
+            logger.info(format("Deleted database %s", name));
+        }
     }
 }

@@ -29,6 +29,10 @@ public class ConfigDir {
         return new File(dir, "content.json");
     }
 
+    public File getTriggersDatabaseFile() {
+        return new File(new File(baseDir, databasesPath), "triggers-database.json");
+    }
+
     public File getRestApiFile() {
         return new File(baseDir, restApiPath);
     }

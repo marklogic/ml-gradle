@@ -11,7 +11,7 @@ import com.marklogic.appdeployer.AppConfig;
 
 /**
  * Base class for tests that run against the new management API in ML8. Main purpose is to provide convenience methods
- * for quickly creating and deleting a sample application. 
+ * for quickly creating and deleting a sample application.
  */
 public abstract class AbstractMgmtTest extends Assert {
 
@@ -46,6 +46,10 @@ public abstract class AbstractMgmtTest extends Assert {
     }
 
     protected void deleteSampleApp() {
-        configMgr.deleteRestApiAndWaitForRestart(appConfig, true, true);
+        try {
+            configMgr.deleteRestApiAndWaitForRestart(appConfig, true, true);
+        } catch (Exception e) {
+            logger.warn("Error while waiting for MarkLogic to restart: " + e.getMessage());
+        }
     }
 }

@@ -8,6 +8,9 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.web.client.RestTemplate;
 
 import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.mgmt.databases.DatabaseManager;
+import com.marklogic.appdeployer.mgmt.forests.ForestManager;
+import com.marklogic.appdeployer.mgmt.hosts.HostManager;
 import com.marklogic.appdeployer.mgmt.services.ServiceManager;
 import com.marklogic.appdeployer.util.RestTemplateUtil;
 import com.marklogic.clientutil.LoggingObject;
@@ -26,18 +29,48 @@ public class ConfigManager extends LoggingObject {
         this.client = client;
     }
 
+    public void createApp(AppConfig appConfig, ConfigDir configDir) {
+        createRestApi(configDir, appConfig);
+        createTriggersDatabase(appConfig, configDir);
+    }
+
     public void createRestApi(ConfigDir configDir, AppConfig config) {
         File f = configDir.getRestApiFile();
-        String input = copyFileToString(f);
+        String payload = copyFileToString(f);
 
         ServiceManager mgr = new ServiceManager(client);
 
-        String body = replaceRestApiTokens(input, config);
-        mgr.createRestApi(config.getRestServerName(), body);
+        payload = replaceConfigTokens(payload, config, false);
+        mgr.createRestApi(config.getRestServerName(), payload);
 
         if (config.isTestPortSet()) {
-            body = replaceRestApiTokens(input, config);
-            mgr.createRestApi(config.getTestRestServerName(), body);
+            payload = replaceConfigTokens(payload, config, true);
+            mgr.createRestApi(config.getTestRestServerName(), payload);
+        }
+    }
+
+    public void createTriggersDatabase(AppConfig appConfig, ConfigDir configDir) {
+        File f = configDir.getTriggersDatabaseFile();
+        if (f.exists()) {
+            DatabaseManager mgr = new DatabaseManager(client);
+
+            String dbName = appConfig.getTriggersDatabaseName();
+            String payload = copyFileToString(f);
+            payload = replaceConfigTokens(payload, appConfig, false);
+            mgr.createDatabase(dbName, payload);
+
+            createAndAttachForestOnEachHost(dbName);
+        } else {
+            logger.info("Not creating a triggers database, no file found at: " + f.getAbsolutePath());
+        }
+    }
+
+    public void createAndAttachForestOnEachHost(String dbName) {
+        ForestManager fmgr = new ForestManager(client);
+        String forestName = dbName + "-1";
+        for (String hostName : new HostManager(client).getHostNames()) {
+            fmgr.createForestWithName(forestName, hostName);
+            fmgr.attachForest(forestName, dbName);
         }
     }
 
@@ -50,33 +83,42 @@ public class ConfigManager extends LoggingObject {
         }
     }
 
-    protected String replaceRestApiTokens(String input, AppConfig config) {
-        input = input.replace("%%NAME%%", config.getRestServerName());
-        input = input.replace("%%GROUP%%", config.getGroupName());
-        input = input.replace("%%DATABASE%%", config.getContentDatabaseName());
-        input = input.replace("%%MODULES-DATABASE%%", config.getModulesDatabaseName());
-        input = input.replace("%%PORT%%", config.getRestPort() + "");
-        return input;
+    protected String replaceConfigTokens(String payload, AppConfig config, boolean isTestResource) {
+        payload = payload.replace("%%NAME%%",
+                isTestResource ? config.getTestRestServerName() : config.getRestServerName());
+        payload = payload.replace("%%GROUP%%", config.getGroupName());
+        payload = payload.replace("%%DATABASE%%",
+                isTestResource ? config.getTestContentDatabaseName() : config.getContentDatabaseName());
+        payload = payload.replace("%%MODULES-DATABASE%%", config.getModulesDatabaseName());
+        payload = payload.replace("%%TRIGGERS_DATABASE%%", config.getTriggersDatabaseName());
+        payload = payload.replace("%%PORT%%", isTestResource ? config.getTestRestPort().toString() : config
+                .getRestPort().toString());
+        return payload;
     }
 
-    protected String replaceTestRestApiTokens(String input, AppConfig config) {
-        input = input.replace("%%NAME%%", config.getTestRestServerName());
-        input = input.replace("%%GROUP%%", config.getGroupName());
-        input = input.replace("%%DATABASE%%", config.getTestContentDatabaseName());
-        input = input.replace("%%MODULES-DATABASE%%", config.getModulesDatabaseName());
-        input = input.replace("%%PORT%%", config.getTestRestPort() + "");
-        return input;
-    }
-
-    public void deleteRestApiAndWaitForRestart(AppConfig config, boolean includeModules, boolean includeContent) {
+    public void deleteRestApiAndWaitForRestart(AppConfig appConfig, boolean includeModules, boolean includeContent) {
         String timestamp = getLastRestartTimestamp();
         logger.info("About to delete REST API, will then wait for MarkLogic to restart");
-        deleteRestApi(config, includeModules, includeContent);
+        deleteRestApi(appConfig, includeModules, includeContent);
         waitForRestart(timestamp);
     }
 
-    public void deleteRestApi(AppConfig config, boolean includeModules, boolean includeContent) {
-        String path = client.getBaseUrl() + "/v1/rest-apis/" + config.getName() + "?";
+    /**
+     * This is the primary method for deleting an entire app. That means it'll need knowledge of everything created by
+     * the app, and not just the REST API.
+     */
+    public void deleteApp(AppConfig appConfig, ConfigDir configDir) {
+        deleteRestApiAndWaitForRestart(appConfig, true, true);
+
+        // TODO Use Spring's event publishing to decouple this?
+        if (configDir.getTriggersDatabaseFile().exists()) {
+            DatabaseManager dbMgr = new DatabaseManager(client);
+            dbMgr.deleteDatabase(appConfig.getTriggersDatabaseName());
+        }
+    }
+
+    public void deleteRestApi(AppConfig appConfig, boolean includeModules, boolean includeContent) {
+        String path = client.getBaseUrl() + "/v1/rest-apis/" + appConfig.getName() + "?";
         if (includeModules) {
             path += "include=modules&";
         }
@@ -91,14 +133,23 @@ public class ConfigManager extends LoggingObject {
     public void waitForRestart(String lastRestartTimestamp) {
         logger.info("Waiting for MarkLogic to restart, last restart timestamp: " + lastRestartTimestamp);
         logger.info("Ignore any HTTP client logging about socket exceptions and retries, those are expected while waiting for MarkLogic to restart");
-        while (true) {
-            sleepUntilNextRestartCheck();
-            String restart = getLastRestartTimestamp();
-            if (restart != null && !restart.equals(lastRestartTimestamp)) {
-                logger.info(String
-                        .format("MarkLogic has successfully restarted; new restart timestamp [%s] is greater than last restart timestamp [%s]",
-                                restart, lastRestartTimestamp));
-                break;
+        try {
+            while (true) {
+                sleepUntilNextRestartCheck();
+                String restart = getLastRestartTimestamp();
+                if (restart != null && !restart.equals(lastRestartTimestamp)) {
+                    logger.info(String
+                            .format("MarkLogic has successfully restarted; new restart timestamp [%s] is greater than last restart timestamp [%s]",
+                                    restart, lastRestartTimestamp));
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            String message = "Caught exception while waiting for MarkLogic to restart: " + e.getMessage();
+            if (logger.isDebugEnabled()) {
+                logger.warn(message, e);
+            } else {
+                logger.warn(message);
             }
         }
     }

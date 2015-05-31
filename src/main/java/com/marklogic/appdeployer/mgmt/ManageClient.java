@@ -1,12 +1,19 @@
 package com.marklogic.appdeployer.mgmt;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jdom2.Namespace;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.marklogic.appdeployer.util.Fragment;
 import com.marklogic.appdeployer.util.RestTemplateUtil;
 import com.marklogic.clientutil.LoggingObject;
 
@@ -39,6 +46,30 @@ public class ManageClient extends LoggingObject {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<String>(json, headers);
         return restTemplate.exchange(baseUrl + path, HttpMethod.POST, request, String.class);
+    }
+
+    public ResponseEntity<String> postForm(String path, String... params) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+        for (int i = 0; i < params.length; i += 2) {
+            map.add(params[i], params[i + 1]);
+        }
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+        return restTemplate.exchange(baseUrl + path, HttpMethod.POST, entity, String.class);
+    }
+
+    public Fragment getXml(String path, String... namespacePrefixesAndUris) {
+        String xml = getRestTemplate().getForObject(getBaseUrl() + path, String.class);
+        List<Namespace> list = new ArrayList<Namespace>();
+        for (int i = 0; i < namespacePrefixesAndUris.length; i += 2) {
+            list.add(Namespace.getNamespace(namespacePrefixesAndUris[i], namespacePrefixesAndUris[i + 1]));
+        }
+        return new Fragment(xml, list.toArray(new Namespace[] {}));
+    }
+
+    public void delete(String path) {
+        restTemplate.delete(baseUrl + path);
     }
 
     public RestTemplate getRestTemplate() {

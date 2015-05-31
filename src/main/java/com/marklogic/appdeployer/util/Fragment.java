@@ -1,6 +1,7 @@
 package com.marklogic.appdeployer.util;
 
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -22,7 +23,13 @@ public class Fragment {
     public Fragment(String xml, Namespace... namespaces) {
         try {
             internalDoc = new SAXBuilder().build(new StringReader(xml));
-            this.namespaces = namespaces;
+            List<Namespace> list = new ArrayList<Namespace>();
+            list.add(Namespace.getNamespace("f", "http://marklogic.com/manage/forests"));
+            list.add(Namespace.getNamespace("h", "http://marklogic.com/manage/hosts"));
+            for (Namespace n : namespaces) {
+                list.add(n);
+            }
+            this.namespaces = list.toArray(new Namespace[] {});
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -38,6 +45,14 @@ public class Fragment {
 
     public boolean elementExists(String xpath) {
         return evaluateForElements(xpath).size() > 0;
+    }
+
+    public List<String> getElementValues(String xpath) {
+        List<String> values = new ArrayList<String>();
+        for (Element el : evaluateForElements(xpath)) {
+            values.add(el.getText());
+        }
+        return values;
     }
 
     protected List<Element> evaluateForElements(String xpath) {

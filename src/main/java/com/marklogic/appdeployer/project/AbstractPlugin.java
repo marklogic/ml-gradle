@@ -8,7 +8,17 @@ import org.springframework.util.FileCopyUtils;
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.clientutil.LoggingObject;
 
-public abstract class AbstractPlugin extends LoggingObject {
+/**
+ * Abstract base class that provides some convenience methods for implementing a plugin. Requires that the Spring
+ * Ordered interface be implemented so that the implementor takes into account when this particular plugin should be
+ * executed relative to other plugins.
+ */
+public abstract class AbstractPlugin extends LoggingObject implements ProjectPlugin, Comparable<ProjectPlugin> {
+
+    @Override
+    public int compareTo(ProjectPlugin otherPlugin) {
+        return getSortOrder().compareTo(otherPlugin.getSortOrder());
+    }
 
     protected String format(String s, Object... args) {
         return String.format(s, args);
@@ -23,6 +33,10 @@ public abstract class AbstractPlugin extends LoggingObject {
         }
     }
 
+    /**
+     * TODO Would be nice to extract this into a separate class - e.g. TokenReplacer - so that it's easier to customize
+     * the tokens that are replaced.
+     */
     protected String replaceConfigTokens(String payload, AppConfig config, boolean isTestResource) {
         payload = payload.replace("%%NAME%%",
                 isTestResource ? config.getTestRestServerName() : config.getRestServerName());

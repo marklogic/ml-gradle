@@ -10,12 +10,12 @@ public abstract class AbstractSampleAppTest extends AbstractMgmtTest {
 
     @Before
     public void setupSampleApp() {
-        createSampleApp();
+        createSampleAppRestApi();
     }
 
     @After
     public void teardownSampleApp() {
-        configMgr.setAdminConfig(new AdminConfig());
+        projectMgr.setAdminConfig(new AdminConfig());
         //deleteSampleApp();
     }
 }

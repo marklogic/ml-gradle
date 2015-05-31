@@ -14,6 +14,7 @@ import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.project.ConfigDir;
 import com.marklogic.appdeployer.project.DefaultConfiguration;
 import com.marklogic.appdeployer.project.ProjectManager;
+import com.marklogic.appdeployer.project.RestApiPlugin;
 
 /**
  * Base class for tests that run against the new management API in ML8. Main purpose is to provide convenience methods
@@ -29,7 +30,7 @@ public abstract class AbstractMgmtTest extends Assert {
     protected ManageClient manageClient;
 
     protected ConfigDir configDir;
-    protected ProjectManager configMgr;
+    protected ProjectManager projectMgr;
     protected ConfigurableApplicationContext projectAppContext;
 
     protected AppConfig appConfig;
@@ -39,7 +40,7 @@ public abstract class AbstractMgmtTest extends Assert {
         manageClient = new ManageClient(new ManageConfig());
         configDir = new ConfigDir(new File("src/test/resources/sample-app/src/main/ml-config"));
         projectAppContext = new AnnotationConfigApplicationContext(DefaultConfiguration.class);
-        configMgr = new ProjectManager(projectAppContext, manageClient);
+        projectMgr = new ProjectManager(projectAppContext, manageClient);
         initializeAppConfig();
     }
 
@@ -50,8 +51,11 @@ public abstract class AbstractMgmtTest extends Assert {
         }
     }
 
-    protected void createSampleApp() {
-        configMgr.createRestApi(configDir, appConfig);
+    /**
+     * Useful for when your test only needs a REST API and not full the sample app created.
+     */
+    protected void createSampleAppRestApi() {
+        new RestApiPlugin().onCreate(appConfig, configDir, manageClient);
     }
 
     protected void initializeAppConfig() {
@@ -62,7 +66,7 @@ public abstract class AbstractMgmtTest extends Assert {
 
     protected void deleteSampleApp() {
         try {
-            configMgr.deleteRestApiAndWaitForRestart(appConfig, true, true);
+            projectMgr.deleteApp(appConfig, configDir);
         } catch (Exception e) {
             logger.warn("Error while waiting for MarkLogic to restart: " + e.getMessage());
         }

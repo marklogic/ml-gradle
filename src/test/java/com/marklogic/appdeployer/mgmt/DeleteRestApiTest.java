@@ -14,10 +14,10 @@ public class DeleteRestApiTest extends AbstractMgmtTest {
     public void createAndDelete() {
         ServiceManager mgr = new ServiceManager(manageClient);
 
-        createSampleApp();
+        createSampleAppRestApi();
         assertTrue("The REST API server should exist", mgr.restApiServerExists(SAMPLE_APP_NAME));
 
-        configMgr.setAdminConfig(new AdminConfig());
+        projectMgr.setAdminConfig(new AdminConfig());
         deleteSampleApp();
         assertFalse("The REST API server should have been deleted", mgr.restApiServerExists(SAMPLE_APP_NAME));
     }

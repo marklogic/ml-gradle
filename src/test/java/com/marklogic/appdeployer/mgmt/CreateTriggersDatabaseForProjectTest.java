@@ -15,14 +15,14 @@ public class CreateTriggersDatabaseForProjectTest extends AbstractMgmtTest {
         String dbName = "sample-app-triggers";
         String forestName = dbName + "-1";
 
-        configMgr.createApp(appConfig, configDir);
+        projectMgr.createApp(appConfig, configDir);
 
         assertTrue("The triggers database should have been created", dbMgr.dbExists(dbName));
         assertTrue("A forest for the triggers database should have been created", forestMgr.forestExists(forestName));
         assertTrue("The forest should be attached", forestMgr.isForestAttached(forestName));
 
-        configMgr.setAdminConfig(new AdminConfig());
-        configMgr.deleteApp(appConfig, configDir);
+        projectMgr.setAdminConfig(new AdminConfig());
+        projectMgr.deleteApp(appConfig, configDir);
 
         assertFalse("The triggers database should have been deleted", dbMgr.dbExists(dbName));
         assertFalse("The triggers forest should have been deleted", forestMgr.forestExists(forestName));

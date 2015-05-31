@@ -8,7 +8,12 @@ import com.marklogic.appdeployer.mgmt.databases.DatabaseManager;
 import com.marklogic.appdeployer.mgmt.forests.ForestManager;
 import com.marklogic.appdeployer.mgmt.hosts.HostManager;
 
-public class TriggersDatabasePlugin extends AbstractPlugin implements ProjectPlugin {
+public class TriggersDatabasePlugin extends AbstractPlugin {
+
+    @Override
+    public Integer getSortOrder() {
+        return 500;
+    }
 
     @Override
     public void onCreate(AppConfig appConfig, ConfigDir configDir, ManageClient manageClient) {

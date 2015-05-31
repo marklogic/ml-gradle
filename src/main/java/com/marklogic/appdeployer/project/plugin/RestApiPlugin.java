@@ -17,7 +17,7 @@ public class RestApiPlugin extends AbstractPlugin implements RequirestRestartOnD
     private boolean includeContent = true;
 
     @Override
-    public Integer getSortOrder() {
+    public Integer getSortOrderOnCreate() {
         return 100;
     }
 

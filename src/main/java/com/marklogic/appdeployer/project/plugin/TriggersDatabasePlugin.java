@@ -13,7 +13,7 @@ import com.marklogic.appdeployer.project.ConfigDir;
 public class TriggersDatabasePlugin extends AbstractPlugin {
 
     @Override
-    public Integer getSortOrder() {
+    public Integer getSortOrderOnCreate() {
         return 500;
     }
 

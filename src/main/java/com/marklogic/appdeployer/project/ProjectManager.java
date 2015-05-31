@@ -2,6 +2,7 @@ package com.marklogic.appdeployer.project;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.context.ApplicationContext;
@@ -31,8 +32,12 @@ public class ProjectManager extends AbstractManager {
         logger.info(format("Creating application %s with config dir of: %s", appConfig.getName(), configDir
                 .getBaseDir().getAbsolutePath()));
 
-        for (ProjectPlugin plugin : getPluginsFromSpring(appContext)) {
-            logPluginToInvoke(plugin);
+        List<ProjectPlugin> plugins = getPluginsFromSpring(appContext);
+        Collections.sort(plugins, new OnCreateComparator());
+
+        for (ProjectPlugin plugin : plugins) {
+            logger.info(format("Invoking plugin [%s] with sort order [%d]", plugin.getClass().getName(),
+                    plugin.getSortOrderOnCreate()));
             plugin.onCreate(appConfig, configDir, manageClient);
         }
 
@@ -43,8 +48,12 @@ public class ProjectManager extends AbstractManager {
         logger.info(format("Deleting app %s with config dir: %s", appConfig.getName(), configDir.getBaseDir()
                 .getAbsolutePath()));
 
+        List<ProjectPlugin> plugins = getPluginsFromSpring(appContext);
+        Collections.sort(plugins, new OnDeleteComparator());
+
         for (ProjectPlugin plugin : getPluginsFromSpring(appContext)) {
-            logPluginToInvoke(plugin);
+            logger.info(format("Invoking plugin [%s] with sort order [%d]", plugin.getClass().getName(),
+                    plugin.getSortOrderOnDelete()));
 
             String lastRestartTimestamp = null;
             if (plugin instanceof RequirestRestartOnDelete) {
@@ -69,20 +78,27 @@ public class ProjectManager extends AbstractManager {
         logger.info(format("Finished deleting app %s", appConfig.getName()));
     }
 
-    private void logPluginToInvoke(ProjectPlugin plugin) {
-        logger.info(format("Invoking plugin [%s] with sort order [%d]", plugin.getClass().getName(),
-                plugin.getSortOrder()));
-    }
-
     protected List<ProjectPlugin> getPluginsFromSpring(ApplicationContext applicationContext) {
         List<ProjectPlugin> plugins = new ArrayList<ProjectPlugin>();
         plugins.addAll(applicationContext.getBeansOfType(ProjectPlugin.class).values());
-        Collections.sort(plugins);
         return plugins;
     }
 
     public void setAdminManager(AdminManager adminManager) {
         this.adminManager = adminManager;
     }
+}
 
+class OnCreateComparator implements Comparator<ProjectPlugin> {
+    @Override
+    public int compare(ProjectPlugin o1, ProjectPlugin o2) {
+        return o1.getSortOrderOnCreate().compareTo(o2.getSortOrderOnCreate());
+    }
+}
+
+class OnDeleteComparator implements Comparator<ProjectPlugin> {
+    @Override
+    public int compare(ProjectPlugin o1, ProjectPlugin o2) {
+        return o1.getSortOrderOnDelete().compareTo(o2.getSortOrderOnDelete());
+    }
 }

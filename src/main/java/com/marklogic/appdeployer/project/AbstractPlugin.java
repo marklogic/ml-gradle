@@ -13,11 +13,15 @@ import com.marklogic.clientutil.LoggingObject;
  * Ordered interface be implemented so that the implementor takes into account when this particular plugin should be
  * executed relative to other plugins.
  */
-public abstract class AbstractPlugin extends LoggingObject implements ProjectPlugin, Comparable<ProjectPlugin> {
+public abstract class AbstractPlugin extends LoggingObject implements ProjectPlugin {
 
+    /**
+     * By default, assumes that the sort order on delete should be the same as on create. Subclasses can override this
+     * to provide an alternate approach.
+     */
     @Override
-    public int compareTo(ProjectPlugin otherPlugin) {
-        return getSortOrder().compareTo(otherPlugin.getSortOrder());
+    public Integer getSortOrderOnDelete() {
+        return getSortOrderOnCreate();
     }
 
     protected String format(String s, Object... args) {

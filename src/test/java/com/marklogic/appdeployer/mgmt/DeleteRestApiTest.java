@@ -2,6 +2,7 @@ package com.marklogic.appdeployer.mgmt;
 
 import org.junit.Test;
 
+import com.marklogic.appdeployer.mgmt.admin.AdminConfig;
 import com.marklogic.appdeployer.mgmt.admin.AdminManager;
 import com.marklogic.appdeployer.mgmt.services.ServiceManager;
 

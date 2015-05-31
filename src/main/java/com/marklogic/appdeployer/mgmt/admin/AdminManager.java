@@ -3,7 +3,6 @@ package com.marklogic.appdeployer.mgmt.admin;
 import org.springframework.web.client.RestTemplate;
 
 import com.marklogic.appdeployer.AbstractManager;
-import com.marklogic.appdeployer.mgmt.AdminConfig;
 import com.marklogic.appdeployer.util.RestTemplateUtil;
 
 public class AdminManager extends AbstractManager {

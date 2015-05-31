@@ -15,7 +15,6 @@ public abstract class AbstractSampleAppTest extends AbstractMgmtTest {
 
     @After
     public void teardownSampleApp() {
-        projectMgr.setAdminConfig(new AdminConfig());
-        //deleteSampleApp();
+        deleteSampleApp();
     }
 }

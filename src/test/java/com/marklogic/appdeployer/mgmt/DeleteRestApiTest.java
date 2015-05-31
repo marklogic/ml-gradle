@@ -2,6 +2,7 @@ package com.marklogic.appdeployer.mgmt;
 
 import org.junit.Test;
 
+import com.marklogic.appdeployer.mgmt.admin.AdminManager;
 import com.marklogic.appdeployer.mgmt.services.ServiceManager;
 
 /**
@@ -17,7 +18,7 @@ public class DeleteRestApiTest extends AbstractMgmtTest {
         createSampleAppRestApi();
         assertTrue("The REST API server should exist", mgr.restApiServerExists(SAMPLE_APP_NAME));
 
-        projectMgr.setAdminConfig(new AdminConfig());
+        projectMgr.setAdminManager(new AdminManager(new AdminConfig()));
         deleteSampleApp();
         assertFalse("The REST API server should have been deleted", mgr.restApiServerExists(SAMPLE_APP_NAME));
     }

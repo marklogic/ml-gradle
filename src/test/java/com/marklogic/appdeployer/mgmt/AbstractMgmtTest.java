@@ -11,6 +11,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.mgmt.admin.AdminManager;
 import com.marklogic.appdeployer.project.ConfigDir;
 import com.marklogic.appdeployer.project.DefaultConfiguration;
 import com.marklogic.appdeployer.project.ProjectManager;
@@ -65,6 +66,8 @@ public abstract class AbstractMgmtTest extends Assert {
     }
 
     protected void deleteSampleApp() {
+        // TODO Will soon need to read in properties for AdminConfig
+        projectMgr.setAdminManager(new AdminManager(new AdminConfig()));
         try {
             projectMgr.deleteApp(appConfig, configDir);
         } catch (Exception e) {

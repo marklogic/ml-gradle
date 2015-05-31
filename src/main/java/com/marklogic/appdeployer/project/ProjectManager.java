@@ -36,9 +36,7 @@ public class ProjectManager extends AbstractManager {
                 .getBaseDir().getAbsolutePath()));
 
         for (ProjectPlugin plugin : getPluginsFromSpring(appContext)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(format("Invoking project plugin %s", plugin.getClass()));
-            }
+            logPluginToInvoke(plugin);
             plugin.onCreate(appConfig, configDir, manageClient);
         }
 
@@ -50,9 +48,7 @@ public class ProjectManager extends AbstractManager {
                 .getAbsolutePath()));
 
         for (ProjectPlugin plugin : getPluginsFromSpring(appContext)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(format("Invoking project plugin %s", plugin.getClass()));
-            }
+            logPluginToInvoke(plugin);
             String lastRestartTimestamp = null;
             if (plugin instanceof RequirestRestartOnDelete) {
                 logger.info("Plugin requests restart after onDelete, last restart timestamp: " + lastRestartTimestamp);
@@ -65,6 +61,11 @@ public class ProjectManager extends AbstractManager {
         }
 
         logger.info(format("Finished deleting app %s", appConfig.getName()));
+    }
+
+    private void logPluginToInvoke(ProjectPlugin plugin) {
+        logger.info(format("Invoking plugin [%s] with sort order [%d]", plugin.getClass().getName(),
+                plugin.getSortOrder()));
     }
 
     protected List<ProjectPlugin> getPluginsFromSpring(ApplicationContext applicationContext) {

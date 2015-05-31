@@ -3,6 +3,9 @@ package com.marklogic.appdeployer.project;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.marklogic.appdeployer.project.plugin.RestApiPlugin;
+import com.marklogic.appdeployer.project.plugin.TriggersDatabasePlugin;
+
 @Configuration
 public class DefaultConfiguration {
 

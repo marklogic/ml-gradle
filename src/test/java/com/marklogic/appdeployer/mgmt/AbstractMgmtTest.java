@@ -14,7 +14,7 @@ import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.project.ConfigDir;
 import com.marklogic.appdeployer.project.DefaultConfiguration;
 import com.marklogic.appdeployer.project.ProjectManager;
-import com.marklogic.appdeployer.project.RestApiPlugin;
+import com.marklogic.appdeployer.project.plugin.RestApiPlugin;
 
 /**
  * Base class for tests that run against the new management API in ML8. Main purpose is to provide convenience methods

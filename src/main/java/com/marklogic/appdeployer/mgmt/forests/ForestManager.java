@@ -27,7 +27,8 @@ public class ForestManager extends AbstractManager {
     }
 
     public boolean forestExists(String name) {
-        return true;
+        Fragment f = client.getXml("/manage/v2/forests");
+        return f.elementExists(format("/node()/f:list-items/f:list-item[f:nameref = '%s']", name));
     }
 
     public void attachForest(String forestIdOrName, String databaseIdOrName) {
@@ -44,7 +45,6 @@ public class ForestManager extends AbstractManager {
 
     public boolean isForestAttached(String forestIdOrName) {
         Fragment f = client.getXml(format("/manage/v2/forests/%s", forestIdOrName));
-        f.prettyPrint();
         return f.elementExists("/node()/f:relations/f:relation-group[f:typeref = 'databases']");
     }
 }

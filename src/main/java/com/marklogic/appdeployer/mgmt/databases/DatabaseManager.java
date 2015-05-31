@@ -13,7 +13,6 @@ public class DatabaseManager extends LoggingObject {
     }
 
     public void createDatabase(String name, String payload) {
-        logger.info("Payload: " + payload);
         if (dbExists(name)) {
             logger.warn("Database already exists: " + name);
         } else {

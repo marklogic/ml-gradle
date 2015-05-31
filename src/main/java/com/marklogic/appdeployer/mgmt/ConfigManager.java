@@ -29,6 +29,11 @@ public class ConfigManager extends LoggingObject {
         this.client = client;
     }
 
+    public void createApp(AppConfig appConfig, ConfigDir configDir) {
+        createRestApi(configDir, appConfig);
+        createTriggersDatabase(appConfig, configDir);
+    }
+
     public void createRestApi(ConfigDir configDir, AppConfig config) {
         File f = configDir.getRestApiFile();
         String payload = copyFileToString(f);
@@ -44,14 +49,14 @@ public class ConfigManager extends LoggingObject {
         }
     }
 
-    public void createTriggersDatabase(ConfigDir configDir, AppConfig config) {
+    public void createTriggersDatabase(AppConfig appConfig, ConfigDir configDir) {
         File f = configDir.getTriggersDatabaseFile();
         if (f.exists()) {
             DatabaseManager mgr = new DatabaseManager(client);
 
-            String dbName = config.getTriggersDatabaseName();
+            String dbName = appConfig.getTriggersDatabaseName();
             String payload = copyFileToString(f);
-            payload = replaceConfigTokens(payload, config, false);
+            payload = replaceConfigTokens(payload, appConfig, false);
             mgr.createDatabase(dbName, payload);
 
             createAndAttachForestOnEachHost(dbName);
@@ -91,15 +96,29 @@ public class ConfigManager extends LoggingObject {
         return payload;
     }
 
-    public void deleteRestApiAndWaitForRestart(AppConfig config, boolean includeModules, boolean includeContent) {
+    public void deleteRestApiAndWaitForRestart(AppConfig appConfig, boolean includeModules, boolean includeContent) {
         String timestamp = getLastRestartTimestamp();
         logger.info("About to delete REST API, will then wait for MarkLogic to restart");
-        deleteRestApi(config, includeModules, includeContent);
+        deleteRestApi(appConfig, includeModules, includeContent);
         waitForRestart(timestamp);
     }
 
-    public void deleteRestApi(AppConfig config, boolean includeModules, boolean includeContent) {
-        String path = client.getBaseUrl() + "/v1/rest-apis/" + config.getName() + "?";
+    /**
+     * This is the primary method for deleting an entire app. That means it'll need knowledge of everything created by
+     * the app, and not just the REST API.
+     */
+    public void deleteApp(AppConfig appConfig, ConfigDir configDir) {
+        deleteRestApiAndWaitForRestart(appConfig, true, true);
+
+        // TODO Use Spring's event publishing to decouple this?
+        if (configDir.getTriggersDatabaseFile().exists()) {
+            DatabaseManager dbMgr = new DatabaseManager(client);
+            dbMgr.deleteDatabase(appConfig.getTriggersDatabaseName());
+        }
+    }
+
+    public void deleteRestApi(AppConfig appConfig, boolean includeModules, boolean includeContent) {
+        String path = client.getBaseUrl() + "/v1/rest-apis/" + appConfig.getName() + "?";
         if (includeModules) {
             path += "include=modules&";
         }
@@ -114,14 +133,23 @@ public class ConfigManager extends LoggingObject {
     public void waitForRestart(String lastRestartTimestamp) {
         logger.info("Waiting for MarkLogic to restart, last restart timestamp: " + lastRestartTimestamp);
         logger.info("Ignore any HTTP client logging about socket exceptions and retries, those are expected while waiting for MarkLogic to restart");
-        while (true) {
-            sleepUntilNextRestartCheck();
-            String restart = getLastRestartTimestamp();
-            if (restart != null && !restart.equals(lastRestartTimestamp)) {
-                logger.info(String
-                        .format("MarkLogic has successfully restarted; new restart timestamp [%s] is greater than last restart timestamp [%s]",
-                                restart, lastRestartTimestamp));
-                break;
+        try {
+            while (true) {
+                sleepUntilNextRestartCheck();
+                String restart = getLastRestartTimestamp();
+                if (restart != null && !restart.equals(lastRestartTimestamp)) {
+                    logger.info(String
+                            .format("MarkLogic has successfully restarted; new restart timestamp [%s] is greater than last restart timestamp [%s]",
+                                    restart, lastRestartTimestamp));
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            String message = "Caught exception while waiting for MarkLogic to restart: " + e.getMessage();
+            if (logger.isDebugEnabled()) {
+                logger.warn(message, e);
+            } else {
+                logger.warn(message);
             }
         }
     }

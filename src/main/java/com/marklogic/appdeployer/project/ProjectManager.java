@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.mgmt;
+package com.marklogic.appdeployer.project;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,6 +8,8 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.web.client.RestTemplate;
 
 import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.mgmt.AdminConfig;
+import com.marklogic.appdeployer.mgmt.ManageClient;
 import com.marklogic.appdeployer.mgmt.databases.DatabaseManager;
 import com.marklogic.appdeployer.mgmt.forests.ForestManager;
 import com.marklogic.appdeployer.mgmt.hosts.HostManager;
@@ -16,16 +18,17 @@ import com.marklogic.appdeployer.util.RestTemplateUtil;
 import com.marklogic.clientutil.LoggingObject;
 
 /**
- * This is an "uber" manager that provides high-level methods that depend on NounManager classes for getting things
- * done.
+ * Manages a project - i.e. looks for files in the ConfigDir and makes the appropriate calls to the Mgmt API using
+ * "NounManager" classes. This is the class that something like a Gradle plugin would interact with, and hopefully only
+ * this class.
  */
-public class ConfigManager extends LoggingObject {
+public class ProjectManager extends LoggingObject {
 
     private ManageClient client;
     private AdminConfig adminConfig;
     private int waitForRestartCheckInterval = 500;
 
-    public ConfigManager(ManageClient client) {
+    public ProjectManager(ManageClient client) {
         this.client = client;
     }
 

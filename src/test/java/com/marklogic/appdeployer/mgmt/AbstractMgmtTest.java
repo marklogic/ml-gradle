@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.project.ConfigDir;
+import com.marklogic.appdeployer.project.ProjectManager;
 
 /**
  * Base class for tests that run against the new management API in ML8. Main purpose is to provide convenience methods
@@ -23,7 +25,7 @@ public abstract class AbstractMgmtTest extends Assert {
     protected ManageClient manageClient;
 
     protected ConfigDir configDir;
-    protected ConfigManager configMgr;
+    protected ProjectManager configMgr;
 
     protected AppConfig appConfig;
 
@@ -31,7 +33,7 @@ public abstract class AbstractMgmtTest extends Assert {
     public void initialize() {
         manageClient = new ManageClient(new ManageConfig());
         configDir = new ConfigDir(new File("src/test/resources/sample-app/src/main/ml-config"));
-        configMgr = new ConfigManager(manageClient);
+        configMgr = new ProjectManager(manageClient);
         initializeAppConfig();
     }
 

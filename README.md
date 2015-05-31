@@ -3,6 +3,8 @@
 ml-app-deployer is being rebuilt to utilize the new Management REST API in MarkLogic 8. If you'd like to contribute to
 this effort, please read the CONTRIBUTING.md file and check out the issues on the right. 
 
+Development for this is currently happening on the dev branch.
+
 # ml-app-deployer for MarkLogic 7
 
 AppDeployer is a library for automating typical tasks involved in installing and configuring a MarkLogic application.
@@ -12,6 +14,8 @@ override how the library works.
 
 AppDeployer is currently only taking advantage of REST API endpoints in MarkLogic 7; it will soon be enhanced to leverage all
 the new management endpoints in MarkLogic 8. 
+
+Development for this can be done on the ml7 branch.
 
 Using AppDeployer is simple - just instantiate AppConfig, set whatever properties you need to, and then pass it into an implementation of AppDeployer.java (currently, Ml7AppDeployer.java). [DeployAppTest](https://github.com/rjrudin/ml-app-deployer/blob/master/src/test/java/com/marklogic/appdeployer/ml7/DeployAppTest.java) shows an example of this, which is shown below as well:
 

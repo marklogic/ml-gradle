@@ -2,13 +2,17 @@ package com.marklogic.appdeployer.mgmt;
 
 import java.io.File;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.project.ConfigDir;
+import com.marklogic.appdeployer.project.DefaultConfiguration;
 import com.marklogic.appdeployer.project.ProjectManager;
 
 /**
@@ -26,6 +30,7 @@ public abstract class AbstractMgmtTest extends Assert {
 
     protected ConfigDir configDir;
     protected ProjectManager configMgr;
+    protected ConfigurableApplicationContext projectAppContext;
 
     protected AppConfig appConfig;
 
@@ -33,8 +38,16 @@ public abstract class AbstractMgmtTest extends Assert {
     public void initialize() {
         manageClient = new ManageClient(new ManageConfig());
         configDir = new ConfigDir(new File("src/test/resources/sample-app/src/main/ml-config"));
-        configMgr = new ProjectManager(manageClient);
+        projectAppContext = new AnnotationConfigApplicationContext(DefaultConfiguration.class);
+        configMgr = new ProjectManager(projectAppContext, manageClient);
         initializeAppConfig();
+    }
+
+    @After
+    public void closeProjectAppContext() {
+        if (projectAppContext != null) {
+            projectAppContext.close();
+        }
     }
 
     protected void createSampleApp() {

@@ -3,6 +3,7 @@ package com.marklogic.appdeployer.project;
 import java.io.File;
 import java.io.IOException;
 
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpMethod;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.client.RestTemplate;
@@ -11,9 +12,6 @@ import com.marklogic.appdeployer.AbstractManager;
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.mgmt.AdminConfig;
 import com.marklogic.appdeployer.mgmt.ManageClient;
-import com.marklogic.appdeployer.mgmt.databases.DatabaseManager;
-import com.marklogic.appdeployer.mgmt.forests.ForestManager;
-import com.marklogic.appdeployer.mgmt.hosts.HostManager;
 import com.marklogic.appdeployer.mgmt.services.ServiceManager;
 import com.marklogic.appdeployer.util.RestTemplateUtil;
 
@@ -24,19 +22,26 @@ import com.marklogic.appdeployer.util.RestTemplateUtil;
  */
 public class ProjectManager extends AbstractManager {
 
-    private ManageClient client;
+    private ManageClient manageClient;
+    private ApplicationContext appContext;
     private AdminConfig adminConfig;
     private int waitForRestartCheckInterval = 500;
 
-    public ProjectManager(ManageClient client) {
-        this.client = client;
+    public ProjectManager(ApplicationContext appContext, ManageClient manageClient) {
+        this.appContext = appContext;
+        this.manageClient = manageClient;
     }
 
     public void createApp(AppConfig appConfig, ConfigDir configDir) {
         logger.info(format("Creating application %s with config dir of: %s", appConfig.getName(), configDir
                 .getBaseDir().getAbsolutePath()));
         createRestApi(configDir, appConfig);
-        createTriggersDatabase(appConfig, configDir);
+
+        for (ProjectPlugin plugin : appContext.getBeansOfType(ProjectPlugin.class).values()) {
+            logger.info(format("Invoking project plugin %s", plugin.getClass()));
+            plugin.onCreate(appConfig, configDir, manageClient);
+        }
+
         logger.info(format("Created application %s", appConfig.getName()));
     }
 
@@ -44,7 +49,7 @@ public class ProjectManager extends AbstractManager {
         File f = configDir.getRestApiFile();
         String payload = copyFileToString(f);
 
-        ServiceManager mgr = new ServiceManager(client);
+        ServiceManager mgr = new ServiceManager(manageClient);
 
         payload = replaceConfigTokens(payload, config, false);
         mgr.createRestApi(config.getRestServerName(), payload);
@@ -52,33 +57,6 @@ public class ProjectManager extends AbstractManager {
         if (config.isTestPortSet()) {
             payload = replaceConfigTokens(payload, config, true);
             mgr.createRestApi(config.getTestRestServerName(), payload);
-        }
-    }
-
-    public void createTriggersDatabase(AppConfig appConfig, ConfigDir configDir) {
-        File f = configDir.getTriggersDatabaseFile();
-        if (f.exists()) {
-            DatabaseManager dbMgr = new DatabaseManager(client);
-
-            String dbName = appConfig.getTriggersDatabaseName();
-            String payload = copyFileToString(f);
-            payload = replaceConfigTokens(payload, appConfig, false);
-            dbMgr.createDatabase(dbName, payload);
-
-            createAndAttachForestOnEachHost(dbName);
-
-            dbMgr.assignTriggersDatabase(appConfig.getContentDatabaseName(), dbName);
-        } else {
-            logger.info("Not creating a triggers database, no file found at: " + f.getAbsolutePath());
-        }
-    }
-
-    public void createAndAttachForestOnEachHost(String dbName) {
-        ForestManager fmgr = new ForestManager(client);
-        String forestName = dbName + "-1";
-        for (String hostName : new HostManager(client).getHostNames()) {
-            fmgr.createForestWithName(forestName, hostName);
-            fmgr.attachForest(forestName, dbName);
         }
     }
 
@@ -121,17 +99,16 @@ public class ProjectManager extends AbstractManager {
 
         deleteRestApiAndWaitForRestart(appConfig, true, true);
 
-        // TODO Use Spring's event publishing to decouple this?
-        if (configDir.getTriggersDatabaseFile().exists()) {
-            DatabaseManager dbMgr = new DatabaseManager(client);
-            dbMgr.deleteDatabase(appConfig.getTriggersDatabaseName());
+        for (ProjectPlugin plugin : appContext.getBeansOfType(ProjectPlugin.class).values()) {
+            logger.info(format("Invoking project plugin %s", plugin.getClass()));
+            plugin.onDelete(appConfig, configDir, manageClient);
         }
 
         logger.info(format("Finished deleting app %s", appConfig.getName()));
     }
 
     public void deleteRestApi(AppConfig appConfig, boolean includeModules, boolean includeContent) {
-        String path = client.getBaseUrl() + "/v1/rest-apis/" + appConfig.getName() + "?";
+        String path = manageClient.getBaseUrl() + "/v1/rest-apis/" + appConfig.getName() + "?";
         if (includeModules) {
             path += "include=modules&";
         }
@@ -139,7 +116,7 @@ public class ProjectManager extends AbstractManager {
             path += "include=content";
         }
         logger.info("Deleting REST API, path: " + path);
-        client.getRestTemplate().exchange(path, HttpMethod.DELETE, null, String.class);
+        manageClient.getRestTemplate().exchange(path, HttpMethod.DELETE, null, String.class);
         logger.info("Finished deleting REST API");
     }
 

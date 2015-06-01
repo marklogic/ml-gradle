@@ -26,7 +26,7 @@ public class ConfigDir {
 
     public File getContentDatabaseFile() {
         File dir = new File(baseDir, databasesPath);
-        return new File(dir, "content.json");
+        return new File(dir, "content-database.json");
     }
 
     public File getTriggersDatabaseFile() {

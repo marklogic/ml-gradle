@@ -1,11 +1,11 @@
 {
-    "database-name": "sample-app-content",
+    "database-name": "%%DATABASE%%",
     "range-element-index": [
         {
             "collation": "http://marklogic.com/collation/",
             "invalid-values": "reject",
             "localname": "id",
-            "namespace-uri": "",
+            "namespace-uri": "urn:sampleapp",
             "range-value-positions": false,
             "scalar-type": "string"
         }

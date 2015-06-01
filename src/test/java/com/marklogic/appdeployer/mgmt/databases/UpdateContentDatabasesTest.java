@@ -6,17 +6,17 @@ import org.springframework.context.annotation.Configuration;
 
 import com.marklogic.appdeployer.mgmt.AbstractMgmtTest;
 import com.marklogic.appdeployer.project.plugin.RestApiPlugin;
-import com.marklogic.appdeployer.project.plugin.UpdateContentDatabasePlugin;
+import com.marklogic.appdeployer.project.plugin.UpdateContentDatabasesPlugin;
 
-public class UpdateDatabaseTest extends AbstractMgmtTest {
+public class UpdateContentDatabasesTest extends AbstractMgmtTest {
 
-    /**
-     * Submit a configuration to ProjectManager that creates a REST API and then updates the database because it finds a
-     * "content-database.json" file.
-     */
     @Test
     public void updateDatabase() {
         initializeProjectManager(TestConfiguration.class);
+
+        projectMgr.createApp(appConfig, configDir);
+
+        // TODO Verify the range index in the content database file was added
     }
 }
 
@@ -29,7 +29,7 @@ class TestConfiguration {
     }
 
     @Bean
-    public UpdateContentDatabasePlugin updateContentDatabasePlugin() {
-        return new UpdateContentDatabasePlugin();
+    public UpdateContentDatabasesPlugin updateContentDatabasePlugin() {
+        return new UpdateContentDatabasesPlugin();
     }
 }

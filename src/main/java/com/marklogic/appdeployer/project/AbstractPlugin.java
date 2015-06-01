@@ -41,15 +41,15 @@ public abstract class AbstractPlugin extends LoggingObject implements ProjectPlu
      * TODO Would be nice to extract this into a separate class - e.g. TokenReplacer - so that it's easier to customize
      * the tokens that are replaced.
      */
-    protected String replaceConfigTokens(String payload, AppConfig config, boolean isTestResource) {
+    protected String replaceConfigTokens(String payload, AppConfig appConfig, boolean isTestResource) {
         payload = payload.replace("%%NAME%%",
-                isTestResource ? config.getTestRestServerName() : config.getRestServerName());
-        payload = payload.replace("%%GROUP%%", config.getGroupName());
+                isTestResource ? appConfig.getTestRestServerName() : appConfig.getRestServerName());
+        payload = payload.replace("%%GROUP%%", appConfig.getGroupName());
         payload = payload.replace("%%DATABASE%%",
-                isTestResource ? config.getTestContentDatabaseName() : config.getContentDatabaseName());
-        payload = payload.replace("%%MODULES-DATABASE%%", config.getModulesDatabaseName());
-        payload = payload.replace("%%TRIGGERS_DATABASE%%", config.getTriggersDatabaseName());
-        payload = payload.replace("%%PORT%%", isTestResource ? config.getTestRestPort().toString() : config
+                isTestResource ? appConfig.getTestContentDatabaseName() : appConfig.getContentDatabaseName());
+        payload = payload.replace("%%MODULES-DATABASE%%", appConfig.getModulesDatabaseName());
+        payload = payload.replace("%%TRIGGERS_DATABASE%%", appConfig.getTriggersDatabaseName());
+        payload = payload.replace("%%PORT%%", isTestResource ? appConfig.getTestRestPort().toString() : appConfig
                 .getRestPort().toString());
         return payload;
     }

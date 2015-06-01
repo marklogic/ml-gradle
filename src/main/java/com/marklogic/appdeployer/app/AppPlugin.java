@@ -4,14 +4,14 @@ import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.mgmt.ManageClient;
 
 /**
- * A plugin is used to provide additional behavior when creating and deleting an application; it keeps the
- * ProjectManager class from being tightly coupled to all the things a developer may want to happen as part of creating
- * or deleting an application.
+ * A plugin is used to provide additional behavior when creating and deleting an application; it keeps the AppManager
+ * class from being tightly coupled to all the things a developer may want to happen as part of creating or deleting an
+ * application.
  * 
- * An instance of ProjectPlugin is expected to be defined in a Spring container which is then used to construct a
- * ProjectManager.
+ * An instance of AppPlugin is expected to be defined in a Spring container which is then used to construct a
+ * AppManager.
  */
-public interface ProjectPlugin {
+public interface AppPlugin {
 
     /**
      * Return a number corresponding to the order in which this plugin should execute when an application is being

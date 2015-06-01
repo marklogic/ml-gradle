@@ -7,7 +7,7 @@ import com.marklogic.appdeployer.mgmt.AbstractMgmtTest;
 import com.marklogic.appdeployer.mgmt.databases.DatabaseManager;
 import com.marklogic.appdeployer.mgmt.forests.ForestManager;
 
-public class CreateTriggersDatabaseForProjectTest extends AbstractMgmtTest {
+public class CreateTriggersDatabaseTest extends AbstractMgmtTest {
 
     @Before
     public void setup() {

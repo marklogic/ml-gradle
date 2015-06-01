@@ -32,10 +32,10 @@ public class AppManager extends AbstractManager {
         logger.info(format("Creating application %s with config dir of: %s", appConfig.getName(), configDir
                 .getBaseDir().getAbsolutePath()));
 
-        List<ProjectPlugin> plugins = getPluginsFromSpring(appContext);
+        List<AppPlugin> plugins = getPluginsFromSpring(appContext);
         Collections.sort(plugins, new OnCreateComparator());
 
-        for (ProjectPlugin plugin : plugins) {
+        for (AppPlugin plugin : plugins) {
             logger.info(format("Invoking plugin [%s] with sort order [%d]", plugin.getClass().getName(),
                     plugin.getSortOrderOnCreate()));
             plugin.onCreate(appConfig, configDir, manageClient);
@@ -48,10 +48,10 @@ public class AppManager extends AbstractManager {
         logger.info(format("Deleting app %s with config dir: %s", appConfig.getName(), configDir.getBaseDir()
                 .getAbsolutePath()));
 
-        List<ProjectPlugin> plugins = getPluginsFromSpring(appContext);
+        List<AppPlugin> plugins = getPluginsFromSpring(appContext);
         Collections.sort(plugins, new OnDeleteComparator());
 
-        for (ProjectPlugin plugin : getPluginsFromSpring(appContext)) {
+        for (AppPlugin plugin : getPluginsFromSpring(appContext)) {
             logger.info(format("Invoking plugin [%s] with sort order [%d]", plugin.getClass().getName(),
                     plugin.getSortOrderOnDelete()));
 
@@ -78,9 +78,9 @@ public class AppManager extends AbstractManager {
         logger.info(format("Finished deleting app %s", appConfig.getName()));
     }
 
-    protected List<ProjectPlugin> getPluginsFromSpring(ApplicationContext applicationContext) {
-        List<ProjectPlugin> plugins = new ArrayList<ProjectPlugin>();
-        plugins.addAll(applicationContext.getBeansOfType(ProjectPlugin.class).values());
+    protected List<AppPlugin> getPluginsFromSpring(ApplicationContext applicationContext) {
+        List<AppPlugin> plugins = new ArrayList<AppPlugin>();
+        plugins.addAll(applicationContext.getBeansOfType(AppPlugin.class).values());
         return plugins;
     }
 
@@ -89,16 +89,16 @@ public class AppManager extends AbstractManager {
     }
 }
 
-class OnCreateComparator implements Comparator<ProjectPlugin> {
+class OnCreateComparator implements Comparator<AppPlugin> {
     @Override
-    public int compare(ProjectPlugin o1, ProjectPlugin o2) {
+    public int compare(AppPlugin o1, AppPlugin o2) {
         return o1.getSortOrderOnCreate().compareTo(o2.getSortOrderOnCreate());
     }
 }
 
-class OnDeleteComparator implements Comparator<ProjectPlugin> {
+class OnDeleteComparator implements Comparator<AppPlugin> {
     @Override
-    public int compare(ProjectPlugin o1, ProjectPlugin o2) {
+    public int compare(AppPlugin o1, AppPlugin o2) {
         return o1.getSortOrderOnDelete().compareTo(o2.getSortOrderOnDelete());
     }
 }

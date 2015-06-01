@@ -20,9 +20,9 @@ import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.app.AppManager;
 import com.marklogic.appdeployer.app.ConfigDir;
 import com.marklogic.appdeployer.app.DefaultConfiguration;
+import com.marklogic.appdeployer.app.plugin.RestApiPlugin;
 import com.marklogic.appdeployer.mgmt.admin.AdminConfig;
 import com.marklogic.appdeployer.mgmt.admin.AdminManager;
-import com.marklogic.appdeployer.project.plugin.RestApiPlugin;
 import com.marklogic.junit.spring.LoggingTestExecutionListener;
 
 /**
@@ -48,7 +48,7 @@ public abstract class AbstractMgmtTest extends Assert {
     protected ManageClient manageClient;
     protected AppManager appManager;
     protected AdminManager adminMgr;
-    protected ConfigurableApplicationContext projectAppContext;
+    protected ConfigurableApplicationContext appManagerContext;
 
     protected AppConfig appConfig;
 
@@ -66,15 +66,15 @@ public abstract class AbstractMgmtTest extends Assert {
     }
 
     protected void initializeAppManager(Class<?> configurationClass) {
-        projectAppContext = new AnnotationConfigApplicationContext(configurationClass);
-        appManager = new AppManager(projectAppContext, manageClient);
+        appManagerContext = new AnnotationConfigApplicationContext(configurationClass);
+        appManager = new AppManager(appManagerContext, manageClient);
         appManager.setAdminManager(adminMgr);
     }
 
     @After
-    public void closeProjectAppContext() {
-        if (projectAppContext != null) {
-            projectAppContext.close();
+    public void closeAppContext() {
+        if (appManagerContext != null) {
+            appManagerContext.close();
         }
     }
 

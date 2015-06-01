@@ -4,9 +4,9 @@ import org.junit.Test;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.marklogic.appdeployer.app.plugin.RestApiPlugin;
+import com.marklogic.appdeployer.app.plugin.UpdateContentDatabasesPlugin;
 import com.marklogic.appdeployer.mgmt.AbstractMgmtTest;
-import com.marklogic.appdeployer.project.plugin.RestApiPlugin;
-import com.marklogic.appdeployer.project.plugin.UpdateContentDatabasesPlugin;
 
 public class UpdateContentDatabasesTest extends AbstractMgmtTest {
 

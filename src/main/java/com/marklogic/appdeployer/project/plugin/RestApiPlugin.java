@@ -5,11 +5,11 @@ import java.io.File;
 import org.springframework.http.HttpMethod;
 
 import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.app.AbstractPlugin;
+import com.marklogic.appdeployer.app.ConfigDir;
+import com.marklogic.appdeployer.app.RequirestRestartOnDelete;
 import com.marklogic.appdeployer.mgmt.ManageClient;
 import com.marklogic.appdeployer.mgmt.services.ServiceManager;
-import com.marklogic.appdeployer.project.AbstractPlugin;
-import com.marklogic.appdeployer.project.ConfigDir;
-import com.marklogic.appdeployer.project.RequirestRestartOnDelete;
 
 public class RestApiPlugin extends AbstractPlugin implements RequirestRestartOnDelete {
 

@@ -11,7 +11,7 @@ public class CreateTriggersDatabaseForProjectTest extends AbstractMgmtTest {
 
     @Before
     public void setup() {
-        initializeProjectManager();
+        initializeAppManager();
     }
     
     @Test
@@ -22,7 +22,7 @@ public class CreateTriggersDatabaseForProjectTest extends AbstractMgmtTest {
         String dbName = "sample-app-triggers";
         String forestName = dbName + "-1";
 
-        projectMgr.createApp(appConfig, configDir);
+        appManager.createApp(appConfig, configDir);
 
         assertTrue("The triggers database should have been created", dbMgr.dbExists(dbName));
         assertTrue("A forest for the triggers database should have been created", forestMgr.forestExists(forestName));

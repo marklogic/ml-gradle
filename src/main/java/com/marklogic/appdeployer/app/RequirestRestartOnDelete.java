@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.project;
+package com.marklogic.appdeployer.app;
 
 /**
  * Marker interface for plugins that require a restart after completing their onDelete method. Implemented as a marker

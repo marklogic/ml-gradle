@@ -17,11 +17,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.app.AppManager;
+import com.marklogic.appdeployer.app.ConfigDir;
+import com.marklogic.appdeployer.app.DefaultConfiguration;
 import com.marklogic.appdeployer.mgmt.admin.AdminConfig;
 import com.marklogic.appdeployer.mgmt.admin.AdminManager;
-import com.marklogic.appdeployer.project.ConfigDir;
-import com.marklogic.appdeployer.project.DefaultConfiguration;
-import com.marklogic.appdeployer.project.ProjectManager;
 import com.marklogic.appdeployer.project.plugin.RestApiPlugin;
 import com.marklogic.junit.spring.LoggingTestExecutionListener;
 
@@ -46,7 +46,7 @@ public abstract class AbstractMgmtTest extends Assert {
 
     protected ConfigDir configDir;
     protected ManageClient manageClient;
-    protected ProjectManager projectMgr;
+    protected AppManager appManager;
     protected AdminManager adminMgr;
     protected ConfigurableApplicationContext projectAppContext;
 
@@ -61,14 +61,14 @@ public abstract class AbstractMgmtTest extends Assert {
         adminMgr = new AdminManager(adminConfig);
     }
 
-    protected void initializeProjectManager() {
-        initializeProjectManager(DefaultConfiguration.class);
+    protected void initializeAppManager() {
+        initializeAppManager(DefaultConfiguration.class);
     }
 
-    protected void initializeProjectManager(Class<?> configurationClass) {
+    protected void initializeAppManager(Class<?> configurationClass) {
         projectAppContext = new AnnotationConfigApplicationContext(configurationClass);
-        projectMgr = new ProjectManager(projectAppContext, manageClient);
-        projectMgr.setAdminManager(adminMgr);
+        appManager = new AppManager(projectAppContext, manageClient);
+        appManager.setAdminManager(adminMgr);
     }
 
     @After
@@ -93,7 +93,7 @@ public abstract class AbstractMgmtTest extends Assert {
 
     protected void deleteSampleApp() {
         try {
-            projectMgr.deleteApp(appConfig, configDir);
+            appManager.deleteApp(appConfig, configDir);
         } catch (Exception e) {
             logger.warn("Error while waiting for MarkLogic to restart: " + e.getMessage());
         }

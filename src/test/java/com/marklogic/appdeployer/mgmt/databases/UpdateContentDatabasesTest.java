@@ -12,9 +12,9 @@ public class UpdateContentDatabasesTest extends AbstractMgmtTest {
 
     @Test
     public void updateDatabase() {
-        initializeProjectManager(TestConfiguration.class);
+        initializeAppManager(TestConfiguration.class);
 
-        projectMgr.createApp(appConfig, configDir);
+        appManager.createApp(appConfig, configDir);
 
         // TODO Verify the range index in the content database file was added
     }

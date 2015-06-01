@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.project;
+package com.marklogic.appdeployer.app;
 
 import java.io.File;
 import java.io.IOException;

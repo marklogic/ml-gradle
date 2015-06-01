@@ -3,10 +3,10 @@ package com.marklogic.appdeployer.project.plugin;
 import java.io.File;
 
 import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.app.AbstractPlugin;
+import com.marklogic.appdeployer.app.ConfigDir;
 import com.marklogic.appdeployer.mgmt.ManageClient;
 import com.marklogic.appdeployer.mgmt.databases.DatabaseManager;
-import com.marklogic.appdeployer.project.AbstractPlugin;
-import com.marklogic.appdeployer.project.ConfigDir;
 
 public class UpdateContentDatabasesPlugin extends AbstractPlugin {
 

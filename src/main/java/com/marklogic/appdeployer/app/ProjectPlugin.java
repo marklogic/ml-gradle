@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.project;
+package com.marklogic.appdeployer.app;
 
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.mgmt.ManageClient;

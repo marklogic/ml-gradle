@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.project;
+package com.marklogic.appdeployer.app;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,17 +13,17 @@ import com.marklogic.appdeployer.mgmt.ManageClient;
 import com.marklogic.appdeployer.mgmt.admin.AdminManager;
 
 /**
- * Manages a project - i.e. looks for files in the ConfigDir and makes the appropriate calls to the Mgmt API using
- * "NounManager" classes. This is the class that something like a Gradle plugin would interact with, and hopefully only
- * this class.
+ * Manages creating and deleting an app - i.e. looks for files in the ConfigDir and makes the appropriate calls to the
+ * Mgmt API using "NounManager" classes. This is the class that something like a Gradle plugin would interact with, and
+ * hopefully only this class.
  */
-public class ProjectManager extends AbstractManager {
+public class AppManager extends AbstractManager {
 
     private ManageClient manageClient;
     private ApplicationContext appContext;
     private AdminManager adminManager;
 
-    public ProjectManager(ApplicationContext appContext, ManageClient manageClient) {
+    public AppManager(ApplicationContext appContext, ManageClient manageClient) {
         this.appContext = appContext;
         this.manageClient = manageClient;
     }

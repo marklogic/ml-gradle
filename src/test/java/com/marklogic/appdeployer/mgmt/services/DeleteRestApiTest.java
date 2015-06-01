@@ -1,7 +1,9 @@
-package com.marklogic.appdeployer.mgmt;
+package com.marklogic.appdeployer.mgmt.services;
 
+import org.junit.Before;
 import org.junit.Test;
 
+import com.marklogic.appdeployer.mgmt.AbstractMgmtTest;
 import com.marklogic.appdeployer.mgmt.admin.AdminConfig;
 import com.marklogic.appdeployer.mgmt.admin.AdminManager;
 import com.marklogic.appdeployer.mgmt.services.ServiceManager;
@@ -11,6 +13,11 @@ import com.marklogic.appdeployer.mgmt.services.ServiceManager;
  * they can be used in other tests that depend on having an app in place.
  */
 public class DeleteRestApiTest extends AbstractMgmtTest {
+
+    @Before
+    public void setup() {
+        initializeProjectManager();
+    }
 
     @Test
     public void createAndDelete() {

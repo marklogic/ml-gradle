@@ -1,12 +1,19 @@
-package com.marklogic.appdeployer.mgmt;
+package com.marklogic.appdeployer.mgmt.databases;
 
+import org.junit.Before;
 import org.junit.Test;
 
+import com.marklogic.appdeployer.mgmt.AbstractMgmtTest;
 import com.marklogic.appdeployer.mgmt.databases.DatabaseManager;
 import com.marklogic.appdeployer.mgmt.forests.ForestManager;
 
 public class CreateTriggersDatabaseForProjectTest extends AbstractMgmtTest {
 
+    @Before
+    public void setup() {
+        initializeProjectManager();
+    }
+    
     @Test
     public void createAndDelete() {
         DatabaseManager dbMgr = new DatabaseManager(manageClient);

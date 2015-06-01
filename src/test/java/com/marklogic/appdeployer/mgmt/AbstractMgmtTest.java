@@ -54,17 +54,21 @@ public abstract class AbstractMgmtTest extends Assert {
 
     @Before
     public void initialize() {
-        configDir = new ConfigDir(new File("src/test/resources/sample-app/src/main/ml-config"));
-
-        manageClient = new ManageClient(manageConfig);
-
-        projectAppContext = new AnnotationConfigApplicationContext(DefaultConfiguration.class);
-        projectMgr = new ProjectManager(projectAppContext, manageClient);
-
-        adminMgr = new AdminManager(adminConfig);
-        projectMgr.setAdminManager(adminMgr);
-
         initializeAppConfig();
+
+        configDir = new ConfigDir(new File("src/test/resources/sample-app/src/main/ml-config"));
+        manageClient = new ManageClient(manageConfig);
+        adminMgr = new AdminManager(adminConfig);
+    }
+
+    protected void initializeProjectManager() {
+        initializeProjectManager(DefaultConfiguration.class);
+    }
+
+    protected void initializeProjectManager(Class<?> configurationClass) {
+        projectAppContext = new AnnotationConfigApplicationContext(configurationClass);
+        projectMgr = new ProjectManager(projectAppContext, manageClient);
+        projectMgr.setAdminManager(adminMgr);
     }
 
     @After
@@ -74,17 +78,17 @@ public abstract class AbstractMgmtTest extends Assert {
         }
     }
 
+    protected void initializeAppConfig() {
+        appConfig = new AppConfig();
+        appConfig.setName("sample-app");
+        appConfig.setRestPort(8540);
+    }
+
     /**
      * Useful for when your test only needs a REST API and not full the sample app created.
      */
     protected void createSampleAppRestApi() {
         new RestApiPlugin().onCreate(appConfig, configDir, manageClient);
-    }
-
-    protected void initializeAppConfig() {
-        appConfig = new AppConfig();
-        appConfig.setName("sample-app");
-        appConfig.setRestPort(8540);
     }
 
     protected void deleteSampleApp() {

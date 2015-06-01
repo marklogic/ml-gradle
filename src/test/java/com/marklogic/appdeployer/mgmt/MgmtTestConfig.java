@@ -25,9 +25,6 @@ public class MgmtTestConfig {
     @Value("${mlManagePassword}")
     private String mlManagePassword;
 
-    @Value("${mlSampleAppRestPort}")
-    private Integer mlSampleAppRestPort;
-
     /**
      * Has to be static so that Spring instantiates it first.
      */
@@ -51,6 +48,7 @@ public class MgmtTestConfig {
         return new AdminConfig(getMlManageHost(), 8001, getMlManageUsername(), getMlManagePassword());
     }
 
+    
     public String getMlManageHost() {
         return mlManageHost;
     }
@@ -61,9 +59,5 @@ public class MgmtTestConfig {
 
     public String getMlManagePassword() {
         return mlManagePassword;
-    }
-
-    public Integer getMlSampleAppRestPort() {
-        return mlSampleAppRestPort;
     }
 }

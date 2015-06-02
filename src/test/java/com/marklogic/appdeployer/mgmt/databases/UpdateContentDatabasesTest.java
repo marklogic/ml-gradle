@@ -4,8 +4,8 @@ import org.junit.After;
 import org.junit.Test;
 
 import com.marklogic.appdeployer.AbstractMgmtTest;
-import com.marklogic.appdeployer.app.plugin.RestApiPlugin;
-import com.marklogic.appdeployer.app.plugin.UpdateContentDatabasesPlugin;
+import com.marklogic.appdeployer.plugin.RestApiPlugin;
+import com.marklogic.appdeployer.plugin.UpdateContentDatabasesPlugin;
 import com.marklogic.rest.mgmt.databases.DatabaseManager;
 import com.marklogic.rest.util.Fragment;
 

@@ -18,13 +18,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 import com.marklogic.appdeployer.AppConfig;
-import com.marklogic.appdeployer.app.AppManager;
-import com.marklogic.appdeployer.app.AppPlugin;
-import com.marklogic.appdeployer.app.AppPluginContext;
-import com.marklogic.appdeployer.app.ConfigDir;
-import com.marklogic.appdeployer.app.manager.SimpleAppManager;
-import com.marklogic.appdeployer.app.manager.spring.SpringAppManager;
-import com.marklogic.appdeployer.app.plugin.RestApiPlugin;
+import com.marklogic.appdeployer.manager.SimpleAppManager;
+import com.marklogic.appdeployer.manager.spring.SpringAppManager;
+import com.marklogic.appdeployer.plugin.RestApiPlugin;
 import com.marklogic.junit.spring.LoggingTestExecutionListener;
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.ManageConfig;

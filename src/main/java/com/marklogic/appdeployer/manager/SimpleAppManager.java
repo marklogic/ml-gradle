@@ -1,8 +1,8 @@
-package com.marklogic.appdeployer.app.manager;
+package com.marklogic.appdeployer.manager;
 
 import java.util.List;
 
-import com.marklogic.appdeployer.app.AppPlugin;
+import com.marklogic.appdeployer.AppPlugin;
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.admin.AdminManager;
 

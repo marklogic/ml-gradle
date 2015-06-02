@@ -1,6 +1,5 @@
-package com.marklogic.appdeployer.app;
+package com.marklogic.appdeployer;
 
-import com.marklogic.appdeployer.AppConfig;
 
 /**
  * Interface for managing an app - i.e. creating it and deleting it based on the given configuration.

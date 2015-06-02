@@ -1,6 +1,5 @@
-package com.marklogic.appdeployer.app;
+package com.marklogic.appdeployer;
 
-import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.admin.AdminManager;
 

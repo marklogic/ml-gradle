@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.app;
+package com.marklogic.appdeployer;
 
 import java.io.File;
 

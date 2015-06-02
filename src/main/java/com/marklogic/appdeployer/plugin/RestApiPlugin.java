@@ -1,11 +1,11 @@
-package com.marklogic.appdeployer.app.plugin;
+package com.marklogic.appdeployer.plugin;
 
 import java.io.File;
 
 import org.springframework.http.HttpMethod;
 
 import com.marklogic.appdeployer.AppConfig;
-import com.marklogic.appdeployer.app.AppPluginContext;
+import com.marklogic.appdeployer.AppPluginContext;
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.admin.ActionRequiringRestart;
 import com.marklogic.rest.mgmt.appservers.ServerManager;

@@ -1,4 +1,5 @@
-package com.marklogic.appdeployer.app;
+package com.marklogic.appdeployer;
+
 
 /**
  * A plugin is used to provide additional behavior when creating and deleting an application; it keeps the AppManager

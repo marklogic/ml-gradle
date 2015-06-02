@@ -1,12 +1,12 @@
-package com.marklogic.appdeployer.app.manager.spring;
+package com.marklogic.appdeployer.manager.spring;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.context.ApplicationContext;
 
-import com.marklogic.appdeployer.app.AppPlugin;
-import com.marklogic.appdeployer.app.manager.AbstractAppManager;
+import com.marklogic.appdeployer.AppPlugin;
+import com.marklogic.appdeployer.manager.AbstractAppManager;
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.admin.AdminManager;
 

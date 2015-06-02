@@ -1,8 +1,8 @@
-package com.marklogic.appdeployer.app.plugin;
+package com.marklogic.appdeployer.plugin;
 
 import java.io.File;
 
-import com.marklogic.appdeployer.app.AppPluginContext;
+import com.marklogic.appdeployer.AppPluginContext;
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.databases.DatabaseManager;
 import com.marklogic.rest.mgmt.forests.ForestManager;

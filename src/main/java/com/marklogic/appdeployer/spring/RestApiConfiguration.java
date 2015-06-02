@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.manager.spring;
+package com.marklogic.appdeployer.spring;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

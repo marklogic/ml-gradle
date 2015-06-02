@@ -1,14 +1,9 @@
-package com.marklogic.appdeployer.manager;
+package com.marklogic.appdeployer;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import com.marklogic.appdeployer.AppConfig;
-import com.marklogic.appdeployer.AppDeployer;
-import com.marklogic.appdeployer.AppPlugin;
-import com.marklogic.appdeployer.AppPluginContext;
-import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.clientutil.LoggingObject;
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.admin.AdminManager;

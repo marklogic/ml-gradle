@@ -2,10 +2,8 @@ package com.marklogic.appdeployer.mgmt.databases;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
-import com.marklogic.appdeployer.app.RestApiConfiguration;
+import com.marklogic.appdeployer.app.plugin.RestApiPlugin;
 import com.marklogic.appdeployer.app.plugin.TriggersDatabasePlugin;
 import com.marklogic.appdeployer.mgmt.AbstractMgmtTest;
 import com.marklogic.appdeployer.mgmt.forests.ForestManager;
@@ -14,7 +12,7 @@ public class CreateTriggersDatabaseTest extends AbstractMgmtTest {
 
     @Before
     public void setup() {
-        initializeAppManager(CreateTriggersDatabaseConfiguration.class);
+        initializeAppManager(new RestApiPlugin(), new TriggersDatabasePlugin());
     }
 
     @Test
@@ -35,14 +33,5 @@ public class CreateTriggersDatabaseTest extends AbstractMgmtTest {
 
         assertFalse("The triggers database should have been deleted", dbMgr.dbExists(dbName));
         assertFalse("The triggers forest should have been deleted", forestMgr.forestExists(forestName));
-    }
-}
-
-@Configuration
-class CreateTriggersDatabaseConfiguration extends RestApiConfiguration {
-
-    @Bean
-    public TriggersDatabasePlugin triggersDatabasePlugin() {
-        return new TriggersDatabasePlugin();
     }
 }

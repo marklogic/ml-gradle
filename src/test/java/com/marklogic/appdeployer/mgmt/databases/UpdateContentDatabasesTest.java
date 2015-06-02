@@ -2,10 +2,8 @@ package com.marklogic.appdeployer.mgmt.databases;
 
 import org.junit.After;
 import org.junit.Test;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
-import com.marklogic.appdeployer.app.RestApiConfiguration;
+import com.marklogic.appdeployer.app.plugin.RestApiPlugin;
 import com.marklogic.appdeployer.app.plugin.UpdateContentDatabasesPlugin;
 import com.marklogic.appdeployer.mgmt.AbstractMgmtTest;
 import com.marklogic.appdeployer.util.Fragment;
@@ -14,8 +12,10 @@ public class UpdateContentDatabasesTest extends AbstractMgmtTest {
 
     @Test
     public void updateDatabase() {
+        // We want both a main and a test app server in this test
         appConfig.setTestRestPort(SAMPLE_APP_TEST_REST_PORT);
-        initializeAppManager(UpdateContentDatabaseConfiguration.class);
+
+        initializeAppManager(new RestApiPlugin(), new UpdateContentDatabasesPlugin());
 
         appManager.createApp(appConfig, configDir);
 
@@ -33,14 +33,5 @@ public class UpdateContentDatabasesTest extends AbstractMgmtTest {
     @After
     public void teardown() {
         deleteSampleApp();
-    }
-}
-
-@Configuration
-class UpdateContentDatabaseConfiguration extends RestApiConfiguration {
-
-    @Bean
-    public UpdateContentDatabasesPlugin updateContentDatabasePlugin() {
-        return new UpdateContentDatabasesPlugin();
     }
 }

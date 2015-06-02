@@ -1,6 +1,7 @@
 package com.marklogic.appdeployer.mgmt;
 
 import java.io.File;
+import java.util.Arrays;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -18,9 +19,11 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.app.AppManager;
+import com.marklogic.appdeployer.app.AppPlugin;
 import com.marklogic.appdeployer.app.AppPluginContext;
 import com.marklogic.appdeployer.app.ConfigDir;
-import com.marklogic.appdeployer.app.RestApiConfiguration;
+import com.marklogic.appdeployer.app.SimpleAppManager;
+import com.marklogic.appdeployer.app.SpringAppManager;
 import com.marklogic.appdeployer.app.plugin.RestApiPlugin;
 import com.marklogic.appdeployer.mgmt.admin.AdminConfig;
 import com.marklogic.appdeployer.mgmt.admin.AdminManager;
@@ -72,12 +75,28 @@ public abstract class AbstractMgmtTest extends Assert {
     }
 
     protected void initializeAppManager() {
-        initializeAppManager(RestApiConfiguration.class);
+        initializeAppManager(new RestApiPlugin());
     }
 
+    /**
+     * Initialize an AppManager with the given set of plugins. Avoids having to create a Spring configuration.
+     * 
+     * @param plugins
+     */
+    protected void initializeAppManager(AppPlugin... plugins) {
+        SimpleAppManager m = new SimpleAppManager(manageClient, adminManager);
+        m.setAppPlugins(Arrays.asList(plugins));
+        appManager = m;
+    }
+
+    /**
+     * Initialize AppManager with a Spring Configuration class.
+     * 
+     * @param configurationClass
+     */
     protected void initializeAppManager(Class<?> configurationClass) {
         appManagerContext = new AnnotationConfigApplicationContext(configurationClass);
-        appManager = new AppManager(appManagerContext, manageClient, adminManager);
+        appManager = new SpringAppManager(appManagerContext, manageClient, adminManager);
     }
 
     @After

@@ -3,7 +3,7 @@ package com.marklogic.appdeployer.mgmt.services;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.marklogic.appdeployer.mgmt.AbstractMgmtTest;
+import com.marklogic.appdeployer.AbstractMgmtTest;
 import com.marklogic.appdeployer.mgmt.appservers.ServerManager;
 
 /**

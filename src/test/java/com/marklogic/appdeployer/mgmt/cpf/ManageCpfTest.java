@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.FileCopyUtils;
 
-import com.marklogic.appdeployer.mgmt.AbstractMgmtTest;
+import com.marklogic.appdeployer.AbstractMgmtTest;
 
 public class ManageCpfTest extends AbstractMgmtTest {
 

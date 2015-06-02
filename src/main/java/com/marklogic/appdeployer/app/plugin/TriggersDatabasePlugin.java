@@ -2,7 +2,6 @@ package com.marklogic.appdeployer.app.plugin;
 
 import java.io.File;
 
-import com.marklogic.appdeployer.app.AbstractPlugin;
 import com.marklogic.appdeployer.app.AppPluginContext;
 import com.marklogic.appdeployer.mgmt.ManageClient;
 import com.marklogic.appdeployer.mgmt.databases.DatabaseManager;

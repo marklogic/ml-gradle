@@ -2,7 +2,7 @@ package com.marklogic.appdeployer.mgmt.hosts;
 
 import java.util.List;
 
-import com.marklogic.appdeployer.AbstractManager;
+import com.marklogic.appdeployer.mgmt.AbstractManager;
 import com.marklogic.appdeployer.mgmt.ManageClient;
 import com.marklogic.appdeployer.util.Fragment;
 

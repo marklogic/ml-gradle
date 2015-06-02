@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.mgmt;
+package com.marklogic.appdeployer;
 
 import java.io.File;
 import java.util.Arrays;
@@ -22,9 +22,11 @@ import com.marklogic.appdeployer.app.AppManager;
 import com.marklogic.appdeployer.app.AppPlugin;
 import com.marklogic.appdeployer.app.AppPluginContext;
 import com.marklogic.appdeployer.app.ConfigDir;
-import com.marklogic.appdeployer.app.SimpleAppManager;
-import com.marklogic.appdeployer.app.SpringAppManager;
+import com.marklogic.appdeployer.app.manager.SimpleAppManager;
+import com.marklogic.appdeployer.app.manager.spring.SpringAppManager;
 import com.marklogic.appdeployer.app.plugin.RestApiPlugin;
+import com.marklogic.appdeployer.mgmt.ManageClient;
+import com.marklogic.appdeployer.mgmt.ManageConfig;
 import com.marklogic.appdeployer.mgmt.admin.AdminConfig;
 import com.marklogic.appdeployer.mgmt.admin.AdminManager;
 import com.marklogic.junit.spring.LoggingTestExecutionListener;

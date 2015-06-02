@@ -3,9 +3,9 @@ package com.marklogic.appdeployer.mgmt.databases;
 import org.junit.After;
 import org.junit.Test;
 
+import com.marklogic.appdeployer.AbstractMgmtTest;
 import com.marklogic.appdeployer.app.plugin.RestApiPlugin;
 import com.marklogic.appdeployer.app.plugin.UpdateContentDatabasesPlugin;
-import com.marklogic.appdeployer.mgmt.AbstractMgmtTest;
 import com.marklogic.appdeployer.util.Fragment;
 
 public class UpdateContentDatabasesTest extends AbstractMgmtTest {

@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.marklogic.appdeployer.mgmt.AbstractMgmtTest;
+import com.marklogic.appdeployer.AbstractMgmtTest;
 
 public class ManageHostsTest extends AbstractMgmtTest {
 

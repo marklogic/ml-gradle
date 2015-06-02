@@ -4,13 +4,12 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.rest.mgmt.hosts.HostManager;
+import com.marklogic.rest.mgmt.AbstractMgmtTest;
 
-public class ManageHostsTest extends AbstractAppDeployerTest {
+public class ManageHostsTest extends AbstractMgmtTest {
 
     @Test
-    public void test() {
+    public void getHostNamesAndIds() {
         HostManager mgr = new HostManager(manageClient);
         List<String> names = mgr.getHostNames();
         List<String> ids = mgr.getHostIds();

@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer;
+package com.marklogic.rest.mgmt;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

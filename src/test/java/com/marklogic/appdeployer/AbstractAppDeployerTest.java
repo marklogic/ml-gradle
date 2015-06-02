@@ -4,36 +4,23 @@ import java.io.File;
 import java.util.Arrays;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
-import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.plugin.RestApiPlugin;
 import com.marklogic.appdeployer.spring.SpringAppDeployer;
-import com.marklogic.junit.spring.LoggingTestExecutionListener;
-import com.marklogic.rest.mgmt.ManageClient;
-import com.marklogic.rest.mgmt.ManageConfig;
+import com.marklogic.rest.mgmt.AbstractMgmtTest;
 import com.marklogic.rest.mgmt.admin.AdminConfig;
 import com.marklogic.rest.mgmt.admin.AdminManager;
 
 /**
- * Base class for tests that run against the new management API in ML8. Main purpose is to provide convenience methods
- * for quickly creating and deleting a sample application.
+ * Base class for tests that depend on an AppDeployer instance.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = { TestConfig.class })
-@TestExecutionListeners({ LoggingTestExecutionListener.class, DependencyInjectionTestExecutionListener.class })
-public abstract class AbstractAppDeployerTest extends Assert {
+public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
 
     public final static String SAMPLE_APP_NAME = "sample-app";
 
@@ -43,13 +30,9 @@ public abstract class AbstractAppDeployerTest extends Assert {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    protected ManageConfig manageConfig;
-
-    @Autowired
-    private AdminConfig adminConfig;
+    protected AdminConfig adminConfig;
 
     protected ConfigDir configDir;
-    protected ManageClient manageClient;
     protected AppDeployer appDeployer;
     protected AdminManager adminManager;
     protected ConfigurableApplicationContext appManagerContext;
@@ -61,7 +44,6 @@ public abstract class AbstractAppDeployerTest extends Assert {
         initializeAppConfig();
 
         configDir = new ConfigDir(new File("src/test/resources/sample-app/src/main/ml-config"));
-        manageClient = new ManageClient(manageConfig);
         adminManager = new AdminManager(adminConfig);
     }
 

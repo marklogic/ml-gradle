@@ -20,7 +20,7 @@ public abstract class AbstractPlugin extends LoggingObject implements AppPlugin 
     protected TokenReplacer tokenReplacer = new DefaultTokenReplacer();
 
     /**
-     * By default, assumes that the sort order on delete should be the same as on create. Subclasses can override this
+     * By default, assumes that the sort order on undeploy should be the same as on deploy. Subclasses can override this
      * to provide an alternate approach.
      */
     @Override

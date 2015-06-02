@@ -51,7 +51,7 @@ public class AppManager extends AbstractManager {
         List<AppPlugin> plugins = getPluginsFromSpring(appContext);
         Collections.sort(plugins, new OnDeleteComparator());
 
-        for (AppPlugin plugin : getPluginsFromSpring(appContext)) {
+        for (AppPlugin plugin : plugins) {
             logger.info(format("Invoking plugin [%s] with sort order [%d]", plugin.getClass().getName(),
                     plugin.getSortOrderOnDelete()));
 

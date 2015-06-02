@@ -36,6 +36,9 @@ public abstract class AbstractMgmtTest extends Assert {
 
     public final static String SAMPLE_APP_NAME = "sample-app";
 
+    protected final static Integer SAMPLE_APP_REST_PORT = 8540;
+    protected final static Integer SAMPLE_APP_TEST_REST_PORT = 8541;
+
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
@@ -61,6 +64,12 @@ public abstract class AbstractMgmtTest extends Assert {
         adminMgr = new AdminManager(adminConfig);
     }
 
+    protected void initializeAppConfig() {
+        appConfig = new AppConfig();
+        appConfig.setName(SAMPLE_APP_NAME);
+        appConfig.setRestPort(SAMPLE_APP_REST_PORT);
+    }
+
     protected void initializeAppManager() {
         initializeAppManager(DefaultConfiguration.class);
     }
@@ -76,12 +85,6 @@ public abstract class AbstractMgmtTest extends Assert {
         if (appManagerContext != null) {
             appManagerContext.close();
         }
-    }
-
-    protected void initializeAppConfig() {
-        appConfig = new AppConfig();
-        appConfig.setName("sample-app");
-        appConfig.setRestPort(8540);
     }
 
     /**

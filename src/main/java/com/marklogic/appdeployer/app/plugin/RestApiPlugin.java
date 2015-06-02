@@ -24,16 +24,14 @@ public class RestApiPlugin extends AbstractPlugin implements RequirestRestartOnD
     @Override
     public void onCreate(AppConfig appConfig, ConfigDir configDir, ManageClient manageClient) {
         File f = configDir.getRestApiFile();
-        String payload = copyFileToString(f);
+        String input = copyFileToString(f);
 
         ServiceManager mgr = new ServiceManager(manageClient);
 
-        payload = replaceConfigTokens(payload, appConfig, false);
-        mgr.createRestApi(appConfig.getRestServerName(), payload);
+        mgr.createRestApi(appConfig.getRestServerName(), replaceConfigTokens(input, appConfig, false));
 
         if (appConfig.isTestPortSet()) {
-            payload = replaceConfigTokens(payload, appConfig, true);
-            mgr.createRestApi(appConfig.getTestRestServerName(), payload);
+            mgr.createRestApi(appConfig.getTestRestServerName(), replaceConfigTokens(input, appConfig, true));
         }
     }
 

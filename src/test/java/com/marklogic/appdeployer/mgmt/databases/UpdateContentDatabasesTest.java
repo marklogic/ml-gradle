@@ -1,5 +1,6 @@
 package com.marklogic.appdeployer.mgmt.databases;
 
+import org.junit.After;
 import org.junit.Test;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,16 +8,32 @@ import org.springframework.context.annotation.Configuration;
 import com.marklogic.appdeployer.app.plugin.RestApiPlugin;
 import com.marklogic.appdeployer.app.plugin.UpdateContentDatabasesPlugin;
 import com.marklogic.appdeployer.mgmt.AbstractMgmtTest;
+import com.marklogic.appdeployer.util.Fragment;
 
 public class UpdateContentDatabasesTest extends AbstractMgmtTest {
 
     @Test
     public void updateDatabase() {
+        appConfig.setTestRestPort(SAMPLE_APP_TEST_REST_PORT);
         initializeAppManager(TestConfiguration.class);
 
         appManager.createApp(appConfig, configDir);
 
-        // TODO Verify the range index in the content database file was added
+        String rangeIndexXpath = "/m:database-properties/m:range-element-indexes/m:range-element-index"
+                + "[m:scalar-type = 'string' and m:namespace-uri = 'urn:sampleapp' and m:localname='id' and m:collation='http://marklogic.com/collation/']";
+        DatabaseManager dbMgr = new DatabaseManager(manageClient);
+
+        Fragment db = dbMgr.getDatabasePropertiesAsXml(appConfig.getContentDatabaseName());
+        assertTrue(db.elementExists(rangeIndexXpath));
+
+        db = dbMgr.getDatabasePropertiesAsXml(appConfig.getTestContentDatabaseName());
+        assertTrue(db.elementExists(rangeIndexXpath));
+    }
+
+    @After
+    public void teardown() {
+        // TODO Can't do this yet with a test REST API, as the modules database is shared
+        //deleteSampleApp();
     }
 }
 

@@ -23,11 +23,15 @@ public class DatabaseManager extends AbstractManager {
     }
 
     public boolean dbExists(String name) {
-        Fragment f = manageClient.getXml("/manage/v2/databases", "db", "http://marklogic.com/manage/databases");
+        Fragment f = manageClient.getXml("/manage/v2/databases");
         return f.elementExists(String.format("/db:database-default-list/db:list-items/db:list-item[db:nameref = '%s']",
                 name));
     }
 
+    public Fragment getDatabasePropertiesAsXml(String databaseIdOrName) {
+        return manageClient.getXml(format("/manage/v2/databases/%s/properties", databaseIdOrName));
+    }
+    
     public void deleteDatabase(String name) {
         if (!dbExists(name)) {
             logger.info(format("Database %s name does not exist, not deleting", name));

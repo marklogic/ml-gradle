@@ -15,7 +15,7 @@ import com.marklogic.rest.mgmt.admin.AdminConfig;
  */
 @Configuration
 @PropertySource(value = { "classpath:test.properties", "classpath:user.properties" }, ignoreResourceNotFound = true)
-public class MgmtTestConfig {
+public class TestConfig {
 
     @Value("${mlManageHost:localhost}")
     private String mlManageHost;

@@ -1,13 +1,13 @@
-package com.marklogic.appdeployer.hosts;
+package com.marklogic.rest.mgmt.hosts;
 
 import java.util.List;
 
 import org.junit.Test;
 
-import com.marklogic.appdeployer.AbstractMgmtTest;
+import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.rest.mgmt.hosts.HostManager;
 
-public class ManageHostsTest extends AbstractMgmtTest {
+public class ManageHostsTest extends AbstractAppDeployerTest {
 
     @Test
     public void test() {

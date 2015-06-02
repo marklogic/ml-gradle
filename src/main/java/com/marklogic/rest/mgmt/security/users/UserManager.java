@@ -1,4 +1,4 @@
-package com.marklogic.rest.mgmt.security;
+package com.marklogic.rest.mgmt.security.users;
 
 import org.jdom2.Namespace;
 

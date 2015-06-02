@@ -3,13 +3,13 @@ package com.marklogic.appdeployer.databases;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.marklogic.appdeployer.AbstractMgmtTest;
+import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.plugin.RestApiPlugin;
 import com.marklogic.appdeployer.plugin.TriggersDatabasePlugin;
 import com.marklogic.rest.mgmt.databases.DatabaseManager;
 import com.marklogic.rest.mgmt.forests.ForestManager;
 
-public class CreateTriggersDatabaseTest extends AbstractMgmtTest {
+public class CreateTriggersDatabaseTest extends AbstractAppDeployerTest {
 
     @Before
     public void setup() {

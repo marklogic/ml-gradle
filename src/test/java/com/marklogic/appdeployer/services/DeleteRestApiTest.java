@@ -3,7 +3,7 @@ package com.marklogic.appdeployer.services;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.marklogic.appdeployer.AbstractMgmtTest;
+import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.rest.mgmt.appservers.ServerManager;
 import com.marklogic.rest.mgmt.services.ServiceManager;
 
@@ -11,7 +11,7 @@ import com.marklogic.rest.mgmt.services.ServiceManager;
  * This test ensures that the convenience methods for creating and deleting a sample application work properly, and thus
  * they can be used in other tests that depend on having an app in place.
  */
-public class DeleteRestApiTest extends AbstractMgmtTest {
+public class DeleteRestApiTest extends AbstractAppDeployerTest {
 
     @Before
     public void setup() {

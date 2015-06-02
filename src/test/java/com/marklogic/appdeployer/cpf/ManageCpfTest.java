@@ -5,10 +5,10 @@ import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.FileCopyUtils;
 
-import com.marklogic.appdeployer.AbstractMgmtTest;
+import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.rest.mgmt.cpf.CpfManager;
 
-public class ManageCpfTest extends AbstractMgmtTest {
+public class ManageCpfTest extends AbstractAppDeployerTest {
 
     @Test
     @Ignore("Need to be able to create a triggers database and a domain first")

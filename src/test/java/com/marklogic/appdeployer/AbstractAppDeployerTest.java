@@ -31,9 +31,9 @@ import com.marklogic.rest.mgmt.admin.AdminManager;
  * for quickly creating and deleting a sample application.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = { MgmtTestConfig.class })
+@ContextConfiguration(classes = { TestConfig.class })
 @TestExecutionListeners({ LoggingTestExecutionListener.class, DependencyInjectionTestExecutionListener.class })
-public abstract class AbstractMgmtTest extends Assert {
+public abstract class AbstractAppDeployerTest extends Assert {
 
     public final static String SAMPLE_APP_NAME = "sample-app";
 

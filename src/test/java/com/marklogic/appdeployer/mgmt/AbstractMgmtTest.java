@@ -20,7 +20,7 @@ import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.app.AppManager;
 import com.marklogic.appdeployer.app.AppPluginContext;
 import com.marklogic.appdeployer.app.ConfigDir;
-import com.marklogic.appdeployer.app.DefaultConfiguration;
+import com.marklogic.appdeployer.app.RestApiConfiguration;
 import com.marklogic.appdeployer.app.plugin.RestApiPlugin;
 import com.marklogic.appdeployer.mgmt.admin.AdminConfig;
 import com.marklogic.appdeployer.mgmt.admin.AdminManager;
@@ -72,7 +72,7 @@ public abstract class AbstractMgmtTest extends Assert {
     }
 
     protected void initializeAppManager() {
-        initializeAppManager(DefaultConfiguration.class);
+        initializeAppManager(RestApiConfiguration.class);
     }
 
     protected void initializeAppManager(Class<?> configurationClass) {

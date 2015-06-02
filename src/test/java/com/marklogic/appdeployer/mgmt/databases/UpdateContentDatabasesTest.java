@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.marklogic.appdeployer.app.plugin.RestApiPlugin;
+import com.marklogic.appdeployer.app.RestApiConfiguration;
 import com.marklogic.appdeployer.app.plugin.UpdateContentDatabasesPlugin;
 import com.marklogic.appdeployer.mgmt.AbstractMgmtTest;
 import com.marklogic.appdeployer.util.Fragment;
@@ -15,7 +15,7 @@ public class UpdateContentDatabasesTest extends AbstractMgmtTest {
     @Test
     public void updateDatabase() {
         appConfig.setTestRestPort(SAMPLE_APP_TEST_REST_PORT);
-        initializeAppManager(TestConfiguration.class);
+        initializeAppManager(UpdateContentDatabaseConfiguration.class);
 
         appManager.createApp(appConfig, configDir);
 
@@ -37,12 +37,7 @@ public class UpdateContentDatabasesTest extends AbstractMgmtTest {
 }
 
 @Configuration
-class TestConfiguration {
-
-    @Bean
-    public RestApiPlugin restApiPlugin() {
-        return new RestApiPlugin();
-    }
+class UpdateContentDatabaseConfiguration extends RestApiConfiguration {
 
     @Bean
     public UpdateContentDatabasesPlugin updateContentDatabasePlugin() {

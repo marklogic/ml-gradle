@@ -89,7 +89,7 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
      * Useful for when your test only needs a REST API and not full the sample app created.
      */
     protected void createSampleAppRestApi() {
-        new RestApiPlugin().onCreate(new AppPluginContext(appConfig, configDir, manageClient, adminManager));
+        new RestApiPlugin().onDeploy(new AppPluginContext(appConfig, configDir, manageClient, adminManager));
     }
 
     protected void deleteSampleApp() {

@@ -9,12 +9,12 @@ import com.marklogic.rest.mgmt.databases.DatabaseManager;
 public class UpdateContentDatabasesPlugin extends AbstractPlugin {
 
     @Override
-    public Integer getSortOrderOnCreate() {
+    public Integer getSortOrderOnDeploy() {
         return 200;
     }
 
     @Override
-    public void onCreate(AppPluginContext context) {
+    public void onDeploy(AppPluginContext context) {
         File f = context.getConfigDir().getContentDatabaseFile();
         if (f.exists()) {
             DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
@@ -36,7 +36,7 @@ public class UpdateContentDatabasesPlugin extends AbstractPlugin {
     }
 
     @Override
-    public void onDelete(AppPluginContext context) {
+    public void onUndeploy(AppPluginContext context) {
     }
 
 }

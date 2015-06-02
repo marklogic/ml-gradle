@@ -11,12 +11,12 @@ import com.marklogic.rest.mgmt.hosts.HostManager;
 public class TriggersDatabasePlugin extends AbstractPlugin {
 
     @Override
-    public Integer getSortOrderOnCreate() {
+    public Integer getSortOrderOnDeploy() {
         return 500;
     }
 
     @Override
-    public void onCreate(AppPluginContext context) {
+    public void onDeploy(AppPluginContext context) {
         File f = context.getConfigDir().getTriggersDatabaseFile();
         if (f.exists()) {
             DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
@@ -44,7 +44,7 @@ public class TriggersDatabasePlugin extends AbstractPlugin {
     }
 
     @Override
-    public void onDelete(AppPluginContext context) {
+    public void onUndeploy(AppPluginContext context) {
         DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
         dbMgr.deleteDatabase(context.getAppConfig().getTriggersDatabaseName());
     }

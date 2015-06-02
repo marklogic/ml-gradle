@@ -17,12 +17,12 @@ public class RestApiPlugin extends AbstractPlugin {
     private boolean includeContent = true;
 
     @Override
-    public Integer getSortOrderOnCreate() {
+    public Integer getSortOrderOnDeploy() {
         return 100;
     }
 
     @Override
-    public void onCreate(AppPluginContext context) {
+    public void onDeploy(AppPluginContext context) {
         File f = context.getConfigDir().getRestApiFile();
         String input = copyFileToString(f);
 
@@ -37,7 +37,7 @@ public class RestApiPlugin extends AbstractPlugin {
     }
 
     @Override
-    public void onDelete(AppPluginContext context) {
+    public void onUndeploy(AppPluginContext context) {
         final AppConfig appConfig = context.getAppConfig();
         final ManageClient manageClient = context.getManageClient();
 

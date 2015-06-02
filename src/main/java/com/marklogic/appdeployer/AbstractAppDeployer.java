@@ -26,39 +26,39 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
     protected abstract List<AppPlugin> getAppPlugins();
 
     public void deploy(AppConfig appConfig, ConfigDir configDir) {
-        logger.info(format("Creating application %s with config dir of: %s", appConfig.getName(), configDir
-                .getBaseDir().getAbsolutePath()));
+        logger.info(format("Deploying app %s with config dir of: %s", appConfig.getName(), configDir.getBaseDir()
+                .getAbsolutePath()));
 
         List<AppPlugin> plugins = getAppPlugins();
-        Collections.sort(plugins, new OnCreateComparator());
+        Collections.sort(plugins, new OnDeployComparator());
 
         AppPluginContext context = new AppPluginContext(appConfig, configDir, manageClient, adminManager);
 
         for (AppPlugin plugin : plugins) {
             logger.info(format("Invoking plugin [%s] with sort order [%d]", plugin.getClass().getName(),
-                    plugin.getSortOrderOnCreate()));
-            plugin.onCreate(context);
+                    plugin.getSortOrderOnDeploy()));
+            plugin.onDeploy(context);
         }
 
-        logger.info(format("Created application %s", appConfig.getName()));
+        logger.info(format("Deployed app %s", appConfig.getName()));
     }
 
     public void undeploy(AppConfig appConfig, ConfigDir configDir) {
-        logger.info(format("Deleting app %s with config dir: %s", appConfig.getName(), configDir.getBaseDir()
+        logger.info(format("Undeploying app %s with config dir: %s", appConfig.getName(), configDir.getBaseDir()
                 .getAbsolutePath()));
 
         List<AppPlugin> plugins = getAppPlugins();
-        Collections.sort(plugins, new OnDeleteComparator());
+        Collections.sort(plugins, new OnUndeployComparator());
 
         for (AppPlugin plugin : plugins) {
             logger.info(format("Invoking plugin [%s] with sort order [%d]", plugin.getClass().getName(),
-                    plugin.getSortOrderOnDelete()));
+                    plugin.getSortOrderOnUndeploy()));
 
             AppPluginContext context = new AppPluginContext(appConfig, configDir, manageClient, adminManager);
-            plugin.onDelete(context);
+            plugin.onUndeploy(context);
         }
 
-        logger.info(format("Finished deleting app %s", appConfig.getName()));
+        logger.info(format("Undeployed app %s", appConfig.getName()));
     }
 
     protected String format(String s, Object... args) {
@@ -66,16 +66,16 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
     }
 }
 
-class OnCreateComparator implements Comparator<AppPlugin> {
+class OnDeployComparator implements Comparator<AppPlugin> {
     @Override
     public int compare(AppPlugin o1, AppPlugin o2) {
-        return o1.getSortOrderOnCreate().compareTo(o2.getSortOrderOnCreate());
+        return o1.getSortOrderOnDeploy().compareTo(o2.getSortOrderOnDeploy());
     }
 }
 
-class OnDeleteComparator implements Comparator<AppPlugin> {
+class OnUndeployComparator implements Comparator<AppPlugin> {
     @Override
     public int compare(AppPlugin o1, AppPlugin o2) {
-        return o1.getSortOrderOnDelete().compareTo(o2.getSortOrderOnDelete());
+        return o1.getSortOrderOnUndeploy().compareTo(o2.getSortOrderOnUndeploy());
     }
 }

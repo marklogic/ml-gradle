@@ -9,29 +9,28 @@ public interface AppPlugin {
 
     /**
      * Return a number corresponding to the order in which this plugin should execute when an application is being
-     * created, where the lower the number, the earlier the plugin is invoked.
+     * deployed, where the lower the number, the earlier the plugin is invoked.
      */
-    public Integer getSortOrderOnCreate();
+    public Integer getSortOrderOnDeploy();
 
     /**
      * Return a number corresponding to the order in which this plugin should execute when an application is being
-     * deleted, where the lower the number, the earlier the plugin is invoked.
+     * undeployed, where the lower the number, the earlier the plugin is invoked.
      */
-    public Integer getSortOrderOnDelete();
+    public Integer getSortOrderOnUndeploy();
 
     /**
-     * Configure the application in some way when it is being created.
+     * Configure the application in some way when it is being deployed.
      * 
      * @param context
      */
-    public void onCreate(AppPluginContext context);
+    public void onDeploy(AppPluginContext context);
 
     /**
-     * Delete some aspect of the application while it is being deleted. This gives the plugin a chance to cleanup/delete
-     * whatever it created. A plugin that needs MarkLogic to restart after it's done deleting resources (such as a
-     * plugin that deletes an app server) should also implement the RequiresRestartOnDelete marker interface.
+     * Delete some aspect of the application while it is being undeployed. This gives the plugin a chance to cleanup/delete
+     * whatever it created.
      * 
      * @param context
      */
-    public void onDelete(AppPluginContext context);
+    public void onUndeploy(AppPluginContext context);
 }

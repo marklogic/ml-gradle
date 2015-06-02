@@ -24,8 +24,8 @@ public abstract class AbstractPlugin extends LoggingObject implements AppPlugin 
      * to provide an alternate approach.
      */
     @Override
-    public Integer getSortOrderOnDelete() {
-        return getSortOrderOnCreate();
+    public Integer getSortOrderOnUndeploy() {
+        return getSortOrderOnDeploy();
     }
 
     protected String format(String s, Object... args) {

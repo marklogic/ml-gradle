@@ -13,7 +13,7 @@ public class CreateTriggersDatabaseTest extends AbstractAppDeployerTest {
 
     @Before
     public void setup() {
-        initializeAppManager(new RestApiPlugin(), new TriggersDatabasePlugin());
+        initializeAppDeployer(new RestApiPlugin(), new TriggersDatabasePlugin());
     }
 
     @Test

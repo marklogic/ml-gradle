@@ -15,7 +15,7 @@ public class DeleteRestApiTest extends AbstractAppDeployerTest {
 
     @Before
     public void setup() {
-        initializeAppManager();
+        initializeAppDeployer();
     }
 
     @Test

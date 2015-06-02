@@ -53,27 +53,27 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
         appConfig.setRestPort(SAMPLE_APP_REST_PORT);
     }
 
-    protected void initializeAppManager() {
-        initializeAppManager(new RestApiPlugin());
+    protected void initializeAppDeployer() {
+        initializeAppDeployer(new RestApiPlugin());
     }
 
     /**
-     * Initialize an AppManager with the given set of plugins. Avoids having to create a Spring configuration.
+     * Initialize an AppDeployer with the given set of plugins. Avoids having to create a Spring configuration.
      * 
      * @param plugins
      */
-    protected void initializeAppManager(AppPlugin... plugins) {
+    protected void initializeAppDeployer(AppPlugin... plugins) {
         SimpleAppDeployer m = new SimpleAppDeployer(manageClient, adminManager);
         m.setAppPlugins(Arrays.asList(plugins));
         appDeployer = m;
     }
 
     /**
-     * Initialize AppManager with a Spring Configuration class.
+     * Initialize AppDeployer with a Spring Configuration class.
      * 
      * @param configurationClass
      */
-    protected void initializeAppManager(Class<?> configurationClass) {
+    protected void initializeAppDeployer(Class<?> configurationClass) {
         appManagerContext = new AnnotationConfigApplicationContext(configurationClass);
         appDeployer = new SpringAppDeployer(appManagerContext, manageClient, adminManager);
     }

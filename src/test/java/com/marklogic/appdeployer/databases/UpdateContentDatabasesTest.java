@@ -16,7 +16,7 @@ public class UpdateContentDatabasesTest extends AbstractAppDeployerTest {
         // We want both a main and a test app server in this test
         appConfig.setTestRestPort(SAMPLE_APP_TEST_REST_PORT);
 
-        initializeAppManager(new RestApiPlugin(), new UpdateContentDatabasesPlugin());
+        initializeAppDeployer(new RestApiPlugin(), new UpdateContentDatabasesPlugin());
 
         appDeployer.deploy(appConfig, configDir);
 

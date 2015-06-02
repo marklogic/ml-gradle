@@ -13,9 +13,6 @@ public class UpdateContentDatabasesPlugin extends AbstractPlugin {
         return 200;
     }
 
-    /**
-     * Check for content-database.json; if it exists, then PUT it against the existing content database.
-     */
     @Override
     public void onCreate(AppPluginContext context) {
         File f = context.getConfigDir().getContentDatabaseFile();
@@ -25,11 +22,11 @@ public class UpdateContentDatabasesPlugin extends AbstractPlugin {
             String payload = copyFileToString(f);
             AppConfig appConfig = context.getAppConfig();
 
-            String json = replaceConfigTokens(payload, appConfig, false);
+            String json = tokenReplacer.replaceTokens(payload, appConfig, false);
             dbMgr.updateDatabase(appConfig.getContentDatabaseName(), json);
 
             if (appConfig.isTestPortSet()) {
-                json = replaceConfigTokens(payload, appConfig, true);
+                json = tokenReplacer.replaceTokens(payload, appConfig, true);
                 dbMgr.updateDatabase(appConfig.getTestContentDatabaseName(), json);
             }
         } else {

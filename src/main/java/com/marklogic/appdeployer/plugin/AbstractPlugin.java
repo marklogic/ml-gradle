@@ -5,8 +5,9 @@ import java.io.IOException;
 
 import org.springframework.util.FileCopyUtils;
 
-import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.AppPlugin;
+import com.marklogic.appdeployer.DefaultTokenReplacer;
+import com.marklogic.appdeployer.TokenReplacer;
 import com.marklogic.clientutil.LoggingObject;
 
 /**
@@ -15,6 +16,8 @@ import com.marklogic.clientutil.LoggingObject;
  * executed relative to other plugins.
  */
 public abstract class AbstractPlugin extends LoggingObject implements AppPlugin {
+
+    protected TokenReplacer tokenReplacer = new DefaultTokenReplacer();
 
     /**
      * By default, assumes that the sort order on delete should be the same as on create. Subclasses can override this
@@ -38,21 +41,12 @@ public abstract class AbstractPlugin extends LoggingObject implements AppPlugin 
         }
     }
 
-    /**
-     * TODO Would be nice to extract this into a separate class - e.g. TokenReplacer - so that it's easier to customize
-     * the tokens that are replaced.
-     */
-    protected String replaceConfigTokens(String payload, AppConfig appConfig, boolean isTestResource) {
-        payload = payload.replace("%%NAME%%",
-                isTestResource ? appConfig.getTestRestServerName() : appConfig.getRestServerName());
-        payload = payload.replace("%%GROUP%%", appConfig.getGroupName());
-        payload = payload.replace("%%DATABASE%%",
-                isTestResource ? appConfig.getTestContentDatabaseName() : appConfig.getContentDatabaseName());
-        payload = payload.replace("%%MODULES-DATABASE%%", appConfig.getModulesDatabaseName());
-        payload = payload.replace("%%TRIGGERS_DATABASE%%", appConfig.getTriggersDatabaseName());
-        payload = payload.replace("%%PORT%%", isTestResource ? appConfig.getTestRestPort().toString() : appConfig
-                .getRestPort().toString());
-        return payload;
+    public void setTokenReplacer(TokenReplacer tokenReplacer) {
+        this.tokenReplacer = tokenReplacer;
+    }
+
+    public TokenReplacer getTokenReplacer() {
+        return tokenReplacer;
     }
 
 }

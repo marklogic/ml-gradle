@@ -23,7 +23,7 @@ public class TriggersDatabasePlugin extends AbstractPlugin {
 
             String dbName = context.getAppConfig().getTriggersDatabaseName();
             String payload = copyFileToString(f);
-            payload = replaceConfigTokens(payload, context.getAppConfig(), false);
+            payload = tokenReplacer.replaceTokens(payload, context.getAppConfig(), false);
             dbMgr.createDatabase(dbName, payload);
 
             createAndAttachForestOnEachHost(dbName, context.getManageClient());

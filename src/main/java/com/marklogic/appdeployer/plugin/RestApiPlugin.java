@@ -29,10 +29,10 @@ public class RestApiPlugin extends AbstractPlugin {
         ServiceManager mgr = new ServiceManager(context.getManageClient());
         AppConfig appConfig = context.getAppConfig();
 
-        mgr.createRestApi(appConfig.getRestServerName(), replaceConfigTokens(input, appConfig, false));
+        mgr.createRestApi(appConfig.getRestServerName(), tokenReplacer.replaceTokens(input, appConfig, false));
 
         if (appConfig.isTestPortSet()) {
-            mgr.createRestApi(appConfig.getTestRestServerName(), replaceConfigTokens(input, appConfig, true));
+            mgr.createRestApi(appConfig.getTestRestServerName(), tokenReplacer.replaceTokens(input, appConfig, true));
         }
     }
 

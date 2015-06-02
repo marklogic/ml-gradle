@@ -3,8 +3,8 @@ package com.marklogic.appdeployer.app.manager;
 import java.util.List;
 
 import com.marklogic.appdeployer.app.AppPlugin;
-import com.marklogic.appdeployer.mgmt.ManageClient;
-import com.marklogic.appdeployer.mgmt.admin.AdminManager;
+import com.marklogic.rest.mgmt.ManageClient;
+import com.marklogic.rest.mgmt.admin.AdminManager;
 
 /**
  * Simple implementation that allows for a list of plugins to be set. Useful for testing purposes in particular - i.e.

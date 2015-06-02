@@ -1,8 +1,8 @@
 package com.marklogic.appdeployer.mgmt.security;
 
-import com.marklogic.appdeployer.mgmt.ManageClient;
-import com.marklogic.appdeployer.mgmt.ManageConfig;
-import com.marklogic.appdeployer.mgmt.security.UserManager;
+import com.marklogic.rest.mgmt.ManageClient;
+import com.marklogic.rest.mgmt.ManageConfig;
+import com.marklogic.rest.mgmt.security.UserManager;
 
 import org.junit.Before;
 import org.junit.Test;

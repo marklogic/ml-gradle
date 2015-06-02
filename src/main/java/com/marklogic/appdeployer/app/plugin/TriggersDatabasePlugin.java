@@ -3,10 +3,10 @@ package com.marklogic.appdeployer.app.plugin;
 import java.io.File;
 
 import com.marklogic.appdeployer.app.AppPluginContext;
-import com.marklogic.appdeployer.mgmt.ManageClient;
-import com.marklogic.appdeployer.mgmt.databases.DatabaseManager;
-import com.marklogic.appdeployer.mgmt.forests.ForestManager;
-import com.marklogic.appdeployer.mgmt.hosts.HostManager;
+import com.marklogic.rest.mgmt.ManageClient;
+import com.marklogic.rest.mgmt.databases.DatabaseManager;
+import com.marklogic.rest.mgmt.forests.ForestManager;
+import com.marklogic.rest.mgmt.hosts.HostManager;
 
 public class TriggersDatabasePlugin extends AbstractPlugin {
 

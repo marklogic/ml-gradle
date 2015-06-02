@@ -6,8 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
-import com.marklogic.appdeployer.mgmt.ManageConfig;
-import com.marklogic.appdeployer.mgmt.admin.AdminConfig;
+import com.marklogic.rest.mgmt.ManageConfig;
+import com.marklogic.rest.mgmt.admin.AdminConfig;
 
 /**
  * Defines configuration for the JUnit tests. The non-version-controlled user.properties file is imported second so that

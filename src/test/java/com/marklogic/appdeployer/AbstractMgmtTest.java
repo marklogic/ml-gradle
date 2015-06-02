@@ -25,11 +25,11 @@ import com.marklogic.appdeployer.app.ConfigDir;
 import com.marklogic.appdeployer.app.manager.SimpleAppManager;
 import com.marklogic.appdeployer.app.manager.spring.SpringAppManager;
 import com.marklogic.appdeployer.app.plugin.RestApiPlugin;
-import com.marklogic.appdeployer.mgmt.ManageClient;
-import com.marklogic.appdeployer.mgmt.ManageConfig;
-import com.marklogic.appdeployer.mgmt.admin.AdminConfig;
-import com.marklogic.appdeployer.mgmt.admin.AdminManager;
 import com.marklogic.junit.spring.LoggingTestExecutionListener;
+import com.marklogic.rest.mgmt.ManageClient;
+import com.marklogic.rest.mgmt.ManageConfig;
+import com.marklogic.rest.mgmt.admin.AdminConfig;
+import com.marklogic.rest.mgmt.admin.AdminManager;
 
 /**
  * Base class for tests that run against the new management API in ML8. Main purpose is to provide convenience methods

@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.util;
+package com.marklogic.rest.util;
 
 public class RestConfig {
 

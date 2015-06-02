@@ -1,7 +1,7 @@
-package com.marklogic.appdeployer.mgmt.appservers;
+package com.marklogic.rest.mgmt.appservers;
 
-import com.marklogic.appdeployer.mgmt.AbstractManager;
-import com.marklogic.appdeployer.mgmt.ManageClient;
+import com.marklogic.rest.mgmt.AbstractManager;
+import com.marklogic.rest.mgmt.ManageClient;
 
 public class ServerManager extends AbstractManager {
 

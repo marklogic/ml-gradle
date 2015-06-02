@@ -4,7 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.marklogic.appdeployer.AbstractMgmtTest;
-import com.marklogic.appdeployer.mgmt.appservers.ServerManager;
+import com.marklogic.rest.mgmt.appservers.ServerManager;
+import com.marklogic.rest.mgmt.services.ServiceManager;
 
 /**
  * This test ensures that the convenience methods for creating and deleting a sample application work properly, and thus

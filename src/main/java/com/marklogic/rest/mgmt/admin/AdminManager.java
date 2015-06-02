@@ -1,9 +1,9 @@
-package com.marklogic.appdeployer.mgmt.admin;
+package com.marklogic.rest.mgmt.admin;
 
 import org.springframework.web.client.RestTemplate;
 
-import com.marklogic.appdeployer.mgmt.AbstractManager;
-import com.marklogic.appdeployer.util.RestTemplateUtil;
+import com.marklogic.rest.mgmt.AbstractManager;
+import com.marklogic.rest.util.RestTemplateUtil;
 
 public class AdminManager extends AbstractManager {
 

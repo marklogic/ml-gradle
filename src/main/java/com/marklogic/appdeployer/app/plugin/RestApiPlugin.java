@@ -6,10 +6,10 @@ import org.springframework.http.HttpMethod;
 
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.app.AppPluginContext;
-import com.marklogic.appdeployer.mgmt.ManageClient;
-import com.marklogic.appdeployer.mgmt.admin.ActionRequiringRestart;
-import com.marklogic.appdeployer.mgmt.appservers.ServerManager;
-import com.marklogic.appdeployer.mgmt.services.ServiceManager;
+import com.marklogic.rest.mgmt.ManageClient;
+import com.marklogic.rest.mgmt.admin.ActionRequiringRestart;
+import com.marklogic.rest.mgmt.appservers.ServerManager;
+import com.marklogic.rest.mgmt.services.ServiceManager;
 
 public class RestApiPlugin extends AbstractPlugin {
 

@@ -1,7 +1,7 @@
-package com.marklogic.appdeployer.mgmt.cpf;
+package com.marklogic.rest.mgmt.cpf;
 
-import com.marklogic.appdeployer.mgmt.ManageClient;
 import com.marklogic.clientutil.LoggingObject;
+import com.marklogic.rest.mgmt.ManageClient;
 
 public class CpfManager extends LoggingObject {
 

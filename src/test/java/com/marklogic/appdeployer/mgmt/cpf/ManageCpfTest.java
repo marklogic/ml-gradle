@@ -6,6 +6,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.FileCopyUtils;
 
 import com.marklogic.appdeployer.AbstractMgmtTest;
+import com.marklogic.rest.mgmt.cpf.CpfManager;
 
 public class ManageCpfTest extends AbstractMgmtTest {
 

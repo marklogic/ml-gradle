@@ -1,10 +1,10 @@
-package com.marklogic.appdeployer.mgmt.security;
+package com.marklogic.rest.mgmt.security;
 
 import org.jdom2.Namespace;
 
-import com.marklogic.appdeployer.mgmt.ManageClient;
-import com.marklogic.appdeployer.util.Fragment;
 import com.marklogic.clientutil.LoggingObject;
+import com.marklogic.rest.mgmt.ManageClient;
+import com.marklogic.rest.util.Fragment;
 
 public class UserManager extends LoggingObject {
 	

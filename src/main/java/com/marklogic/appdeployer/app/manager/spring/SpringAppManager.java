@@ -7,8 +7,8 @@ import org.springframework.context.ApplicationContext;
 
 import com.marklogic.appdeployer.app.AppPlugin;
 import com.marklogic.appdeployer.app.manager.AbstractAppManager;
-import com.marklogic.appdeployer.mgmt.ManageClient;
-import com.marklogic.appdeployer.mgmt.admin.AdminManager;
+import com.marklogic.rest.mgmt.ManageClient;
+import com.marklogic.rest.mgmt.admin.AdminManager;
 
 /**
  * Manages creating and deleting an app - i.e. looks for files in the ConfigDir and makes the appropriate calls to the

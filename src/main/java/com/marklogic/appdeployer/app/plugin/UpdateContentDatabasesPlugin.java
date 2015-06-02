@@ -4,7 +4,7 @@ import java.io.File;
 
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.app.AppPluginContext;
-import com.marklogic.appdeployer.mgmt.databases.DatabaseManager;
+import com.marklogic.rest.mgmt.databases.DatabaseManager;
 
 public class UpdateContentDatabasesPlugin extends AbstractPlugin {
 

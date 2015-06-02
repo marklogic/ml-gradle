@@ -1,6 +1,6 @@
-package com.marklogic.appdeployer.mgmt;
+package com.marklogic.rest.mgmt;
 
-import com.marklogic.appdeployer.util.RestConfig;
+import com.marklogic.rest.util.RestConfig;
 
 /**
  * Defines the configuration data for talking to the Mgmt REST API.

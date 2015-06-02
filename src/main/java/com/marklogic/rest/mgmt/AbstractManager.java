@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.mgmt;
+package com.marklogic.rest.mgmt;
 
 import com.marklogic.clientutil.LoggingObject;
 

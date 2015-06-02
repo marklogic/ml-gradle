@@ -1,8 +1,8 @@
 package com.marklogic.appdeployer.app;
 
 import com.marklogic.appdeployer.AppConfig;
-import com.marklogic.appdeployer.mgmt.ManageClient;
-import com.marklogic.appdeployer.mgmt.admin.AdminManager;
+import com.marklogic.rest.mgmt.ManageClient;
+import com.marklogic.rest.mgmt.admin.AdminManager;
 
 public class AppPluginContext {
 

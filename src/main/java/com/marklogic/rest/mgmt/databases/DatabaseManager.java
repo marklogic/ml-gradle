@@ -1,8 +1,8 @@
-package com.marklogic.appdeployer.mgmt.databases;
+package com.marklogic.rest.mgmt.databases;
 
-import com.marklogic.appdeployer.mgmt.AbstractManager;
-import com.marklogic.appdeployer.mgmt.ManageClient;
-import com.marklogic.appdeployer.util.Fragment;
+import com.marklogic.rest.mgmt.AbstractManager;
+import com.marklogic.rest.mgmt.ManageClient;
+import com.marklogic.rest.util.Fragment;
 
 public class DatabaseManager extends AbstractManager {
 

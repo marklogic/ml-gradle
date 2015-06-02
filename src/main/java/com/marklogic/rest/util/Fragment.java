@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.util;
+package com.marklogic.rest.util;
 
 import java.io.StringReader;
 import java.util.ArrayList;

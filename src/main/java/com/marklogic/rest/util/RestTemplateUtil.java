@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.util;
+package com.marklogic.rest.util;
 
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;

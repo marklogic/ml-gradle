@@ -1,6 +1,6 @@
-package com.marklogic.appdeployer.mgmt.admin;
+package com.marklogic.rest.mgmt.admin;
 
-import com.marklogic.appdeployer.util.RestConfig;
+import com.marklogic.rest.util.RestConfig;
 
 
 /**

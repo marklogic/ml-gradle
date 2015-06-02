@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.mgmt;
+package com.marklogic.rest.mgmt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,9 +13,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import com.marklogic.appdeployer.util.Fragment;
-import com.marklogic.appdeployer.util.RestTemplateUtil;
 import com.marklogic.clientutil.LoggingObject;
+import com.marklogic.rest.util.Fragment;
+import com.marklogic.rest.util.RestTemplateUtil;
 
 /**
  * Wraps a RestTemplate with methods that should simplify accessing the Manage API with RestTemplate. Each NounManager

@@ -1,10 +1,10 @@
-package com.marklogic.appdeployer.mgmt.hosts;
+package com.marklogic.rest.mgmt.hosts;
 
 import java.util.List;
 
-import com.marklogic.appdeployer.mgmt.AbstractManager;
-import com.marklogic.appdeployer.mgmt.ManageClient;
-import com.marklogic.appdeployer.util.Fragment;
+import com.marklogic.rest.mgmt.AbstractManager;
+import com.marklogic.rest.mgmt.ManageClient;
+import com.marklogic.rest.util.Fragment;
 
 public class HostManager extends AbstractManager {
 

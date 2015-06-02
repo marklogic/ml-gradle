@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.mgmt.admin;
+package com.marklogic.rest.mgmt.admin;
 
 public interface ActionRequiringRestart {
 

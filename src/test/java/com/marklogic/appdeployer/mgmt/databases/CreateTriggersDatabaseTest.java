@@ -6,7 +6,8 @@ import org.junit.Test;
 import com.marklogic.appdeployer.AbstractMgmtTest;
 import com.marklogic.appdeployer.app.plugin.RestApiPlugin;
 import com.marklogic.appdeployer.app.plugin.TriggersDatabasePlugin;
-import com.marklogic.appdeployer.mgmt.forests.ForestManager;
+import com.marklogic.rest.mgmt.databases.DatabaseManager;
+import com.marklogic.rest.mgmt.forests.ForestManager;
 
 public class CreateTriggersDatabaseTest extends AbstractMgmtTest {
 

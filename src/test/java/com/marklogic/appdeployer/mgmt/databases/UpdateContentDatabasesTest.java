@@ -6,7 +6,8 @@ import org.junit.Test;
 import com.marklogic.appdeployer.AbstractMgmtTest;
 import com.marklogic.appdeployer.app.plugin.RestApiPlugin;
 import com.marklogic.appdeployer.app.plugin.UpdateContentDatabasesPlugin;
-import com.marklogic.appdeployer.util.Fragment;
+import com.marklogic.rest.mgmt.databases.DatabaseManager;
+import com.marklogic.rest.util.Fragment;
 
 public class UpdateContentDatabasesTest extends AbstractMgmtTest {
 

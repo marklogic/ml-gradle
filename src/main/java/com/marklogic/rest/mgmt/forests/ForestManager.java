@@ -1,8 +1,8 @@
-package com.marklogic.appdeployer.mgmt.forests;
+package com.marklogic.rest.mgmt.forests;
 
-import com.marklogic.appdeployer.mgmt.AbstractManager;
-import com.marklogic.appdeployer.mgmt.ManageClient;
-import com.marklogic.appdeployer.util.Fragment;
+import com.marklogic.rest.mgmt.AbstractManager;
+import com.marklogic.rest.mgmt.ManageClient;
+import com.marklogic.rest.util.Fragment;
 
 public class ForestManager extends AbstractManager {
 

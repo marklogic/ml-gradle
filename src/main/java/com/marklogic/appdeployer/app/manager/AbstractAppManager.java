@@ -9,9 +9,9 @@ import com.marklogic.appdeployer.app.AppManager;
 import com.marklogic.appdeployer.app.AppPlugin;
 import com.marklogic.appdeployer.app.AppPluginContext;
 import com.marklogic.appdeployer.app.ConfigDir;
-import com.marklogic.appdeployer.mgmt.ManageClient;
-import com.marklogic.appdeployer.mgmt.admin.AdminManager;
 import com.marklogic.clientutil.LoggingObject;
+import com.marklogic.rest.mgmt.ManageClient;
+import com.marklogic.rest.mgmt.admin.AdminManager;
 
 /**
  * Abstract base class for managing an app that just needs the subclass to define the list of AppPlugin instances to

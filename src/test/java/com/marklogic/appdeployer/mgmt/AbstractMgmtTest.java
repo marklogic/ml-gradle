@@ -18,6 +18,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.app.AppManager;
+import com.marklogic.appdeployer.app.AppPluginContext;
 import com.marklogic.appdeployer.app.ConfigDir;
 import com.marklogic.appdeployer.app.DefaultConfiguration;
 import com.marklogic.appdeployer.app.plugin.RestApiPlugin;
@@ -50,7 +51,7 @@ public abstract class AbstractMgmtTest extends Assert {
     protected ConfigDir configDir;
     protected ManageClient manageClient;
     protected AppManager appManager;
-    protected AdminManager adminMgr;
+    protected AdminManager adminManager;
     protected ConfigurableApplicationContext appManagerContext;
 
     protected AppConfig appConfig;
@@ -61,7 +62,7 @@ public abstract class AbstractMgmtTest extends Assert {
 
         configDir = new ConfigDir(new File("src/test/resources/sample-app/src/main/ml-config"));
         manageClient = new ManageClient(manageConfig);
-        adminMgr = new AdminManager(adminConfig);
+        adminManager = new AdminManager(adminConfig);
     }
 
     protected void initializeAppConfig() {
@@ -76,8 +77,7 @@ public abstract class AbstractMgmtTest extends Assert {
 
     protected void initializeAppManager(Class<?> configurationClass) {
         appManagerContext = new AnnotationConfigApplicationContext(configurationClass);
-        appManager = new AppManager(appManagerContext, manageClient);
-        appManager.setAdminManager(adminMgr);
+        appManager = new AppManager(appManagerContext, manageClient, adminManager);
     }
 
     @After
@@ -91,7 +91,7 @@ public abstract class AbstractMgmtTest extends Assert {
      * Useful for when your test only needs a REST API and not full the sample app created.
      */
     protected void createSampleAppRestApi() {
-        new RestApiPlugin().onCreate(appConfig, configDir, manageClient);
+        new RestApiPlugin().onCreate(new AppPluginContext(appConfig, configDir, manageClient, adminManager));
     }
 
     protected void deleteSampleApp() {

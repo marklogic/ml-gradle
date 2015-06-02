@@ -4,8 +4,7 @@ import java.io.File;
 
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.app.AbstractPlugin;
-import com.marklogic.appdeployer.app.ConfigDir;
-import com.marklogic.appdeployer.mgmt.ManageClient;
+import com.marklogic.appdeployer.app.AppPluginContext;
 import com.marklogic.appdeployer.mgmt.databases.DatabaseManager;
 
 public class UpdateContentDatabasesPlugin extends AbstractPlugin {
@@ -19,12 +18,13 @@ public class UpdateContentDatabasesPlugin extends AbstractPlugin {
      * Check for content-database.json; if it exists, then PUT it against the existing content database.
      */
     @Override
-    public void onCreate(AppConfig appConfig, ConfigDir configDir, ManageClient manageClient) {
-        File f = configDir.getContentDatabaseFile();
+    public void onCreate(AppPluginContext context) {
+        File f = context.getConfigDir().getContentDatabaseFile();
         if (f.exists()) {
-            DatabaseManager dbMgr = new DatabaseManager(manageClient);
+            DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
 
             String payload = copyFileToString(f);
+            AppConfig appConfig = context.getAppConfig();
 
             String json = replaceConfigTokens(payload, appConfig, false);
             dbMgr.updateDatabase(appConfig.getContentDatabaseName(), json);
@@ -40,7 +40,7 @@ public class UpdateContentDatabasesPlugin extends AbstractPlugin {
     }
 
     @Override
-    public void onDelete(AppConfig appConfig, ConfigDir configDir, ManageClient manageClient) {
+    public void onDelete(AppPluginContext context) {
     }
 
 }

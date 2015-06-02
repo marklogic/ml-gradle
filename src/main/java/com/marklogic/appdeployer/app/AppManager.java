@@ -23,9 +23,10 @@ public class AppManager extends AbstractManager {
     private ApplicationContext appContext;
     private AdminManager adminManager;
 
-    public AppManager(ApplicationContext appContext, ManageClient manageClient) {
+    public AppManager(ApplicationContext appContext, ManageClient manageClient, AdminManager adminManager) {
         this.appContext = appContext;
         this.manageClient = manageClient;
+        this.adminManager = adminManager;
     }
 
     public void createApp(AppConfig appConfig, ConfigDir configDir) {
@@ -35,10 +36,12 @@ public class AppManager extends AbstractManager {
         List<AppPlugin> plugins = getPluginsFromSpring(appContext);
         Collections.sort(plugins, new OnCreateComparator());
 
+        AppPluginContext context = new AppPluginContext(appConfig, configDir, manageClient, adminManager);
+
         for (AppPlugin plugin : plugins) {
             logger.info(format("Invoking plugin [%s] with sort order [%d]", plugin.getClass().getName(),
                     plugin.getSortOrderOnCreate()));
-            plugin.onCreate(appConfig, configDir, manageClient);
+            plugin.onCreate(context);
         }
 
         logger.info(format("Created application %s", appConfig.getName()));
@@ -55,24 +58,8 @@ public class AppManager extends AbstractManager {
             logger.info(format("Invoking plugin [%s] with sort order [%d]", plugin.getClass().getName(),
                     plugin.getSortOrderOnDelete()));
 
-            String lastRestartTimestamp = null;
-            if (plugin instanceof RequirestRestartOnDelete) {
-                if (adminManager != null) {
-                    lastRestartTimestamp = adminManager.getLastRestartTimestamp();
-                } else {
-                    logger.warn("No AdminManager set, cannot get last restart timestamp");
-                }
-            }
-
-            plugin.onDelete(appConfig, configDir, manageClient);
-
-            if (lastRestartTimestamp != null) {
-                if (adminManager != null) {
-                    adminManager.waitForRestart(lastRestartTimestamp);
-                } else {
-                    logger.warn("No AdminManager set, cannot wait for MarkLogic to restart");
-                }
-            }
+            AppPluginContext context = new AppPluginContext(appConfig, configDir, manageClient, adminManager);
+            plugin.onDelete(context);
         }
 
         logger.info(format("Finished deleting app %s", appConfig.getName()));
@@ -82,10 +69,6 @@ public class AppManager extends AbstractManager {
         List<AppPlugin> plugins = new ArrayList<AppPlugin>();
         plugins.addAll(applicationContext.getBeansOfType(AppPlugin.class).values());
         return plugins;
-    }
-
-    public void setAdminManager(AdminManager adminManager) {
-        this.adminManager = adminManager;
     }
 }
 

@@ -1,8 +1,5 @@
 package com.marklogic.appdeployer.app;
 
-import com.marklogic.appdeployer.AppConfig;
-import com.marklogic.appdeployer.mgmt.ManageClient;
-
 /**
  * A plugin is used to provide additional behavior when creating and deleting an application; it keeps the AppManager
  * class from being tightly coupled to all the things a developer may want to happen as part of creating or deleting an
@@ -28,20 +25,16 @@ public interface AppPlugin {
     /**
      * Configure the application in some way when it is being created.
      * 
-     * @param appConfig
-     * @param configDir
-     * @param manageClient
+     * @param context
      */
-    public void onCreate(AppConfig appConfig, ConfigDir configDir, ManageClient manageClient);
+    public void onCreate(AppPluginContext context);
 
     /**
      * Delete some aspect of the application while it is being deleted. This gives the plugin a chance to cleanup/delete
      * whatever it created. A plugin that needs MarkLogic to restart after it's done deleting resources (such as a
      * plugin that deletes an app server) should also implement the RequiresRestartOnDelete marker interface.
      * 
-     * @param appConfig
-     * @param configDir
-     * @param manageClient
+     * @param context
      */
-    public void onDelete(AppConfig appConfig, ConfigDir configDir, ManageClient manageClient);
+    public void onDelete(AppPluginContext context);
 }

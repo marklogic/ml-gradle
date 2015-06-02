@@ -2,9 +2,8 @@ package com.marklogic.appdeployer.app.plugin;
 
 import java.io.File;
 
-import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.app.AbstractPlugin;
-import com.marklogic.appdeployer.app.ConfigDir;
+import com.marklogic.appdeployer.app.AppPluginContext;
 import com.marklogic.appdeployer.mgmt.ManageClient;
 import com.marklogic.appdeployer.mgmt.databases.DatabaseManager;
 import com.marklogic.appdeployer.mgmt.forests.ForestManager;
@@ -18,19 +17,19 @@ public class TriggersDatabasePlugin extends AbstractPlugin {
     }
 
     @Override
-    public void onCreate(AppConfig appConfig, ConfigDir configDir, ManageClient manageClient) {
-        File f = configDir.getTriggersDatabaseFile();
+    public void onCreate(AppPluginContext context) {
+        File f = context.getConfigDir().getTriggersDatabaseFile();
         if (f.exists()) {
-            DatabaseManager dbMgr = new DatabaseManager(manageClient);
+            DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
 
-            String dbName = appConfig.getTriggersDatabaseName();
+            String dbName = context.getAppConfig().getTriggersDatabaseName();
             String payload = copyFileToString(f);
-            payload = replaceConfigTokens(payload, appConfig, false);
+            payload = replaceConfigTokens(payload, context.getAppConfig(), false);
             dbMgr.createDatabase(dbName, payload);
 
-            createAndAttachForestOnEachHost(dbName, manageClient);
+            createAndAttachForestOnEachHost(dbName, context.getManageClient());
 
-            dbMgr.assignTriggersDatabase(appConfig.getContentDatabaseName(), dbName);
+            dbMgr.assignTriggersDatabase(context.getAppConfig().getContentDatabaseName(), dbName);
         } else {
             logger.info("Not creating a triggers database, no file found at: " + f.getAbsolutePath());
         }
@@ -46,9 +45,9 @@ public class TriggersDatabasePlugin extends AbstractPlugin {
     }
 
     @Override
-    public void onDelete(AppConfig appConfig, ConfigDir configDir, ManageClient manageClient) {
-        DatabaseManager dbMgr = new DatabaseManager(manageClient);
-        dbMgr.deleteDatabase(appConfig.getTriggersDatabaseName());
+    public void onDelete(AppPluginContext context) {
+        DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
+        dbMgr.deleteDatabase(context.getAppConfig().getTriggersDatabaseName());
     }
 
 }

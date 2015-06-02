@@ -16,6 +16,14 @@ public class AdminManager extends AbstractManager {
         this.restTemplate = RestTemplateUtil.newRestTemplate(adminConfig);
     }
 
+    public void invokeActionRequiringRestart(ActionRequiringRestart action) {
+        String lastRestartTimestamp = getLastRestartTimestamp();
+        boolean requiresRestart = action.execute();
+        if (requiresRestart) {
+            waitForRestart(lastRestartTimestamp);
+        }
+    }
+    
     public String getLastRestartTimestamp() {
         return restTemplate.getForEntity(adminConfig.getBaseUrl() + "/admin/v1/timestamp", String.class).getBody();
     }

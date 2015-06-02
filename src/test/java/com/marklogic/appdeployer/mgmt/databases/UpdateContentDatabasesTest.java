@@ -32,8 +32,7 @@ public class UpdateContentDatabasesTest extends AbstractMgmtTest {
 
     @After
     public void teardown() {
-        // TODO Can't do this yet with a test REST API, as the modules database is shared
-        //deleteSampleApp();
+        deleteSampleApp();
     }
 }
 

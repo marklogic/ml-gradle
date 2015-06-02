@@ -31,7 +31,7 @@ public class DatabaseManager extends AbstractManager {
     public Fragment getDatabasePropertiesAsXml(String databaseIdOrName) {
         return manageClient.getXml(format("/manage/v2/databases/%s/properties", databaseIdOrName));
     }
-    
+
     public void deleteDatabase(String name) {
         if (!dbExists(name)) {
             logger.info(format("Database %s name does not exist, not deleting", name));

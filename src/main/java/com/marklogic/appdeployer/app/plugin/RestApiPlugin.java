@@ -9,6 +9,7 @@ import com.marklogic.appdeployer.app.AbstractPlugin;
 import com.marklogic.appdeployer.app.ConfigDir;
 import com.marklogic.appdeployer.app.RequirestRestartOnDelete;
 import com.marklogic.appdeployer.mgmt.ManageClient;
+import com.marklogic.appdeployer.mgmt.appservers.ServerManager;
 import com.marklogic.appdeployer.mgmt.services.ServiceManager;
 
 public class RestApiPlugin extends AbstractPlugin implements RequirestRestartOnDelete {
@@ -37,7 +38,20 @@ public class RestApiPlugin extends AbstractPlugin implements RequirestRestartOnD
 
     @Override
     public void onDelete(AppConfig appConfig, ConfigDir configDir, ManageClient manageClient) {
-        String path = manageClient.getBaseUrl() + "/v1/rest-apis/" + appConfig.getName() + "?";
+        // If we have a test REST API, first modify it to point at Documents for the modules database so we can safely
+        // delete each REST API
+        if (appConfig.isTestPortSet()) {
+            ServerManager mgr = new ServerManager(manageClient);
+            mgr.setModulesDatabaseToDocuments(appConfig.getTestRestServerName(), appConfig.getGroupName());
+            deleteRestApi(appConfig.getTestRestServerName(), manageClient, false, true);
+        }
+
+        deleteRestApi(appConfig.getRestServerName(), manageClient, includeModules, includeContent);
+    }
+
+    protected void deleteRestApi(String serverName, ManageClient manageClient, boolean includeModules,
+            boolean includeContent) {
+        String path = format("%s/v1/rest-apis/%s?", manageClient.getBaseUrl(), serverName);
         if (includeModules) {
             path += "include=modules&";
         }

@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.mgmt.security;
+package com.marklogic.appdeployer.security;
 
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.ManageConfig;

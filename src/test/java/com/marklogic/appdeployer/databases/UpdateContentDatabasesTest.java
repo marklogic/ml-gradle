@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.mgmt.databases;
+package com.marklogic.appdeployer.databases;
 
 import org.junit.After;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.mgmt.hosts;
+package com.marklogic.appdeployer.hosts;
 
 import java.util.List;
 

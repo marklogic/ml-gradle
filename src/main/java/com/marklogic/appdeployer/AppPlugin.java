@@ -1,13 +1,9 @@
 package com.marklogic.appdeployer;
 
-
 /**
- * A plugin is used to provide additional behavior when creating and deleting an application; it keeps the AppManager
- * class from being tightly coupled to all the things a developer may want to happen as part of creating or deleting an
- * application.
- * 
- * An instance of AppPlugin is expected to be defined in a Spring container which is then used to construct a
- * AppManager.
+ * A plugin is used to provide additional behavior when creating and deleting an application; it keeps the AppDeployer
+ * instance from being tightly coupled to all the things a developer may want to happen as part of creating or deleting
+ * an application.
  */
 public interface AppPlugin {
 

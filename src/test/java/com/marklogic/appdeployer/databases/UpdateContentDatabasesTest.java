@@ -18,7 +18,7 @@ public class UpdateContentDatabasesTest extends AbstractMgmtTest {
 
         initializeAppManager(new RestApiPlugin(), new UpdateContentDatabasesPlugin());
 
-        appManager.createApp(appConfig, configDir);
+        appDeployer.deploy(appConfig, configDir);
 
         String rangeIndexXpath = "/m:database-properties/m:range-element-indexes/m:range-element-index"
                 + "[m:scalar-type = 'string' and m:namespace-uri = 'urn:sampleapp' and m:localname='id' and m:collation='http://marklogic.com/collation/']";

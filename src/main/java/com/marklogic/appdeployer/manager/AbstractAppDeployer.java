@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.marklogic.appdeployer.AppConfig;
-import com.marklogic.appdeployer.AppManager;
+import com.marklogic.appdeployer.AppDeployer;
 import com.marklogic.appdeployer.AppPlugin;
 import com.marklogic.appdeployer.AppPluginContext;
 import com.marklogic.appdeployer.ConfigDir;
@@ -14,15 +14,15 @@ import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.admin.AdminManager;
 
 /**
- * Abstract base class for managing an app that just needs the subclass to define the list of AppPlugin instances to
- * use. Handles executing plugins in sorted order
+ * Abstract base class that just needs the subclass to define the list of AppPlugin instances to use. Handles executing
+ * plugins in sorted order.
  */
-public abstract class AbstractAppManager extends LoggingObject implements AppManager {
+public abstract class AbstractAppDeployer extends LoggingObject implements AppDeployer {
 
     private ManageClient manageClient;
     private AdminManager adminManager;
 
-    public AbstractAppManager(ManageClient manageClient, AdminManager adminManager) {
+    public AbstractAppDeployer(ManageClient manageClient, AdminManager adminManager) {
         super();
         this.manageClient = manageClient;
         this.adminManager = adminManager;
@@ -30,7 +30,7 @@ public abstract class AbstractAppManager extends LoggingObject implements AppMan
 
     protected abstract List<AppPlugin> getAppPlugins();
 
-    public void createApp(AppConfig appConfig, ConfigDir configDir) {
+    public void deploy(AppConfig appConfig, ConfigDir configDir) {
         logger.info(format("Creating application %s with config dir of: %s", appConfig.getName(), configDir
                 .getBaseDir().getAbsolutePath()));
 
@@ -48,7 +48,7 @@ public abstract class AbstractAppManager extends LoggingObject implements AppMan
         logger.info(format("Created application %s", appConfig.getName()));
     }
 
-    public void deleteApp(AppConfig appConfig, ConfigDir configDir) {
+    public void undeploy(AppConfig appConfig, ConfigDir configDir) {
         logger.info(format("Deleting app %s with config dir: %s", appConfig.getName(), configDir.getBaseDir()
                 .getAbsolutePath()));
 

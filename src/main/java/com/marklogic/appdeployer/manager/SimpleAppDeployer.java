@@ -10,11 +10,11 @@ import com.marklogic.rest.mgmt.admin.AdminManager;
  * Simple implementation that allows for a list of plugins to be set. Useful for testing purposes in particular - i.e.
  * for testing plugins together.
  */
-public class SimpleAppManager extends AbstractAppManager {
+public class SimpleAppDeployer extends AbstractAppDeployer {
 
     private List<AppPlugin> appPlugins;
 
-    public SimpleAppManager(ManageClient manageClient, AdminManager adminManager) {
+    public SimpleAppDeployer(ManageClient manageClient, AdminManager adminManager) {
         super(manageClient, adminManager);
     }
 

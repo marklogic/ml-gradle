@@ -6,20 +6,18 @@ import java.util.List;
 import org.springframework.context.ApplicationContext;
 
 import com.marklogic.appdeployer.AppPlugin;
-import com.marklogic.appdeployer.manager.AbstractAppManager;
+import com.marklogic.appdeployer.manager.AbstractAppDeployer;
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.admin.AdminManager;
 
 /**
- * Manages creating and deleting an app - i.e. looks for files in the ConfigDir and makes the appropriate calls to the
- * Mgmt API using "NounManager" classes. This is the class that something like a Gradle plugin would interact with, and
- * hopefully only this class.
+ * Depends on a Spring ApplicationContext for finding AppPlugin instances.
  */
-public class SpringAppManager extends AbstractAppManager {
+public class SpringAppDeployer extends AbstractAppDeployer {
 
     private ApplicationContext appContext;
 
-    public SpringAppManager(ApplicationContext appContext, ManageClient manageClient, AdminManager adminManager) {
+    public SpringAppDeployer(ApplicationContext appContext, ManageClient manageClient, AdminManager adminManager) {
         super(manageClient, adminManager);
         this.appContext = appContext;
     }

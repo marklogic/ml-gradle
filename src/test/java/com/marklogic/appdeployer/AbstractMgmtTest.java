@@ -18,8 +18,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 import com.marklogic.appdeployer.AppConfig;
-import com.marklogic.appdeployer.manager.SimpleAppManager;
-import com.marklogic.appdeployer.manager.spring.SpringAppManager;
+import com.marklogic.appdeployer.manager.SimpleAppDeployer;
+import com.marklogic.appdeployer.manager.spring.SpringAppDeployer;
 import com.marklogic.appdeployer.plugin.RestApiPlugin;
 import com.marklogic.junit.spring.LoggingTestExecutionListener;
 import com.marklogic.rest.mgmt.ManageClient;
@@ -51,7 +51,7 @@ public abstract class AbstractMgmtTest extends Assert {
 
     protected ConfigDir configDir;
     protected ManageClient manageClient;
-    protected AppManager appManager;
+    protected AppDeployer appDeployer;
     protected AdminManager adminManager;
     protected ConfigurableApplicationContext appManagerContext;
 
@@ -82,9 +82,9 @@ public abstract class AbstractMgmtTest extends Assert {
      * @param plugins
      */
     protected void initializeAppManager(AppPlugin... plugins) {
-        SimpleAppManager m = new SimpleAppManager(manageClient, adminManager);
+        SimpleAppDeployer m = new SimpleAppDeployer(manageClient, adminManager);
         m.setAppPlugins(Arrays.asList(plugins));
-        appManager = m;
+        appDeployer = m;
     }
 
     /**
@@ -94,7 +94,7 @@ public abstract class AbstractMgmtTest extends Assert {
      */
     protected void initializeAppManager(Class<?> configurationClass) {
         appManagerContext = new AnnotationConfigApplicationContext(configurationClass);
-        appManager = new SpringAppManager(appManagerContext, manageClient, adminManager);
+        appDeployer = new SpringAppDeployer(appManagerContext, manageClient, adminManager);
     }
 
     @After
@@ -113,7 +113,7 @@ public abstract class AbstractMgmtTest extends Assert {
 
     protected void deleteSampleApp() {
         try {
-            appManager.deleteApp(appConfig, configDir);
+            appDeployer.undeploy(appConfig, configDir);
         } catch (Exception e) {
             logger.warn("Error while waiting for MarkLogic to restart: " + e.getMessage());
         }

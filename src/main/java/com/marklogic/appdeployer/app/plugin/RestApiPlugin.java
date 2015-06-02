@@ -66,18 +66,22 @@ public class RestApiPlugin extends AbstractPlugin {
 
     protected boolean deleteRestApi(String serverName, ManageClient manageClient, boolean includeModules,
             boolean includeContent) {
-        String path = format("%s/v1/rest-apis/%s?", manageClient.getBaseUrl(), serverName);
-        if (includeModules) {
-            path += "include=modules&";
+        if (new ServerManager(manageClient).serverExists(serverName)) {
+            String path = format("%s/v1/rest-apis/%s?", manageClient.getBaseUrl(), serverName);
+            if (includeModules) {
+                path += "include=modules&";
+            }
+            if (includeContent) {
+                path += "include=content";
+            }
+            logger.info("Deleting REST API, path: " + path);
+            manageClient.getRestTemplate().exchange(path, HttpMethod.DELETE, null, String.class);
+            logger.info("Deleted REST API");
+            return true;
+        } else {
+            logger.info(format("Server %s does not exist, not deleting", serverName));
+            return false;
         }
-        if (includeContent) {
-            path += "include=content";
-        }
-        logger.info("Deleting REST API, path: " + path);
-        manageClient.getRestTemplate().exchange(path, HttpMethod.DELETE, null, String.class);
-        logger.info("Deleted REST API");
-        // TODO Only return true if the server exists
-        return true;
     }
 
     public boolean isIncludeModules() {

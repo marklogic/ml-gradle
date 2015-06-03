@@ -5,15 +5,20 @@ import java.io.File;
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.AppPluginContext;
 import com.marklogic.appdeployer.plugin.AbstractPlugin;
+import com.marklogic.appdeployer.plugin.SortOrderConstants;
 import com.marklogic.rest.mgmt.appservers.ServerManager;
 
 public class UpdateRestApiServersPlugin extends AbstractPlugin {
 
     @Override
     public Integer getSortOrderOnDeploy() {
-        return 600;
+        return SortOrderConstants.UPDATE_REST_API_SERVERS_ORDER;
     }
 
+    /**
+     * This uses a different file than that of creating a REST API, as the payload for /v1/rest-apis differs from that
+     * of the /manage/v2/servers endpoint.
+     */
     @Override
     public void onDeploy(AppPluginContext context) {
         File f = context.getConfigDir().getRestApiServerFile();

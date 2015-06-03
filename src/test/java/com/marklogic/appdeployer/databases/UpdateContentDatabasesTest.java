@@ -4,8 +4,8 @@ import org.junit.After;
 import org.junit.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.appdeployer.plugin.RestApiPlugin;
-import com.marklogic.appdeployer.plugin.UpdateContentDatabasesPlugin;
+import com.marklogic.appdeployer.plugin.databases.UpdateContentDatabasesPlugin;
+import com.marklogic.appdeployer.plugin.restapis.CreateRestApiServersPlugin;
 import com.marklogic.rest.mgmt.databases.DatabaseManager;
 import com.marklogic.rest.util.Fragment;
 
@@ -16,7 +16,7 @@ public class UpdateContentDatabasesTest extends AbstractAppDeployerTest {
         // We want both a main and a test app server in this test
         appConfig.setTestRestPort(SAMPLE_APP_TEST_REST_PORT);
 
-        initializeAppDeployer(new RestApiPlugin(), new UpdateContentDatabasesPlugin());
+        initializeAppDeployer(new CreateRestApiServersPlugin(), new UpdateContentDatabasesPlugin());
 
         appDeployer.deploy(appConfig, configDir);
 

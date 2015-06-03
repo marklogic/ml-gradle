@@ -1,16 +1,18 @@
-package com.marklogic.appdeployer.plugin;
+package com.marklogic.appdeployer.plugin.databases;
 
 import java.io.File;
 
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.AppPluginContext;
+import com.marklogic.appdeployer.plugin.AbstractPlugin;
+import com.marklogic.appdeployer.plugin.SortOrderConstants;
 import com.marklogic.rest.mgmt.databases.DatabaseManager;
 
 public class UpdateContentDatabasesPlugin extends AbstractPlugin {
 
     @Override
     public Integer getSortOrderOnDeploy() {
-        return 200;
+        return SortOrderConstants.UPDATE_CONTENT_DATABASES_ORDER;
     }
 
     @Override

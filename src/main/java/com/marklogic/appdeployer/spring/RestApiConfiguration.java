@@ -3,7 +3,7 @@ package com.marklogic.appdeployer.spring;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.marklogic.appdeployer.plugin.RestApiPlugin;
+import com.marklogic.appdeployer.plugin.restapis.CreateRestApiServersPlugin;
 
 /**
  * Very simple configuration for when you only want a REST API server created.
@@ -12,8 +12,8 @@ import com.marklogic.appdeployer.plugin.RestApiPlugin;
 public class RestApiConfiguration {
 
     @Bean
-    public RestApiPlugin restApiPlugin() {
-        return new RestApiPlugin();
+    public CreateRestApiServersPlugin restApiPlugin() {
+        return new CreateRestApiServersPlugin();
     }
 
 }

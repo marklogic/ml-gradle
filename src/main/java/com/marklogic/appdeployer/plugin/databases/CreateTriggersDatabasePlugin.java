@@ -1,18 +1,20 @@
-package com.marklogic.appdeployer.plugin;
+package com.marklogic.appdeployer.plugin.databases;
 
 import java.io.File;
 
 import com.marklogic.appdeployer.AppPluginContext;
+import com.marklogic.appdeployer.plugin.AbstractPlugin;
+import com.marklogic.appdeployer.plugin.SortOrderConstants;
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.databases.DatabaseManager;
 import com.marklogic.rest.mgmt.forests.ForestManager;
 import com.marklogic.rest.mgmt.hosts.HostManager;
 
-public class TriggersDatabasePlugin extends AbstractPlugin {
+public class CreateTriggersDatabasePlugin extends AbstractPlugin {
 
     @Override
     public Integer getSortOrderOnDeploy() {
-        return 500;
+        return SortOrderConstants.CREATE_TRIGGERS_DATABASE_ORDER;
     }
 
     @Override

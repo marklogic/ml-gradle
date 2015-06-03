@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.plugin;
+package com.marklogic.appdeployer.plugin.restapis;
 
 import java.io.File;
 
@@ -6,19 +6,21 @@ import org.springframework.http.HttpMethod;
 
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.AppPluginContext;
+import com.marklogic.appdeployer.plugin.AbstractPlugin;
+import com.marklogic.appdeployer.plugin.SortOrderConstants;
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.admin.ActionRequiringRestart;
 import com.marklogic.rest.mgmt.appservers.ServerManager;
 import com.marklogic.rest.mgmt.restapis.RestApiManager;
 
-public class RestApiPlugin extends AbstractPlugin {
+public class CreateRestApiServersPlugin extends AbstractPlugin {
 
     private boolean includeModules = true;
     private boolean includeContent = true;
 
     @Override
     public Integer getSortOrderOnDeploy() {
-        return 100;
+        return SortOrderConstants.CREATE_REST_API_SERVERS_ORDER;
     }
 
     @Override

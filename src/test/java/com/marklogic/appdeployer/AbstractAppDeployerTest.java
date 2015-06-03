@@ -48,7 +48,7 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
     }
 
     protected void initializeAppConfig() {
-        appConfig = new AppConfig();
+        appConfig = new AppConfig("src/test/resources/sample-app/src/main/ml-modules");
         appConfig.setName(SAMPLE_APP_NAME);
         appConfig.setRestPort(SAMPLE_APP_REST_PORT);
     }
@@ -89,7 +89,8 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
      * Useful for when your test only needs a REST API and not full the sample app created.
      */
     protected void deployRestApi() {
-        new CreateRestApiServersPlugin().onDeploy(new AppPluginContext(appConfig, configDir, manageClient, adminManager));
+        new CreateRestApiServersPlugin()
+                .onDeploy(new AppPluginContext(appConfig, configDir, manageClient, adminManager));
     }
 
     protected void undeploySampleApp() {

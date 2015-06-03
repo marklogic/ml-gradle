@@ -3,15 +3,21 @@ package com.marklogic.appdeployer;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.marklogic.client.DatabaseClientFactory.Authentication;
+
 /**
- * Encapsulates configuration for both managing an app and loading modules into an app.
+ * Encapsulates the connection information for an application and where its modules can be found. Should possibly add
+ * ConfigDir to this.
  */
 public class AppConfig {
 
     private String name;
     private String host = "localhost";
+
+    // User/password for authenticating against the REST API
     private String username = "admin";
     private String password = "admin";
+    private Authentication authentication = Authentication.DIGEST;
 
     private Integer restPort;
     private Integer xdbcPort;
@@ -19,30 +25,17 @@ public class AppConfig {
     private Integer testXdbcPort;
     private Integer modulesXdbcPort;
 
-    private String defaultModulePath;
     private List<String> modulePaths;
 
     private String groupName = "Default";
-    private String contentDatabaseFilePath;
-    private String httpServerFilePath;
-    private String triggersDatabaseFilePath;
-    private String schemasDatabaseFilePath;
-    private String xdbcServerFilePath;
 
     public AppConfig() {
-        this("src/main/xqy");
+        this("src/main/ml-modules");
     }
 
     public AppConfig(String defaultModulePath) {
-        this.defaultModulePath = defaultModulePath;
-
         modulePaths = new ArrayList<String>();
         modulePaths.add(defaultModulePath);
-        contentDatabaseFilePath = defaultModulePath + "/packages/content-database.xml";
-        httpServerFilePath = defaultModulePath + "/packages/http-server.xml";
-        triggersDatabaseFilePath = defaultModulePath + "/packages/triggers-database.xml";
-        schemasDatabaseFilePath = defaultModulePath + "/packages/schemas-database.xml";
-        xdbcServerFilePath = defaultModulePath + "/packages/xdbc-server.xml";
     }
 
     public boolean isTestPortSet() {
@@ -177,36 +170,12 @@ public class AppConfig {
         this.modulesXdbcPort = modulesXdbcPort;
     }
 
-    public String getDefaultModulePath() {
-        return defaultModulePath;
-    }
-
-    public void setDefaultModulePath(String defaultModulePath) {
-        this.defaultModulePath = defaultModulePath;
-    }
-
     public List<String> getModulePaths() {
         return modulePaths;
     }
 
     public void setModulePaths(List<String> modulePaths) {
         this.modulePaths = modulePaths;
-    }
-
-    public String getContentDatabaseFilePath() {
-        return contentDatabaseFilePath;
-    }
-
-    public void setContentDatabaseFilePath(String contentDatabaseFilePath) {
-        this.contentDatabaseFilePath = contentDatabaseFilePath;
-    }
-
-    public String getHttpServerFilePath() {
-        return httpServerFilePath;
-    }
-
-    public void setHttpServerFilePath(String httpServerFilePath) {
-        this.httpServerFilePath = httpServerFilePath;
     }
 
     public String getGroupName() {
@@ -217,28 +186,12 @@ public class AppConfig {
         this.groupName = groupName;
     }
 
-    public String getTriggersDatabaseFilePath() {
-        return triggersDatabaseFilePath;
+    public Authentication getAuthentication() {
+        return authentication;
     }
 
-    public void setTriggersDatabaseFilePath(String triggersDatabaseFilePath) {
-        this.triggersDatabaseFilePath = triggersDatabaseFilePath;
-    }
-
-    public String getSchemasDatabaseFilePath() {
-        return schemasDatabaseFilePath;
-    }
-
-    public void setSchemasDatabaseFilePath(String schemasDatabaseFilePath) {
-        this.schemasDatabaseFilePath = schemasDatabaseFilePath;
-    }
-
-    public String getXdbcServerFilePath() {
-        return xdbcServerFilePath;
-    }
-
-    public void setXdbcServerFilePath(String xdbcServerFilePath) {
-        this.xdbcServerFilePath = xdbcServerFilePath;
+    public void setAuthentication(Authentication authentication) {
+        this.authentication = authentication;
     }
 
 }

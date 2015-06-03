@@ -2,6 +2,7 @@ package com.marklogic.rest.mgmt.appservers;
 
 import com.marklogic.rest.mgmt.AbstractManager;
 import com.marklogic.rest.mgmt.ManageClient;
+import com.marklogic.rest.util.Fragment;
 
 public class ServerManager extends AbstractManager {
 
@@ -14,6 +15,11 @@ public class ServerManager extends AbstractManager {
     public boolean serverExists(String name) {
         return manageClient.getXml("/manage/v2/servers").elementExists(
                 String.format("/s:server-default-list/s:list-items/s:list-item[s:nameref = '%s']", name));
+    }
+
+    public Fragment getServerPropertiesAsXml(String serverIdOrName, String groupIdOrName) {
+        return manageClient
+                .getXml(format("/manage/v2/servers/%s/properties?group-id=%s", serverIdOrName, groupIdOrName));
     }
 
     public void updateServer(String serverIdOrName, String groupIdOrName, String json) {

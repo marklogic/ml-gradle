@@ -30,7 +30,7 @@ public class CreateTriggersDatabaseTest extends AbstractAppDeployerTest {
         assertTrue("A forest for the triggers database should have been created", forestMgr.forestExists(forestName));
         assertTrue("The forest should be attached", forestMgr.isForestAttached(forestName));
 
-        deleteSampleApp();
+        undeploySampleApp();
 
         assertFalse("The triggers database should have been deleted", dbMgr.dbExists(dbName));
         assertFalse("The triggers forest should have been deleted", forestMgr.forestExists(forestName));

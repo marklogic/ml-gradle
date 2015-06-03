@@ -37,6 +37,10 @@ public class ConfigDir {
         return new File(baseDir, restApiPath);
     }
 
+    public File getRestApiServerFile() {
+        return new File(new File(baseDir, "servers"), "rest-api-server.json");
+    }
+
     public void setDatabasesPath(String databasesPath) {
         this.databasesPath = databasesPath;
     }

@@ -23,11 +23,11 @@ public class DeleteRestApiTest extends AbstractAppDeployerTest {
         ServiceManager mgr = new ServiceManager(manageClient);
         ServerManager serverMgr = new ServerManager(manageClient);
 
-        createSampleAppRestApi();
+        deployRestApi();
         assertTrue("The REST API server should exist", mgr.restApiServerExists(SAMPLE_APP_NAME));
         assertTrue("The REST API app server should exist", serverMgr.serverExists(SAMPLE_APP_NAME));
 
-        deleteSampleApp();
+        undeploySampleApp();
         assertFalse("The REST API server should have been deleted", mgr.restApiServerExists(SAMPLE_APP_NAME));
         assertFalse("The REST API app server have been deleted", serverMgr.serverExists(SAMPLE_APP_NAME));
     }

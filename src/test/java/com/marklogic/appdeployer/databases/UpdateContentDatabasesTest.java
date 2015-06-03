@@ -33,6 +33,6 @@ public class UpdateContentDatabasesTest extends AbstractAppDeployerTest {
 
     @After
     public void teardown() {
-        deleteSampleApp();
+        undeploySampleApp();
     }
 }

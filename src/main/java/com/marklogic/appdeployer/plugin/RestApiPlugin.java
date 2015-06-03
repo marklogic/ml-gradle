@@ -9,7 +9,7 @@ import com.marklogic.appdeployer.AppPluginContext;
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.admin.ActionRequiringRestart;
 import com.marklogic.rest.mgmt.appservers.ServerManager;
-import com.marklogic.rest.mgmt.services.ServiceManager;
+import com.marklogic.rest.mgmt.restapis.RestApiManager;
 
 public class RestApiPlugin extends AbstractPlugin {
 
@@ -26,7 +26,7 @@ public class RestApiPlugin extends AbstractPlugin {
         File f = context.getConfigDir().getRestApiFile();
         String input = copyFileToString(f);
 
-        ServiceManager mgr = new ServiceManager(context.getManageClient());
+        RestApiManager mgr = new RestApiManager(context.getManageClient());
         AppConfig appConfig = context.getAppConfig();
 
         mgr.createRestApi(appConfig.getRestServerName(), tokenReplacer.replaceTokens(input, appConfig, false));

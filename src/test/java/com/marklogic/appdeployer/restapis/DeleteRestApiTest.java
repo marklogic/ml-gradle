@@ -1,11 +1,11 @@
-package com.marklogic.appdeployer.services;
+package com.marklogic.appdeployer.restapis;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.rest.mgmt.appservers.ServerManager;
-import com.marklogic.rest.mgmt.services.ServiceManager;
+import com.marklogic.rest.mgmt.restapis.RestApiManager;
 
 /**
  * This test ensures that the convenience methods for creating and deleting a sample application work properly, and thus
@@ -20,7 +20,7 @@ public class DeleteRestApiTest extends AbstractAppDeployerTest {
 
     @Test
     public void createAndDelete() {
-        ServiceManager mgr = new ServiceManager(manageClient);
+        RestApiManager mgr = new RestApiManager(manageClient);
         ServerManager serverMgr = new ServerManager(manageClient);
 
         deployRestApi();

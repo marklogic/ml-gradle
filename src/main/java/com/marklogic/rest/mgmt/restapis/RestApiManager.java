@@ -1,4 +1,4 @@
-package com.marklogic.rest.mgmt.services;
+package com.marklogic.rest.mgmt.restapis;
 
 import org.jdom2.Namespace;
 
@@ -9,11 +9,11 @@ import com.marklogic.rest.util.Fragment;
 /**
  * For /v1/rest-apis.
  */
-public class ServiceManager extends LoggingObject {
+public class RestApiManager extends LoggingObject {
 
     private ManageClient client;
 
-    public ServiceManager(ManageClient client) {
+    public RestApiManager(ManageClient client) {
         this.client = client;
     }
 

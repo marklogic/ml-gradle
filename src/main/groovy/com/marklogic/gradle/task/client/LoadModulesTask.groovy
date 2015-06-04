@@ -2,16 +2,18 @@ package com.marklogic.gradle.task.client
 
 import org.gradle.api.tasks.TaskAction
 
-import com.marklogic.appdeployer.AppConfig
+import com.marklogic.appdeployer.plugin.modules.LoadModulesPlugin
 import com.marklogic.gradle.task.MarkLogicTask
 
 class LoadModulesTask extends MarkLogicTask {
 
-    String assetRolesAndCapabilities
+    // TODO Bake this into the plugin?
+    // String assetRolesAndCapabilities
 
     @TaskAction
     void loadModules() {
         println "Loading modules from paths: " + getAppConfig().getModulePaths()
-        getAppDeployer().loadModules(getAppConfig(), assetRolesAndCapabilities)
+
+        new LoadModulesPlugin().onDeploy(getAppPluginContext())
     }
 }

@@ -4,22 +4,38 @@ import org.gradle.api.DefaultTask
 
 import com.marklogic.appdeployer.AppConfig
 import com.marklogic.appdeployer.AppDeployer
-import com.marklogic.appdeployer.ml7.Ml7AppDeployer
-import com.marklogic.appdeployer.ml7.Ml7ManageClient
+import com.marklogic.appdeployer.AppPlugin
+import com.marklogic.appdeployer.AppPluginContext
+import com.marklogic.appdeployer.ConfigDir
+import com.marklogic.appdeployer.SimpleAppDeployer
+import com.marklogic.appdeployer.plugin.databases.CreateTriggersDatabasePlugin
+import com.marklogic.appdeployer.plugin.databases.UpdateContentDatabasesPlugin
+import com.marklogic.appdeployer.plugin.restapis.CreateRestApiServersPlugin
 import com.marklogic.client.DatabaseClient
 import com.marklogic.client.DatabaseClientFactory
-import com.marklogic.client.DatabaseClientFactory.Authentication
-import com.marklogic.gradle.task.manage.ManageConfig
+import com.marklogic.rest.mgmt.ManageClient
+import com.marklogic.rest.mgmt.admin.AdminManager
 
+/**
+ * Base class that provides easy access to all of the resources setup by MarkLogicPlugin.
+ */
 class MarkLogicTask extends DefaultTask {
 
     AppConfig getAppConfig() {
         getProject().property("mlAppConfig")
     }
 
+    AppPluginContext getAppPluginContext() {
+        getProject().property("mlAppPluginContext")
+    }
+
+    ConfigDir getConfigDir() {
+        getProject().property("mlConfigDir")
+    }
+
     /**
      * Look for an instance of AppDeployer in the project. In addition to avoiding creating an AppDeployer many times,
-     * I think this also provides a way for a client to override the implementation. 
+     * this also provides a way for a client to override the implementation. 
      */
     AppDeployer getAppDeployer() {
         String propName = "mlAppDeployer"
@@ -32,9 +48,16 @@ class MarkLogicTask extends DefaultTask {
     }
 
     AppDeployer newAppDeployer() {
-        ManageConfig config = getProject().property("mlManageConfig")
-        Ml7ManageClient client = new Ml7ManageClient(config.getHost(), config.getPort(), config.getUsername(), config.getPassword())
-        return new Ml7AppDeployer(client);
+        List<AppPlugin> plugins = new ArrayList<AppPlugin>()
+        plugins.add(new CreateRestApiServersPlugin())
+        plugins.add(new UpdateContentDatabasesPlugin())
+        plugins.add(new CreateTriggersDatabasePlugin())
+
+        ManageClient manageClient = getProject().property("mlManageClient")
+        AdminManager adminManager = getProject().property("mlAdminManager")
+        SimpleAppDeployer deployer = new SimpleAppDeployer(manageClient, adminManager)
+        deployer.setAppPlugins(plugins)
+        return deployer
     }
 
     String getDefaultXccUrl() {
@@ -43,7 +66,7 @@ class MarkLogicTask extends DefaultTask {
 
     DatabaseClient newClient() {
         AppConfig config = getAppConfig()
-        return DatabaseClientFactory.newClient(config.host, config.restPort, config.username, config.password, Authentication.DIGEST)
+        return DatabaseClientFactory.newClient(config.host, config.restPort, config.username, config.password, config.authentication)
     }
 
     RestHelper newRestHelper() {

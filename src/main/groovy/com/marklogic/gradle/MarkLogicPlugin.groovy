@@ -2,99 +2,64 @@ package com.marklogic.gradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.tasks.Copy
-import org.gradle.api.tasks.Delete
 
 import com.marklogic.appdeployer.AppConfig
-import com.marklogic.appdeployer.ml7.Ml7AppDeployer
-import com.marklogic.appdeployer.ml7.Ml7ManageClient
+import com.marklogic.appdeployer.AppPluginContext
+import com.marklogic.appdeployer.ConfigDir
 import com.marklogic.gradle.task.DeleteModuleTimestampsFileTask
-import com.marklogic.gradle.task.UninstallAppTask
+import com.marklogic.gradle.task.DeployAppTask
+import com.marklogic.gradle.task.UndeployAppTask
 import com.marklogic.gradle.task.client.CreateResourceTask
 import com.marklogic.gradle.task.client.CreateTransformTask
-import com.marklogic.gradle.task.client.LoadAssetsViaMlcpTask
 import com.marklogic.gradle.task.client.LoadModulesTask
 import com.marklogic.gradle.task.client.PrepareRestApiDependenciesTask
-import com.marklogic.gradle.task.client.WatchTask
-import com.marklogic.gradle.task.cpf.InsertAlertingPipelineTask
-import com.marklogic.gradle.task.cpf.InsertSchPipelineTask
-import com.marklogic.gradle.task.database.ClearContentDatabaseTask
-import com.marklogic.gradle.task.database.ClearModulesTask
-import com.marklogic.gradle.task.manage.InstallPackagesTask
-import com.marklogic.gradle.task.manage.ManageConfig
-import com.marklogic.gradle.task.manage.MergeDatabasePackagesTask
-import com.marklogic.gradle.task.manage.MergeHttpServerPackagesTask
-import com.marklogic.gradle.task.manage.UpdateDatabaseTask
-import com.marklogic.gradle.task.manage.UpdateHttpServerTask
+import com.marklogic.rest.mgmt.ManageClient
+import com.marklogic.rest.mgmt.ManageConfig
+import com.marklogic.rest.mgmt.admin.AdminConfig
+import com.marklogic.rest.mgmt.admin.AdminManager
 
 class MarkLogicPlugin implements Plugin<Project> {
 
     void apply(Project project) {
         initializeAppConfig(project)
         initializeManageConfig(project)
-        initializeAppDeployer(project)
-        
+        initializeAdminConfig(project)
+        initializeAppDeployerObjects(project)
+
         project.getConfigurations().create("mlRestApi")
 
-        String group = "MarkLogic"
+        String group = "ml-gradle"
 
         project.task("mlDeleteModuleTimestampsFile", type: DeleteModuleTimestampsFileTask, group: group, description: "Delete the properties file in the build directory that keeps track of when each module was last loaded.")
-        project.task("mlUninstallApp", type: UninstallAppTask, group: group, description: "Delete all application resources; this currently has a bug that may require manually deleting the content forest")
 
-        project.task("mlClearContentDatabase", type: ClearContentDatabaseTask, group: group, description: "Deletes all or a collection of documents from the content database")
-        project.task("mlClearModules", type: ClearModulesTask, group: group, dependsOn: "mlDeleteModuleTimestampsFile", description: "Deletes potentially all of the documents in the modules database; has a property for excluding documents from deletion")
+        //project.task("mlClearContentDatabase", type: ClearContentDatabaseTask, group: group, description: "Deletes all or a collection of documents from the content database")
+        //project.task("mlClearModules", type: ClearModulesTask, group: group, dependsOn: "mlDeleteModuleTimestampsFile", description: "Deletes potentially all of the documents in the modules database; has a property for excluding documents from deletion")
 
         project.task("mlPrepareRestApiDependencies", type: PrepareRestApiDependenciesTask, group: group, dependsOn: project.configurations["mlRestApi"], description: "Downloads (if necessary) and unzips in the build directory all mlRestApi dependencies")
 
-        project.task("mlMergeDatabasePackages", type: MergeDatabasePackagesTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Merges together the database packages that are defined by a property on this task; the result is written to the build directory")
-        project.task("mlMergeHttpServerPackages", type: MergeHttpServerPackagesTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description:"Merges together the HTTP server packages that are defined by a property on this task; the result is written to the build directory")
-
-        project.task("mlInstallPackages", type: InstallPackagesTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Installs the application's packages (servers and databases); does not load any modules").mustRunAfter("mlClearModules")
-        project.task("mlBootstrap", dependsOn: "mlInstallPackages", description: "Roxy-influenced alias for mlInstallPackages")
-
-        project.task("mlPostInstallPackages", group: group, description: "Add dependsOn to this task to add tasks after mlInstallPackages finishes within mlDeploy").mustRunAfter("mlInstallPackages")
-
+        project.task("mlDeploy", type: DeployAppTask, group: group)
+        project.task("mlUndeploy", type: UndeployAppTask, group: group)
         project.task("mlLoadModules", type: LoadModulesTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Loads modules from directories defined by mlAppConfig or via a property on this task").mustRunAfter(["mlPostInstallPackages", "mlClearModules"])
 
-        project.task("mlPostDeploy", group: group, description: "Add dependsOn to this to add tasks to mlDeploy").mustRunAfter("mlLoadModules")
+        //project.task("mlPostDeploy", group: group, description: "Add dependsOn to this to add tasks to mlDeploy").mustRunAfter("mlLoadModules")
 
-        project.task("mlDeploy", group: group, dependsOn: ["mlClearModules", "mlInstallPackages", "mlPostInstallPackages", "mlLoadModules", "mlPostDeploy"], description: "Deploys the application by first clearing the modules database (if it exists), installing packages, and then loading modules")
+        //project.task("mlReloadModules", group: group, dependsOn: ["mlClearModules", "mlLoadModules"], description: "Reloads modules by first clearing the modules database and then loading modules")
 
-        project.task("mlReloadModules", group: group, dependsOn: ["mlClearModules", "mlLoadModules"], description: "Reloads modules by first clearing the modules database and then loading modules")
-
-        project.task("mlUpdateContentDatabase", type: UpdateDatabaseTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the content database by building a new database package and then installing it")
-        project.task("mlUpdateHttpServers", type: UpdateHttpServerTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the HTTP servers by building a new HTTP server package and then installing it")
+        //project.task("mlUpdateContentDatabase", type: UpdateDatabaseTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the content database by building a new database package and then installing it")
+        //project.task("mlUpdateHttpServers", type: UpdateHttpServerTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the HTTP servers by building a new HTTP server package and then installing it")
 
         project.task("mlCreateResource", type: CreateResourceTask, group: group, description: "Create a new resource extension in the src/main/xqy/services directory")
         project.task("mlCreateTransform", type: CreateTransformTask, group: group, description: "Create a new transform in the src/main/xqy/transforms directory")
 
-        project.task("mlWatch", type: WatchTask, group: group, description: "Run a loop that checks for new/modified modules every second and loads any that it finds")
-
-        // Tasks for loading asset modules via MLCP
-        project.task("mlDeleteConsolidatedAssets", type: Delete, group: group) {
-            description = "Delete the directory of consolidated asset modules"
-            delete "build/ml-gradle/consolidatedAssets"
-        }
-
-        project.task("mlConsolidateAssets", type: Copy, group: group, dependsOn: ["mlDeleteConsolidatedAssets", "mlPrepareRestApiDependencies"]) {
-            description = "Copy asset modules from each of the module paths in mlAppConfig to a temporarily build directory"
-            doFirst {
-                // Need to update this based on additions made by mlPrepareRestApiDependencies
-                from(project.property("mlAppConfig").getModulePaths())
-            }
-            from(project.property("mlAppConfig").getModulePaths())
-            into("build/ml-gradle/consolidatedAssets")
-            include("ext/**")
-        }
-
-        project.task("mlLoadAssetsViaMlcp", type: LoadAssetsViaMlcpTask, group: group, dependsOn: "mlConsolidateAssets", description: "Loads consolidated assets via MLCP, which is much faster than loading each asset module via the REST API")
-
-        // CPF tasks
-        String cpfGroup = "MarkLogic CPF"
-        project.task("mlInsertSchPipeline", type: InsertSchPipelineTask, group: cpfGroup, description: "Inserts the Status Change Handling pipeline")
-        project.task("mlInsertAlertingPipeline", type: InsertAlertingPipelineTask, group: cpfGroup, description: "Inserts the Alerting pipeline")
+        //project.task("mlWatch", type: WatchTask, group: group, description: "Run a loop that checks for new/modified modules every second and loads any that it finds")
     }
 
+    /**
+     * Read in certain project properties and use them to initialize an instance of AppConfig. The properties are typically
+     * defined in gradle.properties.
+     * 
+     * @param project
+     */
     void initializeAppConfig(Project project) {
         AppConfig appConfig = new AppConfig()
 
@@ -147,16 +112,22 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.extensions.add("mlAppConfig", appConfig)
     }
 
+    /**
+     * TODO Should allow for this to be initialized off a different set of properties if they
+     * exist - e.g. mlManageUsername.
+     * 
+     * @param project
+     */
     void initializeManageConfig(Project project) {
         ManageConfig manageConfig = new ManageConfig()
         if (project.hasProperty("mlHost")) {
             def host = project.property("mlHost")
-            println "Manage app host: " + host
+            println "Manage host: " + host
             manageConfig.setHost(host)
         }
         if (project.hasProperty("mlUsername")) {
             def username = project.property("mlUsername")
-            println "Manage app username: " + username
+            println "Manage username: " + username
             manageConfig.setUsername(username)
         }
         if (project.hasProperty("mlPassword")) {
@@ -166,15 +137,55 @@ class MarkLogicPlugin implements Plugin<Project> {
     }
 
     /**
-     * Initializing this as part of the plugin allows a developer to immediately override the configuration of the 
-     * AppDeployer via a Gradle ext block - e.g. the paths for different kinds of modules could be modified.
+     * Should allow for this to be initialized off a different set of properties if they
+     * exist - e.g. mlAdminUsername.
      * 
      * @param project
      */
-    void initializeAppDeployer(Project project) {
+    void initializeAdminConfig(Project project) {
+        AdminConfig adminConfig = new AdminConfig()
+        if (project.hasProperty("mlHost")) {
+            def host = project.property("mlHost")
+            println "Admin host: " + host
+            adminConfig.setHost(host)
+        }
+        if (project.hasProperty("mlUsername")) {
+            def username = project.property("mlUsername")
+            println "Admin username: " + username
+            adminConfig.setUsername(username)
+        }
+        if (project.hasProperty("mlPassword")) {
+            adminConfig.setPassword(project.property("mlPassword"))
+        }
+        project.extensions.add("mlAdminConfig", adminConfig)
+    }
+
+
+    /**
+     * So we won't initialize an AppDeployer here... MarkLogicTask can fall back to a default impl, perhaps
+     * one that uses the DefaultConfiguration. But a developer could add one in the ext block which 
+     * MarkLogicTask would then use.
+     * 
+     * @param project
+     */
+    void initializeAppDeployerObjects(Project project) {
         ManageConfig manageConfig = project.extensions.getByName("mlManageConfig")
-        Ml7ManageClient client = new Ml7ManageClient(manageConfig.getHost(), manageConfig.getPort(), manageConfig.getUsername(), manageConfig.getPassword())
-        project.extensions.add("mlManageClient", client)
-        project.extensions.add("mlAppDeployer", new Ml7AppDeployer(client))
+
+        ManageClient manageClient = new ManageClient(manageConfig)
+        project.extensions.add("mlManageClient", manageClient)
+
+        // mlPrepareRestApi can add additional configDirs to AppConfig
+        String configBaseDir = "src/main/ml-config"
+        if (project.hasProperty("mlConfigBaseDir")) {
+            configBaseDir = project.property("mlConfigBaseDir")
+        }
+        ConfigDir configDir = new ConfigDir(new File(configBaseDir))
+        project.extensions.add("mlConfigDir", configDir)
+
+        AdminManager adminManager = new AdminManager(project.extensions.getByName("mlAdminConfig"))
+        project.extensions.add("mlAdminManager", adminManager)
+
+        AppPluginContext context = new AppPluginContext(project.extensions.getByName("mlAppConfig"), configDir, manageClient, adminManager)
+        project.extensions.add("mlAppPluginContext", context)
     }
 }

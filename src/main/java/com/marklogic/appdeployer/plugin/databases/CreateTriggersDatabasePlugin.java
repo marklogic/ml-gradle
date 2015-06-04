@@ -2,23 +2,23 @@ package com.marklogic.appdeployer.plugin.databases;
 
 import java.io.File;
 
-import com.marklogic.appdeployer.AppPluginContext;
-import com.marklogic.appdeployer.plugin.AbstractPlugin;
+import com.marklogic.appdeployer.CommandContext;
+import com.marklogic.appdeployer.plugin.AbstractCommand;
 import com.marklogic.appdeployer.plugin.SortOrderConstants;
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.databases.DatabaseManager;
 import com.marklogic.rest.mgmt.forests.ForestManager;
 import com.marklogic.rest.mgmt.hosts.HostManager;
 
-public class CreateTriggersDatabasePlugin extends AbstractPlugin {
+public class CreateTriggersDatabasePlugin extends AbstractCommand {
 
     @Override
-    public Integer getSortOrderOnDeploy() {
+    public Integer getExecuteSortOrder() {
         return SortOrderConstants.CREATE_TRIGGERS_DATABASE_ORDER;
     }
 
     @Override
-    public void onDeploy(AppPluginContext context) {
+    public void execute(CommandContext context) {
         File f = context.getAppConfig().getConfigDir().getTriggersDatabaseFile();
         if (f.exists()) {
             DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
@@ -46,7 +46,7 @@ public class CreateTriggersDatabasePlugin extends AbstractPlugin {
     }
 
     @Override
-    public void onUndeploy(AppPluginContext context) {
+    public void undo(CommandContext context) {
         DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
         dbMgr.deleteDatabase(context.getAppConfig().getTriggersDatabaseName());
     }

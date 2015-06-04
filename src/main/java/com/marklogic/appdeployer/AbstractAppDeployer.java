@@ -10,7 +10,7 @@ import com.marklogic.rest.mgmt.admin.AdminManager;
 
 /**
  * Abstract base class that just needs the subclass to define the list of AppPlugin instances to use. Handles executing
- * plugins in sorted order.
+ * commands in sorted order.
  */
 public abstract class AbstractAppDeployer extends LoggingObject implements AppDeployer {
 
@@ -23,21 +23,21 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
         this.adminManager = adminManager;
     }
 
-    protected abstract List<AppPlugin> getAppPlugins();
+    protected abstract List<Command> getCommands();
 
     public void deploy(AppConfig appConfig) {
         logger.info(format("Deploying app %s with config dir of: %s", appConfig.getName(), appConfig.getConfigDir()
                 .getBaseDir().getAbsolutePath()));
 
-        List<AppPlugin> plugins = getAppPlugins();
-        Collections.sort(plugins, new OnDeployComparator());
+        List<Command> commands = getCommands();
+        Collections.sort(commands, new ExecuteComparator());
 
-        AppPluginContext context = new AppPluginContext(appConfig, manageClient, adminManager);
+        CommandContext context = new CommandContext(appConfig, manageClient, adminManager);
 
-        for (AppPlugin plugin : plugins) {
-            logger.info(format("Invoking plugin [%s] with sort order [%d]", plugin.getClass().getName(),
-                    plugin.getSortOrderOnDeploy()));
-            plugin.onDeploy(context);
+        for (Command command : commands) {
+            logger.info(format("Invoking command [%s] with sort order [%d]", command.getClass().getName(),
+                    command.getExecuteSortOrder()));
+            command.execute(context);
         }
 
         logger.info(format("Deployed app %s", appConfig.getName()));
@@ -47,15 +47,15 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
         logger.info(format("Undeploying app %s with config dir: %s", appConfig.getName(), appConfig.getConfigDir()
                 .getBaseDir().getAbsolutePath()));
 
-        List<AppPlugin> plugins = getAppPlugins();
-        Collections.sort(plugins, new OnUndeployComparator());
+        List<Command> commands = getCommands();
+        Collections.sort(commands, new UndoComparator());
 
-        for (AppPlugin plugin : plugins) {
-            logger.info(format("Invoking plugin [%s] with sort order [%d]", plugin.getClass().getName(),
-                    plugin.getSortOrderOnUndeploy()));
+        for (Command command : commands) {
+            logger.info(format("Invoking command [%s] with sort order [%d]", command.getClass().getName(),
+                    command.getUndoSortOrder()));
 
-            AppPluginContext context = new AppPluginContext(appConfig, manageClient, adminManager);
-            plugin.onUndeploy(context);
+            CommandContext context = new CommandContext(appConfig, manageClient, adminManager);
+            command.undo(context);
         }
 
         logger.info(format("Undeployed app %s", appConfig.getName()));
@@ -66,16 +66,16 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
     }
 }
 
-class OnDeployComparator implements Comparator<AppPlugin> {
+class ExecuteComparator implements Comparator<Command> {
     @Override
-    public int compare(AppPlugin o1, AppPlugin o2) {
-        return o1.getSortOrderOnDeploy().compareTo(o2.getSortOrderOnDeploy());
+    public int compare(Command o1, Command o2) {
+        return o1.getExecuteSortOrder().compareTo(o2.getExecuteSortOrder());
     }
 }
 
-class OnUndeployComparator implements Comparator<AppPlugin> {
+class UndoComparator implements Comparator<Command> {
     @Override
-    public int compare(AppPlugin o1, AppPlugin o2) {
-        return o1.getSortOrderOnUndeploy().compareTo(o2.getSortOrderOnUndeploy());
+    public int compare(Command o1, Command o2) {
+        return o1.getUndoSortOrder().compareTo(o2.getUndoSortOrder());
     }
 }

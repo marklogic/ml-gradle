@@ -3,13 +3,13 @@ package com.marklogic.appdeployer;
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.admin.AdminManager;
 
-public class AppPluginContext {
+public class CommandContext {
 
     private AppConfig appConfig;
     private ManageClient manageClient;
     private AdminManager adminManager;
 
-    public AppPluginContext(AppConfig appConfig, ManageClient manageClient, AdminManager adminManager) {
+    public CommandContext(AppConfig appConfig, ManageClient manageClient, AdminManager adminManager) {
         super();
         this.appConfig = appConfig;
         this.manageClient = manageClient;

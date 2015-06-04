@@ -3,15 +3,15 @@ package com.marklogic.appdeployer.plugin.servers;
 import java.io.File;
 
 import com.marklogic.appdeployer.AppConfig;
-import com.marklogic.appdeployer.AppPluginContext;
-import com.marklogic.appdeployer.plugin.AbstractPlugin;
+import com.marklogic.appdeployer.CommandContext;
+import com.marklogic.appdeployer.plugin.AbstractCommand;
 import com.marklogic.appdeployer.plugin.SortOrderConstants;
 import com.marklogic.rest.mgmt.appservers.ServerManager;
 
-public class UpdateRestApiServersPlugin extends AbstractPlugin {
+public class UpdateRestApiServersPlugin extends AbstractCommand {
 
     @Override
-    public Integer getSortOrderOnDeploy() {
+    public Integer getExecuteSortOrder() {
         return SortOrderConstants.UPDATE_REST_API_SERVERS_ORDER;
     }
 
@@ -20,7 +20,7 @@ public class UpdateRestApiServersPlugin extends AbstractPlugin {
      * of the /manage/v2/servers endpoint.
      */
     @Override
-    public void onDeploy(AppPluginContext context) {
+    public void execute(CommandContext context) {
         File f = context.getAppConfig().getConfigDir().getRestApiServerFile();
         if (f.exists()) {
             ServerManager mgr = new ServerManager(context.getManageClient());
@@ -42,7 +42,7 @@ public class UpdateRestApiServersPlugin extends AbstractPlugin {
     }
 
     @Override
-    public void onUndeploy(AppPluginContext context) {
+    public void undo(CommandContext context) {
     }
 
 }

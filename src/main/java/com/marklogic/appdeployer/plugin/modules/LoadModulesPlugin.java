@@ -3,25 +3,25 @@ package com.marklogic.appdeployer.plugin.modules;
 import java.io.File;
 
 import com.marklogic.appdeployer.AppConfig;
-import com.marklogic.appdeployer.AppPluginContext;
-import com.marklogic.appdeployer.plugin.AbstractPlugin;
+import com.marklogic.appdeployer.CommandContext;
+import com.marklogic.appdeployer.plugin.AbstractCommand;
 import com.marklogic.appdeployer.plugin.SortOrderConstants;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.clientutil.modulesloader.ModulesLoader;
 import com.marklogic.clientutil.modulesloader.impl.DefaultModulesLoader;
 
-public class LoadModulesPlugin extends AbstractPlugin {
+public class LoadModulesPlugin extends AbstractCommand {
 
     private ModulesLoader modulesLoader;
 
     @Override
-    public Integer getSortOrderOnDeploy() {
+    public Integer getExecuteSortOrder() {
         return SortOrderConstants.LOAD_MODULES_ORDER;
     }
 
     @Override
-    public void onDeploy(AppPluginContext context) {
+    public void execute(CommandContext context) {
         if (modulesLoader == null) {
             modulesLoader = new DefaultModulesLoader();
         }
@@ -35,7 +35,7 @@ public class LoadModulesPlugin extends AbstractPlugin {
     }
 
     @Override
-    public void onUndeploy(AppPluginContext context) {
+    public void undo(CommandContext context) {
     }
 
     public void setModulesLoader(ModulesLoader modulesLoader) {

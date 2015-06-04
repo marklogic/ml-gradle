@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import org.springframework.util.FileCopyUtils;
 
-import com.marklogic.appdeployer.AppPlugin;
+import com.marklogic.appdeployer.Command;
 import com.marklogic.appdeployer.DefaultTokenReplacer;
 import com.marklogic.appdeployer.TokenReplacer;
 import com.marklogic.clientutil.LoggingObject;
@@ -15,7 +15,7 @@ import com.marklogic.clientutil.LoggingObject;
  * Ordered interface be implemented so that the implementor takes into account when this particular plugin should be
  * executed relative to other plugins.
  */
-public abstract class AbstractPlugin extends LoggingObject implements AppPlugin {
+public abstract class AbstractCommand extends LoggingObject implements Command {
 
     protected TokenReplacer tokenReplacer = new DefaultTokenReplacer();
 
@@ -24,8 +24,8 @@ public abstract class AbstractPlugin extends LoggingObject implements AppPlugin 
      * to provide an alternate approach.
      */
     @Override
-    public Integer getSortOrderOnUndeploy() {
-        return getSortOrderOnDeploy();
+    public Integer getUndoSortOrder() {
+        return getExecuteSortOrder();
     }
 
     protected String format(String s, Object... args) {

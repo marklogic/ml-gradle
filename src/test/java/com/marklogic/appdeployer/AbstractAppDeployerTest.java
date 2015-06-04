@@ -62,9 +62,9 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
      * 
      * @param plugins
      */
-    protected void initializeAppDeployer(AppPlugin... plugins) {
+    protected void initializeAppDeployer(Command... plugins) {
         SimpleAppDeployer m = new SimpleAppDeployer(manageClient, adminManager);
-        m.setAppPlugins(Arrays.asList(plugins));
+        m.setCommands(Arrays.asList(plugins));
         appDeployer = m;
     }
 
@@ -89,7 +89,7 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
      * Useful for when your test only needs a REST API and not full the sample app created.
      */
     protected void deployRestApi() {
-        new CreateRestApiServersPlugin().onDeploy(new AppPluginContext(appConfig, manageClient, adminManager));
+        new CreateRestApiServersPlugin().execute(new CommandContext(appConfig, manageClient, adminManager));
     }
 
     protected void undeploySampleApp() {

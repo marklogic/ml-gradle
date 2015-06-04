@@ -3,20 +3,20 @@ package com.marklogic.appdeployer.plugin.databases;
 import java.io.File;
 
 import com.marklogic.appdeployer.AppConfig;
-import com.marklogic.appdeployer.AppPluginContext;
-import com.marklogic.appdeployer.plugin.AbstractPlugin;
+import com.marklogic.appdeployer.CommandContext;
+import com.marklogic.appdeployer.plugin.AbstractCommand;
 import com.marklogic.appdeployer.plugin.SortOrderConstants;
 import com.marklogic.rest.mgmt.databases.DatabaseManager;
 
-public class UpdateContentDatabasesPlugin extends AbstractPlugin {
+public class UpdateContentDatabasesPlugin extends AbstractCommand {
 
     @Override
-    public Integer getSortOrderOnDeploy() {
+    public Integer getExecuteSortOrder() {
         return SortOrderConstants.UPDATE_CONTENT_DATABASES_ORDER;
     }
 
     @Override
-    public void onDeploy(AppPluginContext context) {
+    public void execute(CommandContext context) {
         File f = context.getAppConfig().getConfigDir().getContentDatabaseFile();
         if (f.exists()) {
             DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
@@ -38,7 +38,7 @@ public class UpdateContentDatabasesPlugin extends AbstractPlugin {
     }
 
     @Override
-    public void onUndeploy(AppPluginContext context) {
+    public void undo(CommandContext context) {
     }
 
 }

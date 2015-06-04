@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.context.ApplicationContext;
 
 import com.marklogic.appdeployer.AbstractAppDeployer;
-import com.marklogic.appdeployer.AppPlugin;
+import com.marklogic.appdeployer.Command;
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.admin.AdminManager;
 
@@ -22,9 +22,9 @@ public class SpringAppDeployer extends AbstractAppDeployer {
         this.appContext = appContext;
     }
 
-    protected List<AppPlugin> getAppPlugins() {
-        List<AppPlugin> plugins = new ArrayList<AppPlugin>();
-        plugins.addAll(appContext.getBeansOfType(AppPlugin.class).values());
+    protected List<Command> getCommands() {
+        List<Command> plugins = new ArrayList<Command>();
+        plugins.addAll(appContext.getBeansOfType(Command.class).values());
         return plugins;
     }
 }

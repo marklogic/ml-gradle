@@ -5,26 +5,26 @@ import java.io.File;
 import org.springframework.http.HttpMethod;
 
 import com.marklogic.appdeployer.AppConfig;
-import com.marklogic.appdeployer.AppPluginContext;
-import com.marklogic.appdeployer.plugin.AbstractPlugin;
+import com.marklogic.appdeployer.CommandContext;
+import com.marklogic.appdeployer.plugin.AbstractCommand;
 import com.marklogic.appdeployer.plugin.SortOrderConstants;
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.admin.ActionRequiringRestart;
 import com.marklogic.rest.mgmt.appservers.ServerManager;
 import com.marklogic.rest.mgmt.restapis.RestApiManager;
 
-public class CreateRestApiServersPlugin extends AbstractPlugin {
+public class CreateRestApiServersPlugin extends AbstractCommand {
 
     private boolean includeModules = true;
     private boolean includeContent = true;
 
     @Override
-    public Integer getSortOrderOnDeploy() {
+    public Integer getExecuteSortOrder() {
         return SortOrderConstants.CREATE_REST_API_SERVERS_ORDER;
     }
 
     @Override
-    public void onDeploy(AppPluginContext context) {
+    public void execute(CommandContext context) {
         File f = context.getAppConfig().getConfigDir().getRestApiFile();
         String payload = null;
         if (f.exists()) {
@@ -45,7 +45,7 @@ public class CreateRestApiServersPlugin extends AbstractPlugin {
     }
 
     @Override
-    public void onUndeploy(AppPluginContext context) {
+    public void undo(CommandContext context) {
         final AppConfig appConfig = context.getAppConfig();
         final ManageClient manageClient = context.getManageClient();
 

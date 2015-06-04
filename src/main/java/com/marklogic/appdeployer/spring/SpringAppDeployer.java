@@ -11,7 +11,7 @@ import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.admin.AdminManager;
 
 /**
- * Depends on a Spring ApplicationContext for finding AppPlugin instances.
+ * Depends on a Spring ApplicationContext for finding Command instances.
  */
 public class SpringAppDeployer extends AbstractAppDeployer {
 
@@ -23,8 +23,8 @@ public class SpringAppDeployer extends AbstractAppDeployer {
     }
 
     protected List<Command> getCommands() {
-        List<Command> plugins = new ArrayList<Command>();
-        plugins.addAll(appContext.getBeansOfType(Command.class).values());
-        return plugins;
+        List<Command> commands = new ArrayList<Command>();
+        commands.addAll(appContext.getBeansOfType(Command.class).values());
+        return commands;
     }
 }

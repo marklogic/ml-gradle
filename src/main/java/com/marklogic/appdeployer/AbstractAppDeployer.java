@@ -9,7 +9,7 @@ import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.admin.AdminManager;
 
 /**
- * Abstract base class that just needs the subclass to define the list of AppPlugin instances to use. Handles executing
+ * Abstract base class that just needs the subclass to define the list of Command instances to use. Handles executing
  * commands in sorted order.
  */
 public abstract class AbstractAppDeployer extends LoggingObject implements AppDeployer {

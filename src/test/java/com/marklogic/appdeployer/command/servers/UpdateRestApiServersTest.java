@@ -5,7 +5,6 @@ import org.junit.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
-import com.marklogic.appdeployer.command.servers.UpdateRestApiServersCommand;
 import com.marklogic.rest.mgmt.appservers.ServerManager;
 import com.marklogic.rest.util.Fragment;
 
@@ -28,7 +27,7 @@ public class UpdateRestApiServersTest extends AbstractAppDeployerTest {
         assertAuthentication("The test REST API server auth should default to digest",
                 appConfig.getTestRestServerName(), "digest");
 
-        // Now redeploy with the update plugin
+        // Now redeploy with the update command
         initializeAppDeployer(new CreateRestApiServersCommand(), new UpdateRestApiServersCommand());
         appDeployer.deploy(appConfig);
 

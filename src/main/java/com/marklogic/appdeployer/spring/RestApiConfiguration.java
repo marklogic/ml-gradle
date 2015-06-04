@@ -12,7 +12,7 @@ import com.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
 public class RestApiConfiguration {
 
     @Bean
-    public CreateRestApiServersCommand restApiPlugin() {
+    public CreateRestApiServersCommand createRestApiServersCommand() {
         return new CreateRestApiServersCommand();
     }
 

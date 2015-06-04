@@ -9,9 +9,9 @@ import com.marklogic.appdeployer.Command;
 import com.marklogic.clientutil.LoggingObject;
 
 /**
- * Abstract base class that provides some convenience methods for implementing a plugin. Requires that the Spring
- * Ordered interface be implemented so that the implementor takes into account when this particular plugin should be
- * executed relative to other plugins.
+ * Abstract base class that provides some convenience methods for implementing a command. Requires that the Spring
+ * Ordered interface be implemented so that the implementor takes into account when this particular command should be
+ * executed relative to other commands.
  */
 public abstract class AbstractCommand extends LoggingObject implements Command {
 

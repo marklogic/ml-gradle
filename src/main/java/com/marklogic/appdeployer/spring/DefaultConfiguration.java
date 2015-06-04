@@ -7,13 +7,13 @@ import com.marklogic.appdeployer.command.databases.CreateTriggersDatabaseCommand
 
 /**
  * Intended to be a useful configuration that will work for a wide variety of apps. Can of course be subclassed to add
- * additional plugins.
+ * additional commands.
  */
 @Configuration
 public class DefaultConfiguration extends RestApiConfiguration {
 
     @Bean
-    public CreateTriggersDatabaseCommand triggersDatabasePlugin() {
+    public CreateTriggersDatabaseCommand createTriggersDatabaseCommand() {
         return new CreateTriggersDatabaseCommand();
     }
 }

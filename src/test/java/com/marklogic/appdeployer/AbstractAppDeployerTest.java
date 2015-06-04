@@ -58,13 +58,13 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
     }
 
     /**
-     * Initialize an AppDeployer with the given set of plugins. Avoids having to create a Spring configuration.
+     * Initialize an AppDeployer with the given set of commands. Avoids having to create a Spring configuration.
      * 
-     * @param plugins
+     * @param commands
      */
-    protected void initializeAppDeployer(Command... plugins) {
+    protected void initializeAppDeployer(Command... commands) {
         SimpleAppDeployer m = new SimpleAppDeployer(manageClient, adminManager);
-        m.setCommands(Arrays.asList(plugins));
+        m.setCommands(Arrays.asList(commands));
         appDeployer = m;
     }
 

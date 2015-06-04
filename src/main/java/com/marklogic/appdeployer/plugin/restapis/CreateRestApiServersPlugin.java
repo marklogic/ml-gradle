@@ -26,15 +26,21 @@ public class CreateRestApiServersPlugin extends AbstractPlugin {
     @Override
     public void onDeploy(AppPluginContext context) {
         File f = context.getConfigDir().getRestApiFile();
-        String input = copyFileToString(f);
+        String payload = null;
+        if (f.exists()) {
+            payload = copyFileToString(f);
+        } else {
+            logger.info(format("Could not find REST API file at %s, will use default payload", f.getAbsolutePath()));
+            payload = getDefaultRestApiPayload();
+        }
 
         RestApiManager mgr = new RestApiManager(context.getManageClient());
         AppConfig appConfig = context.getAppConfig();
 
-        mgr.createRestApi(appConfig.getRestServerName(), tokenReplacer.replaceTokens(input, appConfig, false));
+        mgr.createRestApi(appConfig.getRestServerName(), tokenReplacer.replaceTokens(payload, appConfig, false));
 
         if (appConfig.isTestPortSet()) {
-            mgr.createRestApi(appConfig.getTestRestServerName(), tokenReplacer.replaceTokens(input, appConfig, true));
+            mgr.createRestApi(appConfig.getTestRestServerName(), tokenReplacer.replaceTokens(payload, appConfig, true));
         }
     }
 
@@ -63,6 +69,12 @@ public class CreateRestApiServersPlugin extends AbstractPlugin {
                 return deleteRestApi(appConfig.getRestServerName(), manageClient, includeModules, includeContent);
             }
         });
+    }
+
+    protected String getDefaultRestApiPayload() {
+        return "{\"rest-api\": {\"name\":\"%%NAME%%\", \"group\":\"%%GROUP%%\", \"database\":\"%%DATABASE%%\", "
+                + "\"modules-database\":\"%%MODULES-DATABASE%%\", \"port\":\"%%PORT%%\", \"xdbc-enabled\":true, "
+                + "\"forests-per-host\":3, \"error-format\":\"json\"}}";
     }
 
     protected boolean deleteRestApi(String serverName, ManageClient manageClient, boolean includeModules,

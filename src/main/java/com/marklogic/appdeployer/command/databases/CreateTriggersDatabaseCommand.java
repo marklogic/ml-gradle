@@ -10,7 +10,7 @@ import com.marklogic.rest.mgmt.databases.DatabaseManager;
 import com.marklogic.rest.mgmt.forests.ForestManager;
 import com.marklogic.rest.mgmt.hosts.HostManager;
 
-public class CreateTriggersDatabasePlugin extends AbstractCommand {
+public class CreateTriggersDatabaseCommand extends AbstractCommand {
 
     @Override
     public Integer getExecuteSortOrder() {

@@ -4,8 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.appdeployer.command.databases.CreateTriggersDatabasePlugin;
-import com.marklogic.appdeployer.command.restapis.CreateRestApiServersPlugin;
+import com.marklogic.appdeployer.command.databases.CreateTriggersDatabaseCommand;
+import com.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
 import com.marklogic.rest.mgmt.databases.DatabaseManager;
 import com.marklogic.rest.mgmt.forests.ForestManager;
 
@@ -13,7 +13,7 @@ public class CreateTriggersDatabaseTest extends AbstractAppDeployerTest {
 
     @Before
     public void setup() {
-        initializeAppDeployer(new CreateRestApiServersPlugin(), new CreateTriggersDatabasePlugin());
+        initializeAppDeployer(new CreateRestApiServersCommand(), new CreateTriggersDatabaseCommand());
     }
 
     @Test

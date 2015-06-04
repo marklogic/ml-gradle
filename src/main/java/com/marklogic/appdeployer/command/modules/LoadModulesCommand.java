@@ -11,7 +11,7 @@ import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.clientutil.modulesloader.ModulesLoader;
 import com.marklogic.clientutil.modulesloader.impl.DefaultModulesLoader;
 
-public class LoadModulesPlugin extends AbstractCommand {
+public class LoadModulesCommand extends AbstractCommand {
 
     private ModulesLoader modulesLoader;
 

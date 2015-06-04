@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import com.marklogic.appdeployer.command.restapis.CreateRestApiServersPlugin;
+import com.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
 import com.marklogic.appdeployer.spring.SpringAppDeployer;
 import com.marklogic.rest.mgmt.AbstractMgmtTest;
 import com.marklogic.rest.mgmt.admin.AdminConfig;
@@ -54,7 +54,7 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
     }
 
     protected void initializeAppDeployer() {
-        initializeAppDeployer(new CreateRestApiServersPlugin());
+        initializeAppDeployer(new CreateRestApiServersCommand());
     }
 
     /**
@@ -89,7 +89,7 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
      * Useful for when your test only needs a REST API and not full the sample app created.
      */
     protected void deployRestApi() {
-        new CreateRestApiServersPlugin().execute(new CommandContext(appConfig, manageClient, adminManager));
+        new CreateRestApiServersCommand().execute(new CommandContext(appConfig, manageClient, adminManager));
     }
 
     protected void undeploySampleApp() {

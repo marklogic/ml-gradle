@@ -8,7 +8,7 @@ import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.rest.mgmt.databases.DatabaseManager;
 
-public class UpdateContentDatabasesPlugin extends AbstractCommand {
+public class UpdateContentDatabasesCommand extends AbstractCommand {
 
     @Override
     public Integer getExecuteSortOrder() {

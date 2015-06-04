@@ -3,8 +3,8 @@ package com.marklogic.appdeployer.command.modules;
 import org.junit.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.appdeployer.command.modules.LoadModulesPlugin;
-import com.marklogic.appdeployer.command.restapis.CreateRestApiServersPlugin;
+import com.marklogic.appdeployer.command.modules.LoadModulesCommand;
+import com.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
 
 public class LoadModulesTest extends AbstractAppDeployerTest {
 
@@ -13,7 +13,7 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
      */
     @Test
     public void loadModules() {
-        initializeAppDeployer(new CreateRestApiServersPlugin(), new LoadModulesPlugin());
+        initializeAppDeployer(new CreateRestApiServersCommand(), new LoadModulesCommand());
 
         appDeployer.deploy(appConfig);
     }

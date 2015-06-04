@@ -13,7 +13,7 @@ import com.marklogic.rest.mgmt.admin.ActionRequiringRestart;
 import com.marklogic.rest.mgmt.appservers.ServerManager;
 import com.marklogic.rest.mgmt.restapis.RestApiManager;
 
-public class CreateRestApiServersPlugin extends AbstractCommand {
+public class CreateRestApiServersCommand extends AbstractCommand {
 
     private boolean includeModules = true;
     private boolean includeContent = true;

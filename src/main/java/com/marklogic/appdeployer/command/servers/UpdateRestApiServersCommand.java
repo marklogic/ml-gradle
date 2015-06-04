@@ -8,7 +8,7 @@ import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.rest.mgmt.appservers.ServerManager;
 
-public class UpdateRestApiServersPlugin extends AbstractCommand {
+public class UpdateRestApiServersCommand extends AbstractCommand {
 
     @Override
     public Integer getExecuteSortOrder() {

@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.plugin.restapis;
+package com.marklogic.appdeployer.command.restapis;
 
 import java.io.File;
 
@@ -6,8 +6,8 @@ import org.springframework.http.HttpMethod;
 
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.CommandContext;
-import com.marklogic.appdeployer.plugin.AbstractCommand;
-import com.marklogic.appdeployer.plugin.SortOrderConstants;
+import com.marklogic.appdeployer.command.AbstractCommand;
+import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.admin.ActionRequiringRestart;
 import com.marklogic.rest.mgmt.appservers.ServerManager;

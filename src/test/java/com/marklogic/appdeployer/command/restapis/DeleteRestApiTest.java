@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.restapis;
+package com.marklogic.appdeployer.command.restapis;
 
 import org.junit.Before;
 import org.junit.Test;

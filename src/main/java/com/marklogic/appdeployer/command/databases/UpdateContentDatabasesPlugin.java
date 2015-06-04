@@ -1,11 +1,11 @@
-package com.marklogic.appdeployer.plugin.databases;
+package com.marklogic.appdeployer.command.databases;
 
 import java.io.File;
 
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.CommandContext;
-import com.marklogic.appdeployer.plugin.AbstractCommand;
-import com.marklogic.appdeployer.plugin.SortOrderConstants;
+import com.marklogic.appdeployer.command.AbstractCommand;
+import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.rest.mgmt.databases.DatabaseManager;
 
 public class UpdateContentDatabasesPlugin extends AbstractCommand {

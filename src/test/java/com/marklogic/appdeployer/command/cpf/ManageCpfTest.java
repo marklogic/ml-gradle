@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.cpf;
+package com.marklogic.appdeployer.command.cpf;
 
 import org.junit.Ignore;
 import org.junit.Test;

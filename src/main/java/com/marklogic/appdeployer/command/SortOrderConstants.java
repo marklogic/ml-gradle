@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.plugin;
+package com.marklogic.appdeployer.command;
 
 public abstract class SortOrderConstants {
 

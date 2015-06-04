@@ -1,4 +1,6 @@
-package com.marklogic.appdeployer;
+package com.marklogic.appdeployer.command;
+
+import com.marklogic.appdeployer.AppConfig;
 
 public class DefaultTokenReplacer implements TokenReplacer {
 

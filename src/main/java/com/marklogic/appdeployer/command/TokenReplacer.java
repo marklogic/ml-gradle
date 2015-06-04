@@ -1,4 +1,6 @@
-package com.marklogic.appdeployer;
+package com.marklogic.appdeployer.command;
+
+import com.marklogic.appdeployer.AppConfig;
 
 /**
  * Used by plugins to replace tokens in configuration files that are dependent on names of resources in the application.

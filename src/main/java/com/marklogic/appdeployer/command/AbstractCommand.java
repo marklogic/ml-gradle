@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.plugin;
+package com.marklogic.appdeployer.command;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,8 +6,6 @@ import java.io.IOException;
 import org.springframework.util.FileCopyUtils;
 
 import com.marklogic.appdeployer.Command;
-import com.marklogic.appdeployer.DefaultTokenReplacer;
-import com.marklogic.appdeployer.TokenReplacer;
 import com.marklogic.clientutil.LoggingObject;
 
 /**

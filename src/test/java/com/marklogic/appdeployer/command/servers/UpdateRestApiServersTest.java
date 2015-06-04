@@ -1,11 +1,11 @@
-package com.marklogic.appdeployer.servers;
+package com.marklogic.appdeployer.command.servers;
 
 import org.junit.After;
 import org.junit.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.appdeployer.plugin.restapis.CreateRestApiServersPlugin;
-import com.marklogic.appdeployer.plugin.servers.UpdateRestApiServersPlugin;
+import com.marklogic.appdeployer.command.restapis.CreateRestApiServersPlugin;
+import com.marklogic.appdeployer.command.servers.UpdateRestApiServersPlugin;
 import com.marklogic.rest.mgmt.appservers.ServerManager;
 import com.marklogic.rest.util.Fragment;
 

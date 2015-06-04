@@ -1,11 +1,11 @@
-package com.marklogic.appdeployer.databases;
+package com.marklogic.appdeployer.command.databases;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.appdeployer.plugin.databases.CreateTriggersDatabasePlugin;
-import com.marklogic.appdeployer.plugin.restapis.CreateRestApiServersPlugin;
+import com.marklogic.appdeployer.command.databases.CreateTriggersDatabasePlugin;
+import com.marklogic.appdeployer.command.restapis.CreateRestApiServersPlugin;
 import com.marklogic.rest.mgmt.databases.DatabaseManager;
 import com.marklogic.rest.mgmt.forests.ForestManager;
 

@@ -1,10 +1,10 @@
-package com.marklogic.appdeployer.modules;
+package com.marklogic.appdeployer.command.modules;
 
 import org.junit.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.appdeployer.plugin.modules.LoadModulesPlugin;
-import com.marklogic.appdeployer.plugin.restapis.CreateRestApiServersPlugin;
+import com.marklogic.appdeployer.command.modules.LoadModulesPlugin;
+import com.marklogic.appdeployer.command.restapis.CreateRestApiServersPlugin;
 
 public class LoadModulesTest extends AbstractAppDeployerTest {
 

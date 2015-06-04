@@ -25,7 +25,7 @@ public class CreateRestApiServersPlugin extends AbstractPlugin {
 
     @Override
     public void onDeploy(AppPluginContext context) {
-        File f = context.getConfigDir().getRestApiFile();
+        File f = context.getAppConfig().getConfigDir().getRestApiFile();
         String payload = null;
         if (f.exists()) {
             payload = copyFileToString(f);

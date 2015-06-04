@@ -26,6 +26,8 @@ public class AppConfig {
     private Integer modulesXdbcPort;
 
     private List<String> modulePaths;
+    private ConfigDir configDir;
+    private List<ConfigDir> dependencyConfigDirs;
 
     private String groupName = "Default";
 
@@ -36,6 +38,7 @@ public class AppConfig {
     public AppConfig(String defaultModulePath) {
         modulePaths = new ArrayList<String>();
         modulePaths.add(defaultModulePath);
+        configDir = new ConfigDir();
     }
 
     public boolean isTestPortSet() {
@@ -192,6 +195,22 @@ public class AppConfig {
 
     public void setAuthentication(Authentication authentication) {
         this.authentication = authentication;
+    }
+
+    public ConfigDir getConfigDir() {
+        return configDir;
+    }
+
+    public void setConfigDir(ConfigDir configDir) {
+        this.configDir = configDir;
+    }
+
+    public List<ConfigDir> getDependencyConfigDirs() {
+        return dependencyConfigDirs;
+    }
+
+    public void setDependencyConfigDirs(List<ConfigDir> dependencyConfigDirs) {
+        this.dependencyConfigDirs = dependencyConfigDirs;
     }
 
 }

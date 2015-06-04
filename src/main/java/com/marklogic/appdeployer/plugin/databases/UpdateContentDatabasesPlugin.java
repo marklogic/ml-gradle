@@ -17,7 +17,7 @@ public class UpdateContentDatabasesPlugin extends AbstractPlugin {
 
     @Override
     public void onDeploy(AppPluginContext context) {
-        File f = context.getConfigDir().getContentDatabaseFile();
+        File f = context.getAppConfig().getConfigDir().getContentDatabaseFile();
         if (f.exists()) {
             DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
 

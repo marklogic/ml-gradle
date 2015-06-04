@@ -21,7 +21,7 @@ public class UpdateRestApiServersPlugin extends AbstractPlugin {
      */
     @Override
     public void onDeploy(AppPluginContext context) {
-        File f = context.getConfigDir().getRestApiServerFile();
+        File f = context.getAppConfig().getConfigDir().getRestApiServerFile();
         if (f.exists()) {
             ServerManager mgr = new ServerManager(context.getManageClient());
 

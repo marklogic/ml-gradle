@@ -21,7 +21,7 @@ public class UpdateRestApiServersTest extends AbstractAppDeployerTest {
         // Deploy a REST API server and a test one too
         initializeAppDeployer();
         appConfig.setTestRestPort(SAMPLE_APP_TEST_REST_PORT);
-        appDeployer.deploy(appConfig, configDir);
+        appDeployer.deploy(appConfig);
 
         assertAuthentication("The REST API server auth should default to digest", appConfig.getRestServerName(),
                 "digest");
@@ -30,7 +30,7 @@ public class UpdateRestApiServersTest extends AbstractAppDeployerTest {
 
         // Now redeploy with the update plugin
         initializeAppDeployer(new CreateRestApiServersPlugin(), new UpdateRestApiServersPlugin());
-        appDeployer.deploy(appConfig, configDir);
+        appDeployer.deploy(appConfig);
 
         assertAuthentication(
                 "The REST API server auth should now be set to basic because of what's in the rest-api-server.json file",

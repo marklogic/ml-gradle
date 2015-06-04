@@ -24,7 +24,7 @@ public class CreateTriggersDatabaseTest extends AbstractAppDeployerTest {
         String dbName = "sample-app-triggers";
         String forestName = dbName + "-1";
 
-        appDeployer.deploy(appConfig, configDir);
+        appDeployer.deploy(appConfig);
 
         assertTrue("The triggers database should have been created", dbMgr.dbExists(dbName));
         assertTrue("A forest for the triggers database should have been created", forestMgr.forestExists(forestName));

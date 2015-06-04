@@ -25,14 +25,14 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
 
     protected abstract List<AppPlugin> getAppPlugins();
 
-    public void deploy(AppConfig appConfig, ConfigDir configDir) {
-        logger.info(format("Deploying app %s with config dir of: %s", appConfig.getName(), configDir.getBaseDir()
-                .getAbsolutePath()));
+    public void deploy(AppConfig appConfig) {
+        logger.info(format("Deploying app %s with config dir of: %s", appConfig.getName(), appConfig.getConfigDir()
+                .getBaseDir().getAbsolutePath()));
 
         List<AppPlugin> plugins = getAppPlugins();
         Collections.sort(plugins, new OnDeployComparator());
 
-        AppPluginContext context = new AppPluginContext(appConfig, configDir, manageClient, adminManager);
+        AppPluginContext context = new AppPluginContext(appConfig, manageClient, adminManager);
 
         for (AppPlugin plugin : plugins) {
             logger.info(format("Invoking plugin [%s] with sort order [%d]", plugin.getClass().getName(),
@@ -43,9 +43,9 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
         logger.info(format("Deployed app %s", appConfig.getName()));
     }
 
-    public void undeploy(AppConfig appConfig, ConfigDir configDir) {
-        logger.info(format("Undeploying app %s with config dir: %s", appConfig.getName(), configDir.getBaseDir()
-                .getAbsolutePath()));
+    public void undeploy(AppConfig appConfig) {
+        logger.info(format("Undeploying app %s with config dir: %s", appConfig.getName(), appConfig.getConfigDir()
+                .getBaseDir().getAbsolutePath()));
 
         List<AppPlugin> plugins = getAppPlugins();
         Collections.sort(plugins, new OnUndeployComparator());
@@ -54,7 +54,7 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
             logger.info(format("Invoking plugin [%s] with sort order [%d]", plugin.getClass().getName(),
                     plugin.getSortOrderOnUndeploy()));
 
-            AppPluginContext context = new AppPluginContext(appConfig, configDir, manageClient, adminManager);
+            AppPluginContext context = new AppPluginContext(appConfig, manageClient, adminManager);
             plugin.onUndeploy(context);
         }
 

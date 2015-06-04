@@ -20,8 +20,9 @@ import com.marklogic.junit.spring.LoggingTestExecutionListener;
 public abstract class AbstractMgmtTest extends Assert {
 
     @Autowired
-    protected ManageConfig manageConfig;
+    private ManageConfig manageConfig;
 
+    // Intended to be used by subclasses
     protected ManageClient manageClient;
 
     @Before

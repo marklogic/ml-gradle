@@ -19,7 +19,7 @@ public class CreateTriggersDatabasePlugin extends AbstractPlugin {
 
     @Override
     public void onDeploy(AppPluginContext context) {
-        File f = context.getConfigDir().getTriggersDatabaseFile();
+        File f = context.getAppConfig().getConfigDir().getTriggersDatabaseFile();
         if (f.exists()) {
             DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
 

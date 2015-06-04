@@ -15,6 +15,6 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
     public void loadModules() {
         initializeAppDeployer(new CreateRestApiServersPlugin(), new LoadModulesPlugin());
 
-        appDeployer.deploy(appConfig, configDir);
+        appDeployer.deploy(appConfig);
     }
 }

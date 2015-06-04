@@ -30,20 +30,18 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    protected AdminConfig adminConfig;
+    private AdminConfig adminConfig;
 
-    protected ConfigDir configDir;
+    private ConfigurableApplicationContext appManagerContext;
+
+    // Intended to be used by subclasses
     protected AppDeployer appDeployer;
     protected AdminManager adminManager;
-    protected ConfigurableApplicationContext appManagerContext;
-
     protected AppConfig appConfig;
 
     @Before
     public void initialize() {
         initializeAppConfig();
-
-        configDir = new ConfigDir(new File("src/test/resources/sample-app/src/main/ml-config"));
         adminManager = new AdminManager(adminConfig);
     }
 
@@ -51,6 +49,8 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
         appConfig = new AppConfig("src/test/resources/sample-app/src/main/ml-modules");
         appConfig.setName(SAMPLE_APP_NAME);
         appConfig.setRestPort(SAMPLE_APP_REST_PORT);
+        ConfigDir configDir = new ConfigDir(new File("src/test/resources/sample-app/src/main/ml-config"));
+        appConfig.setConfigDir(configDir);
     }
 
     protected void initializeAppDeployer() {
@@ -89,13 +89,12 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
      * Useful for when your test only needs a REST API and not full the sample app created.
      */
     protected void deployRestApi() {
-        new CreateRestApiServersPlugin()
-                .onDeploy(new AppPluginContext(appConfig, configDir, manageClient, adminManager));
+        new CreateRestApiServersPlugin().onDeploy(new AppPluginContext(appConfig, manageClient, adminManager));
     }
 
     protected void undeploySampleApp() {
         try {
-            appDeployer.undeploy(appConfig, configDir);
+            appDeployer.undeploy(appConfig);
         } catch (Exception e) {
             logger.warn("Error while waiting for MarkLogic to restart: " + e.getMessage());
         }

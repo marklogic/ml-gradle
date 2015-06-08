@@ -8,18 +8,6 @@ package com.marklogic.appdeployer;
 public interface Command {
 
     /**
-     * Return a number corresponding to the order in which this command should execute when an application is being
-     * deployed, where the lower the number, the earlier the command is invoked.
-     */
-    public Integer getExecuteSortOrder();
-
-    /**
-     * Return a number corresponding to the order in which this command should execute when an application is being
-     * undeployed, where the lower the number, the earlier the command is invoked.
-     */
-    public Integer getUndoSortOrder();
-
-    /**
      * Configure the application in some way.
      * 
      * @param context
@@ -32,4 +20,17 @@ public interface Command {
      * @param context
      */
     public void undo(CommandContext context);
+
+    /**
+     * Return a number corresponding to the order in which this command should execute when an application is being
+     * deployed, where the lower the number, the earlier the command is invoked.
+     */
+    public Integer getExecuteSortOrder();
+
+    /**
+     * Return a number corresponding to the order in which this command should execute when an application is being
+     * undeployed, where the lower the number, the earlier the command is invoked.
+     */
+    public Integer getUndoSortOrder();
+
 }

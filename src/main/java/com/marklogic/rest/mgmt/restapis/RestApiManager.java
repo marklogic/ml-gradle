@@ -1,7 +1,5 @@
 package com.marklogic.rest.mgmt.restapis;
 
-import org.jdom2.Namespace;
-
 import com.marklogic.clientutil.LoggingObject;
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.util.Fragment;
@@ -29,9 +27,7 @@ public class RestApiManager extends LoggingObject {
     }
 
     public boolean restApiServerExists(String name) {
-        String xml = client.getRestTemplate().getForObject(client.getBaseUrl() + "/v1/rest-apis?format=xml",
-                String.class);
-        Fragment f = new Fragment(xml, Namespace.getNamespace("rapi", "http://marklogic.com/rest-api"));
+        Fragment f = client.getXml("/v1/rest-apis?format=xml", "rapi", "http://marklogic.com/rest-api");
         return f.elementExists(String.format("/rapi:rest-apis/rapi:rest-api[rapi:name = '%s']", name));
     }
 }

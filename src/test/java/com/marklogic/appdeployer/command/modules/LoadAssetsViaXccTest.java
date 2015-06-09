@@ -1,6 +1,7 @@
 package com.marklogic.appdeployer.command.modules;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
@@ -11,33 +12,51 @@ import com.marklogic.xccutil.template.XccTemplate;
 public class LoadAssetsViaXccTest extends AbstractAppDeployerTest {
 
     private XccTemplate xccTemplate;
+    private LoadAssetsViaXccCommand command;
+
+    @Before
+    public void setup() {
+        xccTemplate = newModulesXccTemplate();
+        command = new LoadAssetsViaXccCommand("src/test/resources/sample-app/more-modules");
+    }
+
+    @After
+    public void tearDown() {
+        undeploySampleApp();
+    }
 
     @Test
     public void defaultPermissionsAndCustomCollections() {
-        LoadAssetsViaXccCommand command = new LoadAssetsViaXccCommand("src/test/resources/sample-app/more-modules");
         command.setCollections(new String[] { "blue", "red" });
 
         initializeAppDeployer(new CreateRestApiServersCommand(), command);
-
         appDeployer.deploy(appConfig);
-
-        xccTemplate = newModulesXccTemplate();
 
         assertModulesWereLoaded("/app/hello-lib.xqy", "/app/models/world-lib.xqy");
     }
 
+    @Test
+    public void customPermissions() {
+        command.setPermissions("rest-admin,read,rest-admin,update,rest-extension-user,execute,rest-extension-user,update");
+
+        initializeAppDeployer(new CreateRestApiServersCommand(), command);
+        appDeployer.deploy(appConfig);
+
+        assertModuleHasPermissionCount("/app/hello-lib.xqy", 4);
+        assertModuleHasPermissionCount("/app/models/world-lib.xqy", 4);
+    }
+
     private void assertModulesWereLoaded(String... uris) {
         for (String uri : uris) {
-            assertModuleHasTheDefaultPermissions(uri);
+            assertModuleHasPermissionCount(uri, 3);
             assertModuleIsInTheCustomCollections(uri);
         }
     }
 
-    private void assertModuleHasTheDefaultPermissions(String uri) {
+    private void assertModuleHasPermissionCount(String uri, int expectedCount) {
         String response = xccTemplate.executeAdhocQuery(format("xdmp:document-get-permissions('%s')", uri));
         Fragment perms = new Fragment("<xml>" + response + "</xml>");
-        assertEquals(format("By default, the module %s should have 3 permissions", uri), 3,
-                perms.getElements("/xml/sec:permission").size());
+        assertEquals(expectedCount, perms.getElements("/xml/sec:permission").size());
     }
 
     private void assertModuleIsInTheCustomCollections(String uri) {
@@ -48,8 +67,4 @@ public class LoadAssetsViaXccTest extends AbstractAppDeployerTest {
         assertEquals("red", collections[1]);
     }
 
-    @After
-    public void tearDown() {
-        // undeploySampleApp();
-    }
 }

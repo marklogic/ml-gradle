@@ -71,16 +71,18 @@ public class LoadAssetsViaXccCommand extends AbstractCommand implements FileVisi
                 databaseName != null ? databaseName : config.getModulesDatabaseName());
         activeSession = cs.newSession();
 
-        for (Path path : assetPaths) {
-            this.currentAssetPath = path;
-            try {
-                Files.walkFileTree(path, this);
-            } catch (IOException ie) {
-                throw new RuntimeException("Error while walking assets file tree: " + ie.getMessage(), ie);
-            } finally {
-                activeSession.close();
-                activeSession = null;
+        try {
+            for (Path path : assetPaths) {
+                this.currentAssetPath = path;
+                try {
+                    Files.walkFileTree(path, this);
+                } catch (IOException ie) {
+                    throw new RuntimeException("Error while walking assets file tree: " + ie.getMessage(), ie);
+                }
             }
+        } finally {
+            activeSession.close();
+            activeSession = null;
         }
     }
 

@@ -12,12 +12,11 @@ import com.marklogic.xccutil.template.XccTemplate;
 public class LoadAssetsViaXccTest extends AbstractAppDeployerTest {
 
     private XccTemplate xccTemplate;
-    private LoadAssetsViaXccCommand command;
 
     @Before
     public void setup() {
         xccTemplate = newModulesXccTemplate();
-        command = new LoadAssetsViaXccCommand("src/test/resources/sample-app/more-modules");
+
     }
 
     @After
@@ -27,6 +26,7 @@ public class LoadAssetsViaXccTest extends AbstractAppDeployerTest {
 
     @Test
     public void defaultPermissionsAndCustomCollections() {
+        LoadAssetsViaXccCommand command = new LoadAssetsViaXccCommand("src/test/resources/sample-app/more-modules");
         command.setCollections(new String[] { "blue", "red" });
 
         initializeAppDeployer(new CreateRestApiServersCommand(), command);
@@ -36,7 +36,9 @@ public class LoadAssetsViaXccTest extends AbstractAppDeployerTest {
     }
 
     @Test
-    public void customPermissions() {
+    public void customPermissionsAndMultipleAssetPaths() {
+        LoadAssetsViaXccCommand command = new LoadAssetsViaXccCommand("src/test/resources/sample-app/more-modules",
+                "src/test/resources/sample-app/other-modules");
         command.setPermissions("rest-admin,read,rest-admin,update,rest-extension-user,execute,rest-extension-user,update");
 
         initializeAppDeployer(new CreateRestApiServersCommand(), command);
@@ -44,6 +46,7 @@ public class LoadAssetsViaXccTest extends AbstractAppDeployerTest {
 
         assertModuleHasPermissionCount("/app/hello-lib.xqy", 4);
         assertModuleHasPermissionCount("/app/models/world-lib.xqy", 4);
+        assertModuleHasPermissionCount("/other-lib.xqy", 4);
     }
 
     private void assertModulesWereLoaded(String... uris) {

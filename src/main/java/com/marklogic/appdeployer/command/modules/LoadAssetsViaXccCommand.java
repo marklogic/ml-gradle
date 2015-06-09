@@ -114,8 +114,8 @@ public class LoadAssetsViaXccCommand extends AbstractCommand implements FileVisi
         if (permissions != null && permissions.trim().length() > 0) {
             String[] tokens = permissions.split(",");
             for (int i = 0; i < tokens.length; i += 2) {
-                String role = tokens[0];
-                String capability = tokens[1];
+                String role = tokens[i];
+                String capability = tokens[i + 1];
 
                 ContentCapability cc = ContentCapability.READ;
                 if (capability.equals("execute")) {

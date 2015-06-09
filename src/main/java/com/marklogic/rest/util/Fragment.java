@@ -29,6 +29,7 @@ public class Fragment {
             list.add(Namespace.getNamespace("h", "http://marklogic.com/manage/hosts"));
             list.add(Namespace.getNamespace("m", "http://marklogic.com/manage"));
             list.add(Namespace.getNamespace("s", "http://marklogic.com/manage/servers"));
+            list.add(Namespace.getNamespace("sec", "http://marklogic.com/xdmp/security"));
             for (Namespace n : namespaces) {
                 list.add(n);
             }
@@ -56,6 +57,10 @@ public class Fragment {
             values.add(el.getText());
         }
         return values;
+    }
+
+    public List<Element> getElements(String xpath) {
+        return evaluateForElements(xpath);
     }
 
     protected List<Element> evaluateForElements(String xpath) {

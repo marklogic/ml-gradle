@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.CommandContext;
@@ -20,25 +22,39 @@ import com.marklogic.xcc.ContentSourceFactory;
 import com.marklogic.xcc.Session;
 import com.marklogic.xcc.exceptions.RequestException;
 
+/**
+ * This command is for loading assets from any directory in a project via XCC. It's useful for when you have dozens of
+ * assets or more, as using the /v1/ext REST API endpoint is often too slow in such cases.
+ */
 public class LoadAssetsViaXccCommand extends AbstractCommand implements FileVisitor<Path> {
 
+    // XCC connection info
     private String username;
     private String password;
     private String host;
     private Integer port = 8000;
     private String databaseName;
 
-    private Path assetsPath;
+    // The list of asset paths to load modules from
+    private List<Path> assetPaths;
+
+    // Default permissions and collections for each module
     private String permissions = "rest-admin,read,rest-admin,update,rest-extension-user,execute";
     private String[] collections;
-
-    private Session activeSession;
 
     private PermissionsParser permissionsParser = new CommaDelimitedPermissionsParser();
     private DocumentFormatGetter documentFormatGetter = new DefaultDocumentFormatGetter();
 
-    public LoadAssetsViaXccCommand(String assetsPath) {
-        this.assetsPath = Paths.get(assetsPath);
+    // State that is maintained while visiting each asset path. Would need to move this to another class if this
+    // command ever needs to be thread-safe.
+    private Session activeSession;
+    private Path currentAssetPath;
+
+    public LoadAssetsViaXccCommand(String... paths) {
+        assetPaths = new ArrayList<Path>();
+        for (String path : paths) {
+            assetPaths.add(Paths.get(path));
+        }
     }
 
     @Override
@@ -55,13 +71,16 @@ public class LoadAssetsViaXccCommand extends AbstractCommand implements FileVisi
                 databaseName != null ? databaseName : config.getModulesDatabaseName());
         activeSession = cs.newSession();
 
-        try {
-            Files.walkFileTree(assetsPath, this);
-        } catch (IOException ie) {
-            throw new RuntimeException("Error while walking assets file tree: " + ie.getMessage(), ie);
-        } finally {
-            activeSession.close();
-            activeSession = null;
+        for (Path path : assetPaths) {
+            this.currentAssetPath = path;
+            try {
+                Files.walkFileTree(path, this);
+            } catch (IOException ie) {
+                throw new RuntimeException("Error while walking assets file tree: " + ie.getMessage(), ie);
+            } finally {
+                activeSession.close();
+                activeSession = null;
+            }
         }
     }
 
@@ -72,7 +91,7 @@ public class LoadAssetsViaXccCommand extends AbstractCommand implements FileVisi
     @Override
     public FileVisitResult visitFile(Path path, BasicFileAttributes attributes) throws IOException {
         if (attributes.isRegularFile()) {
-            Path relPath = assetsPath.relativize(path);
+            Path relPath = currentAssetPath.relativize(path);
             String uri = "/" + relPath.toString().replace("\\", "/");
 
             ContentCreateOptions options = new ContentCreateOptions();

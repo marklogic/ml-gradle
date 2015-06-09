@@ -7,21 +7,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.CommandContext;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.xcc.Content;
-import com.marklogic.xcc.ContentCapability;
 import com.marklogic.xcc.ContentCreateOptions;
 import com.marklogic.xcc.ContentFactory;
-import com.marklogic.xcc.ContentPermission;
 import com.marklogic.xcc.ContentSource;
 import com.marklogic.xcc.ContentSourceFactory;
-import com.marklogic.xcc.DocumentFormat;
 import com.marklogic.xcc.Session;
 import com.marklogic.xcc.exceptions.RequestException;
 
@@ -38,6 +33,9 @@ public class LoadAssetsViaXccCommand extends AbstractCommand implements FileVisi
     private String[] collections;
 
     private Session activeSession;
+
+    private PermissionsParser permissionsParser = new CommaDelimitedPermissionsParser();
+    private DocumentFormatGetter documentFormatGetter = new DefaultDocumentFormatGetter();
 
     public LoadAssetsViaXccCommand(String assetsPath) {
         this.assetsPath = Paths.get(assetsPath);
@@ -78,8 +76,8 @@ public class LoadAssetsViaXccCommand extends AbstractCommand implements FileVisi
             String uri = "/" + relPath.toString().replace("\\", "/");
 
             ContentCreateOptions options = new ContentCreateOptions();
-            options.setFormat(determineDocumentFormat(relPath));
-            options.setPermissions(parsePermissions(this.permissions));
+            options.setFormat(documentFormatGetter.getDocumentFormat(relPath.toFile()));
+            options.setPermissions(permissionsParser.parsePermissions(this.permissions));
             if (this.collections != null) {
                 options.setCollections(collections);
             }
@@ -94,42 +92,6 @@ public class LoadAssetsViaXccCommand extends AbstractCommand implements FileVisi
             }
         }
         return FileVisitResult.CONTINUE;
-    }
-
-    /**
-     * TODO Toss this into a separate class for reusability/modification.
-     */
-    protected DocumentFormat determineDocumentFormat(Path path) {
-        if (path.endsWith(".xml") || path.endsWith(".xsl")) {
-            return DocumentFormat.XML;
-        }
-        return DocumentFormat.TEXT;
-    }
-
-    /**
-     * TODO Would also be nice to move this to a separate class.
-     */
-    protected ContentPermission[] parsePermissions(String permissions) {
-        List<ContentPermission> list = new ArrayList<ContentPermission>();
-        if (permissions != null && permissions.trim().length() > 0) {
-            String[] tokens = permissions.split(",");
-            for (int i = 0; i < tokens.length; i += 2) {
-                String role = tokens[i];
-                String capability = tokens[i + 1];
-
-                ContentCapability cc = ContentCapability.READ;
-                if (capability.equals("execute")) {
-                    cc = ContentCapability.EXECUTE;
-                } else if (capability.equals("insert")) {
-                    cc = ContentCapability.INSERT;
-                } else if (capability.equals("update")) {
-                    cc = ContentCapability.UPDATE;
-                }
-
-                list.add(new ContentPermission(cc, role));
-            }
-        }
-        return list.toArray(new ContentPermission[] {});
     }
 
     @Override
@@ -173,6 +135,14 @@ public class LoadAssetsViaXccCommand extends AbstractCommand implements FileVisi
 
     public void setDatabaseName(String databaseName) {
         this.databaseName = databaseName;
+    }
+
+    public void setPermissionsParser(PermissionsParser permissionsParser) {
+        this.permissionsParser = permissionsParser;
+    }
+
+    public void setDocumentFormatGetter(DocumentFormatGetter documentFormatGetter) {
+        this.documentFormatGetter = documentFormatGetter;
     }
 
 }

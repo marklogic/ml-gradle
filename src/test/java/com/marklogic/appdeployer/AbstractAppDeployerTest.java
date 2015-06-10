@@ -5,8 +5,6 @@ import java.util.Arrays;
 
 import org.junit.After;
 import org.junit.Before;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -26,8 +24,6 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
 
     protected final static Integer SAMPLE_APP_REST_PORT = 8540;
     protected final static Integer SAMPLE_APP_TEST_REST_PORT = 8541;
-
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private AdminConfig adminConfig;

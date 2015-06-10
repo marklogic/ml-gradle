@@ -26,7 +26,15 @@ public class ManageUsersTest extends AbstractMgmtTest {
     
     @Test
     public void createUserTest() {
-    	userMgr.createUser("");
+    	try {
+    		userMgr.createUser("{\"user-name\":\"joe\", \"password\": \"cool\"}");
+    		
+    	} catch (Exception ex) {
+    		logger.info(ex.getMessage());
+    	}
+    	String name = "joe";
+    	assertTrue(userMgr.userExists("joe"));
+    	
     }
 
 }

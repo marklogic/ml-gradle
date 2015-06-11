@@ -20,10 +20,7 @@ public class AppConfig {
     private Authentication authentication = Authentication.DIGEST;
 
     private Integer restPort;
-    private Integer xdbcPort;
     private Integer testRestPort;
-    private Integer testXdbcPort;
-    private Integer modulesXdbcPort;
 
     private List<String> modulePaths;
     private ConfigDir configDir;
@@ -89,16 +86,16 @@ public class AppConfig {
         return name + "-schemas";
     }
 
-    public String getXccUrl() {
-        return String.format("xcc://%s:%s@%s:%d", username, password, host, xdbcPort);
+    public String getContentXccUrl() {
+        return String.format("xcc://%s:%s@%s:8000/%s", username, password, host, getContentDatabaseName());
     }
 
-    public String getTestXccUrl() {
-        return String.format("xcc://%s:%s@%s:%d", username, password, host, testXdbcPort);
+    public String getTestContentXccUrl() {
+        return String.format("xcc://%s:%s@%s:8000/%s", username, password, host, getTestContentDatabaseName());
     }
 
     public String getModulesXccUrl() {
-        return String.format("xcc://%s:%s@%s:%d", username, password, host, modulesXdbcPort);
+        return String.format("xcc://%s:%s@%s:8000/%s", username, password, host, getModulesDatabaseName());
     }
 
     public String getName() {
@@ -141,36 +138,12 @@ public class AppConfig {
         this.restPort = restPort;
     }
 
-    public Integer getXdbcPort() {
-        return xdbcPort;
-    }
-
-    public void setXdbcPort(Integer xdbcPort) {
-        this.xdbcPort = xdbcPort;
-    }
-
     public Integer getTestRestPort() {
         return testRestPort;
     }
 
     public void setTestRestPort(Integer testRestPort) {
         this.testRestPort = testRestPort;
-    }
-
-    public Integer getTestXdbcPort() {
-        return testXdbcPort;
-    }
-
-    public void setTestXdbcPort(Integer testXdbcPort) {
-        this.testXdbcPort = testXdbcPort;
-    }
-
-    public Integer getModulesXdbcPort() {
-        return modulesXdbcPort;
-    }
-
-    public void setModulesXdbcPort(Integer modulesXdbcPort) {
-        this.modulesXdbcPort = modulesXdbcPort;
     }
 
     public List<String> getModulePaths() {

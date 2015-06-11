@@ -61,4 +61,11 @@ public class DatabaseManager extends AbstractManager {
         manageClient.putJson(path, json);
         logger.info(format("Updated database %s", databaseIdOrName));
     }
+
+    public void clearDatabase(String databaseIdOrName) {
+        String path = format("/manage/v2/databases/%s", databaseIdOrName);
+        logger.info(format("Clearing database %s", databaseIdOrName));
+        manageClient.postJson(path, "{\"operation\":\"clear-database\"}");
+        logger.info(format("Cleared database %s", databaseIdOrName));
+    }
 }

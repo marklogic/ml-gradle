@@ -14,6 +14,7 @@ import com.marklogic.clientutil.modulesloader.impl.DefaultModulesLoader;
 public class LoadModulesCommand extends AbstractCommand {
 
     private ModulesLoader modulesLoader;
+    private String modulePermissions;
 
     @Override
     public Integer getExecuteSortOrder() {
@@ -40,5 +41,9 @@ public class LoadModulesCommand extends AbstractCommand {
 
     public void setModulesLoader(ModulesLoader modulesLoader) {
         this.modulesLoader = modulesLoader;
+    }
+
+    public void setModulePermissions(String modulePermissions) {
+        this.modulePermissions = modulePermissions;
     }
 }

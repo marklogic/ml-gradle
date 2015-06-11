@@ -6,8 +6,7 @@ import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.admin.AdminManager;
 
 /**
- * Simple implementation that allows for a list of commands to be set. Useful for testing purposes in particular - i.e.
- * for testing commands together.
+ * Simple implementation that allows for a list of commands to be set.
  */
 public class SimpleAppDeployer extends AbstractAppDeployer {
 
@@ -17,8 +16,12 @@ public class SimpleAppDeployer extends AbstractAppDeployer {
         super(manageClient, adminManager);
     }
 
+    /**
+     * Keep this public so that a client can easily manipulate the list in case a default set of commands has been
+     * provided.
+     */
     @Override
-    protected List<Command> getCommands() {
+    public List<Command> getCommands() {
         return commands;
     }
 

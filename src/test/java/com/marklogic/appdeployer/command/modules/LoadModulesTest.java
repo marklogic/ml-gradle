@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
-import com.marklogic.rest.mgmt.PermissionsFragment;
+import com.marklogic.junit.PermissionsFragment;
 import com.marklogic.xccutil.template.XccTemplate;
 
 public class LoadModulesTest extends AbstractAppDeployerTest {

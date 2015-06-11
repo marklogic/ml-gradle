@@ -12,4 +12,10 @@ public class PermissionsFragment extends Fragment {
         assertElementExists(format("/node()/sec:permission[sec:role-name = '%s' and sec:capability = '%s']", roleName,
                 capability));
     }
+
+    public void assertPermissionCount(int count) {
+        String xpath = "/node()/sec:permission[%d]";
+        assertElementExists(format(xpath, count));
+        assertElementMissing(format("Only expected %d permissions", count), format(xpath, count + 1));
+    }
 }

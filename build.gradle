@@ -13,11 +13,11 @@ repositories {
 }
 
 dependencies {
-  compile 'com.marklogic:ml-javaclient-util:1.0.1'
+  compile 'com.marklogic:ml-javaclient-util:2.0'
   compile 'jaxen:jaxen:1.1.6'
   compile 'org.apache.httpcomponents:httpclient:4.3.5'
   compile 'org.springframework:spring-web:4.1.5.RELEASE'
-  testCompile 'com.marklogic:ml-junit:1.0'
+  testCompile 'com.marklogic:ml-junit:2.0'
 }
 
 // This ensures that Gradle includes in the published jar any non-java files under src/main/java

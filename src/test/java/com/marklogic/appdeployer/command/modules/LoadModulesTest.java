@@ -1,5 +1,9 @@
 package com.marklogic.appdeployer.command.modules;
 
+import java.io.File;
+
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
@@ -10,6 +14,17 @@ import com.marklogic.xccutil.template.XccTemplate;
 public class LoadModulesTest extends AbstractAppDeployerTest {
 
     private XccTemplate xccTemplate;
+
+    @Before
+    public void setup() {
+        xccTemplate = newModulesXccTemplate();
+        deleteModuleTimestampsFile();
+    }
+
+    @After
+    public void teardown() {
+        undeploySampleApp();
+    }
 
     @Test
     public void loadModulesFromMultiplePaths() {
@@ -27,19 +42,46 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 
     @Test
     public void loadModulesWithCustomPermissions() {
+        LoadModulesCommand c = new LoadModulesCommand();
+        c.setAssetRolesAndCapabilities("app-user,execute");
 
+        initializeAppDeployer(new CreateRestApiServersCommand(), c);
+
+        appDeployer.deploy(appConfig);
+
+        PermissionsFragment perms = getDocumentPermissions("/ext/sample-lib.xqy", xccTemplate);
+        perms.assertPermissionCount(4);
+        perms.assertPermissionExists("rest-admin", "read");
+        perms.assertPermissionExists("rest-admin", "update");
+        perms.assertPermissionExists("rest-extension-user", "execute");
+        perms.assertPermissionExists("app-user", "execute");
     }
 
     private void assertModuleExistsWithDefaultPermissions(String message, String uri) {
-        if (xccTemplate == null) {
-            xccTemplate = newModulesXccTemplate();
-        }
-
         assertEquals(message, "true", xccTemplate.executeAdhocQuery(format("fn:doc-available('%s')", uri)));
+        assertDefaultPermissionsExists(uri);
+    }
 
+    /**
+     * Apparently, the REST API won't let you remove these 3 default permissions, they're always present.
+     */
+    private void assertDefaultPermissionsExists(String uri) {
         PermissionsFragment perms = getDocumentPermissions(uri, xccTemplate);
+        perms.assertPermissionCount(3);
         perms.assertPermissionExists("rest-admin", "read");
         perms.assertPermissionExists("rest-admin", "update");
         perms.assertPermissionExists("rest-extension-user", "execute");
     }
+
+    /**
+     * This ensures that modules aren't loaded because of the timestamps file.
+     */
+    private void deleteModuleTimestampsFile() {
+        File f = new File("build/ml-last-configured-timestamps.properties");
+        if (f.exists()) {
+            logger.info("Deleting module timestamps file: " + f.getAbsolutePath());
+            f.delete();
+        }
+    }
+
 }

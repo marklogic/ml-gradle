@@ -23,6 +23,7 @@ public class UpdateContentDatabasesCommand extends AbstractCommand {
         AppConfig appConfig = context.getAppConfig();
 
         List<File> files = appConfig.getConfigDir().getContentDatabaseFiles();
+        logger.info("Merging JSON files at locations: " + files);
         JsonNode node = JsonNodeUtil.mergeJsonFiles(files);
 
         if (node == null) {

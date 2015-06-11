@@ -13,8 +13,10 @@ import com.marklogic.gradle.task.client.CreateTransformTask
 import com.marklogic.gradle.task.client.LoadModulesTask
 import com.marklogic.gradle.task.client.PrepareRestApiDependenciesTask
 import com.marklogic.gradle.task.client.WatchTask
-import com.marklogic.gradle.task.database.ClearContentDatabaseTask
-import com.marklogic.gradle.task.database.ClearModulesTask
+import com.marklogic.gradle.task.databases.ClearContentDatabaseTask
+import com.marklogic.gradle.task.databases.ClearModulesTask
+import com.marklogic.gradle.task.databases.UpdateContentDatabasesTask
+import com.marklogic.gradle.task.servers.UpdateRestApiServersTask
 import com.marklogic.rest.mgmt.ManageClient
 import com.marklogic.rest.mgmt.ManageConfig
 import com.marklogic.rest.mgmt.admin.AdminConfig
@@ -47,14 +49,15 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlAppUndeploy", type: UndeployAppTask, group: group, description: "Undeploys the application")
         project.task("mlDeploy", group: group, dependsOn:["mlAppDeploy"], description: "Deploys the application and allows for additional steps via dependsOn")
         project.task("mlUndeploy", group: group, dependsOn:["mlAppUndeploy"], description: "Undeploys the application and allows for additional steps via dependsOn")
-        
+
         // Tasks for loading modules
-        project.task("mlLoadModules", type: LoadModulesTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Loads modules from directories defined by mlAppConfig or via a property on this task").mustRunAfter(["mlPostInstallPackages", "mlClearModules"])
+        project.task("mlLoadModules", type: LoadModulesTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Loads modules from directories defined by mlAppConfig or via a property on this task").mustRunAfter(["mlClearModules"])
         project.task("mlReloadModules", group: group, dependsOn: ["mlClearModules", "mlLoadModules"], description: "Reloads modules by first clearing the modules database and then loading modules")
         project.task("mlWatch", type: WatchTask, group: group, description: "Run a loop that checks for new/modified modules every second and loads any that it finds")
-        
-        //project.task("mlUpdateContentDatabase", type: UpdateDatabaseTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the content database by building a new database package and then installing it")
-        //project.task("mlUpdateHttpServers", type: UpdateHttpServerTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the HTTP servers by building a new HTTP server package and then installing it")
+
+        // Tasks for configuring specific parts of an application
+        project.task("mlUpdateContentDatabase", type: UpdateContentDatabasesTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the content databases")
+        project.task("mlUpdateRestApiServers", type: UpdateRestApiServersTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the REST API servers")
 
         // Tasks for generating code
         project.task("mlCreateResource", type: CreateResourceTask, group: group, description: "Create a new resource extension in the src/main/xqy/services directory")

@@ -20,22 +20,24 @@ public class UpdateContentDatabasesCommand extends AbstractCommand {
 
     @Override
     public void execute(CommandContext context) {
-        List<File> files = context.getAppConfig().getConfigDir().getContentDatabaseFiles();
+        AppConfig appConfig = context.getAppConfig();
+
+        List<File> files = appConfig.getConfigDir().getContentDatabaseFiles();
         JsonNode node = JsonNodeUtil.mergeJsonFiles(files);
 
         if (node == null) {
             logger.info(format("No content database files found in directory %s, so no updating content databases",
-                    context.getAppConfig().getConfigDir().getDatabasesDir().getAbsolutePath()));
+                    appConfig.getConfigDir().getDatabasesDir().getAbsolutePath()));
             return;
         }
 
-        DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
         String payload = node.toString();
-        logger.info(payload);
-
-        AppConfig appConfig = context.getAppConfig();
-
         String json = tokenReplacer.replaceTokens(payload, appConfig, false);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Content database JSON: " + payload);
+        }
+
+        DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
         dbMgr.updateDatabase(appConfig.getContentDatabaseName(), json);
 
         if (appConfig.isTestPortSet()) {

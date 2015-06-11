@@ -10,6 +10,7 @@ import com.marklogic.appdeployer.command.CommandContext
 import com.marklogic.appdeployer.command.databases.CreateTriggersDatabaseCommand
 import com.marklogic.appdeployer.command.databases.UpdateContentDatabasesCommand
 import com.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand
+import com.marklogic.appdeployer.command.servers.UpdateRestApiServersCommand
 import com.marklogic.appdeployer.impl.SimpleAppDeployer
 import com.marklogic.gradle.task.DeleteModuleTimestampsFileTask
 import com.marklogic.gradle.task.DeployAppTask
@@ -201,6 +202,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         commands.add(new CreateRestApiServersCommand())
         commands.add(new UpdateContentDatabasesCommand())
         commands.add(new CreateTriggersDatabaseCommand())
+        commands.add(new UpdateRestApiServersCommand())
 
         SimpleAppDeployer deployer = new SimpleAppDeployer(manageClient, adminManager)
         deployer.setCommands(commands)

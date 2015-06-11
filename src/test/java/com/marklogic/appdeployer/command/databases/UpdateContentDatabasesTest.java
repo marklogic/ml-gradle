@@ -24,7 +24,7 @@ public class UpdateContentDatabasesTest extends AbstractAppDeployerTest {
 
     @After
     public void teardown() {
-        // undeploySampleApp();
+        undeploySampleApp();
     }
 
     @Test

@@ -4,7 +4,13 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 import com.marklogic.appdeployer.AppConfig
-import com.marklogic.appdeployer.CommandContext
+import com.marklogic.appdeployer.AppDeployer
+import com.marklogic.appdeployer.command.Command
+import com.marklogic.appdeployer.command.CommandContext
+import com.marklogic.appdeployer.command.databases.CreateTriggersDatabaseCommand
+import com.marklogic.appdeployer.command.databases.UpdateContentDatabasesCommand
+import com.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand
+import com.marklogic.appdeployer.impl.SimpleAppDeployer
 import com.marklogic.gradle.task.DeleteModuleTimestampsFileTask
 import com.marklogic.gradle.task.DeployAppTask
 import com.marklogic.gradle.task.UndeployAppTask
@@ -171,13 +177,6 @@ class MarkLogicPlugin implements Plugin<Project> {
     }
 
 
-    /**
-     * So we won't initialize an AppDeployer here... MarkLogicTask can fall back to a default impl, perhaps
-     * one that uses the DefaultConfiguration. But a developer could add one in the ext block which 
-     * MarkLogicTask would then use.
-     * 
-     * @param project
-     */
     void initializeAppDeployerObjects(Project project) {
         ManageConfig manageConfig = project.extensions.getByName("mlManageConfig")
 
@@ -189,5 +188,22 @@ class MarkLogicPlugin implements Plugin<Project> {
 
         CommandContext context = new CommandContext(project.extensions.getByName("mlAppConfig"), manageClient, adminManager)
         project.extensions.add("mlCommandContext", context)
+        
+        project.extensions.add("mlAppDeployer", newAppDeployer(manageClient, adminManager))
+    }
+
+    /**
+     * Creates an AppDeployer with a default set of commands. A developer can then modify this in an
+     * ext block.
+     */
+    AppDeployer newAppDeployer(ManageClient manageClient, AdminManager adminManager) {
+        List<Command> commands = new ArrayList<Command>()
+        commands.add(new CreateRestApiServersCommand())
+        commands.add(new UpdateContentDatabasesCommand())
+        commands.add(new CreateTriggersDatabaseCommand())
+
+        SimpleAppDeployer deployer = new SimpleAppDeployer(manageClient, adminManager)
+        deployer.setCommands(commands)
+        return deployer
     }
 }

@@ -4,8 +4,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 import com.marklogic.appdeployer.AppConfig
-import com.marklogic.appdeployer.AppPluginContext
-import com.marklogic.appdeployer.ConfigDir
+import com.marklogic.appdeployer.CommandContext
 import com.marklogic.gradle.task.DeleteModuleTimestampsFileTask
 import com.marklogic.gradle.task.DeployAppTask
 import com.marklogic.gradle.task.UndeployAppTask
@@ -13,6 +12,9 @@ import com.marklogic.gradle.task.client.CreateResourceTask
 import com.marklogic.gradle.task.client.CreateTransformTask
 import com.marklogic.gradle.task.client.LoadModulesTask
 import com.marklogic.gradle.task.client.PrepareRestApiDependenciesTask
+import com.marklogic.gradle.task.client.WatchTask
+import com.marklogic.gradle.task.database.ClearContentDatabaseTask
+import com.marklogic.gradle.task.database.ClearModulesTask
 import com.marklogic.rest.mgmt.ManageClient
 import com.marklogic.rest.mgmt.ManageConfig
 import com.marklogic.rest.mgmt.admin.AdminConfig
@@ -32,26 +34,31 @@ class MarkLogicPlugin implements Plugin<Project> {
 
         project.task("mlDeleteModuleTimestampsFile", type: DeleteModuleTimestampsFileTask, group: group, description: "Delete the properties file in the build directory that keeps track of when each module was last loaded.")
 
-        //project.task("mlClearContentDatabase", type: ClearContentDatabaseTask, group: group, description: "Deletes all or a collection of documents from the content database")
-        //project.task("mlClearModules", type: ClearModulesTask, group: group, dependsOn: "mlDeleteModuleTimestampsFile", description: "Deletes potentially all of the documents in the modules database; has a property for excluding documents from deletion")
+        project.task("mlClearContentDatabase", type: ClearContentDatabaseTask, group: group, description: "Deletes all or a collection of documents from the content database")
+        project.task("mlClearModules", type: ClearModulesTask, group: group, dependsOn: "mlDeleteModuleTimestampsFile", description: "Deletes potentially all of the documents in the modules database; has a property for excluding documents from deletion")
 
         project.task("mlPrepareRestApiDependencies", type: PrepareRestApiDependenciesTask, group: group, dependsOn: project.configurations["mlRestApi"], description: "Downloads (if necessary) and unzips in the build directory all mlRestApi dependencies")
 
-        project.task("mlDeploy", type: DeployAppTask, group: group)
-        project.task("mlUndeploy", type: UndeployAppTask, group: group)
+        /**
+         * Tasks for deploying and undeploying. mlDeploy and mlUndeploy exist so that a developer can easily use
+         * dependsOn and mustRunAfter to add additional steps after an application has been deployed/undeployed.
+         */
+        project.task("mlAppDeploy", type: DeployAppTask, group: group, description: "Deploys the application")
+        project.task("mlAppUndeploy", type: UndeployAppTask, group: group, description: "Undeploys the application")
+        project.task("mlDeploy", group: group, dependsOn:["mlAppDeploy"], description: "Deploys the application and allows for additional steps via dependsOn")
+        project.task("mlUndeploy", group: group, dependsOn:["mlAppUndeploy"], description: "Undeploys the application and allows for additional steps via dependsOn")
+        
+        // Tasks for loading modules
         project.task("mlLoadModules", type: LoadModulesTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Loads modules from directories defined by mlAppConfig or via a property on this task").mustRunAfter(["mlPostInstallPackages", "mlClearModules"])
-
-        //project.task("mlPostDeploy", group: group, description: "Add dependsOn to this to add tasks to mlDeploy").mustRunAfter("mlLoadModules")
-
-        //project.task("mlReloadModules", group: group, dependsOn: ["mlClearModules", "mlLoadModules"], description: "Reloads modules by first clearing the modules database and then loading modules")
-
+        project.task("mlReloadModules", group: group, dependsOn: ["mlClearModules", "mlLoadModules"], description: "Reloads modules by first clearing the modules database and then loading modules")
+        project.task("mlWatch", type: WatchTask, group: group, description: "Run a loop that checks for new/modified modules every second and loads any that it finds")
+        
         //project.task("mlUpdateContentDatabase", type: UpdateDatabaseTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the content database by building a new database package and then installing it")
         //project.task("mlUpdateHttpServers", type: UpdateHttpServerTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the HTTP servers by building a new HTTP server package and then installing it")
 
+        // Tasks for generating code
         project.task("mlCreateResource", type: CreateResourceTask, group: group, description: "Create a new resource extension in the src/main/xqy/services directory")
         project.task("mlCreateTransform", type: CreateTransformTask, group: group, description: "Create a new transform in the src/main/xqy/transforms directory")
-
-        //project.task("mlWatch", type: WatchTask, group: group, description: "Run a loop that checks for new/modified modules every second and loads any that it finds")
     }
 
     /**
@@ -137,7 +144,7 @@ class MarkLogicPlugin implements Plugin<Project> {
     }
 
     /**
-     * Should allow for this to be initialized off a different set of properties if they
+     * TODO Should allow for this to be initialized off a different set of properties if they
      * exist - e.g. mlAdminUsername.
      * 
      * @param project
@@ -174,18 +181,10 @@ class MarkLogicPlugin implements Plugin<Project> {
         ManageClient manageClient = new ManageClient(manageConfig)
         project.extensions.add("mlManageClient", manageClient)
 
-        // mlPrepareRestApi can add additional configDirs to AppConfig
-        String configBaseDir = "src/main/ml-config"
-        if (project.hasProperty("mlConfigBaseDir")) {
-            configBaseDir = project.property("mlConfigBaseDir")
-        }
-        ConfigDir configDir = new ConfigDir(new File(configBaseDir))
-        project.extensions.add("mlConfigDir", configDir)
-
         AdminManager adminManager = new AdminManager(project.extensions.getByName("mlAdminConfig"))
         project.extensions.add("mlAdminManager", adminManager)
 
-        AppPluginContext context = new AppPluginContext(project.extensions.getByName("mlAppConfig"), configDir, manageClient, adminManager)
-        project.extensions.add("mlAppPluginContext", context)
+        CommandContext context = new CommandContext(project.extensions.getByName("mlAppConfig"), manageClient, adminManager)
+        project.extensions.add("mlCommandContext", context)
     }
 }

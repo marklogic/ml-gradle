@@ -1,12 +1,15 @@
 package com.marklogic.appdeployer.command.databases;
 
 import java.io.File;
+import java.util.List;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.rest.mgmt.databases.DatabaseManager;
+import com.marklogic.rest.util.JsonNodeUtil;
 
 public class UpdateContentDatabasesCommand extends AbstractCommand {
 
@@ -17,24 +20,27 @@ public class UpdateContentDatabasesCommand extends AbstractCommand {
 
     @Override
     public void execute(CommandContext context) {
-        File f = context.getAppConfig().getConfigDir().getContentDatabaseFile();
-        if (f.exists()) {
-            DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
+        List<File> files = context.getAppConfig().getConfigDir().getContentDatabaseFiles();
+        JsonNode node = JsonNodeUtil.mergeJsonFiles(files);
 
-            String payload = copyFileToString(f);
-            AppConfig appConfig = context.getAppConfig();
+        if (node == null) {
+            logger.info(format("No content database files found in directory %s, so no updating content databases",
+                    context.getAppConfig().getConfigDir().getDatabasesDir().getAbsolutePath()));
+            return;
+        }
 
-            String json = tokenReplacer.replaceTokens(payload, appConfig, false);
-            dbMgr.updateDatabase(appConfig.getContentDatabaseName(), json);
+        DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
+        String payload = node.toString();
+        logger.info(payload);
 
-            if (appConfig.isTestPortSet()) {
-                json = tokenReplacer.replaceTokens(payload, appConfig, true);
-                dbMgr.updateDatabase(appConfig.getTestContentDatabaseName(), json);
-            }
-        } else {
-            logger.info(format("No content database file found at %s, so not updating the content database",
-                    f.getAbsolutePath()));
+        AppConfig appConfig = context.getAppConfig();
+
+        String json = tokenReplacer.replaceTokens(payload, appConfig, false);
+        dbMgr.updateDatabase(appConfig.getContentDatabaseName(), json);
+
+        if (appConfig.isTestPortSet()) {
+            json = tokenReplacer.replaceTokens(payload, appConfig, true);
+            dbMgr.updateDatabase(appConfig.getTestContentDatabaseName(), json);
         }
     }
-
 }

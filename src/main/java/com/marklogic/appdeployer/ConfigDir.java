@@ -1,6 +1,8 @@
 package com.marklogic.appdeployer;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Defines all of the directories where configuration files can be found. This is decoupled from the NounManager
@@ -14,7 +16,11 @@ public class ConfigDir {
     private File baseDir;
 
     private String databasesPath = "databases";
+    private String defaultContentDatabaseFilename = "content-database.json";
+
     private String restApiPath = "rest-api.json";
+
+    private List<File> contentDatabaseFiles;
 
     public ConfigDir() {
         this(new File("src/main/ml-config"));
@@ -22,11 +28,16 @@ public class ConfigDir {
 
     public ConfigDir(File baseDir) {
         this.baseDir = baseDir;
+        initializeContentDatabaseFiles();
     }
 
-    public File getContentDatabaseFile() {
-        File dir = new File(baseDir, databasesPath);
-        return new File(dir, "content-database.json");
+    public File getDatabasesDir() {
+        return new File(baseDir, databasesPath);
+    }
+
+    protected void initializeContentDatabaseFiles() {
+        contentDatabaseFiles = new ArrayList<>();
+        contentDatabaseFiles.add(new File(getDatabasesDir(), defaultContentDatabaseFilename));
     }
 
     public File getTriggersDatabaseFile() {
@@ -51,5 +62,21 @@ public class ConfigDir {
 
     public File getBaseDir() {
         return baseDir;
+    }
+
+    public List<File> getContentDatabaseFiles() {
+        return contentDatabaseFiles;
+    }
+
+    public void setContentDatabaseFiles(List<File> contentDatabaseFiles) {
+        this.contentDatabaseFiles = contentDatabaseFiles;
+    }
+
+    public String getDefaultContentDatabaseFilename() {
+        return defaultContentDatabaseFilename;
+    }
+
+    public void setDefaultContentDatabaseFilename(String contentDatabaseFilename) {
+        this.defaultContentDatabaseFilename = contentDatabaseFilename;
     }
 }

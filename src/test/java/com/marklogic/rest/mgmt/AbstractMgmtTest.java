@@ -29,4 +29,9 @@ public abstract class AbstractMgmtTest extends Assert {
     public void initializeManageClient() {
         manageClient = new ManageClient(manageConfig);
     }
+
+    protected String format(String s, Object... args) {
+        return String.format(s, args);
+    }
+
 }

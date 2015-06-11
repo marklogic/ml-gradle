@@ -6,6 +6,6 @@ class DeployAppTask extends MarkLogicTask {
 
     @TaskAction
     void deployApp() {
-        getAppDeployer().deploy(getAppConfig(), getConfigDir())
+        getAppDeployer().deploy(getAppConfig())
     }
 }

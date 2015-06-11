@@ -5,10 +5,10 @@ import java.io.File;
 import org.springframework.http.HttpMethod;
 
 import com.marklogic.appdeployer.AppConfig;
-import com.marklogic.appdeployer.CommandContext;
-import com.marklogic.appdeployer.UndoableCommand;
 import com.marklogic.appdeployer.command.AbstractCommand;
+import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
+import com.marklogic.appdeployer.command.UndoableCommand;
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.admin.ActionRequiringRestart;
 import com.marklogic.rest.mgmt.appservers.ServerManager;

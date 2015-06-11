@@ -1,4 +1,5 @@
-package com.marklogic.appdeployer;
+package com.marklogic.appdeployer.command;
+
 
 /**
  * A command is used to provide behavior when creating an application; it keeps the AppDeployer instance from being

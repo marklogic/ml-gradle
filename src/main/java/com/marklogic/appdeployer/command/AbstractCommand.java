@@ -5,7 +5,6 @@ import java.io.IOException;
 
 import org.springframework.util.FileCopyUtils;
 
-import com.marklogic.appdeployer.Command;
 import com.marklogic.clientutil.LoggingObject;
 
 /**

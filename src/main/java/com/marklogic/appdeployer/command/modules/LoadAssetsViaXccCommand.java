@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.marklogic.appdeployer.AppConfig;
-import com.marklogic.appdeployer.CommandContext;
 import com.marklogic.appdeployer.command.AbstractCommand;
+import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.xcc.Content;
 import com.marklogic.xcc.ContentCreateOptions;

@@ -11,7 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import com.marklogic.appdeployer.command.Command;
+import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
+import com.marklogic.appdeployer.impl.SimpleAppDeployer;
 import com.marklogic.appdeployer.spring.SpringAppDeployer;
 import com.marklogic.rest.mgmt.AbstractMgmtTest;
 import com.marklogic.rest.mgmt.admin.AdminConfig;

@@ -2,10 +2,10 @@ package com.marklogic.appdeployer.command.databases;
 
 import java.io.File;
 
-import com.marklogic.appdeployer.CommandContext;
-import com.marklogic.appdeployer.UndoableCommand;
 import com.marklogic.appdeployer.command.AbstractCommand;
+import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
+import com.marklogic.appdeployer.command.UndoableCommand;
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.databases.DatabaseManager;
 import com.marklogic.rest.mgmt.forests.ForestManager;

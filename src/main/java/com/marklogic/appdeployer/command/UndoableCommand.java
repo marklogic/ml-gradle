@@ -1,4 +1,5 @@
-package com.marklogic.appdeployer;
+package com.marklogic.appdeployer.command;
+
 
 /**
  * Implement this interface for when your command needs to perform some action when an application is being undeployed.

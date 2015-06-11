@@ -37,8 +37,4 @@ public class UpdateContentDatabasesCommand extends AbstractCommand {
         }
     }
 
-    @Override
-    public void undo(CommandContext context) {
-    }
-
 }

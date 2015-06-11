@@ -3,6 +3,7 @@ package com.marklogic.appdeployer.command.databases;
 import java.io.File;
 
 import com.marklogic.appdeployer.CommandContext;
+import com.marklogic.appdeployer.UndoableCommand;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.rest.mgmt.ManageClient;
@@ -10,11 +11,16 @@ import com.marklogic.rest.mgmt.databases.DatabaseManager;
 import com.marklogic.rest.mgmt.forests.ForestManager;
 import com.marklogic.rest.mgmt.hosts.HostManager;
 
-public class CreateTriggersDatabaseCommand extends AbstractCommand {
+public class CreateTriggersDatabaseCommand extends AbstractCommand implements UndoableCommand {
 
     @Override
     public Integer getExecuteSortOrder() {
         return SortOrderConstants.CREATE_TRIGGERS_DATABASE_ORDER;
+    }
+
+    @Override
+    public Integer getUndoSortOrder() {
+        return getExecuteSortOrder();
     }
 
     @Override

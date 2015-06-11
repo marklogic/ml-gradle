@@ -45,10 +45,6 @@ public class LoadModulesCommand extends AbstractCommand {
         }
     }
 
-    @Override
-    public void undo(CommandContext context) {
-    }
-
     public void setModulesLoader(ModulesLoader modulesLoader) {
         this.modulesLoader = modulesLoader;
     }

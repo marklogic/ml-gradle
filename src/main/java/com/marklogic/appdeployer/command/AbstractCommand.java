@@ -17,15 +17,6 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 
     protected TokenReplacer tokenReplacer = new DefaultTokenReplacer();
 
-    /**
-     * By default, assumes that the sort order on undeploy should be the same as on deploy. Subclasses can override this
-     * to provide an alternate approach.
-     */
-    @Override
-    public Integer getUndoSortOrder() {
-        return getExecuteSortOrder();
-    }
-
     protected String format(String s, Object... args) {
         return String.format(s, args);
     }

@@ -38,11 +38,6 @@ public class UpdateRestApiServersCommand extends AbstractCommand {
         } else {
             logger.info(format("No REST API server file found at %s, so not updating the server", f.getAbsolutePath()));
         }
-
-    }
-
-    @Override
-    public void undo(CommandContext context) {
     }
 
 }

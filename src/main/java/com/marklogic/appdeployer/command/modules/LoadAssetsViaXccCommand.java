@@ -87,10 +87,6 @@ public class LoadAssetsViaXccCommand extends AbstractCommand implements FileVisi
     }
 
     @Override
-    public void undo(CommandContext context) {
-    }
-
-    @Override
     public FileVisitResult visitFile(Path path, BasicFileAttributes attributes) throws IOException {
         if (attributes.isRegularFile()) {
             Path relPath = currentAssetPath.relativize(path);

@@ -1,5 +1,6 @@
 package com.marklogic.appdeployer;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -48,9 +49,17 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
                 .getBaseDir().getAbsolutePath()));
 
         List<Command> commands = getCommands();
-        Collections.sort(commands, new UndoComparator());
 
+        List<UndoableCommand> undoableCommands = new ArrayList<UndoableCommand>();
         for (Command command : commands) {
+            if (command instanceof UndoableCommand) {
+                undoableCommands.add((UndoableCommand) command);
+            }
+        }
+
+        Collections.sort(undoableCommands, new UndoComparator());
+
+        for (UndoableCommand command : undoableCommands) {
             logger.info(format("Invoking command [%s] with sort order [%d]", command.getClass().getName(),
                     command.getUndoSortOrder()));
 
@@ -73,9 +82,9 @@ class ExecuteComparator implements Comparator<Command> {
     }
 }
 
-class UndoComparator implements Comparator<Command> {
+class UndoComparator implements Comparator<UndoableCommand> {
     @Override
-    public int compare(Command o1, Command o2) {
+    public int compare(UndoableCommand o1, UndoableCommand o2) {
         return o1.getUndoSortOrder().compareTo(o2.getUndoSortOrder());
     }
 }

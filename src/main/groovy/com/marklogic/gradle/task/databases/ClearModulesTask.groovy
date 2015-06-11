@@ -1,4 +1,4 @@
-package com.marklogic.gradle.task.database
+package com.marklogic.gradle.task.databases
 
 import org.gradle.api.tasks.TaskAction
 

@@ -1,39 +1,41 @@
 package com.marklogic.rest.mgmt.security.users;
 
-import org.jdom2.Namespace;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
-
-import com.marklogic.clientutil.LoggingObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.marklogic.rest.mgmt.AbstractManager;
 import com.marklogic.rest.mgmt.ManageClient;
-import com.marklogic.rest.util.Fragment;
 
-public class UserManager extends LoggingObject {
-	
-  private ManageClient client;
+public class UserManager extends AbstractManager {
 
-  public UserManager(ManageClient client) {
-      this.client = client;
-  }
+    private ManageClient client;
 
-  public boolean userExists(String name) {
-    logger.info("Checking for existence of username: " + name);
-    String xml = client.getRestTemplate().getForObject(client.getBaseUrl() + "/manage/v2/users", String.class);
-    Fragment f = new Fragment(xml, Namespace.getNamespace("sec", "http://marklogic.com/manage/security"));
-    return f.elementExists(String.format("/sec:user-default-list/sec:list-items/sec:list-item[sec:nameref = '%s']", name));
-  }
-  
-  public void createUser(String json) throws Exception {
-	  ResponseEntity<String> response = client.postJson("/manage/v2/users", json);
-	  logger.info(response.toString());
-	  logger.info(response.getStatusCode().toString());
-	  logger.info(HttpStatus.ACCEPTED.toString());
-	  if (response.getStatusCode() == HttpStatus.CREATED) {
-		  return;
-	  } else {
-		  logger.error("Invalid User JSON");
-		  throw new Exception("Invalid JSON for User");
-	  }
-  }
+    public UserManager(ManageClient client) {
+        this.client = client;
+    }
 
+    public boolean userExists(String name) {
+        return client.getXml("/manage/v2/users").elementExists(
+                format("/msec:user-default-list/msec:list-items/msec:list-item[msec:nameref = '%s']", name));
+    }
+
+    public void createUser(String json) {
+        JsonNode node = parseJson(json);
+        String username = node.get("user-name").asText();
+        if (userExists(username)) {
+            logger.info("User already exists, not creating: " + username);
+        } else {
+            logger.info("Creating user: " + username);
+            client.postJson("/manage/v2/users", json);
+            logger.info("Created user: " + username);
+        }
+    }
+
+    public void deleteUser(String username) {
+        if (!userExists(username)) {
+            logger.info("User doesn't exist, not deleting: " + username);
+        } else {
+            logger.info("Deleting user: " + username);
+            client.delete("/manage/v2/users/" + username);
+            logger.info("Deleted user: " + username);
+        }
+    }
 }

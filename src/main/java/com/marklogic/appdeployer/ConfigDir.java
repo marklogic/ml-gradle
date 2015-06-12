@@ -52,6 +52,10 @@ public class ConfigDir {
         return new File(new File(baseDir, "servers"), "rest-api-server.json");
     }
 
+    public File getSecurityDir() {
+        return new File(baseDir, "security");
+    }
+
     public void setDatabasesPath(String databasesPath) {
         this.databasesPath = databasesPath;
     }

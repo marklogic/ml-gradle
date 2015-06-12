@@ -1,10 +1,10 @@
 {
-  "database-name": "%%DATABASE%%",
+  "maintain-last-modified": true,  
   "range-element-index": [
     {
       "collation": "http://marklogic.com/collation/",
       "invalid-values": "reject",
-      "localname": "id",
+      "localname": "anotherElement",
       "namespace-uri": "urn:sampleapp",
       "range-value-positions": false,
       "scalar-type": "string"

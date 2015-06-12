@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.springframework.context.ApplicationContext;
 
-import com.marklogic.appdeployer.AbstractAppDeployer;
-import com.marklogic.appdeployer.Command;
+import com.marklogic.appdeployer.command.Command;
+import com.marklogic.appdeployer.impl.AbstractAppDeployer;
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.admin.AdminManager;
 

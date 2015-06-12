@@ -3,8 +3,8 @@ package com.marklogic.appdeployer.command.databases;
 import java.io.File;
 
 import com.marklogic.appdeployer.AppConfig;
-import com.marklogic.appdeployer.CommandContext;
 import com.marklogic.appdeployer.command.AbstractCommand;
+import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.rest.mgmt.databases.DatabaseManager;
 
@@ -35,10 +35,6 @@ public class UpdateContentDatabasesCommand extends AbstractCommand {
             logger.info(format("No content database file found at %s, so not updating the content database",
                     f.getAbsolutePath()));
         }
-    }
-
-    @Override
-    public void undo(CommandContext context) {
     }
 
 }

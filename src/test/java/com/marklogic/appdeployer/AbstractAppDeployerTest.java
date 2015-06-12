@@ -9,11 +9,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import com.marklogic.appdeployer.command.Command;
+import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
+import com.marklogic.appdeployer.impl.SimpleAppDeployer;
 import com.marklogic.appdeployer.spring.SpringAppDeployer;
 import com.marklogic.rest.mgmt.AbstractMgmtTest;
 import com.marklogic.rest.mgmt.admin.AdminConfig;
 import com.marklogic.rest.mgmt.admin.AdminManager;
+import com.marklogic.xccutil.template.XccTemplate;
 
 /**
  * Base class for tests that depend on an AppDeployer instance.
@@ -94,5 +98,15 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
         } catch (Exception e) {
             logger.warn("Error while waiting for MarkLogic to restart: " + e.getMessage());
         }
+    }
+
+    /**
+     * Assumes that the AppConfig user can be used to talk XCC to the modules database.
+     * 
+     * @return
+     */
+    protected XccTemplate newModulesXccTemplate() {
+        return new XccTemplate(format("xcc://%s:%s@%s:8000/%s", appConfig.getUsername(), appConfig.getPassword(),
+                appConfig.getHost(), appConfig.getModulesDatabaseName()));
     }
 }

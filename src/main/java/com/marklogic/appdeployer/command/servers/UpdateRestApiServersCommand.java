@@ -3,8 +3,8 @@ package com.marklogic.appdeployer.command.servers;
 import java.io.File;
 
 import com.marklogic.appdeployer.AppConfig;
-import com.marklogic.appdeployer.CommandContext;
 import com.marklogic.appdeployer.command.AbstractCommand;
+import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.rest.mgmt.appservers.ServerManager;
 
@@ -38,11 +38,6 @@ public class UpdateRestApiServersCommand extends AbstractCommand {
         } else {
             logger.info(format("No REST API server file found at %s, so not updating the server", f.getAbsolutePath()));
         }
-
-    }
-
-    @Override
-    public void undo(CommandContext context) {
     }
 
 }

@@ -5,15 +5,16 @@ import java.io.File;
 import org.springframework.http.HttpMethod;
 
 import com.marklogic.appdeployer.AppConfig;
-import com.marklogic.appdeployer.CommandContext;
 import com.marklogic.appdeployer.command.AbstractCommand;
+import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
+import com.marklogic.appdeployer.command.UndoableCommand;
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.admin.ActionRequiringRestart;
 import com.marklogic.rest.mgmt.appservers.ServerManager;
 import com.marklogic.rest.mgmt.restapis.RestApiManager;
 
-public class CreateRestApiServersCommand extends AbstractCommand {
+public class CreateRestApiServersCommand extends AbstractCommand implements UndoableCommand {
 
     private boolean includeModules = true;
     private boolean includeContent = true;
@@ -21,6 +22,11 @@ public class CreateRestApiServersCommand extends AbstractCommand {
     @Override
     public Integer getExecuteSortOrder() {
         return SortOrderConstants.CREATE_REST_API_SERVERS_ORDER;
+    }
+
+    @Override
+    public Integer getUndoSortOrder() {
+        return getExecuteSortOrder();
     }
 
     @Override

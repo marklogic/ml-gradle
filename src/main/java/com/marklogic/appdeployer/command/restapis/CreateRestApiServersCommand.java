@@ -55,10 +55,10 @@ public class CreateRestApiServersCommand extends AbstractCommand implements Undo
         final AppConfig appConfig = context.getAppConfig();
         final ManageClient manageClient = context.getManageClient();
 
+        ServerManager mgr = new ServerManager(manageClient);
         // If we have a test REST API, first modify it to point at Documents for the modules database so we can safely
         // delete each REST API
-        if (appConfig.isTestPortSet()) {
-            ServerManager mgr = new ServerManager(manageClient);
+        if (appConfig.isTestPortSet() && mgr.serverExists(appConfig.getTestRestServerName())) {
             mgr.setModulesDatabaseToDocuments(appConfig.getTestRestServerName(), appConfig.getGroupName());
             context.getAdminManager().invokeActionRequiringRestart(new ActionRequiringRestart() {
                 @Override
@@ -66,15 +66,16 @@ public class CreateRestApiServersCommand extends AbstractCommand implements Undo
                     return deleteRestApi(appConfig.getTestRestServerName(), manageClient, false, true);
                 }
             });
-
         }
 
-        context.getAdminManager().invokeActionRequiringRestart(new ActionRequiringRestart() {
-            @Override
-            public boolean execute() {
-                return deleteRestApi(appConfig.getRestServerName(), manageClient, includeModules, includeContent);
-            }
-        });
+        if (mgr.serverExists(appConfig.getRestServerName())) {
+            context.getAdminManager().invokeActionRequiringRestart(new ActionRequiringRestart() {
+                @Override
+                public boolean execute() {
+                    return deleteRestApi(appConfig.getRestServerName(), manageClient, includeModules, includeContent);
+                }
+            });
+        }
     }
 
     protected String getDefaultRestApiPayload() {

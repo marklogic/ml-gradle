@@ -54,7 +54,7 @@ class MarkLogicPlugin implements Plugin<Project> {
          * Tasks for deploying and undeploying. mlDeploy and mlUndeploy exist so that a developer can easily use
          * dependsOn and mustRunAfter to add additional steps after an application has been deployed/undeployed.
          */
-        project.task("mlAppDeploy", type: DeployAppTask, group: group, dependsOn: "mlDeleteModuleTimestampsFile", description: "Deploys the application")
+        project.task("mlAppDeploy", type: DeployAppTask, group: group, dependsOn: ["mlDeleteModuleTimestampsFile", "mlPrepareRestApiDependencies"], description: "Deploys the application")
         project.task("mlAppUndeploy", type: UndeployAppTask, group: group, description: "Undeploys the application")
         project.task("mlDeploy", group: group, dependsOn: "mlAppDeploy", description: "Deploys the application and allows for additional steps via dependsOn")
         project.task("mlUndeploy", group: group, dependsOn: "mlAppUndeploy", description: "Undeploys the application and allows for additional steps via dependsOn")

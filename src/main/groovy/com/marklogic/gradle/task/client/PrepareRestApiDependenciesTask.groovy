@@ -36,7 +36,7 @@ class PrepareRestApiDependenciesTask extends MarkLogicTask {
 
                 for (dir in buildDir.listFiles()) {
                     if (dir.isDirectory()) {
-                        newModulePaths.add(dir.getAbsolutePath())
+                        newModulePaths.add(new File(dir, "ml-modules").getAbsolutePath())
                     }
                 }
 

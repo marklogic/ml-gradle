@@ -11,11 +11,11 @@ class XccTask extends MarkLogicTask {
 
     String xquery
     String xccUrl
-    
+
     @TaskAction
     void executeXcc() {
         if (!xccUrl) {
-            xccUrl = getDefaultXccUrl()
+            xccUrl = getAppConfig().getContentXccUrl()
         }
         new XccHelper(xccUrl).executeXquery(xquery)
     }

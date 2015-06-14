@@ -9,7 +9,9 @@ import com.marklogic.appdeployer.command.Command
 import com.marklogic.appdeployer.command.CommandContext
 import com.marklogic.appdeployer.command.databases.CreateTriggersDatabaseCommand
 import com.marklogic.appdeployer.command.databases.UpdateContentDatabasesCommand
+import com.marklogic.appdeployer.command.modules.LoadModulesCommand
 import com.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand
+import com.marklogic.appdeployer.command.security.users.CreateUsersCommand
 import com.marklogic.appdeployer.command.servers.UpdateRestApiServersCommand
 import com.marklogic.appdeployer.impl.SimpleAppDeployer
 import com.marklogic.gradle.task.DeleteModuleTimestampsFileTask
@@ -52,10 +54,10 @@ class MarkLogicPlugin implements Plugin<Project> {
          * Tasks for deploying and undeploying. mlDeploy and mlUndeploy exist so that a developer can easily use
          * dependsOn and mustRunAfter to add additional steps after an application has been deployed/undeployed.
          */
-        project.task("mlAppDeploy", type: DeployAppTask, group: group, description: "Deploys the application")
+        project.task("mlAppDeploy", type: DeployAppTask, group: group, dependsOn: "mlDeleteModuleTimestampsFile", description: "Deploys the application")
         project.task("mlAppUndeploy", type: UndeployAppTask, group: group, description: "Undeploys the application")
-        project.task("mlDeploy", group: group, dependsOn:["mlAppDeploy"], description: "Deploys the application and allows for additional steps via dependsOn")
-        project.task("mlUndeploy", group: group, dependsOn:["mlAppUndeploy"], description: "Undeploys the application and allows for additional steps via dependsOn")
+        project.task("mlDeploy", group: group, dependsOn: "mlAppDeploy", description: "Deploys the application and allows for additional steps via dependsOn")
+        project.task("mlUndeploy", group: group, dependsOn: "mlAppUndeploy", description: "Undeploys the application and allows for additional steps via dependsOn")
 
         // Tasks for loading modules
         project.task("mlLoadModules", type: LoadModulesTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Loads modules from directories defined by mlAppConfig or via a property on this task").mustRunAfter(["mlClearModules"])
@@ -108,22 +110,6 @@ class MarkLogicPlugin implements Plugin<Project> {
             def port = project.property("mlTestRestPort")
             println "App test REST port: " + port
             appConfig.setTestRestPort(Integer.parseInt(port))
-        }
-
-        if (project.hasProperty("mlXdbcPort")) {
-            def port = project.property("mlXdbcPort")
-            println "App XDBC port: " + port
-            appConfig.setXdbcPort(Integer.parseInt(port))
-        }
-        if (project.hasProperty("mlTestXdbcPort")) {
-            def port = project.property("mlTestXdbcPort")
-            println "App test XDBC port: " + port
-            appConfig.setTestXdbcPort(Integer.parseInt(port))
-        }
-        if (project.hasProperty("mlModulesXdbcPort")) {
-            def port = project.property("mlModulesXdbcPort")
-            println "App modules XDBC port: " + port
-            appConfig.setModulesXdbcPort(Integer.parseInt(port))
         }
 
         project.extensions.add("mlAppConfig", appConfig)
@@ -189,7 +175,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 
         CommandContext context = new CommandContext(project.extensions.getByName("mlAppConfig"), manageClient, adminManager)
         project.extensions.add("mlCommandContext", context)
-        
+
         project.extensions.add("mlAppDeployer", newAppDeployer(manageClient, adminManager))
     }
 
@@ -199,9 +185,11 @@ class MarkLogicPlugin implements Plugin<Project> {
      */
     AppDeployer newAppDeployer(ManageClient manageClient, AdminManager adminManager) {
         List<Command> commands = new ArrayList<Command>()
+        commands.add(new CreateUsersCommand())
         commands.add(new CreateRestApiServersCommand())
         commands.add(new UpdateContentDatabasesCommand())
         commands.add(new CreateTriggersDatabaseCommand())
+        commands.add(new LoadModulesCommand())
         commands.add(new UpdateRestApiServersCommand())
 
         SimpleAppDeployer deployer = new SimpleAppDeployer(manageClient, adminManager)

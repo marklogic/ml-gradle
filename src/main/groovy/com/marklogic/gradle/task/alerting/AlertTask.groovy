@@ -9,7 +9,7 @@ class AlertTask extends MarkLogicTask {
 
     AlertHelper newAlertHelper() {
         if (!xccUrl) {
-            xccUrl = getDefaultXccUrl()
+            xccUrl = getAppConfig().getContentXccUrl()
         }
         new AlertHelper(new XccHelper(xccUrl))
     }

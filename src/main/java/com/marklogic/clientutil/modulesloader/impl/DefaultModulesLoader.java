@@ -31,9 +31,20 @@ import com.marklogic.clientutil.modulesloader.Modules;
 import com.marklogic.clientutil.modulesloader.ModulesFinder;
 import com.marklogic.clientutil.modulesloader.ModulesManager;
 
+/**
+ * Uses the REST API for loading modules, but if given an instance of XccAssetLoader, will instead use that for loading
+ * assets instead of the /v1/ext REST API endpoint. That is usually preferable when loading dozens of modules or more,
+ * as XCC is much faster than the REST API endpoint.
+ * <p>
+ * If using XccAssetLoader, note that this class will not be threadsafe since XccAssetLoader is not currently threadsafe
+ * either.
+ */
 public class DefaultModulesLoader extends LoggingObject implements com.marklogic.clientutil.modulesloader.ModulesLoader {
 
     private DatabaseClient client;
+
+    // Used for loading assets via XCC
+    private XccAssetLoader xccAssetLoader;
 
     private ExtensionMetadataProvider extensionMetadataProvider;
     private ModulesFinder modulesFinder;
@@ -51,6 +62,11 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
         this.extensionMetadataProvider = new DefaultExtensionMetadataProvider();
         this.modulesFinder = new DefaultModulesFinder();
         this.modulesManager = new PropertiesModuleManager();
+    }
+
+    public DefaultModulesLoader(XccAssetLoader xccAssetLoader) {
+        this();
+        this.xccAssetLoader = xccAssetLoader;
     }
 
     public Set<File> loadModules(File baseDir, DatabaseClient client) {
@@ -74,10 +90,19 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
     }
 
     protected void loadAssets(Modules modules, Set<File> loadedModules) {
-        for (Asset asset : modules.getAssets()) {
-            File f = installAsset(asset);
-            if (f != null) {
-                loadedModules.add(f);
+        if (xccAssetLoader != null) {
+            xccAssetLoader.initializeActiveSession();
+        }
+        try {
+            for (Asset asset : modules.getAssets()) {
+                File f = installAsset(asset);
+                if (f != null) {
+                    loadedModules.add(f);
+                }
+            }
+        } finally {
+            if (xccAssetLoader != null) {
+                xccAssetLoader.closeActiveSession();
             }
         }
     }
@@ -166,33 +191,37 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
         }
     }
 
-    public File installAsset(Asset asset) {
+    protected File installAsset(Asset asset) {
         File file = asset.getFile();
-
         if (modulesManager != null & !modulesManager.hasFileBeenModifiedSinceLastInstalled(file)) {
             return null;
         }
-        ExtensionLibrariesManager libMgr = client.newServerConfigManager().newExtensionLibrariesManager();
-        Format format = determineFormat(file);
-        FileHandle h = new FileHandle(file);
-        if (extensionLibraryDescriptorBuilder != null) {
-            ExtensionLibraryDescriptor descriptor = extensionLibraryDescriptorBuilder.buildDescriptor(asset);
-            logger.info(String.format("Loading module at path %s from file %s", descriptor.getPath(),
-                    file.getAbsolutePath()));
-            try {
-                libMgr.write(descriptor, h.withFormat(format));
-            } catch (FailedRequestException fre) {
-                logger.warn("Caught exception, retrying as binary file; exception message: " + fre.getMessage());
-                libMgr.write(descriptor, h.withFormat(Format.BINARY));
-            }
+
+        if (xccAssetLoader != null) {
+            xccAssetLoader.loadFile("/ext" + asset.getPath(), file);
         } else {
-            String path = "/ext" + asset.getPath();
-            logger.info(String.format("Loading module at path %s from file %s", path, file.getAbsolutePath()));
-            try {
-                libMgr.write(path, h.withFormat(format));
-            } catch (FailedRequestException fre) {
-                logger.warn("Caught exception, retrying as binary file; exception message: " + fre.getMessage());
-                libMgr.write(path, h.withFormat(Format.BINARY));
+            ExtensionLibrariesManager libMgr = client.newServerConfigManager().newExtensionLibrariesManager();
+            Format format = determineFormat(file);
+            FileHandle h = new FileHandle(file);
+            if (extensionLibraryDescriptorBuilder != null) {
+                ExtensionLibraryDescriptor descriptor = extensionLibraryDescriptorBuilder.buildDescriptor(asset);
+                logger.info(String.format("Loading module at path %s from file %s", descriptor.getPath(),
+                        file.getAbsolutePath()));
+                try {
+                    libMgr.write(descriptor, h.withFormat(format));
+                } catch (FailedRequestException fre) {
+                    logger.warn("Caught exception, retrying as binary file; exception message: " + fre.getMessage());
+                    libMgr.write(descriptor, h.withFormat(Format.BINARY));
+                }
+            } else {
+                String uri = "/ext" + asset.getPath();
+                logger.info(String.format("Loading module at path %s from file %s", uri, file.getAbsolutePath()));
+                try {
+                    libMgr.write(uri, h.withFormat(format));
+                } catch (FailedRequestException fre) {
+                    logger.warn("Caught exception, retrying as binary file; exception message: " + fre.getMessage());
+                    libMgr.write(uri, h.withFormat(Format.BINARY));
+                }
             }
         }
 
@@ -346,4 +375,7 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
         this.catchExceptions = catchExceptions;
     }
 
+    public void setXccAssetLoader(XccAssetLoader xccAssetLoader) {
+        this.xccAssetLoader = xccAssetLoader;
+    }
 }

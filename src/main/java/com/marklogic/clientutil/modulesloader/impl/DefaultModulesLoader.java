@@ -56,7 +56,9 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
     public Set<File> loadModules(File baseDir, DatabaseClient client) {
         setDatabaseClient(client);
 
-        modulesManager.initialize();
+        if (modulesManager != null) {
+            modulesManager.initialize();
+        }
 
         Modules modules = modulesFinder.findModules(baseDir);
 
@@ -150,17 +152,24 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
     public void simulateLoadingOfAllAssets(File baseDir, DatabaseClient client) {
         setDatabaseClient(client);
         Date now = new Date();
-        modulesManager.initialize();
+
+        if (modulesManager != null) {
+            modulesManager.initialize();
+        }
+
         Modules files = modulesFinder.findModules(baseDir);
-        for (Asset asset : files.getAssets()) {
-            modulesManager.saveLastInstalledTimestamp(asset.getFile(), now);
+
+        if (modulesManager != null) {
+            for (Asset asset : files.getAssets()) {
+                modulesManager.saveLastInstalledTimestamp(asset.getFile(), now);
+            }
         }
     }
 
     public File installAsset(Asset asset) {
         File file = asset.getFile();
 
-        if (!modulesManager.hasFileBeenModifiedSinceLastInstalled(file)) {
+        if (modulesManager != null & !modulesManager.hasFileBeenModifiedSinceLastInstalled(file)) {
             return null;
         }
         ExtensionLibrariesManager libMgr = client.newServerConfigManager().newExtensionLibrariesManager();
@@ -186,7 +195,11 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
                 libMgr.write(path, h.withFormat(Format.BINARY));
             }
         }
-        modulesManager.saveLastInstalledTimestamp(file, new Date());
+
+        if (modulesManager != null) {
+            modulesManager.saveLastInstalledTimestamp(file, new Date());
+        }
+
         return file;
     }
 
@@ -210,7 +223,7 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
     }
 
     public File installResource(File file, ExtensionMetadata metadata, MethodParameters... methodParams) {
-        if (!modulesManager.hasFileBeenModifiedSinceLastInstalled(file)) {
+        if (modulesManager != null & !modulesManager.hasFileBeenModifiedSinceLastInstalled(file)) {
             return null;
         }
 
@@ -222,12 +235,16 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
 
         logger.info(String.format("Loading %s resource extension from file %s", resourceName, file));
         extMgr.writeServices(resourceName, new FileHandle(file), metadata, methodParams);
-        modulesManager.saveLastInstalledTimestamp(file, new Date());
+
+        if (modulesManager != null) {
+            modulesManager.saveLastInstalledTimestamp(file, new Date());
+        }
+
         return file;
     }
 
     public File installTransform(File file, ExtensionMetadata metadata) {
-        if (!modulesManager.hasFileBeenModifiedSinceLastInstalled(file)) {
+        if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(file)) {
             return null;
         }
         TransformExtensionsManager mgr = client.newServerConfigManager().newTransformExtensionsManager();
@@ -238,12 +255,16 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
         } else {
             mgr.writeXQueryTransform(transformName, new FileHandle(file), metadata);
         }
-        modulesManager.saveLastInstalledTimestamp(file, new Date());
+
+        if (modulesManager != null) {
+            modulesManager.saveLastInstalledTimestamp(file, new Date());
+        }
+
         return file;
     }
 
     public File installQueryOptions(File f) {
-        if (!modulesManager.hasFileBeenModifiedSinceLastInstalled(f)) {
+        if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(f)) {
             return null;
         }
         String name = getExtensionNameFromFile(f);
@@ -254,12 +275,16 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
         } else {
             mgr.writeOptions(name, new FileHandle(f));
         }
-        modulesManager.saveLastInstalledTimestamp(f, new Date());
+
+        if (modulesManager != null) {
+            modulesManager.saveLastInstalledTimestamp(f, new Date());
+        }
+
         return f;
     }
 
     public File installNamespace(File f) {
-        if (!modulesManager.hasFileBeenModifiedSinceLastInstalled(f)) {
+        if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(f)) {
             return null;
         }
         String prefix = getExtensionNameFromFile(f);
@@ -278,7 +303,10 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
         }
         logger.info(String.format("Adding namespace with prefix of %s and URI of %s", prefix, namespaceUri));
         mgr.addPrefix(prefix, namespaceUri);
-        modulesManager.saveLastInstalledTimestamp(f, new Date());
+
+        if (modulesManager != null) {
+            modulesManager.saveLastInstalledTimestamp(f, new Date());
+        }
         return f;
     }
 

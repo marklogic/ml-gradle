@@ -16,10 +16,6 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 
     protected TokenReplacer tokenReplacer = new DefaultTokenReplacer();
 
-    protected String format(String s, Object... args) {
-        return String.format(s, args);
-    }
-
     protected String copyFileToString(File f) {
         try {
             return new String(FileCopyUtils.copyToByteArray(f));

@@ -8,15 +8,11 @@ public class AbstractManager extends LoggingObject {
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
-    protected String format(String s, Object... args) {
-        return String.format(s, args);
-    }
-
     protected JsonNode parseJson(String json) {
         try {
             return objectMapper.readTree(json);
         } catch (Exception e) {
-            throw new RuntimeException("Unable to parse JSON: " + e.getMessage(), e);
+            throw new RuntimeException(format("Unable to parse JSON: %s", e.getMessage()), e);
         }
     }
 }

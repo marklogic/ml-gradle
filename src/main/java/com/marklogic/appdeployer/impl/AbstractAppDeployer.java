@@ -74,10 +74,6 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
 
         logger.info(format("Undeployed app %s", appConfig.getName()));
     }
-
-    protected String format(String s, Object... args) {
-        return String.format(s, args);
-    }
 }
 
 class ExecuteComparator implements Comparator<Command> {

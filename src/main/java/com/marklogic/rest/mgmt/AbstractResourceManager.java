@@ -77,7 +77,6 @@ public abstract class AbstractResourceManager extends AbstractManager implements
         String name = node.get(getIdFieldName()).asText();
         String label = getResourceName();
         if (exists(name)) {
-            // TODO Need to do an update instead
             logger.info(format("Found %s with name of %s, so so updating", label, name));
             client.putJson(getPropertiesPath(name), json);
             logger.info(format("Updated %s: %s", label, name));

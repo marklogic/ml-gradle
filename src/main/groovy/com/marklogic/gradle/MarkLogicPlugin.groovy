@@ -11,6 +11,7 @@ import com.marklogic.appdeployer.command.databases.CreateTriggersDatabaseCommand
 import com.marklogic.appdeployer.command.databases.UpdateContentDatabasesCommand
 import com.marklogic.appdeployer.command.modules.LoadModulesCommand
 import com.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand
+import com.marklogic.appdeployer.command.security.roles.CreateRolesCommand
 import com.marklogic.appdeployer.command.security.users.CreateUsersCommand
 import com.marklogic.appdeployer.command.servers.UpdateRestApiServersCommand
 import com.marklogic.appdeployer.impl.SimpleAppDeployer
@@ -185,6 +186,7 @@ class MarkLogicPlugin implements Plugin<Project> {
      */
     AppDeployer newAppDeployer(ManageClient manageClient, AdminManager adminManager) {
         List<Command> commands = new ArrayList<Command>()
+        commands.add(new CreateRolesCommand())
         commands.add(new CreateUsersCommand())
         commands.add(new CreateRestApiServersCommand())
         commands.add(new UpdateContentDatabasesCommand())

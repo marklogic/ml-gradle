@@ -2,69 +2,31 @@ package com.marklogic.appdeployer.command.security.users;
 
 import java.io.File;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
+import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.SortOrderConstants;
-import com.marklogic.appdeployer.command.UndoableCommand;
+import com.marklogic.rest.mgmt.ResourceManager;
 import com.marklogic.rest.mgmt.security.users.UserManager;
 
-public class CreateUsersCommand extends AbstractCommand implements UndoableCommand {
-
-    private boolean deleteUsersOnUndo = true;
+public class CreateUsersCommand extends AbstractResourceCommand {
 
     @Override
     public Integer getExecuteSortOrder() {
         return SortOrderConstants.CREATE_USERS;
     }
 
-    @Override
-    public Integer getUndoSortOrder() {
-        return getExecuteSortOrder();
-    }
-
-    @Override
-    public void execute(CommandContext context) {
-        File userDir = getUserDir(context);
-        if (userDir.exists()) {
-            UserManager mgr = new UserManager(context.getManageClient());
-            for (File f : userDir.listFiles()) {
-                if (f.getName().endsWith(".json")) {
-                    mgr.save(copyFileToString(f));
-                }
-            }
-        }
-    }
-
-    protected File getUserDir(CommandContext context) {
+    protected File getResourcesDir(CommandContext context) {
         return new File(context.getAppConfig().getConfigDir().getSecurityDir(), "users");
     }
 
     @Override
-    public void undo(CommandContext context) {
-        if (deleteUsersOnUndo) {
-            File userDir = getUserDir(context);
-            if (userDir.exists()) {
-                UserManager mgr = new UserManager(context.getManageClient());
-                ObjectMapper mapper = new ObjectMapper();
-                for (File f : userDir.listFiles()) {
-                    if (f.getName().endsWith(".json")) {
-                        JsonNode node = null;
-                        try {
-                            node = mapper.readTree(f);
-                        } catch (Exception e) {
-                            throw new RuntimeException("Unable to read user JSON from file: " + f.getAbsolutePath(), e);
-                        }
-                        mgr.delete(node.get("user-name").asText());
-                    }
-                }
-            }
-        }
+    protected ResourceManager getResourceManager(CommandContext context) {
+        return new UserManager(context.getManageClient());
     }
 
-    public void setDeleteUsersOnUndo(boolean deleteUserOnUndo) {
-        this.deleteUsersOnUndo = deleteUserOnUndo;
+    @Override
+    protected String getIdFieldName() {
+        return "user-name";
     }
 
 }

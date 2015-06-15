@@ -10,7 +10,7 @@ import com.marklogic.rest.util.Fragment;
  * management resource. Feel free to override the methods in here in a subclass when those assumptions don't work for a
  * particular resource.
  */
-public abstract class AbstractResourceManager extends AbstractManager {
+public abstract class AbstractResourceManager extends AbstractManager implements ResourceManager {
 
     private ManageClient client;
 

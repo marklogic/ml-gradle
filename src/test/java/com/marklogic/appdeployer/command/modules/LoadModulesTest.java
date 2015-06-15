@@ -43,7 +43,7 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
     @Test
     public void loadModulesWithCustomPermissions() {
         LoadModulesCommand c = new LoadModulesCommand();
-        c.setAssetRolesAndCapabilities("app-user,execute");
+        c.setCustomAssetRolesAndCapabilities("app-user,execute");
 
         initializeAppDeployer(new CreateRestApiServersCommand(), c);
 

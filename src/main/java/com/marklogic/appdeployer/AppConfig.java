@@ -15,9 +15,13 @@ public class AppConfig {
     private String host = "localhost";
 
     // User/password for authenticating against the REST API
-    private String username = "admin";
-    private String password = "admin";
+    private String username;
+    private String password;
     private Authentication authentication = Authentication.DIGEST;
+
+    // User/password for making XDBC calls, usually against port 8000
+    private String xdbcUsername;
+    private String xdbcPassword;
 
     private Integer restPort;
     private Integer testRestPort;
@@ -36,6 +40,11 @@ public class AppConfig {
         modulePaths = new ArrayList<String>();
         modulePaths.add(defaultModulePath);
         configDir = new ConfigDir();
+
+        this.username = "admin";
+        this.password = "admin";
+        this.xdbcUsername = username;
+        this.xdbcPassword = password;
     }
 
     public boolean isTestPortSet() {
@@ -184,6 +193,22 @@ public class AppConfig {
 
     public void setDependencyConfigDirs(List<ConfigDir> dependencyConfigDirs) {
         this.dependencyConfigDirs = dependencyConfigDirs;
+    }
+
+    public String getXdbcUsername() {
+        return xdbcUsername;
+    }
+
+    public void setXdbcUsername(String xdbcUsername) {
+        this.xdbcUsername = xdbcUsername;
+    }
+
+    public String getXdbcPassword() {
+        return xdbcPassword;
+    }
+
+    public void setXdbcPassword(String xdbcPassword) {
+        this.xdbcPassword = xdbcPassword;
     }
 
 }

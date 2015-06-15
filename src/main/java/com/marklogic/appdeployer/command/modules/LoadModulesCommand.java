@@ -9,13 +9,19 @@ import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.clientutil.modulesloader.ModulesLoader;
-import com.marklogic.clientutil.modulesloader.impl.DefaultExtensionLibraryDescriptorBuilder;
 import com.marklogic.clientutil.modulesloader.impl.DefaultModulesLoader;
+import com.marklogic.clientutil.modulesloader.impl.XccAssetLoader;
 
+/**
+ * By default, uses XCC to load modules, as that's normally much faster than using the /v1/ext REST API endpoint.
+ */
 public class LoadModulesCommand extends AbstractCommand {
 
     private ModulesLoader modulesLoader;
-    private String assetRolesAndCapabilities;
+
+    // As defined by the REST API
+    private String defaultAssetRolesAndCapabilities = "rest-admin,read,rest-admin,update,rest-extension-user,execute";
+    private String customAssetRolesAndCapabilities;
 
     @Override
     public Integer getExecuteSortOrder() {
@@ -26,11 +32,7 @@ public class LoadModulesCommand extends AbstractCommand {
     public void execute(CommandContext context) {
         if (modulesLoader == null) {
             DefaultModulesLoader l = new DefaultModulesLoader();
-            if (assetRolesAndCapabilities != null) {
-                logger.info("Will load asset modules with roles and capabilities of: " + assetRolesAndCapabilities);
-                l.setExtensionLibraryDescriptorBuilder(new DefaultExtensionLibraryDescriptorBuilder(
-                        assetRolesAndCapabilities));
-            }
+            l.setXccAssetLoader(newXccAssetLoader(context));
             this.modulesLoader = l;
         }
 
@@ -45,11 +47,40 @@ public class LoadModulesCommand extends AbstractCommand {
         }
     }
 
+    protected XccAssetLoader newXccAssetLoader(CommandContext context) {
+        XccAssetLoader l = new XccAssetLoader();
+        AppConfig config = context.getAppConfig();
+        l.setHost(config.getHost());
+        l.setUsername(config.getXdbcUsername());
+        l.setPassword(config.getXdbcPassword());
+        l.setDatabaseName(config.getModulesDatabaseName());
+
+        String permissions = null;
+        if (defaultAssetRolesAndCapabilities != null) {
+            permissions = defaultAssetRolesAndCapabilities;
+            if (customAssetRolesAndCapabilities != null) {
+                permissions += "," + customAssetRolesAndCapabilities;
+            }
+        } else {
+            permissions = customAssetRolesAndCapabilities;
+        }
+
+        if (permissions != null) {
+            logger.info("Will load asset modules with roles and capabilities of: " + permissions);
+            l.setPermissions(permissions);
+        }
+        return l;
+    }
+
     public void setModulesLoader(ModulesLoader modulesLoader) {
         this.modulesLoader = modulesLoader;
     }
 
-    public void setAssetRolesAndCapabilities(String modulePermissions) {
-        this.assetRolesAndCapabilities = modulePermissions;
+    public void setCustomAssetRolesAndCapabilities(String customAssetRolesAndCapabilities) {
+        this.customAssetRolesAndCapabilities = customAssetRolesAndCapabilities;
+    }
+
+    public void setDefaultAssetRolesAndCapabilities(String defaultAssetRolesAndCapabilities) {
+        this.defaultAssetRolesAndCapabilities = defaultAssetRolesAndCapabilities;
     }
 }

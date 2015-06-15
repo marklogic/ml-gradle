@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
+import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.appdeployer.command.UndoableCommand;
 import com.marklogic.rest.mgmt.security.roles.RoleManager;
 
@@ -15,7 +16,7 @@ public class CreateRolesCommand extends AbstractCommand implements UndoableComma
 
     @Override
     public Integer getExecuteSortOrder() {
-        return 10;
+        return SortOrderConstants.CREATE_ROLES;
     }
 
     @Override

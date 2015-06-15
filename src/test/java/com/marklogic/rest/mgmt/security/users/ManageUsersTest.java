@@ -16,17 +16,17 @@ public class ManageUsersTest extends AbstractMgmtTest {
 
     @Test
     public void doesUserExistTest() {
-        assertTrue(userMgr.userExists("admin"));
+        assertTrue(userMgr.exists("admin"));
     }
 
     @Test
     public void doesUserNotExistTest() {
-        assertFalse(userMgr.userExists("admin123"));
+        assertFalse(userMgr.exists("admin123"));
     }
 
     @Test
     public void createUserTest() {
-        userMgr.createUser("{\"user-name\":\"joe\", \"password\": \"cool\"}");
-        assertTrue(userMgr.userExists("joe"));
+        userMgr.create("{\"user-name\":\"joe\", \"password\": \"cool\"}");
+        assertTrue(userMgr.exists("joe"));
     }
 }

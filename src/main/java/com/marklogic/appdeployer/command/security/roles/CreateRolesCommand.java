@@ -31,7 +31,7 @@ public class CreateRolesCommand extends AbstractCommand implements UndoableComma
             RoleManager mgr = new RoleManager(context.getManageClient());
             for (File f : roleDir.listFiles()) {
                 if (f.getName().endsWith(".json")) {
-                    mgr.createRole(copyFileToString(f));
+                    mgr.create(copyFileToString(f));
                 }
             }
         }
@@ -52,7 +52,7 @@ public class CreateRolesCommand extends AbstractCommand implements UndoableComma
                         } catch (Exception e) {
                             throw new RuntimeException("Unable to read role JSON from file: " + f.getAbsolutePath(), e);
                         }
-                        mgr.deleteRole(node.get("role-name").asText());
+                        mgr.delete(node.get("role-name").asText());
                     }
                 }
             }

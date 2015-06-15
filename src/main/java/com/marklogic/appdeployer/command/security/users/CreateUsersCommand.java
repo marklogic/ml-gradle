@@ -31,7 +31,7 @@ public class CreateUsersCommand extends AbstractCommand implements UndoableComma
             UserManager mgr = new UserManager(context.getManageClient());
             for (File f : userDir.listFiles()) {
                 if (f.getName().endsWith(".json")) {
-                    mgr.createUser(copyFileToString(f));
+                    mgr.create(copyFileToString(f));
                 }
             }
         }
@@ -56,7 +56,7 @@ public class CreateUsersCommand extends AbstractCommand implements UndoableComma
                         } catch (Exception e) {
                             throw new RuntimeException("Unable to read user JSON from file: " + f.getAbsolutePath(), e);
                         }
-                        mgr.deleteUser(node.get("user-name").asText());
+                        mgr.delete(node.get("user-name").asText());
                     }
                 }
             }

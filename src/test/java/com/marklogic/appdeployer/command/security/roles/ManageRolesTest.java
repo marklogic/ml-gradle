@@ -8,14 +8,14 @@ import com.marklogic.rest.mgmt.security.roles.RoleManager;
 public class ManageRolesTest extends AbstractAppDeployerTest {
 
     @Test
-    public void test() {
+    public void createRolesAsPartOfDeploy() {
         RoleManager mgr = new RoleManager(manageClient);
         initializeAppDeployer(new CreateRolesCommand());
 
         appDeployer.deploy(appConfig);
 
-        assertTrue(mgr.roleExists("sample-app-role1"));
-        assertTrue(mgr.roleExists("sample-app-role2"));
+        assertTrue(mgr.exists("sample-app-role1"));
+        assertTrue(mgr.exists("sample-app-role2"));
 
         // Make sure we don't get an error from trying to create the roles again
         appDeployer.deploy(appConfig);
@@ -23,7 +23,7 @@ public class ManageRolesTest extends AbstractAppDeployerTest {
         // Now undo
         appDeployer.undeploy(appConfig);
 
-        assertFalse(mgr.roleExists("sample-app-role1"));
-        assertFalse(mgr.roleExists("sample-app-role2"));
+        assertFalse(mgr.exists("sample-app-role1"));
+        assertFalse(mgr.exists("sample-app-role2"));
     }
 }

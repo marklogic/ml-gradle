@@ -25,12 +25,9 @@ import com.marklogic.xcc.Session;
 import com.marklogic.xcc.exceptions.RequestException;
 
 /**
- * Handles loading assets - defined by the REST API as those in the /ext directory in a modules database - via XCC.
+ * Handles loading assets - as defined by the REST API, which are typically under the /ext directory - via XCC.
  * Currently not a threadsafe class - in order to make it threadsafe, would need to move the impl of FileVisitor to a
  * separate class.
- * 
- * @author rrudin
- *
  */
 public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
 
@@ -55,8 +52,8 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
     private Set<File> filesLoaded;
 
     public void initializeActiveSession() {
-        logger.info(String.format("Initializing XCC session; host: %s; username: %s; database name: %s", host,
-                username, databaseName));
+        logger.info(format("Initializing XCC session; host: %s; username: %s; database name: %s", host, username,
+                databaseName));
         ContentSource cs = ContentSourceFactory.newContentSource(host, port, username, password, databaseName);
         activeSession = cs.newSession();
     }
@@ -83,7 +80,7 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
             options.setCollections(collections);
         }
 
-        logger.info("Inserting module into URI: " + uri);
+        logger.info(format("Inserting module with URI: %s", uri));
         Content content = ContentFactory.newContent(uri, f, options);
         try {
             activeSession.insertContent(content);
@@ -101,11 +98,12 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
         filesLoaded = new HashSet<>();
         try {
             for (String path : paths) {
+                logger.info(format("Loading assets from path: %s", path));
                 this.currentAssetPath = Paths.get(path);
                 try {
                     Files.walkFileTree(this.currentAssetPath, this);
                 } catch (IOException ie) {
-                    throw new RuntimeException("Error while walking assets file tree: " + ie.getMessage(), ie);
+                    throw new RuntimeException(format("Error while walking assets file tree: %s", ie.getMessage()), ie);
                 }
             }
             return filesLoaded;
@@ -119,7 +117,7 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
         if (attributes.isRegularFile()) {
             Path relPath = currentAssetPath.relativize(path);
             String uri = "/" + relPath.toString().replace("\\", "/");
-            loadFile(uri, relPath.toFile());
+            loadFile(uri, path.toFile());
             filesLoaded.add(path.toFile());
         }
         return FileVisitResult.CONTINUE;

@@ -31,7 +31,7 @@ public class CreateRolesCommand extends AbstractCommand implements UndoableComma
             RoleManager mgr = new RoleManager(context.getManageClient());
             for (File f : roleDir.listFiles()) {
                 if (f.getName().endsWith(".json")) {
-                    mgr.create(copyFileToString(f));
+                    mgr.save(copyFileToString(f));
                 }
             }
         }

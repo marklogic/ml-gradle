@@ -31,7 +31,7 @@ public class CreateUsersCommand extends AbstractCommand implements UndoableComma
             UserManager mgr = new UserManager(context.getManageClient());
             for (File f : userDir.listFiles()) {
                 if (f.getName().endsWith(".json")) {
-                    mgr.create(copyFileToString(f));
+                    mgr.save(copyFileToString(f));
                 }
             }
         }

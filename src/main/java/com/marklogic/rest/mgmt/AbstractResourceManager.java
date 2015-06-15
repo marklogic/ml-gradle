@@ -57,6 +57,10 @@ public abstract class AbstractResourceManager extends AbstractManager {
         return format("%s/%s", getResourcesPath(), resourceNameOrId);
     }
 
+    public String getPropertiesPath(String resourceNameOrId) {
+        return format("%s/properties", getResourcePath(resourceNameOrId));
+    }
+
     public boolean exists(String resourceNameOrId) {
         String xpath = format("/msec:%s/msec:list-items/msec:list-item[msec:nameref = '%s' or msec:idref = '%s']",
                 getResourcesRootElementName(), resourceNameOrId, resourceNameOrId);
@@ -64,13 +68,19 @@ public abstract class AbstractResourceManager extends AbstractManager {
         return f.elementExists(xpath);
     }
 
-    public void create(String json) {
+    public Fragment getAsXml(String resourceNameOrId) {
+        return client.getXml(getResourcePath(resourceNameOrId));
+    }
+
+    public void save(String json) {
         JsonNode node = parseJson(json);
         String name = node.get(getIdFieldName()).asText();
         String label = getResourceName();
         if (exists(name)) {
             // TODO Need to do an update instead
-            logger.info(format("Found %s with name of %s, so not creating", label, name));
+            logger.info(format("Found %s with name of %s, so so updating", label, name));
+            client.putJson(getPropertiesPath(name), json);
+            logger.info(format("Updated %s: %s", label, name));
         } else {
             logger.info(format("Creating %s: %s", label, name));
             client.postJson(getResourcesPath(), json);

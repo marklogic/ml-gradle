@@ -34,13 +34,4 @@ class MarkLogicTask extends DefaultTask {
         AppConfig config = getAppConfig()
         return DatabaseClientFactory.newClient(config.host, config.restPort, config.username, config.password, config.authentication)
     }
-
-    RestHelper newRestHelper() {
-        AppConfig config = getAppConfig()
-        RestHelper h = new RestHelper()
-        h.setUrl("http://" + config.getHost() + ":" + config.getRestPort())
-        h.setUsername(config.getUsername())
-        h.setPassword(config.getPassword())
-        return h
-    }
 }

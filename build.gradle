@@ -3,6 +3,9 @@ apply plugin: 'maven-publish'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 
+sourceCompatibility = "1.7"
+targetCompatibility = "1.7"
+
 repositories {
   mavenCentral()
   maven {url "http://developer.marklogic.com/maven2/"}

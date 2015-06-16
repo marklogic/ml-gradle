@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.command.security.users;
+package com.marklogic.appdeployer.command.security.roles;
 
 import java.io.File;
 
@@ -6,27 +6,27 @@ import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.rest.mgmt.ResourceManager;
-import com.marklogic.rest.mgmt.security.users.UserManager;
+import com.marklogic.rest.mgmt.security.roles.RoleManager;
 
-public class CreateUsersCommand extends AbstractResourceCommand {
+public class CreateRolesCommand extends AbstractResourceCommand {
 
     @Override
     public Integer getExecuteSortOrder() {
-        return SortOrderConstants.CREATE_USERS;
+        return SortOrderConstants.CREATE_ROLES;
     }
 
     protected File getResourcesDir(CommandContext context) {
-        return new File(context.getAppConfig().getConfigDir().getSecurityDir(), "users");
+        return new File(context.getAppConfig().getConfigDir().getSecurityDir(), "roles");
     }
 
     @Override
     protected ResourceManager getResourceManager(CommandContext context) {
-        return new UserManager(context.getManageClient());
+        return new RoleManager(context.getManageClient());
     }
 
     @Override
     protected String getIdFieldName() {
-        return "user-name";
+        return "role-name";
     }
 
 }

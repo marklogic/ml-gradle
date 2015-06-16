@@ -14,8 +14,8 @@ public class CreateUsersTest extends AbstractAppDeployerTest {
 
         appDeployer.deploy(appConfig);
 
-        assertTrue(mgr.userExists("sample-app-jane"));
-        assertTrue(mgr.userExists("sample-app-john"));
+        assertTrue(mgr.exists("sample-app-jane"));
+        assertTrue(mgr.exists("sample-app-john"));
 
         // Make sure we don't get an error from trying to create the users again
         appDeployer.deploy(appConfig);
@@ -23,7 +23,7 @@ public class CreateUsersTest extends AbstractAppDeployerTest {
         // Now undo
         appDeployer.undeploy(appConfig);
 
-        assertFalse(mgr.userExists("sample-app-jane"));
-        assertFalse(mgr.userExists("sample-app-john"));
+        assertFalse(mgr.exists("sample-app-jane"));
+        assertFalse(mgr.exists("sample-app-john"));
     }
 }

@@ -1,9 +1,10 @@
-package com.marklogic.appdeployer.command.security.users;
+package com.marklogic.appdeployer.command.security;
 
 import org.junit.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.rest.mgmt.security.users.UserManager;
+import com.marklogic.appdeployer.command.security.CreateUsersCommand;
+import com.marklogic.rest.mgmt.security.UserManager;
 
 public class CreateUsersTest extends AbstractAppDeployerTest {
 

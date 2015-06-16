@@ -1,4 +1,4 @@
-package com.marklogic.rest.mgmt.security.roles;
+package com.marklogic.rest.mgmt.security;
 
 import com.marklogic.rest.mgmt.AbstractResourceManager;
 import com.marklogic.rest.mgmt.ManageClient;

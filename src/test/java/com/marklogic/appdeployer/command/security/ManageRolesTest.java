@@ -1,9 +1,10 @@
-package com.marklogic.appdeployer.command.security.roles;
+package com.marklogic.appdeployer.command.security;
 
 import org.junit.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.rest.mgmt.security.roles.RoleManager;
+import com.marklogic.appdeployer.command.security.CreateRolesCommand;
+import com.marklogic.rest.mgmt.security.RoleManager;
 import com.marklogic.rest.util.Fragment;
 
 public class ManageRolesTest extends AbstractAppDeployerTest {

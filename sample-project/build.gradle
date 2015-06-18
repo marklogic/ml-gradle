@@ -1,0 +1,105 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {url "http://developer.marklogic.com/maven2/"}
+        maven {url "http://rjrudin.github.io/marklogic-java/releases"}
+        maven {url "../../gh-pages-marklogic-java/releases"}
+    }
+
+    dependencies {  classpath "com.marklogic:ml-gradle:2.0-alpha-4" }
+}
+
+apply plugin: 'ml-gradle'
+
+//
+// To use ml-gradle, you only need what is above this line. Everything below this line is optional and is intended to
+// show different features provided by ml-gradle.
+//
+
+// For generating IDE project files you might consider leveraging the Eclipse or IntelliJ IDEA plugin.
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
+/*
+ * This lists the repositories for finding project dependencies (which differ from buildscript dependencies - buildscript
+ * dependencies are not included in project artifacts that are built). These repositories are needed to satisfy the
+ * dependencies expressed below.
+ */
+repositories {
+    mavenCentral()
+    maven {url "file:../../gh-pages-marklogic-java/releases"}
+    maven {url "http://developer.marklogic.com/maven2/"}
+    maven {url "http://rjrudin.github.io/marklogic-java/releases"}
+}
+
+/*
+ * This custom Gradle configuration allows us to specify the classpath for running Corb jobs. This is only needed if 
+ * you want to run Corb jobs via Gradle tasks. More info on Corb can be found at - http://developer.marklogic.com/code/corb.
+ */
+configurations { corb }
+
+/*
+ * This expresses dependencies on the ml-java and ml-junit libraries. The former is typically used for application
+ * code, and the latter supports writing JUnit-based tests. A dependency exists on RestAssured to show an option for
+ * using that library in tests that must invoke MarkLogic HTTP endpoints.
+ */
+dependencies {
+    compile "com.marklogic:ml-javaclient-util:2.0.3"
+    testCompile "com.marklogic:ml-junit:2.0.2"
+    testCompile "com.jayway.restassured:rest-assured:2.3.1"
+
+    // Located at https://github.com/rjrudin/marklogic-java/tree/gh-pages/releases/com/marklogic/corb
+    corb "com.marklogic:corb:1.0"
+    corb "com.marklogic:marklogic-xcc:8.0.2"
+}
+
+/*
+ * This is an example of both a custom Gradle task and an easy way of invoking Corb. This depends on "mlLoadModules" to
+ * ensure that the Corb uris/transform modules are loaded. It also uses as a classpath the custom configuration named
+ * "corb" that we defined earlier. Note that sample uris.xqy and transform.xqy modules just print a log statement for
+ * each document in your content database, so unless there are documents, you won't see any result from this.
+ */
+task runCorb(dependsOn: ['mlLoadModules'], type: JavaExec) {
+    main = 'com.marklogic.developer.corb.Manager'
+    classpath = configurations.corb
+    args = [mlAppConfig.contentXccUrl, '""', 'transform.xqy', '4', 'uris.xqy', '/ext/corb/', 'sample-project-modules', 'false']
+}
+
+/*
+ * For tests that reference test files in the test source tree, we need to tell Gradle to copy these to src/test/resources
+ * so that they can be found when running "gradle test".
+ */
+sourceSets.test.resources.srcDir 'src/test/java'
+
+/*
+ * Example of a custom command and how it's added to the AppDeployer. This could also be defined in the Gradle buildSrc
+ * directory (that's more likely the better option for keeping your build.gradle file slim)
+ */
+ext {
+    mlAppDeployer.commands.add(new MergeContentDatabaseCommand())
+}
+
+import com.marklogic.appdeployer.command.*
+
+class MergeContentDatabaseCommand extends AbstractCommand {
+
+    public Integer getExecuteSortOrder() {
+        return 1000;
+    }
+    
+    public void execute(CommandContext context) {
+        def contentDatabaseName = context.getAppConfig().getContentDatabaseName()
+        println "Merging content database"
+        context.getManageClient().postJson("/manage/v2/databases/" + contentDatabaseName, '{"operation":"merge-database"}')
+    }
+}
+
+/*
+ * Example of doing a database merge, but not as part of the deployment process.
+ */
+task mergeContentDatabase(type: com.marklogic.gradle.task.MarkLogicTask) {
+    doLast {
+        getManageClient().postJson("/manage/v2/databases/" + getAppConfig().getContentDatabaseName(), '{"operation":"merge-database"}')
+    }
+}

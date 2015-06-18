@@ -77,9 +77,12 @@ public abstract class AbstractResourceManager extends AbstractManager implements
         String name = node.get(getIdFieldName()).asText();
         String label = getResourceName();
         if (exists(name)) {
-            logger.info(format("Found %s with name of %s, so so updating", label, name));
-            client.putJson(getPropertiesPath(name), json);
-            logger.info(format("Updated %s: %s", label, name));
+            String path = getPropertiesPath(name);
+            path = appendParamsAndValuesToPath(path, getResourceParams(node));
+
+            logger.info(format("Found %s with name of %s, so updating ", label, path));
+            client.putJson(path, json);
+            logger.info(format("Updated %s at %s", label, path));
         } else {
             logger.info(format("Creating %s: %s", label, name));
             client.postJson(getResourcesPath(), json);
@@ -87,15 +90,44 @@ public abstract class AbstractResourceManager extends AbstractManager implements
         }
     }
 
-    public void delete(String resourceNameOrId) {
+    public void delete(String json) {
+        JsonNode node = parseJson(json);
+        String name = node.get(getIdFieldName()).asText();
+
         String label = getResourceName();
-        if (!exists(resourceNameOrId)) {
-            logger.info(format("Could not find %s with name or ID of %s, so not deleting", label, resourceNameOrId));
+        if (!exists(name)) {
+            logger.info(format("Could not find %s with name or ID of %s, so not deleting", label, name));
         } else {
-            logger.info(format("Deleting %s: %s", label, resourceNameOrId));
-            client.delete(getResourcePath(resourceNameOrId));
-            logger.info(format("Deleted %s: %s", label, resourceNameOrId));
+            String path = getResourcePath(name);
+            path = appendParamsAndValuesToPath(path, getResourceParams(node));
+
+            logger.info(format("Deleting %s at path %s", label, path));
+            client.delete(path);
+            logger.info(format("Deleted %s at path %s", label, path));
         }
+    }
+
+    protected String appendParamsAndValuesToPath(String path, String... paramsAndValues) {
+        if (paramsAndValues.length > 0) {
+            path += "?";
+            for (int i = 0; i < paramsAndValues.length; i += 2) {
+                if (i > 0) {
+                    path += "&";
+                }
+                path += paramsAndValues[i] + "=" + paramsAndValues[i + 1];
+            }
+        }
+        return path;
+    }
+
+    /**
+     * Can be overridden by subclass to provide custom querystring parameters.
+     * 
+     * @param node
+     * @return
+     */
+    protected String[] getResourceParams(JsonNode node) {
+        return new String[] {};
     }
 
 }

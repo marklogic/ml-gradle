@@ -3,49 +3,48 @@ package com.marklogic.appdeployer;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.marklogic.client.DatabaseClientFactory.Authentication;
+
+/**
+ * Encapsulates the connection information for an application and where its modules can be found. Should possibly add
+ * ConfigDir to this.
+ */
 public class AppConfig {
 
     private String name;
     private String host = "localhost";
-    private String username = "admin";
-    private String password = "admin";
+
+    // User/password for authenticating against the REST API
+    private String username;
+    private String password;
+    private Authentication authentication = Authentication.DIGEST;
+
+    // User/password for making XDBC calls, usually against port 8000
+    private String xdbcUsername;
+    private String xdbcPassword;
 
     private Integer restPort;
-    private Integer xdbcPort;
     private Integer testRestPort;
-    private Integer testXdbcPort;
-    private Integer modulesXdbcPort;
 
-    private String defaultModulePath;
     private List<String> modulePaths;
+    private ConfigDir configDir;
+    private List<ConfigDir> dependencyConfigDirs;
 
     private String groupName = "Default";
-    private String contentDatabaseFilePath;
-    private String httpServerFilePath;
-    private String triggersDatabaseFilePath;
-    private String schemasDatabaseFilePath;
-    private String xdbcServerFilePath;
 
-    private List<String> databasePackageFilePaths;
-    private String mergedDatabasePackageFilePath = "build/ml-app-deployer/merged-database-package.xml";
-
-    private List<String> httpServerPackageFilePaths;
-    private String mergedHttpServerPackageFilePath = "build/ml-app-deployer/merged-http-server-package.xml";
-    
     public AppConfig() {
-        this("src/main/xqy");
+        this("src/main/ml-modules");
     }
 
     public AppConfig(String defaultModulePath) {
-        this.defaultModulePath = defaultModulePath;
-
         modulePaths = new ArrayList<String>();
         modulePaths.add(defaultModulePath);
-        contentDatabaseFilePath = defaultModulePath + "/packages/content-database.xml";
-        httpServerFilePath = defaultModulePath + "/packages/http-server.xml";
-        triggersDatabaseFilePath = defaultModulePath + "/packages/triggers-database.xml";
-        schemasDatabaseFilePath = defaultModulePath + "/packages/schemas-database.xml";
-        xdbcServerFilePath = defaultModulePath + "/packages/xdbc-server.xml";
+        configDir = new ConfigDir();
+
+        this.username = "admin";
+        this.password = "admin";
+        this.xdbcUsername = username;
+        this.xdbcPassword = password;
     }
 
     public boolean isTestPortSet() {
@@ -96,16 +95,16 @@ public class AppConfig {
         return name + "-schemas";
     }
 
-    public String getXccUrl() {
-        return String.format("xcc://%s:%s@%s:%d", username, password, host, xdbcPort);
+    public String getContentXccUrl() {
+        return String.format("xcc://%s:%s@%s:8000/%s", username, password, host, getContentDatabaseName());
     }
 
-    public String getTestXccUrl() {
-        return String.format("xcc://%s:%s@%s:%d", username, password, host, testXdbcPort);
+    public String getTestContentXccUrl() {
+        return String.format("xcc://%s:%s@%s:8000/%s", username, password, host, getTestContentDatabaseName());
     }
 
     public String getModulesXccUrl() {
-        return String.format("xcc://%s:%s@%s:%d", username, password, host, modulesXdbcPort);
+        return String.format("xcc://%s:%s@%s:8000/%s", username, password, host, getModulesDatabaseName());
     }
 
     public String getName() {
@@ -148,44 +147,12 @@ public class AppConfig {
         this.restPort = restPort;
     }
 
-    public Integer getXdbcPort() {
-        return xdbcPort;
-    }
-
-    public void setXdbcPort(Integer xdbcPort) {
-        this.xdbcPort = xdbcPort;
-    }
-
     public Integer getTestRestPort() {
         return testRestPort;
     }
 
     public void setTestRestPort(Integer testRestPort) {
         this.testRestPort = testRestPort;
-    }
-
-    public Integer getTestXdbcPort() {
-        return testXdbcPort;
-    }
-
-    public void setTestXdbcPort(Integer testXdbcPort) {
-        this.testXdbcPort = testXdbcPort;
-    }
-
-    public Integer getModulesXdbcPort() {
-        return modulesXdbcPort;
-    }
-
-    public void setModulesXdbcPort(Integer modulesXdbcPort) {
-        this.modulesXdbcPort = modulesXdbcPort;
-    }
-
-    public String getDefaultModulePath() {
-        return defaultModulePath;
-    }
-
-    public void setDefaultModulePath(String defaultModulePath) {
-        this.defaultModulePath = defaultModulePath;
     }
 
     public List<String> getModulePaths() {
@@ -196,22 +163,6 @@ public class AppConfig {
         this.modulePaths = modulePaths;
     }
 
-    public String getContentDatabaseFilePath() {
-        return contentDatabaseFilePath;
-    }
-
-    public void setContentDatabaseFilePath(String contentDatabaseFilePath) {
-        this.contentDatabaseFilePath = contentDatabaseFilePath;
-    }
-
-    public String getHttpServerFilePath() {
-        return httpServerFilePath;
-    }
-
-    public void setHttpServerFilePath(String httpServerFilePath) {
-        this.httpServerFilePath = httpServerFilePath;
-    }
-
     public String getGroupName() {
         return groupName;
     }
@@ -220,60 +171,44 @@ public class AppConfig {
         this.groupName = groupName;
     }
 
-    public String getTriggersDatabaseFilePath() {
-        return triggersDatabaseFilePath;
+    public Authentication getAuthentication() {
+        return authentication;
     }
 
-    public void setTriggersDatabaseFilePath(String triggersDatabaseFilePath) {
-        this.triggersDatabaseFilePath = triggersDatabaseFilePath;
+    public void setAuthentication(Authentication authentication) {
+        this.authentication = authentication;
     }
 
-    public String getSchemasDatabaseFilePath() {
-        return schemasDatabaseFilePath;
+    public ConfigDir getConfigDir() {
+        return configDir;
     }
 
-    public void setSchemasDatabaseFilePath(String schemasDatabaseFilePath) {
-        this.schemasDatabaseFilePath = schemasDatabaseFilePath;
+    public void setConfigDir(ConfigDir configDir) {
+        this.configDir = configDir;
     }
 
-    public String getXdbcServerFilePath() {
-        return xdbcServerFilePath;
+    public List<ConfigDir> getDependencyConfigDirs() {
+        return dependencyConfigDirs;
     }
 
-    public void setXdbcServerFilePath(String xdbcServerFilePath) {
-        this.xdbcServerFilePath = xdbcServerFilePath;
+    public void setDependencyConfigDirs(List<ConfigDir> dependencyConfigDirs) {
+        this.dependencyConfigDirs = dependencyConfigDirs;
     }
 
-    public List<String> getDatabasePackageFilePaths() {
-        return databasePackageFilePaths;
+    public String getXdbcUsername() {
+        return xdbcUsername;
     }
 
-    public void setDatabasePackageFilePaths(List<String> databasePackageFilePaths) {
-        this.databasePackageFilePaths = databasePackageFilePaths;
+    public void setXdbcUsername(String xdbcUsername) {
+        this.xdbcUsername = xdbcUsername;
     }
 
-    public String getMergedDatabasePackageFilePath() {
-        return mergedDatabasePackageFilePath;
+    public String getXdbcPassword() {
+        return xdbcPassword;
     }
 
-    public void setMergedDatabasePackageFilePath(String mergedDatabasePackageFilePath) {
-        this.mergedDatabasePackageFilePath = mergedDatabasePackageFilePath;
-    }
-
-    public List<String> getHttpServerPackageFilePaths() {
-        return httpServerPackageFilePaths;
-    }
-
-    public void setHttpServerPackageFilePaths(List<String> httpServerPackageFilePaths) {
-        this.httpServerPackageFilePaths = httpServerPackageFilePaths;
-    }
-
-    public String getMergedHttpServerPackageFilePath() {
-        return mergedHttpServerPackageFilePath;
-    }
-
-    public void setMergedHttpServerPackageFilePath(String mergedHttpServerPackageFilePath) {
-        this.mergedHttpServerPackageFilePath = mergedHttpServerPackageFilePath;
+    public void setXdbcPassword(String xdbcPassword) {
+        this.xdbcPassword = xdbcPassword;
     }
 
 }

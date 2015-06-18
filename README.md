@@ -3,7 +3,7 @@
 ml-app-deployer is being rebuilt to utilize the new Management REST API in MarkLogic 8. If you'd like to contribute to
 this effort, please read the CONTRIBUTING.md file and check out the issues on the right. 
 
-Development for this is currently happening on the dev branch.
+Development for this is currently happening on the dev branch. To see the new directory structure for ML config files as it's evolving, go to https://github.com/rjrudin/ml-app-deployer/tree/dev/src/test/resources/sample-app/src/main/ml-config . 
 
 # ml-app-deployer for MarkLogic 7
 

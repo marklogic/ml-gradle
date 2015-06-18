@@ -19,12 +19,7 @@ public class AmpManager extends AbstractResourceManager {
     }
 
     @Override
-    protected String[] getDeleteParams(JsonNode node) {
-        return getUpdateParams(node);
-    }
-
-    @Override
-    protected String[] getUpdateParams(JsonNode node) {
+    protected String[] getResourceParams(JsonNode node) {
         List<String> params = new ArrayList<String>();
         params.add("document-uri");
         params.add(node.get("document-uri").asText());

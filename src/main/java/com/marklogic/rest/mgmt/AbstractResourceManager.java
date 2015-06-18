@@ -78,11 +78,11 @@ public abstract class AbstractResourceManager extends AbstractManager implements
         String label = getResourceName();
         if (exists(name)) {
             String path = getPropertiesPath(name);
-            path = appendParamsAndValuesToPath(path, getUpdateParams(node));
+            path = appendParamsAndValuesToPath(path, getResourceParams(node));
 
-            logger.info(format("Found %s with name of %s, so updating", label, name));
+            logger.info(format("Found %s with name of %s, so updating ", label, path));
             client.putJson(path, json);
-            logger.info(format("Updated %s: %s", label, name));
+            logger.info(format("Updated %s at %s", label, path));
         } else {
             logger.info(format("Creating %s: %s", label, name));
             client.postJson(getResourcesPath(), json);
@@ -99,7 +99,7 @@ public abstract class AbstractResourceManager extends AbstractManager implements
             logger.info(format("Could not find %s with name or ID of %s, so not deleting", label, name));
         } else {
             String path = getResourcePath(name);
-            path = appendParamsAndValuesToPath(path, getDeleteParams(node));
+            path = appendParamsAndValuesToPath(path, getResourceParams(node));
 
             logger.info(format("Deleting %s at path %s", label, path));
             client.delete(path);
@@ -126,17 +126,7 @@ public abstract class AbstractResourceManager extends AbstractManager implements
      * @param node
      * @return
      */
-    protected String[] getDeleteParams(JsonNode node) {
-        return new String[] {};
-    }
-
-    /**
-     * Can be overridden by subclass to provide custom querystring parameters.
-     * 
-     * @param node
-     * @return
-     */
-    protected String[] getUpdateParams(JsonNode node) {
+    protected String[] getResourceParams(JsonNode node) {
         return new String[] {};
     }
 

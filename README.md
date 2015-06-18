@@ -19,7 +19,7 @@ Essentially, if you're using MarkLogic and Java, then ml-gradle is probably a go
 
 Here are some of the main features of ml-gradle:
 
-1. Utilizes the new (Management REST API)[http://docs.marklogic.com/REST/management) in MarkLogic 8 to configure all aspects of an application.
+1. Utilizes the new [Management REST API](http://docs.marklogic.com/REST/management) in MarkLogic 8 to configure all aspects of an application.
 1. Can watch for new/modified modules and automatically load them for you, thus simplifying the code/build/test cycle
 1. Can treat packages of XQuery code as true third-party dependencies, resolving them just like you would a dependency on a jar, as well as automatically loading such code into your modules database
 1. Can easily run MarkLogic Content Pump and Corb without having to copy jars around and worry about a classpath

@@ -1,7 +1,6 @@
 package com.marklogic.appdeployer;
 
 import java.io.File;
-import java.util.Arrays;
 
 import org.junit.After;
 import org.junit.Before;
@@ -63,9 +62,7 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
      * @param commands
      */
     protected void initializeAppDeployer(Command... commands) {
-        SimpleAppDeployer m = new SimpleAppDeployer(manageClient, adminManager);
-        m.setCommands(Arrays.asList(commands));
-        appDeployer = m;
+        appDeployer = new SimpleAppDeployer(manageClient, adminManager, commands);
     }
 
     /**

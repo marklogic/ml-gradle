@@ -11,6 +11,13 @@ public class AdminManager extends AbstractManager {
     private RestTemplate restTemplate;
     private AdminConfig adminConfig;
 
+    /**
+     * Can use this constructor when the default values in ManageConfig will work.
+     */
+    public AdminManager() {
+        this(new AdminConfig());
+    }
+
     public AdminManager(AdminConfig adminConfig) {
         this.adminConfig = adminConfig;
         this.restTemplate = RestTemplateUtil.newRestTemplate(adminConfig);
@@ -23,7 +30,7 @@ public class AdminManager extends AbstractManager {
             waitForRestart(lastRestartTimestamp);
         }
     }
-    
+
     public String getLastRestartTimestamp() {
         return restTemplate.getForEntity(adminConfig.getBaseUrl() + "/admin/v1/timestamp", String.class).getBody();
     }

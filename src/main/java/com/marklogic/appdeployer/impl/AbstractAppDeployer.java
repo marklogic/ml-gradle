@@ -23,12 +23,24 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
     private ManageClient manageClient;
     private AdminManager adminManager;
 
+    /**
+     * Can use this constructor when the default config used by ManageClient and AdminManager will work.
+     */
+    public AbstractAppDeployer() {
+        this(new ManageClient(), new AdminManager());
+    }
+
     public AbstractAppDeployer(ManageClient manageClient, AdminManager adminManager) {
         super();
         this.manageClient = manageClient;
         this.adminManager = adminManager;
     }
 
+    /**
+     * The subclass just needs to define the list of commands to be invoked.
+     * 
+     * @return
+     */
     protected abstract List<Command> getCommands();
 
     public void deploy(AppConfig appConfig) {

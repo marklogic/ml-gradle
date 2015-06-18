@@ -34,20 +34,24 @@ The best way to understand that directory is to look at the [sample-app applicat
 
 The logic for when to look for files is encapsulated in Command objects. A deployment is performed by one or more Command objects. Thus, the general pattern for using the deployer library is:
 
-1. Create an instance of SimpleAppDeployer (there is a Spring-based implementation too, but that's more of a science project)
+1. Create an instance of SimpleAppDeployer, which implements the AppDeployer interface
 2. Set a list of commands on the SimpleAppDeployer instance
 3. Call the "deploy" method to invoke each of the commands in a specific order
 
-Here's a brief example of what that looks like - note that we'll reuse our ManageClient from above:
+Here's a brief example of what that looks like - note that we'll reuse our ManageClient from above, and we'll deploy an 
+application that needs to create a REST API server named "my-app" on port 8123 and create some users too - the config for both of those will be read from
+files in the ml-config directory structure:
 
     ManageClient client = new ManageClient(); // defaults to localhost/8002/admin/admin
-    SimpleAppDeployer deployer = new SimpleAppDeployer(client);
-    List<Command> commands = new ArrayList<>();
-    commands.add(new CreateRestApiServersCommand());
-    commands.add(new CreateUsersCommand());
+    AdminManager manager = new AdminManager(); // used for restarting ML; defaults to localhost/8001/admin/admin
+    AppDeployer deployer = new SimpleAppDeployer(client, manager, new CreateRestApiServersCommand(), new CreateUsersCommand());
     
     AppConfig config = new AppConfig(); // contains all configuration about the application being deployed
     config.setName("my-app");
     config.setRestPort(8123);
     
     deployer.deploy(config); // calls each command, passing the AppConfig and ManageClient to each one
+    
+    // do some other stuff...
+    
+    deployer.undeploy(config); // calls each command, giving each a chance to undo what it did before

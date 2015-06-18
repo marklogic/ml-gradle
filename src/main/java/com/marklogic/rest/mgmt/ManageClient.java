@@ -26,6 +26,13 @@ public class ManageClient extends LoggingObject {
     private RestTemplate restTemplate;
     private String baseUrl;
 
+    /**
+     * Can use this constructor when the default values in ManageConfig will work.
+     */
+    public ManageClient() {
+        this(new ManageConfig());
+    }
+
     public ManageClient(ManageConfig config) {
         initialize(config);
     }

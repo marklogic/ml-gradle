@@ -1,5 +1,7 @@
 package com.marklogic.rest.mgmt;
 
+import com.marklogic.rest.util.Fragment;
+
 /**
  * Interface that AbstractResourceCommand is bound to. If you can implement this - most likely by subclassing
  * AbstractResourceManager - then you should be able to subclass AbstractResourceCommand in order to very easily
@@ -26,4 +28,6 @@ public interface ResourceManager {
      * @param resourceNameOrId
      */
     public void delete(String resourceNameOrId);
+
+    public Fragment getAsXml(String resourceNameOrId);
 }

@@ -1,40 +1,33 @@
 package com.marklogic.appdeployer.command.security;
 
+import org.junit.Before;
 import org.junit.Test;
 
-import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.appdeployer.command.security.CreateRolesCommand;
+import com.marklogic.appdeployer.command.AbstractManageResourceTest;
+import com.marklogic.rest.mgmt.ResourceManager;
 import com.marklogic.rest.mgmt.security.RoleManager;
 import com.marklogic.rest.util.Fragment;
 
-public class ManageRolesTest extends AbstractAppDeployerTest {
+public class ManageRolesTest extends AbstractManageResourceTest {
 
-    @Test
-    public void createRolesAsPartOfDeploy() {
-        RoleManager mgr = new RoleManager(manageClient);
+    @Before
+    public void setup() {
         initializeAppDeployer(new CreateRolesCommand());
+    }
+    
+    @Override
+    protected ResourceManager newResourceManager() {
+        return new RoleManager(manageClient);
+    }
 
-        appDeployer.deploy(appConfig);
-
-        assertTrue(mgr.exists("sample-app-role1"));
-        assertTrue(mgr.exists("sample-app-role2"));
-
-        try {
-            // Make sure we don't get an error from trying to create the roles again
-            appDeployer.deploy(appConfig);
-        } finally {
-            // Now undo
-            appDeployer.undeploy(appConfig);
-
-            assertFalse(mgr.exists("sample-app-role1"));
-            assertFalse(mgr.exists("sample-app-role2"));
-        }
+    @Override
+    protected String[] getResourceNames() {
+        return new String[] { "sample-app-role1", "sample-app-role2" };
     }
 
     @Test
     public void updateRole() {
         RoleManager mgr = new RoleManager(manageClient);
-        initializeAppDeployer(new CreateRolesCommand());
 
         appDeployer.deploy(appConfig);
 
@@ -51,4 +44,5 @@ public class ManageRolesTest extends AbstractAppDeployerTest {
         }
 
     }
+
 }

@@ -12,12 +12,15 @@ public abstract class AbstractManageResourceTest extends AbstractAppDeployerTest
 
     protected abstract ResourceManager newResourceManager();
 
+    protected abstract Command newCommand();
+
     protected abstract String[] getResourceNames();
 
     @Test
     public void createThenDelete() {
         ResourceManager mgr = newResourceManager();
 
+        initializeAppDeployer(newCommand());
         appDeployer.deploy(appConfig);
 
         for (String name : getResourceNames()) {

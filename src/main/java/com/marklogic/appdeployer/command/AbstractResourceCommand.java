@@ -2,8 +2,6 @@ package com.marklogic.appdeployer.command;
 
 import java.io.File;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marklogic.rest.mgmt.ResourceManager;
 
 /**
@@ -17,8 +15,6 @@ public abstract class AbstractResourceCommand extends AbstractCommand implements
     protected abstract File getResourcesDir(CommandContext context);
 
     protected abstract ResourceManager getResourceManager(CommandContext context);
-
-    protected abstract String getIdFieldName();
 
     @Override
     public Integer getUndoSortOrder() {
@@ -44,16 +40,9 @@ public abstract class AbstractResourceCommand extends AbstractCommand implements
             File resourceDir = getResourcesDir(context);
             if (resourceDir.exists()) {
                 ResourceManager mgr = getResourceManager(context);
-                ObjectMapper mapper = new ObjectMapper();
                 for (File f : resourceDir.listFiles()) {
                     if (f.getName().endsWith(".json")) {
-                        JsonNode node = null;
-                        try {
-                            node = mapper.readTree(f);
-                        } catch (Exception e) {
-                            throw new RuntimeException("Unable to read JSON from file: " + f.getAbsolutePath(), e);
-                        }
-                        mgr.delete(node.get(getIdFieldName()).asText());
+                        mgr.delete(copyFileToString(f));
                     }
                 }
             }

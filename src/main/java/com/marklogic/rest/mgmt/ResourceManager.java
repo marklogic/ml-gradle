@@ -27,7 +27,12 @@ public interface ResourceManager {
      * 
      * @param resourceNameOrId
      */
-    public void delete(String resourceNameOrId);
+    public void delete(String json);
 
+    /**
+     * 
+     * @param resourceNameOrId
+     * @return
+     */
     public Fragment getAsXml(String resourceNameOrId);
 }

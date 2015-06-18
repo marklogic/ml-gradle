@@ -24,9 +24,4 @@ public class CreateAmpsCommand extends AbstractResourceCommand {
         return new AmpManager(context.getManageClient());
     }
 
-    @Override
-    protected String getIdFieldName() {
-        return "local-name";
-    }
-
 }

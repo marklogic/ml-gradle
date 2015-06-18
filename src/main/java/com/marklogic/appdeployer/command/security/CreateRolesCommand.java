@@ -24,9 +24,4 @@ public class CreateRolesCommand extends AbstractResourceCommand {
         return new RoleManager(context.getManageClient());
     }
 
-    @Override
-    protected String getIdFieldName() {
-        return "role-name";
-    }
-
 }

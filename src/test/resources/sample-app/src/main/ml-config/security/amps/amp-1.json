@@ -1,0 +1,7 @@
+{
+  "namespace": "http://example.com/uri",
+  "local-name": "sample-app-amp-1",
+  "document-uri": "/module/path/name",
+  "modules-database": "",
+  "role": ["app-user"]
+}

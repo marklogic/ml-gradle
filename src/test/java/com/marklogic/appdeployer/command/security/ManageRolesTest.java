@@ -1,23 +1,23 @@
 package com.marklogic.appdeployer.command.security;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import com.marklogic.appdeployer.command.AbstractManageResourceTest;
+import com.marklogic.appdeployer.command.Command;
 import com.marklogic.rest.mgmt.ResourceManager;
 import com.marklogic.rest.mgmt.security.RoleManager;
 import com.marklogic.rest.util.Fragment;
 
 public class ManageRolesTest extends AbstractManageResourceTest {
 
-    @Before
-    public void setup() {
-        initializeAppDeployer(new CreateRolesCommand());
-    }
-    
     @Override
     protected ResourceManager newResourceManager() {
         return new RoleManager(manageClient);
+    }
+
+    @Override
+    protected Command newCommand() {
+        return new CreateRolesCommand();
     }
 
     @Override
@@ -28,6 +28,7 @@ public class ManageRolesTest extends AbstractManageResourceTest {
     @Test
     public void updateRole() {
         RoleManager mgr = new RoleManager(manageClient);
+        initializeAppDeployer(new CreateRolesCommand());
 
         appDeployer.deploy(appConfig);
 
@@ -44,5 +45,4 @@ public class ManageRolesTest extends AbstractManageResourceTest {
         }
 
     }
-
 }

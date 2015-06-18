@@ -35,4 +35,11 @@ public interface ResourceManager {
      * @return
      */
     public Fragment getAsXml(String resourceNameOrId);
+
+    /**
+     * 
+     * @param resourceNameOrId
+     * @return
+     */
+    public Fragment getPropertiesAsXml(String resourceNameOrId);
 }

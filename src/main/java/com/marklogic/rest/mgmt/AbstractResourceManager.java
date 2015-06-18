@@ -12,10 +12,10 @@ import com.marklogic.rest.util.Fragment;
  */
 public abstract class AbstractResourceManager extends AbstractManager implements ResourceManager {
 
-    private ManageClient client;
+    private ManageClient manageClient;
 
     public AbstractResourceManager(ManageClient client) {
-        this.client = client;
+        this.manageClient = client;
     }
 
     /**
@@ -62,18 +62,28 @@ public abstract class AbstractResourceManager extends AbstractManager implements
     }
 
     public boolean exists(String resourceNameOrId) {
-        String xpath = format("/msec:%s/msec:list-items/msec:list-item[msec:nameref = '%s' or msec:idref = '%s']",
-                getResourcesRootElementName(), resourceNameOrId, resourceNameOrId);
-        Fragment f = client.getXml(getResourcesPath());
+        String xpath = "/node()/*[local-name(.) = 'list-items']/*[local-name(.) = 'list-item']"
+                + "[*[local-name(.) = 'nameref'] = '%s' or *[local-name(.) = 'idref'] = '%s']";
+        xpath = format(xpath, resourceNameOrId, resourceNameOrId);
+        Fragment f = manageClient.getXml(getResourcesPath());
         return f.elementExists(xpath);
     }
 
     public Fragment getAsXml(String resourceNameOrId) {
-        return client.getXml(getResourcePath(resourceNameOrId));
+        return manageClient.getXml(getResourcePath(resourceNameOrId));
+    }
+
+    public Fragment getPropertiesAsXml(String resourceNameOrId) {
+        return manageClient.getXml(getPropertiesPath(resourceNameOrId));
     }
 
     public void save(String json) {
         JsonNode node = parseJson(json);
+        String idFieldName = getIdFieldName();
+        if (!node.has(idFieldName)) {
+            throw new RuntimeException("Cannot save resource, JSON does not contains ID field name of: " + idFieldName
+                    + "; JSON: " + json);
+        }
         String name = node.get(getIdFieldName()).asText();
         String label = getResourceName();
         if (exists(name)) {
@@ -81,11 +91,11 @@ public abstract class AbstractResourceManager extends AbstractManager implements
             path = appendParamsAndValuesToPath(path, getResourceParams(node));
 
             logger.info(format("Found %s with name of %s, so updating ", label, path));
-            client.putJson(path, json);
+            manageClient.putJson(path, json);
             logger.info(format("Updated %s at %s", label, path));
         } else {
             logger.info(format("Creating %s: %s", label, name));
-            client.postJson(getResourcesPath(), json);
+            manageClient.postJson(getResourcesPath(), json);
             logger.info(format("Created %s: %s", label, name));
         }
     }
@@ -102,7 +112,7 @@ public abstract class AbstractResourceManager extends AbstractManager implements
             path = appendParamsAndValuesToPath(path, getResourceParams(node));
 
             logger.info(format("Deleting %s at path %s", label, path));
-            client.delete(path);
+            manageClient.delete(path);
             logger.info(format("Deleted %s at path %s", label, path));
         }
     }
@@ -128,6 +138,10 @@ public abstract class AbstractResourceManager extends AbstractManager implements
      */
     protected String[] getResourceParams(JsonNode node) {
         return new String[] {};
+    }
+
+    protected ManageClient getManageClient() {
+        return manageClient;
     }
 
 }

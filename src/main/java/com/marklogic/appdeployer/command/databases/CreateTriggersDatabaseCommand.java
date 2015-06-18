@@ -32,11 +32,9 @@ public class CreateTriggersDatabaseCommand extends AbstractCommand implements Un
             String dbName = context.getAppConfig().getTriggersDatabaseName();
             String payload = copyFileToString(f);
             payload = tokenReplacer.replaceTokens(payload, context.getAppConfig(), false);
-            dbMgr.createDatabase(dbName, payload);
+            dbMgr.save(payload);
 
             createAndAttachForestOnEachHost(dbName, context.getManageClient());
-
-            dbMgr.assignTriggersDatabase(context.getAppConfig().getContentDatabaseName(), dbName);
         } else {
             logger.info("Not creating a triggers database, no file found at: " + f.getAbsolutePath());
         }
@@ -53,8 +51,13 @@ public class CreateTriggersDatabaseCommand extends AbstractCommand implements Un
 
     @Override
     public void undo(CommandContext context) {
-        DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
-        dbMgr.deleteDatabase(context.getAppConfig().getTriggersDatabaseName());
+        File f = context.getAppConfig().getConfigDir().getTriggersDatabaseFile();
+        if (f.exists()) {
+            DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
+            String payload = copyFileToString(f);
+            payload = tokenReplacer.replaceTokens(payload, context.getAppConfig(), false);
+            dbMgr.delete(payload);
+        }
     }
 
 }

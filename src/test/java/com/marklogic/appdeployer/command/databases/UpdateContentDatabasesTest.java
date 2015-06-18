@@ -36,10 +36,10 @@ public class UpdateContentDatabasesTest extends AbstractAppDeployerTest {
 
         appDeployer.deploy(appConfig);
 
-        Fragment db = dbMgr.getDatabasePropertiesAsXml(appConfig.getContentDatabaseName());
+        Fragment db = dbMgr.getPropertiesAsXml(appConfig.getContentDatabaseName());
         assertTrue(db.elementExists(idRangeIndexPath));
 
-        db = dbMgr.getDatabasePropertiesAsXml(appConfig.getTestContentDatabaseName());
+        db = dbMgr.getPropertiesAsXml(appConfig.getTestContentDatabaseName());
         assertTrue(db.elementExists(idRangeIndexPath));
     }
 
@@ -54,7 +54,7 @@ public class UpdateContentDatabasesTest extends AbstractAppDeployerTest {
 
         String rangeIndexXpath = "//m:range-element-index[m:namespace-uri = 'urn:sampleapp' and m:localname='anotherElement']";
 
-        Fragment db = dbMgr.getDatabasePropertiesAsXml(appConfig.getContentDatabaseName());
+        Fragment db = dbMgr.getPropertiesAsXml(appConfig.getContentDatabaseName());
         assertTrue(db.elementExists("//m:maintain-last-modified[. = 'true']"));
         assertTrue(db.elementExists(idRangeIndexPath));
         assertTrue(db.elementExists(rangeIndexXpath));

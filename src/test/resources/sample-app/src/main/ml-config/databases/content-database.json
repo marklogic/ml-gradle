@@ -9,5 +9,6 @@
       "range-value-positions": false,
       "scalar-type": "string"
     }
-  ]
+  ],
+  "triggers-database": "%%TRIGGERS_DATABASE%%"
 }

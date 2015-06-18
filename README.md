@@ -1,33 +1,15 @@
-# ml-app-deployer for MarkLogic 8
+# What is ml-app-deployer?
 
-ml-app-deployer is being rebuilt to utilize the new Management REST API in MarkLogic 8. If you'd like to contribute to
-this effort, please read the CONTRIBUTING.md file and check out the issues on the right. 
+ml-app-deployer is a Java library that provides two capabilities:
 
-Development for this is currently happening on the dev branch. To see the new directory structure for ML config files as it's evolving, go to https://github.com/rjrudin/ml-app-deployer/tree/dev/src/test/resources/sample-app/src/main/ml-config . 
+# A client library for the new [Management REST API](http://docs.marklogic.com/REST/management) in MarkLogic 8. 
+# A command-driven approach for deploying and undeploying an application to MarkLogic that depends on the management client library.
 
-# ml-app-deployer for MarkLogic 7
+If you're just looking for a Java library for interacting with the Management REST API, you can certainly use ml-app-deployer. The deployer/command library is mostly a thin layer around the management client library and can be safely ignored if you don't need it. 
 
-AppDeployer is a library for automating typical tasks involved in installing and configuring a MarkLogic application.
-It was extracted from the https://github.com/rjrudin/ml-gradle Gradle plugin for the primary purpose of making it easier
-to create an equivalent plugin for Maven. Having it as a separate, plain Java library also makes it easier to test, extend, and
-override how the library works.
+# What does it depend on? 
 
-AppDeployer is currently only taking advantage of REST API endpoints in MarkLogic 7; it will soon be enhanced to leverage all
-the new management endpoints in MarkLogic 8. 
+ml-app-deployer depends on Spring's [RestTemplate](http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html) for interacting with the Management REST API. It also depends on [ml-javaclient-util](https://github.com/rjrudin/ml-javaclient-util) for loading modules, which is done via the MarkLogic Client REST API. 
 
-Development for this can be done on the ml7 branch.
+# How do I start using it?
 
-Using AppDeployer is simple - just instantiate AppConfig, set whatever properties you need to, and then pass it into an implementation of AppDeployer.java (currently, Ml7AppDeployer.java). [DeployAppTest](https://github.com/rjrudin/ml-app-deployer/blob/master/src/test/java/com/marklogic/appdeployer/ml7/DeployAppTest.java) shows an example of this, which is shown below as well:
-
-    AppConfig appConfig = new AppConfig();
-    appConfig.setName("myAppName");
-    appConfig.setRestPort(8123);
-    appConfig.setXdbcPort(8124);
-  
-    AppDeployer deployer = new Ml7AppDeployer(new Ml7ManageClient("localhost", 8002, "admin", "admin"));
-    deployer.installPackages(appConfig);
-    deployer.loadModules(appConfig, null);
-
-The idea then is you define all your application configuration in AppConfig and then pass it into each high-level method in AppDeployer, along with any other parameters specific to that particular operation. You can then run this in a simple Java program, or more likely, bake it into a plugin for a tool like Ant, Gradle, or Maven. 
-
-You can also easily extend/override behavior. You can extend AppConfig to add new properties to control how a deployment is performed, and you can utilize those properties by extending an impl of AppDeployer. All of the methods in Ml7AppDeployer are public or protected, so it's easy to override the behavior. If you find you need a method extracted to make it easier to extend an AppDeployer impl, just submit an issue and/or pull request. 

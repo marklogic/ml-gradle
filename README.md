@@ -1,4 +1,4 @@
-# What is ml-app-deployer?
+## What is ml-app-deployer?
 
 ml-app-deployer is a Java library that provides two capabilities:
 
@@ -7,13 +7,13 @@ ml-app-deployer is a Java library that provides two capabilities:
 
 If you're just looking for a Java library for interacting with the Management REST API, you can certainly use ml-app-deployer. The deployer/command library is mostly a thin layer around the management client library and can be safely ignored if you don't need it. 
 
-# What does it depend on? 
+## What does it depend on? 
 
 ml-app-deployer depends on Spring's [RestTemplate](http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html) for interacting with the Management REST API. It also depends on [ml-javaclient-util](https://github.com/rjrudin/ml-javaclient-util) for loading modules, which is done via the MarkLogic Client REST API. 
 
-# How do I start using the client library?
+## How do I start using the client library?
 
-The general pattern to use the management client library is:
+The general pattern for using the management client library is:
 
 1. Create an instance of [ManageConfig](https://github.com/rjrudin/ml-app-deployer/blob/master/src/main/java/com/marklogic/rest/mgmt/ManageConfig.java), which specifies connection information for the management REST API instance.
 2. Create an instance of [ManageClient](https://github.com/rjrudin/ml-app-deployer/blob/master/src/main/java/com/marklogic/rest/mgmt/ManageClient.java) using ManageConfig. ManageClient simply wraps a RestTemplate with some convenience methods.
@@ -26,7 +26,7 @@ Here's a brief example of what that looks like:
     DatabaseManager dbMgr = new DatabaseManager(client);
     dbMgr.createDatabase("{\"database-name\":\"my-database\"}");
 
-# How do I start using the deployer library?
+## How do I start using the deployer library?
 
 The main concept behind the deployer library is invoke a series of commands, where each command looks for one or more configuration files in a specific directory structure and then uses a Manager class in the client library to apply those configuration files as part of deploying an application. 
 

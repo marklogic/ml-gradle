@@ -1,0 +1,5 @@
+{
+  "role-name": "sample-project-role",
+  "description": "Sample project role",
+  "role": ["rest-reader"]
+}

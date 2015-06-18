@@ -1,0 +1,4 @@
+<person xmlns='http://marklogic.com/sample'>
+  <name>Jane</name>
+  <description>This is a sample document</description>
+</person>

@@ -1,0 +1,6 @@
+{
+  "user-name": "sample-project-user",
+  "description": "Sample project user",
+  "password": "password",
+  "role": ["alert-user", "rest-admin"]
+}

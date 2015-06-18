@@ -1,0 +1,22 @@
+{
+    "database-name": "%%DATABASE%%",
+    "maintain-last-modified": true,
+    "range-element-index": [
+        {
+            "invalid-values": "reject",
+            "collation": "",
+            "localname": "testDateTime",
+            "namespace-uri": "http://marklogic.com/test",
+            "range-value-positions": false,
+            "scalar-type": "dateTime"
+        },
+        {
+            "invalid-values": "reject",
+            "collation": "",
+            "localname": "secondTestDateTime",
+            "namespace-uri": "http://marklogic.com/test",
+            "range-value-positions": false,
+            "scalar-type": "dateTime"
+        }
+   ]
+}

@@ -44,7 +44,8 @@ files in the ml-config directory structure:
 
     ManageClient client = new ManageClient(); // defaults to localhost/8002/admin/admin
     AdminManager manager = new AdminManager(); // used for restarting ML; defaults to localhost/8001/admin/admin
-    AppDeployer deployer = new SimpleAppDeployer(client, manager, new CreateRestApiServersCommand(), new CreateUsersCommand());
+    AppDeployer deployer = new SimpleAppDeployer(client, manager, 
+        new CreateRestApiServersCommand(), new CreateUsersCommand());
     
     AppConfig config = new AppConfig(); // contains all configuration about the application being deployed
     config.setName("my-app");

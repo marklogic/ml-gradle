@@ -47,12 +47,15 @@ files in the ml-config directory structure:
     AppDeployer deployer = new SimpleAppDeployer(client, manager, 
         new CreateRestApiServersCommand(), new CreateUsersCommand());
     
-    AppConfig config = new AppConfig(); // contains all configuration about the application being deployed
+    // AppConfig contains all configuration about the application being deployed
+    AppConfig config = new AppConfig(); 
     config.setName("my-app");
     config.setRestPort(8123);
     
-    deployer.deploy(config); // calls each command, passing the AppConfig and ManageClient to each one
+    // Calls each command, passing the AppConfig and ManageClient to each one
+    deployer.deploy(config); 
     
     // do some other stuff...
     
-    deployer.undeploy(config); // calls each command, giving each a chance to undo what it did before
+    // Calls each command, giving each a chance to undo what it did before
+    deployer.undeploy(config); 

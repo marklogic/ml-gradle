@@ -5,7 +5,7 @@ Gradle is a standard build tool that is used for building and deploying primaril
 
 What is ml-gradle?
 =========
-ml-gradle is a [Gradle plugin](http://www.gradle.org/plugins "") that supports a number of tasks pertaining to deploying an application to MarkLogic and interacting with other features of MarkLogic via a Gradle build file. In general, ml-gradle tries to get as many things done as possible by making HTTP calls to the MarkLogic REST API services, particularly the [packaging API](http://docs.marklogic.com/REST/packaging ""). When a REST API endpoint doesn't exist, ml-gradle will use XCC. ml-gradle also provides support for using tools such as MarkLogic Content Pump from a Gradle build file. 
+ml-gradle is a [Gradle plugin](http://www.gradle.org/plugins "") that supports a number of tasks pertaining to deploying an application to MarkLogic and interacting with other features of MarkLogic via a Gradle build file. The bulk of the functionality provided by ml-gradle is actually in [ml-app-deployer](https://github.com/rjrudin/ml-app-deployer) - ml-gradle is just intended to be a thin wrapper around this library, exposing its functionality via Gradle tasks and properties.
 
 Why use ml-gradle?
 =========
@@ -19,12 +19,10 @@ Essentially, if you're using MarkLogic and Java, then ml-gradle is probably a go
 
 Here are some of the main features of ml-gradle:
 
-1. Can install database/server packages and load modules via the MarkLogic REST API
+1. Utilizes the new (Management REST API)[http://docs.marklogic.com/REST/management) in MarkLogic 8 to configure all aspects of an application.
 1. Can watch for new/modified modules and automatically load them for you, thus simplifying the code/build/test cycle
 1. Can treat packages of XQuery code as true third-party dependencies, resolving them just like you would a dependency on a jar, as well as automatically loading such code into your modules database
 1. Can easily run MarkLogic Content Pump and Corb without having to copy jars around and worry about a classpath
-1. Can perform most tasks related to CPF
-1. Can manage security resources such as users, roles, and amps
 
 ml-gradle quick start
 =========
@@ -37,32 +35,30 @@ To use ml-gradle right away, you'll need Gradle installed first. And of course y
         maven {url "http://rjrudin.github.io/marklogic-java/releases"}
       }
       dependencies {
-        classpath "com.marklogic:ml-gradle:1.1.2"
+        classpath "com.marklogic:ml-gradle:2.0-alpha-4"
       }
     }
     
     apply plugin: 'ml-gradle'
 
-And here's the simplest gradle.properties file possible (you can of course customize these properties as needed, particularly the ports - make sure that they're open on the host you're deploying to):
+And here's the simplest gradle.properties file possible (you can of course customize these properties as needed, particularly the port - make sure that it's open on the host you're deploying to):
 
     mlHost=localhost
     mlUsername=admin
     mlPassword=admin
-    mlRestPort=8200
-    mlXdbcPort=8201
     mlAppName=quick-start
+    mlRestPort=8200
 
-Then just run "gradle mlDeploy" in the directory containing these two files. You'll end up with a new REST API server on port 8200, an XDBC server on 8201, and two databases - a content database and a modules database, with one forest for each. 
+Then just run "gradle mlDeploy" in the directory containing these two files. You'll end up with a new REST API server on port 8200 with a modules database and a content database with 3 forests by default. 
 
 
 Digging deeper into ml-gradle
 =========
-The best way to dig deeper into what ml-gradle provies is to clone [the marklogic-java repository](https://github.com/rjrudin/marklogic-java) and 
-[examine the build.gradle file](https://github.com/rjrudin/marklogic-java/blob/master/sample-project/build.gradle) in the 
-sample-project directory. This is intended to show all the different features of ml-gradle, with comments explaining 
-each one. Most tasks have Wiki pages as well to provide further information, and of course there's always 
-the source code, with [the MarkLogicPlugin](https://github.com/rjrudin/ml-gradle/blob/master/src/main/groovy/com/marklogic/gradle/MarkLogicPlugin.groovy) being a 
-good place to start, as it lists out all the registered tasks. 
+There are two things to learn with ml-gradle - what the ml-app-deployer library lets you do, and what ml-gradle adds on top of it. The main thing to know about ml-app-deployer is where it expects Management API configuration files to be placed so that they're automatically processed by ml-app-deployer and thus by ml-gradle. 
+
+To learn more about what ml-gradle provides on top of ml-app-deployer, you should start by 
+[examining the build.gradle file](https://github.com/rjrudin/ml-gradle/blob/master/sample-project/build.gradle) in the 
+sample-project directory of this repository. This is intended to show all the different features of ml-gradle. To understand the ml-gradle code itself, you should start with [the MarkLogicPlugin](https://github.com/rjrudin/ml-gradle/blob/master/src/main/groovy/com/marklogic/gradle/MarkLogicPlugin.groovy), as it lists out all the registered tasks. 
 
 If you have a project already, then a good way to start is by copying the aforementioned build.gradle file into your project. You can remove all the optional stuff to start with a bare minimum Gradle file, and then start adding things back in as you realize a need for them.
 
@@ -74,15 +70,7 @@ You can also see a list of the tasks with all their dependencies - this is helpf
 
     gradle tasks --all 
 
-To see ml-gradle in action, you can deploy the sample-project application by doing the following (assuming you've cloned the repository already):
+To see ml-gradle in action, you can deploy the sample-project application by doing the following (assuming you've cloned this repository already):
 
 1. cd sample-project
 1. gradle mlDeploy
-
-Then watch the logging scroll by as a number of ml-gradle tasks are executed, resulting in new databases and app servers prefixed with "sample-project" as the name, all of which you can of course inspect via the MarkLogic Admin app. 
-
-What about MarkLogic 8 and all those new REST endpoints?
-=========
-One of the best aspects of MarkLogic 8 is the addition of so many new capabilities to the REST management API. This will allow for a number of tasks to be accomplished via HTTP calls rather than XQuery statements over XCC. 
-
-The plan with ml-gradle is for it support both MarkLogic 7 and 8 seamlessly, with a REST endpoint being used if available, and XCC used as a fallback. You should see support for ML8 in the 2.0 release of ml-gradle. 

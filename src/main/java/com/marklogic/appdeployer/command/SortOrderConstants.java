@@ -12,4 +12,8 @@ public abstract class SortOrderConstants {
 
     // This would have to be after loading modules in case the rewriter is modified
     public static Integer UPDATE_REST_API_SERVERS_ORDER = 600;
+
+    public static Integer CREATE_DOMAINS_ORDER = 900;
+    public static Integer CREATE_CPF_CONFIGS_ORDER = 910;
+    public static Integer CREATE_PIPELINES_ORDER = 920;
 }

@@ -2,7 +2,7 @@
    "domain-name": "sample-app-domain-1",
    "description": "Test domain for sample app",
    "scope": "directory",
-   "uri": "/sample-app/",
+   "uri": "/sample-app-1/",
    "depth": "infinity",
    "eval-module": "%%MODULES_DATABASE%%",
    "eval-root": "/"

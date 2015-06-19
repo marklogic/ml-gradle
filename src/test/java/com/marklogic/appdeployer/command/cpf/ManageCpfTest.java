@@ -12,9 +12,12 @@ public class ManageCpfTest extends AbstractAppDeployerTest {
     @Test
     public void test() throws Exception {
         initializeAppDeployer(new CreateRestApiServersCommand(), new UpdateContentDatabasesCommand(),
-                new CreateTriggersDatabaseCommand(), new CreateDomainsCommand(), new CreateCpfConfigsCommand());
+                new CreateTriggersDatabaseCommand(), new CreateDomainsCommand(), new CreateCpfConfigsCommand(),
+                new CreatePipelinesCommand());
 
         appDeployer.deploy(appConfig);
+
+//        appDeployer.undeploy(appConfig);
     }
 
 }

@@ -15,7 +15,7 @@ public class ManageCpfTest extends AbstractAppDeployerTest {
 
     @After
     public void teardown() {
-        //undeploySampleApp();
+        undeploySampleApp();
     }
 
     @Test

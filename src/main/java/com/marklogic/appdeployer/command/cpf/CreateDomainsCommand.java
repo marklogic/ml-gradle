@@ -21,7 +21,7 @@ public class CreateDomainsCommand extends AbstractCommand {
         if (dir.exists()) {
             DomainManager mgr = new DomainManager(context.getManageClient());
             for (File f : dir.listFiles()) {
-                if (f.getName().endsWith(".json")) {
+                if (f.getName().endsWith(".json") || f.getName().endsWith(".xml")) {
                     String payload = copyFileToString(f);
                     payload = tokenReplacer.replaceTokens(payload, config, false);
                     mgr.save(config.getTriggersDatabaseName(), payload);

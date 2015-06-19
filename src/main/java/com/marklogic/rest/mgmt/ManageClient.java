@@ -45,14 +45,28 @@ public class ManageClient extends LoggingObject {
         return restTemplate.exchange(baseUrl + path, HttpMethod.PUT, buildJsonEntity(json), String.class);
     }
 
+    public ResponseEntity<String> putXml(String path, String xml) {
+        return restTemplate.exchange(baseUrl + path, HttpMethod.PUT, buildXmlEntity(xml), String.class);
+    }
+
     public ResponseEntity<String> postJson(String path, String json) {
         return restTemplate.exchange(baseUrl + path, HttpMethod.POST, buildJsonEntity(json), String.class);
     }
 
-    protected HttpEntity<String> buildJsonEntity(String json) {
+    public ResponseEntity<String> postXml(String path, String xml) {
+        return restTemplate.exchange(baseUrl + path, HttpMethod.POST, buildXmlEntity(xml), String.class);
+    }
+
+    public HttpEntity<String> buildJsonEntity(String json) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         return new HttpEntity<String>(json, headers);
+    }
+
+    public HttpEntity<String> buildXmlEntity(String xml) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_XML);
+        return new HttpEntity<String>(xml, headers);
     }
 
     public ResponseEntity<String> postForm(String path, String... params) {

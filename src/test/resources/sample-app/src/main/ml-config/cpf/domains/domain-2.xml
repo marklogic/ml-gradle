@@ -1,0 +1,9 @@
+<domain-properties xmlns="http://marklogic.com/manage/domain/properties">
+  <domain-name>sample-app-domain-2</domain-name>
+  <description>Test domain for sample app</description>
+  <scope>directory</scope>
+  <uri>/sample-app-2/</uri>
+  <depth>infinity</depth>
+  <eval-module>%%MODULES_DATABASE%%</eval-module>
+  <eval-root>/</eval-root>
+</domain-properties>

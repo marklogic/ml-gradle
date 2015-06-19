@@ -1,6 +1,5 @@
 package com.marklogic.rest.mgmt.cpf;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.marklogic.rest.mgmt.AbstractManager;
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.util.ResourcesFragment;
@@ -36,23 +35,17 @@ public abstract class AbstractCpfResourceManager extends AbstractManager {
         return getAsXml(databaseIdOrName).resourceExists(resourceIdOrName);
     }
 
-    public void save(String databaseIdOrName, String json) {
-        JsonNode node = parseJson(json);
-        String idFieldName = getIdFieldName();
-        if (!node.has(idFieldName)) {
-            throw new RuntimeException("Cannot save resource, JSON does not contains ID field name of: " + idFieldName
-                    + "; JSON: " + json);
-        }
-        String name = node.get(idFieldName).asText();
+    public void save(String databaseIdOrName, String payload) {
+        String name = getPayloadName(payload);
         String label = getResourceName();
         if (exists(databaseIdOrName, name)) {
             String path = getPropertiesPath(databaseIdOrName, name);
             logger.info(format("Found %s with name of %s, so updating ", label, path));
-            client.putJson(path, json);
+            putPayload(client, path, payload);
             logger.info(format("Updated %s at %s", label, path));
         } else {
             logger.info(format("Creating %s: %s", label, name));
-            client.postJson(getResourcesPath(databaseIdOrName), json);
+            postPayload(client, getResourcesPath(databaseIdOrName), payload);
             logger.info(format("Created %s: %s", label, name));
         }
     }

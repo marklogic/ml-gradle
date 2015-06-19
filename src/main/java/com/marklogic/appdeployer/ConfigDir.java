@@ -56,6 +56,10 @@ public class ConfigDir {
         return new File(baseDir, "security");
     }
 
+    public File getCpfDir() {
+        return new File(baseDir, "cpf");
+    }
+    
     public void setDatabasesPath(String databasesPath) {
         this.databasesPath = databasesPath;
     }

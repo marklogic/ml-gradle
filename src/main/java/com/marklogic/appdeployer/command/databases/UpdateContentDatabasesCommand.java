@@ -34,9 +34,6 @@ public class UpdateContentDatabasesCommand extends AbstractCommand {
 
         String payload = node.toString();
         String json = tokenReplacer.replaceTokens(payload, appConfig, false);
-        if (logger.isDebugEnabled()) {
-            logger.debug("Content database JSON: " + payload);
-        }
 
         DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
         dbMgr.save(json);

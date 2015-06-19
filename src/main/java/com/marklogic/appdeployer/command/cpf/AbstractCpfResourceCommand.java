@@ -20,7 +20,7 @@ public abstract class AbstractCpfResourceCommand extends AbstractCommand {
         if (dir.exists()) {
             AbstractCpfResourceManager mgr = getResourceManager(context);
             for (File f : dir.listFiles()) {
-                if (f.getName().endsWith(".json") || f.getName().endsWith(".xml")) {
+                if (isResourceFile(f)) {
                     String payload = copyFileToString(f);
                     payload = tokenReplacer.replaceTokens(payload, config, false);
                     mgr.save(config.getTriggersDatabaseName(), payload);

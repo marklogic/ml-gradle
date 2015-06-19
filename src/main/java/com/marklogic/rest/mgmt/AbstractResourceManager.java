@@ -1,6 +1,5 @@
 package com.marklogic.rest.mgmt;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.marklogic.rest.util.Fragment;
 import com.marklogic.rest.util.ResourcesFragment;
 
@@ -15,16 +14,6 @@ public abstract class AbstractResourceManager extends AbstractManager implements
 
     public AbstractResourceManager(ManageClient client) {
         this.manageClient = client;
-    }
-
-    /**
-     * The root element differs in the XML return by each "/manage/v2/(resource name)" endpoint. This defaults to the
-     * resource name plus "-default-list". So RoleManager would have a root element name of "role-default-list".
-     * 
-     * @return
-     */
-    protected String getResourcesRootElementName() {
-        return getResourceName() + "-default-list";
     }
 
     public String getResourcesPath() {
@@ -55,39 +44,30 @@ public abstract class AbstractResourceManager extends AbstractManager implements
         return manageClient.getXml(getPropertiesPath(resourceNameOrId));
     }
 
-    public void save(String json) {
-        JsonNode node = parseJson(json);
-        String idFieldName = getIdFieldName();
-        if (!node.has(idFieldName)) {
-            throw new RuntimeException("Cannot save resource, JSON does not contains ID field name of: " + idFieldName
-                    + "; JSON: " + json);
-        }
-        String name = node.get(getIdFieldName()).asText();
+    public void save(String payload) {
+        String name = getPayloadName(payload);
         String label = getResourceName();
         if (exists(name)) {
             String path = getPropertiesPath(name);
-            path = appendParamsAndValuesToPath(path, getResourceParams(node));
-
-            logger.info(format("Found %s with name of %s, so updating ", label, path));
-            manageClient.putJson(path, json);
+            path = appendParamsAndValuesToPath(path, getResourceParams(payload));
+            logger.info(format("Found %s with name of %s, so updating at path %s", label, name, path));
+            putPayload(manageClient, path, payload);
             logger.info(format("Updated %s at %s", label, path));
         } else {
             logger.info(format("Creating %s: %s", label, name));
-            manageClient.postJson(getResourcesPath(), json);
+            postPayload(manageClient, getResourcesPath(), payload);
             logger.info(format("Created %s: %s", label, name));
         }
     }
 
-    public void delete(String json) {
-        JsonNode node = parseJson(json);
-        String name = node.get(getIdFieldName()).asText();
-
+    public void delete(String payload) {
+        String name = getPayloadName(payload);
         String label = getResourceName();
         if (!exists(name)) {
             logger.info(format("Could not find %s with name or ID of %s, so not deleting", label, name));
         } else {
             String path = getResourcePath(name);
-            path = appendParamsAndValuesToPath(path, getResourceParams(node));
+            path = appendParamsAndValuesToPath(path, getResourceParams(payload));
 
             logger.info(format("Deleting %s at path %s", label, path));
             manageClient.delete(path);
@@ -114,7 +94,7 @@ public abstract class AbstractResourceManager extends AbstractManager implements
      * @param node
      * @return
      */
-    protected String[] getResourceParams(JsonNode node) {
+    protected String[] getResourceParams(String payload) {
         return new String[] {};
     }
 

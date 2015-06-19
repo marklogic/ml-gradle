@@ -25,6 +25,10 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
         }
     }
 
+    protected boolean isResourceFile(File f) {
+        return f.getName().endsWith(".json") || f.getName().endsWith(".xml");
+    }
+
     public void setTokenReplacer(TokenReplacer tokenReplacer) {
         this.tokenReplacer = tokenReplacer;
     }

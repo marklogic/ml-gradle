@@ -65,6 +65,11 @@ public class Fragment {
         return values;
     }
 
+    public String getElementValue(String xpath) {
+        List<String> values = getElementValues(xpath);
+        return values.isEmpty() ? null : values.get(0);
+    }
+
     public List<Element> getElements(String xpath) {
         return evaluateForElements(xpath);
     }

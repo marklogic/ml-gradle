@@ -42,19 +42,22 @@ public class AbstractManager extends LoggingObject {
     }
 
     protected String getPayloadName(String payload) {
-        String idFieldName = getIdFieldName();
+        return getPayloadFieldValue(payload, getIdFieldName());
+    }
+
+    protected String getPayloadFieldValue(String payload, String fieldName) {
         if (isJsonPayload(payload)) {
             JsonNode node = parseJson(payload);
-            if (!node.has(idFieldName)) {
-                throw new RuntimeException("Cannot get resource name from JSON; expected ID field name: " + idFieldName
-                        + "; JSON: " + payload);
+            if (!node.has(fieldName)) {
+                throw new RuntimeException("Cannot get field value from JSON; field name: " + fieldName + "; JSON: "
+                        + payload);
             }
-            return node.get(idFieldName).asText();
+            return node.get(fieldName).asText();
         } else {
             Fragment f = new Fragment(payload);
-            String xpath = format("/node()/*[local-name(.) = '%s']", idFieldName);
+            String xpath = format("/node()/*[local-name(.) = '%s']", fieldName);
             if (!f.elementExists(xpath)) {
-                throw new RuntimeException("Cannot get resource name from XML at path: " + xpath + "; XML: " + payload);
+                throw new RuntimeException("Cannot get field value from XML at path: " + xpath + "; XML: " + payload);
             }
             return f.getElementValues(xpath).get(0);
         }

@@ -20,6 +20,11 @@ public class Fragment {
     private Document internalDoc;
     private Namespace[] namespaces;
 
+    public Fragment(Fragment other) {
+        this.internalDoc = other.internalDoc;
+        this.namespaces = other.namespaces;
+    }
+
     public Fragment(String xml, Namespace... namespaces) {
         try {
             internalDoc = new SAXBuilder().build(new StringReader(xml));

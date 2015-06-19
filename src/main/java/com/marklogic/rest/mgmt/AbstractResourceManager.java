@@ -1,9 +1,8 @@
 package com.marklogic.rest.mgmt;
 
-import org.springframework.util.ClassUtils;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.marklogic.rest.util.Fragment;
+import com.marklogic.rest.util.ResourcesFragment;
 
 /**
  * This class makes a number of assumptions in order to simplify the implementation of common operations for a MarkLogic
@@ -16,27 +15,6 @@ public abstract class AbstractResourceManager extends AbstractManager implements
 
     public AbstractResourceManager(ManageClient client) {
         this.manageClient = client;
-    }
-
-    /**
-     * Assumes the resource name is based on the class name - e.g. RoleManager would have a resource name of "role".
-     * 
-     * @return
-     */
-    protected String getResourceName() {
-        String name = ClassUtils.getShortName(getClass());
-        name = name.replace("Manager", "");
-        return name.toLowerCase();
-    }
-
-    /**
-     * Assumes the field name of the resource ID - which is used to determine existence - is the resource name plus
-     * "-name". So RoleManager would have an ID field name of "role-name".
-     * 
-     * @return
-     */
-    protected String getIdFieldName() {
-        return getResourceName() + "-name";
     }
 
     /**
@@ -62,11 +40,11 @@ public abstract class AbstractResourceManager extends AbstractManager implements
     }
 
     public boolean exists(String resourceNameOrId) {
-        String xpath = "/node()/*[local-name(.) = 'list-items']/*[local-name(.) = 'list-item']"
-                + "[*[local-name(.) = 'nameref'] = '%s' or *[local-name(.) = 'idref'] = '%s']";
-        xpath = format(xpath, resourceNameOrId, resourceNameOrId);
-        Fragment f = manageClient.getXml(getResourcesPath());
-        return f.elementExists(xpath);
+        return getAsXml().resourceExists(resourceNameOrId);
+    }
+
+    public ResourcesFragment getAsXml() {
+        return new ResourcesFragment(manageClient.getXml(getResourcesPath()));
     }
 
     public Fragment getAsXml(String resourceNameOrId) {

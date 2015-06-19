@@ -1,6 +1,7 @@
 package com.marklogic.rest.mgmt;
 
 import com.marklogic.rest.util.Fragment;
+import com.marklogic.rest.util.ResourcesFragment;
 
 /**
  * Interface that AbstractResourceCommand is bound to. If you can implement this - most likely by subclassing
@@ -28,6 +29,12 @@ public interface ResourceManager {
      * @param resourceNameOrId
      */
     public void delete(String json);
+
+    /**
+     * 
+     * @return
+     */
+    public ResourcesFragment getAsXml();
 
     /**
      * 

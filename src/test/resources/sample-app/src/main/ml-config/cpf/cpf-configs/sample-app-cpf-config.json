@@ -1,7 +1,7 @@
 {
-    "domain-name": "myDomain",
+    "domain-name": "sample-app-domain-1",
     "restart-user-name": "admin",
-    "eval-module": "sample-app-modules",
+    "eval-module": "%%MODULES_DATABASE%%",
     "eval-root": "/",
     "conversion-enabled": false,
     "permission": [{

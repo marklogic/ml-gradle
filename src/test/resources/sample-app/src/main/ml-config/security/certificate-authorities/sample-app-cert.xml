@@ -1,0 +1,64 @@
+<pki:certificate xmlns:pki="http://marklogic.com/xdmp/pki">
+  <pki:template-id>6264653696899042645</pki:template-id>
+  <pki:certificate-id>11056419645740622001</pki:certificate-id>
+  <pki:template-version>1</pki:template-version>
+  <pki:temporary>true</pki:temporary>
+  <pki:authority>true</pki:authority>
+  <pki:host-name>mycert Certificate Authority</pki:host-name>
+  <pki:pem>
+    -----BEGIN CERTIFICATE-----
+    MIIDPDCCAiSgAwIBAgIJAN+vzvihAy+IMA0GCSqGSIb3DQEBCwUAMDsxEjAQBgNV
+    BAoMCU1hcmtMb2dpYzElMCMGA1UEAwwcbXljZXJ0IENlcnRpZmljYXRlIEF1dGhv
+    cml0eTAeFw0xNDA5MTcyMTU5MDJaFw0xNTA5MTcyMTU5MDJaMDsxEjAQBgNVBAoM
+    CU1hcmtMb2dpYzElMCMGA1UEAwwcbXljZXJ0IENlcnRpZmljYXRlIEF1dGhvcml0
+    eTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMAzX1vdjgcV2/j5FNH/
+    G5oDNqJupIjjxKJb9AqY6+Gf5m45sDRhz2bTuyqJUzipLei0xQKn901ZSMSCO7yW
+    1KFy4hbxtVYy9i4LEcTreY48xU7Fu5Hi2Qi6foP69D0gzYI3WW9oBpp4B5oTnDyX
+    XBariEbF4xl00wI9EQ1UEuriMX1EFwtr3Fa0srQN7NahPLSwbUx9yU2EjdHPaKez
+    vEd8LN8POuE2OzZshDY4GPl6EY6SG990NykU+SZxLMBpRFQ1YpWDgNe1Zcjyu2VW
+    Ai4x1pu6gUO/mquBPsbCl8Ujyl/jAbNlVncbsDFkAQZG9Qhz4AS8HxCW5pVNYZx1
+    dD0CAwEAAaNDMEEwDAYDVR0TBAUwAwEB/zALBgNVHQ8EBAMCAQYwEQYJYIZIAYb4
+    QgEBBAQDAgZAMBEGA1UdDgQKBAgky7mtT1Fl8DANBgkqhkiG9w0BAQsFAAOCAQEA
+    jiv0UpoSAl5MZStWenzVMOyeRjJhkzU1/cjurQxIYcRqVHhlZ3S1kbW4sBxzIJQQ
+    GzfmJYrNVX9u9f2B2W2FAbU77MBSqMYpmClNlcAniAVQiMI54vs6KkZU5YSd7TWM
+    WxkCi7WqfxqGCZKZZOHweKccjA7BVLX3qK/VdYd9n2RxZg3cOwLe/bOmQj6Pd4yB
+    Mq0u+dfZHzBYJseRVZLfyhZwk7XYSy6fYsHwsXmwjUFKuJmXPoSdT405yjTvtnoT
+    516FwCM2u8w2MRdvVquQfrSaTlFPy7R0qxh7SJclCvKgRkPNPc4LT34DjSUJ5k45
+    nZeJYELOLG9St3pmvnbRyQ==
+    -----END CERTIFICATE-----
+  </pki:pem>
+  <cert xmlns="http://marklogic.com/xdmp/x509">
+    <version>2</version>
+    <serialNumber>DFAFCEF8A1032F88</serialNumber>
+    <signatureType>sha256WithRSAEncryption</signatureType>
+    <issuer>
+      <organizationName>MarkLogic</organizationName>
+      <commonName>mycert Certificate Authority</commonName>
+    </issuer>
+    <validity>
+      <notBefore>2014-09-17T21:59:02Z</notBefore>
+      <notAfter>2015-09-17T21:59:02Z</notAfter>
+    </validity>
+    <subject>
+      <organizationName>MarkLogic</organizationName>
+      <commonName>mycert Certificate Authority</commonName>
+    </subject>
+    <publicKey>
+      -----BEGIN PUBLIC KEY-----
+      MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwDNfW92OBxXb+PkU0f8b
+      mgM2om6kiOPEolv0Cpjr4Z/mbjmwNGHPZtO7KolTOKkt6LTFAqf3TVlIxII7vJbU
+      oXLiFvG1VjL2LgsRxOt5jjzFTsW7keLZCLp+g/r0PSDNgjdZb2gGmngHmhOcPJdc
+      FquIRsXjGXTTAj0RDVQS6uIxfUQXC2vcVrSytA3s1qE8tLBtTH3JTYSN0c9op7O8
+      R3ws3w864TY7NmyENjgY+XoRjpIb33Q3KRT5JnEswGlEVDVilYOA17VlyPK7ZVYC
+      LjHWm7qBQ7+aq4E+xsKXxSPKX+MBs2VWdxuwMWQBBkb1CHPgBLwfEJbmlU1hnHV0
+      PQIDAQAB
+      -----END PUBLIC KEY-----
+    </publicKey>
+    <v3ext>
+      <basicConstraints critical="false">CA:TRUE</basicConstraints>
+      <keyUsage critical="false">Certificate Sign, CRL Sign</keyUsage>
+      <nsCertType critical="false">SSL Server</nsCertType>
+      <subjectKeyIdentifier critical="false">24:CB:B9:AD:4F:51:65:F0</subjectKeyIdentifier>
+    </v3ext>
+  </cert>
+</pki:certificate>

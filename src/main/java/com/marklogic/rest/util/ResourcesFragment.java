@@ -26,4 +26,11 @@ public class ResourcesFragment extends Fragment {
         xpath = String.format(xpath, resourceIdOrName, resourceIdOrName);
         return elementExists(xpath);
     }
+
+    public String getIdForNameOrId(String resourceIdOrName) {
+        String xpath = "/node()/*[local-name(.) = 'list-items']/node()"
+                + "[*[local-name(.) = 'nameref'] = '%s' or *[local-name(.) = 'idref'] = '%s']/*[local-name(.) = 'idref']";
+        xpath = String.format(xpath, resourceIdOrName, resourceIdOrName);
+        return getElementValue(xpath);
+    }
 }

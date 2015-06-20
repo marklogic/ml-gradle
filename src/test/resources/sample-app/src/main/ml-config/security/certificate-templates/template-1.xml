@@ -1,7 +1,6 @@
 <certificate-template-properties xmlns="http://marklogic.com/manage">
   <template-name>sample-app-template</template-name>
   <template-description>Sample description</template-description>
-  <template-version>1</template-version>
   <key-type>rsa</key-type>
   <key-options />
   <req>

@@ -8,6 +8,7 @@ public abstract class SortOrderConstants {
     public static Integer CREATE_PRIVILEGES = 40;
     public static Integer CREATE_CERTIFICATE_TEMPLATES = 45;
     public static Integer CREATE_CERTIFICATE_AUTHORITIES = 50;
+    public static Integer CREATE_EXTERNAL_SECURITY = 60;
 
     public static Integer CREATE_REST_API_SERVERS_ORDER = 100;
     public static Integer CREATE_TRIGGERS_DATABASE_ORDER = 200;

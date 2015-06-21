@@ -74,3 +74,5 @@ To see ml-gradle in action, you can deploy the sample-project application by doi
 
 1. cd sample-project
 1. gradle mlDeploy
+
+Finally, check out all the Wiki pages on the right for more information about ml-gradle. 

@@ -18,9 +18,12 @@ public class CreateTriggersDatabaseCommand extends AbstractCommand implements Un
         return SortOrderConstants.CREATE_TRIGGERS_DATABASE_ORDER;
     }
 
+    /**
+     * Have to first delete the REST API server and its content database, then delete the trigger database.
+     */
     @Override
     public Integer getUndoSortOrder() {
-        return getExecuteSortOrder();
+        return SortOrderConstants.CREATE_REST_API_SERVERS_ORDER + 10;
     }
 
     @Override

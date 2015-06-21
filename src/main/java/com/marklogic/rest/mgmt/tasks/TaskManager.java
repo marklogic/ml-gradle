@@ -29,7 +29,7 @@ public class TaskManager extends AbstractResourceManager {
     }
 
     @Override
-    protected String[] getResourceParams(String payload) {
+    protected String[] getUpdateResourceParams(String payload) {
         List<String> params = new ArrayList<>();
         params.add("group-id");
         params.add(groupName);

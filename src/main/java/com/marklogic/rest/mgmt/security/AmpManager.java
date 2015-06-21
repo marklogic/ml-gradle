@@ -20,7 +20,7 @@ public class AmpManager extends AbstractResourceManager {
     }
 
     @Override
-    protected String[] getResourceParams(String payload) {
+    protected String[] getUpdateResourceParams(String payload) {
         List<String> params = new ArrayList<String>();
         params.add("document-uri");
         if (isJsonPayload(payload)) {

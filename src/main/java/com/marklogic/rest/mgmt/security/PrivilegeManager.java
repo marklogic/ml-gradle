@@ -10,7 +10,7 @@ public class PrivilegeManager extends AbstractResourceManager {
     }
 
     @Override
-    protected String[] getResourceParams(String payload) {
+    protected String[] getUpdateResourceParams(String payload) {
         return new String[] { "kind", getPayloadFieldValue(payload, "kind") };
     }
 }

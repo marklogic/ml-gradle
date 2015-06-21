@@ -3,7 +3,6 @@ package com.marklogic.appdeployer.command.databases;
 import org.junit.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
 import com.marklogic.rest.mgmt.databases.DatabaseManager;
 import com.marklogic.rest.mgmt.forests.ForestManager;
 
@@ -11,8 +10,7 @@ public class CreateTriggersDatabaseTest extends AbstractAppDeployerTest {
 
     @Test
     public void createAndDelete() {
-        initializeAppDeployer(new CreateRestApiServersCommand(), new UpdateContentDatabasesCommand(),
-                new CreateTriggersDatabaseCommand());
+        initializeAppDeployer(new CreateTriggersDatabaseCommand());
 
         appDeployer.deploy(appConfig);
 
@@ -28,9 +26,7 @@ public class CreateTriggersDatabaseTest extends AbstractAppDeployerTest {
                     forestMgr.forestExists(forestName));
             assertTrue("The forest should be attached", forestMgr.isForestAttached(forestName));
         } finally {
-
             undeploySampleApp();
-
             assertFalse("The triggers database should have been deleted", dbMgr.exists(dbName));
             assertFalse("The triggers forest should have been deleted", forestMgr.forestExists(forestName));
         }

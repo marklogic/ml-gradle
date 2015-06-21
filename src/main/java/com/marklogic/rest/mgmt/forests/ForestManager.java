@@ -22,13 +22,28 @@ public class ForestManager extends AbstractManager {
         }
     }
 
+    public void delete(String nameOrId) {
+        delete(nameOrId, "full");
+    }
+
+    public void delete(String nameOrId, String level) {
+        if (!forestExists(nameOrId)) {
+            logger.info(format("Could not find forest with name or ID: %s, so not deleting", nameOrId));
+        } else {
+            logger.info(format("Deleting forest %s", nameOrId));
+            client.delete(format("/manage/v2/forests/%s?level=%s", nameOrId, level));
+            logger.info(format("Deleted forest %s", nameOrId));
+        }
+    }
+
     public void createForest(String json) {
         client.postJson("/manage/v2/forests", json);
     }
 
-    public boolean forestExists(String name) {
+    public boolean forestExists(String nameOrId) {
         Fragment f = client.getXml("/manage/v2/forests");
-        return f.elementExists(format("/node()/f:list-items/f:list-item[f:nameref = '%s']", name));
+        return f.elementExists(format("/node()/f:list-items/f:list-item[f:nameref = '%s' or f:idref = '%s']", nameOrId,
+                nameOrId));
     }
 
     public void attachForest(String forestIdOrName, String databaseIdOrName) {

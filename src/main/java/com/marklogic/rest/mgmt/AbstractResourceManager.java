@@ -49,7 +49,7 @@ public abstract class AbstractResourceManager extends AbstractManager implements
         String label = getResourceName();
         if (exists(name)) {
             String path = getPropertiesPath(name);
-            path = appendParamsAndValuesToPath(path, getResourceParams(payload));
+            path = appendParamsAndValuesToPath(path, getUpdateResourceParams(payload));
             logger.info(format("Found %s with name of %s, so updating at path %s", label, name, path));
             putPayload(manageClient, path, payload);
             logger.info(format("Updated %s at %s", label, path));
@@ -71,7 +71,7 @@ public abstract class AbstractResourceManager extends AbstractManager implements
             logger.info(format("Could not find %s with name or ID of %s, so not deleting", label, name));
         } else {
             String path = getResourcePath(name);
-            path = appendParamsAndValuesToPath(path, getResourceParams(payload));
+            path = appendParamsAndValuesToPath(path, getDeleteResourceParams(payload));
 
             logger.info(format("Deleting %s at path %s", label, path));
             manageClient.delete(path);
@@ -98,8 +98,18 @@ public abstract class AbstractResourceManager extends AbstractManager implements
      * @param node
      * @return
      */
-    protected String[] getResourceParams(String payload) {
+    protected String[] getUpdateResourceParams(String payload) {
         return new String[] {};
+    }
+
+    /**
+     * Defaults to the "update" resource parameters.
+     * 
+     * @param payload
+     * @return
+     */
+    protected String[] getDeleteResourceParams(String payload) {
+        return getUpdateResourceParams(payload);
     }
 
     protected ManageClient getManageClient() {

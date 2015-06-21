@@ -28,9 +28,13 @@ public class ResourcesFragment extends Fragment {
     }
 
     public String getIdForNameOrId(String resourceIdOrName) {
+        return getListItemValue(resourceIdOrName, "idref");
+    }
+
+    public String getListItemValue(String resourceIdOrName, String elementLocalName) {
         String xpath = "/node()/*[local-name(.) = 'list-items']/node()"
-                + "[*[local-name(.) = 'nameref'] = '%s' or *[local-name(.) = 'idref'] = '%s']/*[local-name(.) = 'idref']";
-        xpath = String.format(xpath, resourceIdOrName, resourceIdOrName);
+                + "[*[local-name(.) = 'nameref'] = '%s' or *[local-name(.) = 'idref'] = '%s']/*[local-name(.) = '%s']";
+        xpath = String.format(xpath, resourceIdOrName, resourceIdOrName, elementLocalName);
         return getElementValue(xpath);
     }
 }

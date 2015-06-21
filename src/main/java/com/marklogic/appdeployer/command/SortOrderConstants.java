@@ -10,7 +10,7 @@ public abstract class SortOrderConstants {
     public static Integer CREATE_CERTIFICATE_AUTHORITIES = 50;
     public static Integer CREATE_EXTERNAL_SECURITY = 60;
     public static Integer CREATE_PROTECTED_COLLECTIONS = 70;
-    
+
     public static Integer CREATE_REST_API_SERVERS_ORDER = 100;
     public static Integer CREATE_TRIGGERS_DATABASE_ORDER = 200;
     public static Integer UPDATE_CONTENT_DATABASES_ORDER = 300;
@@ -19,6 +19,7 @@ public abstract class SortOrderConstants {
     // This would have to be after loading modules in case the rewriter is modified
     public static Integer UPDATE_REST_API_SERVERS_ORDER = 600;
 
+    public static Integer CREATE_SCHEDULED_TASKS = 800;
     public static Integer CREATE_DOMAINS_ORDER = 900;
     public static Integer CREATE_CPF_CONFIGS_ORDER = 910;
     public static Integer CREATE_PIPELINES_ORDER = 920;

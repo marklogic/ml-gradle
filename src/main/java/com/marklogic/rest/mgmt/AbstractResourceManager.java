@@ -55,9 +55,13 @@ public abstract class AbstractResourceManager extends AbstractManager implements
             logger.info(format("Updated %s at %s", label, path));
         } else {
             logger.info(format("Creating %s: %s", label, name));
-            postPayload(manageClient, getResourcesPath(), payload);
+            postPayload(manageClient, getCreateResourcePath(payload), payload);
             logger.info(format("Created %s: %s", label, name));
         }
+    }
+
+    protected String getCreateResourcePath(String payload) {
+        return getResourcesPath();
     }
 
     public void delete(String payload) {

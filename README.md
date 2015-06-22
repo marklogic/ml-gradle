@@ -9,7 +9,9 @@ If you're just looking for a Java library for interacting with the Management RE
 
 ## What does it depend on? 
 
-ml-app-deployer depends on Spring's [RestTemplate](http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html) for interacting with the Management REST API. It also depends on [ml-javaclient-util](https://github.com/rjrudin/ml-javaclient-util) for loading modules, which is done via the MarkLogic Client REST API. 
+ml-app-deployer depends on MarkLogic 8 and Java 1.7+.
+
+Under the hood, it depends on Spring's [RestTemplate](http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html) for interacting with the Management REST API. It also depends on [ml-javaclient-util](https://github.com/rjrudin/ml-javaclient-util) for loading modules, which is done via the MarkLogic Client REST API. 
 
 ## How do I start using the client library?
 

@@ -26,7 +26,7 @@ Here's a brief example of what that looks like:
     ManageConfig config = new ManageConfig(); // defaults to localhost/8002/admin/admin
     ManageClient client = new ManageClient(config);
     DatabaseManager dbMgr = new DatabaseManager(client);
-    dbMgr.createDatabase("{\"database-name\":\"my-database\"}");
+    dbMgr.save("{\"database-name\":\"my-database\"}");
 
 ## How do I start using the deployer library?
 

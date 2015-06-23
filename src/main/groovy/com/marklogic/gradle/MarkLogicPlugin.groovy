@@ -7,17 +7,26 @@ import com.marklogic.appdeployer.AppConfig
 import com.marklogic.appdeployer.AppDeployer
 import com.marklogic.appdeployer.command.Command
 import com.marklogic.appdeployer.command.CommandContext
+import com.marklogic.appdeployer.command.cpf.CreateCpfConfigsCommand
+import com.marklogic.appdeployer.command.cpf.CreateDomainsCommand
+import com.marklogic.appdeployer.command.cpf.CreatePipelinesCommand
 import com.marklogic.appdeployer.command.databases.CreateTriggersDatabaseCommand
 import com.marklogic.appdeployer.command.databases.UpdateContentDatabasesCommand
 import com.marklogic.appdeployer.command.modules.LoadModulesCommand
 import com.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand
-import com.marklogic.appdeployer.command.security.roles.CreateRolesCommand
-import com.marklogic.appdeployer.command.security.users.CreateUsersCommand
+import com.marklogic.appdeployer.command.security.CreateAmpsCommand
+import com.marklogic.appdeployer.command.security.CreateCertificateTemplatesCommand
+import com.marklogic.appdeployer.command.security.CreateExternalSecurityCommand
+import com.marklogic.appdeployer.command.security.CreatePrivilegesCommand
+import com.marklogic.appdeployer.command.security.CreateRolesCommand
+import com.marklogic.appdeployer.command.security.CreateUsersCommand
 import com.marklogic.appdeployer.command.servers.UpdateRestApiServersCommand
 import com.marklogic.appdeployer.impl.SimpleAppDeployer
 import com.marklogic.gradle.task.DeleteModuleTimestampsFileTask
 import com.marklogic.gradle.task.DeployAppTask
 import com.marklogic.gradle.task.UndeployAppTask
+import com.marklogic.gradle.task.admin.InitTask
+import com.marklogic.gradle.task.admin.InstallAdminTask
 import com.marklogic.gradle.task.client.CreateResourceTask
 import com.marklogic.gradle.task.client.CreateTransformTask
 import com.marklogic.gradle.task.client.LoadModulesTask
@@ -44,11 +53,13 @@ class MarkLogicPlugin implements Plugin<Project> {
 
         String group = "ml-gradle"
 
-        project.task("mlDeleteModuleTimestampsFile", type: DeleteModuleTimestampsFileTask, group: group, description: "Delete the properties file in the build directory that keeps track of when each module was last loaded.")
+        // admin/v1 tasks
+        project.task("mlInit", type: InitTask, group: group, description: "Perform a one-time initialization of a MarkLogic server")
+        project.task("mlInstallAdmin", type: InstallAdminTask, group: group, description: "Perform a one-time installation of an admin user")
 
+        project.task("mlDeleteModuleTimestampsFile", type: DeleteModuleTimestampsFileTask, group: group, description: "Delete the properties file in the build directory that keeps track of when each module was last loaded.")
         project.task("mlClearContentDatabase", type: ClearContentDatabaseTask, group: group, description: "Deletes all or a collection of documents from the content database")
         project.task("mlClearModules", type: ClearModulesTask, group: group, dependsOn: "mlDeleteModuleTimestampsFile", description: "Deletes potentially all of the documents in the modules database; has a property for excluding documents from deletion")
-
         project.task("mlPrepareRestApiDependencies", type: PrepareRestApiDependenciesTask, group: group, dependsOn: project.configurations["mlRestApi"], description: "Downloads (if necessary) and unzips in the build directory all mlRestApi dependencies")
 
         /**
@@ -188,12 +199,19 @@ class MarkLogicPlugin implements Plugin<Project> {
         List<Command> commands = new ArrayList<Command>()
         commands.add(new CreateRolesCommand())
         commands.add(new CreateUsersCommand())
+        commands.add(new CreateAmpsCommand())
+        commands.add(new CreateCertificateTemplatesCommand())
+        commands.add(new CreateExternalSecurityCommand())
+        commands.add(new CreatePrivilegesCommand())
         commands.add(new CreateRestApiServersCommand())
         commands.add(new UpdateContentDatabasesCommand())
         commands.add(new CreateTriggersDatabaseCommand())
         commands.add(new LoadModulesCommand())
         commands.add(new UpdateRestApiServersCommand())
-
+        commands.add(new CreateCpfConfigsCommand())
+        commands.add(new CreateDomainsCommand())
+        commands.add(new CreatePipelinesCommand())
+        
         SimpleAppDeployer deployer = new SimpleAppDeployer(manageClient, adminManager)
         deployer.setCommands(commands)
         return deployer

@@ -8,6 +8,7 @@ import com.marklogic.appdeployer.command.CommandContext
 import com.marklogic.client.DatabaseClient
 import com.marklogic.client.DatabaseClientFactory
 import com.marklogic.rest.mgmt.ManageClient
+import com.marklogic.rest.mgmt.admin.AdminManager;
 
 /**
  * Base class that provides easy access to all of the resources setup by MarkLogicPlugin.
@@ -30,6 +31,10 @@ class MarkLogicTask extends DefaultTask {
         getProject().property("mlAppDeployer")
     }
 
+    AdminManager getAdminManager() {
+        getProject().property("mlAdminManager")
+    }
+    
     DatabaseClient newClient() {
         AppConfig config = getAppConfig()
         return DatabaseClientFactory.newClient(config.host, config.restPort, config.username, config.password, config.authentication)

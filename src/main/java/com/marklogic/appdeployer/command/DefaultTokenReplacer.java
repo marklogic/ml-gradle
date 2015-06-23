@@ -4,9 +4,6 @@ import java.util.Map;
 
 import com.marklogic.appdeployer.AppConfig;
 
-/**
- * TODO Eventually want a way to be able to e.g. inject Gradle properties into there so it's easy to customize.
- */
 public class DefaultTokenReplacer implements TokenReplacer {
 
     public String replaceTokens(String payload, AppConfig appConfig, boolean isTestResource) {

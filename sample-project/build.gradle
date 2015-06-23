@@ -6,7 +6,7 @@ buildscript {
         maven {url "../../gh-pages-marklogic-java/releases"}
     }
 
-    dependencies {  classpath "com.marklogic:ml-gradle:2.0-alpha-4" }
+    dependencies {  classpath "com.marklogic:ml-gradle:2.0-alpha-6" }
 }
 
 apply plugin: 'ml-gradle'
@@ -52,6 +52,13 @@ dependencies {
     // Located at https://github.com/rjrudin/marklogic-java/tree/gh-pages/releases/com/marklogic/corb
     corb "com.marklogic:corb:1.0"
     corb "com.marklogic:marklogic-xcc:8.0.2"
+}
+
+// Example of adding custom tokens
+ext {
+    mlAppConfig {
+        customTokens.put("sample-key", "sample-value")
+    }
 }
 
 /*

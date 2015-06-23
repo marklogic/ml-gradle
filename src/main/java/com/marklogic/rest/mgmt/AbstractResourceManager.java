@@ -1,9 +1,7 @@
 package com.marklogic.rest.mgmt;
 
-import org.springframework.util.ClassUtils;
-
-import com.fasterxml.jackson.databind.JsonNode;
 import com.marklogic.rest.util.Fragment;
+import com.marklogic.rest.util.ResourcesFragment;
 
 /**
  * This class makes a number of assumptions in order to simplify the implementation of common operations for a MarkLogic
@@ -12,41 +10,10 @@ import com.marklogic.rest.util.Fragment;
  */
 public abstract class AbstractResourceManager extends AbstractManager implements ResourceManager {
 
-    private ManageClient client;
+    private ManageClient manageClient;
 
     public AbstractResourceManager(ManageClient client) {
-        this.client = client;
-    }
-
-    /**
-     * Assumes the resource name is based on the class name - e.g. RoleManager would have a resource name of "role".
-     * 
-     * @return
-     */
-    protected String getResourceName() {
-        String name = ClassUtils.getShortName(getClass());
-        name = name.replace("Manager", "");
-        return name.toLowerCase();
-    }
-
-    /**
-     * Assumes the field name of the resource ID - which is used to determine existence - is the resource name plus
-     * "-name". So RoleManager would have an ID field name of "role-name".
-     * 
-     * @return
-     */
-    protected String getIdFieldName() {
-        return getResourceName() + "-name";
-    }
-
-    /**
-     * The root element differs in the XML return by each "/manage/v2/(resource name)" endpoint. This defaults to the
-     * resource name plus "-default-list". So RoleManager would have a root element name of "role-default-list".
-     * 
-     * @return
-     */
-    protected String getResourcesRootElementName() {
-        return getResourceName() + "-default-list";
+        this.manageClient = client;
     }
 
     public String getResourcesPath() {
@@ -62,47 +29,52 @@ public abstract class AbstractResourceManager extends AbstractManager implements
     }
 
     public boolean exists(String resourceNameOrId) {
-        String xpath = format("/msec:%s/msec:list-items/msec:list-item[msec:nameref = '%s' or msec:idref = '%s']",
-                getResourcesRootElementName(), resourceNameOrId, resourceNameOrId);
-        Fragment f = client.getXml(getResourcesPath());
-        return f.elementExists(xpath);
+        return getAsXml().resourceExists(resourceNameOrId);
+    }
+
+    public ResourcesFragment getAsXml() {
+        return new ResourcesFragment(manageClient.getXml(getResourcesPath()));
     }
 
     public Fragment getAsXml(String resourceNameOrId) {
-        return client.getXml(getResourcePath(resourceNameOrId));
+        return manageClient.getXml(getResourcePath(resourceNameOrId));
     }
 
-    public void save(String json) {
-        JsonNode node = parseJson(json);
-        String name = node.get(getIdFieldName()).asText();
+    public Fragment getPropertiesAsXml(String resourceNameOrId) {
+        return manageClient.getXml(getPropertiesPath(resourceNameOrId));
+    }
+
+    public void save(String payload) {
+        String name = getPayloadName(payload);
         String label = getResourceName();
         if (exists(name)) {
             String path = getPropertiesPath(name);
-            path = appendParamsAndValuesToPath(path, getResourceParams(node));
-
-            logger.info(format("Found %s with name of %s, so updating ", label, path));
-            client.putJson(path, json);
+            path = appendParamsAndValuesToPath(path, getUpdateResourceParams(payload));
+            logger.info(format("Found %s with name of %s, so updating at path %s", label, name, path));
+            putPayload(manageClient, path, payload);
             logger.info(format("Updated %s at %s", label, path));
         } else {
             logger.info(format("Creating %s: %s", label, name));
-            client.postJson(getResourcesPath(), json);
+            postPayload(manageClient, getCreateResourcePath(payload), payload);
             logger.info(format("Created %s: %s", label, name));
         }
     }
 
-    public void delete(String json) {
-        JsonNode node = parseJson(json);
-        String name = node.get(getIdFieldName()).asText();
+    protected String getCreateResourcePath(String payload) {
+        return getResourcesPath();
+    }
 
+    public void delete(String payload) {
+        String name = getPayloadName(payload);
         String label = getResourceName();
         if (!exists(name)) {
             logger.info(format("Could not find %s with name or ID of %s, so not deleting", label, name));
         } else {
             String path = getResourcePath(name);
-            path = appendParamsAndValuesToPath(path, getResourceParams(node));
+            path = appendParamsAndValuesToPath(path, getDeleteResourceParams(payload));
 
             logger.info(format("Deleting %s at path %s", label, path));
-            client.delete(path);
+            manageClient.delete(path);
             logger.info(format("Deleted %s at path %s", label, path));
         }
     }
@@ -126,8 +98,22 @@ public abstract class AbstractResourceManager extends AbstractManager implements
      * @param node
      * @return
      */
-    protected String[] getResourceParams(JsonNode node) {
+    protected String[] getUpdateResourceParams(String payload) {
         return new String[] {};
+    }
+
+    /**
+     * Defaults to the "update" resource parameters.
+     * 
+     * @param payload
+     * @return
+     */
+    protected String[] getDeleteResourceParams(String payload) {
+        return getUpdateResourceParams(payload);
+    }
+
+    protected ManageClient getManageClient() {
+        return manageClient;
     }
 
 }

@@ -27,8 +27,10 @@ public abstract class AbstractResourceCommand extends AbstractCommand implements
         if (resourceDir.exists()) {
             ResourceManager mgr = getResourceManager(context);
             for (File f : resourceDir.listFiles()) {
-                if (f.getName().endsWith(".json")) {
-                    mgr.save(copyFileToString(f));
+                if (isResourceFile(f)) {
+                    String payload = copyFileToString(f);
+                    payload = tokenReplacer.replaceTokens(payload, context.getAppConfig(), false);
+                    mgr.save(payload);
                 }
             }
         }
@@ -41,8 +43,10 @@ public abstract class AbstractResourceCommand extends AbstractCommand implements
             if (resourceDir.exists()) {
                 ResourceManager mgr = getResourceManager(context);
                 for (File f : resourceDir.listFiles()) {
-                    if (f.getName().endsWith(".json")) {
-                        mgr.delete(copyFileToString(f));
+                    if (isResourceFile(f)) {
+                        String payload = copyFileToString(f);
+                        payload = tokenReplacer.replaceTokens(payload, context.getAppConfig(), false);
+                        mgr.delete(payload);
                     }
                 }
             }

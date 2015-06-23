@@ -80,7 +80,7 @@ public class CreateRestApiServersCommand extends AbstractCommand implements Undo
 
     protected String getDefaultRestApiPayload() {
         return "{\"rest-api\": {\"name\":\"%%NAME%%\", \"group\":\"%%GROUP%%\", \"database\":\"%%DATABASE%%\", "
-                + "\"modules-database\":\"%%MODULES-DATABASE%%\", \"port\":\"%%PORT%%\", \"xdbc-enabled\":true, "
+                + "\"modules-database\":\"%%MODULES_DATABASE%%\", \"port\":\"%%PORT%%\", \"xdbc-enabled\":true, "
                 + "\"forests-per-host\":3, \"error-format\":\"json\"}}";
     }
 

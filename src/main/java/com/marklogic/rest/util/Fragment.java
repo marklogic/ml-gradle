@@ -20,6 +20,11 @@ public class Fragment {
     private Document internalDoc;
     private Namespace[] namespaces;
 
+    public Fragment(Fragment other) {
+        this.internalDoc = other.internalDoc;
+        this.namespaces = other.namespaces;
+    }
+
     public Fragment(String xml, Namespace... namespaces) {
         try {
             internalDoc = new SAXBuilder().build(new StringReader(xml));
@@ -58,6 +63,11 @@ public class Fragment {
             values.add(el.getText());
         }
         return values;
+    }
+
+    public String getElementValue(String xpath) {
+        List<String> values = getElementValues(xpath);
+        return values.isEmpty() ? null : values.get(0);
     }
 
     public List<Element> getElements(String xpath) {

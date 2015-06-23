@@ -1,24 +1,35 @@
 package com.marklogic.appdeployer.command.cpf;
 
-import org.junit.Ignore;
+import org.junit.After;
 import org.junit.Test;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.util.FileCopyUtils;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.rest.mgmt.cpf.CpfManager;
+import com.marklogic.appdeployer.command.databases.CreateTriggersDatabaseCommand;
+import com.marklogic.appdeployer.command.databases.UpdateContentDatabasesCommand;
+import com.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
+import com.marklogic.rest.mgmt.cpf.CpfConfigManager;
+import com.marklogic.rest.mgmt.cpf.DomainManager;
+import com.marklogic.rest.mgmt.cpf.PipelineManager;
 
 public class ManageCpfTest extends AbstractAppDeployerTest {
 
+    @After
+    public void teardown() {
+        undeploySampleApp();
+    }
+
     @Test
-    @Ignore("Need to be able to create a triggers database and a domain first")
-    public void test() throws Exception {
-        CpfManager mgr = new CpfManager(manageClient);
+    public void test() {
+        initializeAppDeployer(new CreateRestApiServersCommand(), new UpdateContentDatabasesCommand(),
+                new CreateTriggersDatabaseCommand(), new CreateDomainsCommand(), new CreateCpfConfigsCommand(),
+                new CreatePipelinesCommand());
 
-        String json = new String(FileCopyUtils.copyToByteArray(new ClassPathResource(
-                "sample-app/src/main/ml-config/cpf/cpf-configs/my-cpf-config.json").getInputStream()));
+        appDeployer.deploy(appConfig);
 
-        mgr.createCpfConfig("Triggers", json);
+        String dbName = appConfig.getTriggersDatabaseName();
+        assertEquals(2, new DomainManager(manageClient).getAsXml(dbName).getResourceCount());
+        assertEquals(1, new CpfConfigManager(manageClient).getAsXml(dbName).getResourceCount());
+        assertEquals(1, new PipelineManager(manageClient).getAsXml(dbName).getResourceCount());
     }
 
 }

@@ -14,7 +14,18 @@ public abstract class AbstractManageResourceTest extends AbstractAppDeployerTest
 
     protected abstract Command newCommand();
 
+    /**
+     * @return an array of resource names that can be used to verify that each resource was created successfully
+     */
     protected abstract String[] getResourceNames();
+
+    /**
+     * A subclass can override this to perform additional assertions on any resources that were created before the
+     * resources are deleted.
+     */
+    protected void afterResourcesCreated() {
+
+    }
 
     @Test
     public void createThenDelete() {
@@ -23,20 +34,26 @@ public abstract class AbstractManageResourceTest extends AbstractAppDeployerTest
         initializeAppDeployer(newCommand());
         appDeployer.deploy(appConfig);
 
-        for (String name : getResourceNames()) {
-            assertTrue(mgr.exists(name));
-        }
-
         try {
+            for (String name : getResourceNames()) {
+                assertTrue(mgr.exists(name));
+            }
+
+            // Let the subclass optionally perform any additional assertions
+            afterResourcesCreated();
+
             // Make sure we don't get an error from trying to create the roles again
             appDeployer.deploy(appConfig);
         } finally {
-            // Now undo
-            appDeployer.undeploy(appConfig);
+            undeployAndVerifyResourcesWereDeleted(mgr);
+        }
+    }
 
-            for (String name : getResourceNames()) {
-                assertFalse(mgr.exists(name));
-            }
+    protected void undeployAndVerifyResourcesWereDeleted(ResourceManager mgr) {
+        appDeployer.undeploy(appConfig);
+
+        for (String name : getResourceNames()) {
+            assertFalse(mgr.exists(name));
         }
     }
 }

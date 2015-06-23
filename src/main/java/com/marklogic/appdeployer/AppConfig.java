@@ -1,7 +1,9 @@
 package com.marklogic.appdeployer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.marklogic.client.DatabaseClientFactory.Authentication;
 
@@ -31,6 +33,9 @@ public class AppConfig {
     private List<ConfigDir> dependencyConfigDirs;
 
     private String groupName = "Default";
+
+    // Passed into the TokenReplacer that subclasses of AbstractCommand use
+    private Map<String, String> customTokens = new HashMap<>();
 
     public AppConfig() {
         this("src/main/ml-modules");
@@ -209,6 +214,14 @@ public class AppConfig {
 
     public void setXdbcPassword(String xdbcPassword) {
         this.xdbcPassword = xdbcPassword;
+    }
+
+    public Map<String, String> getCustomTokens() {
+        return customTokens;
+    }
+
+    public void setCustomTokens(Map<String, String> customTokens) {
+        this.customTokens = customTokens;
     }
 
 }

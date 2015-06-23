@@ -11,6 +11,8 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 
 import com.marklogic.junit.BaseTestHelper;
 import com.marklogic.junit.spring.LoggingTestExecutionListener;
+import com.marklogic.rest.mgmt.admin.AdminConfig;
+import com.marklogic.rest.mgmt.admin.AdminManager;
 
 /**
  * Base class for tests that just talk to the Mgmt API and don't depend on an AppDeployer instance.
@@ -23,14 +25,19 @@ public abstract class AbstractMgmtTest extends BaseTestHelper {
     @Autowired
     private ManageConfig manageConfig;
 
+    @Autowired
+    private AdminConfig adminConfig;
+
     // Intended to be used by subclasses
     protected ManageClient manageClient;
+    protected AdminManager adminManager;
 
     protected static HttpStatus.Series[] httpStatus;
 
     @Before
     public void initializeManageClient() {
         manageClient = new ManageClient(manageConfig);
+        adminManager = new AdminManager(adminConfig);
     }
 
     protected String format(String s, Object... args) {

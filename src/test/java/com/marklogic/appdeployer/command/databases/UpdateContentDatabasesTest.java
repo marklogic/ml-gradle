@@ -32,14 +32,15 @@ public class UpdateContentDatabasesTest extends AbstractAppDeployerTest {
         // We want both a main and a test app server in this test
         appConfig.setTestRestPort(SAMPLE_APP_TEST_REST_PORT);
 
-        initializeAppDeployer(new CreateRestApiServersCommand(), new UpdateContentDatabasesCommand());
+        initializeAppDeployer(new CreateRestApiServersCommand(), new CreateTriggersDatabaseCommand(),
+                new UpdateContentDatabasesCommand());
 
         appDeployer.deploy(appConfig);
 
-        Fragment db = dbMgr.getDatabasePropertiesAsXml(appConfig.getContentDatabaseName());
+        Fragment db = dbMgr.getPropertiesAsXml(appConfig.getContentDatabaseName());
         assertTrue(db.elementExists(idRangeIndexPath));
 
-        db = dbMgr.getDatabasePropertiesAsXml(appConfig.getTestContentDatabaseName());
+        db = dbMgr.getPropertiesAsXml(appConfig.getTestContentDatabaseName());
         assertTrue(db.elementExists(idRangeIndexPath));
     }
 
@@ -48,13 +49,14 @@ public class UpdateContentDatabasesTest extends AbstractAppDeployerTest {
         ConfigDir dir = appConfig.getConfigDir();
         dir.getContentDatabaseFiles().add(new File(dir.getDatabasesDir(), "more-content-db-config.json"));
 
-        initializeAppDeployer(new CreateRestApiServersCommand(), new UpdateContentDatabasesCommand());
+        initializeAppDeployer(new CreateRestApiServersCommand(), new CreateTriggersDatabaseCommand(),
+                new UpdateContentDatabasesCommand());
 
         appDeployer.deploy(appConfig);
 
         String rangeIndexXpath = "//m:range-element-index[m:namespace-uri = 'urn:sampleapp' and m:localname='anotherElement']";
 
-        Fragment db = dbMgr.getDatabasePropertiesAsXml(appConfig.getContentDatabaseName());
+        Fragment db = dbMgr.getPropertiesAsXml(appConfig.getContentDatabaseName());
         assertTrue(db.elementExists("//m:maintain-last-modified[. = 'true']"));
         assertTrue(db.elementExists(idRangeIndexPath));
         assertTrue(db.elementExists(rangeIndexXpath));

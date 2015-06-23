@@ -4,6 +4,7 @@ import java.io.File;
 
 import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
+import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.rest.mgmt.ResourceManager;
 import com.marklogic.rest.mgmt.security.AmpManager;
 
@@ -11,7 +12,7 @@ public class CreateAmpsCommand extends AbstractResourceCommand {
 
     @Override
     public Integer getExecuteSortOrder() {
-        return 30;
+        return SortOrderConstants.CREATE_AMPS;
     }
 
     @Override

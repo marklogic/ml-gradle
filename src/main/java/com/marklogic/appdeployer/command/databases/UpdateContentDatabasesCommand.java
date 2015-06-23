@@ -34,16 +34,13 @@ public class UpdateContentDatabasesCommand extends AbstractCommand {
 
         String payload = node.toString();
         String json = tokenReplacer.replaceTokens(payload, appConfig, false);
-        if (logger.isDebugEnabled()) {
-            logger.debug("Content database JSON: " + payload);
-        }
 
         DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
-        dbMgr.updateDatabase(appConfig.getContentDatabaseName(), json);
+        dbMgr.save(json);
 
         if (appConfig.isTestPortSet()) {
             json = tokenReplacer.replaceTokens(payload, appConfig, true);
-            dbMgr.updateDatabase(appConfig.getTestContentDatabaseName(), json);
+            dbMgr.save(json);
         }
     }
 }

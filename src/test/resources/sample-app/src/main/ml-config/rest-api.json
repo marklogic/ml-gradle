@@ -3,7 +3,7 @@
     "name": "%%NAME%%",
     "group": "%%GROUP%%",
     "database": "%%DATABASE%%",
-    "modules-database": "%%MODULES-DATABASE%%",
+    "modules-database": "%%MODULES_DATABASE%%",
     "port": "%%PORT%%",
     "xdbc-enabled": true,
     "forests-per-host": 3,

@@ -281,6 +281,8 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
         logger.info(String.format("Loading %s transform from file %s", transformName, file));
         if (FilenameUtil.isXslFile(file.getName())) {
             mgr.writeXSLTransform(transformName, new FileHandle(file), metadata);
+        } else if (FilenameUtil.isJavascriptFile(file.getName())) {
+            mgr.writeJavascriptTransform(transformName, new FileHandle(file), metadata);
         } else {
             mgr.writeXQueryTransform(transformName, new FileHandle(file), metadata);
         }

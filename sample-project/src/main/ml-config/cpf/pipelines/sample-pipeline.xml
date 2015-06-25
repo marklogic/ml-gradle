@@ -1,7 +1,7 @@
-<pipeline xmlns="http://marklogic.com/cpf/pipelines">
-
+<pipeline-properties xmlns="http://marklogic.com/manage/pipeline/properties">
   <pipeline-name>Sample Pipeline</pipeline-name>
-  <pipeline-description>This is a simple pipeline that exists solely to show how CPF can be configured via ml-gradle</pipeline-description>
+  <pipeline-description>This is a simple pipeline that exists solely to show how CPF can be configured via ml-gradle
+  </pipeline-description>
   <success-action>
     <module>/MarkLogic/cpf/actions/success-action.xqy</module>
   </success-action>
@@ -11,18 +11,14 @@
 
   <state-transition>
     <annotation>
-      Just a sample action that prints a log statement. 
+      Just a sample action that prints a log statement.
     </annotation>
     <state>http://marklogic.com/states/initial</state>
     <on-success>http://marklogic.com/states/done</on-success>
     <on-failure>http://marklogic.com/states/error</on-failure>
     <execute>
       <condition>
-        <module>/MarkLogic/cpf/actions/namespace-condition.xqy</module>
-        <options xmlns="/MarkLogic/cpf/actions/namespace-condition.xqy">
-          <root-element>person</root-element>
-          <namespace>http://marklogic.com/sample</namespace>
-        </options>
+        <module>/marklogic/cpf/actions/changed-type-condition.xqy</module>
       </condition>
       <action>
         <module>ext/cpf/sample-action.xqy</module>
@@ -30,4 +26,4 @@
     </execute>
   </state-transition>
 
-</pipeline>
+</pipeline-properties>

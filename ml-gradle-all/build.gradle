@@ -1,0 +1,39 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+repositories {
+    mavenCentral()
+    maven {url "http://developer.marklogic.com/maven2/"}
+    maven {url "http://rjrudin.github.io/marklogic-java/releases"}
+}
+
+dependencies { compile "com.marklogic:ml-junit:2.0.2" }
+
+task packageMlGradle(type: JavaExec) {
+    main = 'com.marklogic.mlgradleall.MlGradlePackager'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+apply plugin: 'maven-publish'
+
+configurations { mlgradle }
+
+task mlgradleZip(type: Zip) {
+    from("build/ml-gradle-all") { into("ml-gradle-all") }
+    destinationDir file('build/tmp')
+    baseName "ml-gradle-all"
+}
+
+artifacts { mlgradle mlgradleZip }
+
+publishing {
+    publications {
+        mainMlgradle(MavenPublication) {
+            artifactId 'ml-gradle-all'
+            artifact mlgradleZip
+        }
+    }
+    repositories { maven {url "file://$projectDir/../../gh-pages-marklogic-java/releases"
+        } }
+}
+

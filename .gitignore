@@ -4,3 +4,8 @@
 /.gradle
 /.settings
 /.project
+ml-gradle-all/build/
+ml-gradle-all/.gradle/
+ml-gradle-all/.classpath
+ml-gradle-all/.project
+ml-gradle-all/.settings/

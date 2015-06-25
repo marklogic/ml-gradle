@@ -19,6 +19,7 @@ public class MlGradlePackager {
     public static void main(String[] args) throws Exception {
         destDir.mkdirs();
         processDependency("ml-gradle", "2.0-alpha-6");
+        processDependency("ml-junit", "2.0.2");
     }
 
     private static void processDependency(String name, String version) throws IOException {

@@ -18,7 +18,7 @@ apply plugin: 'maven-publish'
 
 configurations { mlgradle }
 
-task mlgradleZip(type: Zip) {
+task mlgradleZip(type: Zip, dependsOn: packageMlGradle) {
     from("build/ml-gradle-all") { into("ml-gradle-all") }
     destinationDir file('build/tmp')
     baseName "ml-gradle-all"

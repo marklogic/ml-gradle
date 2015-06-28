@@ -27,6 +27,10 @@ public class ConfigDir {
     }
 
     public ConfigDir(File baseDir) {
+        setBaseDir(baseDir);
+    }
+
+    public void setBaseDir(File baseDir) {
         this.baseDir = baseDir;
         initializeContentDatabaseFiles();
     }
@@ -59,7 +63,7 @@ public class ConfigDir {
     public File getCpfDir() {
         return new File(baseDir, "cpf");
     }
-    
+
     public void setDatabasesPath(String databasesPath) {
         this.databasesPath = databasesPath;
     }

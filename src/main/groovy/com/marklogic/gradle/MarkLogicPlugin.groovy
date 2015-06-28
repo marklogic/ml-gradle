@@ -5,6 +5,7 @@ import org.gradle.api.Project
 
 import com.marklogic.appdeployer.AppConfig
 import com.marklogic.appdeployer.AppDeployer
+import com.marklogic.appdeployer.ConfigDir
 import com.marklogic.appdeployer.command.Command
 import com.marklogic.appdeployer.command.CommandContext
 import com.marklogic.appdeployer.command.cpf.CreateCpfConfigsCommand
@@ -44,6 +45,8 @@ import com.marklogic.rest.mgmt.admin.AdminManager
 class MarkLogicPlugin implements Plugin<Project> {
 
     void apply(Project project) {
+        println "\nInitializing ml-gradle"
+        
         initializeAppConfig(project)
         initializeManageConfig(project)
         initializeAdminConfig(project)
@@ -83,6 +86,8 @@ class MarkLogicPlugin implements Plugin<Project> {
         // Tasks for generating code
         project.task("mlCreateResource", type: CreateResourceTask, group: group, description: "Create a new resource extension in the src/main/xqy/services directory")
         project.task("mlCreateTransform", type: CreateTransformTask, group: group, description: "Create a new transform in the src/main/xqy/transforms directory")
+        
+        println "Finished initializing ml-gradle\n"
     }
 
     /**
@@ -93,7 +98,11 @@ class MarkLogicPlugin implements Plugin<Project> {
      */
     void initializeAppConfig(Project project) {
         AppConfig appConfig = new AppConfig()
-
+        if (project.hasProperty("mlConfigDir")) {
+            def prop = project.property("mlConfigDir")
+            println "Setting config dir to: " + prop
+            appConfig.setConfigDir(new ConfigDir(new File(prop)))
+        }
         if (project.hasProperty("mlAppName")) {
             def name = project.property("mlAppName")
             println "App name: " + name
@@ -211,7 +220,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         commands.add(new CreateCpfConfigsCommand())
         commands.add(new CreateDomainsCommand())
         commands.add(new CreatePipelinesCommand())
-        
+
         SimpleAppDeployer deployer = new SimpleAppDeployer(manageClient, adminManager)
         deployer.setCommands(commands)
         return deployer

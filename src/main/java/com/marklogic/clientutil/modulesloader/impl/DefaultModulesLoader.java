@@ -9,6 +9,8 @@ import java.util.Set;
 
 import org.springframework.util.FileCopyUtils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.FailedRequestException;
 import com.marklogic.client.admin.ExtensionLibrariesManager;
@@ -18,6 +20,8 @@ import com.marklogic.client.admin.NamespacesManager;
 import com.marklogic.client.admin.QueryOptionsManager;
 import com.marklogic.client.admin.ResourceExtensionsManager;
 import com.marklogic.client.admin.ResourceExtensionsManager.MethodParameters;
+import com.marklogic.client.admin.ServerConfigurationManager;
+import com.marklogic.client.admin.ServerConfigurationManager.UpdatePolicy;
 import com.marklogic.client.admin.TransformExtensionsManager;
 import com.marklogic.client.io.FileHandle;
 import com.marklogic.client.io.Format;
@@ -80,6 +84,7 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
 
         Set<File> loadedModules = new HashSet<>();
 
+        loadProperties(modules, loadedModules);
         loadAssets(modules, loadedModules);
         loadQueryOptions(modules, loadedModules);
         loadTransforms(modules, loadedModules);
@@ -87,6 +92,55 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
         loadNamespaces(modules, loadedModules);
 
         return loadedModules;
+    }
+
+    /**
+     * Only supports a JSON file.
+     * 
+     * @param modules
+     * @param loadedModules
+     */
+    protected void loadProperties(Modules modules, Set<File> loadedModules) {
+        File f = modules.getPropertiesFile();
+        if (f != null && f.exists()) {
+            ServerConfigurationManager mgr = client.newServerConfigManager();
+            ObjectMapper m = new ObjectMapper();
+            try {
+                JsonNode node = m.readTree(f);
+                if (node.has("document-transform-all")) {
+                    mgr.setDefaultDocumentReadTransformAll(node.get("document-transform-all").asBoolean());
+                }
+                if (node.has("document-transform-out")) {
+                    mgr.setDefaultDocumentReadTransform(node.get("document-transform-out").asText());
+                }
+                if (node.has("update-policy")) {
+                    mgr.setUpdatePolicy(UpdatePolicy.valueOf(node.get("update-policy").asText()));
+                }
+                if (node.has("validate-options")) {
+                    mgr.setQueryValidation(node.get("validate-options").asBoolean());
+                }
+                if (node.has("validate-queries")) {
+                    mgr.setQueryOptionValidation(node.get("validate-queries").asBoolean());
+                }
+                if (node.has("debug")) {
+                    mgr.setServerRequestLogging(node.get("debug").asBoolean());
+                }
+                if (logger.isInfoEnabled()) {
+                    logger.info("Writing REST server configuration");
+                    logger.info("Default document read transform: " + mgr.getDefaultDocumentReadTransform());
+                    logger.info("Transform all documents on read: " + mgr.getDefaultDocumentReadTransformAll());
+                    logger.info("Validate query options: " + mgr.getQueryOptionValidation());
+                    logger.info("Validate queries: " + mgr.getQueryValidation());
+                    logger.info("Output debugging: " + mgr.getServerRequestLogging());
+                    if (mgr.getUpdatePolicy() != null) {
+                        logger.info("Update policy: " + mgr.getUpdatePolicy().name());
+                    }
+                }
+                mgr.writeConfiguration();
+            } catch (Exception e) {
+                throw new RuntimeException("Unable to read REST configuration from file: " + f.getAbsolutePath(), e);
+            }
+        }
     }
 
     protected void loadAssets(Modules modules, Set<File> loadedModules) {

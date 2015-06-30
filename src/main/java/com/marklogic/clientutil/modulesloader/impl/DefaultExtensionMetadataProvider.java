@@ -29,7 +29,6 @@ public class DefaultExtensionMetadataProvider extends LoggingObject implements E
         ExtensionMetadata m = new ExtensionMetadata();
         List<MethodParameters> paramList = new ArrayList<>();
 
-        // JAVA API defaults to the script language of XQuery
         if (FilenameUtil.isJavascriptFile(resourceFile.getName())) {
             m.setScriptLanguage(ScriptLanguage.JAVASCRIPT);
             m.setVersion("1.0");

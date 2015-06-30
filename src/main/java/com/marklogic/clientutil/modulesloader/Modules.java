@@ -10,7 +10,8 @@ public class Modules {
     private List<File> transforms;
     private List<File> options;
     private List<File> namespaces;
-    
+    private File propertiesFile;
+
     public List<File> getServices() {
         return services;
     }
@@ -49,6 +50,14 @@ public class Modules {
 
     public void setNamespaces(List<File> namespaces) {
         this.namespaces = namespaces;
+    }
+
+    public File getPropertiesFile() {
+        return propertiesFile;
+    }
+
+    public void setPropertiesFile(File propertiesFile) {
+        this.propertiesFile = propertiesFile;
     }
 
 }

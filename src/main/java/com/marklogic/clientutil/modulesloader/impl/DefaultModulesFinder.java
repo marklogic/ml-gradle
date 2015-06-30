@@ -30,7 +30,21 @@ public class DefaultModulesFinder implements ModulesFinder {
         addOptions(modules, baseDir);
         addTransforms(modules, baseDir);
         addNamespaces(modules, baseDir);
+        addPropertiesFile(modules, baseDir);
         return modules;
+    }
+
+    /**
+     * Only supports JSON for now.
+     * 
+     * @param modules
+     * @param baseDir
+     */
+    protected void addPropertiesFile(Modules modules, File baseDir) {
+        File jsonFile = new File(baseDir, "rest-properties.json");
+        if (jsonFile.exists()) {
+            modules.setPropertiesFile(jsonFile);
+        }
     }
 
     protected void addServices(Modules modules, File baseDir) {

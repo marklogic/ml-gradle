@@ -39,12 +39,12 @@ public class ManageClient extends LoggingObject {
 
     public void initialize(ManageConfig config) {
         if (logger.isInfoEnabled()) {
-            logger.info("Initializing with manage config of: " + config);
+            logger.info("Initializing ManageClient with manage config of: " + config);
         }
         this.restTemplate = RestTemplateUtil.newRestTemplate(config);
         this.baseUrl = config.getBaseUrl();
         if (logger.isInfoEnabled()) {
-            logger.info("Initialized with base URL of: " + baseUrl);
+            logger.info("Initialized ManageClient with base URL of: " + baseUrl);
         }
     }
 

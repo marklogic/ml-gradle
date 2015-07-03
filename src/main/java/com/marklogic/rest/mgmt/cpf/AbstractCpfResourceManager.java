@@ -9,10 +9,10 @@ import com.marklogic.rest.util.ResourcesFragment;
  */
 public abstract class AbstractCpfResourceManager extends AbstractManager {
 
-    private ManageClient client;
+    private ManageClient manageClient;
 
     public AbstractCpfResourceManager(ManageClient client) {
-        this.client = client;
+        this.manageClient = client;
     }
 
     public String getResourcesPath(String databaseIdOrName) {
@@ -28,7 +28,7 @@ public abstract class AbstractCpfResourceManager extends AbstractManager {
     }
 
     public ResourcesFragment getAsXml(String databaseIdOrName) {
-        return new ResourcesFragment(client.getXml(getResourcesPath(databaseIdOrName)));
+        return new ResourcesFragment(manageClient.getXml(getResourcesPath(databaseIdOrName)));
     }
 
     public boolean exists(String databaseIdOrName, String resourceIdOrName) {
@@ -41,12 +41,16 @@ public abstract class AbstractCpfResourceManager extends AbstractManager {
         if (exists(databaseIdOrName, name)) {
             String path = getPropertiesPath(databaseIdOrName, name);
             logger.info(format("Found %s with name of %s, so updating ", label, path));
-            putPayload(client, path, payload);
+            putPayload(manageClient, path, payload);
             logger.info(format("Updated %s at %s", label, path));
         } else {
             logger.info(format("Creating %s: %s", label, name));
-            postPayload(client, getResourcesPath(databaseIdOrName), payload);
+            postPayload(manageClient, getResourcesPath(databaseIdOrName), payload);
             logger.info(format("Created %s: %s", label, name));
         }
+    }
+
+    public ManageClient getManageClient() {
+        return manageClient;
     }
 }

@@ -33,6 +33,8 @@ import com.marklogic.gradle.task.client.CreateTransformTask
 import com.marklogic.gradle.task.client.LoadModulesTask
 import com.marklogic.gradle.task.client.PrepareRestApiDependenciesTask
 import com.marklogic.gradle.task.client.WatchTask
+import com.marklogic.gradle.task.cpf.DeployCpfTask;
+import com.marklogic.gradle.task.cpf.LoadDefaultPipelinesTask;
 import com.marklogic.gradle.task.databases.ClearContentDatabaseTask
 import com.marklogic.gradle.task.databases.ClearModulesTask
 import com.marklogic.gradle.task.databases.UpdateContentDatabasesTask
@@ -83,6 +85,10 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlUpdateContentDatabase", type: UpdateContentDatabasesTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the content databases")
         project.task("mlUpdateRestApiServers", type: UpdateRestApiServersTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the REST API servers")
 
+        // CPF tasks
+        project.task("mlCpfDeploy", type: DeployCpfTask, group: group, description: "Deploy CPF pipelines, domains, and configurations")
+        project.task("mlCpfLoadDefaultPipelines", type: LoadDefaultPipelinesTask, group: group, description: "Load default pipelines into a triggers database")
+        
         // Tasks for generating code
         project.task("mlCreateResource", type: CreateResourceTask, group: group, description: "Create a new resource extension in the src/main/xqy/services directory")
         project.task("mlCreateTransform", type: CreateTransformTask, group: group, description: "Create a new transform in the src/main/xqy/transforms directory")

@@ -7,7 +7,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "com.marklogic:ml-gradle:2.0-alpha-7"
+        classpath "com.marklogic:ml-gradle:2.0a8"
     }
 }
 

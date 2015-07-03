@@ -17,6 +17,9 @@ public class MlGradlePackager {
     private static File destDir = new File("build/ml-gradle-all/com/marklogic");
 
     public static void main(String[] args) throws Exception {
+        if (destDir.exists()) {
+            destDir.delete();
+        }
         destDir.mkdirs();
         processDependency("ml-gradle", "2.0-alpha-7");
         processDependency("ml-junit", "2.0.2");

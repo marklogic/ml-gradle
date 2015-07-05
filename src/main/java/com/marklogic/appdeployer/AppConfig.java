@@ -37,6 +37,9 @@ public class AppConfig {
     // Passed into the TokenReplacer that subclasses of AbstractCommand use
     private Map<String, String> customTokens = new HashMap<>();
 
+    // Allows for creating a triggers database without a config file for one
+    private boolean createTriggerDatabase = true;
+
     public AppConfig() {
         this("src/main/ml-modules");
     }
@@ -222,6 +225,14 @@ public class AppConfig {
 
     public void setCustomTokens(Map<String, String> customTokens) {
         this.customTokens = customTokens;
+    }
+
+    public boolean isCreateTriggerDatabase() {
+        return createTriggerDatabase;
+    }
+
+    public void setCreateTriggerDatabase(boolean createTriggerDatabase) {
+        this.createTriggerDatabase = createTriggerDatabase;
     }
 
 }

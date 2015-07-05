@@ -97,14 +97,16 @@ task createSampleTrigger(type: com.marklogic.gradle.task.trigger.CreateTriggersT
 }
 
 /*
- * Example of attaching the creation of our trigger to the end of the mlDeploy process.
+ * Example of attaching the creation of our trigger to the end of the mlDeploy process. mlPostDeploy is an empty task
+ * that is called by mlDeploy after mlAppDeploy runs; mlPostDeploy thus allows for any additional tasks to be added to
+ * the deployment process. 
  */
 mlPostDeploy.dependsOn createSampleTrigger
 
 
 /*
  * Example of a custom command and how it's added to the AppDeployer. This could also be defined in the Gradle buildSrc
- * directory (that's more likely the better option for keeping your build.gradle file slim)
+ * directory (that's more likely the better option for keeping your build.gradle file slim).
  */
 ext {
     mlAppDeployer.commands.add(new MergeContentDatabaseCommand())

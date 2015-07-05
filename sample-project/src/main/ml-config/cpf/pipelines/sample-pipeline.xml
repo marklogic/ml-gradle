@@ -21,7 +21,7 @@
         <module>/marklogic/cpf/actions/changed-type-condition.xqy</module>
       </condition>
       <action>
-        <module>ext/cpf/sample-action.xqy</module>
+        <module>ext/sample-project/cpf/sample-action.xqy</module>
       </action>
     </execute>
   </state-transition>

@@ -47,7 +47,7 @@ configurations { corb }
  * using that library in tests that must invoke MarkLogic HTTP endpoints.
  */
 dependencies {
-    compile "com.marklogic:ml-javaclient-util:2.0.3"
+    compile "com.marklogic:ml-javaclient-util:2.0.6"
     testCompile "com.marklogic:ml-junit:2.0.2"
     testCompile "com.jayway.restassured:rest-assured:2.3.1"
 
@@ -64,6 +64,12 @@ ext {
 }
 
 /*
+ * For tests that reference test files in the test source tree, we need to tell Gradle to copy these to src/test/resources
+ * so that they can be found when running "gradle test".
+ */
+sourceSets.test.resources.srcDir 'src/test/java'
+
+/*
  * This is an example of both a custom Gradle task and an easy way of invoking Corb. This depends on "mlLoadModules" to
  * ensure that the Corb uris/transform modules are loaded. It also uses as a classpath the custom configuration named
  * "corb" that we defined earlier. Note that sample uris.xqy and transform.xqy modules just print a log statement for
@@ -76,10 +82,25 @@ task runCorb(dependsOn: ['mlLoadModules'], type: JavaExec) {
 }
 
 /*
- * For tests that reference test files in the test source tree, we need to tell Gradle to copy these to src/test/resources
- * so that they can be found when running "gradle test".
+ * As of ML 8.0-3, triggers can not yet be managed via the Management REST API, so we still rely on a custom Gradle task
+ * that uses XCC to create the trigger.
  */
-sourceSets.test.resources.srcDir 'src/test/java'
+task createSampleTrigger(type: com.marklogic.gradle.task.trigger.CreateTriggersTask) {
+    xccUrl = appConfig.contentXccUrl
+    triggerName = "sample-project-trigger"
+    description = "This is an example of creating a trigger"
+    dataEventCommit = "post"
+    dataEventScopeArgs = ["some-collection"]
+    dataEventContentArgs = ["create", "modify", "delete"]
+    moduleRoot = "/"
+    modulePath = "/ext/sample-project/trigger/sample-trigger.xqy"
+}
+
+/*
+ * Example of attaching the creation of our trigger to the end of the mlDeploy process.
+ */
+mlPostDeploy.dependsOn createSampleTrigger
+
 
 /*
  * Example of a custom command and how it's added to the AppDeployer. This could also be defined in the Gradle buildSrc
@@ -112,3 +133,4 @@ task mergeContentDatabase(type: com.marklogic.gradle.task.MarkLogicTask) {
         getManageClient().postJson("/manage/v2/databases/" + getAppConfig().getContentDatabaseName(), '{"operation":"merge-database"}')
     }
 }
+

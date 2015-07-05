@@ -73,8 +73,10 @@ class MarkLogicPlugin implements Plugin<Project> {
          */
         project.task("mlAppDeploy", type: DeployAppTask, group: group, dependsOn: ["mlDeleteModuleTimestampsFile", "mlPrepareRestApiDependencies"], description: "Deploys the application")
         project.task("mlAppUndeploy", type: UndeployAppTask, group: group, description: "Undeploys the application")
-        project.task("mlDeploy", group: group, dependsOn: "mlAppDeploy", description: "Deploys the application and allows for additional steps via dependsOn")
-        project.task("mlUndeploy", group: group, dependsOn: "mlAppUndeploy", description: "Undeploys the application and allows for additional steps via dependsOn")
+        project.task("mlPostDeploy", group: group, description: "Called by mlDeploy after mlAppDeploy as a way of allowing tasks to easily be added to mlDeploy").mustRunAfter(["mlAppDeploy"])
+        project.task("mlDeploy", group: group, dependsOn: ["mlAppDeploy", "mlPostDeploy"], description: "Deploys the application and allows for additional steps via dependsOn")
+        project.task("mlPostUndeploy", group: group, description: "Called by mlUndeploy after mlAppUndeploy as a way of allowing tasks to easily be added to mlUndeploy").mustRunAfter(["mlAppUndeploy"])
+        project.task("mlUndeploy", group: group, dependsOn: ["mlAppUndeploy", "mlPostUndeploy"], description: "Undeploys the application and allows for additional steps via dependsOn")
 
         // Tasks for loading modules
         project.task("mlLoadModules", type: LoadModulesTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Loads modules from directories defined by mlAppConfig or via a property on this task").mustRunAfter(["mlClearModules"])

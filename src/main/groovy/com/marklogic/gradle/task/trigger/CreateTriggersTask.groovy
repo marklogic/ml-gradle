@@ -32,10 +32,13 @@ class CreateTriggersTask extends MarkLogicTask {
 
     @TaskAction
     void createTriggers() {
+        if (!xccUrl) {
+            xccUrl = getAppConfig().getContentXccUrl()
+        }
         XccHelper xccHelper = new XccHelper(xccUrl)
 
         if (!triggersDatabaseName) {
-            triggersDatabaseName = getAppConfig().getName() + "-triggers"
+            triggersDatabaseName = getAppConfig().getTriggersDatabaseName()
         }
         
         boolean isAnyPropertyContent = !dataEventContentArgs

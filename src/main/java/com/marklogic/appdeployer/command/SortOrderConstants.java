@@ -20,8 +20,9 @@ public abstract class SortOrderConstants {
     public static Integer UPDATE_REST_API_SERVERS_ORDER = 600;
 
     public static Integer CREATE_SCHEDULED_TASKS = 800;
-    
-    public static Integer CREATE_PIPELINES_ORDER = 900;
+
+    public static Integer LOAD_DEFAULT_PIPELINES = 900;
+    public static Integer CREATE_PIPELINES_ORDER = 905;
     public static Integer CREATE_DOMAINS_ORDER = 910;
     public static Integer CREATE_CPF_CONFIGS_ORDER = 920;
 }

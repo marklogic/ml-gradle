@@ -9,7 +9,9 @@ public class PipelineManager extends AbstractCpfResourceManager {
     }
 
     public void loadDefaultPipelines(String databaseIdOrName) {
+        logger.info("Loading default pipelines into database: " + databaseIdOrName);
         getManageClient()
                 .postJson(getResourcesPath(databaseIdOrName), "{\"operation\":\"load-default-cpf-pipelines\"}");
+        logger.info("Loaded default pipelines into database: " + databaseIdOrName);
     }
 }

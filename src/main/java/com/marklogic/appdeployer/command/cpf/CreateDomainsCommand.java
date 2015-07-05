@@ -7,9 +7,8 @@ import com.marklogic.rest.mgmt.cpf.DomainManager;
 
 public class CreateDomainsCommand extends AbstractCpfResourceCommand {
 
-    @Override
-    public Integer getExecuteSortOrder() {
-        return SortOrderConstants.CREATE_DOMAINS_ORDER;
+    public CreateDomainsCommand() {
+        setExecuteSortOrder(SortOrderConstants.CREATE_DOMAINS_ORDER);
     }
 
     @Override

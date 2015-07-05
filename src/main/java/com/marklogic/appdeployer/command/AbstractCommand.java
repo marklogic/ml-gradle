@@ -8,13 +8,14 @@ import org.springframework.util.FileCopyUtils;
 import com.marklogic.clientutil.LoggingObject;
 
 /**
- * Abstract base class that provides some convenience methods for implementing a command. Requires that the Spring
- * Ordered interface be implemented so that the implementor takes into account when this particular command should be
- * executed relative to other commands.
+ * Abstract base class that provides some convenience methods for implementing a command. Subclasses will typically override
+ * the default sort order within the subclass constructor.
  */
 public abstract class AbstractCommand extends LoggingObject implements Command {
 
     protected TokenReplacer tokenReplacer = new DefaultTokenReplacer();
+
+    protected int executeSortOrder = Integer.MAX_VALUE;
 
     protected String copyFileToString(File f) {
         try {
@@ -35,6 +36,15 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 
     public TokenReplacer getTokenReplacer() {
         return tokenReplacer;
+    }
+
+    @Override
+    public Integer getExecuteSortOrder() {
+        return this.executeSortOrder;
+    }
+
+    public void setExecuteSortOrder(int executeSortOrder) {
+        this.executeSortOrder = executeSortOrder;
     }
 
 }

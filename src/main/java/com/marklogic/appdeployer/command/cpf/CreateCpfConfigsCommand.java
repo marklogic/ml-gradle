@@ -7,9 +7,8 @@ import com.marklogic.rest.mgmt.cpf.CpfConfigManager;
 
 public class CreateCpfConfigsCommand extends AbstractCpfResourceCommand {
 
-    @Override
-    public Integer getExecuteSortOrder() {
-        return SortOrderConstants.CREATE_CPF_CONFIGS_ORDER;
+    public CreateCpfConfigsCommand() {
+        setExecuteSortOrder(SortOrderConstants.CREATE_CPF_CONFIGS_ORDER);
     }
 
     @Override

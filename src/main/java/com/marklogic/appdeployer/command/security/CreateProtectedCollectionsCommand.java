@@ -10,9 +10,8 @@ import com.marklogic.rest.mgmt.security.ProtectedCollectionsManager;
 
 public class CreateProtectedCollectionsCommand extends AbstractResourceCommand {
 
-    @Override
-    public Integer getExecuteSortOrder() {
-        return SortOrderConstants.CREATE_PROTECTED_COLLECTIONS;
+    public CreateProtectedCollectionsCommand() {
+        setExecuteSortOrder(SortOrderConstants.CREATE_PROTECTED_COLLECTIONS);
     }
 
     @Override

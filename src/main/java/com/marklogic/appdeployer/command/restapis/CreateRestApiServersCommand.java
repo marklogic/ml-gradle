@@ -19,9 +19,8 @@ public class CreateRestApiServersCommand extends AbstractCommand implements Undo
     private boolean includeModules = true;
     private boolean includeContent = true;
 
-    @Override
-    public Integer getExecuteSortOrder() {
-        return SortOrderConstants.CREATE_REST_API_SERVERS_ORDER;
+    public CreateRestApiServersCommand() {
+        setExecuteSortOrder(SortOrderConstants.CREATE_REST_API_SERVERS_ORDER);
     }
 
     @Override

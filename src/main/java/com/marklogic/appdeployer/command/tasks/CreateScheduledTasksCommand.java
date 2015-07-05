@@ -12,9 +12,8 @@ public class CreateScheduledTasksCommand extends AbstractResourceCommand {
 
     private String groupName;
 
-    @Override
-    public Integer getExecuteSortOrder() {
-        return SortOrderConstants.CREATE_SCHEDULED_TASKS;
+    public CreateScheduledTasksCommand() {
+        setExecuteSortOrder(SortOrderConstants.CREATE_SCHEDULED_TASKS);
     }
 
     @Override

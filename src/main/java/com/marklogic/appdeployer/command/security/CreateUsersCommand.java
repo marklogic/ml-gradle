@@ -10,9 +10,8 @@ import com.marklogic.rest.mgmt.security.UserManager;
 
 public class CreateUsersCommand extends AbstractResourceCommand {
 
-    @Override
-    public Integer getExecuteSortOrder() {
-        return SortOrderConstants.CREATE_USERS;
+    public CreateUsersCommand() {
+        setExecuteSortOrder(SortOrderConstants.CREATE_USERS);
     }
 
     protected File getResourcesDir(CommandContext context) {

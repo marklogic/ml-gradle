@@ -23,9 +23,8 @@ public class LoadModulesCommand extends AbstractCommand {
     private String defaultAssetRolesAndCapabilities = "rest-admin,read,rest-admin,update,rest-extension-user,execute";
     private String customAssetRolesAndCapabilities;
 
-    @Override
-    public Integer getExecuteSortOrder() {
-        return SortOrderConstants.LOAD_MODULES_ORDER;
+    public LoadModulesCommand() {
+        setExecuteSortOrder(SortOrderConstants.LOAD_MODULES_ORDER);
     }
 
     @Override

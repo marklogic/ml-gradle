@@ -13,9 +13,8 @@ import com.marklogic.rest.mgmt.hosts.HostManager;
 
 public class CreateTriggersDatabaseCommand extends AbstractCommand implements UndoableCommand {
 
-    @Override
-    public Integer getExecuteSortOrder() {
-        return SortOrderConstants.CREATE_TRIGGERS_DATABASE_ORDER;
+    public CreateTriggersDatabaseCommand() {
+        setExecuteSortOrder(SortOrderConstants.CREATE_TRIGGERS_DATABASE_ORDER);
     }
 
     /**

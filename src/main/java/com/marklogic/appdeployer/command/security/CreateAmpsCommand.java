@@ -10,9 +10,8 @@ import com.marklogic.rest.mgmt.security.AmpManager;
 
 public class CreateAmpsCommand extends AbstractResourceCommand {
 
-    @Override
-    public Integer getExecuteSortOrder() {
-        return SortOrderConstants.CREATE_AMPS;
+    public CreateAmpsCommand() {
+        setExecuteSortOrder(SortOrderConstants.CREATE_AMPS);
     }
 
     @Override

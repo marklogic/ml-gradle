@@ -10,9 +10,8 @@ import com.marklogic.rest.mgmt.security.ExternalSecurityManager;
 
 public class CreateExternalSecurityCommand extends AbstractResourceCommand {
 
-    @Override
-    public Integer getExecuteSortOrder() {
-        return SortOrderConstants.CREATE_EXTERNAL_SECURITY;
+    public CreateExternalSecurityCommand() {
+        setExecuteSortOrder(SortOrderConstants.CREATE_EXTERNAL_SECURITY);
     }
 
     @Override

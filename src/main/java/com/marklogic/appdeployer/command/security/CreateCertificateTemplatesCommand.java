@@ -10,9 +10,8 @@ import com.marklogic.rest.mgmt.security.CertificateTemplateManager;
 
 public class CreateCertificateTemplatesCommand extends AbstractResourceCommand {
 
-    @Override
-    public Integer getExecuteSortOrder() {
-        return SortOrderConstants.CREATE_CERTIFICATE_TEMPLATES;
+    public CreateCertificateTemplatesCommand() {
+        setExecuteSortOrder(SortOrderConstants.CREATE_CERTIFICATE_TEMPLATES);
     }
 
     @Override

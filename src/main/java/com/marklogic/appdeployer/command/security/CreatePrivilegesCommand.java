@@ -10,9 +10,8 @@ import com.marklogic.rest.mgmt.security.PrivilegeManager;
 
 public class CreatePrivilegesCommand extends AbstractResourceCommand {
 
-    @Override
-    public Integer getExecuteSortOrder() {
-        return SortOrderConstants.CREATE_PRIVILEGES;
+    public CreatePrivilegesCommand() {
+        setExecuteSortOrder(SortOrderConstants.CREATE_PRIVILEGES);
     }
 
     @Override

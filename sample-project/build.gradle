@@ -72,7 +72,7 @@ ext {
 task runCorb(dependsOn: ['mlLoadModules'], type: JavaExec) {
     main = 'com.marklogic.developer.corb.Manager'
     classpath = configurations.corb
-    args = [mlAppConfig.contentXccUrl, '""', 'transform.xqy', '4', 'uris.xqy', '/ext/corb/', 'sample-project-modules', 'false']
+    args = [mlAppConfig.contentXccUrl, '""', 'transform.xqy', '4', 'uris.xqy', '/ext/sample-project/corb/', 'sample-project-modules', 'false']
 }
 
 /*

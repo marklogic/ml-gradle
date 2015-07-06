@@ -27,6 +27,7 @@ public class CreateRestApiAsNonAdminUserTest extends AbstractAppDeployerTest {
     @Before
     public void setup() {
         xccTemplate = newModulesXccTemplate();
+        deleteModuleTimestampsFile();
     }
 
     @After

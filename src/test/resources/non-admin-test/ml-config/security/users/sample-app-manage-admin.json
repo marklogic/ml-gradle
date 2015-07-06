@@ -1,5 +1,5 @@
 {
   "user-name" : "sample-app-manage-admin",
   "password" : "sample-app-manage-admin",
-  "role" : [ "manage-admin", "admin" ]
+  "role" : [ "manage-admin", "rest-admin" ]
 }

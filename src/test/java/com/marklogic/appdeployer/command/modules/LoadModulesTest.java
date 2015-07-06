@@ -1,7 +1,5 @@
 package com.marklogic.appdeployer.command.modules;
 
-import java.io.File;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -71,17 +69,6 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
         perms.assertPermissionExists("rest-admin", "read");
         perms.assertPermissionExists("rest-admin", "update");
         perms.assertPermissionExists("rest-extension-user", "execute");
-    }
-
-    /**
-     * This ensures that modules aren't loaded because of the timestamps file.
-     */
-    private void deleteModuleTimestampsFile() {
-        File f = new File("build/ml-last-configured-timestamps.properties");
-        if (f.exists()) {
-            logger.info("Deleting module timestamps file: " + f.getAbsolutePath());
-            f.delete();
-        }
     }
 
 }

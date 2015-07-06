@@ -93,4 +93,16 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
         return new XccTemplate(format("xcc://%s:%s@%s:8000/%s", appConfig.getXdbcUsername(),
                 appConfig.getXdbcPassword(), appConfig.getHost(), appConfig.getModulesDatabaseName()));
     }
+
+    /**
+     * This ensures that modules aren't not loaded because of the timestamps file.
+     */
+    protected void deleteModuleTimestampsFile() {
+        File f = new File("build/ml-last-configured-timestamps.properties");
+        if (f.exists()) {
+            logger.info("Deleting module timestamps file: " + f.getAbsolutePath());
+            f.delete();
+        }
+    }
+
 }

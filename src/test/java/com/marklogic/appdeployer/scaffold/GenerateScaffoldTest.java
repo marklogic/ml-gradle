@@ -21,9 +21,14 @@ public class GenerateScaffoldTest extends AbstractAppDeployerTest {
         sg.generateScaffold(path, appConfig);
 
         File configDir = new File(dir, "src/main/ml-config");
+        assertTrue(configDir.exists());
         assertTrue(new File(configDir, "rest-api.json").exists());
         assertTrue(new File(configDir, "databases/content-database.json").exists());
         assertTrue(new File(configDir, "security/roles/sample-app-role.json").exists());
         assertTrue(new File(configDir, "security/users/sample-app-user.json").exists());
+
+        File modulesDir = new File(dir, "src/main/ml-modules");
+        assertTrue(modulesDir.exists());
+        assertTrue(new File(modulesDir, "rest-properties.json").exists());
     }
 }

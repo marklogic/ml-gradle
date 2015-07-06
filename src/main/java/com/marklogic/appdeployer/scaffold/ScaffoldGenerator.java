@@ -31,9 +31,27 @@ public class ScaffoldGenerator extends LoggingObject {
         File modulesDir = getModulesDir(rootDir);
         modulesDir.mkdirs();
 
+        // Config
         generateRestApiFile(configDir, config);
         generateContentDatabaseFile(configDir, config);
         generateSecurityFiles(configDir, config);
+
+        // Modules
+        generateRestPropertiesFile(modulesDir, config);
+
+    }
+
+    protected void generateRestPropertiesFile(File modulesDir, AppConfig config) {
+        writeFile(buildRestPropertiesJson(config), new File(modulesDir, "rest-properties.json"));
+    }
+
+    protected ObjectNode buildRestPropertiesJson(AppConfig config) {
+        ObjectNode node = objectMapper.createObjectNode();
+        node.put("debug", false);
+        node.put("validate-queries", true);
+        node.put("document-transform-all", false);
+        node.put("validate-options", true);
+        return node;
     }
 
     protected void generateSecurityFiles(File configDir, AppConfig config) {

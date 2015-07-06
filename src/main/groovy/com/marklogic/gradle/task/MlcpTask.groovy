@@ -13,9 +13,10 @@ import com.marklogic.appdeployer.AppConfig
 class MlcpTask extends JavaExec {
 
     String host
-    Integer port
+    Integer port = 8000
     String username
     String password 
+    String database
     
     String command
     String input_file_path
@@ -33,7 +34,7 @@ class MlcpTask extends JavaExec {
     String output_permissions
     String transform_module
     String transform_namespace
-		String transform_param
+    String transform_param
     String thread_count
     
     @TaskAction
@@ -42,16 +43,19 @@ class MlcpTask extends JavaExec {
         setMain("com.marklogic.contentpump.ContentPump")
         AppConfig config = getProject().property("mlAppConfig")
 
-        
         List<String> newArgs = new ArrayList<>()
         newArgs.add(command)
         newArgs.add("-host")
         newArgs.add(host ? host : config.getHost())
         newArgs.add("-port")
-        newArgs.add(port ? port : config.getXdbcPort())
+        newArgs.add(port)
         newArgs.add("-username")
-        newArgs.add(username ? username : config.getUsername())
-
+        newArgs.add(username ? username : config.getXdbcUsername())
+        
+        if (database) {
+            newArgs.add("-database")
+            newArgs.add(database)
+        }
         if (input_file_path) {
             newArgs.add("-input_file_path")
             newArgs.add(input_file_path)
@@ -112,10 +116,10 @@ class MlcpTask extends JavaExec {
             newArgs.add("-transform_namespace")
             newArgs.add(transform_namespace)
         }
-				if (transform_param) {
-					newArgs.add("-transform_param")
-					newArgs.add(transform_param)
-			}
+		if (transform_param) {
+			newArgs.add("-transform_param")
+			newArgs.add(transform_param)
+		}
         if (thread_count) {
             newArgs.add("-thread_count")
             newArgs.add(thread_count)
@@ -126,7 +130,7 @@ class MlcpTask extends JavaExec {
         println "mlcp arguments, excluding password: " + newArgs
         
         newArgs.add("-password")
-        newArgs.add(password ? password : config.getPassword())
+        newArgs.add(password ? password : config.getXdbcPassword())
         
         setArgs(newArgs)
 

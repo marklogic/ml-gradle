@@ -37,6 +37,6 @@ class MarkLogicTask extends DefaultTask {
     
     DatabaseClient newClient() {
         AppConfig config = getAppConfig()
-        return DatabaseClientFactory.newClient(config.host, config.restPort, config.username, config.password, config.authentication)
+        return DatabaseClientFactory.newClient(config.host, config.restPort, config.getRestAdminUsername(), config.getRestAdminPassword(), config.authentication)
     }
 }

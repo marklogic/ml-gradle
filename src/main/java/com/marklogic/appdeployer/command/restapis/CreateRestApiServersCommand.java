@@ -79,7 +79,7 @@ public class CreateRestApiServersCommand extends AbstractCommand implements Undo
     }
 
     protected String getDefaultRestApiPayload() {
-        return RestApiUtil.buildDefaultRestApiJson().toString();
+        return RestApiUtil.buildDefaultRestApiJson();
     }
 
     protected boolean deleteRestApi(String serverName, ManageClient manageClient, boolean includeModules,

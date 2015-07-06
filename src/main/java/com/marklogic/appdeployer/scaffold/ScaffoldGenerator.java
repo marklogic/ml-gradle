@@ -92,10 +92,10 @@ public class ScaffoldGenerator extends LoggingObject {
     }
 
     protected void generateRestApiFile(File configDir, AppConfig config) {
-        writeFile(buildRestApiJson(config), new File(configDir, "rest-api.json"));
+        writeFile(buildRestApiJson(config).getBytes(), new File(configDir, "rest-api.json"));
     }
 
-    protected ObjectNode buildRestApiJson(AppConfig config) {
+    protected String buildRestApiJson(AppConfig config) {
         return RestApiUtil.buildDefaultRestApiJson();
     }
 

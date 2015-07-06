@@ -35,7 +35,7 @@ public class CreateTriggersDatabaseCommand extends AbstractCommand implements Un
             String payload = copyFileToString(f);
             payload = tokenReplacer.replaceTokens(payload, config, false);
             createTriggersDatabase(payload, context);
-        } else if (config.isCreateTriggerDatabase()) {
+        } else if (config.isCreateTriggersDatabase()) {
             logger.info("Creating triggers database because AppConfig property is set to true");
             createTriggersDatabase(buildDefaultTriggersDatabasePayload(config), context);
         } else {
@@ -66,7 +66,7 @@ public class CreateTriggersDatabaseCommand extends AbstractCommand implements Un
             String payload = copyFileToString(f);
             payload = tokenReplacer.replaceTokens(payload, context.getAppConfig(), false);
             new DatabaseManager(context.getManageClient()).delete(payload);
-        } else if (config.isCreateTriggerDatabase()) {
+        } else if (config.isCreateTriggersDatabase()) {
             new DatabaseManager(context.getManageClient()).delete(buildDefaultTriggersDatabasePayload(config));
         }
     }

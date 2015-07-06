@@ -38,7 +38,7 @@ public class AppConfig {
     private Map<String, String> customTokens = new HashMap<>();
 
     // Allows for creating a triggers database without a config file for one
-    private boolean createTriggerDatabase = true;
+    private boolean createTriggersDatabase = true;
 
     public AppConfig() {
         this("src/main/ml-modules");
@@ -227,12 +227,12 @@ public class AppConfig {
         this.customTokens = customTokens;
     }
 
-    public boolean isCreateTriggerDatabase() {
-        return createTriggerDatabase;
+    public boolean isCreateTriggersDatabase() {
+        return createTriggersDatabase;
     }
 
-    public void setCreateTriggerDatabase(boolean createTriggerDatabase) {
-        this.createTriggerDatabase = createTriggerDatabase;
+    public void setCreateTriggersDatabase(boolean createTriggerDatabase) {
+        this.createTriggersDatabase = createTriggerDatabase;
     }
 
 }

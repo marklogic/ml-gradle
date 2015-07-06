@@ -6,9 +6,7 @@ buildscript {
         maven {url "../../gh-pages-marklogic-java/releases"}
     }
 
-    dependencies {
-        classpath "com.marklogic:ml-gradle:2.0a8"
-    }
+    dependencies { classpath "com.marklogic:ml-gradle:2.0a8" }
 }
 
 apply plugin: 'ml-gradle'
@@ -64,9 +62,9 @@ ext {
     mlAppConfig {
         // Example of adding custom tokens; these will then be replaced in any JSON/XML config files
         customTokens.put("sample-key", "sample-value")
-        
+
         // By default, the createTriggersDatabase attribute is set to true, which results in a triggers database being
-        // created, even if a databases/triggers-database.json file isn't present. Un-commenting the line will below 
+        // created, even if a databases/triggers-database.json file isn't present. Un-commenting the line will below
         // will prevent one from being created (assuming the triggers-database.json file isn't present).
         //createTriggersDatabase = false
     }
@@ -88,6 +86,16 @@ task runCorb(dependsOn: ['mlLoadModules'], type: JavaExec) {
     main = 'com.marklogic.developer.corb.Manager'
     classpath = configurations.corb
     args = [mlAppConfig.contentXccUrl, '""', 'transform.xqy', '4', 'uris.xqy', '/ext/sample-project/corb/', 'sample-project-modules', 'false']
+}
+
+/*
+ * The management API has an operation for loading the default CPF pipelines - 
+ * http://docs.marklogic.com/REST/POST/manage/v2/databases/[id-or-name]/pipelines. To load these as part of your
+ * deployment process, just include the block below. These pipelines will be loaded before your custom pipelines and 
+ * domains, which means you can safely reference them in your domain configuration files. 
+ */
+ext {
+    mlAppDeployer.commands.add(new com.marklogic.appdeployer.command.cpf.LoadDefaultPipelinesCommand())
 }
 
 /*

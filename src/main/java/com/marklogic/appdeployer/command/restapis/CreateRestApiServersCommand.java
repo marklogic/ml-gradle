@@ -9,6 +9,7 @@ import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.appdeployer.command.UndoableCommand;
+import com.marklogic.appdeployer.spring.RestApiUtil;
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.admin.ActionRequiringRestart;
 import com.marklogic.rest.mgmt.appservers.ServerManager;
@@ -78,9 +79,7 @@ public class CreateRestApiServersCommand extends AbstractCommand implements Undo
     }
 
     protected String getDefaultRestApiPayload() {
-        return "{\"rest-api\": {\"name\":\"%%NAME%%\", \"group\":\"%%GROUP%%\", \"database\":\"%%DATABASE%%\", "
-                + "\"modules-database\":\"%%MODULES_DATABASE%%\", \"port\":\"%%PORT%%\", \"xdbc-enabled\":true, "
-                + "\"forests-per-host\":3, \"error-format\":\"json\"}}";
+        return RestApiUtil.buildDefaultRestApiJson().toString();
     }
 
     protected boolean deleteRestApi(String serverName, ManageClient manageClient, boolean includeModules,

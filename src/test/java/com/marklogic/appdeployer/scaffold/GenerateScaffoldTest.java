@@ -5,9 +5,9 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import com.marklogic.rest.mgmt.AbstractMgmtTest;
+import com.marklogic.appdeployer.AbstractAppDeployerTest;
 
-public class GenerateScaffoldTest extends AbstractMgmtTest {
+public class GenerateScaffoldTest extends AbstractAppDeployerTest {
 
     @Test
     public void test() throws IOException {
@@ -18,6 +18,12 @@ public class GenerateScaffoldTest extends AbstractMgmtTest {
         dir.mkdirs();
 
         ScaffoldGenerator sg = new ScaffoldGenerator();
-        sg.generateScaffold(path);
+        sg.generateScaffold(path, appConfig);
+
+        File configDir = new File(dir, "src/main/ml-config");
+        assertTrue(new File(configDir, "rest-api.json").exists());
+        assertTrue(new File(configDir, "databases/content-database.json").exists());
+        assertTrue(new File(configDir, "security/roles/sample-app-role.json").exists());
+        assertTrue(new File(configDir, "security/users/sample-app-user.json").exists());
     }
 }

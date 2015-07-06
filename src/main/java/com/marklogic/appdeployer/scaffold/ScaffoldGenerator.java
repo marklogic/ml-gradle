@@ -131,12 +131,16 @@ public class ScaffoldGenerator extends LoggingObject {
     }
 
     protected void writeFile(byte[] bytes, File f) {
-        try {
-            logger.info("Writing: " + f.getAbsolutePath());
-            FileCopyUtils.copy(bytes, f);
-        } catch (IOException ie) {
-            throw new RuntimeException("Unable to write file at: " + f.getAbsolutePath() + "; cause: "
-                    + ie.getMessage(), ie);
+        if (f.exists()) {
+            logger.info("Not writing file, as it already exists: " + f.getAbsolutePath());
+        } else {
+            try {
+                logger.info("Writing: " + f.getAbsolutePath());
+                FileCopyUtils.copy(bytes, f);
+            } catch (IOException ie) {
+                throw new RuntimeException("Unable to write file at: " + f.getAbsolutePath() + "; cause: "
+                        + ie.getMessage(), ie);
+            }
         }
     }
 

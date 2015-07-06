@@ -35,7 +35,7 @@ public class GenerateScaffoldTest extends AbstractAppDeployerTest {
         appConfig.setConfigDir(new ConfigDir(new File(path, "src/main/ml-config")));
         appConfig.getModulePaths().clear();
         appConfig.getModulePaths().add(path + "/src/main/ml-modules");
-        
+
         initializeAppDeployer(new CreateRestApiServersCommand(), new CreateTriggersDatabaseCommand(),
                 new CreateUsersCommand(), new CreateRolesCommand(), new LoadModulesCommand());
         appDeployer.deploy(appConfig);
@@ -48,7 +48,7 @@ public class GenerateScaffoldTest extends AbstractAppDeployerTest {
             assertTrue(new UserManager(manageClient).exists("sample-app-user"));
             assertTrue(new RoleManager(manageClient).exists("sample-app-role"));
         } finally {
-            // undeploySampleApp();
+            undeploySampleApp();
         }
     }
 

@@ -49,7 +49,17 @@ And here's the simplest gradle.properties file possible (you can of course custo
     mlAppName=quick-start
     mlRestPort=8200
 
-Then just run "gradle mlDeploy" in the directory containing these two files. You'll end up with a new REST API server on port 8200 with a modules database and a content database with 3 forests by default. 
+Then just run "gradle mlDeploy" in the directory containing these two files:
+
+    gradle mlDeploy
+    
+You'll end up with a new REST API server on port 8200 with a modules database and a content database with 3 forests by default. 
+
+To start customizing your application, just run:
+
+    gradle mlScaffold
+    
+This will generate a directory structure containing several configuration files - one for a content database, a REST API server, an application role, an application user, and more. You can change these and add more configuration files based on the examples in the [sample project in this repository](https://github.com/rjrudin/ml-gradle/blob/master/sample-project/build.gradle).
 
 
 Digging deeper into ml-gradle

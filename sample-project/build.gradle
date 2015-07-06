@@ -56,10 +56,19 @@ dependencies {
     corb "com.marklogic:marklogic-xcc:8.0.2"
 }
 
-// Example of adding custom tokens
+/*
+ * ml-gradle adds an instance of com.marklogic.appdeployer.AppConfig to the Gradle project under the key "mlAppConfig".
+ * This instance can be modified to affect the behavior of ml-gradle.
+ */
 ext {
     mlAppConfig {
+        // Example of adding custom tokens; these will then be replaced in any JSON/XML config files
         customTokens.put("sample-key", "sample-value")
+        
+        // By default, the createTriggersDatabase attribute is set to true, which results in a triggers database being
+        // created, even if a databases/triggers-database.json file isn't present. Un-commenting the line will below 
+        // will prevent one from being created (assuming the triggers-database.json file isn't present).
+        //createTriggersDatabase = false
     }
 }
 

@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.springframework.util.FileCopyUtils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.PrettyPrinter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,7 +39,15 @@ public class ScaffoldGenerator extends LoggingObject {
 
         // Modules
         generateRestPropertiesFile(modulesDir, config);
+        generateSearchOptions(modulesDir, config);
 
+    }
+
+    private void generateSearchOptions(File modulesDir, AppConfig config) {
+        File optionsDir = new File(modulesDir, "options");
+        optionsDir.mkdirs();
+        String xml = "<options xmlns='http://marklogic.com/appservices/search'>\n  <search-option>unfiltered</search-option>\n  <quality-weight>0</quality-weight>\n</options>";
+        writeFile(xml.getBytes(), new File(optionsDir, config.getName() + "-options.xml"));
     }
 
     protected void generateRestPropertiesFile(File modulesDir, AppConfig config) {
@@ -113,11 +122,20 @@ public class ScaffoldGenerator extends LoggingObject {
 
     protected void writeFile(ObjectNode node, File f) {
         try {
-            logger.info("Writing: " + f.getAbsolutePath());
             byte[] bytes = objectMapper.writer(prettyPrinter).writeValueAsBytes(node);
+            writeFile(bytes, f);
+        } catch (JsonProcessingException je) {
+            throw new RuntimeException("Unable to process JSON for file: " + f.getAbsolutePath() + "; cause: "
+                    + je.getMessage(), je);
+        }
+    }
+
+    protected void writeFile(byte[] bytes, File f) {
+        try {
+            logger.info("Writing: " + f.getAbsolutePath());
             FileCopyUtils.copy(bytes, f);
         } catch (IOException ie) {
-            throw new RuntimeException("Unable to write JSON to file at: " + f.getAbsolutePath() + "; cause: "
+            throw new RuntimeException("Unable to write file at: " + f.getAbsolutePath() + "; cause: "
                     + ie.getMessage(), ie);
         }
     }

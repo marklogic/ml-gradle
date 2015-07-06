@@ -30,5 +30,6 @@ public class GenerateScaffoldTest extends AbstractAppDeployerTest {
         File modulesDir = new File(dir, "src/main/ml-modules");
         assertTrue(modulesDir.exists());
         assertTrue(new File(modulesDir, "rest-properties.json").exists());
+        assertTrue(new File(modulesDir, "options/sample-app-options.xml").exists());
     }
 }

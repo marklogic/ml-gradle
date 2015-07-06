@@ -1,0 +1,4 @@
+{
+  "role-name" : "sample-app-role",
+  "role" : [ "rest-admin" ]
+}

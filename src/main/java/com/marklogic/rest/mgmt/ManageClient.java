@@ -24,6 +24,7 @@ import com.marklogic.rest.util.RestTemplateUtil;
 public class ManageClient extends LoggingObject {
 
     private RestTemplate restTemplate;
+    private RestTemplate adminRestTemplate;
     private String baseUrl;
 
     /**
@@ -42,6 +43,17 @@ public class ManageClient extends LoggingObject {
             logger.info("Initializing ManageClient with manage config of: " + config);
         }
         this.restTemplate = RestTemplateUtil.newRestTemplate(config);
+
+        if (!config.getUsername().equals(config.getAdminUsername())) {
+            if (logger.isInfoEnabled()) {
+                logger.info("Initializing ManageClient with admin config, admin user: " + config.getAdminUsername());
+            }
+            this.adminRestTemplate = RestTemplateUtil.newRestTemplate(config.getHost(), config.getPort(),
+                    config.getAdminUsername(), config.getAdminPassword());
+        } else {
+            this.adminRestTemplate = restTemplate;
+        }
+
         this.baseUrl = config.getBaseUrl();
         if (logger.isInfoEnabled()) {
             logger.info("Initialized ManageClient with base URL of: " + baseUrl);
@@ -52,16 +64,44 @@ public class ManageClient extends LoggingObject {
         return restTemplate.exchange(baseUrl + path, HttpMethod.PUT, buildJsonEntity(json), String.class);
     }
 
+    public ResponseEntity<String> putJsonAsAdmin(String path, String json) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Sending JSON PUT request as user with MarkLogic admin role");
+        }
+        return adminRestTemplate.exchange(baseUrl + path, HttpMethod.PUT, buildJsonEntity(json), String.class);
+    }
+
     public ResponseEntity<String> putXml(String path, String xml) {
         return restTemplate.exchange(baseUrl + path, HttpMethod.PUT, buildXmlEntity(xml), String.class);
+    }
+
+    public ResponseEntity<String> putXmlAsAdmin(String path, String xml) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Sending XML PUT request as user with MarkLogic admin role");
+        }
+        return adminRestTemplate.exchange(baseUrl + path, HttpMethod.PUT, buildXmlEntity(xml), String.class);
     }
 
     public ResponseEntity<String> postJson(String path, String json) {
         return restTemplate.exchange(baseUrl + path, HttpMethod.POST, buildJsonEntity(json), String.class);
     }
 
+    public ResponseEntity<String> postJsonAsAdmin(String path, String json) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Sending JSON POST request as user with MarkLogic admin role");
+        }
+        return adminRestTemplate.exchange(baseUrl + path, HttpMethod.POST, buildJsonEntity(json), String.class);
+    }
+
     public ResponseEntity<String> postXml(String path, String xml) {
         return restTemplate.exchange(baseUrl + path, HttpMethod.POST, buildXmlEntity(xml), String.class);
+    }
+
+    public ResponseEntity<String> postXmlAsAdmin(String path, String xml) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Sending XML POST request as user with MarkLogic admin role");
+        }
+        return adminRestTemplate.exchange(baseUrl + path, HttpMethod.POST, buildXmlEntity(xml), String.class);
     }
 
     public HttpEntity<String> buildJsonEntity(String json) {
@@ -96,8 +136,27 @@ public class ManageClient extends LoggingObject {
         return new Fragment(xml, list.toArray(new Namespace[] {}));
     }
 
+    public Fragment getXmlAsAdmin(String path, String... namespacePrefixesAndUris) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Sending GET request as user with MarkLogic admin role");
+        }
+        String xml = getAdminRestTemplate().getForObject(getBaseUrl() + path, String.class);
+        List<Namespace> list = new ArrayList<Namespace>();
+        for (int i = 0; i < namespacePrefixesAndUris.length; i += 2) {
+            list.add(Namespace.getNamespace(namespacePrefixesAndUris[i], namespacePrefixesAndUris[i + 1]));
+        }
+        return new Fragment(xml, list.toArray(new Namespace[] {}));
+    }
+
     public void delete(String path) {
         restTemplate.delete(baseUrl + path);
+    }
+
+    public void deleteAsAdmin(String path) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Sending DELETE request as user with MarkLogic admin role");
+        }
+        adminRestTemplate.delete(baseUrl + path);
     }
 
     public RestTemplate getRestTemplate() {
@@ -106,5 +165,9 @@ public class ManageClient extends LoggingObject {
 
     public String getBaseUrl() {
         return baseUrl;
+    }
+
+    public RestTemplate getAdminRestTemplate() {
+        return adminRestTemplate;
     }
 }

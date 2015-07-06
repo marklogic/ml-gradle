@@ -38,7 +38,7 @@ public class LoadModulesCommand extends AbstractCommand {
         AppConfig config = context.getAppConfig();
 
         DatabaseClient client = DatabaseClientFactory.newClient(config.getHost(), config.getRestPort(),
-                config.getUsername(), config.getPassword(), config.getAuthentication());
+                config.getRestAdminUsername(), config.getRestAdminPassword(), config.getAuthentication());
 
         for (String modulesPath : config.getModulePaths()) {
             logger.info("Loading modules from dir: " + modulesPath);

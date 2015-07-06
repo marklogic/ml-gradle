@@ -33,15 +33,19 @@ public abstract class AbstractResourceManager extends AbstractManager implements
     }
 
     public ResourcesFragment getAsXml() {
-        return new ResourcesFragment(manageClient.getXml(getResourcesPath()));
+        Fragment f = useAdminUser() ? manageClient.getXmlAsAdmin(getResourcesPath()) : manageClient
+                .getXml(getResourcesPath());
+        return new ResourcesFragment(f);
     }
 
     public Fragment getAsXml(String resourceNameOrId) {
-        return manageClient.getXml(getResourcePath(resourceNameOrId));
+        return useAdminUser() ? manageClient.getXmlAsAdmin(getResourcePath(resourceNameOrId)) : manageClient
+                .getXml(getResourcePath(resourceNameOrId));
     }
 
     public Fragment getPropertiesAsXml(String resourceNameOrId) {
-        return manageClient.getXml(getPropertiesPath(resourceNameOrId));
+        return useAdminUser() ? manageClient.getXmlAsAdmin(getPropertiesPath(resourceNameOrId)) : manageClient
+                .getXml(getPropertiesPath(resourceNameOrId));
     }
 
     public void save(String payload) {
@@ -74,7 +78,11 @@ public abstract class AbstractResourceManager extends AbstractManager implements
             path = appendParamsAndValuesToPath(path, getDeleteResourceParams(payload));
 
             logger.info(format("Deleting %s at path %s", label, path));
-            manageClient.delete(path);
+            if (useAdminUser()) {
+                manageClient.deleteAsAdmin(path);
+            } else {
+                manageClient.delete(path);
+            }
             logger.info(format("Deleted %s at path %s", label, path));
         }
     }

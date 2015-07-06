@@ -14,6 +14,14 @@ public class CreateRolesCommand extends AbstractResourceCommand {
         setExecuteSortOrder(SortOrderConstants.CREATE_ROLES);
     }
 
+    /**
+     * Roles are usually the very last thing we want to delete, right after deleting users.
+     */
+    @Override
+    public Integer getUndoSortOrder() {
+        return Integer.MAX_VALUE;
+    }
+
     protected File getResourcesDir(CommandContext context) {
         return new File(context.getAppConfig().getConfigDir().getSecurityDir(), "roles");
     }

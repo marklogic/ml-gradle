@@ -13,6 +13,15 @@ public class AbstractManager extends LoggingObject {
     protected ObjectMapper objectMapper = new ObjectMapper();
 
     /**
+     * Manager classes that need to connect to ML as a user with the admin role should override this to return true.
+     * 
+     * @return
+     */
+    protected boolean useAdminUser() {
+        return false;
+    }
+
+    /**
      * Assumes the resource name is based on the class name - e.g. RoleManager would have a resource name of "role".
      * 
      * @return
@@ -68,16 +77,18 @@ public class AbstractManager extends LoggingObject {
     }
 
     protected ResponseEntity<String> putPayload(ManageClient client, String path, String payload) {
+        boolean useAdmin = useAdminUser();
         if (isJsonPayload(payload)) {
-            return client.putJson(path, payload);
+            return useAdmin ? client.putJsonAsAdmin(path, payload) : client.putJson(path, payload);
         }
-        return client.putXml(path, payload);
+        return useAdmin ? client.putXmlAsAdmin(path, payload) : client.putXml(path, payload);
     }
 
     protected ResponseEntity<String> postPayload(ManageClient client, String path, String payload) {
+        boolean useAdmin = useAdminUser();
         if (isJsonPayload(payload)) {
-            return client.postJson(path, payload);
+            return useAdmin ? client.postJsonAsAdmin(path, payload) : client.postJson(path, payload);
         }
-        return client.postXml(path, payload);
+        return useAdmin ? client.postXmlAsAdmin(path, payload) : client.postXml(path, payload);
     }
 }

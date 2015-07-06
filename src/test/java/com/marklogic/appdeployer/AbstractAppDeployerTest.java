@@ -89,13 +89,8 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
         }
     }
 
-    /**
-     * Assumes that the AppConfig user can be used to talk XCC to the modules database.
-     * 
-     * @return
-     */
     protected XccTemplate newModulesXccTemplate() {
-        return new XccTemplate(format("xcc://%s:%s@%s:8000/%s", appConfig.getUsername(), appConfig.getPassword(),
-                appConfig.getHost(), appConfig.getModulesDatabaseName()));
+        return new XccTemplate(format("xcc://%s:%s@%s:8000/%s", appConfig.getXdbcUsername(),
+                appConfig.getXdbcPassword(), appConfig.getHost(), appConfig.getModulesDatabaseName()));
     }
 }

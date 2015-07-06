@@ -49,9 +49,12 @@ public class CreateRestApiAsNonAdminUserTest extends AbstractAppDeployerTest {
         newConfig.setAdminPassword(manageConfig.getPassword());
         this.manageClient = new ManageClient(newConfig);
 
-        // And ensure we use our custom user for loading modules
+        // And ensure we use our custom user for loading modules; the custom app role has the privileges required for
+        // inserting modules via XCC
         appConfig.setRestAdminUsername("sample-app-rest-admin");
         appConfig.setRestAdminPassword("sample-app-rest-admin");
+        appConfig.setXdbcUsername(appConfig.getRestAdminUsername());
+        appConfig.setXdbcPassword(appConfig.getRestAdminPassword());
 
         initializeAppDeployer(new CreateRestApiServersCommand(), new CreateRolesCommand(), new CreateUsersCommand(),
                 new LoadModulesCommand());

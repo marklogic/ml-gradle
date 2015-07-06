@@ -114,7 +114,7 @@ public class ScaffoldGenerator extends LoggingObject {
         index.put("scalar-type", "string");
         index.put("namespace-uri", "CHANGEME");
         index.put("localname", "CHANGEME");
-        index.put("collation", "http://marklogic.com/collation");
+        index.put("collation", "http://marklogic.com/collation/");
         index.put("range-value-positions", false);
         index.put("invalid-values", "reject");
         return node;

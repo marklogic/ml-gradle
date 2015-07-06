@@ -126,10 +126,10 @@ class MarkLogicPlugin implements Plugin<Project> {
         if (project.hasProperty("mlUsername")) {
             def username = project.property("mlUsername")
             println "App username: " + username
-            appConfig.setUsername(username)
+            appConfig.setRestAdminUsername(username)
         }
         if (project.hasProperty("mlPassword")) {
-            appConfig.setPassword(project.property("mlPassword"))
+            appConfig.setRestAdminPassword(project.property("mlPassword"))
         }
 
         if (project.hasProperty("mlRestPort")) {
@@ -146,12 +146,6 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.extensions.add("mlAppConfig", appConfig)
     }
 
-    /**
-     * TODO Should allow for this to be initialized off a different set of properties if they
-     * exist - e.g. mlManageUsername.
-     * 
-     * @param project
-     */
     void initializeManageConfig(Project project) {
         ManageConfig manageConfig = new ManageConfig()
         if (project.hasProperty("mlHost")) {
@@ -159,23 +153,40 @@ class MarkLogicPlugin implements Plugin<Project> {
             println "Manage host: " + host
             manageConfig.setHost(host)
         }
-        if (project.hasProperty("mlUsername")) {
-            def username = project.property("mlUsername")
+        
+        String username = null
+        if (project.hasProperty("mlManageUsername")) {
+            username = project.property("mlManageUsername")
+        }
+        else if (project.hasProperty("mlUsername")) {
+            username = project.property("mlUsername")
+        }
+        if (username != null) {
             println "Manage username: " + username
             manageConfig.setUsername(username)
         }
-        if (project.hasProperty("mlPassword")) {
-            manageConfig.setPassword(project.property("mlPassword"))
+        
+        String password = null
+        if (project.hasProperty("mlManagePassword")) {
+            password = project.property("mlManagePassword")
         }
+        else if (project.hasProperty("mlPassword")) {
+            password = project.property("mlPassword")
+        }
+        if (password != null) {
+            manageConfig.setPassword(password)
+        }
+        
+        if (project.hasProperty("mlAdminUsername")) {
+            manageConfig.setAdminUsername(project.property("mlAdminUsername"))
+        }
+        if (project.hasProperty("mlAdminPassword")) {
+            manageConfig.setAdminPassword(project.property("mlAdminPassword"))
+        }
+        
         project.extensions.add("mlManageConfig", manageConfig)
     }
 
-    /**
-     * TODO Should allow for this to be initialized off a different set of properties if they
-     * exist - e.g. mlAdminUsername.
-     * 
-     * @param project
-     */
     void initializeAdminConfig(Project project) {
         AdminConfig adminConfig = new AdminConfig()
         if (project.hasProperty("mlHost")) {
@@ -183,17 +194,32 @@ class MarkLogicPlugin implements Plugin<Project> {
             println "Admin host: " + host
             adminConfig.setHost(host)
         }
-        if (project.hasProperty("mlUsername")) {
-            def username = project.property("mlUsername")
+        
+        String username = null
+        if (project.hasProperty("mlAdminUsername")) {
+            username = project.property("mlAdminUsername")
+        }
+        else if (project.hasProperty("mlUsername")) {
+            username = project.property("mlUsername")
+        }
+        if (username != null) {
             println "Admin username: " + username
             adminConfig.setUsername(username)
         }
-        if (project.hasProperty("mlPassword")) {
-            adminConfig.setPassword(project.property("mlPassword"))
+        
+        String password = null
+        if (project.hasProperty("mlAdminPassword")) {
+            password = project.property("mlAdminPassword")
         }
+        else if (project.hasProperty("mlPassword")) {
+            password = project.property("mlPassword")
+        }
+        if (password != null) {
+            adminConfig.setPassword(password)
+        }
+        
         project.extensions.add("mlAdminConfig", adminConfig)
     }
-
 
     void initializeAppDeployerObjects(Project project) {
         ManageConfig manageConfig = project.extensions.getByName("mlManageConfig")

@@ -17,8 +17,8 @@ class WatchTask extends JavaExec {
         setClasspath(getProject().sourceSets.main.runtimeClasspath)
 
         AppConfig config = getProject().property("mlAppConfig")
-        def username = config.getUsername() ? config.getUsername() : getProject().property("mlUsername")
-        def password = config.getPassword() ? config.getPassword() : getProject().property("mlPassword")
+        def username = config.getRestAdminUsername() ? config.getRestAdminUsername() : getProject().property("mlUsername")
+        def password = config.getRestAdminPassword() ? config.getRestAdminPassword() : getProject().property("mlPassword")
         setArgs([
             config.getModulePaths().join(","),
             config.getHost(),

@@ -1,5 +1,5 @@
 {
   "role-name": "sample-project-role",
-  "description": "Sample project role",
-  "role": ["rest-reader"]
+  "description": "sample-project rest-admin role that allows the user to insert documents via XCC",
+  "role": ["rest-admin"]
 }

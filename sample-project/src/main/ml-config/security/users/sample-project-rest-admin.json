@@ -1,0 +1,6 @@
+{
+  "user-name": "sample-project-rest-admin",
+  "description": "sample-project user that is used for loading modules and optionally within the application too",
+  "password": "password",
+  "role": ["sample-project-role"]
+}

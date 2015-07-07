@@ -1,0 +1,6 @@
+{
+  "user-name": "sample-project-manager",
+  "description": "sample-project user that is used for managing resource applications",
+  "password": "password",
+  "role": ["sample-project-manager-role"]
+}

@@ -91,11 +91,11 @@ task runCorb(dependsOn: ['mlLoadModules'], type: JavaExec) {
 /*
  * The management API has an operation for loading the default CPF pipelines - 
  * http://docs.marklogic.com/REST/POST/manage/v2/databases/[id-or-name]/pipelines. To load these as part of your
- * deployment process, just include the block below. These pipelines will be loaded before your custom pipelines and 
+ * deployment process, just uncomment the line below. These pipelines will be loaded before your custom pipelines and 
  * domains, which means you can safely reference them in your domain configuration files. 
  */
 ext {
-    mlAppDeployer.commands.add(new com.marklogic.appdeployer.command.cpf.LoadDefaultPipelinesCommand())
+    //mlAppDeployer.commands.add(new com.marklogic.appdeployer.command.cpf.LoadDefaultPipelinesCommand())
 }
 
 /*

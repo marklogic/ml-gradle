@@ -103,6 +103,10 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
     protected void loadProperties(Modules modules, Set<File> loadedModules) {
         File f = modules.getPropertiesFile();
         if (f != null && f.exists()) {
+            if (modulesManager != null & !modulesManager.hasFileBeenModifiedSinceLastInstalled(f)) {
+                return;
+            }
+
             ServerConfigurationManager mgr = client.newServerConfigManager();
             ObjectMapper m = new ObjectMapper();
             try {
@@ -140,6 +144,12 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
             } catch (Exception e) {
                 throw new RuntimeException("Unable to read REST configuration from file: " + f.getAbsolutePath(), e);
             }
+
+            if (modulesManager != null) {
+                modulesManager.saveLastInstalledTimestamp(f, new Date());
+            }
+
+            loadedModules.add(f);
         }
     }
 

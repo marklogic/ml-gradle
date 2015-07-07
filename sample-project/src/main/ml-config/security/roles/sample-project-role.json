@@ -1,5 +1,17 @@
 {
   "role-name": "sample-project-role",
-  "description": "sample-project rest-admin role that allows the user to insert documents via XCC",
-  "role": ["rest-admin"]
+  "description": "sample-project rest-admin role that allows the user to insert documents via XCC and clear the database at the start of a JUnit test",
+  "role": ["rest-admin"],
+  "privilege": [
+    {
+      "privilege-name": "xdbc:eval-in",
+      "action": "http://marklogic.com/xdmp/privileges/xdbc-eval-in",
+      "kind": "execute"
+    },
+    {
+      "privilege-name": "xdmp:forest-clear",
+      "action": "http://marklogic.com/xdmp/privileges/xdmp-forest-clear",
+      "kind": "execute"
+    }
+  ]
 }

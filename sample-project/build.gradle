@@ -2,7 +2,6 @@ buildscript {
     repositories {
         mavenCentral()
         maven {url "http://developer.marklogic.com/maven2/"}
-        maven {url "../../gh-pages-marklogic-java/releases"}
         maven {url "http://rjrudin.github.io/marklogic-java/releases"}
     }
 

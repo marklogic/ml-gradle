@@ -9,7 +9,6 @@ repositories {
   mavenCentral()
   maven {url "http://developer.marklogic.com/maven2/"}
   maven {url "http://rjrudin.github.io/marklogic-java/releases"}
-  maven {url publishUrl}
 }
 
 dependencies {

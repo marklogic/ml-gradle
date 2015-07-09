@@ -1,0 +1,13 @@
+{
+  "view-schema-name": "main",
+  "permission": [
+    {
+      "role-name": "rest-reader",
+      "capability": "read"
+    },
+    {
+      "role-name": "rest-writer",
+      "capability": "update"
+    }
+  ]
+}

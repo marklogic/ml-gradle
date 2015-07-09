@@ -1,0 +1,15 @@
+{
+   "view-name": "ordertable",
+   "schema-name": "main",
+   "element-scope": {"namespace-uri":"", "localname":"order"},
+   "column": [
+     {
+       "column-name": "amount",
+       "element-reference": {
+          "namespace-uri": "",
+          "localname": "amount",
+          "scalar-type": "int" 
+       }
+     }
+   ] 
+ }

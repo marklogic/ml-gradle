@@ -8,9 +8,12 @@ import com.marklogic.appdeployer.AppDeployer
 import com.marklogic.appdeployer.ConfigDir
 import com.marklogic.appdeployer.command.Command
 import com.marklogic.appdeployer.command.CommandContext
+import com.marklogic.appdeployer.command.appservers.CreateOtherServersCommand
+import com.marklogic.appdeployer.command.appservers.UpdateRestApiServersCommand
 import com.marklogic.appdeployer.command.cpf.CreateCpfConfigsCommand
 import com.marklogic.appdeployer.command.cpf.CreateDomainsCommand
 import com.marklogic.appdeployer.command.cpf.CreatePipelinesCommand
+import com.marklogic.appdeployer.command.databases.CreateSchemasDatabaseCommand
 import com.marklogic.appdeployer.command.databases.CreateTriggersDatabaseCommand
 import com.marklogic.appdeployer.command.databases.UpdateContentDatabasesCommand
 import com.marklogic.appdeployer.command.modules.LoadModulesCommand
@@ -19,9 +22,11 @@ import com.marklogic.appdeployer.command.security.CreateAmpsCommand
 import com.marklogic.appdeployer.command.security.CreateCertificateTemplatesCommand
 import com.marklogic.appdeployer.command.security.CreateExternalSecurityCommand
 import com.marklogic.appdeployer.command.security.CreatePrivilegesCommand
+import com.marklogic.appdeployer.command.security.CreateProtectedCollectionsCommand
 import com.marklogic.appdeployer.command.security.CreateRolesCommand
 import com.marklogic.appdeployer.command.security.CreateUsersCommand
-import com.marklogic.appdeployer.command.servers.UpdateRestApiServersCommand
+import com.marklogic.appdeployer.command.tasks.CreateScheduledTasksCommand
+import com.marklogic.appdeployer.command.viewschemas.CreateViewSchemasCommand
 import com.marklogic.appdeployer.impl.SimpleAppDeployer
 import com.marklogic.gradle.task.DeleteModuleTimestampsFileTask
 import com.marklogic.gradle.task.DeployAppTask
@@ -40,6 +45,7 @@ import com.marklogic.gradle.task.databases.ClearModulesTask
 import com.marklogic.gradle.task.databases.UpdateContentDatabasesTask
 import com.marklogic.gradle.task.scaffold.GenerateScaffoldTask
 import com.marklogic.gradle.task.servers.UpdateRestApiServersTask
+import com.marklogic.gradle.task.viewschemas.CreateViewSchemasTask
 import com.marklogic.rest.mgmt.ManageClient
 import com.marklogic.rest.mgmt.ManageConfig
 import com.marklogic.rest.mgmt.admin.AdminConfig
@@ -49,7 +55,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 
     void apply(Project project) {
         println "\nInitializing ml-gradle"
-        
+
         initializeAppConfig(project)
         initializeManageConfig(project)
         initializeAdminConfig(project)
@@ -91,12 +97,15 @@ class MarkLogicPlugin implements Plugin<Project> {
         // CPF tasks
         project.task("mlCpfDeploy", type: DeployCpfTask, group: group, description: "Deploy CPF pipelines, domains, and configurations")
         project.task("mlCpfLoadDefaultPipelines", type: LoadDefaultPipelinesTask, group: group, description: "Load default pipelines into a triggers database")
+
+        // SQL
+        project.task("mlCreateViewSchemas", type: CreateViewSchemasTask, group: group, description: "Create or update SQL view schemas")
         
         // Tasks for generating code
         project.task("mlScaffold", type: GenerateScaffoldTask, group: group, description: "Generate project scaffold for a new project")
         project.task("mlCreateResource", type: CreateResourceTask, group: group, description: "Create a new resource extension in the src/main/xqy/services directory")
         project.task("mlCreateTransform", type: CreateTransformTask, group: group, description: "Create a new transform in the src/main/xqy/transforms directory")
-        
+
         println "Finished initializing ml-gradle\n"
     }
 
@@ -153,7 +162,7 @@ class MarkLogicPlugin implements Plugin<Project> {
             println "Manage host: " + host
             manageConfig.setHost(host)
         }
-        
+
         String username = null
         if (project.hasProperty("mlManageUsername")) {
             username = project.property("mlManageUsername")
@@ -165,7 +174,7 @@ class MarkLogicPlugin implements Plugin<Project> {
             println "Manage username: " + username
             manageConfig.setUsername(username)
         }
-        
+
         String password = null
         if (project.hasProperty("mlManagePassword")) {
             password = project.property("mlManagePassword")
@@ -176,14 +185,14 @@ class MarkLogicPlugin implements Plugin<Project> {
         if (password != null) {
             manageConfig.setPassword(password)
         }
-        
+
         if (project.hasProperty("mlAdminUsername")) {
             manageConfig.setAdminUsername(project.property("mlAdminUsername"))
         }
         if (project.hasProperty("mlAdminPassword")) {
             manageConfig.setAdminPassword(project.property("mlAdminPassword"))
         }
-        
+
         project.extensions.add("mlManageConfig", manageConfig)
     }
 
@@ -194,7 +203,7 @@ class MarkLogicPlugin implements Plugin<Project> {
             println "Admin host: " + host
             adminConfig.setHost(host)
         }
-        
+
         String username = null
         if (project.hasProperty("mlAdminUsername")) {
             username = project.property("mlAdminUsername")
@@ -206,7 +215,7 @@ class MarkLogicPlugin implements Plugin<Project> {
             println "Admin username: " + username
             adminConfig.setUsername(username)
         }
-        
+
         String password = null
         if (project.hasProperty("mlAdminPassword")) {
             password = project.property("mlAdminPassword")
@@ -217,7 +226,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         if (password != null) {
             adminConfig.setPassword(password)
         }
-        
+
         project.extensions.add("mlAdminConfig", adminConfig)
     }
 
@@ -242,21 +251,36 @@ class MarkLogicPlugin implements Plugin<Project> {
      */
     AppDeployer newAppDeployer(ManageClient manageClient, AdminManager adminManager) {
         List<Command> commands = new ArrayList<Command>()
+        
+        // Security
         commands.add(new CreateRolesCommand())
         commands.add(new CreateUsersCommand())
         commands.add(new CreateAmpsCommand())
         commands.add(new CreateCertificateTemplatesCommand())
         commands.add(new CreateExternalSecurityCommand())
         commands.add(new CreatePrivilegesCommand())
+        commands.add(new CreateProtectedCollectionsCommand())
+        
+        // Databases and appservers
         commands.add(new CreateRestApiServersCommand())
-        commands.add(new UpdateContentDatabasesCommand())
         commands.add(new CreateTriggersDatabaseCommand())
-        commands.add(new LoadModulesCommand())
+        commands.add(new CreateSchemasDatabaseCommand())
+        commands.add(new CreateOtherServersCommand())
+        commands.add(new UpdateContentDatabasesCommand())
         commands.add(new UpdateRestApiServersCommand())
+
+        // Modules
+        commands.add(new LoadModulesCommand())
+        
+        // CPF
         commands.add(new CreateCpfConfigsCommand())
         commands.add(new CreateDomainsCommand())
         commands.add(new CreatePipelinesCommand())
-
+        
+        // Others        
+        commands.add(new CreateViewSchemasCommand())
+        commands.add(new CreateScheduledTasksCommand())
+        
         SimpleAppDeployer deployer = new SimpleAppDeployer(manageClient, adminManager)
         deployer.setCommands(commands)
         return deployer

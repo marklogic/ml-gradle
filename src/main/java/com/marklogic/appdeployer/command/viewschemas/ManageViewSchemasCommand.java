@@ -6,6 +6,7 @@ import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.rest.mgmt.PayloadParser;
 import com.marklogic.rest.mgmt.ResourceManager;
+import com.marklogic.rest.mgmt.viewschemas.ViewManager;
 import com.marklogic.rest.mgmt.viewschemas.ViewSchemaManager;
 
 /**
@@ -31,17 +32,19 @@ public class ManageViewSchemasCommand extends AbstractResourceCommand {
     }
 
     @Override
-    protected String saveResource(ResourceManager mgr, CommandContext context, File f) {
-        String payload = super.saveResource(mgr, context, f);
-        if (payload != null) {
-            PayloadParser parser = new PayloadParser();
-            String viewSchemaName = parser.getPayloadFieldValue(payload, "view-schema-name");
-            File viewDir = new File(f.getParentFile(), viewSchemaName + "-views");
-            if (viewDir.exists()) {
-                logger.info("VIEW DIR EXISTS!");
+    protected void afterResourceSaved(ResourceManager mgr, CommandContext context, File resourceFile, String payload) {
+        PayloadParser parser = new PayloadParser();
+        String viewSchemaName = parser.getPayloadFieldValue(payload, "view-schema-name");
+        File viewDir = new File(resourceFile.getParentFile(), viewSchemaName + "-views");
+        if (viewDir.exists()) {
+            ViewManager viewMgr = new ViewManager(context.getManageClient(), context.getAppConfig()
+                    .getContentDatabaseName(), viewSchemaName);
+            for (File viewFile : viewDir.listFiles()) {
+                if (isResourceFile(viewFile)) {
+                    saveResource(viewMgr, context, viewFile);
+                }
             }
         }
-        return payload;
     }
 
 }

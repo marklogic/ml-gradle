@@ -1,0 +1,14 @@
+{
+   "view-name": "myTable1",
+   "element-scope":{"namespace-uri":"urn:sampleapp", "localname":"message"},
+   "column": [
+     {
+       "column-name": "messageId",
+       "element-reference": {
+          "namespace-uri": "urn:sampleapp",
+          "localname": "id",
+          "scalar-type": "string" 
+       }
+     }
+   ] 
+ }

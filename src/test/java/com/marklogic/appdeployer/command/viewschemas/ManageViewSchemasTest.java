@@ -36,5 +36,4 @@ public class ManageViewSchemasTest extends AbstractManageResourceTest {
         // Nothing to do here, as the content database is deleted which holds all the view schemas
     }
 
-    
 }

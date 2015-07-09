@@ -55,24 +55,24 @@ public class CreateRestApiServersCommand extends AbstractCommand implements Undo
         final AppConfig appConfig = context.getAppConfig();
         final ManageClient manageClient = context.getManageClient();
 
-        ServerManager mgr = new ServerManager(manageClient);
+        ServerManager mgr = new ServerManager(manageClient, appConfig.getGroupName());
         // If we have a test REST API, first modify it to point at Documents for the modules database so we can safely
         // delete each REST API
-        if (appConfig.isTestPortSet() && mgr.serverExists(appConfig.getTestRestServerName())) {
-            mgr.setModulesDatabaseToDocuments(appConfig.getTestRestServerName(), appConfig.getGroupName());
+        if (appConfig.isTestPortSet() && mgr.exists(appConfig.getTestRestServerName())) {
+            mgr.setModulesDatabaseToDocuments(appConfig.getTestRestServerName());
             context.getAdminManager().invokeActionRequiringRestart(new ActionRequiringRestart() {
                 @Override
                 public boolean execute() {
-                    return deleteRestApi(appConfig.getTestRestServerName(), manageClient, false, true);
+                    return deleteRestApi(appConfig.getTestRestServerName(), appConfig.getGroupName(), manageClient, false, true);
                 }
             });
         }
 
-        if (mgr.serverExists(appConfig.getRestServerName())) {
+        if (mgr.exists(appConfig.getRestServerName())) {
             context.getAdminManager().invokeActionRequiringRestart(new ActionRequiringRestart() {
                 @Override
                 public boolean execute() {
-                    return deleteRestApi(appConfig.getRestServerName(), manageClient, includeModules, includeContent);
+                    return deleteRestApi(appConfig.getRestServerName(), appConfig.getGroupName(), manageClient, includeModules, includeContent);
                 }
             });
         }
@@ -82,9 +82,9 @@ public class CreateRestApiServersCommand extends AbstractCommand implements Undo
         return RestApiUtil.buildDefaultRestApiJson();
     }
 
-    protected boolean deleteRestApi(String serverName, ManageClient manageClient, boolean includeModules,
+    protected boolean deleteRestApi(String serverName, String groupName, ManageClient manageClient, boolean includeModules,
             boolean includeContent) {
-        if (new ServerManager(manageClient).serverExists(serverName)) {
+        if (new ServerManager(manageClient, groupName).exists(serverName)) {
             String path = format("%s/v1/rest-apis/%s?", manageClient.getBaseUrl(), serverName);
             if (includeModules) {
                 path += "include=modules&";

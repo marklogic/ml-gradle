@@ -28,7 +28,7 @@ public interface ResourceManager {
      * 
      * @param resourceNameOrId
      */
-    public void delete(String json);
+    public boolean delete(String json);
 
     /**
      * 

@@ -4,6 +4,7 @@ import org.junit.After;
 import org.junit.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
+import com.marklogic.appdeployer.command.appservers.UpdateRestApiServersCommand;
 import com.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
 import com.marklogic.rest.mgmt.appservers.ServerManager;
 import com.marklogic.rest.util.Fragment;
@@ -40,7 +41,7 @@ public class UpdateRestApiServersTest extends AbstractAppDeployerTest {
     }
 
     private void assertAuthentication(String message, String serverName, String auth) {
-        Fragment xml = new ServerManager(manageClient).getServerPropertiesAsXml(serverName, appConfig.getGroupName());
+        Fragment xml = new ServerManager(manageClient, appConfig.getGroupName()).getPropertiesAsXml(serverName);
         assertTrue(message,
                 xml.elementExists(String.format("/m:http-server-properties/m:authentication[. = '%s']", auth)));
     }

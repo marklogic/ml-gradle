@@ -16,19 +16,20 @@ public class DeleteRestApiTest extends AbstractAppDeployerTest {
     @Before
     public void setup() {
         initializeAppDeployer();
+        appConfig.setTestRestPort(8541);
     }
 
     @Test
     public void createAndDelete() {
         RestApiManager mgr = new RestApiManager(manageClient);
-        ServerManager serverMgr = new ServerManager(manageClient);
+        ServerManager serverMgr = new ServerManager(manageClient, appConfig.getGroupName());
 
         deployRestApi();
         assertTrue("The REST API server should exist", mgr.restApiServerExists(SAMPLE_APP_NAME));
-        assertTrue("The REST API app server should exist", serverMgr.serverExists(SAMPLE_APP_NAME));
+        assertTrue("The REST API app server should exist", serverMgr.exists(SAMPLE_APP_NAME));
 
         undeploySampleApp();
         assertFalse("The REST API server should have been deleted", mgr.restApiServerExists(SAMPLE_APP_NAME));
-        assertFalse("The REST API app server have been deleted", serverMgr.serverExists(SAMPLE_APP_NAME));
+        assertFalse("The REST API app server have been deleted", serverMgr.exists(SAMPLE_APP_NAME));
     }
 }

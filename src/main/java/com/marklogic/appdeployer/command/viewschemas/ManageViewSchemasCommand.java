@@ -9,6 +9,11 @@ import com.marklogic.rest.mgmt.tasks.ViewSchemaManager;
 
 public class ManageViewSchemasCommand extends AbstractResourceCommand {
 
+    public ManageViewSchemasCommand() {
+        // Don't need to delete anything, as view-schemas all live in a database
+        setDeleteResourcesOnUndo(false);
+    }
+
     @Override
     protected File getResourcesDir(CommandContext context) {
         return new File(context.getAppConfig().getConfigDir().getBaseDir(), "view-schemas");

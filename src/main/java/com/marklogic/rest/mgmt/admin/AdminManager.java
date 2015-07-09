@@ -120,8 +120,10 @@ public class AdminManager extends AbstractManager {
      * @param action
      */
     public void invokeActionRequiringRestart(ActionRequiringRestart action) {
+        logger.info("Executing action that may require restarting MarkLogic");
         boolean requiresRestart = action.execute();
         if (requiresRestart) {
+            logger.info("Waiting for MarkLogic to restart...");
             waitForRestart();
         }
     }

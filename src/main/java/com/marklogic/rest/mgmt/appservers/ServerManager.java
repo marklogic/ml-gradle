@@ -1,44 +1,34 @@
 package com.marklogic.rest.mgmt.appservers;
 
-import com.marklogic.rest.mgmt.AbstractManager;
+import com.marklogic.rest.mgmt.AbstractResourceManager;
 import com.marklogic.rest.mgmt.ManageClient;
-import com.marklogic.rest.util.Fragment;
 
-public class ServerManager extends AbstractManager {
+public class ServerManager extends AbstractResourceManager {
 
-    private ManageClient manageClient;
+    private String groupName;
 
-    public ServerManager(ManageClient manageClient) {
-        this.manageClient = manageClient;
+    public ServerManager(ManageClient manageClient, String groupName) {
+        super(manageClient);
+        this.groupName = groupName;
     }
 
-    public boolean serverExists(String name) {
-        return manageClient.getXml("/manage/v2/servers").elementExists(
-                String.format("/s:server-default-list/s:list-items/s:list-item[s:nameref = '%s']", name));
+    @Override
+    protected String[] getDeleteResourceParams(String payload) {
+        return new String[] { "group-id", groupName };
     }
 
-    public Fragment getServerPropertiesAsXml(String serverIdOrName, String groupIdOrName) {
-        return manageClient
-                .getXml(format("/manage/v2/servers/%s/properties?group-id=%s", serverIdOrName, groupIdOrName));
-    }
-
-    public void updateServer(String serverIdOrName, String groupIdOrName, String json) {
-        String path = format("/manage/v2/servers/%s/properties?group-id=%s", serverIdOrName, groupIdOrName);
-        // TODO Log the JSON at debug level?
-        logger.info(format("Updating server %s", serverIdOrName));
-        manageClient.putJson(path, json);
-        logger.info(format("Updated server %s", serverIdOrName));
+    @Override
+    public String getPropertiesPath(String resourceNameOrId) {
+        return format("%s/properties?group-id=%s", getResourcePath(resourceNameOrId), groupName);
     }
 
     /**
      * Useful method for when you need to delete multiple REST API servers that point at the same modules database - set
      * the modules database to Documents for all but one, and then you can safely delete all of them.
-     * 
-     * @param serverIdOrName
      */
-    public void setModulesDatabaseToDocuments(String serverIdOrName, String groupIdOrName) {
-        String json = "{\"modules-database\":\"Documents\"}";
-        updateServer(serverIdOrName, groupIdOrName, json);
+    public void setModulesDatabaseToDocuments(String serverName) {
+        String payload = format("{\"server-name\":\"%s\", \"group-name\": \"%s\", \"modules-database\":\"Documents\"}",
+                serverName, groupName);
+        save(payload);
     }
-
 }

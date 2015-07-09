@@ -31,8 +31,7 @@ public abstract class AbstractManageResourceTest extends AbstractAppDeployerTest
     public void createThenDelete() {
         ResourceManager mgr = newResourceManager();
 
-        initializeAppDeployer(newCommand());
-        appDeployer.deploy(appConfig);
+        initializeAndDeploy();
 
         try {
             for (String name : getResourceNames()) {
@@ -49,6 +48,11 @@ public abstract class AbstractManageResourceTest extends AbstractAppDeployerTest
         }
     }
 
+    protected void initializeAndDeploy() {
+        initializeAppDeployer(newCommand());
+        appDeployer.deploy(appConfig);
+    }
+    
     protected void undeployAndVerifyResourcesWereDeleted(ResourceManager mgr) {
         appDeployer.undeploy(appConfig);
 

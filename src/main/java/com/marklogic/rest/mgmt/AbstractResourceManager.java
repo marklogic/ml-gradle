@@ -68,11 +68,12 @@ public abstract class AbstractResourceManager extends AbstractManager implements
         return getResourcesPath();
     }
 
-    public void delete(String payload) {
+    public boolean delete(String payload) {
         String name = getPayloadName(payload);
         String label = getResourceName();
         if (!exists(name)) {
             logger.info(format("Could not find %s with name or ID of %s, so not deleting", label, name));
+            return false;
         } else {
             String path = getResourcePath(name);
             path = appendParamsAndValuesToPath(path, getDeleteResourceParams(payload));
@@ -84,6 +85,7 @@ public abstract class AbstractResourceManager extends AbstractManager implements
                 manageClient.delete(path);
             }
             logger.info(format("Deleted %s at path %s", label, path));
+            return true;
         }
     }
 

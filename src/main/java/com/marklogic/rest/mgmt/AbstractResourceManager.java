@@ -68,6 +68,12 @@ public abstract class AbstractResourceManager extends AbstractManager implements
         return getResourcesPath();
     }
 
+    @Override
+    public boolean deleteByIdField(String resourceIdFieldValue) {
+        String payload = "{\"%s\":\"%s\"}";
+        return delete(format(payload, getIdFieldName(), resourceIdFieldValue));
+    }
+
     public boolean delete(String payload) {
         String name = getPayloadName(payload);
         String label = getResourceName();

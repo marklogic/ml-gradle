@@ -6,7 +6,6 @@ import org.springframework.web.client.RestTemplate;
 
 import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
-import com.marklogic.appdeployer.command.appservers.CreateOtherServersCommand;
 import com.marklogic.appdeployer.command.databases.CreateSchemasDatabaseCommand;
 import com.marklogic.appdeployer.command.databases.CreateTriggersDatabaseCommand;
 import com.marklogic.appdeployer.command.databases.UpdateContentDatabasesCommand;
@@ -21,11 +20,12 @@ public class ManageViewSchemasTest extends AbstractManageResourceTest {
 
     @Override
     protected void initializeAndDeploy() {
-        initializeAppDeployer(new CreateRestApiServersCommand(), new CreateSchemasDatabaseCommand(),
-                new CreateOtherServersCommand(), new CreateTriggersDatabaseCommand(),
-                new UpdateContentDatabasesCommand(), newCommand(), new LoadModulesCommand());
+        deleteModuleTimestampsFile();
 
-        appConfig.getCustomTokens().put("%%ODBC_PORT%%", "8542");
+        initializeAppDeployer(new CreateRestApiServersCommand(), new CreateSchemasDatabaseCommand(),
+                new CreateTriggersDatabaseCommand(), new UpdateContentDatabasesCommand(), newCommand(),
+                new LoadModulesCommand());
+
         appDeployer.deploy(appConfig);
     }
 

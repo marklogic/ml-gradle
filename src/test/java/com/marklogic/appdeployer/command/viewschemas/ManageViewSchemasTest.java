@@ -36,7 +36,7 @@ public class ManageViewSchemasTest extends AbstractManageResourceTest {
 
     @Override
     protected Command newCommand() {
-        return new ManageViewSchemasCommand();
+        return new CreateViewSchemasCommand();
     }
 
     @Override

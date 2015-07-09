@@ -1,5 +1,5 @@
 {
-   "view-name": "myTable1",
+   "view-name": "sampletable1",
    "element-scope":{"namespace-uri":"urn:sampleapp", "localname":"message"},
    "column": [
      {

@@ -4,6 +4,8 @@ import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
 import com.marklogic.appdeployer.command.appservers.ManageOtherServersCommand;
 import com.marklogic.appdeployer.command.databases.CreateSchemasDatabaseCommand;
+import com.marklogic.appdeployer.command.databases.CreateTriggersDatabaseCommand;
+import com.marklogic.appdeployer.command.databases.UpdateContentDatabasesCommand;
 import com.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
 import com.marklogic.rest.mgmt.ResourceManager;
 import com.marklogic.rest.mgmt.viewschemas.ViewSchemaManager;
@@ -13,8 +15,11 @@ public class ManageViewSchemasTest extends AbstractManageResourceTest {
     @Override
     protected void initializeAndDeploy() {
         initializeAppDeployer(new CreateRestApiServersCommand(), new CreateSchemasDatabaseCommand(),
-                new ManageOtherServersCommand());
+                new ManageOtherServersCommand(), new CreateTriggersDatabaseCommand(),
+                new UpdateContentDatabasesCommand(), newCommand());
+
         appConfig.getCustomTokens().put("%%ODBC_PORT%%", "8542");
+
         appDeployer.deploy(appConfig);
     }
 

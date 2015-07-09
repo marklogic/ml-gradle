@@ -11,7 +11,7 @@ import com.marklogic.rest.mgmt.appservers.ServerManager;
 public class UpdateRestApiServersCommand extends AbstractCommand {
 
     public UpdateRestApiServersCommand() {
-        setExecuteSortOrder(SortOrderConstants.UPDATE_REST_API_SERVERS_ORDER);
+        setExecuteSortOrder(SortOrderConstants.UPDATE_REST_API_SERVERS);
     }
 
     /**

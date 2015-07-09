@@ -11,22 +11,22 @@ public abstract class SortOrderConstants {
     public static Integer CREATE_EXTERNAL_SECURITY = 60;
     public static Integer CREATE_PROTECTED_COLLECTIONS = 70;
 
-    public static Integer CREATE_REST_API_SERVERS_ORDER = 100;
-    public static Integer CREATE_TRIGGERS_DATABASE_ORDER = 200;
-    public static Integer CREATE_SCHEMAS_DATABASE_ORDER = 250;
-    public static Integer UPDATE_CONTENT_DATABASES_ORDER = 300;
+    public static Integer CREATE_REST_API_SERVERS = 100;
+    public static Integer CREATE_TRIGGERS_DATABASE = 200;
+    public static Integer CREATE_SCHEMAS_DATABASE = 250;
+    public static Integer UPDATE_CONTENT_DATABASES = 300;
     public static Integer LOAD_MODULES_ORDER = 500;
 
     // This would have to be after loading modules in case the rewriter is modified
-    public static Integer UPDATE_REST_API_SERVERS_ORDER = 600;
-    public static Integer MANAGE_OTHER_SERVERS_ORDER = 650;
+    public static Integer UPDATE_REST_API_SERVERS = 600;
+    public static Integer MANAGE_OTHER_SERVERS = 650;
     
     public static Integer CREATE_SCHEDULED_TASKS = 800;
     
     public static Integer LOAD_DEFAULT_PIPELINES = 900;
-    public static Integer CREATE_PIPELINES_ORDER = 905;
-    public static Integer CREATE_DOMAINS_ORDER = 910;
-    public static Integer CREATE_CPF_CONFIGS_ORDER = 920;
+    public static Integer CREATE_PIPELINES = 905;
+    public static Integer CREATE_DOMAINS = 910;
+    public static Integer CREATE_CPF_CONFIGS = 920;
     
     public static Integer CREATE_SQL_VIEWS = 1000;
     

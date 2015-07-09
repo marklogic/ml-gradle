@@ -14,7 +14,7 @@ import com.marklogic.rest.util.JsonNodeUtil;
 public class UpdateContentDatabasesCommand extends AbstractCommand {
 
     public UpdateContentDatabasesCommand() {
-        setExecuteSortOrder(SortOrderConstants.UPDATE_CONTENT_DATABASES_ORDER);
+        setExecuteSortOrder(SortOrderConstants.UPDATE_CONTENT_DATABASES);
     }
 
     @Override

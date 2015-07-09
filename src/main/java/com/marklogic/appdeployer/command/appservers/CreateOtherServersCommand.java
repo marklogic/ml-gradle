@@ -12,10 +12,10 @@ import com.marklogic.rest.mgmt.appservers.ServerManager;
  * "Other" = non-REST-API servers. This will process every JSON/XML file that's not named "rest-api-server.*" in the
  * servers directory.
  */
-public class ManageOtherServersCommand extends AbstractResourceCommand {
+public class CreateOtherServersCommand extends AbstractResourceCommand {
 
-    public ManageOtherServersCommand() {
-        setExecuteSortOrder(SortOrderConstants.MANAGE_OTHER_SERVERS_ORDER);
+    public CreateOtherServersCommand() {
+        setExecuteSortOrder(SortOrderConstants.MANAGE_OTHER_SERVERS);
         setRestartAfterDelete(true);
     }
 

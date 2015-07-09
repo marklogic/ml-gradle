@@ -15,7 +15,7 @@ import com.marklogic.rest.mgmt.hosts.HostManager;
 public class CreateSchemasDatabaseCommand extends AbstractCommand implements UndoableCommand {
 
     public CreateSchemasDatabaseCommand() {
-        setExecuteSortOrder(SortOrderConstants.CREATE_SCHEMAS_DATABASE_ORDER);
+        setExecuteSortOrder(SortOrderConstants.CREATE_SCHEMAS_DATABASE);
     }
 
     /**
@@ -23,7 +23,7 @@ public class CreateSchemasDatabaseCommand extends AbstractCommand implements Und
      */
     @Override
     public Integer getUndoSortOrder() {
-        return SortOrderConstants.CREATE_REST_API_SERVERS_ORDER + 10;
+        return SortOrderConstants.CREATE_REST_API_SERVERS + 10;
     }
 
     @Override

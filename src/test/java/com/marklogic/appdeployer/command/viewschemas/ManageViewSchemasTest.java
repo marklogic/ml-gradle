@@ -5,7 +5,7 @@ import com.marklogic.appdeployer.command.Command;
 import com.marklogic.appdeployer.command.appservers.ManageOtherServersCommand;
 import com.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
 import com.marklogic.rest.mgmt.ResourceManager;
-import com.marklogic.rest.mgmt.tasks.ViewSchemaManager;
+import com.marklogic.rest.mgmt.viewschemas.ViewSchemaManager;
 
 public class ManageViewSchemasTest extends AbstractManageResourceTest {
 

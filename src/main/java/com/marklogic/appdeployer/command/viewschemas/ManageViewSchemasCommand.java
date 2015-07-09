@@ -5,7 +5,7 @@ import java.io.File;
 import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.rest.mgmt.ResourceManager;
-import com.marklogic.rest.mgmt.tasks.ViewSchemaManager;
+import com.marklogic.rest.mgmt.viewschemas.ViewSchemaManager;
 
 public class ManageViewSchemasCommand extends AbstractResourceCommand {
 

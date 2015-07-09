@@ -1,4 +1,4 @@
-package com.marklogic.rest.mgmt.tasks;
+package com.marklogic.rest.mgmt.viewschemas;
 
 import com.marklogic.rest.mgmt.AbstractResourceManager;
 import com.marklogic.rest.mgmt.ManageClient;

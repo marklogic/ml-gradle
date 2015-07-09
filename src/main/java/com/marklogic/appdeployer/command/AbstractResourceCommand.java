@@ -30,12 +30,26 @@ public abstract class AbstractResourceCommand extends AbstractCommand implements
             ResourceManager mgr = getResourceManager(context);
             for (File f : resourceDir.listFiles()) {
                 if (isResourceFile(f)) {
-                    String payload = copyFileToString(f);
-                    payload = tokenReplacer.replaceTokens(payload, context.getAppConfig(), false);
-                    mgr.save(payload);
+                    saveResource(mgr, context, f);
                 }
             }
         }
+    }
+
+    /**
+     * This is in a protected method so that a subclass can easily override it to customize it or provide additional
+     * functionality after a resource has been saved.
+     * 
+     * @param mgr
+     * @param context
+     * @param f
+     * @return the payload that was sent to the ResourceManager
+     */
+    protected String saveResource(ResourceManager mgr, CommandContext context, File f) {
+        String payload = copyFileToString(f);
+        payload = tokenReplacer.replaceTokens(payload, context.getAppConfig(), false);
+        mgr.save(payload);
+        return payload;
     }
 
     @Override

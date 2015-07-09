@@ -3,14 +3,11 @@ package com.marklogic.rest.mgmt;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ClassUtils;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marklogic.clientutil.LoggingObject;
-import com.marklogic.rest.util.Fragment;
 
 public class AbstractManager extends LoggingObject {
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected PayloadParser payloadParser = new PayloadParser();
 
     /**
      * Manager classes that need to connect to ML as a user with the admin role should override this to return true.
@@ -42,43 +39,13 @@ public class AbstractManager extends LoggingObject {
         return getResourceName() + "-name";
     }
 
-    protected JsonNode parseJson(String json) {
-        try {
-            return objectMapper.readTree(json);
-        } catch (Exception e) {
-            throw new RuntimeException(format("Unable to parse JSON: %s", e.getMessage()), e);
-        }
-    }
-
     protected String getPayloadName(String payload) {
-        return getPayloadFieldValue(payload, getIdFieldName());
-    }
-
-    protected String getPayloadFieldValue(String payload, String fieldName) {
-        if (isJsonPayload(payload)) {
-            JsonNode node = parseJson(payload);
-            if (!node.has(fieldName)) {
-                throw new RuntimeException("Cannot get field value from JSON; field name: " + fieldName + "; JSON: "
-                        + payload);
-            }
-            return node.get(fieldName).asText();
-        } else {
-            Fragment f = new Fragment(payload);
-            String xpath = format("/node()/*[local-name(.) = '%s']", fieldName);
-            if (!f.elementExists(xpath)) {
-                throw new RuntimeException("Cannot get field value from XML at path: " + xpath + "; XML: " + payload);
-            }
-            return f.getElementValues(xpath).get(0);
-        }
-    }
-
-    protected boolean isJsonPayload(String payload) {
-        return payload.trim().startsWith("{");
+        return payloadParser.getPayloadFieldValue(payload, getIdFieldName());
     }
 
     protected ResponseEntity<String> putPayload(ManageClient client, String path, String payload) {
         boolean useAdmin = useAdminUser();
-        if (isJsonPayload(payload)) {
+        if (payloadParser.isJsonPayload(payload)) {
             return useAdmin ? client.putJsonAsAdmin(path, payload) : client.putJson(path, payload);
         }
         return useAdmin ? client.putXmlAsAdmin(path, payload) : client.putXml(path, payload);
@@ -86,7 +53,7 @@ public class AbstractManager extends LoggingObject {
 
     protected ResponseEntity<String> postPayload(ManageClient client, String path, String payload) {
         boolean useAdmin = useAdminUser();
-        if (isJsonPayload(payload)) {
+        if (payloadParser.isJsonPayload(payload)) {
             return useAdmin ? client.postJsonAsAdmin(path, payload) : client.postJson(path, payload);
         }
         return useAdmin ? client.postXmlAsAdmin(path, payload) : client.postXml(path, payload);

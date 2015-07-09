@@ -23,8 +23,8 @@ public class AmpManager extends AbstractResourceManager {
     protected String[] getUpdateResourceParams(String payload) {
         List<String> params = new ArrayList<String>();
         params.add("document-uri");
-        if (isJsonPayload(payload)) {
-            JsonNode node = parseJson(payload);
+        if (payloadParser.isJsonPayload(payload)) {
+            JsonNode node = payloadParser.parseJson(payload);
             params.add(node.get("document-uri").asText());
             if (node.has("namespace")) {
                 params.add("namespace");

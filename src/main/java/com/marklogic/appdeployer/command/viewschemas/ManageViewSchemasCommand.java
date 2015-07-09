@@ -4,6 +4,7 @@ import java.io.File;
 
 import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
+import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.rest.mgmt.PayloadParser;
 import com.marklogic.rest.mgmt.ResourceManager;
 import com.marklogic.rest.mgmt.viewschemas.ViewManager;
@@ -19,6 +20,7 @@ public class ManageViewSchemasCommand extends AbstractResourceCommand {
     public ManageViewSchemasCommand() {
         // Don't need to delete anything, as view-schemas all live in a database
         setDeleteResourcesOnUndo(false);
+        setExecuteSortOrder(SortOrderConstants.CREATE_SQL_VIEWS);
     }
 
     @Override

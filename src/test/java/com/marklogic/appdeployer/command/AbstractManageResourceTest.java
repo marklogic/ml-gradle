@@ -41,7 +41,7 @@ public abstract class AbstractManageResourceTest extends AbstractAppDeployerTest
             // Let the subclass optionally perform any additional assertions
             afterResourcesCreated();
 
-            // Make sure we don't get an error from trying to create the roles again
+            // Make sure we don't get an error from trying to create the resources again
             appDeployer.deploy(appConfig);
         } finally {
             undeployAndVerifyResourcesWereDeleted(mgr);

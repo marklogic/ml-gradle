@@ -1,13 +1,14 @@
 {
-   "view-name": "sampletable1",
-   "element-scope":{"namespace-uri":"urn:sampleapp", "localname":"message"},
+   "view-name": "ordertable",
+   "schema-name": "main",
+   "element-scope": {"namespace-uri":"", "localname":"order"},
    "column": [
      {
-       "column-name": "messageId",
+       "column-name": "amount",
        "element-reference": {
-          "namespace-uri": "urn:sampleapp",
-          "localname": "id",
-          "scalar-type": "string" 
+          "namespace-uri": "",
+          "localname": "amount",
+          "scalar-type": "int" 
        }
      }
    ] 

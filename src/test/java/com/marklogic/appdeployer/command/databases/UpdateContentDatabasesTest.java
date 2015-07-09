@@ -33,7 +33,7 @@ public class UpdateContentDatabasesTest extends AbstractAppDeployerTest {
         appConfig.setTestRestPort(SAMPLE_APP_TEST_REST_PORT);
 
         initializeAppDeployer(new CreateRestApiServersCommand(), new CreateTriggersDatabaseCommand(),
-                new UpdateContentDatabasesCommand());
+                new UpdateContentDatabasesCommand(), new CreateSchemasDatabaseCommand());
 
         appDeployer.deploy(appConfig);
 
@@ -50,7 +50,7 @@ public class UpdateContentDatabasesTest extends AbstractAppDeployerTest {
         dir.getContentDatabaseFiles().add(new File(dir.getDatabasesDir(), "more-content-db-config.json"));
 
         initializeAppDeployer(new CreateRestApiServersCommand(), new CreateTriggersDatabaseCommand(),
-                new UpdateContentDatabasesCommand());
+                new UpdateContentDatabasesCommand(), new CreateSchemasDatabaseCommand());
 
         appDeployer.deploy(appConfig);
 

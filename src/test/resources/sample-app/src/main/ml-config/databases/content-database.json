@@ -10,5 +10,6 @@
       "scalar-type": "string"
     }
   ],
-  "triggers-database": "%%TRIGGERS_DATABASE%%"
+  "triggers-database": "%%TRIGGERS_DATABASE%%",
+  "schema-database": "%%SCHEMAS_DATABASE%%"
 }

@@ -44,7 +44,7 @@ public abstract class AbstractManageResourceTest extends AbstractAppDeployerTest
             // Make sure we don't get an error from trying to create the roles again
             appDeployer.deploy(appConfig);
         } finally {
-            //undeployAndVerifyResourcesWereDeleted(mgr);
+            undeployAndVerifyResourcesWereDeleted(mgr);
         }
     }
 
@@ -52,10 +52,13 @@ public abstract class AbstractManageResourceTest extends AbstractAppDeployerTest
         initializeAppDeployer(newCommand());
         appDeployer.deploy(appConfig);
     }
-    
+
     protected void undeployAndVerifyResourcesWereDeleted(ResourceManager mgr) {
         appDeployer.undeploy(appConfig);
+        verifyResourcesWereDeleted(mgr);
+    }
 
+    protected void verifyResourcesWereDeleted(ResourceManager mgr) {
         for (String name : getResourceNames()) {
             assertFalse(mgr.exists(name));
         }

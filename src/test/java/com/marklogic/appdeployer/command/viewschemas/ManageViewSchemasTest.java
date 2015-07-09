@@ -3,6 +3,7 @@ package com.marklogic.appdeployer.command.viewschemas;
 import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
 import com.marklogic.appdeployer.command.appservers.ManageOtherServersCommand;
+import com.marklogic.appdeployer.command.databases.CreateSchemasDatabaseCommand;
 import com.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
 import com.marklogic.rest.mgmt.ResourceManager;
 import com.marklogic.rest.mgmt.viewschemas.ViewSchemaManager;
@@ -11,7 +12,8 @@ public class ManageViewSchemasTest extends AbstractManageResourceTest {
 
     @Override
     protected void initializeAndDeploy() {
-        initializeAppDeployer(new CreateRestApiServersCommand(), newCommand(), new ManageOtherServersCommand());
+        initializeAppDeployer(new CreateRestApiServersCommand(), new CreateSchemasDatabaseCommand(),
+                new ManageOtherServersCommand());
         appConfig.getCustomTokens().put("%%ODBC_PORT%%", "8542");
         appDeployer.deploy(appConfig);
     }
@@ -31,9 +33,12 @@ public class ManageViewSchemasTest extends AbstractManageResourceTest {
         return new String[] { "main" };
     }
 
+    /**
+     * We don't need to verify anything here, as SQL schemas and views live in the sample-app-schemas database which was
+     * already deleted.
+     */
     @Override
-    protected void undeployAndVerifyResourcesWereDeleted(ResourceManager mgr) {
-        // Nothing to do here, as the content database is deleted which holds all the view schemas
+    protected void verifyResourcesWereDeleted(ResourceManager mgr) {
     }
 
 }

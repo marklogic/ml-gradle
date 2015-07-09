@@ -19,6 +19,7 @@ public class DefaultTokenReplacer implements TokenReplacer {
                 isTestResource ? appConfig.getTestContentDatabaseName() : appConfig.getContentDatabaseName());
         payload = payload.replace("%%MODULES_DATABASE%%", appConfig.getModulesDatabaseName());
         payload = payload.replace("%%TRIGGERS_DATABASE%%", appConfig.getTriggersDatabaseName());
+        payload = payload.replace("%%SCHEMAS_DATABASE%%", appConfig.getSchemasDatabaseName());
         payload = payload.replace("%%PORT%%", isTestResource ? appConfig.getTestRestPort().toString() : appConfig
                 .getRestPort().toString());
         return payload;

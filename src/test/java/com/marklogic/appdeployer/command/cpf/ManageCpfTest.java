@@ -4,6 +4,7 @@ import org.junit.After;
 import org.junit.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
+import com.marklogic.appdeployer.command.databases.CreateSchemasDatabaseCommand;
 import com.marklogic.appdeployer.command.databases.CreateTriggersDatabaseCommand;
 import com.marklogic.appdeployer.command.databases.UpdateContentDatabasesCommand;
 import com.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
@@ -21,8 +22,8 @@ public class ManageCpfTest extends AbstractAppDeployerTest {
     @Test
     public void test() {
         initializeAppDeployer(new CreateRestApiServersCommand(), new UpdateContentDatabasesCommand(),
-                new CreateTriggersDatabaseCommand(), new CreateDomainsCommand(), new CreateCpfConfigsCommand(),
-                new CreatePipelinesCommand());
+                new CreateSchemasDatabaseCommand(), new CreateTriggersDatabaseCommand(), new CreateDomainsCommand(),
+                new CreateCpfConfigsCommand(), new CreatePipelinesCommand());
 
         appDeployer.deploy(appConfig);
 

@@ -6,5 +6,5 @@
    "depth": "infinity",
    "eval-module": "%%MODULES_DATABASE%%",
    "eval-root": "/",
-   "pipeline":["Status Change Handling", "Sample Pipeline"]
+   "pipeline": ["Status Change Handling", "Sample Pipeline"]
  }

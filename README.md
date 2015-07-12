@@ -35,7 +35,7 @@ To use ml-gradle right away, you'll need Gradle installed first. And of course y
         maven {url "http://rjrudin.github.io/marklogic-java/releases"}
       }
       dependencies {
-        classpath "com.marklogic:ml-gradle:2.0a8"
+        classpath "com.marklogic:ml-gradle:2.0a10"
       }
     }
     
@@ -66,7 +66,7 @@ To start customizing your application, your best bet is to examine the [sample-p
 
 1. The [build.gradle file](https://github.com/rjrudin/ml-gradle/blob/master/sample-project/build.gradle) provides examples of configuring and extending ml-gradle. 
 1. The [ml-config directory](https://github.com/rjrudin/ml-gradle/tree/master/sample-project/src/main/ml-config) provides examples of all of the MarkLogic management resources currently supported by ml-gradle.
-1. The [ml-modules directory(https://github.com/rjrudin/ml-gradle/tree/master/sample-project/src/main/ml-modules) provides examples of the different kinds of modules that can be loaded (application modules are loaded via the MarkLogic Client REST API, not the Management REST API). 
+1. The [ml-modules directory](https://github.com/rjrudin/ml-gradle/tree/master/sample-project/src/main/ml-modules) provides examples of the different kinds of modules that can be loaded (application modules are loaded via the MarkLogic Client REST API, not the Management REST API). 
 
 To quickly generate a useful set of configuration files, just run:
 

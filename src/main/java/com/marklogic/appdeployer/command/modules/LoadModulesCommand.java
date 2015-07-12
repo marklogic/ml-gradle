@@ -23,9 +23,8 @@ public class LoadModulesCommand extends AbstractCommand {
     private String defaultAssetRolesAndCapabilities = "rest-admin,read,rest-admin,update,rest-extension-user,execute";
     private String customAssetRolesAndCapabilities;
 
-    @Override
-    public Integer getExecuteSortOrder() {
-        return SortOrderConstants.LOAD_MODULES_ORDER;
+    public LoadModulesCommand() {
+        setExecuteSortOrder(SortOrderConstants.LOAD_MODULES_ORDER);
     }
 
     @Override
@@ -39,7 +38,7 @@ public class LoadModulesCommand extends AbstractCommand {
         AppConfig config = context.getAppConfig();
 
         DatabaseClient client = DatabaseClientFactory.newClient(config.getHost(), config.getRestPort(),
-                config.getUsername(), config.getPassword(), config.getAuthentication());
+                config.getRestAdminUsername(), config.getRestAdminPassword(), config.getAuthentication());
 
         for (String modulesPath : config.getModulePaths()) {
             logger.info("Loading modules from dir: " + modulesPath);

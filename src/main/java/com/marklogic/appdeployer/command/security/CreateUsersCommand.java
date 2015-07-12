@@ -10,9 +10,16 @@ import com.marklogic.rest.mgmt.security.UserManager;
 
 public class CreateUsersCommand extends AbstractResourceCommand {
 
+    public CreateUsersCommand() {
+        setExecuteSortOrder(SortOrderConstants.CREATE_USERS);
+    }
+
+    /**
+     * We usually want to delete users right before we delete roles, at the end of the deployment process.
+     */
     @Override
-    public Integer getExecuteSortOrder() {
-        return SortOrderConstants.CREATE_USERS;
+    public Integer getUndoSortOrder() {
+        return Integer.MAX_VALUE - 10;
     }
 
     protected File getResourcesDir(CommandContext context) {

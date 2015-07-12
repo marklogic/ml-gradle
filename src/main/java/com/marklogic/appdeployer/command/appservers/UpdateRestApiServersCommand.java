@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.command.servers;
+package com.marklogic.appdeployer.command.appservers;
 
 import java.io.File;
 
@@ -10,9 +10,8 @@ import com.marklogic.rest.mgmt.appservers.ServerManager;
 
 public class UpdateRestApiServersCommand extends AbstractCommand {
 
-    @Override
-    public Integer getExecuteSortOrder() {
-        return SortOrderConstants.UPDATE_REST_API_SERVERS_ORDER;
+    public UpdateRestApiServersCommand() {
+        setExecuteSortOrder(SortOrderConstants.UPDATE_REST_API_SERVERS);
     }
 
     /**
@@ -23,17 +22,18 @@ public class UpdateRestApiServersCommand extends AbstractCommand {
     public void execute(CommandContext context) {
         File f = context.getAppConfig().getConfigDir().getRestApiServerFile();
         if (f.exists()) {
-            ServerManager mgr = new ServerManager(context.getManageClient());
-
-            String payload = copyFileToString(f);
             AppConfig appConfig = context.getAppConfig();
 
+            ServerManager mgr = new ServerManager(context.getManageClient(), appConfig.getGroupName());
+
+            String payload = copyFileToString(f);
+
             String json = tokenReplacer.replaceTokens(payload, appConfig, false);
-            mgr.updateServer(appConfig.getRestServerName(), appConfig.getGroupName(), json);
+            mgr.save(json);
 
             if (appConfig.isTestPortSet()) {
                 json = tokenReplacer.replaceTokens(payload, appConfig, true);
-                mgr.updateServer(appConfig.getTestRestServerName(), appConfig.getGroupName(), json);
+                mgr.save(json);
             }
         } else {
             logger.info(format("No REST API server file found at %s, so not updating the server", f.getAbsolutePath()));

@@ -1,3 +1,4 @@
 {
+  "server-name": "%%NAME%%",
   "authentication": "basic"
 }

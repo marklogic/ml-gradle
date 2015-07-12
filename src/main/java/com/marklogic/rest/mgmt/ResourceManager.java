@@ -24,12 +24,22 @@ public interface ResourceManager {
     public void save(String json);
 
     /**
-     * If a resource with the given name or ID exists, then delete it; else do nothing.
+     * Assumes that a resource ID field is in the payload, and then extracts that field value and 
+     * tries to delete a resource with the ID field value.
      * 
-     * @param resourceNameOrId
+     * @param payload a JSON or XML payload with the resource ID field in it
+     * @return true if a resource was deleted; false otherwise
      */
-    public void delete(String json);
+    public boolean delete(String payload);
 
+    /**
+     * Deletes a resource with the given resource ID field value.
+     * 
+     * @param resourceIdFieldValue
+     * @return true if a resource was deleted; false otherwise
+     */
+    public boolean deleteByIdField(String resourceIdFieldValue);
+    
     /**
      * 
      * @return

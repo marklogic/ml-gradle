@@ -1,11 +1,9 @@
 package com.marklogic.appdeployer;
 
 import java.io.File;
-import java.util.Arrays;
 
 import org.junit.After;
 import org.junit.Before;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -15,8 +13,6 @@ import com.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
 import com.marklogic.appdeployer.impl.SimpleAppDeployer;
 import com.marklogic.appdeployer.spring.SpringAppDeployer;
 import com.marklogic.rest.mgmt.AbstractMgmtTest;
-import com.marklogic.rest.mgmt.admin.AdminConfig;
-import com.marklogic.rest.mgmt.admin.AdminManager;
 import com.marklogic.xccutil.template.XccTemplate;
 
 /**
@@ -29,20 +25,15 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
     protected final static Integer SAMPLE_APP_REST_PORT = 8540;
     protected final static Integer SAMPLE_APP_TEST_REST_PORT = 8541;
 
-    @Autowired
-    private AdminConfig adminConfig;
-
     private ConfigurableApplicationContext appManagerContext;
 
     // Intended to be used by subclasses
     protected AppDeployer appDeployer;
-    protected AdminManager adminManager;
     protected AppConfig appConfig;
 
     @Before
     public void initialize() {
         initializeAppConfig();
-        adminManager = new AdminManager(adminConfig);
     }
 
     protected void initializeAppConfig() {
@@ -63,9 +54,7 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
      * @param commands
      */
     protected void initializeAppDeployer(Command... commands) {
-        SimpleAppDeployer m = new SimpleAppDeployer(manageClient, adminManager);
-        m.setCommands(Arrays.asList(commands));
-        appDeployer = m;
+        appDeployer = new SimpleAppDeployer(manageClient, adminManager, commands);
     }
 
     /**
@@ -100,13 +89,20 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
         }
     }
 
-    /**
-     * Assumes that the AppConfig user can be used to talk XCC to the modules database.
-     * 
-     * @return
-     */
     protected XccTemplate newModulesXccTemplate() {
-        return new XccTemplate(format("xcc://%s:%s@%s:8000/%s", appConfig.getUsername(), appConfig.getPassword(),
-                appConfig.getHost(), appConfig.getModulesDatabaseName()));
+        return new XccTemplate(format("xcc://%s:%s@%s:8000/%s", appConfig.getXdbcUsername(),
+                appConfig.getXdbcPassword(), appConfig.getHost(), appConfig.getModulesDatabaseName()));
     }
+
+    /**
+     * This ensures that modules aren't not loaded because of the timestamps file.
+     */
+    protected void deleteModuleTimestampsFile() {
+        File f = new File("build/ml-last-configured-timestamps.properties");
+        if (f.exists()) {
+            logger.info("Deleting module timestamps file: " + f.getAbsolutePath());
+            f.delete();
+        }
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.marklogic.appdeployer.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.marklogic.appdeployer.command.Command;
@@ -13,8 +14,26 @@ public class SimpleAppDeployer extends AbstractAppDeployer {
 
     private List<Command> commands;
 
-    public SimpleAppDeployer(ManageClient manageClient, AdminManager adminManager) {
+    public SimpleAppDeployer(Command... commandArray) {
+        super();
+        buildModifiableCommandList(commandArray);
+    }
+
+    public SimpleAppDeployer(ManageClient manageClient, AdminManager adminManager, Command... commandArray) {
         super(manageClient, adminManager);
+        buildModifiableCommandList(commandArray);
+    }
+
+    /**
+     * Arrays.asList produces an unmodifiable list, but we want a client to be able to modify the list.
+     * 
+     * @param commandArray
+     */
+    protected void buildModifiableCommandList(Command... commandArray) {
+        commands = new ArrayList<Command>(commandArray.length);
+        for (Command c : commandArray) {
+            commands.add(c);
+        }
     }
 
     /**

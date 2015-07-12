@@ -33,15 +33,19 @@ public abstract class AbstractResourceManager extends AbstractManager implements
     }
 
     public ResourcesFragment getAsXml() {
-        return new ResourcesFragment(manageClient.getXml(getResourcesPath()));
+        Fragment f = useAdminUser() ? manageClient.getXmlAsAdmin(getResourcesPath()) : manageClient
+                .getXml(getResourcesPath());
+        return new ResourcesFragment(f);
     }
 
     public Fragment getAsXml(String resourceNameOrId) {
-        return manageClient.getXml(getResourcePath(resourceNameOrId));
+        return useAdminUser() ? manageClient.getXmlAsAdmin(getResourcePath(resourceNameOrId)) : manageClient
+                .getXml(getResourcePath(resourceNameOrId));
     }
 
     public Fragment getPropertiesAsXml(String resourceNameOrId) {
-        return manageClient.getXml(getPropertiesPath(resourceNameOrId));
+        return useAdminUser() ? manageClient.getXmlAsAdmin(getPropertiesPath(resourceNameOrId)) : manageClient
+                .getXml(getPropertiesPath(resourceNameOrId));
     }
 
     public void save(String payload) {
@@ -49,29 +53,45 @@ public abstract class AbstractResourceManager extends AbstractManager implements
         String label = getResourceName();
         if (exists(name)) {
             String path = getPropertiesPath(name);
-            path = appendParamsAndValuesToPath(path, getResourceParams(payload));
+            path = appendParamsAndValuesToPath(path, getUpdateResourceParams(payload));
             logger.info(format("Found %s with name of %s, so updating at path %s", label, name, path));
             putPayload(manageClient, path, payload);
             logger.info(format("Updated %s at %s", label, path));
         } else {
             logger.info(format("Creating %s: %s", label, name));
-            postPayload(manageClient, getResourcesPath(), payload);
+            postPayload(manageClient, getCreateResourcePath(payload), payload);
             logger.info(format("Created %s: %s", label, name));
         }
     }
 
-    public void delete(String payload) {
+    protected String getCreateResourcePath(String payload) {
+        return getResourcesPath();
+    }
+
+    @Override
+    public boolean deleteByIdField(String resourceIdFieldValue) {
+        String payload = "{\"%s\":\"%s\"}";
+        return delete(format(payload, getIdFieldName(), resourceIdFieldValue));
+    }
+
+    public boolean delete(String payload) {
         String name = getPayloadName(payload);
         String label = getResourceName();
         if (!exists(name)) {
             logger.info(format("Could not find %s with name or ID of %s, so not deleting", label, name));
+            return false;
         } else {
             String path = getResourcePath(name);
-            path = appendParamsAndValuesToPath(path, getResourceParams(payload));
+            path = appendParamsAndValuesToPath(path, getDeleteResourceParams(payload));
 
             logger.info(format("Deleting %s at path %s", label, path));
-            manageClient.delete(path);
+            if (useAdminUser()) {
+                manageClient.deleteAsAdmin(path);
+            } else {
+                manageClient.delete(path);
+            }
             logger.info(format("Deleted %s at path %s", label, path));
+            return true;
         }
     }
 
@@ -94,8 +114,18 @@ public abstract class AbstractResourceManager extends AbstractManager implements
      * @param node
      * @return
      */
-    protected String[] getResourceParams(String payload) {
+    protected String[] getUpdateResourceParams(String payload) {
         return new String[] {};
+    }
+
+    /**
+     * Defaults to the "update" resource parameters.
+     * 
+     * @param payload
+     * @return
+     */
+    protected String[] getDeleteResourceParams(String payload) {
+        return getUpdateResourceParams(payload);
     }
 
     protected ManageClient getManageClient() {

@@ -27,6 +27,10 @@ public class ConfigDir {
     }
 
     public ConfigDir(File baseDir) {
+        setBaseDir(baseDir);
+    }
+
+    public void setBaseDir(File baseDir) {
         this.baseDir = baseDir;
         initializeContentDatabaseFiles();
     }
@@ -44,6 +48,10 @@ public class ConfigDir {
         return new File(new File(baseDir, databasesPath), "triggers-database.json");
     }
 
+    public File getSchemasDatabaseFile() {
+        return new File(new File(baseDir, databasesPath), "schemas-database.json");
+    }
+
     public File getRestApiFile() {
         return new File(baseDir, restApiPath);
     }
@@ -59,7 +67,7 @@ public class ConfigDir {
     public File getCpfDir() {
         return new File(baseDir, "cpf");
     }
-    
+
     public void setDatabasesPath(String databasesPath) {
         this.databasesPath = databasesPath;
     }

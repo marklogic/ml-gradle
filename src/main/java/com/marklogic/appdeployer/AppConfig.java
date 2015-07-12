@@ -1,7 +1,9 @@
 package com.marklogic.appdeployer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.marklogic.client.DatabaseClientFactory.Authentication;
 
@@ -14,9 +16,9 @@ public class AppConfig {
     private String name;
     private String host = "localhost";
 
-    // User/password for authenticating against the REST API
-    private String username;
-    private String password;
+    // Username/password combo for using the client REST API - e.g. to load modules
+    private String restAdminUsername;
+    private String restAdminPassword;
     private Authentication authentication = Authentication.DIGEST;
 
     // User/password for making XDBC calls, usually against port 8000
@@ -28,9 +30,14 @@ public class AppConfig {
 
     private List<String> modulePaths;
     private ConfigDir configDir;
-    private List<ConfigDir> dependencyConfigDirs;
 
     private String groupName = "Default";
+
+    // Passed into the TokenReplacer that subclasses of AbstractCommand use
+    private Map<String, String> customTokens = new HashMap<>();
+
+    // Allows for creating a triggers database without a config file for one
+    private boolean createTriggersDatabase = true;
 
     public AppConfig() {
         this("src/main/ml-modules");
@@ -41,10 +48,10 @@ public class AppConfig {
         modulePaths.add(defaultModulePath);
         configDir = new ConfigDir();
 
-        this.username = "admin";
-        this.password = "admin";
-        this.xdbcUsername = username;
-        this.xdbcPassword = password;
+        this.restAdminUsername = "admin";
+        this.restAdminPassword = "admin";
+        this.xdbcUsername = restAdminUsername;
+        this.xdbcPassword = restAdminPassword;
     }
 
     public boolean isTestPortSet() {
@@ -96,15 +103,15 @@ public class AppConfig {
     }
 
     public String getContentXccUrl() {
-        return String.format("xcc://%s:%s@%s:8000/%s", username, password, host, getContentDatabaseName());
+        return String.format("xcc://%s:%s@%s:8000/%s", xdbcUsername, xdbcPassword, host, getContentDatabaseName());
     }
 
     public String getTestContentXccUrl() {
-        return String.format("xcc://%s:%s@%s:8000/%s", username, password, host, getTestContentDatabaseName());
+        return String.format("xcc://%s:%s@%s:8000/%s", xdbcUsername, xdbcPassword, host, getTestContentDatabaseName());
     }
 
     public String getModulesXccUrl() {
-        return String.format("xcc://%s:%s@%s:8000/%s", username, password, host, getModulesDatabaseName());
+        return String.format("xcc://%s:%s@%s:8000/%s", xdbcUsername, xdbcPassword, host, getModulesDatabaseName());
     }
 
     public String getName() {
@@ -123,20 +130,20 @@ public class AppConfig {
         this.host = host;
     }
 
-    public String getUsername() {
-        return username;
+    public String getRestAdminUsername() {
+        return restAdminUsername;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setRestAdminUsername(String username) {
+        this.restAdminUsername = username;
     }
 
-    public String getPassword() {
-        return password;
+    public String getRestAdminPassword() {
+        return restAdminPassword;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setRestAdminPassword(String password) {
+        this.restAdminPassword = password;
     }
 
     public Integer getRestPort() {
@@ -187,14 +194,6 @@ public class AppConfig {
         this.configDir = configDir;
     }
 
-    public List<ConfigDir> getDependencyConfigDirs() {
-        return dependencyConfigDirs;
-    }
-
-    public void setDependencyConfigDirs(List<ConfigDir> dependencyConfigDirs) {
-        this.dependencyConfigDirs = dependencyConfigDirs;
-    }
-
     public String getXdbcUsername() {
         return xdbcUsername;
     }
@@ -209,6 +208,22 @@ public class AppConfig {
 
     public void setXdbcPassword(String xdbcPassword) {
         this.xdbcPassword = xdbcPassword;
+    }
+
+    public Map<String, String> getCustomTokens() {
+        return customTokens;
+    }
+
+    public void setCustomTokens(Map<String, String> customTokens) {
+        this.customTokens = customTokens;
+    }
+
+    public boolean isCreateTriggersDatabase() {
+        return createTriggersDatabase;
+    }
+
+    public void setCreateTriggersDatabase(boolean createTriggerDatabase) {
+        this.createTriggersDatabase = createTriggerDatabase;
     }
 
 }

@@ -1,0 +1,9 @@
+{
+  "collection": "sample-app-collection",
+  "permission": [
+    {
+      "role-name": "view-admin",
+      "capability": "read"
+    }
+  ]
+}

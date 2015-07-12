@@ -1,0 +1,16 @@
+{
+  "role-name" : "sample-app-role",
+  "role" : [ "rest-admin" ],
+  "privilege": [
+    {
+      "privilege-name": "xdbc:insert-in",
+      "action": "http://marklogic.com/xdmp/privileges/xdbc-insert-in",
+      "kind": "execute"
+    },
+    {
+      "privilege-name": "any-uri",
+      "action": "http://marklogic.com/xdmp/privileges/any-uri",
+      "kind": "execute"
+    }
+  ]
+}

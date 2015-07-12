@@ -7,9 +7,8 @@ import com.marklogic.rest.mgmt.cpf.PipelineManager;
 
 public class CreatePipelinesCommand extends AbstractCpfResourceCommand {
 
-    @Override
-    public Integer getExecuteSortOrder() {
-        return SortOrderConstants.CREATE_PIPELINES_ORDER;
+    public CreatePipelinesCommand() {
+        setExecuteSortOrder(SortOrderConstants.CREATE_PIPELINES);
     }
 
     @Override

@@ -4,14 +4,14 @@ import java.io.File;
 
 import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
+import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.rest.mgmt.ResourceManager;
 import com.marklogic.rest.mgmt.security.PrivilegeManager;
 
 public class CreatePrivilegesCommand extends AbstractResourceCommand {
 
-    @Override
-    public Integer getExecuteSortOrder() {
-        return 40;
+    public CreatePrivilegesCommand() {
+        setExecuteSortOrder(SortOrderConstants.CREATE_PRIVILEGES);
     }
 
     @Override

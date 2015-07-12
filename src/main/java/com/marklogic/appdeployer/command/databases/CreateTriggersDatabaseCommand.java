@@ -2,6 +2,7 @@ package com.marklogic.appdeployer.command.databases;
 
 import java.io.File;
 
+import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
@@ -13,31 +14,39 @@ import com.marklogic.rest.mgmt.hosts.HostManager;
 
 public class CreateTriggersDatabaseCommand extends AbstractCommand implements UndoableCommand {
 
-    @Override
-    public Integer getExecuteSortOrder() {
-        return SortOrderConstants.CREATE_TRIGGERS_DATABASE_ORDER;
+    public CreateTriggersDatabaseCommand() {
+        setExecuteSortOrder(SortOrderConstants.CREATE_TRIGGERS_DATABASE);
     }
 
+    /**
+     * Have to first delete the REST API server and its content database, then delete the trigger database.
+     */
     @Override
     public Integer getUndoSortOrder() {
-        return getExecuteSortOrder();
+        return SortOrderConstants.CREATE_REST_API_SERVERS + 10;
     }
 
     @Override
     public void execute(CommandContext context) {
-        File f = context.getAppConfig().getConfigDir().getTriggersDatabaseFile();
+        AppConfig config = context.getAppConfig();
+        File f = config.getConfigDir().getTriggersDatabaseFile();
         if (f.exists()) {
-            DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
-
-            String dbName = context.getAppConfig().getTriggersDatabaseName();
+            logger.info("Creating triggers database based on file at: " + f.getAbsolutePath());
             String payload = copyFileToString(f);
-            payload = tokenReplacer.replaceTokens(payload, context.getAppConfig(), false);
-            dbMgr.save(payload);
-
-            createAndAttachForestOnEachHost(dbName, context.getManageClient());
+            payload = tokenReplacer.replaceTokens(payload, config, false);
+            createTriggersDatabase(payload, context);
+        } else if (config.isCreateTriggersDatabase()) {
+            logger.info("Creating triggers database because AppConfig property is set to true");
+            createTriggersDatabase(buildDefaultTriggersDatabasePayload(config), context);
         } else {
             logger.info("Not creating a triggers database, no file found at: " + f.getAbsolutePath());
         }
+    }
+
+    protected void createTriggersDatabase(String payload, CommandContext context) {
+        DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
+        dbMgr.save(payload);
+        createAndAttachForestOnEachHost(context.getAppConfig().getTriggersDatabaseName(), context.getManageClient());
     }
 
     public void createAndAttachForestOnEachHost(String dbName, ManageClient client) {
@@ -51,13 +60,18 @@ public class CreateTriggersDatabaseCommand extends AbstractCommand implements Un
 
     @Override
     public void undo(CommandContext context) {
-        File f = context.getAppConfig().getConfigDir().getTriggersDatabaseFile();
+        AppConfig config = context.getAppConfig();
+        File f = config.getConfigDir().getTriggersDatabaseFile();
         if (f.exists()) {
-            DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
             String payload = copyFileToString(f);
             payload = tokenReplacer.replaceTokens(payload, context.getAppConfig(), false);
-            dbMgr.delete(payload);
+            new DatabaseManager(context.getManageClient()).delete(payload);
+        } else if (config.isCreateTriggersDatabase()) {
+            new DatabaseManager(context.getManageClient()).deleteByIdField(config.getTriggersDatabaseName());
         }
     }
 
+    protected String buildDefaultTriggersDatabasePayload(AppConfig config) {
+        return format("{\"database-name\": \"%s\"}", config.getTriggersDatabaseName());
+    }
 }

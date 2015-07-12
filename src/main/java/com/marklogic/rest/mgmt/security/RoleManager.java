@@ -9,4 +9,9 @@ public class RoleManager extends AbstractResourceManager {
         super(client);
     }
 
+    @Override
+    protected boolean useAdminUser() {
+        return true;
+    }
+
 }

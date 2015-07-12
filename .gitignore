@@ -6,3 +6,4 @@
 .classpath
 src/test/resources/user.properties
 setenv.bat
+src/test/resources/scaffold-test/

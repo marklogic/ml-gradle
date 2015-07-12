@@ -1,0 +1,5 @@
+{
+  "privilege-name":"sample-project-execute-1", 
+  "action": "urn:sample-project:privilege:1",
+  "kind":"execute"
+}

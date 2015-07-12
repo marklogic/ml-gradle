@@ -55,11 +55,24 @@ Then just run "gradle mlDeploy" in the directory containing these two files:
     
 You'll end up with a new REST API server on port 8200 with a modules database and a content database with 3 forests by default. 
 
-To start customizing your application, just run:
+To see exactly what mlDeploy is doing, just run Gradle with the "-i" or "--info" option (it's normally useful to do this in any case with Gradle):
+
+    gradle -i mlDeploy
+
+Exploring the sample project
+-----
+
+To start customizing your application, your best bet is to examine the [sample-project application](https://github.com/rjrudin/ml-gradle/blob/master/sample-project) in this repository. There are three primary things to examine:
+
+1. The [build.gradle file](https://github.com/rjrudin/ml-gradle/blob/master/sample-project/build.gradle) provides examples of configuring and extending ml-gradle. 
+1. The [ml-config directory](https://github.com/rjrudin/ml-gradle/tree/master/sample-project/src/main/ml-config) provides examples of all of the MarkLogic management resources currently supported by ml-gradle.
+1. The [ml-modules directory(https://github.com/rjrudin/ml-gradle/tree/master/sample-project/src/main/ml-modules) provides examples of the different kinds of modules that can be loaded (application modules are loaded via the MarkLogic Client REST API, not the Management REST API). 
+
+To quickly generate a useful set of configuration files, just run:
 
     gradle mlScaffold
-    
-This will generate a directory structure containing several configuration files - one for a content database, a REST API server, an application role, an application user, and more. You can change these and add more configuration files based on the examples in the [sample project in this repository](https://github.com/rjrudin/ml-gradle/blob/master/sample-project/build.gradle).
+
+This will generate a directory structure containing several configuration files - one for a content database, a REST API server, an application role, an application user, and more. You can change these and add more configuration files based on the examples in the sample project mentioned above.
 
 
 Digging deeper into ml-gradle

@@ -1,0 +1,12 @@
+{
+  "range-element-index": [
+    {
+      "invalid-values": "reject",
+      "collation": "",
+      "localname": "amount",
+      "namespace-uri": "",
+      "range-value-positions": false,
+      "scalar-type": "int"
+    }
+  ]
+}

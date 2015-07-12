@@ -72,6 +72,12 @@ ext {
         // modulePaths.add("src/another-modules-dir")
         // You can also override the list of module paths
         // modulePaths = ["src/another-modules-dir"]
+        
+        // You can have multiple config files for your content database. This is useful when you have a dependency on
+        // a package of MarkLogic modules that requires some content database config, and you don't want to duplicate
+        // that in your own content-database.json file. Instead, just add the file from your 
+        // build/mlRestApi/(name of dependency)/ml-config/databases directory.
+        configDir.contentDatabaseFiles.add(new File("src/main/ml-config/databases/more-content-database-config.json"))
     }
 }
 

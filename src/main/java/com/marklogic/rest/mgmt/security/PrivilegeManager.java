@@ -10,6 +10,11 @@ public class PrivilegeManager extends AbstractResourceManager {
     }
 
     @Override
+    protected boolean useAdminUser() {
+        return true;
+    }
+
+    @Override
     protected String[] getUpdateResourceParams(String payload) {
         return new String[] { "kind", payloadParser.getPayloadFieldValue(payload, "kind") };
     }

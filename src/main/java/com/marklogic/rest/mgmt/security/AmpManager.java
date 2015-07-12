@@ -15,6 +15,11 @@ public class AmpManager extends AbstractResourceManager {
     }
 
     @Override
+    protected boolean useAdminUser() {
+        return true;
+    }
+
+    @Override
     protected String getIdFieldName() {
         return "local-name";
     }

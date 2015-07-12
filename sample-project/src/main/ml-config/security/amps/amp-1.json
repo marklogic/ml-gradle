@@ -1,0 +1,7 @@
+{
+  "namespace": "http://example.com/uri",
+  "local-name": "sample-project-amp-1",
+  "document-uri": "/module/path/name",
+  "modules-database": "",
+  "role": ["rest-reader"]
+}

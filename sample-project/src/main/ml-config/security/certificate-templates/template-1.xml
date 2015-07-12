@@ -1,0 +1,12 @@
+<certificate-template-properties xmlns="http://marklogic.com/manage">
+  <template-name>sample-project-template</template-name>
+  <template-description>Sample description</template-description>
+  <key-type>rsa</key-type>
+  <key-options />
+  <req>
+    <version>0</version>
+    <subject>
+      <organizationName>MarkLogic</organizationName>
+    </subject>
+  </req>
+</certificate-template-properties>

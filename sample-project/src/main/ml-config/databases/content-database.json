@@ -17,14 +17,6 @@
       "namespace-uri": "http://marklogic.com/test",
       "range-value-positions": false,
       "scalar-type": "dateTime"
-    },
-    {
-      "invalid-values": "reject",
-      "collation": "",
-      "localname": "amount",
-      "namespace-uri": "",
-      "range-value-positions": false,
-      "scalar-type": "int"
     }
    ],
   "schema-database": "%%SCHEMAS_DATABASE%%",

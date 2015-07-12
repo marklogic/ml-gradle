@@ -1,0 +1,1 @@
+See [the MarkLogic docs](http://docs.marklogic.com/REST/POST/manage/v2/amps) for what an amp JSON/XML file can contain.

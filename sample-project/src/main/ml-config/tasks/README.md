@@ -1,0 +1,1 @@
+See [the MarkLogic docs](http://docs.marklogic.com/REST/POST/manage/v2/tasks) for what a scheduled task JSON/XML file can contain.

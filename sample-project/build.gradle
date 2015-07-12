@@ -5,7 +5,7 @@ buildscript {
         maven {url "http://rjrudin.github.io/marklogic-java/releases"}
     }
 
-    dependencies { classpath "com.marklogic:ml-gradle:2.0a10" }
+    dependencies { classpath "com.marklogic:ml-gradle:2.0a11" }
 }
 
 apply plugin: 'ml-gradle'
@@ -62,6 +62,7 @@ ext {
         // Example of adding custom tokens; these will then be replaced in any JSON/XML config files
         customTokens.put("sample-key", "sample-value")
         customTokens.put("%%ODBC_PORT%%", "8102")
+        customTokens.put("%%XDBC_PORT%%", "8103")
         
         // By default, the createTriggersDatabase attribute is set to true, which results in a triggers database being
         // created, even if a databases/triggers-database.json file isn't present. Un-commenting the line will below

@@ -8,6 +8,10 @@ import org.junit.Test;
 
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.path.json.JsonPath;
+import com.marklogic.client.document.XMLDocumentManager;
+import com.marklogic.client.io.DocumentMetadataHandle;
+import com.marklogic.client.io.Format;
+import com.marklogic.client.io.StringHandle;
 import com.marklogic.clientutil.DatabaseClientConfig;
 import com.marklogic.junit.Fragment;
 
@@ -40,15 +44,15 @@ public class SearchDocumentsViaRestAssuredTest extends AbstractSampleProjectTest
          * This shows a simple RestAssured GET call that will return XML, and we can easily parse that to get a Fragment
          * instance that we can use for making assertions.
          */
-        Fragment results = parse(get("/v1/search").asString());
-        results.assertElementExists("/search:response/search:result[@uri = '/jane.xml']");
-        results.assertElementExists("/search:response/search:result[@uri = '/john.xml']");
+        Fragment response = parse(get("/v1/search").asString());
+        response.assertElementExists("/search:response/search:result[@uri = '/jane.xml']");
+        response.assertElementExists("/search:response/search:result[@uri = '/john.xml']");
 
         /**
          * This shows searching for a term and then asserting on the total and snippet highlighting in the result.
          */
-        results = parse(get("/v1/search?q=Jane").asString());
-        results.assertElementExists("/search:response[@total = '1']/search:result[@uri = '/jane.xml']/search:snippet/search:match/search:highlight[. = 'Jane']");
+        response = parse(get("/v1/search?q=Jane").asString());
+        response.assertElementExists("/search:response[@total = '1']/search:result[@uri = '/jane.xml']/search:snippet/search:match/search:highlight[. = 'Jane']");
 
         /**
          * RestAssured also makes it easy to assert on JSON responses.
@@ -56,5 +60,24 @@ public class SearchDocumentsViaRestAssuredTest extends AbstractSampleProjectTest
         JsonPath json = get("/v1/search?q=John&format=json").jsonPath();
         assertEquals(1, json.getInt("total"));
         assertEquals("/john.xml", json.get("results[0].uri"));
+    }
+
+    /**
+     * This test verifies that the search options are loaded by ml-gradle for both the "main" REST server -
+     * "sample-project" and the "test" REST server - "sample-project-test".
+     */
+    @Test
+    public void searchWithSampleProjectOptions() {
+        XMLDocumentManager mgr = getClient().newXMLDocumentManager();
+        mgr.write("/doc1.xml", new DocumentMetadataHandle().withCollections("sample-project-docs"), new StringHandle(
+                "<doc>This is the first doc</doc>").withFormat(Format.XML));
+        mgr.write("/doc2.xml", new DocumentMetadataHandle().withCollections("some-other-docs"), new StringHandle(
+                "<doc>This is the second doc</doc>").withFormat(Format.XML));
+
+        Fragment response = parse(get("/v1/search?options=sample-project-options").asString());
+        assertEquals(
+                "Only doc1.xml should have been returned, since the options constrain to the collection that it's in",
+                "1", response.getAttributeValue("/search:response", "total"));
+        assertEquals("/doc1.xml", response.getAttributeValue("/search:response/search:result", "uri"));
     }
 }

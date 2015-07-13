@@ -10,6 +10,7 @@ import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.clientutil.modulesloader.ModulesLoader;
 import com.marklogic.clientutil.modulesloader.impl.DefaultModulesLoader;
+import com.marklogic.clientutil.modulesloader.impl.TestServerModulesFinder;
 import com.marklogic.clientutil.modulesloader.impl.XccAssetLoader;
 
 /**
@@ -29,6 +30,14 @@ public class LoadModulesCommand extends AbstractCommand {
 
     @Override
     public void execute(CommandContext context) {
+        loadModulesIntoMainServer(context);
+
+        if (context.getAppConfig().isTestPortSet()) {
+            loadModulesIntoTestServer(context);
+        }
+    }
+
+    protected void loadModulesIntoMainServer(CommandContext context) {
         if (modulesLoader == null) {
             DefaultModulesLoader l = new DefaultModulesLoader();
             l.setXccAssetLoader(newXccAssetLoader(context));
@@ -43,6 +52,28 @@ public class LoadModulesCommand extends AbstractCommand {
         for (String modulesPath : config.getModulePaths()) {
             logger.info("Loading modules from dir: " + modulesPath);
             modulesLoader.loadModules(new File(modulesPath), client);
+        }
+    }
+
+    /**
+     * We use a customized impl of DefaultModulesLoader here so we can ensure that options are always loaded again into
+     * the test server.
+     * 
+     * @param context
+     */
+    protected void loadModulesIntoTestServer(CommandContext context) {
+        AppConfig config = context.getAppConfig();
+
+        DatabaseClient client = DatabaseClientFactory.newClient(config.getHost(), config.getTestRestPort(),
+                config.getRestAdminUsername(), config.getRestAdminPassword(), config.getAuthentication());
+
+        DefaultModulesLoader l = new DefaultModulesLoader();
+        l.setModulesFinder(new TestServerModulesFinder());
+        l.setModulesManager(null);
+
+        for (String modulesPath : config.getModulePaths()) {
+            logger.info("Loading modules into test server from dir: " + modulesPath);
+            l.loadModules(new File(modulesPath), client);
         }
     }
 

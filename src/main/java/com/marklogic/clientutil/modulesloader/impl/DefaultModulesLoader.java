@@ -154,6 +154,10 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
     }
 
     protected void loadAssets(Modules modules, Set<File> loadedModules) {
+        if (modules.getAssets() == null) {
+            return;
+        }
+        
         if (xccAssetLoader != null) {
             xccAssetLoader.initializeActiveSession();
         }
@@ -172,6 +176,10 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
     }
 
     protected void loadQueryOptions(Modules modules, Set<File> loadedModules) {
+        if (modules.getOptions() == null) {
+            return;
+        }
+        
         for (File f : modules.getOptions()) {
             f = installQueryOptions(f);
             if (f != null) {
@@ -181,6 +189,10 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
     }
 
     protected void loadTransforms(Modules modules, Set<File> loadedModules) {
+        if (modules.getTransforms() == null) {
+            return;
+        }
+        
         for (File f : modules.getTransforms()) {
             ExtensionMetadataAndParams emap = extensionMetadataProvider.provideExtensionMetadataAndParams(f);
 
@@ -202,6 +214,10 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
     }
 
     protected void loadResources(Modules modules, Set<File> loadedModules) {
+        if (modules.getServices() == null) {
+            return;
+        }
+        
         for (File f : modules.getServices()) {
             ExtensionMetadataAndParams emap = extensionMetadataProvider.provideExtensionMetadataAndParams(f);
 
@@ -223,6 +239,10 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
     }
 
     protected void loadNamespaces(Modules modules, Set<File> loadedModules) {
+        if (modules.getNamespaces() == null) {
+            return;
+        }
+        
         for (File f : modules.getNamespaces()) {
             f = installNamespace(f);
             if (f != null) {
@@ -421,11 +441,11 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
         this.extensionMetadataProvider = extensionMetadataProvider;
     }
 
-    public void setConfigurationFilesFinder(ModulesFinder extensionFilesFinder) {
+    public void setModulesFinder(ModulesFinder extensionFilesFinder) {
         this.modulesFinder = extensionFilesFinder;
     }
 
-    public void setConfigurationFilesManager(ModulesManager configurationFilesManager) {
+    public void setModulesManager(ModulesManager configurationFilesManager) {
         this.modulesManager = configurationFilesManager;
     }
 

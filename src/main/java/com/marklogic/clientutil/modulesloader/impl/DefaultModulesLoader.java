@@ -103,7 +103,7 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
     protected void loadProperties(Modules modules, Set<File> loadedModules) {
         File f = modules.getPropertiesFile();
         if (f != null && f.exists()) {
-            if (modulesManager != null & !modulesManager.hasFileBeenModifiedSinceLastInstalled(f)) {
+            if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(f)) {
                 return;
             }
 
@@ -277,7 +277,7 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
 
     protected File installAsset(Asset asset) {
         File file = asset.getFile();
-        if (modulesManager != null & !modulesManager.hasFileBeenModifiedSinceLastInstalled(file)) {
+        if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(file)) {
             return null;
         }
 
@@ -336,7 +336,7 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
     }
 
     public File installResource(File file, ExtensionMetadata metadata, MethodParameters... methodParams) {
-        if (modulesManager != null & !modulesManager.hasFileBeenModifiedSinceLastInstalled(file)) {
+        if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(file)) {
             return null;
         }
 

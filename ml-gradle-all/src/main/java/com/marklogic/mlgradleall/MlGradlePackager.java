@@ -21,8 +21,8 @@ public class MlGradlePackager {
             destDir.delete();
         }
         destDir.mkdirs();
-        processDependency("ml-gradle", "2.0a10");
-        processDependency("ml-junit", "2.0.2");
+        processDependency("ml-gradle", "2.0a12");
+        processDependency("ml-junit", "2.0.3");
     }
 
     private static void processDependency(String name, String version) throws IOException {

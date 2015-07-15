@@ -41,7 +41,9 @@ import com.marklogic.gradle.task.client.WatchTask
 import com.marklogic.gradle.task.cpf.DeployCpfTask
 import com.marklogic.gradle.task.cpf.LoadDefaultPipelinesTask
 import com.marklogic.gradle.task.databases.ClearContentDatabaseTask
-import com.marklogic.gradle.task.databases.ClearModulesTask
+import com.marklogic.gradle.task.databases.ClearModulesDatabaseTask
+import com.marklogic.gradle.task.databases.ClearSchemasDatabaseTask
+import com.marklogic.gradle.task.databases.ClearTriggersDatabaseTask
 import com.marklogic.gradle.task.databases.UpdateContentDatabasesTask
 import com.marklogic.gradle.task.scaffold.GenerateScaffoldTask
 import com.marklogic.gradle.task.servers.UpdateRestApiServersTask
@@ -63,49 +65,50 @@ class MarkLogicPlugin implements Plugin<Project> {
 
         project.getConfigurations().create("mlRestApi")
 
-        String group = "ml-gradle"
-
-        // admin/v1 tasks
-        project.task("mlInit", type: InitTask, group: group, description: "Perform a one-time initialization of a MarkLogic server")
-        project.task("mlInstallAdmin", type: InstallAdminTask, group: group, description: "Perform a one-time installation of an admin user")
-
-        project.task("mlDeleteModuleTimestampsFile", type: DeleteModuleTimestampsFileTask, group: group, description: "Delete the properties file in the build directory that keeps track of when each module was last loaded.")
-        project.task("mlClearContentDatabase", type: ClearContentDatabaseTask, group: group, description: "Deletes all or a collection of documents from the content database")
-        project.task("mlClearModules", type: ClearModulesTask, group: group, dependsOn: "mlDeleteModuleTimestampsFile", description: "Deletes potentially all of the documents in the modules database; has a property for excluding documents from deletion")
-        project.task("mlPrepareRestApiDependencies", type: PrepareRestApiDependenciesTask, group: group, dependsOn: project.configurations["mlRestApi"], description: "Downloads (if necessary) and unzips in the build directory all mlRestApi dependencies")
-
-        /**
-         * Tasks for deploying and undeploying. mlDeploy and mlUndeploy exist so that a developer can easily use
-         * dependsOn and mustRunAfter to add additional steps after an application has been deployed/undeployed.
-         */
-        project.task("mlAppDeploy", type: DeployAppTask, group: group, dependsOn: ["mlDeleteModuleTimestampsFile", "mlPrepareRestApiDependencies"], description: "Deploys the application")
-        project.task("mlAppUndeploy", type: UndeployAppTask, group: group, description: "Undeploys the application")
-        project.task("mlPostDeploy", group: group, description: "Called by mlDeploy after mlAppDeploy as a way of allowing tasks to easily be added to mlDeploy").mustRunAfter(["mlAppDeploy"])
-        project.task("mlDeploy", group: group, dependsOn: ["mlAppDeploy", "mlPostDeploy"], description: "Deploys the application and allows for additional steps via dependsOn")
-        project.task("mlPostUndeploy", group: group, description: "Called by mlUndeploy after mlAppUndeploy as a way of allowing tasks to easily be added to mlUndeploy").mustRunAfter(["mlAppUndeploy"])
-        project.task("mlUndeploy", group: group, dependsOn: ["mlAppUndeploy", "mlPostUndeploy"], description: "Undeploys the application and allows for additional steps via dependsOn")
-
-        // Tasks for loading modules
-        project.task("mlLoadModules", type: LoadModulesTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Loads modules from directories defined by mlAppConfig or via a property on this task").mustRunAfter(["mlClearModules"])
-        project.task("mlReloadModules", group: group, dependsOn: ["mlClearModules", "mlLoadModules"], description: "Reloads modules by first clearing the modules database and then loading modules")
-        project.task("mlWatch", type: WatchTask, group: group, description: "Run a loop that checks for new/modified modules every second and loads any that it finds")
-
-        // Tasks for configuring specific parts of an application
-        project.task("mlUpdateContentDatabase", type: UpdateContentDatabasesTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the content databases")
-        project.task("mlUpdateRestApiServers", type: UpdateRestApiServersTask, group: group, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the REST API servers")
-
-        // CPF tasks
-        project.task("mlCpfDeploy", type: DeployCpfTask, group: group, description: "Deploy CPF pipelines, domains, and configurations")
-        project.task("mlCpfLoadDefaultPipelines", type: LoadDefaultPipelinesTask, group: group, description: "Load default pipelines into a triggers database")
-
-        // SQL
-        project.task("mlCreateViewSchemas", type: CreateViewSchemasTask, group: group, description: "Create or update SQL view schemas")
+        // No group or description on these so they don't show up in "gradle tasks"
+        project.task("mlDeployApp", type: DeployAppTask, dependsOn: ["mlDeleteModuleTimestampsFile", "mlPrepareRestApiDependencies"])
+        project.task("mlUndeployApp", type: UndeployAppTask)
         
-        // Tasks for generating code
-        project.task("mlScaffold", type: GenerateScaffoldTask, group: group, description: "Generate project scaffold for a new project")
-        project.task("mlCreateResource", type: CreateResourceTask, group: group, description: "Create a new resource extension in the src/main/xqy/services directory")
-        project.task("mlCreateTransform", type: CreateTransformTask, group: group, description: "Create a new transform in the src/main/xqy/transforms directory")
+        String deployGroup = "ml-gradle Deploy"
+        project.task("mlPostDeploy", group: deployGroup, description: "Add dependsOn to this task to add tasks at the end of mlDeploy").mustRunAfter(["mlDeployApp"])
+        project.task("mlPostUndeploy", group: deployGroup, description: "Add dependsOn to this task to add tasks at the end of mlUndeploy").mustRunAfter(["mlUndeployApp"])
+        project.task("mlDeploy", group: deployGroup, dependsOn: ["mlDeployApp", "mlPostDeploy"], description: "Deploys the application and allows for additional steps via mlPostDeploy.dependsOn")
+        project.task("mlUndeploy", group: deployGroup, dependsOn: ["mlUndeployApp", "mlPostUndeploy"], description: "Undeploys the application and allows for additional steps via mlPostUndeploy.dependsOn")
 
+        String adminGroup = "ml-gradle Admin"
+        project.task("mlInit", type: InitTask, group: adminGroup, description: "Perform a one-time initialization of a MarkLogic server")
+        project.task("mlInstallAdmin", type: InstallAdminTask, group: adminGroup, description: "Perform a one-time installation of an admin user")
+
+        String cpfGroup = "ml-gradle CPF"
+        project.task("mlDeployCpf", type: DeployCpfTask, group: cpfGroup, description: "Deploy only CPF pipelines, domains, and configurations").mustRunAfter("mlClearTriggersDatabase")
+        project.task("mlRedeployCpf", group: cpfGroup, dependsOn: ["mlClearTriggersDatabase", "mlDeployCpf"], description: "Clears the triggers database and then calls mlDeployCpf; be sure to reload custom triggers after doing this, as they will be deleted as well")
+        project.task("mlLoadDefaultPipelines", type: LoadDefaultPipelinesTask, group: cpfGroup, description: "Load default pipelines into a triggers database")
+
+        String dbGroup = "ml-gradle Database"
+        project.task("mlClearContentDatabase", type: ClearContentDatabaseTask, group: dbGroup, description: "Deletes all documents in the content database; requires -PdeleteAll=true to be set so you don't accidentally do this")
+        project.task("mlClearModulesDatabase", type: ClearModulesDatabaseTask, group: dbGroup, dependsOn: "mlDeleteModuleTimestampsFile", description: "Deletes potentially all of the documents in the modules database; has a property for excluding documents from deletion")
+        project.task("mlClearSchemasDatabase", type: ClearSchemasDatabaseTask, group: dbGroup, description: "Deletes all documents in the schemas database")
+        project.task("mlClearTriggersDatabase", type: ClearTriggersDatabaseTask, group: dbGroup, description: "Deletes all documents in the triggers database")
+        project.task("mlUpdateContentDatabase", type: UpdateContentDatabasesTask, group: dbGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the content databases based on the content database configuration file(s)")
+
+        String devGroup = "ml-gradle Development"
+        project.task("mlScaffold", type: GenerateScaffoldTask, group: devGroup, description: "Generate project scaffold for a new project")
+        project.task("mlCreateResource", type: CreateResourceTask, group: devGroup, description: "Create a new resource extension in the modules services directory")
+        project.task("mlCreateTransform", type: CreateTransformTask, group: devGroup, description: "Create a new transform in the modules transforms directory")
+        project.task("mlPrepareRestApiDependencies", type: PrepareRestApiDependenciesTask, group: devGroup, dependsOn: project.configurations["mlRestApi"], description: "Downloads (if necessary) and unzips in the build directory all mlRestApi dependencies")
+
+        String modulesGroup = "ml-gradle Modules"
+        project.task("mlLoadModules", type: LoadModulesTask, group: modulesGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Loads modules from directories defined by mlAppConfig or via a property on this task").mustRunAfter(["mlClearModulesDatabase"])
+        project.task("mlReloadModules", group: modulesGroup, dependsOn: ["mlClearModulesDatabase", "mlLoadModules"], description: "Reloads modules by first clearing the modules database and then loading modules")
+        project.task("mlWatch", type: WatchTask, group: modulesGroup, description: "Run a loop that checks for new/modified modules every second and loads any that it finds")
+        project.task("mlDeleteModuleTimestampsFile", type: DeleteModuleTimestampsFileTask, group: modulesGroup, description: "Delete the properties file in the build directory that keeps track of when each module was last loaded")
+        
+        String serverGroup = "ml-gradle Server"
+        project.task("mlUpdateRestApiServers", type: UpdateRestApiServersTask, group: serverGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the REST API servers")
+        
+        String sqlGroup = "ml-gradle SQL"
+        project.task("mlCreateViewSchemas", type: CreateViewSchemasTask, group: sqlGroup, description: "Create or update SQL view schemas")
+        
         println "Finished initializing ml-gradle\n"
     }
 

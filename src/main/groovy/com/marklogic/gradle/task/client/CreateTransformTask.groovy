@@ -3,7 +3,9 @@ package com.marklogic.gradle.task.client
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 
-class CreateTransformTask extends DefaultTask {
+import com.marklogic.gradle.task.MarkLogicTask;
+
+class CreateTransformTask extends MarkLogicTask {
 
     final static String XQUERY_TEMPLATE = '''xquery version "1.0-ml";
 
@@ -28,12 +30,14 @@ declare function transform(
 </xsl:stylesheet>
 '''
     
-    String transformsDir = "src/main/xqy/transforms"
+    String transformsDir
 
     @TaskAction
     void createResource() {
         String propName = "transformName"
         if (getProject().hasProperty(propName)) {
+            transformsDir = transformsDir ? transformsDir : getAppConfig().getModulePaths().get(0) + "/transforms"
+            
             String name = getProject().getProperties().get(propName)
             
             String defaultType = "xqy"

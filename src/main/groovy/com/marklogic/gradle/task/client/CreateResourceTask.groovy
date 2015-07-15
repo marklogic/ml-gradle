@@ -1,9 +1,10 @@
 package com.marklogic.gradle.task.client
 
-import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 
-class CreateResourceTask extends DefaultTask {
+import com.marklogic.gradle.task.MarkLogicTask
+
+class CreateResourceTask extends MarkLogicTask {
 
     final static String RESOURCE_TEMPLATE = '''xquery version "1.0-ml";
 
@@ -60,12 +61,14 @@ declare function delete(
 </metadata>
 '''
 
-    String servicesDir = "src/main/xqy/services"
+    String servicesDir
 
     @TaskAction
     void createResource() {
-        String propName = "resourceName"
+        String propName = "resourceName"        
         if (getProject().hasProperty(propName)) {
+            servicesDir = servicesDir ? servicesDir : getAppConfig().getModulePaths().get(0) + "/services"
+            
             String name = getProject().getProperties().get(propName)
 
             String resource = RESOURCE_TEMPLATE.replace("%%RESOURCE_NAME%%", name)

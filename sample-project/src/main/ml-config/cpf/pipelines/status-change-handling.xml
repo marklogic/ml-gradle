@@ -36,9 +36,7 @@
     </execute>
     <execute>
       <condition>
-        <module>
-          /MarkLogic/cpf/actions/existing-state-condition.xqy
-        </module>
+        <module>/MarkLogic/cpf/actions/existing-state-condition.xqy</module>
       </condition>
       <action>
         <module>/MarkLogic/cpf/actions/touch-state-action.xqy</module>
@@ -74,9 +72,7 @@
     <on-success>http://marklogic.com/states/property-updated</on-success>
     <priority>100</priority>
     <default-action>
-      <module>
-        /MarkLogic/cpf/actions/set-property-updated-action.xqy
-      </module>
+      <module>/MarkLogic/cpf/actions/set-property-updated-action.xqy</module>
     </default-action>
   </status-transition>
 </pipeline-properties>

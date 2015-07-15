@@ -7,7 +7,7 @@ repositories {
     maven {url "http://rjrudin.github.io/marklogic-java/releases"}
 }
 
-dependencies { compile "com.marklogic:ml-junit:2.0.2" }
+dependencies { compile "com.marklogic:ml-junit:2.0.3" }
 
 task packageMlGradle(type: JavaExec) {
     main = 'com.marklogic.mlgradleall.MlGradlePackager'
@@ -20,6 +20,12 @@ configurations { mlgradle }
 
 task mlgradleZip(type: Zip, dependsOn: packageMlGradle) {
     from("build/ml-gradle-all") { into("ml-gradle-all") }
+    from ("../sample-project") {
+        into("ml-gradle-all/sample-project")
+        include("src/**")
+        include("build.gradle")
+        include("gradle.properties")
+    }
     destinationDir file('build/tmp')
     baseName "ml-gradle-all"
 }
@@ -33,7 +39,6 @@ publishing {
             artifact mlgradleZip
         }
     }
-    repositories { maven {url "file://$projectDir/../../gh-pages-marklogic-java/releases"
-        } }
+    repositories { maven {url "file://$projectDir/../../gh-pages-marklogic-java/releases" } }
 }
 

@@ -34,9 +34,3 @@ publishing {
     }
   }
 }
-
-task runTestClient(type: JavaExec) {
-	main = "com.marklogic.appdeployer.mgmt.TestClient"
-	classpath = sourceSets.test.runtimeClasspath
-}
-

@@ -5,7 +5,7 @@ buildscript {
         maven {url "http://rjrudin.github.io/marklogic-java/releases"}
     }
 
-    dependencies { classpath "com.marklogic:ml-gradle:2.0a12" }
+    dependencies { classpath "com.marklogic:ml-gradle:2.0a12b" }
 }
 
 apply plugin: 'ml-gradle'
@@ -44,8 +44,8 @@ configurations { corb }
  * using that library in tests that must invoke MarkLogic HTTP endpoints.
  */
 dependencies {
-    compile "com.marklogic:ml-javaclient-util:2.0.7"
-    testCompile "com.marklogic:ml-junit:2.0.2"
+    compile "com.marklogic:ml-javaclient-util:2.0.8"
+    testCompile "com.marklogic:ml-junit:2.0.3"
     testCompile "com.jayway.restassured:rest-assured:2.3.1"
 
     // Located at https://github.com/rjrudin/marklogic-java/tree/gh-pages/releases/com/marklogic/corb

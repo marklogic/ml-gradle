@@ -2,14 +2,14 @@ package com.marklogic.appdeployer.command;
 
 public abstract class SortOrderConstants {
 
-    public static Integer CREATE_ROLES = 10;
-    public static Integer CREATE_USERS = 20;
-    public static Integer CREATE_AMPS = 30;
-    public static Integer CREATE_PRIVILEGES = 40;
-    public static Integer CREATE_CERTIFICATE_TEMPLATES = 45;
-    public static Integer CREATE_CERTIFICATE_AUTHORITIES = 50;
-    public static Integer CREATE_EXTERNAL_SECURITY = 60;
-    public static Integer CREATE_PROTECTED_COLLECTIONS = 70;
+    public static Integer CREATE_PRIVILEGES = 10;
+    public static Integer CREATE_ROLES = 20;
+    public static Integer CREATE_USERS = 30;
+    public static Integer CREATE_AMPS = 40;
+    public static Integer CREATE_CERTIFICATE_TEMPLATES = 50;
+    public static Integer CREATE_CERTIFICATE_AUTHORITIES = 60;
+    public static Integer CREATE_EXTERNAL_SECURITY = 70;
+    public static Integer CREATE_PROTECTED_COLLECTIONS = 80;
 
     public static Integer CREATE_REST_API_SERVERS = 100;
     public static Integer CREATE_TRIGGERS_DATABASE = 200;

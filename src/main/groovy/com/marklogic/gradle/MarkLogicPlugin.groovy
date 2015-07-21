@@ -135,14 +135,6 @@ class MarkLogicPlugin implements Plugin<Project> {
             println "App host: " + host
             appConfig.setHost(host)
         }
-        if (project.hasProperty("mlUsername")) {
-            def username = project.property("mlUsername")
-            println "App username: " + username
-            appConfig.setRestAdminUsername(username)
-        }
-        if (project.hasProperty("mlPassword")) {
-            appConfig.setRestAdminPassword(project.property("mlPassword"))
-        }
 
         if (project.hasProperty("mlRestPort")) {
             def port = project.property("mlRestPort")
@@ -155,6 +147,29 @@ class MarkLogicPlugin implements Plugin<Project> {
             appConfig.setTestRestPort(Integer.parseInt(port))
         }
 
+        String restUsername = null
+        if (project.hasProperty("mlRestAdminUsername")) {
+            restUsername = project.property("mlRestAdminUsername")
+        }
+        else if (project.hasProperty("mlUsername")) {
+            restUsername = project.property("mlUsername")
+        }
+        if (restUsername != null) {
+            println "REST Admin username: " + restUsername
+            appConfig.setRestAdminUsername(restUsername)
+        }
+        
+        String restPassword = null
+        if (project.hasProperty("mlRestAdminPassword")) {
+            restPassword = project.property("mlRestAdminPassword")
+        }
+        else if (project.hasProperty("mlPassword")) {
+            restPassword = project.property("mlPassword")
+        }
+        if (restPassword != null) {
+            appConfig.setRestAdminPassword(restPassword)
+        }
+
         String xdbcUsername = null
         if (project.hasProperty("mlXdbcUsername")) {
             xdbcUsername = project.property("mlXdbcUsername")
@@ -163,7 +178,7 @@ class MarkLogicPlugin implements Plugin<Project> {
             xdbcUsername = project.property("mlUsername")
         }
         if (xdbcUsername != null) {
-            println "App XDBC username: " + xdbcUsername
+            println "XDBC username: " + xdbcUsername
             appConfig.setXdbcUsername(xdbcUsername)
         }
         

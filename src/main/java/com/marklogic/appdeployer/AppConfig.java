@@ -21,7 +21,7 @@ public class AppConfig {
     private String restAdminPassword;
     private Authentication authentication = Authentication.DIGEST;
 
-    // User/password for making XDBC calls, usually against port 8000
+    // User/password for making XDBC calls, usually against port 8000; this includes loading asset modules
     private String xdbcUsername;
     private String xdbcPassword;
 

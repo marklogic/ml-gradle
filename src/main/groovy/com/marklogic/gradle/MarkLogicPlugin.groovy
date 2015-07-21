@@ -155,6 +155,29 @@ class MarkLogicPlugin implements Plugin<Project> {
             appConfig.setTestRestPort(Integer.parseInt(port))
         }
 
+        String xdbcUsername = null
+        if (project.hasProperty("mlXdbcUsername")) {
+            xdbcUsername = project.property("mlXdbcUsername")
+        }
+        else if (project.hasProperty("mlUsername")) {
+            xdbcUsername = project.property("mlUsername")
+        }
+        if (xdbcUsername != null) {
+            println "App XDBC username: " + xdbcUsername
+            appConfig.setXdbcUsername(xdbcUsername)
+        }
+        
+        String xdbcPassword = null
+        if (project.hasProperty("mlXdbcPassword")) {
+            xdbcPassword = project.property("mlXdbcPassword")
+        }
+        else if (project.hasProperty("mlPassword")) {
+            xdbcPassword = project.property("mlPassword")
+        }
+        if (xdbcPassword != null) {
+            appConfig.setXdbcPassword(xdbcPassword)
+        }
+        
         project.extensions.add("mlAppConfig", appConfig)
     }
 

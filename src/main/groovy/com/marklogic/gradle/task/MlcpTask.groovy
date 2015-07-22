@@ -9,6 +9,10 @@ import com.marklogic.appdeployer.AppConfig
  * Provides parameters for some, but not all, mlcp arguments. Arguments that aren't supported can be passed in
  * via JavaExec's "args" property. The main benefit of using this class is that it assumes usage of the connection
  * properties found in the mlAppConfig project property.
+ * 
+ * Note that this defaults to using appConfig.restAdminUsername and appConfig.restAdminPassword. That user may not 
+ * have permission to perform the mlcp operation you wish to perform. In that case, just set the username/password
+ * parameters of this task for the appropriate user.  
  */
 class MlcpTask extends JavaExec {
 
@@ -29,6 +33,7 @@ class MlcpTask extends JavaExec {
     String delimited_uri_id
     String namespace
     String options_file
+    String output_file_path
     String output_uri_prefix
     String output_uri_replace
     String output_permissions
@@ -50,7 +55,7 @@ class MlcpTask extends JavaExec {
         newArgs.add("-port")
         newArgs.add(port)
         newArgs.add("-username")
-        newArgs.add(username ? username : config.getXdbcUsername())
+        newArgs.add(username ? username : config.getRestAdminUsername())
         
         if (database) {
             newArgs.add("-database")
@@ -96,6 +101,10 @@ class MlcpTask extends JavaExec {
             newArgs.add("-options_file")
             newArgs.add(options_file)
         }
+        if (output_file_path) {
+            newArgs.add("-output_file_path")
+            newArgs.add(output_file_path)
+        }
         if (output_uri_prefix) {
             newArgs.add("-output_uri_prefix")
             newArgs.add(output_uri_prefix)
@@ -130,7 +139,7 @@ class MlcpTask extends JavaExec {
         println "mlcp arguments, excluding password: " + newArgs
         
         newArgs.add("-password")
-        newArgs.add(password ? password : config.getXdbcPassword())
+        newArgs.add(password ? password : config.getRestAdminPassword())
         
         setArgs(newArgs)
 

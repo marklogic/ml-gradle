@@ -5,7 +5,7 @@ buildscript {
         maven {url "http://rjrudin.github.io/marklogic-java/releases"}
     }
 
-    dependencies { classpath "com.marklogic:ml-gradle:2.0a12d" }
+    dependencies { classpath "com.marklogic:ml-gradle:2.0a13" }
 }
 
 apply plugin: 'ml-gradle'
@@ -79,6 +79,11 @@ ext {
         // that in your own content-database.json file. Instead, just add the file from your 
         // build/mlRestApi/(name of dependency)/ml-config/databases directory.
         configDir.contentDatabaseFiles.add(new File("src/main/ml-config/databases/more-content-database-config.json"))
+        
+        // For the tasks below that depend on XCC - such as for running corb or creating triggers - the following URL
+        // will be used. In this sample project, the sample-project-rest-admin user has the privileges necessary to
+        // create triggers, so we use that user.
+        contentXccUrl = "xcc://${mlRestAdminUsername}:${mlRestAdminPassword}@${mlHost}:8000/${mlAppConfig.contentDatabaseName}"
     }
 }
 
@@ -97,7 +102,7 @@ sourceSets.test.resources.srcDir 'src/test/java'
 task runCorb(dependsOn: ['mlLoadModules'], type: JavaExec) {
     main = 'com.marklogic.developer.corb.Manager'
     classpath = configurations.corb
-    args = [mlAppConfig.contentXccUrl, '""', 'transform.xqy', '4', 'uris.xqy', '/ext/sample-project/corb/', 'sample-project-modules', 'false']
+    args = [contentXccUrl, '""', 'transform.xqy', '4', 'uris.xqy', '/ext/sample-project/corb/', 'sample-project-modules', 'false']
 }
 
 /*
@@ -115,7 +120,7 @@ ext {
  * that uses XCC to create the trigger.
  */
 task createSampleTrigger(type: com.marklogic.gradle.task.trigger.CreateTriggersTask) {
-    xccUrl = appConfig.contentXccUrl
+    xccUrl = contentXccUrl
     triggerName = "sample-project-trigger"
     description = "This is an example of creating a trigger"
     dataEventCommit = "post"

@@ -5,7 +5,7 @@ buildscript {
         maven {url "http://rjrudin.github.io/marklogic-java/releases"}
     }
 
-    dependencies { classpath "com.marklogic:ml-gradle:2.0a12c" }
+    dependencies { classpath "com.marklogic:ml-gradle:2.0a12d" }
 }
 
 apply plugin: 'ml-gradle'

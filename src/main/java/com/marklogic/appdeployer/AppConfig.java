@@ -21,10 +21,6 @@ public class AppConfig {
     private String restAdminPassword;
     private Authentication authentication = Authentication.DIGEST;
 
-    // User/password for making XDBC calls, usually against port 8000; this includes loading asset modules
-    private String xdbcUsername;
-    private String xdbcPassword;
-
     private Integer restPort;
     private Integer testRestPort;
 
@@ -47,11 +43,6 @@ public class AppConfig {
         modulePaths = new ArrayList<String>();
         modulePaths.add(defaultModulePath);
         configDir = new ConfigDir();
-
-        this.restAdminUsername = "admin";
-        this.restAdminPassword = "admin";
-        this.xdbcUsername = restAdminUsername;
-        this.xdbcPassword = restAdminPassword;
     }
 
     public boolean isTestPortSet() {
@@ -100,18 +91,6 @@ public class AppConfig {
 
     public String getSchemasDatabaseName() {
         return name + "-schemas";
-    }
-
-    public String getContentXccUrl() {
-        return String.format("xcc://%s:%s@%s:8000/%s", xdbcUsername, xdbcPassword, host, getContentDatabaseName());
-    }
-
-    public String getTestContentXccUrl() {
-        return String.format("xcc://%s:%s@%s:8000/%s", xdbcUsername, xdbcPassword, host, getTestContentDatabaseName());
-    }
-
-    public String getModulesXccUrl() {
-        return String.format("xcc://%s:%s@%s:8000/%s", xdbcUsername, xdbcPassword, host, getModulesDatabaseName());
     }
 
     public String getName() {
@@ -192,22 +171,6 @@ public class AppConfig {
 
     public void setConfigDir(ConfigDir configDir) {
         this.configDir = configDir;
-    }
-
-    public String getXdbcUsername() {
-        return xdbcUsername;
-    }
-
-    public void setXdbcUsername(String xdbcUsername) {
-        this.xdbcUsername = xdbcUsername;
-    }
-
-    public String getXdbcPassword() {
-        return xdbcPassword;
-    }
-
-    public void setXdbcPassword(String xdbcPassword) {
-        this.xdbcPassword = xdbcPassword;
     }
 
     public Map<String, String> getCustomTokens() {

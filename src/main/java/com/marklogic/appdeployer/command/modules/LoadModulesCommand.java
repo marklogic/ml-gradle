@@ -24,6 +24,9 @@ public class LoadModulesCommand extends AbstractCommand {
     private String defaultAssetRolesAndCapabilities = "rest-admin,read,rest-admin,update,rest-extension-user,execute";
     private String customAssetRolesAndCapabilities;
 
+    private String username;
+    private String password;
+    
     public LoadModulesCommand() {
         setExecuteSortOrder(SortOrderConstants.LOAD_MODULES_ORDER);
     }
@@ -81,8 +84,8 @@ public class LoadModulesCommand extends AbstractCommand {
         XccAssetLoader l = new XccAssetLoader();
         AppConfig config = context.getAppConfig();
         l.setHost(config.getHost());
-        l.setUsername(config.getXdbcUsername());
-        l.setPassword(config.getXdbcPassword());
+        l.setUsername(username != null ? username : config.getRestAdminUsername());
+        l.setPassword(password != null ? password : config.getRestAdminPassword());
         l.setDatabaseName(config.getModulesDatabaseName());
 
         String permissions = null;
@@ -112,5 +115,13 @@ public class LoadModulesCommand extends AbstractCommand {
 
     public void setDefaultAssetRolesAndCapabilities(String defaultAssetRolesAndCapabilities) {
         this.defaultAssetRolesAndCapabilities = defaultAssetRolesAndCapabilities;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

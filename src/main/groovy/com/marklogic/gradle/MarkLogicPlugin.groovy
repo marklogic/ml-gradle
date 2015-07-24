@@ -46,6 +46,7 @@ import com.marklogic.gradle.task.databases.ClearSchemasDatabaseTask
 import com.marklogic.gradle.task.databases.ClearTriggersDatabaseTask
 import com.marklogic.gradle.task.databases.UpdateContentDatabasesTask
 import com.marklogic.gradle.task.scaffold.GenerateScaffoldTask
+import com.marklogic.gradle.task.security.DeploySecurityTask
 import com.marklogic.gradle.task.servers.UpdateRestApiServersTask
 import com.marklogic.gradle.task.viewschemas.CreateViewSchemasTask
 import com.marklogic.rest.mgmt.ManageClient
@@ -105,6 +106,9 @@ class MarkLogicPlugin implements Plugin<Project> {
         
         String serverGroup = "ml-gradle Server"
         project.task("mlUpdateRestApiServers", type: UpdateRestApiServersTask, group: serverGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the REST API servers")
+        
+        String securityGroup = "ml-gradle Security"
+        project.task("mlDeploySecurity", type: DeploySecurityTask, group: securityGroup, description: "Deploys only security resources")
         
         String sqlGroup = "ml-gradle SQL"
         project.task("mlCreateViewSchemas", type: CreateViewSchemasTask, group: sqlGroup, description: "Create or update SQL view schemas")
@@ -260,24 +264,27 @@ class MarkLogicPlugin implements Plugin<Project> {
         CommandContext context = new CommandContext(project.extensions.getByName("mlAppConfig"), manageClient, adminManager)
         project.extensions.add("mlCommandContext", context)
 
-        project.extensions.add("mlAppDeployer", newAppDeployer(manageClient, adminManager))
+        project.extensions.add("mlAppDeployer", newAppDeployer(project, manageClient, adminManager))
     }
 
     /**
      * Creates an AppDeployer with a default set of commands. A developer can then modify this in an
      * ext block.
      */
-    AppDeployer newAppDeployer(ManageClient manageClient, AdminManager adminManager) {
+    AppDeployer newAppDeployer(Project project, ManageClient manageClient, AdminManager adminManager) {
         List<Command> commands = new ArrayList<Command>()
         
         // Security
-        commands.add(new CreateRolesCommand())
-        commands.add(new CreateUsersCommand())
-        commands.add(new CreateAmpsCommand())
-        commands.add(new CreateCertificateTemplatesCommand())
-        commands.add(new CreateExternalSecurityCommand())
-        commands.add(new CreatePrivilegesCommand())
-        commands.add(new CreateProtectedCollectionsCommand())
+        List<Command> securityCommands = new ArrayList<Command>()
+        securityCommands.add(new CreateRolesCommand())
+        securityCommands.add(new CreateUsersCommand())
+        securityCommands.add(new CreateAmpsCommand())
+        securityCommands.add(new CreateCertificateTemplatesCommand())
+        securityCommands.add(new CreateExternalSecurityCommand())
+        securityCommands.add(new CreatePrivilegesCommand())
+        securityCommands.add(new CreateProtectedCollectionsCommand())
+        project.extensions.add("mlSecurityCommands", securityCommands)
+        commands.addAll(securityCommands)
         
         // Databases and appservers
         commands.add(new CreateRestApiServersCommand())
@@ -291,9 +298,12 @@ class MarkLogicPlugin implements Plugin<Project> {
         commands.add(new LoadModulesCommand())
         
         // CPF
-        commands.add(new CreateCpfConfigsCommand())
-        commands.add(new CreateDomainsCommand())
-        commands.add(new CreatePipelinesCommand())
+        List<Command> cpfCommands = new ArrayList<Command>()
+        cpfCommands.add(new CreateCpfConfigsCommand())
+        cpfCommands.add(new CreateDomainsCommand())
+        cpfCommands.add(new CreatePipelinesCommand())
+        project.extensions.add("mlCpfCommands", cpfCommands)
+        commands.addAll(cpfCommands)
         
         // Others        
         commands.add(new CreateViewSchemasCommand())

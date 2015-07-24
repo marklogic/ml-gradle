@@ -61,18 +61,6 @@ public class AppConfig {
         return name + "-test";
     }
 
-    public String getXdbcServerName() {
-        return getContentDatabaseName() + "-xdbc";
-    }
-
-    public String getTestXdbcServerName() {
-        return getTestContentDatabaseName() + "-xdbc";
-    }
-
-    public String getModulesXdbcServerName() {
-        return name + "-modules-xdbc";
-    }
-
     public String getContentDatabaseName() {
         return name + "-content";
     }

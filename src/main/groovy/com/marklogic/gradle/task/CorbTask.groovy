@@ -36,11 +36,7 @@ class CorbTask extends JavaExec {
 
         List<String> newArgs = new ArrayList<>()
 
-        if (xccUrl) {
-            newArgs.add(xccUrl)
-        } else {
-            newArgs.add(config.getXccUrl())
-        }
+        newArgs.add(xccUrl)
 
         newArgs.add(collectionName)
 

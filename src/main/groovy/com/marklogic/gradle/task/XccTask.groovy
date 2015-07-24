@@ -14,9 +14,6 @@ class XccTask extends MarkLogicTask {
 
     @TaskAction
     void executeXcc() {
-        if (!xccUrl) {
-            xccUrl = getAppConfig().getContentXccUrl()
-        }
         new XccHelper(xccUrl).executeXquery(xquery)
     }
 }

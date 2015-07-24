@@ -1,0 +1,82 @@
+<role-properties xmlns="http://marklogic.com/manage">
+  <role-name>sample-project-role</role-name>
+  <description>sample-project rest-admin role that allows the user to insert documents via XCC and clear the database at
+    the start of a JUnit test</description>
+  <roles>
+    <role>rest-admin</role>
+    <role>trigger-management</role>
+  </roles>
+  <privileges>
+
+    <!-- Privileges for loading modules via XCC and port 8000 -->
+    <privilege>
+      <privilege-name>any-uri</privilege-name>
+      <action>http://marklogic.com/xdmp/privileges/any-uri</action>
+      <kind>execute</kind>
+    </privilege>
+    <privilege>
+      <privilege-name>xdbc:insert-in</privilege-name>
+      <action>http://marklogic.com/xdmp/privileges/xdbc-insert-in</action>
+      <kind>execute</kind>
+    </privilege>
+    <!-- End privileges -->
+    
+    <!-- Privileges for creating triggers -->
+    <privilege>
+      <privilege-name>create-trigger</privilege-name>
+      <action>http://marklogic.com/xdmp/privileges/create-trigger</action>
+      <kind>execute</kind>
+    </privilege>
+    <privilege>
+      <privilege-name>xdmp:eval-in</privilege-name>
+      <action>http://marklogic.com/xdmp/privileges/xdmp-eval-in</action>
+      <kind>execute</kind>
+    </privilege>
+    <privilege>
+      <privilege-name>xdmp:eval</privilege-name>
+      <action>http://marklogic.com/xdmp/privileges/xdmp-eval</action>
+      <kind>execute</kind>
+    </privilege>
+    <!-- End privileges -->
+    
+    <!-- Privileges for operations performed while running JUnit tests -->
+    <privilege>
+      <privilege-name>xdmp:forest-clear</privilege-name>
+      <action>http://marklogic.com/xdmp/privileges/xdmp-forest-clear</action>
+      <kind>execute</kind>
+    </privilege>
+    <privilege>
+      <privilege-name>xdbc:eval-in</privilege-name>
+      <action>http://marklogic.com/xdmp/privileges/xdbc-eval-in</action>
+      <kind>execute</kind>
+    </privilege>
+    <!-- End privileges -->
+    
+    <!-- Privileges for importing data with mlcp -->
+    <privilege>
+      <privilege-name>xdbc:eval</privilege-name>
+      <action>http://marklogic.com/xdmp/privileges/xdbc-eval</action>
+      <kind>execute</kind>
+    </privilege>
+    <privilege>
+      <privilege-name>xdbc:insert</privilege-name>
+      <action>http://marklogic.com/xdmp/privileges/xdbc-insert</action>
+      <kind>execute</kind>
+    </privilege>
+    <privilege>
+      <privilege-name>unprotected-collections</privilege-name>
+      <action>http://marklogic.com/xdmp/privileges/unprotected-collections</action>
+      <kind>execute</kind>
+    </privilege>
+    <!-- End privileges -->
+    
+    <!-- Privileges for exporting data with mlcp -->
+    <privilege>
+      <privilege-name>xdmp:with-namespaces</privilege-name>
+      <action>http://marklogic.com/xdmp/privileges/xdmp-with-namespaces</action>
+      <kind>execute</kind>
+    </privilege>
+    <!-- End privileges -->
+    
+  </privileges>
+</role-properties>

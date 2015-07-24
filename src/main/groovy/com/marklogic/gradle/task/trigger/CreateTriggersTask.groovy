@@ -78,7 +78,9 @@ class CreateTriggersTask extends MarkLogicTask {
             'trgr:trigger-data-event(' + dataEventScopeFunction + ', ' + dataEventContentFunction + ', ' + dataEventWhenFunction + ')',
             'trgr:trigger-module(xdmp:database("' + moduleDatabase + '"), "' + moduleRoot + '", "' + modulePath + '")',
             enabled ? 'fn:true()' : 'fn:false()',
-            permissions
+            permissions,
+            recursive ? 'fn:true()' : 'fn:false()',
+            '"' + taskPriority + '"'
         ]
 
         return wrapInEval('trgr:create-trigger(' + args.join(', ') + ')')

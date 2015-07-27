@@ -1,13 +1,14 @@
 package com.marklogic.appdeployer.command;
 
 import java.io.File;
+import java.util.Arrays;
 
 import com.marklogic.rest.mgmt.ResourceManager;
 import com.marklogic.rest.mgmt.admin.ActionRequiringRestart;
 
 /**
- * Provides a basic implementation for creating/updating a resource while an app is being deployed and then deleting it
- * while the app is being undeployed.
+ * Provides a basic implementation for creating/updating a resource while an app is being deployed
+ * and then deleting it while the app is being undeployed.
  */
 public abstract class AbstractResourceCommand extends AbstractCommand implements UndoableCommand {
 
@@ -28,13 +29,19 @@ public abstract class AbstractResourceCommand extends AbstractCommand implements
         File resourceDir = getResourcesDir(context);
         if (resourceDir.exists()) {
             ResourceManager mgr = getResourceManager(context);
-            for (File f : resourceDir.listFiles()) {
+            for (File f : listFilesInDirectory(resourceDir)) {
                 if (isResourceFile(f)) {
                     String payload = saveResource(mgr, context, f);
                     afterResourceSaved(mgr, context, f, payload);
                 }
             }
         }
+    }
+
+    protected File[] listFilesInDirectory(File dir) {
+        File[] files = dir.listFiles();
+        Arrays.sort(files);
+        return files;
     }
 
     /**
@@ -70,7 +77,7 @@ public abstract class AbstractResourceCommand extends AbstractCommand implements
             File resourceDir = getResourcesDir(context);
             if (resourceDir.exists()) {
                 final ResourceManager mgr = getResourceManager(context);
-                for (File f : resourceDir.listFiles()) {
+                for (File f : listFilesInDirectory(resourceDir)) {
                     if (isResourceFile(f)) {
                         deleteResource(mgr, context, f);
                     }

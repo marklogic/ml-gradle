@@ -30,20 +30,20 @@ repositories {
     maven {url "file:../../gh-pages-marklogic-java/releases"}
     maven {url "http://developer.marklogic.com/maven2/"}
     maven {url "http://rjrudin.github.io/marklogic-java/releases"}
-    
+
     // Needed for hadoop dependencies for running mlcp
     maven {url "http://repository.cloudera.com/artifactory/cloudera-repos/" }
 }
 
 configurations {
-    // This custom Gradle configuration allows us to specify the classpath for running Corb jobs. This is only needed if 
-    // you want to run Corb jobs via Gradle tasks. More info on Corb can be found at - http://developer.marklogic.com/code/corb. 
+    // This custom Gradle configuration allows us to specify the classpath for running Corb jobs. This is only needed if
+    // you want to run Corb jobs via Gradle tasks. More info on Corb can be found at - http://developer.marklogic.com/code/corb.
     corb
-    
+
     // This configuration captures the dependencies for running mlcp (Content Pump). This is only needed if you want
     // to run mlcp via Gradle tasks. If you do, using com.marklogic.gradle.task.MlcpTask is a useful starting point, as
     // shown below.
-    mlcp 
+    mlcp
 }
 
 /*
@@ -59,7 +59,7 @@ dependencies {
     // Located at https://github.com/rjrudin/marklogic-java/tree/gh-pages/releases/com/marklogic/corb
     corb "com.marklogic:corb:1.0"
     corb "com.marklogic:marklogic-xcc:8.0.2"
-    
+
     // mlcp dependencies for import and export
     mlcp "com.marklogic:mlcp-Hadoop2:1.3-2"
     mlcp "com.marklogic:marklogic-mapreduce2:2.1.2"
@@ -75,23 +75,23 @@ ext {
         customTokens.put("sample-key", "sample-value")
         customTokens.put("%%ODBC_PORT%%", "8102")
         customTokens.put("%%XDBC_PORT%%", "8103")
-        
+
         // By default, the createTriggersDatabase attribute is set to true, which results in a triggers database being
         // created, even if a databases/triggers-database.json file isn't present. Un-commenting the line will below
         // will prevent one from being created (assuming the triggers-database.json file isn't present).
         //createTriggersDatabase = false
-        
+
         // Example of adding a path for modules to the list of module paths, which defaults to src/main/ml-modules
         // modulePaths.add("src/another-modules-dir")
         // You can also override the list of module paths
         // modulePaths = ["src/another-modules-dir"]
-        
+
         // You can have multiple config files for your content database. This is useful when you have a dependency on
         // a package of MarkLogic modules that requires some content database config, and you don't want to duplicate
-        // that in your own content-database.json file. Instead, just add the file from your 
+        // that in your own content-database.json file. Instead, just add the file from your
         // build/mlRestApi/(name of dependency)/ml-config/databases directory.
         configDir.contentDatabaseFiles.add(new File("src/main/ml-config/databases/more-content-database-config.json"))
-        
+
         // For the tasks below that depend on XCC - such as for running corb or creating triggers - the following URL
         // will be used. In this sample project, the sample-project-rest-admin user has the privileges necessary to
         // create triggers, so we use that user.
@@ -108,8 +108,10 @@ sourceSets.test.resources.srcDir 'src/test/java'
 /*
  * This is an example of both a custom Gradle task and an easy way of invoking Corb. This depends on "mlLoadModules" to
  * ensure that the Corb uris/transform modules are loaded. It also uses as a classpath the custom configuration named
- * "corb" that we defined earlier. Note that sample uris.xqy and transform.xqy modules just print a log statement for
- * each document in your content database, so unless there are documents, you won't see any result from this.
+ * "corb" that we defined earlier. Note that the sample uris.xqy and transform.xqy modules just print a log statement 
+ * for each document in your content database, so unless there are documents, you won't see any result from this. You
+ * of course can modify the transform.xqy module to perform any action that you would like - this is just to show how
+ * to invoke corb from Gradle.
  */
 task runCorb(dependsOn: ['mlLoadModules'], type: JavaExec) {
     main = 'com.marklogic.developer.corb.Manager'
@@ -117,8 +119,10 @@ task runCorb(dependsOn: ['mlLoadModules'], type: JavaExec) {
     args = [contentXccUrl, '""', 'transform.xqy', '4', 'uris.xqy', '/ext/sample-project/corb/', 'sample-project-modules', 'false']
 }
 
+/*
+ * Example of using MlcpTask to import data with mlcp.
+ */
 task importSampleData(type: com.marklogic.gradle.task.MlcpTask) {
-    description = "Example of using mlcp and MlcpTask to import documents"
     classpath = configurations.mlcp
     command = "IMPORT"
     database = mlAppConfig.contentDatabaseName
@@ -128,6 +132,9 @@ task importSampleData(type: com.marklogic.gradle.task.MlcpTask) {
     output_uri_replace = ".*import,'/import'"
 }
 
+/*
+ * Example of using MlcpTask to export data with mlcp.
+ */
 task exportSampleData(type: com.marklogic.gradle.task.MlcpTask) {
     description = "Example of using mlcp and MlcpTask to export documents; note the args array is used for any args MlcpTask doesn't yet have as task properties"
     classpath = configurations.mlcp
@@ -171,34 +178,46 @@ mlPostDeploy.dependsOn createSampleTrigger
 
 
 /*
- * Example of a custom command and how it's added to the AppDeployer. This could also be defined in the Gradle buildSrc
- * directory (that's more likely the better option for keeping your build.gradle file slim).
+ * Example of including a custom command in the deployment process. The order in which it's invoked is determined by
+ * the command's "getExecuteSortOrder" method.
  */
 ext {
-    mlAppDeployer.commands.add(new MergeContentDatabaseCommand())
+    mlAppDeployer.commands.add(new ClearTriggersDatabaseCommand())
 }
 
-import com.marklogic.appdeployer.command.*
 
-class MergeContentDatabaseCommand extends AbstractCommand {
+/*
+ * Below is an example of a custom command, which also fixes a bug in ML that should be fixed in the 8.0-4 release. The 
+ * bug is - when a pipeline is updated via the Management REST API,  pipeline states are dropped. To address this, we 
+ * insert a command to clear the triggers database before any CPF resources are created, thus forcing a create instead 
+ * of an update, thereby bypassing the bug. This example also shows how the ManageClient instance in CommandContext can
+ * be used to easily make any call to the Management REST API. Note that this class could also be defined in the Gradle
+ * buildSrc directory, which is really a better option for keeping your build.gradle file slim.
+ */
+import com.marklogic.appdeployer.command.AbstractCommand;
+import com.marklogic.appdeployer.command.CommandContext;
+import com.marklogic.appdeployer.command.SortOrderConstants;
 
+class ClearTriggersDatabaseCommand extends AbstractCommand {
     public Integer getExecuteSortOrder() {
-        return 1000;
+        return SortOrderConstants.LOAD_DEFAULT_PIPELINES - 1;
     }
-
     public void execute(CommandContext context) {
-        def contentDatabaseName = context.getAppConfig().getContentDatabaseName()
-        println "Merging content database"
-        context.getManageClient().postJson("/manage/v2/databases/" + contentDatabaseName, '{"operation":"merge-database"}')
+        String dbName = context.getAppConfig().getTriggersDatabaseName();
+        logger.info("Clearing database: " + dbName);
+        context.getManageClient().postJson("/manage/v2/databases/" + dbName, '{"operation":"clear-database"}');
+        logger.info("Cleared database: " + dbName)
     }
 }
 
 /*
- * Example of doing a database merge, but not as part of the deployment process.
+ * Sometimes, you need a custom step, but you want it to be a separate task - not a command that's included when 
+ * mlDeploy is invoked. Below is a task that extends MarkLogicTask, which provides access to a number of helpful 
+ * objects for implementing custom functionality.
  */
 task mergeContentDatabase(type: com.marklogic.gradle.task.MarkLogicTask) {
+    description = "Call this task to initiate a merge on the content database"
     doLast {
         getManageClient().postJson("/manage/v2/databases/" + getAppConfig().getContentDatabaseName(), '{"operation":"merge-database"}')
     }
 }
-

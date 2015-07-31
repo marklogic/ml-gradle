@@ -1,3 +1,20 @@
+/*
+ * This first block is optional, and it shows one way to override properties based on an environment property that is
+ * set when calling Gradle. For example, you could run "gradle -Penv=qa mlDeploy" in order to apply the env-qa.gradle
+ * build file, which would set properties based on the QA environment. This doesn't have anything to do with ml-gradle -
+ * it just shows one technique for overriding properties. See env-prod.gradle and env-qa.gradle for more details. 
+ */
+if (project.hasProperty("env")) {
+    def buildFile = "env-" + project.property("env") + ".gradle"
+    println "Applying environment-based build file: " + buildFile
+    apply from: buildFile
+}
+
+
+/*
+ * This buildscript and apply block are the required configuration for using ml-gradle. In order to use ml-gradle, you
+ * only need these two parts.
+ */
 buildscript {
     repositories {
         mavenCentral()
@@ -10,15 +27,24 @@ buildscript {
 
 apply plugin: 'ml-gradle'
 
-//
-// To use ml-gradle, you only need what is above this line. Everything below this line is optional and is intended to
-// show different features provided by ml-gradle.
-//
 
-// For generating IDE project files you might consider leveraging the Eclipse or IntelliJ IDEA plugin.
+/*
+ * Everything below this line is optional and is intended to show different features provided by ml-gradle.
+ */
+
+
+/*
+ * The Java plugin is used to compile and run JUnit tests. It also is needed for the "mlWatch" task.
+ */
 apply plugin: 'java'
+
+
+/*
+ * For generating IDE project files you might consider leveraging the Eclipse or IntelliJ IDEA plugin.
+ */
 apply plugin: 'eclipse'
 apply plugin: 'idea'
+
 
 /*
  * This lists the repositories for finding project dependencies (which differ from buildscript dependencies - buildscript
@@ -35,6 +61,7 @@ repositories {
     maven {url "http://repository.cloudera.com/artifactory/cloudera-repos/" }
 }
 
+
 configurations {
     // This custom Gradle configuration allows us to specify the classpath for running Corb jobs. This is only needed if
     // you want to run Corb jobs via Gradle tasks. More info on Corb can be found at - http://developer.marklogic.com/code/corb.
@@ -45,6 +72,7 @@ configurations {
     // shown below.
     mlcp
 }
+
 
 /*
  * This expresses dependencies on the ml-java and ml-junit libraries. The former is typically used for application
@@ -64,6 +92,7 @@ dependencies {
     mlcp "com.marklogic:mlcp-Hadoop2:1.3-2"
     mlcp "com.marklogic:marklogic-mapreduce2:2.1.2"
 }
+
 
 /*
  * ml-gradle adds an instance of com.marklogic.appdeployer.AppConfig to the Gradle project under the key "mlAppConfig".
@@ -99,11 +128,13 @@ ext {
     }
 }
 
+
 /*
  * For tests that reference test files in the test source tree, we need to tell Gradle to copy these to src/test/resources
  * so that they can be found when running "gradle test".
  */
 sourceSets.test.resources.srcDir 'src/test/java'
+
 
 /*
  * This is an example of both a custom Gradle task and an easy way of invoking Corb. This depends on "mlLoadModules" to
@@ -119,6 +150,7 @@ task runCorb(dependsOn: ['mlLoadModules'], type: JavaExec) {
     args = [contentXccUrl, '""', 'transform.xqy', '4', 'uris.xqy', '/ext/sample-project/corb/', 'sample-project-modules', 'false']
 }
 
+
 /*
  * Example of using MlcpTask to import data with mlcp.
  */
@@ -132,6 +164,7 @@ task importSampleData(type: com.marklogic.gradle.task.MlcpTask) {
     output_uri_replace = ".*import,'/import'"
 }
 
+
 /*
  * Example of using MlcpTask to export data with mlcp.
  */
@@ -144,6 +177,7 @@ task exportSampleData(type: com.marklogic.gradle.task.MlcpTask) {
     args = ["-collection_filter", "sample-import"]
 }
 
+
 /*
  * The management API has an operation for loading the default CPF pipelines - 
  * http://docs.marklogic.com/REST/POST/manage/v2/databases/[id-or-name]/pipelines. To load these as part of your
@@ -153,6 +187,7 @@ task exportSampleData(type: com.marklogic.gradle.task.MlcpTask) {
 ext {
     //mlAppDeployer.commands.add(new com.marklogic.appdeployer.command.cpf.LoadDefaultPipelinesCommand())
 }
+
 
 /*
  * As of ML 8.0-3, triggers can not yet be managed via the Management REST API, so we still rely on a custom Gradle task
@@ -168,6 +203,7 @@ task createSampleTrigger(type: com.marklogic.gradle.task.trigger.CreateTriggersT
     moduleRoot = "/"
     modulePath = "/ext/sample-project/trigger/sample-trigger.xqy"
 }
+
 
 /*
  * Example of attaching the creation of our trigger to the end of the mlDeploy process. mlPostDeploy is an empty task
@@ -209,6 +245,7 @@ class ClearTriggersDatabaseCommand extends AbstractCommand {
         logger.info("Cleared database: " + dbName)
     }
 }
+
 
 /*
  * Sometimes, you need a custom step, but you want it to be a separate task - not a command that's included when 

@@ -1,0 +1,7 @@
+/*
+ * An environment-based build file can have any Gradle configuration that a normal build.gradle file would. Here, we 
+ * just override one property for demonstration purposes.
+ */
+ext {
+    mlAdminUsername = "qaAdminUser"
+}

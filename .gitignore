@@ -11,3 +11,5 @@ ml-gradle-all/.project
 ml-gradle-all/.settings/
 sample-project/rob/
 sample-project/data/export/
+disconnected-project/build/
+disconnected-project/.gradle/

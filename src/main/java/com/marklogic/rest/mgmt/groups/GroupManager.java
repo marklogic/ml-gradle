@@ -9,4 +9,8 @@ public class GroupManager extends AbstractResourceManager {
 		super(manageClient);
 	}
 
+    @Override
+    protected boolean useAdminUser() {
+        return true;
+    }
 }

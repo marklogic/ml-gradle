@@ -1,4 +1,18 @@
 /*
+ * This buildscript declares the ml-gradle dependency and the repositories that contain ml-gradle and its dependencies.
+ * This block is always needed in order to use ml-gradle.
+ */
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {url "http://developer.marklogic.com/maven2/"}
+        maven {url "http://rjrudin.github.io/marklogic-java/releases"}
+    }
+    dependencies { classpath "com.marklogic:ml-gradle:2.0a15" }
+}
+
+
+/*
  * This first block is optional, and it shows one way to override properties based on an environment property that is
  * set when calling Gradle. For example, you could run "gradle -Penv=qa mlDeploy" in order to apply the env-qa.gradle
  * build file, which would set properties based on the QA environment. This doesn't have anything to do with ml-gradle -
@@ -12,19 +26,22 @@ if (project.hasProperty("env")) {
 
 
 /*
- * This buildscript and apply block are the required configuration for using ml-gradle. In order to use ml-gradle, you
- * only need these two parts.
+ * This is another optional block, and it's a similar technique to the block above, but it instead is used for local
+ * development. A developer can create a non-version-controlled local.gradle file and, within that file, override any
+ * properties that are defined in gradle.properties. This also isn't specific to ml-gradle - it's just one way with
+ * Gradle to allow a developer to easily override gradle.properties for local development purposes. 
  */
-buildscript {
-    repositories {
-        mavenCentral()
-        maven {url "http://developer.marklogic.com/maven2/"}
-        maven {url "http://rjrudin.github.io/marklogic-java/releases"}
-    }
-
-    dependencies { classpath "com.marklogic:ml-gradle:2.0a15" }
+if (new File("local.gradle").exists()) {
+    println "Applying local.gradle file"
+    apply from: "local.gradle"
+    println "Applied local.gradle file"
 }
 
+
+/*
+ * In order to use ml-gradle, it must be applied. This occurs after the two above blocks for overriding properties so
+ * that those blocks can override properties before ml-gradle initializes itself.
+ */
 apply plugin: 'ml-gradle'
 
 

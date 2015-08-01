@@ -13,3 +13,4 @@ sample-project/rob/
 sample-project/data/export/
 disconnected-project/build/
 disconnected-project/.gradle/
+sample-project/local.gradle

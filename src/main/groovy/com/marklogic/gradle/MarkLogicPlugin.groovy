@@ -48,7 +48,8 @@ import com.marklogic.gradle.task.databases.UpdateContentDatabasesTask
 import com.marklogic.gradle.task.scaffold.GenerateScaffoldTask
 import com.marklogic.gradle.task.security.DeploySecurityTask
 import com.marklogic.gradle.task.servers.UpdateRestApiServersTask
-import com.marklogic.gradle.task.viewschemas.CreateViewSchemasTask
+import com.marklogic.gradle.task.tasks.DeployTasksTask;
+import com.marklogic.gradle.task.viewschemas.DeployViewSchemasTask
 import com.marklogic.rest.mgmt.ManageClient
 import com.marklogic.rest.mgmt.ManageConfig
 import com.marklogic.rest.mgmt.admin.AdminConfig
@@ -69,7 +70,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         // No group or description on these so they don't show up in "gradle tasks"
         project.task("mlDeployApp", type: DeployAppTask, dependsOn: ["mlDeleteModuleTimestampsFile", "mlPrepareRestApiDependencies"])
         project.task("mlUndeployApp", type: UndeployAppTask)
-        
+
         String deployGroup = "ml-gradle Deploy"
         project.task("mlPostDeploy", group: deployGroup, description: "Add dependsOn to this task to add tasks at the end of mlDeploy").mustRunAfter(["mlDeployApp"])
         project.task("mlPostUndeploy", group: deployGroup, description: "Add dependsOn to this task to add tasks at the end of mlUndeploy").mustRunAfter(["mlUndeployApp"])
@@ -103,16 +104,19 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlReloadModules", group: modulesGroup, dependsOn: ["mlClearModulesDatabase", "mlLoadModules"], description: "Reloads modules by first clearing the modules database and then loading modules")
         project.task("mlWatch", type: WatchTask, group: modulesGroup, description: "Run a loop that checks for new/modified modules every second and loads any that it finds")
         project.task("mlDeleteModuleTimestampsFile", type: DeleteModuleTimestampsFileTask, group: modulesGroup, description: "Delete the properties file in the build directory that keeps track of when each module was last loaded")
-        
+
         String serverGroup = "ml-gradle Server"
         project.task("mlUpdateRestApiServers", type: UpdateRestApiServersTask, group: serverGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the REST API servers")
-        
+
         String securityGroup = "ml-gradle Security"
-        project.task("mlDeploySecurity", type: DeploySecurityTask, group: securityGroup, description: "Deploys only security resources")
-        
+        project.task("mlDeploySecurity", type: DeploySecurityTask, group: securityGroup, description: "Deploy only security resources")
+
         String sqlGroup = "ml-gradle SQL"
-        project.task("mlCreateViewSchemas", type: CreateViewSchemasTask, group: sqlGroup, description: "Create or update SQL view schemas")
-        
+        project.task("mlDeployViewSchemas", type: DeployViewSchemasTask, group: sqlGroup, description: "Deploy only SQL view schemas")
+
+        String taskGroup = "ml-gradle Tasks"
+        project.task("mlDeployTasks", type: DeployTasksTask, group: taskGroup, description: "Deploy only scheduled tasks")
+
         println "Finished initializing ml-gradle\n"
     }
 
@@ -162,7 +166,7 @@ class MarkLogicPlugin implements Plugin<Project> {
             println "REST Admin username: " + restUsername
             appConfig.setRestAdminUsername(restUsername)
         }
-        
+
         String restPassword = null
         if (project.hasProperty("mlRestAdminPassword")) {
             restPassword = project.property("mlRestAdminPassword")
@@ -273,7 +277,7 @@ class MarkLogicPlugin implements Plugin<Project> {
      */
     AppDeployer newAppDeployer(Project project, ManageClient manageClient, AdminManager adminManager) {
         List<Command> commands = new ArrayList<Command>()
-        
+
         // Security
         List<Command> securityCommands = new ArrayList<Command>()
         securityCommands.add(new CreateRolesCommand())
@@ -285,7 +289,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         securityCommands.add(new CreateProtectedCollectionsCommand())
         project.extensions.add("mlSecurityCommands", securityCommands)
         commands.addAll(securityCommands)
-        
+
         // Databases and appservers
         commands.add(new CreateRestApiServersCommand())
         commands.add(new CreateTriggersDatabaseCommand())
@@ -296,7 +300,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 
         // Modules
         commands.add(new LoadModulesCommand())
-        
+
         // CPF
         List<Command> cpfCommands = new ArrayList<Command>()
         cpfCommands.add(new CreateCpfConfigsCommand())
@@ -304,11 +308,19 @@ class MarkLogicPlugin implements Plugin<Project> {
         cpfCommands.add(new CreatePipelinesCommand())
         project.extensions.add("mlCpfCommands", cpfCommands)
         commands.addAll(cpfCommands)
-        
-        // Others        
-        commands.add(new CreateViewSchemasCommand())
-        commands.add(new CreateScheduledTasksCommand())
-        
+
+        // Tasks
+        List<Command> taskCommands = new ArrayList<Command>()
+        taskCommands.add(new CreateScheduledTasksCommand())
+        project.extensions.add("mlTaskCommands", taskCommands)
+        commands.addAll(taskCommands)
+
+        // SQL Views
+        List<Command> viewCommands = new ArrayList<Command>()
+        viewCommands.add(new CreateViewSchemasCommand())
+        project.extensions.add("mlViewCommands", viewCommands)
+        commands.addAll(viewCommands)
+
         SimpleAppDeployer deployer = new SimpleAppDeployer(manageClient, adminManager)
         deployer.setCommands(commands)
         return deployer

@@ -18,7 +18,9 @@ import com.marklogic.rest.mgmt.ManageConfig;
 import com.marklogic.xccutil.template.XccTemplate;
 
 /**
- * Base class for tests that depend on an AppDeployer instance.
+ * Base class for tests that depend on an AppDeployer instance. You can extend this directly to write a test for a
+ * particular resource, but check out AbstractManageResourceTest (and its subclasses) to see if that will work for you
+ * instead, as that saves a lot of work.
  */
 public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
 
@@ -29,7 +31,7 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
 
     @Autowired
     private ManageConfig manageConfig;
-    
+
     private ConfigurableApplicationContext appManagerContext;
 
     // Intended to be used by subclasses
@@ -47,7 +49,7 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
         appConfig.setRestPort(SAMPLE_APP_REST_PORT);
         ConfigDir configDir = new ConfigDir(new File("src/test/resources/sample-app/src/main/ml-config"));
         appConfig.setConfigDir(configDir);
-        
+
         // Assume that the manager user can also be used as the REST admin user
         appConfig.setRestAdminUsername(manageConfig.getUsername());
         appConfig.setRestAdminPassword(manageConfig.getPassword());

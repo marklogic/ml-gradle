@@ -24,4 +24,13 @@ public class CreateGroupsCommand extends AbstractResourceCommand {
         return new GroupManager(context.getManageClient());
     }
 
+    /**
+     * While groups should be created right away, we don't want to undelete them until the very end, as we won't be 
+     * able to delete one unless all of its app servers have been deleted.
+     */
+    @Override
+    public Integer getUndoSortOrder() {
+        return Integer.MAX_VALUE;
+    }
+
 }

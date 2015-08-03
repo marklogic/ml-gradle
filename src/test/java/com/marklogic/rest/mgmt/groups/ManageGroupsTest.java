@@ -1,20 +1,12 @@
 package com.marklogic.rest.mgmt.groups;
 
-import java.util.List;
-
-import org.jdom2.Element;
 import org.junit.Test;
 
 import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
 import com.marklogic.appdeployer.command.groups.CreateGroupsCommand;
-import com.marklogic.appdeployer.command.security.CreateRolesCommand;
-import com.marklogic.rest.mgmt.AbstractMgmtTest;
 import com.marklogic.rest.mgmt.ResourceManager;
-import com.marklogic.rest.mgmt.groups.GroupManager;
-import com.marklogic.rest.mgmt.security.RoleManager;
 import com.marklogic.rest.util.Fragment;
-import com.marklogic.rest.util.ResourcesFragment;
 
 public class ManageGroupsTest extends AbstractManageResourceTest {
 
@@ -47,7 +39,6 @@ public class ManageGroupsTest extends AbstractManageResourceTest {
 	public void testDefaultGroup() {
       GroupManager mgr = new GroupManager(manageClient);
       Boolean exists = mgr.exists("Default");
-      ResourcesFragment xml = mgr.getAsXml();
       assertTrue("The Default group should exist.", exists);
   }
 }

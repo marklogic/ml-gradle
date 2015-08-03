@@ -17,11 +17,11 @@ public interface ResourceManager {
     public boolean exists(String resourceNameOrId);
 
     /**
-     * If a resource with a name in the the given JSON exists, then update that resource; else create it.
+     * If a resource with a name in the the given payload exists, then update that resource; else create it.
      * 
-     * @param json
+     * @param payload
      */
-    public void save(String json);
+    public void save(String payload);
 
     /**
      * Assumes that a resource ID field is in the payload, and then extracts that field value and 

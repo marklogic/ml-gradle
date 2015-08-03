@@ -9,14 +9,14 @@ import com.marklogic.rest.mgmt.ResourceManager;
 import com.marklogic.rest.mgmt.groups.GroupManager;
 
 public class CreateGroupsCommand extends AbstractResourceCommand {
-	
+
     public CreateGroupsCommand() {
         setExecuteSortOrder(SortOrderConstants.CREATE_GROUPS);
     }
 
     @Override
     protected File getResourcesDir(CommandContext context) {
-        return new File(context.getAppConfig().getConfigDir().getSecurityDir(), "groups");
+        return new File(context.getAppConfig().getConfigDir().getBaseDir(), "groups");
     }
 
     @Override

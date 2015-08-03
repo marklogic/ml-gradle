@@ -10,12 +10,21 @@ import com.marklogic.rest.mgmt.ResourceManager;
  */
 public abstract class AbstractManageResourceTest extends AbstractAppDeployerTest {
 
+    /**
+     * @return an instance of the ResourceManager that supports the resource being tested
+     */
     protected abstract ResourceManager newResourceManager();
 
+    /**
+     * @return an instance of the Command class that is being tested
+     */
     protected abstract Command newCommand();
 
     /**
-     * @return an array of resource names that can be used to verify that each resource was created successfully
+     * @return an array of resource names that can be used to verify that each resource was created successfully. Each
+     *         resource name should typically correspond to a test file under
+     *         src/test/resources/sample-app/src/main/ml-config in the directory that corresponds to the resource being
+     *         tested.
      */
     protected abstract String[] getResourceNames();
 
@@ -24,9 +33,12 @@ public abstract class AbstractManageResourceTest extends AbstractAppDeployerTest
      * resources are deleted.
      */
     protected void afterResourcesCreated() {
-
     }
 
+    /**
+     * Performs a generic test of creating a resource, then creating it again (to ensure that doesn't cause any failures
+     * - this should typically result in an update instead of a create), and then deleting it.
+     */
     @Test
     public void createThenDelete() {
         ResourceManager mgr = newResourceManager();

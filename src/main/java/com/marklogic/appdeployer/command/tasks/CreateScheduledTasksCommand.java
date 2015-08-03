@@ -16,6 +16,15 @@ public class CreateScheduledTasksCommand extends AbstractResourceCommand {
         setExecuteSortOrder(SortOrderConstants.CREATE_SCHEDULED_TASKS);
     }
 
+    /**
+     * While scheduled tasks are usually created at the end of a deployment process, it's typical to delete them at the
+     * start of an undeployment, since nothing depends on them.
+     */
+    @Override
+    public Integer getUndoSortOrder() {
+        return 0;
+    }
+
     @Override
     protected File getResourcesDir(CommandContext context) {
         return new File(context.getAppConfig().getConfigDir().getBaseDir(), "tasks");
@@ -33,5 +42,4 @@ public class CreateScheduledTasksCommand extends AbstractResourceCommand {
     public void setGroupName(String groupName) {
         this.groupName = groupName;
     }
-
 }

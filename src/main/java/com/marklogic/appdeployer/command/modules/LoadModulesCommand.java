@@ -10,6 +10,7 @@ import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.clientutil.modulesloader.ModulesLoader;
 import com.marklogic.clientutil.modulesloader.impl.DefaultModulesLoader;
+import com.marklogic.clientutil.modulesloader.impl.TestServerModulesFinder;
 import com.marklogic.clientutil.modulesloader.impl.XccAssetLoader;
 
 /**
@@ -23,12 +24,23 @@ public class LoadModulesCommand extends AbstractCommand {
     private String defaultAssetRolesAndCapabilities = "rest-admin,read,rest-admin,update,rest-extension-user,execute";
     private String customAssetRolesAndCapabilities;
 
+    private String username;
+    private String password;
+    
     public LoadModulesCommand() {
         setExecuteSortOrder(SortOrderConstants.LOAD_MODULES_ORDER);
     }
 
     @Override
     public void execute(CommandContext context) {
+        loadModulesIntoMainServer(context);
+
+        if (context.getAppConfig().isTestPortSet()) {
+            loadModulesIntoTestServer(context);
+        }
+    }
+
+    protected void loadModulesIntoMainServer(CommandContext context) {
         if (modulesLoader == null) {
             DefaultModulesLoader l = new DefaultModulesLoader();
             l.setXccAssetLoader(newXccAssetLoader(context));
@@ -46,12 +58,34 @@ public class LoadModulesCommand extends AbstractCommand {
         }
     }
 
+    /**
+     * We use a customized impl of DefaultModulesLoader here so we can ensure that options are always loaded again into
+     * the test server.
+     * 
+     * @param context
+     */
+    protected void loadModulesIntoTestServer(CommandContext context) {
+        AppConfig config = context.getAppConfig();
+
+        DatabaseClient client = DatabaseClientFactory.newClient(config.getHost(), config.getTestRestPort(),
+                config.getRestAdminUsername(), config.getRestAdminPassword(), config.getAuthentication());
+
+        DefaultModulesLoader l = new DefaultModulesLoader();
+        l.setModulesFinder(new TestServerModulesFinder());
+        l.setModulesManager(null);
+
+        for (String modulesPath : config.getModulePaths()) {
+            logger.info("Loading modules into test server from dir: " + modulesPath);
+            l.loadModules(new File(modulesPath), client);
+        }
+    }
+
     protected XccAssetLoader newXccAssetLoader(CommandContext context) {
         XccAssetLoader l = new XccAssetLoader();
         AppConfig config = context.getAppConfig();
         l.setHost(config.getHost());
-        l.setUsername(config.getXdbcUsername());
-        l.setPassword(config.getXdbcPassword());
+        l.setUsername(username != null ? username : config.getRestAdminUsername());
+        l.setPassword(password != null ? password : config.getRestAdminPassword());
         l.setDatabaseName(config.getModulesDatabaseName());
 
         String permissions = null;
@@ -81,5 +115,13 @@ public class LoadModulesCommand extends AbstractCommand {
 
     public void setDefaultAssetRolesAndCapabilities(String defaultAssetRolesAndCapabilities) {
         this.defaultAssetRolesAndCapabilities = defaultAssetRolesAndCapabilities;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

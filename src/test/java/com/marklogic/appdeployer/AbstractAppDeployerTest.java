@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.junit.After;
 import org.junit.Before;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -13,10 +14,13 @@ import com.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
 import com.marklogic.appdeployer.impl.SimpleAppDeployer;
 import com.marklogic.appdeployer.spring.SpringAppDeployer;
 import com.marklogic.rest.mgmt.AbstractMgmtTest;
+import com.marklogic.rest.mgmt.ManageConfig;
 import com.marklogic.xccutil.template.XccTemplate;
 
 /**
- * Base class for tests that depend on an AppDeployer instance.
+ * Base class for tests that depend on an AppDeployer instance. You can extend this directly to write a test for a
+ * particular resource, but check out AbstractManageResourceTest (and its subclasses) to see if that will work for you
+ * instead, as that saves a lot of work.
  */
 public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
 
@@ -24,6 +28,9 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
 
     protected final static Integer SAMPLE_APP_REST_PORT = 8540;
     protected final static Integer SAMPLE_APP_TEST_REST_PORT = 8541;
+
+    @Autowired
+    private ManageConfig manageConfig;
 
     private ConfigurableApplicationContext appManagerContext;
 
@@ -42,6 +49,10 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
         appConfig.setRestPort(SAMPLE_APP_REST_PORT);
         ConfigDir configDir = new ConfigDir(new File("src/test/resources/sample-app/src/main/ml-config"));
         appConfig.setConfigDir(configDir);
+
+        // Assume that the manager user can also be used as the REST admin user
+        appConfig.setRestAdminUsername(manageConfig.getUsername());
+        appConfig.setRestAdminPassword(manageConfig.getPassword());
     }
 
     protected void initializeAppDeployer() {
@@ -90,8 +101,8 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
     }
 
     protected XccTemplate newModulesXccTemplate() {
-        return new XccTemplate(format("xcc://%s:%s@%s:8000/%s", appConfig.getXdbcUsername(),
-                appConfig.getXdbcPassword(), appConfig.getHost(), appConfig.getModulesDatabaseName()));
+        return new XccTemplate(format("xcc://%s:%s@%s:8000/%s", appConfig.getRestAdminUsername(),
+                appConfig.getRestAdminPassword(), appConfig.getHost(), appConfig.getModulesDatabaseName()));
     }
 
     /**

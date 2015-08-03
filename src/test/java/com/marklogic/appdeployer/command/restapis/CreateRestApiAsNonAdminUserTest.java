@@ -53,8 +53,6 @@ public class CreateRestApiAsNonAdminUserTest extends AbstractAppDeployerTest {
         // inserting modules via XCC
         appConfig.setRestAdminUsername("sample-app-rest-admin");
         appConfig.setRestAdminPassword("sample-app-rest-admin");
-        appConfig.setXdbcUsername(appConfig.getRestAdminUsername());
-        appConfig.setXdbcPassword(appConfig.getRestAdminPassword());
 
         initializeAppDeployer(new CreateRestApiServersCommand(), new CreateRolesCommand(), new CreateUsersCommand(),
                 new LoadModulesCommand());

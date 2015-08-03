@@ -55,6 +55,22 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
         perms.assertPermissionExists("app-user", "execute");
     }
 
+    @Test
+    public void testServerExists() {
+        appConfig.setTestRestPort(8541);
+        initializeAppDeployer(new CreateRestApiServersCommand(), new LoadModulesCommand());
+        appDeployer.deploy(appConfig);
+
+        assertEquals(
+                "true",
+                xccTemplate
+                        .executeAdhocQuery("fn:doc-available('/Default/sample-app/rest-api/options/sample-app-options.xml')"));
+        assertEquals(
+                "true",
+                xccTemplate
+                        .executeAdhocQuery("fn:doc-available('/Default/sample-app-test/rest-api/options/sample-app-options.xml')"));
+    }
+
     private void assertModuleExistsWithDefaultPermissions(String message, String uri) {
         assertEquals(message, "true", xccTemplate.executeAdhocQuery(format("fn:doc-available('%s')", uri)));
         assertDefaultPermissionsExists(uri);

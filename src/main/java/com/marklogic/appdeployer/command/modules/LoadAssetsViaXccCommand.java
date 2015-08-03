@@ -19,6 +19,9 @@ public class LoadAssetsViaXccCommand extends AbstractCommand {
     private String permissions = "rest-admin,read,rest-admin,update,rest-extension-user,execute";
     private String[] collections;
 
+    private String username;
+    private String password;
+    
     public LoadAssetsViaXccCommand(String... assetPaths) {
         this.assetPaths = assetPaths;
         setExecuteSortOrder(SortOrderConstants.LOAD_MODULES_ORDER - 10);
@@ -29,8 +32,8 @@ public class LoadAssetsViaXccCommand extends AbstractCommand {
         AppConfig config = context.getAppConfig();
 
         XccAssetLoader loader = new XccAssetLoader();
-        loader.setUsername(config.getXdbcUsername());
-        loader.setPassword(config.getXdbcPassword());
+        loader.setUsername(username != null ? username : config.getRestAdminUsername());
+        loader.setPassword(password != null ? password : config.getRestAdminPassword());
         loader.setHost(config.getHost());
         loader.setDatabaseName(config.getModulesDatabaseName());
         if (permissions != null) {
@@ -49,6 +52,14 @@ public class LoadAssetsViaXccCommand extends AbstractCommand {
 
     public void setCollections(String[] collections) {
         this.collections = collections;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
 }

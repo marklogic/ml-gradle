@@ -11,11 +11,10 @@ Why use ml-gradle?
 =========
 ml-gradle is a good fit for you and your team if:
 
-1. You're using MarkLogic
-1. You're already using Gradle, or you're using Ant or Maven and are interested in shifting to Gradle (there are many comparisons of these tools on the Internet; I'll just say I recommend making this shift). Note that if you are using Ant, it's easy to invoke Ant tasks from Gradle. And if you can't move away from Maven, you can try [this Maven plugin for invoking Gradle](https://github.com/if6was9/gradle-maven-plugin).
-1. You're a Java development team that can utilize a lot of the Java-focused features of Gradle
+1. You're using MarkLogic 8
+2. You're already using Gradle, or you think Gradle would be a useful build tool to add to your development/deployment process. If you're currently using Ant or Maven and are wondering about Gradle, there are many comparisons of these tools on the Internet; I'll just say I recommend making this shift. If you are using Ant, it's easy to invoke Ant tasks from Gradle. And if you can't move away from Maven, you can try [this Maven plugin for invoking Gradle](https://github.com/if6was9/gradle-maven-plugin).
 
-Essentially, if you're using MarkLogic and Java, then ml-gradle is probably a good fit for you. And if you're not using Java, then ml-gradle is most likely not a good fit for you - I recommend instead using the [Roxy deployer](https://github.com/marklogic/roxy) for managing how you configure MarkLogic and deploy applications to it. You can still use ml-gradle, but odds are introducing Gradle for the sole purpose of using ml-gradle is going to add too much complexity to your project to be worth it. You should have already decided that you want to use Gradle as your project's build tool (or as Gradle calls it, your "enterprise automation tool"), and then ml-gradle will be a good fit for you. 
+If you don't want to use Gradle, then ml-gradle is most likely not a good fit for you - I recommend instead using the [Roxy deployer](https://github.com/marklogic/roxy) for managing how you configure MarkLogic and deploy applications to it. 
 
 Here are some of the main features of ml-gradle:
 
@@ -35,7 +34,7 @@ To use ml-gradle right away, you'll need Gradle installed first. And of course y
         maven {url "http://rjrudin.github.io/marklogic-java/releases"}
       }
       dependencies {
-        classpath "com.marklogic:ml-gradle:2.0a10"
+        classpath "com.marklogic:ml-gradle:2.0a15"
       }
     }
     

@@ -12,15 +12,16 @@ Why use ml-gradle?
 ml-gradle is a good fit for you and your team if:
 
 1. You're using MarkLogic 8
-2. You're already using Gradle, or you think Gradle would be a useful build tool to add to your development/deployment process. If you're currently using Ant or Maven and are wondering about Gradle, there are many comparisons of these tools on the Internet; I'll just say I recommend making this shift. If you are using Ant, it's easy to invoke Ant tasks from Gradle. And if you can't move away from Maven, you can try [this Maven plugin for invoking Gradle](https://github.com/if6was9/gradle-maven-plugin).
+2. You're using Gradle, or you think Gradle would be a useful build tool to add to your development/deployment process. If you're currently using Ant or Maven and are wondering about Gradle, there are many comparisons of these tools on the Internet; I'll just say I recommend making this shift. If you are using Ant, it's easy to invoke Ant tasks from Gradle. And if you can't move away from Maven, you can try [this Maven plugin for invoking Gradle](https://github.com/if6was9/gradle-maven-plugin).
+3. (Optional) You're interested in managing other people's MarkLogic modules as [true third-party dependencies](https://github.com/rjrudin/ml-gradle/wiki/Common-tasks#preparing-rest-api-dependencies) instead of having to clone their code into your own project. This leverages Gradle's normal dependency management. 
 
-If you don't want to use Gradle, then ml-gradle is most likely not a good fit for you - I recommend instead using the [Roxy deployer](https://github.com/marklogic/roxy) for managing how you configure MarkLogic and deploy applications to it. 
+If you don't want to use Gradle, then ml-gradle is most likely not a good fit for you - I recommend instead using the [Roxy deployer](https://github.com/marklogic/roxy) for managing how you configure MarkLogic. 
 
 Here are some of the main features of ml-gradle:
 
 1. Utilizes the new [Management REST API](http://docs.marklogic.com/REST/management) in MarkLogic 8 to configure all aspects of an application.
 1. Can watch for new/modified modules and automatically load them for you, thus simplifying the code/build/test cycle
-1. Can treat packages of XQuery code as true third-party dependencies, resolving them just like you would a dependency on a jar, as well as automatically loading such code into your modules database
+1. Can treat packages of MarkLogic code as [true third-party dependencies](https://github.com/rjrudin/ml-gradle/wiki/Common-tasks#preparing-rest-api-dependencies), resolving them just like you would a dependency on a jar, as well as automatically loading such code into your modules database
 1. Can easily run MarkLogic Content Pump and Corb without having to copy jars around and worry about a classpath
 
 ml-gradle quick start

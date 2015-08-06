@@ -1,56 +1,34 @@
 package com.marklogic.appdeployer.command.groups;
 
-import static org.junit.Assert.*;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
 import com.marklogic.rest.mgmt.ResourceManager;
+import com.marklogic.rest.mgmt.groups.GroupManager;
+import com.marklogic.rest.util.Fragment;
 
-public class ManageGroupsTest extends AbstractManageResourceTest{
+public class ManageGroupsTest extends AbstractManageResourceTest {
 
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
+    @Override
+    protected ResourceManager newResourceManager() {
+        return new GroupManager(manageClient);
+    }
 
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
+    @Override
+    protected Command newCommand() {
+        return new CreateGroupsCommand();
+    }
 
-	@Before
-	public void setUp() throws Exception {
-	}
+    @Override
+    protected String[] getResourceNames() {
+        return new String[] { "sample-app-group" };
+    }
 
-	@After
-	public void tearDown() throws Exception {
-	}
-
-	@Test
-	public void test() {
-		fail("Not yet implemented");
-	}
-
-	@Override
-	protected ResourceManager newResourceManager() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	protected Command newCommand() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	protected String[] getResourceNames() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    protected void afterResourcesCreated() {
+        GroupManager mgr = new GroupManager(manageClient);
+        Fragment f = mgr.getPropertiesAsXml("sample-app-group");
+        assertEquals("metering should be turned off as configured in sample-app-group.json", "false",
+                f.getElementValue("/m:group-properties/m:metering-enabled"));
+    }
 
 }

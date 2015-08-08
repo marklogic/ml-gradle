@@ -2,6 +2,8 @@ package com.marklogic.appdeployer.command;
 
 public abstract class SortOrderConstants {
 
+    public static Integer CREATE_GROUPS = 5;
+
     public static Integer CREATE_PRIVILEGES = 10;
     public static Integer CREATE_ROLES = 20;
     public static Integer CREATE_USERS = 30;

@@ -1,0 +1,8 @@
+package com.rjrudin.marklogic.modulesloader;
+
+import java.io.File;
+
+public interface ModulesFinder {
+
+    public Modules findModules(File dir);
+}

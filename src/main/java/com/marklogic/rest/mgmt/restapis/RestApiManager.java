@@ -1,8 +1,8 @@
 package com.marklogic.rest.mgmt.restapis;
 
-import com.marklogic.clientutil.LoggingObject;
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.util.Fragment;
+import com.rjrudin.marklogic.client.LoggingObject;
 
 /**
  * For /v1/rest-apis.

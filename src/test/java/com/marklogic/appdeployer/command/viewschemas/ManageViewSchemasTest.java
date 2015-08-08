@@ -11,10 +11,10 @@ import com.marklogic.appdeployer.command.databases.CreateTriggersDatabaseCommand
 import com.marklogic.appdeployer.command.databases.UpdateContentDatabasesCommand;
 import com.marklogic.appdeployer.command.modules.LoadModulesCommand;
 import com.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
-import com.marklogic.junit.Fragment;
 import com.marklogic.rest.mgmt.ResourceManager;
 import com.marklogic.rest.mgmt.viewschemas.ViewSchemaManager;
 import com.marklogic.rest.util.RestTemplateUtil;
+import com.rjrudin.marklogic.junit.Fragment;
 
 public class ManageViewSchemasTest extends AbstractManageResourceTest {
 

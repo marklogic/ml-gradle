@@ -3,7 +3,7 @@ package com.marklogic.rest.mgmt;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ClassUtils;
 
-import com.marklogic.clientutil.LoggingObject;
+import com.rjrudin.marklogic.client.LoggingObject;
 
 public class AbstractManager extends LoggingObject {
 

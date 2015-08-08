@@ -4,7 +4,7 @@ import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
-import com.marklogic.clientutil.modulesloader.impl.XccAssetLoader;
+import com.rjrudin.marklogic.modulesloader.impl.XccAssetLoader;
 
 /**
  * Command for loading assets via XCC from a directory that doesn't fit the REST API structure, where assets are

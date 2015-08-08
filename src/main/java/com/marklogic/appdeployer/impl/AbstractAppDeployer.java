@@ -10,9 +10,9 @@ import com.marklogic.appdeployer.AppDeployer;
 import com.marklogic.appdeployer.command.Command;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.UndoableCommand;
-import com.marklogic.clientutil.LoggingObject;
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.admin.AdminManager;
+import com.rjrudin.marklogic.client.LoggingObject;
 
 /**
  * Abstract base class that just needs the subclass to define the list of Command instances to use. Handles executing

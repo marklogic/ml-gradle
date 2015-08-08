@@ -9,10 +9,10 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
-import com.marklogic.junit.BaseTestHelper;
-import com.marklogic.junit.spring.LoggingTestExecutionListener;
 import com.marklogic.rest.mgmt.admin.AdminConfig;
 import com.marklogic.rest.mgmt.admin.AdminManager;
+import com.rjrudin.marklogic.junit.BaseTestHelper;
+import com.rjrudin.marklogic.junit.spring.LoggingTestExecutionListener;
 
 /**
  * Base class for tests that just talk to the Mgmt API and don't depend on an AppDeployer instance.

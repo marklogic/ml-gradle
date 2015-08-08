@@ -8,10 +8,10 @@ import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
-import com.marklogic.clientutil.modulesloader.ModulesLoader;
-import com.marklogic.clientutil.modulesloader.impl.DefaultModulesLoader;
-import com.marklogic.clientutil.modulesloader.impl.TestServerModulesFinder;
-import com.marklogic.clientutil.modulesloader.impl.XccAssetLoader;
+import com.rjrudin.marklogic.modulesloader.ModulesLoader;
+import com.rjrudin.marklogic.modulesloader.impl.DefaultModulesLoader;
+import com.rjrudin.marklogic.modulesloader.impl.TestServerModulesFinder;
+import com.rjrudin.marklogic.modulesloader.impl.XccAssetLoader;
 
 /**
  * By default, uses XCC to load modules, as that's normally much faster than using the /v1/ext REST API endpoint.

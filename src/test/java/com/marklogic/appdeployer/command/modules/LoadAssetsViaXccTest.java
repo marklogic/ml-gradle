@@ -7,7 +7,7 @@ import org.junit.Test;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
 import com.marklogic.rest.util.Fragment;
-import com.marklogic.xccutil.template.XccTemplate;
+import com.rjrudin.marklogic.xcc.XccTemplate;
 
 public class LoadAssetsViaXccTest extends AbstractAppDeployerTest {
 

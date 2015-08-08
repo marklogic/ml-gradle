@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import org.springframework.util.FileCopyUtils;
 
-import com.marklogic.clientutil.LoggingObject;
+import com.rjrudin.marklogic.client.LoggingObject;
 
 /**
  * Abstract base class that provides some convenience methods for implementing a command. Subclasses will typically override

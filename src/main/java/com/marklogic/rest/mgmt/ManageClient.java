@@ -13,9 +13,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import com.marklogic.clientutil.LoggingObject;
 import com.marklogic.rest.util.Fragment;
 import com.marklogic.rest.util.RestTemplateUtil;
+import com.rjrudin.marklogic.client.LoggingObject;
 
 /**
  * Wraps a RestTemplate with methods that should simplify accessing the Manage API with RestTemplate. Each NounManager

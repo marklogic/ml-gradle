@@ -12,10 +12,10 @@ import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.modules.LoadModulesCommand;
 import com.marklogic.appdeployer.command.security.CreateRolesCommand;
 import com.marklogic.appdeployer.command.security.CreateUsersCommand;
-import com.marklogic.junit.PermissionsFragment;
 import com.marklogic.rest.mgmt.ManageClient;
 import com.marklogic.rest.mgmt.ManageConfig;
-import com.marklogic.xccutil.template.XccTemplate;
+import com.rjrudin.marklogic.junit.PermissionsFragment;
+import com.rjrudin.marklogic.xcc.XccTemplate;
 
 public class CreateRestApiAsNonAdminUserTest extends AbstractAppDeployerTest {
 

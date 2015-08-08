@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.spring.RestApiUtil;
-import com.marklogic.clientutil.LoggingObject;
+import com.rjrudin.marklogic.client.LoggingObject;
 
 /**
  * Lots of protected methods in here to encourage subclassing and overriding behavior.

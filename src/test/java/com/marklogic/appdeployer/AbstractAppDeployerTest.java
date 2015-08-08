@@ -15,7 +15,7 @@ import com.marklogic.appdeployer.impl.SimpleAppDeployer;
 import com.marklogic.appdeployer.spring.SpringAppDeployer;
 import com.marklogic.rest.mgmt.AbstractMgmtTest;
 import com.marklogic.rest.mgmt.ManageConfig;
-import com.marklogic.xccutil.template.XccTemplate;
+import com.rjrudin.marklogic.xcc.XccTemplate;
 
 /**
  * Base class for tests that depend on an AppDeployer instance. You can extend this directly to write a test for a

@@ -2,12 +2,12 @@ package com.marklogic.gradle.xcc;
 
 import java.net.URI;
 
-import com.marklogic.clientutil.LoggingObject;
 import com.marklogic.xcc.AdhocQuery;
 import com.marklogic.xcc.ContentSource;
 import com.marklogic.xcc.ContentSourceFactory;
 import com.marklogic.xcc.Session;
 import com.marklogic.xcc.exceptions.RequestException;
+import com.rjrudin.marklogic.client.LoggingObject;
 
 public class XccHelper extends LoggingObject {
 

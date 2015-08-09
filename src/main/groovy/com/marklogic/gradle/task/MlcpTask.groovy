@@ -3,7 +3,7 @@ package com.marklogic.gradle.task
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.TaskAction
 
-import com.marklogic.appdeployer.AppConfig
+import com.rjrudin.marklogic.appdeployer.AppConfig
 
 /**
  * Provides parameters for some, but not all, mlcp arguments. Arguments that aren't supported can be passed in

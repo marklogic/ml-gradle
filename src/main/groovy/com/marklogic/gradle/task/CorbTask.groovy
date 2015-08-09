@@ -3,7 +3,7 @@ package com.marklogic.gradle.task
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.TaskAction
 
-import com.marklogic.appdeployer.AppConfig
+import com.rjrudin.marklogic.appdeployer.AppConfig
 
 class CorbTask extends JavaExec {
 

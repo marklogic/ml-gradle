@@ -2,7 +2,7 @@ package com.marklogic.gradle.task.scaffold
 
 import org.gradle.api.tasks.TaskAction
 
-import com.marklogic.appdeployer.scaffold.ScaffoldGenerator
+import com.rjrudin.marklogic.appdeployer.scaffold.ScaffoldGenerator
 import com.marklogic.gradle.task.MarkLogicTask
 
 class GenerateScaffoldTask extends MarkLogicTask {

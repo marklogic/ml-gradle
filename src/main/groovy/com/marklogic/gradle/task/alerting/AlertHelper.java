@@ -1,7 +1,7 @@
 package com.marklogic.gradle.task.alerting;
 
-import com.marklogic.clientutil.LoggingObject;
 import com.marklogic.gradle.xcc.XccHelper;
+import com.rjrudin.marklogic.client.LoggingObject;
 
 public class AlertHelper extends LoggingObject {
 

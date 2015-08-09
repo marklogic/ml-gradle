@@ -2,8 +2,8 @@ package com.marklogic.gradle.task.viewschemas
 
 import org.gradle.api.tasks.TaskAction
 
-import com.marklogic.appdeployer.command.Command
-import com.marklogic.appdeployer.impl.SimpleAppDeployer
+import com.rjrudin.marklogic.appdeployer.command.Command
+import com.rjrudin.marklogic.appdeployer.impl.SimpleAppDeployer
 import com.marklogic.gradle.task.MarkLogicTask
 
 class DeployViewSchemasTask extends MarkLogicTask {

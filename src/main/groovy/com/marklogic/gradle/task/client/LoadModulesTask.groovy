@@ -2,10 +2,10 @@ package com.marklogic.gradle.task.client
 
 import org.gradle.api.tasks.TaskAction
 
-import com.marklogic.appdeployer.AppDeployer
-import com.marklogic.appdeployer.command.Command
-import com.marklogic.appdeployer.command.modules.LoadModulesCommand
-import com.marklogic.appdeployer.impl.SimpleAppDeployer
+import com.rjrudin.marklogic.appdeployer.AppDeployer
+import com.rjrudin.marklogic.appdeployer.command.Command
+import com.rjrudin.marklogic.appdeployer.command.modules.LoadModulesCommand
+import com.rjrudin.marklogic.appdeployer.impl.SimpleAppDeployer
 import com.marklogic.gradle.task.MarkLogicTask
 
 class LoadModulesTask extends MarkLogicTask {

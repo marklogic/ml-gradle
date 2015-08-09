@@ -3,8 +3,8 @@ package com.marklogic.gradle.task.client
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.TaskAction
 
-import com.marklogic.appdeployer.AppConfig;
-import com.marklogic.clientutil.modulesloader.impl.DefaultModulesLoader
+import com.rjrudin.marklogic.appdeployer.AppConfig
+import com.rjrudin.marklogic.modulesloader.impl.DefaultModulesLoader
 
 class WatchTask extends JavaExec {
 

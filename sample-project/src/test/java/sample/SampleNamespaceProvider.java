@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.jdom2.Namespace;
 
-import com.marklogic.junit.MarkLogicNamespaceProvider;
+import com.rjrudin.marklogic.junit.MarkLogicNamespaceProvider;
 
 /**
  * A project will typically define a subclass of MarkLogicNamespaceProvider that then registers namespaces specific to

@@ -12,8 +12,8 @@ import com.marklogic.client.document.XMLDocumentManager;
 import com.marklogic.client.io.DocumentMetadataHandle;
 import com.marklogic.client.io.Format;
 import com.marklogic.client.io.StringHandle;
-import com.marklogic.clientutil.DatabaseClientConfig;
-import com.marklogic.junit.Fragment;
+import com.rjrudin.marklogic.client.DatabaseClientConfig;
+import com.rjrudin.marklogic.junit.Fragment;
 
 /**
  * This test shows an example of using RestAssured instead of the MarkLogic Java API to invoke MarkLogic REST API

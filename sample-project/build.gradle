@@ -210,7 +210,7 @@ ext {
  * As of ML 8.0-3, triggers can not yet be managed via the Management REST API, so we still rely on a custom Gradle task
  * that uses XCC to create the trigger.
  */
-task createSampleTrigger(type: com.marklogic.gradle.task.trigger.CreateTriggersTask) {
+task createSampleTrigger(type: com.rjrudin.marklogic.gradle.task.trigger.CreateTriggersTask) {
     xccUrl = contentXccUrl
     triggerName = "sample-project-trigger"
     description = "This is an example of creating a trigger"

@@ -5,11 +5,11 @@ import org.springframework.test.context.TestExecutionListeners;
 
 import com.marklogic.client.io.Format;
 import com.marklogic.client.io.StringHandle;
-import com.marklogic.junit.NamespaceProvider;
-import com.marklogic.junit.spring.AbstractSpringTest;
-import com.marklogic.junit.spring.BasicTestConfig;
-import com.marklogic.junit.spring.ModulesLoaderTestExecutionListener;
-import com.marklogic.junit.spring.ModulesPath;
+import com.rjrudin.marklogic.junit.NamespaceProvider;
+import com.rjrudin.marklogic.junit.spring.AbstractSpringTest;
+import com.rjrudin.marklogic.junit.spring.BasicTestConfig;
+import com.rjrudin.marklogic.junit.spring.ModulesLoaderTestExecutionListener;
+import com.rjrudin.marklogic.junit.spring.ModulesPath;
 
 /**
  * A project that uses ml-junit will usually have a base class like this one that extends AbstractSpringTest and defines

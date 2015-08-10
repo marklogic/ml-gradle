@@ -7,10 +7,10 @@ repositories {
     maven {url "http://rjrudin.github.io/marklogic-java/releases"}
 }
 
-dependencies { compile "com.marklogic:ml-junit:2.0.3" }
+dependencies { compile "com.rjrudin:ml-junit:2.1" }
 
 task packageMlGradle(type: JavaExec) {
-    main = 'com.marklogic.mlgradleall.MlGradlePackager'
+    main = 'com.rjrudin.marklogic.mlgradleall.MlGradlePackager'
     classpath = sourceSets.main.runtimeClasspath
 }
 
@@ -39,6 +39,6 @@ publishing {
             artifact mlgradleZip
         }
     }
-    repositories { maven {url "file://$projectDir/../../gh-pages-marklogic-java/releases" } }
+    repositories { maven {url publishUrl } }
 }
 

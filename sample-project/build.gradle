@@ -8,7 +8,7 @@ buildscript {
         maven {url "http://developer.marklogic.com/maven2/"}
         maven {url "http://rjrudin.github.io/marklogic-java/releases"}
     }
-    dependencies { classpath "com.rjrudin:ml-gradle:2.0b1" }
+    dependencies { classpath "com.rjrudin:ml-gradle:2.0b2" }
 }
 
 
@@ -70,7 +70,6 @@ apply plugin: 'idea'
  */
 repositories {
     mavenCentral()
-    maven {url "file:../../gh-pages-marklogic-java/releases"}
     maven {url "http://developer.marklogic.com/maven2/"}
     maven {url "http://rjrudin.github.io/marklogic-java/releases"}
 

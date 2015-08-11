@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,6 +20,7 @@ import com.marklogic.xcc.ContentSourceFactory;
 import com.marklogic.xcc.Session;
 import com.marklogic.xcc.exceptions.RequestException;
 import com.rjrudin.marklogic.client.LoggingObject;
+import com.rjrudin.marklogic.modulesloader.ModulesManager;
 import com.rjrudin.marklogic.modulesloader.xcc.CommaDelimitedPermissionsParser;
 import com.rjrudin.marklogic.modulesloader.xcc.DefaultDocumentFormatGetter;
 import com.rjrudin.marklogic.modulesloader.xcc.DocumentFormatGetter;
@@ -49,13 +51,22 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
     // class ever needs to be thread-safe.
     private Session activeSession;
     private Path currentAssetPath;
+    private Path currentRootPath;
     private Set<File> filesLoaded;
 
+    private ModulesManager modulesManager;
+
     public void initializeActiveSession() {
-        logger.info(format("Initializing XCC session; host: %s; username: %s; database name: %s", host, username,
-                databaseName));
-        ContentSource cs = ContentSourceFactory.newContentSource(host, port, username, password, databaseName);
-        activeSession = cs.newSession();
+        if (databaseName != null) {
+            logger.info(format("Initializing XCC session; host: %s; username: %s; database name: %s", host, username,
+                    databaseName));
+            ContentSource cs = ContentSourceFactory.newContentSource(host, port, username, password, databaseName);
+            activeSession = cs.newSession();
+        } else {
+            logger.info(format("Initializing XCC session; host: %s; username: %s", host, username));
+            ContentSource cs = ContentSourceFactory.newContentSource(host, port, username, password);
+            activeSession = cs.newSession();
+        }
     }
 
     public void closeActiveSession() {
@@ -63,29 +74,6 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
             logger.info("Closing XCC session");
             activeSession.close();
             activeSession = null;
-        }
-    }
-
-    /**
-     * For loading a single file; depends on initializeActiveSession having been called.
-     * 
-     * @param uri
-     * @param f
-     */
-    public void loadFile(String uri, File f) {
-        ContentCreateOptions options = new ContentCreateOptions();
-        options.setFormat(documentFormatGetter.getDocumentFormat(f));
-        options.setPermissions(permissionsParser.parsePermissions(this.permissions));
-        if (this.collections != null) {
-            options.setCollections(collections);
-        }
-
-        logger.info(format("Inserting module with URI: %s", uri));
-        Content content = ContentFactory.newContent(uri, f, options);
-        try {
-            activeSession.insertContent(content);
-        } catch (RequestException re) {
-            throw new RuntimeException("Unable to insert content at URI: " + uri + "; cause: " + re.getMessage(), re);
         }
     }
 
@@ -100,6 +88,7 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
             for (String path : paths) {
                 logger.info(format("Loading assets from path: %s", path));
                 this.currentAssetPath = Paths.get(path);
+                this.currentRootPath = this.currentAssetPath;
                 try {
                     Files.walkFileTree(this.currentAssetPath, this);
                 } catch (IOException ie) {
@@ -117,10 +106,50 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
         if (attributes.isRegularFile()) {
             Path relPath = currentAssetPath.relativize(path);
             String uri = "/" + relPath.toString().replace("\\", "/");
+            if (isCurrentRootPathForRestApiAssets()) {
+                uri = "/ext" + uri;
+            }
             loadFile(uri, path.toFile());
             filesLoaded.add(path.toFile());
         }
         return FileVisitResult.CONTINUE;
+    }
+
+    /**
+     * A bit of a hack so that any modules in the samplestack-inspired "ext" directory have "/ext" prepended to their
+     * URI.
+     * 
+     * @return
+     */
+    protected boolean isCurrentRootPathForRestApiAssets() {
+        return this.currentRootPath != null && this.currentRootPath.toFile().getName().equals("ext");
+    }
+
+    protected void loadFile(String uri, File f) {
+        if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(f)) {
+            return;
+        }
+
+        ContentCreateOptions options = new ContentCreateOptions();
+        options.setFormat(documentFormatGetter.getDocumentFormat(f));
+        options.setPermissions(permissionsParser.parsePermissions(this.permissions));
+        if (this.collections != null) {
+            options.setCollections(collections);
+        }
+
+        if (logger.isInfoEnabled()) {
+            logger.info(format("Inserting module with URI: %s", uri));
+        }
+
+        Content content = ContentFactory.newContent(uri, f, options);
+        try {
+            activeSession.insertContent(content);
+            if (modulesManager != null) {
+                modulesManager.saveLastInstalledTimestamp(f, new Date());
+            }
+        } catch (RequestException re) {
+            throw new RuntimeException("Unable to insert content at URI: " + uri + "; cause: " + re.getMessage(), re);
+        }
     }
 
     @Override
@@ -172,5 +201,9 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
 
     public void setDocumentFormatGetter(DocumentFormatGetter documentFormatGetter) {
         this.documentFormatGetter = documentFormatGetter;
+    }
+
+    public void setModulesManager(ModulesManager modulesManager) {
+        this.modulesManager = modulesManager;
     }
 }

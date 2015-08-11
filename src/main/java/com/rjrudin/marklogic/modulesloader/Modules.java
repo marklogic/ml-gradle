@@ -6,7 +6,7 @@ import java.util.List;
 public class Modules {
 
     private List<File> services;
-    private List<Asset> assets;
+    private List<File> assetDirectories;
     private List<File> transforms;
     private List<File> options;
     private List<File> namespaces;
@@ -14,10 +14,6 @@ public class Modules {
 
     public List<File> getServices() {
         return services;
-    }
-
-    public List<Asset> getAssets() {
-        return assets;
     }
 
     public List<File> getTransforms() {
@@ -30,10 +26,6 @@ public class Modules {
 
     public void setServices(List<File> resources) {
         this.services = resources;
-    }
-
-    public void setAssets(List<Asset> assets) {
-        this.assets = assets;
     }
 
     public void setTransforms(List<File> transforms) {
@@ -58,6 +50,14 @@ public class Modules {
 
     public void setPropertiesFile(File propertiesFile) {
         this.propertiesFile = propertiesFile;
+    }
+
+    public List<File> getAssetDirectories() {
+        return assetDirectories;
+    }
+
+    public void setAssetDirectories(List<File> assetDirectories) {
+        this.assetDirectories = assetDirectories;
     }
 
 }

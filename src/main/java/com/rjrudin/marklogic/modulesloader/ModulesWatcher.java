@@ -11,6 +11,7 @@ import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.DatabaseClientFactory.Authentication;
 import com.rjrudin.marklogic.modulesloader.impl.DefaultModulesLoader;
+import com.rjrudin.marklogic.modulesloader.impl.XccAssetLoader;
 
 public class ModulesWatcher {
 
@@ -21,7 +22,7 @@ public class ModulesWatcher {
      * <ol>
      * <li>First arg is a comma-delimited list of file paths to load modules from</li>
      * <li>Second arg is the MarkLogic host to connect to</li>
-     * <li>Third arg is the port to connect to on the MarkLogic host</li>
+     * <li>Third arg is the REST API port to connect to on the MarkLogic host (must support XDBC calls)</li>
      * <li>Fourth arg is the MarkLogic username to connect with</li>
      * <li>Fifth arg is the password for the MarkLogic username</li>
      * <li>The optional sixth arg is the fully-qualified class name of a ModulesLoader implementation</li>
@@ -43,7 +44,13 @@ public class ModulesWatcher {
             loader = (DefaultModulesLoader) Class.forName(args[5]).newInstance();
         } else {
             logger.info("Using " + DefaultModulesLoader.class.getName() + " to load modules");
-            DefaultModulesLoader impl = new DefaultModulesLoader();
+            XccAssetLoader xal = new XccAssetLoader();
+            xal.setHost(host);
+            xal.setPort(port);
+            xal.setUsername(username);
+            xal.setPassword(password);
+
+            DefaultModulesLoader impl = new DefaultModulesLoader(xal);
             impl.setCatchExceptions(true);
             loader = impl;
         }

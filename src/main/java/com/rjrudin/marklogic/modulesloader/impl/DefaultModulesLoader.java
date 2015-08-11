@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.util.FileCopyUtils;
@@ -12,9 +13,8 @@ import org.springframework.util.FileCopyUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marklogic.client.DatabaseClient;
-import com.marklogic.client.FailedRequestException;
-import com.marklogic.client.admin.ExtensionLibrariesManager;
-import com.marklogic.client.admin.ExtensionLibraryDescriptor;
+import com.marklogic.client.DatabaseClientFactory;
+import com.marklogic.client.DatabaseClientFactory.Authentication;
 import com.marklogic.client.admin.ExtensionMetadata;
 import com.marklogic.client.admin.NamespacesManager;
 import com.marklogic.client.admin.QueryOptionsManager;
@@ -27,8 +27,6 @@ import com.marklogic.client.io.FileHandle;
 import com.marklogic.client.io.Format;
 import com.rjrudin.marklogic.client.FilenameUtil;
 import com.rjrudin.marklogic.client.LoggingObject;
-import com.rjrudin.marklogic.modulesloader.Asset;
-import com.rjrudin.marklogic.modulesloader.ExtensionLibraryDescriptorBuilder;
 import com.rjrudin.marklogic.modulesloader.ExtensionMetadataAndParams;
 import com.rjrudin.marklogic.modulesloader.ExtensionMetadataProvider;
 import com.rjrudin.marklogic.modulesloader.Modules;
@@ -36,24 +34,17 @@ import com.rjrudin.marklogic.modulesloader.ModulesFinder;
 import com.rjrudin.marklogic.modulesloader.ModulesManager;
 
 /**
- * Uses the REST API for loading modules, but if given an instance of XccAssetLoader, will instead use that for loading
- * assets instead of the /v1/ext REST API endpoint. That is usually preferable when loading dozens of modules or more,
- * as XCC is much faster than the REST API endpoint.
- * <p>
- * If using XccAssetLoader, note that this class will not be threadsafe since XccAssetLoader is not currently threadsafe
- * either.
+ * Uses the REST API for loading all modules except "assets", which are loaded via XCC for speed reasons. Note that this
+ * class will not be threadsafe since XccAssetLoader is not currently threadsafe either.
  */
 public class DefaultModulesLoader extends LoggingObject implements com.rjrudin.marklogic.modulesloader.ModulesLoader {
 
     private DatabaseClient client;
 
-    // Used for loading assets via XCC
     private XccAssetLoader xccAssetLoader;
-
     private ExtensionMetadataProvider extensionMetadataProvider;
     private ModulesFinder modulesFinder;
     private ModulesManager modulesManager;
-    private ExtensionLibraryDescriptorBuilder extensionLibraryDescriptorBuilder;
 
     /**
      * When set to true, exceptions thrown while loading transforms and resources will be caught and logged, and the
@@ -62,14 +53,25 @@ public class DefaultModulesLoader extends LoggingObject implements com.rjrudin.m
      */
     private boolean catchExceptions = false;
 
-    public DefaultModulesLoader() {
-        this.extensionMetadataProvider = new DefaultExtensionMetadataProvider();
-        this.modulesFinder = new DefaultModulesFinder();
-        this.modulesManager = new PropertiesModuleManager();
+    public static void main(String[] args) {
+        XccAssetLoader xal = new XccAssetLoader();
+        xal.setDatabaseName("Modules");
+        xal.setUsername("admin");
+        xal.setPassword("admin");
+        xal.setPort(8000);
+        xal.setHost("localhost");
+
+        DefaultModulesLoader l = new DefaultModulesLoader(xal);
+        l.setModulesManager(null);
+        l.loadModules(new File("src/test/resources/sample-base-dir"),
+                DatabaseClientFactory.newClient("localhost", 8000, "Modules", "admin", "admin", Authentication.DIGEST));
+
     }
 
     public DefaultModulesLoader(XccAssetLoader xccAssetLoader) {
-        this();
+        this.extensionMetadataProvider = new DefaultExtensionMetadataProvider();
+        this.modulesFinder = new DefaultModulesFinder();
+        this.modulesManager = new PropertiesModuleManager();
         this.xccAssetLoader = xccAssetLoader;
     }
 
@@ -85,11 +87,11 @@ public class DefaultModulesLoader extends LoggingObject implements com.rjrudin.m
         Set<File> loadedModules = new HashSet<>();
 
         loadProperties(modules, loadedModules);
+        loadNamespaces(modules, loadedModules);
         loadAssets(modules, loadedModules);
         loadQueryOptions(modules, loadedModules);
         loadTransforms(modules, loadedModules);
         loadResources(modules, loadedModules);
-        loadNamespaces(modules, loadedModules);
 
         return loadedModules;
     }
@@ -154,24 +156,23 @@ public class DefaultModulesLoader extends LoggingObject implements com.rjrudin.m
     }
 
     protected void loadAssets(Modules modules, Set<File> loadedModules) {
-        if (modules.getAssets() == null) {
+        List<File> dirs = modules.getAssetDirectories();
+        if (dirs == null || dirs.isEmpty()) {
             return;
         }
-        
+
         if (xccAssetLoader != null) {
-            xccAssetLoader.initializeActiveSession();
+            xccAssetLoader.setModulesManager(modulesManager);
         }
-        try {
-            for (Asset asset : modules.getAssets()) {
-                File f = installAsset(asset);
-                if (f != null) {
-                    loadedModules.add(f);
-                }
-            }
-        } finally {
-            if (xccAssetLoader != null) {
-                xccAssetLoader.closeActiveSession();
-            }
+
+        String[] paths = new String[dirs.size()];
+        for (int i = 0; i < dirs.size(); i++) {
+            paths[i] = dirs.get(i).getAbsolutePath();
+        }
+        Set<File> files = xccAssetLoader.loadAssetsViaXcc(paths);
+
+        if (files != null) {
+            loadedModules.addAll(files);
         }
     }
 
@@ -179,7 +180,7 @@ public class DefaultModulesLoader extends LoggingObject implements com.rjrudin.m
         if (modules.getOptions() == null) {
             return;
         }
-        
+
         for (File f : modules.getOptions()) {
             f = installQueryOptions(f);
             if (f != null) {
@@ -192,7 +193,7 @@ public class DefaultModulesLoader extends LoggingObject implements com.rjrudin.m
         if (modules.getTransforms() == null) {
             return;
         }
-        
+
         for (File f : modules.getTransforms()) {
             ExtensionMetadataAndParams emap = extensionMetadataProvider.provideExtensionMetadataAndParams(f);
 
@@ -217,7 +218,7 @@ public class DefaultModulesLoader extends LoggingObject implements com.rjrudin.m
         if (modules.getServices() == null) {
             return;
         }
-        
+
         for (File f : modules.getServices()) {
             ExtensionMetadataAndParams emap = extensionMetadataProvider.provideExtensionMetadataAndParams(f);
 
@@ -242,97 +243,13 @@ public class DefaultModulesLoader extends LoggingObject implements com.rjrudin.m
         if (modules.getNamespaces() == null) {
             return;
         }
-        
+
         for (File f : modules.getNamespaces()) {
             f = installNamespace(f);
             if (f != null) {
                 loadedModules.add(f);
             }
         }
-    }
-
-    /**
-     * This can be used by projects that use MLCP to load many modules in the assets directory. In such a case, it's
-     * usually desirable to pretend to load all of the assets so that the timestamp at which each asset was last loaded
-     * is updated to the current time.
-     *
-     * @param baseDir
-     */
-    public void simulateLoadingOfAllAssets(File baseDir, DatabaseClient client) {
-        setDatabaseClient(client);
-        Date now = new Date();
-
-        if (modulesManager != null) {
-            modulesManager.initialize();
-        }
-
-        Modules files = modulesFinder.findModules(baseDir);
-
-        if (modulesManager != null) {
-            for (Asset asset : files.getAssets()) {
-                modulesManager.saveLastInstalledTimestamp(asset.getFile(), now);
-            }
-        }
-    }
-
-    protected File installAsset(Asset asset) {
-        File file = asset.getFile();
-        if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(file)) {
-            return null;
-        }
-
-        if (xccAssetLoader != null) {
-            xccAssetLoader.loadFile("/ext" + asset.getPath(), file);
-        } else {
-            ExtensionLibrariesManager libMgr = client.newServerConfigManager().newExtensionLibrariesManager();
-            Format format = determineFormat(file);
-            FileHandle h = new FileHandle(file);
-            if (extensionLibraryDescriptorBuilder != null) {
-                ExtensionLibraryDescriptor descriptor = extensionLibraryDescriptorBuilder.buildDescriptor(asset);
-                logger.info(String.format("Loading module at path %s from file %s", descriptor.getPath(),
-                        file.getAbsolutePath()));
-                try {
-                    libMgr.write(descriptor, h.withFormat(format));
-                } catch (FailedRequestException fre) {
-                    logger.warn("Caught exception, retrying as binary file; exception message: " + fre.getMessage());
-                    libMgr.write(descriptor, h.withFormat(Format.BINARY));
-                }
-            } else {
-                String uri = "/ext" + asset.getPath();
-                logger.info(String.format("Loading module at path %s from file %s", uri, file.getAbsolutePath()));
-                try {
-                    libMgr.write(uri, h.withFormat(format));
-                } catch (FailedRequestException fre) {
-                    logger.warn("Caught exception, retrying as binary file; exception message: " + fre.getMessage());
-                    libMgr.write(uri, h.withFormat(Format.BINARY));
-                }
-            }
-        }
-
-        if (modulesManager != null) {
-            modulesManager.saveLastInstalledTimestamp(file, new Date());
-        }
-
-        return file;
-    }
-
-    /**
-     * TODO Need something pluggable here - probably should delegate this to a separate object so that a client could
-     * easily provide a different implementation in case the assumptions below aren't correct.
-     *
-     * @param file
-     * @return
-     */
-    protected Format determineFormat(File file) {
-        String name = file.getName();
-        if (FilenameUtil.isXslFile(name) || name.endsWith(".xml") || name.endsWith(".html")) {
-            return Format.XML;
-        } else if (name.endsWith(".swf") || name.endsWith(".jpeg") || name.endsWith(".jpg") || name.endsWith(".png")
-                || name.endsWith(".gif") || name.endsWith(".svg") || name.endsWith(".ttf") || name.endsWith(".eot")
-                || name.endsWith(".woff") || name.endsWith(".cur")) {
-            return Format.BINARY;
-        }
-        return Format.TEXT;
     }
 
     public File installResource(File file, ExtensionMetadata metadata, MethodParameters... methodParams) {
@@ -447,10 +364,6 @@ public class DefaultModulesLoader extends LoggingObject implements com.rjrudin.m
 
     public void setModulesManager(ModulesManager configurationFilesManager) {
         this.modulesManager = configurationFilesManager;
-    }
-
-    public void setExtensionLibraryDescriptorBuilder(ExtensionLibraryDescriptorBuilder extensionLibraryDescriptorBuilder) {
-        this.extensionLibraryDescriptorBuilder = extensionLibraryDescriptorBuilder;
     }
 
     public boolean isCatchExceptions() {

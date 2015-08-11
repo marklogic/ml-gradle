@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.rjrudin.marklogic.client.FilenameUtil;
-import com.rjrudin.marklogic.modulesloader.Asset;
 import com.rjrudin.marklogic.modulesloader.Modules;
 import com.rjrudin.marklogic.modulesloader.ModulesFinder;
 
@@ -21,7 +20,6 @@ public abstract class BaseModulesFinder implements ModulesFinder {
     private FilenameFilter namespaceFilenameFilter = new NamespaceFilenameFilter();
 
     private String servicesPath = "services";
-    private String assetsPath = "ext";
     private String optionsPath = "options";
     private String namespacesPath = "namespaces";
     private String transformsPath = "transforms";
@@ -53,23 +51,16 @@ public abstract class BaseModulesFinder implements ModulesFinder {
     }
 
     protected void addAssets(Modules modules, File baseDir) {
-        File assetsBaseDir = new File(baseDir, assetsPath);
-        List<Asset> assets = new ArrayList<>();
-        addAssetFiles(assetsBaseDir, "", assets);
-        modules.setAssets(assets);
-    }
-
-    protected void addAssetFiles(File dir, String pathRelativeToAssetsDir, List<Asset> assets) {
+        List<File> dirs = new ArrayList<>();
+        File dir = new File(baseDir, "ext");
         if (dir.exists()) {
-            for (File f : dir.listFiles(getAssetFilenameFilter())) {
-                String name = f.getName();
-                if (f.isDirectory()) {
-                    addAssetFiles(f, pathRelativeToAssetsDir + "/" + name, assets);
-                } else if (f.isFile()) {
-                    assets.add(new Asset(f, pathRelativeToAssetsDir + "/" + name));
-                }
-            }
+            dirs.add(dir);
         }
+        dir = new File(baseDir, "root");
+        if (dir.exists()) {
+            dirs.add(dir);
+        }
+        modules.setAssetDirectories(dirs);
     }
 
     protected void addOptions(Modules modules, File baseDir) {
@@ -134,10 +125,6 @@ public abstract class BaseModulesFinder implements ModulesFinder {
 
     public void setServicesPath(String servicesPath) {
         this.servicesPath = servicesPath;
-    }
-
-    public void setAssetsPath(String assetsPath) {
-        this.assetsPath = assetsPath;
     }
 
     public void setOptionsPath(String optionsPath) {

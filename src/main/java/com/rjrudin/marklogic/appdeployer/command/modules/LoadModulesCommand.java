@@ -26,7 +26,7 @@ public class LoadModulesCommand extends AbstractCommand {
 
     private String username;
     private String password;
-    
+
     public LoadModulesCommand() {
         setExecuteSortOrder(SortOrderConstants.LOAD_MODULES_ORDER);
     }
@@ -42,9 +42,7 @@ public class LoadModulesCommand extends AbstractCommand {
 
     protected void loadModulesIntoMainServer(CommandContext context) {
         if (modulesLoader == null) {
-            DefaultModulesLoader l = new DefaultModulesLoader();
-            l.setXccAssetLoader(newXccAssetLoader(context));
-            this.modulesLoader = l;
+            this.modulesLoader = new DefaultModulesLoader(newXccAssetLoader(context));
         }
 
         AppConfig config = context.getAppConfig();
@@ -70,7 +68,8 @@ public class LoadModulesCommand extends AbstractCommand {
         DatabaseClient client = DatabaseClientFactory.newClient(config.getHost(), config.getTestRestPort(),
                 config.getRestAdminUsername(), config.getRestAdminPassword(), config.getAuthentication());
 
-        DefaultModulesLoader l = new DefaultModulesLoader();
+        // Don't need an XccAssetLoader here, as only options/properties are loaded for the test server
+        DefaultModulesLoader l = new DefaultModulesLoader(null);
         l.setModulesFinder(new TestServerModulesFinder());
         l.setModulesManager(null);
 

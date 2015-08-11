@@ -31,7 +31,7 @@ import com.rjrudin.marklogic.junit.spring.ModulesPath;
  * new/modified modules - the test framework will instead handle that for you.
  */
 @TestExecutionListeners(value = { ModulesLoaderTestExecutionListener.class })
-@ModulesPath(baseDir = "src/main/xqy")
+@ModulesPath(baseDir = "src/main/ml-modules")
 public abstract class AbstractSampleProjectTest extends AbstractSpringTest {
 
     /**

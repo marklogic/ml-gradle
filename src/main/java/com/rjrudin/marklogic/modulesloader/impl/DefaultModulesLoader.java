@@ -13,8 +13,6 @@ import org.springframework.util.FileCopyUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marklogic.client.DatabaseClient;
-import com.marklogic.client.DatabaseClientFactory;
-import com.marklogic.client.DatabaseClientFactory.Authentication;
 import com.marklogic.client.admin.ExtensionMetadata;
 import com.marklogic.client.admin.NamespacesManager;
 import com.marklogic.client.admin.QueryOptionsManager;
@@ -52,21 +50,6 @@ public class DefaultModulesLoader extends LoggingObject implements com.rjrudin.m
      * prevents the program from crashing and also from trying to load the module over and over.
      */
     private boolean catchExceptions = false;
-
-    public static void main(String[] args) {
-        XccAssetLoader xal = new XccAssetLoader();
-        xal.setDatabaseName("Modules");
-        xal.setUsername("admin");
-        xal.setPassword("admin");
-        xal.setPort(8000);
-        xal.setHost("localhost");
-
-        DefaultModulesLoader l = new DefaultModulesLoader(xal);
-        l.setModulesManager(null);
-        l.loadModules(new File("src/test/resources/sample-base-dir"),
-                DatabaseClientFactory.newClient("localhost", 8000, "Modules", "admin", "admin", Authentication.DIGEST));
-
-    }
 
     public DefaultModulesLoader(XccAssetLoader xccAssetLoader) {
         this.extensionMetadataProvider = new DefaultExtensionMetadataProvider();

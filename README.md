@@ -35,7 +35,7 @@ To use ml-gradle right away, you'll need Gradle installed first. And of course y
         maven {url "http://rjrudin.github.io/marklogic-java/releases"}
       }
       dependencies {
-        classpath "com.marklogic:ml-gradle:2.0a15"
+        classpath "com.rjrudin:ml-gradle:2.0b1"
       }
     }
     
@@ -81,7 +81,7 @@ There are two things to learn with ml-gradle - what the ml-app-deployer library 
 
 To learn more about what ml-gradle provides on top of ml-app-deployer, you should start by 
 [examining the build.gradle file](https://github.com/rjrudin/ml-gradle/blob/master/sample-project/build.gradle) in the 
-sample-project directory of this repository. This is intended to show all the different features of ml-gradle. To understand the ml-gradle code itself, you should start with [the MarkLogicPlugin](https://github.com/rjrudin/ml-gradle/blob/master/src/main/groovy/com/marklogic/gradle/MarkLogicPlugin.groovy), as it lists out all the registered tasks. 
+sample-project directory of this repository. This is intended to show all the different features of ml-gradle. To understand the ml-gradle code itself, you should start with [the MarkLogicPlugin](https://github.com/rjrudin/ml-gradle/blob/master/src/main/groovy/com/rjrudin/marklogic/gradle/MarkLogicPlugin.groovy), as it lists out all the registered tasks. 
 
 If you have a project already, then a good way to start is by copying the aforementioned build.gradle file into your project. You can remove all the optional stuff to start with a bare minimum Gradle file, and then start adding things back in as you realize a need for them.
 

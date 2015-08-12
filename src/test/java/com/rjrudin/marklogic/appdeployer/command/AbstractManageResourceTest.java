@@ -37,6 +37,14 @@ public abstract class AbstractManageResourceTest extends AbstractAppDeployerTest
     }
 
     /**
+     * A subclass can override this to perform additional assertions after the second deploy call has been made, which
+     * most often will result in the resource being updated.
+     */
+    protected void afterResourcesCreatedAgain() {
+
+    }
+
+    /**
      * Performs a generic test of creating a resource, then creating it again (to ensure that doesn't cause any failures
      * - this should typically result in an update instead of a create), and then deleting it.
      */
@@ -56,6 +64,8 @@ public abstract class AbstractManageResourceTest extends AbstractAppDeployerTest
 
             // Make sure we don't get an error from trying to create the resources again
             appDeployer.deploy(appConfig);
+
+            afterResourcesCreatedAgain();
         } finally {
             undeployAndVerifyResourcesWereDeleted(mgr);
         }

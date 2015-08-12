@@ -4,11 +4,12 @@ import java.io.File;
 import java.util.Arrays;
 
 import com.rjrudin.marklogic.mgmt.ResourceManager;
+import com.rjrudin.marklogic.mgmt.SaveReceipt;
 import com.rjrudin.marklogic.mgmt.admin.ActionRequiringRestart;
 
 /**
- * Provides a basic implementation for creating/updating a resource while an app is being deployed
- * and then deleting it while the app is being undeployed.
+ * Provides a basic implementation for creating/updating a resource while an app is being deployed and then deleting it
+ * while the app is being undeployed.
  */
 public abstract class AbstractResourceCommand extends AbstractCommand implements UndoableCommand {
 
@@ -31,8 +32,8 @@ public abstract class AbstractResourceCommand extends AbstractCommand implements
             ResourceManager mgr = getResourceManager(context);
             for (File f : listFilesInDirectory(resourceDir)) {
                 if (isResourceFile(f)) {
-                    String payload = saveResource(mgr, context, f);
-                    afterResourceSaved(mgr, context, f, payload);
+                    SaveReceipt receipt = saveResource(mgr, context, f);
+                    afterResourceSaved(mgr, context, f, receipt);
                 }
             }
         }
@@ -52,11 +53,10 @@ public abstract class AbstractResourceCommand extends AbstractCommand implements
      * @param f
      * @return
      */
-    protected String saveResource(ResourceManager mgr, CommandContext context, File f) {
+    protected SaveReceipt saveResource(ResourceManager mgr, CommandContext context, File f) {
         String payload = copyFileToString(f);
         payload = tokenReplacer.replaceTokens(payload, context.getAppConfig(), false);
-        mgr.save(payload);
-        return payload;
+        return mgr.save(payload);
     }
 
     /**
@@ -65,9 +65,10 @@ public abstract class AbstractResourceCommand extends AbstractCommand implements
      * @param mgr
      * @param context
      * @param resourceFile
-     * @param payload
+     * @param receipt
      */
-    protected void afterResourceSaved(ResourceManager mgr, CommandContext context, File resourceFile, String payload) {
+    protected void afterResourceSaved(ResourceManager mgr, CommandContext context, File resourceFile,
+            SaveReceipt receipt) {
 
     }
 

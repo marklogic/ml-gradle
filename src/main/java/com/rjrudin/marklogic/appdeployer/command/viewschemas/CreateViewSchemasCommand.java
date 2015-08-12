@@ -7,6 +7,7 @@ import com.rjrudin.marklogic.appdeployer.command.CommandContext;
 import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
 import com.rjrudin.marklogic.mgmt.PayloadParser;
 import com.rjrudin.marklogic.mgmt.ResourceManager;
+import com.rjrudin.marklogic.mgmt.SaveReceipt;
 import com.rjrudin.marklogic.mgmt.viewschemas.ViewManager;
 import com.rjrudin.marklogic.mgmt.viewschemas.ViewSchemaManager;
 
@@ -34,9 +35,10 @@ public class CreateViewSchemasCommand extends AbstractResourceCommand {
     }
 
     @Override
-    protected void afterResourceSaved(ResourceManager mgr, CommandContext context, File resourceFile, String payload) {
+    protected void afterResourceSaved(ResourceManager mgr, CommandContext context, File resourceFile,
+            SaveReceipt receipt) {
         PayloadParser parser = new PayloadParser();
-        String viewSchemaName = parser.getPayloadFieldValue(payload, "view-schema-name");
+        String viewSchemaName = parser.getPayloadFieldValue(receipt.getPayload(), "view-schema-name");
         File viewDir = new File(resourceFile.getParentFile(), viewSchemaName + "-views");
         if (viewDir.exists()) {
             ViewManager viewMgr = new ViewManager(context.getManageClient(), context.getAppConfig()

@@ -1,5 +1,7 @@
 package com.rjrudin.marklogic.mgmt;
 
+import org.springframework.http.ResponseEntity;
+
 import com.rjrudin.marklogic.rest.util.Fragment;
 import com.rjrudin.marklogic.rest.util.ResourcesFragment;
 
@@ -48,20 +50,24 @@ public abstract class AbstractResourceManager extends AbstractManager implements
                 .getXml(getPropertiesPath(resourceNameOrId));
     }
 
-    public void save(String payload) {
-        String name = getPayloadName(payload);
+    public SaveReceipt save(String payload) {
+        String resourceId = getResourceId(payload);
         String label = getResourceName();
-        if (exists(name)) {
-            String path = getPropertiesPath(name);
+        String path = null;
+        ResponseEntity<String> response = null;
+        if (exists(resourceId)) {
+            path = getPropertiesPath(resourceId);
             path = appendParamsAndValuesToPath(path, getUpdateResourceParams(payload));
-            logger.info(format("Found %s with name of %s, so updating at path %s", label, name, path));
-            putPayload(manageClient, path, payload);
+            logger.info(format("Found %s with name of %s, so updating at path %s", label, resourceId, path));
+            response = putPayload(manageClient, path, payload);
             logger.info(format("Updated %s at %s", label, path));
         } else {
-            logger.info(format("Creating %s: %s", label, name));
-            postPayload(manageClient, getCreateResourcePath(payload), payload);
-            logger.info(format("Created %s: %s", label, name));
+            logger.info(format("Creating %s: %s", label, resourceId));
+            path = getCreateResourcePath(payload);
+            response = postPayload(manageClient, path, payload);
+            logger.info(format("Created %s: %s", label, resourceId));
         }
+        return new SaveReceipt(resourceId, payload, path, response);
     }
 
     protected String getCreateResourcePath(String payload) {
@@ -75,13 +81,13 @@ public abstract class AbstractResourceManager extends AbstractManager implements
     }
 
     public boolean delete(String payload) {
-        String name = getPayloadName(payload);
+        String resourceId = getResourceId(payload);
         String label = getResourceName();
-        if (!exists(name)) {
-            logger.info(format("Could not find %s with name or ID of %s, so not deleting", label, name));
+        if (!exists(resourceId)) {
+            logger.info(format("Could not find %s with name or ID of %s, so not deleting", label, resourceId));
             return false;
         } else {
-            String path = getResourcePath(name);
+            String path = getResourcePath(resourceId);
             path = appendParamsAndValuesToPath(path, getDeleteResourceParams(payload));
 
             logger.info(format("Deleting %s at path %s", label, path));

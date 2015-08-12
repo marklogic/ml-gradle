@@ -39,7 +39,7 @@ public class AbstractManager extends LoggingObject {
         return getResourceName() + "-name";
     }
 
-    protected String getPayloadName(String payload) {
+    protected String getResourceId(String payload) {
         return payloadParser.getPayloadFieldValue(payload, getIdFieldName());
     }
 

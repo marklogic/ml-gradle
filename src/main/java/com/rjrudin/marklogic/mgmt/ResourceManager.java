@@ -21,13 +21,14 @@ public interface ResourceManager {
      * 
      * @param payload
      */
-    public void save(String payload);
+    public SaveReceipt save(String payload);
 
     /**
-     * Assumes that a resource ID field is in the payload, and then extracts that field value and 
-     * tries to delete a resource with the ID field value.
+     * Assumes that a resource ID field is in the payload, and then extracts that field value and tries to delete a
+     * resource with the ID field value.
      * 
-     * @param payload a JSON or XML payload with the resource ID field in it
+     * @param payload
+     *            a JSON or XML payload with the resource ID field in it
      * @return true if a resource was deleted; false otherwise
      */
     public boolean delete(String payload);
@@ -39,7 +40,7 @@ public interface ResourceManager {
      * @return true if a resource was deleted; false otherwise
      */
     public boolean deleteByIdField(String resourceIdFieldValue);
-    
+
     /**
      * 
      * @return

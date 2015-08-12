@@ -36,7 +36,7 @@ public abstract class AbstractCpfResourceManager extends AbstractManager {
     }
 
     public void save(String databaseIdOrName, String payload) {
-        String name = getPayloadName(payload);
+        String name = getResourceId(payload);
         String label = getResourceName();
         if (exists(databaseIdOrName, name)) {
             String path = getPropertiesPath(databaseIdOrName, name);

@@ -49,7 +49,6 @@ public abstract class SortOrderConstants {
     public static Integer DELETE_CONTENT_DATABASES = 8000;
     public static Integer DELETE_TRIGGERS_DATABASE = 8010;
     public static Integer DELETE_SCHEMAS_DATABASE = 8020;
-    public static Integer DELETE_MODULES_DATABASE = 8030;
     public static Integer DELETE_FORESTS = 8040;
 
     public static Integer DELETE_REST_API_SERVERS = 7000;

@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import com.rjrudin.marklogic.appdeployer.command.Command;
-import com.rjrudin.marklogic.appdeployer.command.CommandContext;
 import com.rjrudin.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
 import com.rjrudin.marklogic.appdeployer.impl.SimpleAppDeployer;
 import com.rjrudin.marklogic.mgmt.AbstractMgmtTest;
@@ -71,13 +70,6 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
         if (appManagerContext != null) {
             appManagerContext.close();
         }
-    }
-
-    /**
-     * Useful for when your test only needs a REST API and not full the sample app created.
-     */
-    protected void deployRestApi() {
-        new CreateRestApiServersCommand().execute(new CommandContext(appConfig, manageClient, adminManager));
     }
 
     protected void undeploySampleApp() {

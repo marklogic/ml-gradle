@@ -15,10 +15,15 @@ import com.rjrudin.marklogic.mgmt.admin.ActionRequiringRestart;
 import com.rjrudin.marklogic.mgmt.appservers.ServerManager;
 import com.rjrudin.marklogic.mgmt.restapis.RestApiManager;
 
+/**
+ * By default, when this command deletes a REST API server, it will delete the modules database but not the content
+ * database. The content database is expected to be deleted by an instance of CreateContentDatabasesCommand. If you're
+ * not using that command, just set deleteContentDatabase to true.
+ */
 public class CreateRestApiServersCommand extends AbstractCommand implements UndoableCommand {
 
-    private boolean includeModules = true;
-    private boolean includeContent = true;
+    private boolean deleteModulesDatabase = true;
+    private boolean deleteContentDatabase = false;
 
     public CreateRestApiServersCommand() {
         setExecuteSortOrder(SortOrderConstants.CREATE_REST_API_SERVERS);
@@ -74,7 +79,7 @@ public class CreateRestApiServersCommand extends AbstractCommand implements Undo
                 @Override
                 public boolean execute() {
                     return deleteRestApi(appConfig.getRestServerName(), appConfig.getGroupName(), manageClient,
-                            includeModules, includeContent);
+                            deleteModulesDatabase, deleteContentDatabase);
                 }
             });
         }
@@ -104,20 +109,20 @@ public class CreateRestApiServersCommand extends AbstractCommand implements Undo
         }
     }
 
-    public boolean isIncludeModules() {
-        return includeModules;
+    public boolean isDeleteModulesDatabase() {
+        return deleteModulesDatabase;
     }
 
-    public void setIncludeModules(boolean includesModules) {
-        this.includeModules = includesModules;
+    public void setDeleteModulesDatabase(boolean includesModules) {
+        this.deleteModulesDatabase = includesModules;
     }
 
-    public boolean isIncludeContent() {
-        return includeContent;
+    public boolean isDeleteContentDatabase() {
+        return deleteContentDatabase;
     }
 
-    public void setIncludeContent(boolean includeContent) {
-        this.includeContent = includeContent;
+    public void setDeleteContentDatabase(boolean includeContent) {
+        this.deleteContentDatabase = includeContent;
     }
 
 }

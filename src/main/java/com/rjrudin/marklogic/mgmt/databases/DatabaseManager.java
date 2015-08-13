@@ -21,6 +21,11 @@ public class DatabaseManager extends AbstractResourceManager {
         logger.info(format("Cleared database %s", databaseIdOrName));
     }
 
+    public void deleteByName(String databaseName) {
+        String json = format("{\"database-name\":\"%s\"}", databaseName);
+        delete(json);
+    }
+
     public List<String> getForestIds(String databaseNameOrId) {
         Fragment f = getAsXml(databaseNameOrId);
         return f.getElementValues("/node()/db:relations/db:relation-group[db:typeref='forests']/db:relation/db:idref");

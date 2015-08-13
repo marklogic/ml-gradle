@@ -35,7 +35,7 @@ public class CreateContentDatabasesCommand extends AbstractCommand implements Un
 
         JsonNode node = mergeContentDatabaseFiles(appConfig);
         if (node == null) {
-            logger.info("No content database files found, so no updating content databases");
+            logger.info("No content database files found, so no creating or updating content databases");
             return;
         }
 
@@ -51,25 +51,37 @@ public class CreateContentDatabasesCommand extends AbstractCommand implements Un
         }
     }
 
+    /**
+     * Just because there's not a content database file doesn't mean that one wasn't created via the command for
+     * creating a REST API server. If the REST API server command didn't delete the content database, we'd still want
+     * this command to attempt to do so in the event that no content database files exist.
+     */
     @Override
     public void undo(CommandContext context) {
         AppConfig appConfig = context.getAppConfig();
         JsonNode node = mergeContentDatabaseFiles(appConfig);
-        if (node == null) {
+        if (node != null) {
             logger.info("No content database files found, so not deleting content databases");
-            return;
-        }
+            String payload = node.toString();
+            String json = tokenReplacer.replaceTokens(payload, appConfig, false);
 
-        String payload = node.toString();
-        String json = tokenReplacer.replaceTokens(payload, appConfig, false);
-
-        DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
-        dbMgr.setForestDelete(forestDelete);
-        dbMgr.delete(json);
-
-        if (appConfig.isTestPortSet()) {
-            json = tokenReplacer.replaceTokens(payload, appConfig, true);
+            DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
+            dbMgr.setForestDelete(forestDelete);
             dbMgr.delete(json);
+
+            if (appConfig.isTestPortSet()) {
+                json = tokenReplacer.replaceTokens(payload, appConfig, true);
+                dbMgr.delete(json);
+            }
+        } else {
+            // Try to delete the content database if it exists
+            DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
+            dbMgr.setForestDelete(forestDelete);
+            dbMgr.deleteByName(appConfig.getContentDatabaseName());
+
+            if (appConfig.isTestPortSet()) {
+                dbMgr.deleteByName(appConfig.getContentDatabaseName());
+            }
         }
     }
 

@@ -8,7 +8,9 @@ buildscript {
         maven {url "http://developer.marklogic.com/maven2/"}
         maven {url "http://rjrudin.github.io/marklogic-java/releases"}
     }
-    dependencies { classpath "com.rjrudin:ml-gradle:2.0b2" }
+    dependencies { 
+        classpath "com.rjrudin:ml-gradle:2.0b3" 
+    }
 }
 
 

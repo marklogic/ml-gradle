@@ -2,7 +2,6 @@ package com.rjrudin.marklogic.appdeployer.command.restapis;
 
 import java.io.File;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import com.rjrudin.marklogic.appdeployer.AbstractAppDeployerTest;
@@ -18,12 +17,6 @@ import com.rjrudin.marklogic.mgmt.restapis.RestApiManager;
  */
 public class DeleteRestApiTest extends AbstractAppDeployerTest {
 
-    @Before
-    public void setup() {
-        initializeAppDeployer();
-        appConfig.setTestRestPort(8541);
-    }
-
     @Test
     public void createAndDelete() {
         RestApiManager mgr = new RestApiManager(manageClient);
@@ -38,6 +31,24 @@ public class DeleteRestApiTest extends AbstractAppDeployerTest {
         undeploySampleApp();
         assertFalse("The REST API server should have been deleted", mgr.restApiServerExists(SAMPLE_APP_NAME));
         assertFalse("The REST API app server have been deleted", serverMgr.exists(SAMPLE_APP_NAME));
+    }
+
+    @Test
+    public void contentDatabaseCommandAndRestApiCommandConfiguredToDeleteContent() {
+        DatabaseManager dbMgr = new DatabaseManager(manageClient);
+        final String dbName = appConfig.getContentDatabaseName();
+
+        CreateRestApiServersCommand command = new CreateRestApiServersCommand();
+        command.setDeleteContentDatabase(true);
+        initializeAppDeployer(new CreateRestApiServersCommand(), new CreateContentDatabasesCommand());
+
+        appDeployer.deploy(appConfig);
+        assertTrue("The content database should have been created by the REST API command", dbMgr.exists(dbName));
+
+        undeploySampleApp();
+        assertFalse(
+                "The content database should have been deleted by the REST API command, and the database command shouldn't throw any error",
+                dbMgr.exists(dbName));
     }
 
     @Test

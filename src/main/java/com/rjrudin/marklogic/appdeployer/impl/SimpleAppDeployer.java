@@ -37,6 +37,21 @@ public class SimpleAppDeployer extends AbstractAppDeployer {
     }
 
     /**
+     * Convenience method for finding a command of a certain type, presumably so it can be modified/reconfigured.
+     * 
+     * @param clazz
+     * @return
+     */
+    public Command getCommandOfType(Class<?> clazz) {
+        for (Command c : commands) {
+            if (c.getClass().equals(clazz)) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Keep this public so that a client can easily manipulate the list in case a default set of commands has been
      * provided.
      */

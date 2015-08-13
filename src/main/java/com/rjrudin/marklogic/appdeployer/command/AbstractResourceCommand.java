@@ -104,7 +104,7 @@ public abstract class AbstractResourceCommand extends AbstractCommand implements
             resourceName = tokens[tokens.length - 3];
         }
 
-        String key = resourceName + "-id-" + receipt.getResourceId();
+        String key = "%%" + resourceName + "-id-" + receipt.getResourceId() + "%%";
         if (logger.isInfoEnabled()) {
             logger.info(format("Storing token with key '%s' and value '%s'", key, idValue));
         }

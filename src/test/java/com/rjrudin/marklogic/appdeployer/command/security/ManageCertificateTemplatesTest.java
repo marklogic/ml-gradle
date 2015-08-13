@@ -33,7 +33,7 @@ public class ManageCertificateTemplatesTest extends AbstractManageResourceTest {
     @Override
     protected void afterResourcesCreated() {
         Map<String, String> customTokens = appConfig.getCustomTokens();
-        String key = "certificate-templates-id-sample-app-template";
+        String key = "%%certificate-templates-id-sample-app-template%%";
         assertNotNull(
                 "The cert template ID should have been stored in the tokens map so that it can be referenced in an HTTP server file",
                 customTokens.get(key));
@@ -45,7 +45,7 @@ public class ManageCertificateTemplatesTest extends AbstractManageResourceTest {
     @Override
     protected void afterResourcesCreatedAgain() {
         Map<String, String> customTokens = appConfig.getCustomTokens();
-        String key = "certificate-templates-id-sample-app-template";
+        String key = "%%certificate-templates-id-sample-app-template%%";
         assertNotNull("Verifying that the cert template ID is stored on an update as well", customTokens.get(key));
     }
 

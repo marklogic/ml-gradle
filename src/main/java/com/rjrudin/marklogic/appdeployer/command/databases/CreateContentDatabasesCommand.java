@@ -11,9 +11,9 @@ import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
 import com.rjrudin.marklogic.mgmt.databases.DatabaseManager;
 import com.rjrudin.marklogic.rest.util.JsonNodeUtil;
 
-public class UpdateContentDatabasesCommand extends AbstractCommand {
+public class CreateContentDatabasesCommand extends AbstractCommand {
 
-    public UpdateContentDatabasesCommand() {
+    public CreateContentDatabasesCommand() {
         setExecuteSortOrder(SortOrderConstants.CREATE_CONTENT_DATABASES);
     }
 
@@ -22,7 +22,9 @@ public class UpdateContentDatabasesCommand extends AbstractCommand {
         AppConfig appConfig = context.getAppConfig();
 
         List<File> files = appConfig.getConfigDir().getContentDatabaseFiles();
-        logger.info("Merging JSON files at locations: " + files);
+        if (logger.isInfoEnabled()) {
+            logger.info("Merging JSON files at locations: " + files);
+        }
         JsonNode node = JsonNodeUtil.mergeJsonFiles(files);
 
         if (node == null) {

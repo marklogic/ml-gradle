@@ -1,15 +1,13 @@
 package com.rjrudin.marklogic.mgmt.forests;
 
-import com.rjrudin.marklogic.mgmt.AbstractManager;
+import com.rjrudin.marklogic.mgmt.AbstractResourceManager;
 import com.rjrudin.marklogic.mgmt.ManageClient;
 import com.rjrudin.marklogic.rest.util.Fragment;
 
-public class ForestManager extends AbstractManager {
-
-    private ManageClient client;
+public class ForestManager extends AbstractResourceManager {
 
     public ForestManager(ManageClient client) {
-        this.client = client;
+        super(client);
     }
 
     public void createForestWithName(String name, String host) {
@@ -22,26 +20,22 @@ public class ForestManager extends AbstractManager {
         }
     }
 
-    public void delete(String nameOrId) {
-        delete(nameOrId, "full");
-    }
-
     public void delete(String nameOrId, String level) {
         if (!forestExists(nameOrId)) {
             logger.info(format("Could not find forest with name or ID: %s, so not deleting", nameOrId));
         } else {
             logger.info(format("Deleting forest %s", nameOrId));
-            client.delete(format("/manage/v2/forests/%s?level=%s", nameOrId, level));
+            getManageClient().delete(format("/manage/v2/forests/%s?level=%s", nameOrId, level));
             logger.info(format("Deleted forest %s", nameOrId));
         }
     }
 
     public void createForest(String json) {
-        client.postJson("/manage/v2/forests", json);
+        getManageClient().postJson("/manage/v2/forests", json);
     }
 
     public boolean forestExists(String nameOrId) {
-        Fragment f = client.getXml("/manage/v2/forests");
+        Fragment f = getManageClient().getXml("/manage/v2/forests");
         return f.elementExists(format("/node()/f:list-items/f:list-item[f:nameref = '%s' or f:idref = '%s']", nameOrId,
                 nameOrId));
     }
@@ -53,12 +47,12 @@ public class ForestManager extends AbstractManager {
         }
         logger.info(format("Attaching forest %s to database %s", forestIdOrName, databaseIdOrName));
         String path = format("/manage/v2/forests/%s", forestIdOrName);
-        client.postForm(path, "state", "attach", "database", databaseIdOrName);
+        getManageClient().postForm(path, "state", "attach", "database", databaseIdOrName);
         logger.info(format("Attached forest %s to database %s", forestIdOrName, databaseIdOrName));
     }
 
     public boolean isForestAttached(String forestIdOrName) {
-        Fragment f = client.getXml(format("/manage/v2/forests/%s", forestIdOrName));
+        Fragment f = getManageClient().getXml(format("/manage/v2/forests/%s", forestIdOrName));
         return f.elementExists("/node()/f:relations/f:relation-group[f:typeref = 'databases']");
     }
 }

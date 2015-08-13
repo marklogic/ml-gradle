@@ -152,4 +152,16 @@ public abstract class AbstractResourceCommand extends AbstractCommand implements
     public void setStoreResourceIdsAsCustomTokens(boolean storeResourceIdsAsCustomTokens) {
         this.storeResourceIdsAsCustomTokens = storeResourceIdsAsCustomTokens;
     }
+
+    public boolean isDeleteResourcesOnUndo() {
+        return deleteResourcesOnUndo;
+    }
+
+    public boolean isRestartAfterDelete() {
+        return restartAfterDelete;
+    }
+
+    public boolean isStoreResourceIdsAsCustomTokens() {
+        return storeResourceIdsAsCustomTokens;
+    }
 }

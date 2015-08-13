@@ -9,7 +9,7 @@ import com.rjrudin.marklogic.appdeployer.command.cpf.CreateDomainsCommand;
 import com.rjrudin.marklogic.appdeployer.command.cpf.CreatePipelinesCommand;
 import com.rjrudin.marklogic.appdeployer.command.databases.CreateSchemasDatabaseCommand;
 import com.rjrudin.marklogic.appdeployer.command.databases.CreateTriggersDatabaseCommand;
-import com.rjrudin.marklogic.appdeployer.command.databases.UpdateContentDatabasesCommand;
+import com.rjrudin.marklogic.appdeployer.command.databases.CreateContentDatabasesCommand;
 import com.rjrudin.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
 import com.rjrudin.marklogic.mgmt.cpf.CpfConfigManager;
 import com.rjrudin.marklogic.mgmt.cpf.DomainManager;
@@ -24,7 +24,7 @@ public class ManageCpfTest extends AbstractAppDeployerTest {
 
     @Test
     public void test() {
-        initializeAppDeployer(new CreateRestApiServersCommand(), new UpdateContentDatabasesCommand(),
+        initializeAppDeployer(new CreateRestApiServersCommand(), new CreateContentDatabasesCommand(),
                 new CreateSchemasDatabaseCommand(), new CreateTriggersDatabaseCommand(), new CreateDomainsCommand(),
                 new CreateCpfConfigsCommand(), new CreatePipelinesCommand());
 

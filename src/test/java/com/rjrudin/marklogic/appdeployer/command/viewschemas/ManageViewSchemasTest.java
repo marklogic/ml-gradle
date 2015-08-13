@@ -8,7 +8,7 @@ import com.rjrudin.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.rjrudin.marklogic.appdeployer.command.Command;
 import com.rjrudin.marklogic.appdeployer.command.databases.CreateSchemasDatabaseCommand;
 import com.rjrudin.marklogic.appdeployer.command.databases.CreateTriggersDatabaseCommand;
-import com.rjrudin.marklogic.appdeployer.command.databases.UpdateContentDatabasesCommand;
+import com.rjrudin.marklogic.appdeployer.command.databases.CreateContentDatabasesCommand;
 import com.rjrudin.marklogic.appdeployer.command.modules.LoadModulesCommand;
 import com.rjrudin.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
 import com.rjrudin.marklogic.appdeployer.command.viewschemas.CreateViewSchemasCommand;
@@ -24,7 +24,7 @@ public class ManageViewSchemasTest extends AbstractManageResourceTest {
         deleteModuleTimestampsFile();
 
         initializeAppDeployer(new CreateRestApiServersCommand(), new CreateSchemasDatabaseCommand(),
-                new CreateTriggersDatabaseCommand(), new UpdateContentDatabasesCommand(), newCommand(),
+                new CreateTriggersDatabaseCommand(), new CreateContentDatabasesCommand(), newCommand(),
                 new LoadModulesCommand());
 
         appDeployer.deploy(appConfig);

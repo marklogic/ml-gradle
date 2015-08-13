@@ -6,7 +6,7 @@ import org.junit.Test;
 import com.rjrudin.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.rjrudin.marklogic.appdeployer.command.databases.CreateSchemasDatabaseCommand;
 import com.rjrudin.marklogic.appdeployer.command.databases.CreateTriggersDatabaseCommand;
-import com.rjrudin.marklogic.appdeployer.command.databases.UpdateContentDatabasesCommand;
+import com.rjrudin.marklogic.appdeployer.command.databases.CreateContentDatabasesCommand;
 import com.rjrudin.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
 import com.rjrudin.marklogic.mgmt.cpf.PipelineManager;
 import com.rjrudin.marklogic.rest.util.ResourcesFragment;
@@ -20,7 +20,7 @@ public class LoadDefaultCpfPipelinesTest extends AbstractAppDeployerTest {
 
     @Test
     public void loadDefaultCpfPipelines() {
-        initializeAppDeployer(new CreateRestApiServersCommand(), new UpdateContentDatabasesCommand(),
+        initializeAppDeployer(new CreateRestApiServersCommand(), new CreateContentDatabasesCommand(),
                 new CreateSchemasDatabaseCommand(), new CreateTriggersDatabaseCommand());
 
         appDeployer.deploy(appConfig);

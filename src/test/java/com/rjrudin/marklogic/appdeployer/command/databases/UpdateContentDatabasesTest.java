@@ -10,7 +10,7 @@ import com.rjrudin.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.rjrudin.marklogic.appdeployer.ConfigDir;
 import com.rjrudin.marklogic.appdeployer.command.databases.CreateSchemasDatabaseCommand;
 import com.rjrudin.marklogic.appdeployer.command.databases.CreateTriggersDatabaseCommand;
-import com.rjrudin.marklogic.appdeployer.command.databases.UpdateContentDatabasesCommand;
+import com.rjrudin.marklogic.appdeployer.command.databases.CreateContentDatabasesCommand;
 import com.rjrudin.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
 import com.rjrudin.marklogic.mgmt.databases.DatabaseManager;
 import com.rjrudin.marklogic.rest.util.Fragment;
@@ -36,7 +36,7 @@ public class UpdateContentDatabasesTest extends AbstractAppDeployerTest {
         appConfig.setTestRestPort(SAMPLE_APP_TEST_REST_PORT);
 
         initializeAppDeployer(new CreateRestApiServersCommand(), new CreateTriggersDatabaseCommand(),
-                new UpdateContentDatabasesCommand(), new CreateSchemasDatabaseCommand());
+                new CreateContentDatabasesCommand(), new CreateSchemasDatabaseCommand());
 
         appDeployer.deploy(appConfig);
 
@@ -53,7 +53,7 @@ public class UpdateContentDatabasesTest extends AbstractAppDeployerTest {
         dir.getContentDatabaseFiles().add(new File(dir.getDatabasesDir(), "more-content-db-config.json"));
 
         initializeAppDeployer(new CreateRestApiServersCommand(), new CreateTriggersDatabaseCommand(),
-                new UpdateContentDatabasesCommand(), new CreateSchemasDatabaseCommand());
+                new CreateContentDatabasesCommand(), new CreateSchemasDatabaseCommand());
 
         appDeployer.deploy(appConfig);
 

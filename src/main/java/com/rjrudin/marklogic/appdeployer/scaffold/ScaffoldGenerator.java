@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.rjrudin.marklogic.appdeployer.AppConfig;
-import com.rjrudin.marklogic.appdeployer.spring.RestApiUtil;
+import com.rjrudin.marklogic.appdeployer.util.RestApiUtil;
 import com.rjrudin.marklogic.client.LoggingObject;
 
 /**

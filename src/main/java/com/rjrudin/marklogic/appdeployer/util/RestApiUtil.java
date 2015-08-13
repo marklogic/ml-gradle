@@ -1,4 +1,4 @@
-package com.rjrudin.marklogic.appdeployer.spring;
+package com.rjrudin.marklogic.appdeployer.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;

@@ -6,16 +6,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import com.rjrudin.marklogic.appdeployer.AppConfig;
-import com.rjrudin.marklogic.appdeployer.AppDeployer;
-import com.rjrudin.marklogic.appdeployer.ConfigDir;
 import com.rjrudin.marklogic.appdeployer.command.Command;
 import com.rjrudin.marklogic.appdeployer.command.CommandContext;
 import com.rjrudin.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
 import com.rjrudin.marklogic.appdeployer.impl.SimpleAppDeployer;
-import com.rjrudin.marklogic.appdeployer.spring.SpringAppDeployer;
 import com.rjrudin.marklogic.mgmt.AbstractMgmtTest;
 import com.rjrudin.marklogic.mgmt.ManageConfig;
 import com.rjrudin.marklogic.xcc.XccTemplate;
@@ -69,16 +64,6 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
      */
     protected void initializeAppDeployer(Command... commands) {
         appDeployer = new SimpleAppDeployer(manageClient, adminManager, commands);
-    }
-
-    /**
-     * Initialize AppDeployer with a Spring Configuration class.
-     * 
-     * @param configurationClass
-     */
-    protected void initializeAppDeployer(Class<?> configurationClass) {
-        appManagerContext = new AnnotationConfigApplicationContext(configurationClass);
-        appDeployer = new SpringAppDeployer(appManagerContext, manageClient, adminManager);
     }
 
     @After

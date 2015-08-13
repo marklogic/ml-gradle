@@ -9,7 +9,7 @@ import com.rjrudin.marklogic.appdeployer.command.AbstractCommand;
 import com.rjrudin.marklogic.appdeployer.command.CommandContext;
 import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
 import com.rjrudin.marklogic.appdeployer.command.UndoableCommand;
-import com.rjrudin.marklogic.appdeployer.spring.RestApiUtil;
+import com.rjrudin.marklogic.appdeployer.util.RestApiUtil;
 import com.rjrudin.marklogic.mgmt.ManageClient;
 import com.rjrudin.marklogic.mgmt.admin.ActionRequiringRestart;
 import com.rjrudin.marklogic.mgmt.appservers.ServerManager;

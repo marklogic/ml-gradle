@@ -6,8 +6,11 @@ import com.rjrudin.marklogic.rest.util.Fragment;
 
 public class ForestManager extends AbstractResourceManager {
 
+    private String deleteLevel;
+
     public ForestManager(ManageClient client) {
         super(client);
+        setUpdateAllowed(false);
     }
 
     public void createForestWithName(String name, String host) {
@@ -54,5 +57,18 @@ public class ForestManager extends AbstractResourceManager {
     public boolean isForestAttached(String forestIdOrName) {
         Fragment f = getManageClient().getXml(format("/manage/v2/forests/%s", forestIdOrName));
         return f.elementExists("/node()/f:relations/f:relation-group[f:typeref = 'databases']");
+    }
+
+    @Override
+    protected String[] getDeleteResourceParams(String payload) {
+        return this.deleteLevel != null ? new String[] { "level", deleteLevel } : null;
+    }
+
+    public String getDeleteLevel() {
+        return deleteLevel;
+    }
+
+    public void setDeleteLevel(String deleteLevel) {
+        this.deleteLevel = deleteLevel;
     }
 }

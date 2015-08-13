@@ -14,7 +14,7 @@ public abstract class SortOrderConstants {
     public static Integer CREATE_PROTECTED_COLLECTIONS = 80;
 
     public static Integer CREATE_TRIGGERS_DATABASE = 100;
-    public static Integer CREATE_SCHEMAS_DATABASE = 110;
+    public static Integer CREATE_SCHEMAS_DATABASE = 100;
     public static Integer CREATE_CONTENT_DATABASES = 120;
     public static Integer CREATE_FORESTS = 130;
 

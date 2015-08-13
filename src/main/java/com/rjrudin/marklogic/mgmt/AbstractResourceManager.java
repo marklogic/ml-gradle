@@ -13,6 +13,7 @@ import com.rjrudin.marklogic.rest.util.ResourcesFragment;
 public abstract class AbstractResourceManager extends AbstractManager implements ResourceManager {
 
     private ManageClient manageClient;
+    private boolean updateAllowed = true;
 
     public AbstractResourceManager(ManageClient client) {
         this.manageClient = client;
@@ -56,11 +57,15 @@ public abstract class AbstractResourceManager extends AbstractManager implements
         String path = null;
         ResponseEntity<String> response = null;
         if (exists(resourceId)) {
-            path = getPropertiesPath(resourceId);
-            path = appendParamsAndValuesToPath(path, getUpdateResourceParams(payload));
-            logger.info(format("Found %s with name of %s, so updating at path %s", label, resourceId, path));
-            response = putPayload(manageClient, path, payload);
-            logger.info(format("Updated %s at %s", label, path));
+            if (updateAllowed) {
+                path = getPropertiesPath(resourceId);
+                path = appendParamsAndValuesToPath(path, getUpdateResourceParams(payload));
+                logger.info(format("Found %s with name of %s, so updating at path %s", label, resourceId, path));
+                response = putPayload(manageClient, path, payload);
+                logger.info(format("Updated %s at %s", label, path));
+            } else {
+                logger.info("Resource already exists and updates are not supported, so not updating: " + resourceId);
+            }
         } else {
             logger.info(format("Creating %s: %s", label, resourceId));
             path = getCreateResourcePath(payload);
@@ -136,6 +141,14 @@ public abstract class AbstractResourceManager extends AbstractManager implements
 
     protected ManageClient getManageClient() {
         return manageClient;
+    }
+
+    public boolean isUpdateAllowed() {
+        return updateAllowed;
+    }
+
+    public void setUpdateAllowed(boolean updateAllowed) {
+        this.updateAllowed = updateAllowed;
     }
 
 }

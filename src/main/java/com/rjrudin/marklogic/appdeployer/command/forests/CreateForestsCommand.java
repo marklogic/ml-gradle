@@ -3,50 +3,89 @@ package com.rjrudin.marklogic.appdeployer.command.forests;
 import java.io.File;
 
 import com.rjrudin.marklogic.appdeployer.AppConfig;
-import com.rjrudin.marklogic.appdeployer.command.AbstractResourceCommand;
+import com.rjrudin.marklogic.appdeployer.command.AbstractCommand;
 import com.rjrudin.marklogic.appdeployer.command.CommandContext;
 import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
-import com.rjrudin.marklogic.mgmt.ResourceManager;
-import com.rjrudin.marklogic.mgmt.SaveReceipt;
 import com.rjrudin.marklogic.mgmt.forests.ForestManager;
 import com.rjrudin.marklogic.mgmt.hosts.HostManager;
 
-public class CreateForestsCommand extends AbstractResourceCommand {
+public class CreateForestsCommand extends AbstractCommand {
+
+    private int forestsPerHost = 1;
+    private String databaseName;
+    private String forestFilename;
+
+    private boolean createTestForests = false;
 
     public CreateForestsCommand() {
         setExecuteSortOrder(SortOrderConstants.CREATE_FORESTS);
     }
 
     @Override
-    protected File getResourcesDir(CommandContext context) {
-        return new File(context.getAppConfig().getConfigDir().getBaseDir(), "forests");
-    }
-
-    @Override
-    protected ResourceManager getResourceManager(CommandContext context) {
-        return new ForestManager(context.getManageClient());
-    }
-
-    @Override
-    protected SaveReceipt saveResource(ResourceManager mgr, CommandContext context, File f) {
-        String payload = copyFileToString(f);
-
-        AppConfig appConfig = context.getAppConfig();
-
-        for (String hostName : new HostManager(context.getManageClient()).getHostNames()) {
-            for (int i = 1; i <= 1; i++) {
-                payload = tokenReplacer.replaceTokens(payload, appConfig, false);
-                payload = payload.replace("%%FOREST_HOST%%", hostName);
-                payload = payload.replace("%%FOREST_NAME%%", appConfig.getContentDatabaseName() + "-" + i);
-                logger.info(payload);
-                SaveReceipt receipt = mgr.save(payload);
-                if (isStoreResourceIdsAsCustomTokens()) {
-                    storeTokenForResourceId(receipt, context);
-                }
+    public void execute(CommandContext context) {
+        File dir = new File(context.getAppConfig().getConfigDir().getBaseDir(), "forests");
+        if (dir.exists()) {
+            File f = new File(dir, forestFilename);
+            if (f.exists()) {
+                createForests(f, new ForestManager(context.getManageClient()), context);
             }
         }
-
-        return null;
     }
 
+    /**
+     * This command manages a couple of its own tokens, as it's expected that the host and forest name should be
+     * dynamically generated based on what hosts exist and how many forests should be created on each host.
+     * 
+     * @param f
+     * @param mgr
+     * @param context
+     */
+    protected void createForests(File f, ForestManager mgr, CommandContext context) {
+        String originalPayload = copyFileToString(f);
+        AppConfig appConfig = context.getAppConfig();
+        for (String hostName : new HostManager(context.getManageClient()).getHostNames()) {
+            for (int i = 1; i <= forestsPerHost; i++) {
+                String payload = tokenReplacer.replaceTokens(originalPayload, appConfig, false);
+                payload = payload.replace("%%FOREST_HOST%%", hostName);
+                payload = payload.replace("%%FOREST_NAME%%", getForestDatabaseName(appConfig, i));
+                mgr.save(payload);
+            }
+        }
+    }
+
+    protected String getForestDatabaseName(AppConfig appConfig, int forestNumber) {
+        return databaseName + "-" + forestNumber;
+    }
+
+    public int getForestsPerHost() {
+        return forestsPerHost;
+    }
+
+    public void setForestsPerHost(int forestsPerHost) {
+        this.forestsPerHost = forestsPerHost;
+    }
+
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
+    }
+
+    public String getForestFilename() {
+        return forestFilename;
+    }
+
+    public void setForestFilename(String forestFilename) {
+        this.forestFilename = forestFilename;
+    }
+
+    public boolean isCreateTestForests() {
+        return createTestForests;
+    }
+
+    public void setCreateTestForests(boolean createTestForests) {
+        this.createTestForests = createTestForests;
+    }
 }

@@ -3,7 +3,7 @@ package com.rjrudin.marklogic.appdeployer.command.databases;
 import org.junit.Test;
 
 import com.rjrudin.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.rjrudin.marklogic.appdeployer.command.forests.CreateForestsCommand;
+import com.rjrudin.marklogic.appdeployer.command.forests.CreateContentForestsCommand;
 
 /**
  * So we could process content-database.json first (and any other JSON files that are merged together). We use that to
@@ -25,14 +25,15 @@ public class CreateDatabaseWithCustomForestsTest extends AbstractAppDeployerTest
 
     @Test
     public void test() {
-        initializeAppDeployer(new CreateContentDatabasesCommand(), new CreateSchemasDatabaseCommand(),
-                new CreateTriggersDatabaseCommand(),
-                new CreateForestsCommand());
+        // initializeAppDeployer(new CreateContentDatabasesCommand(), new CreateSchemasDatabaseCommand(),
+        // new CreateTriggersDatabaseCommand(), new CreateContentForestsCommand());
+
+        initializeAppDeployer(new CreateContentDatabasesCommand(), new CreateContentForestsCommand());
 
         try {
             appDeployer.deploy(appConfig);
         } finally {
-            // undeploySampleApp();
+            //undeploySampleApp();
         }
     }
 }

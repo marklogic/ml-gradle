@@ -18,12 +18,9 @@ public class CreateSchemasDatabaseCommand extends AbstractCommand implements Und
         setExecuteSortOrder(SortOrderConstants.CREATE_SCHEMAS_DATABASE);
     }
 
-    /**
-     * Have to first delete the REST API server and its content database, then delete the schemas database.
-     */
     @Override
     public Integer getUndoSortOrder() {
-        return SortOrderConstants.CREATE_REST_API_SERVERS + 10;
+        return SortOrderConstants.DELETE_SCHEMAS_DATABASE;
     }
 
     @Override

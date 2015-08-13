@@ -12,6 +12,7 @@ public class CreateProtectedCollectionsCommand extends AbstractResourceCommand {
 
     public CreateProtectedCollectionsCommand() {
         setExecuteSortOrder(SortOrderConstants.CREATE_PROTECTED_COLLECTIONS);
+        setUndoSortOrder(SortOrderConstants.DELETE_PROTECTED_COLLECTIONS);
     }
 
     @Override

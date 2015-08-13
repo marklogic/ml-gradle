@@ -12,14 +12,7 @@ public class CreateUsersCommand extends AbstractResourceCommand {
 
     public CreateUsersCommand() {
         setExecuteSortOrder(SortOrderConstants.CREATE_USERS);
-    }
-
-    /**
-     * We usually want to delete users right before we delete roles, at the end of the deployment process.
-     */
-    @Override
-    public Integer getUndoSortOrder() {
-        return Integer.MAX_VALUE - 10;
+        setUndoSortOrder(SortOrderConstants.DELETE_USERS);
     }
 
     protected File getResourcesDir(CommandContext context) {

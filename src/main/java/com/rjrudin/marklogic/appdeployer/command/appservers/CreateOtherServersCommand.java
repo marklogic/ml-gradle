@@ -15,7 +15,8 @@ import com.rjrudin.marklogic.mgmt.appservers.ServerManager;
 public class CreateOtherServersCommand extends AbstractResourceCommand {
 
     public CreateOtherServersCommand() {
-        setExecuteSortOrder(SortOrderConstants.MANAGE_OTHER_SERVERS);
+        setExecuteSortOrder(SortOrderConstants.CREATE_OTHER_SERVERS);
+        setUndoSortOrder(SortOrderConstants.DELETE_OTHER_SERVERS);
         setRestartAfterDelete(true);
     }
 
@@ -34,9 +35,6 @@ public class CreateOtherServersCommand extends AbstractResourceCommand {
         return super.isResourceFile(f) && !f.getName().startsWith("rest-api-server");
     }
 
-    /**
-     * Nothing should depend on the existence of an ODBC server, so we can delete it right away.
-     */
     @Override
     public Integer getUndoSortOrder() {
         return 0;

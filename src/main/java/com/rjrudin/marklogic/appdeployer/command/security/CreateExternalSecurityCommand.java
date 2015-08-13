@@ -12,6 +12,7 @@ public class CreateExternalSecurityCommand extends AbstractResourceCommand {
 
     public CreateExternalSecurityCommand() {
         setExecuteSortOrder(SortOrderConstants.CREATE_EXTERNAL_SECURITY);
+        setUndoSortOrder(SortOrderConstants.DELETE_EXTERNAL_SECURITY);
     }
 
     @Override

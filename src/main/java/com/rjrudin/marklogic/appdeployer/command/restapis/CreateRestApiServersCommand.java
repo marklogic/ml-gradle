@@ -26,7 +26,7 @@ public class CreateRestApiServersCommand extends AbstractCommand implements Undo
 
     @Override
     public Integer getUndoSortOrder() {
-        return getExecuteSortOrder();
+        return SortOrderConstants.DELETE_REST_API_SERVERS;
     }
 
     @Override
@@ -63,7 +63,8 @@ public class CreateRestApiServersCommand extends AbstractCommand implements Undo
             context.getAdminManager().invokeActionRequiringRestart(new ActionRequiringRestart() {
                 @Override
                 public boolean execute() {
-                    return deleteRestApi(appConfig.getTestRestServerName(), appConfig.getGroupName(), manageClient, false, true);
+                    return deleteRestApi(appConfig.getTestRestServerName(), appConfig.getGroupName(), manageClient,
+                            false, true);
                 }
             });
         }
@@ -72,7 +73,8 @@ public class CreateRestApiServersCommand extends AbstractCommand implements Undo
             context.getAdminManager().invokeActionRequiringRestart(new ActionRequiringRestart() {
                 @Override
                 public boolean execute() {
-                    return deleteRestApi(appConfig.getRestServerName(), appConfig.getGroupName(), manageClient, includeModules, includeContent);
+                    return deleteRestApi(appConfig.getRestServerName(), appConfig.getGroupName(), manageClient,
+                            includeModules, includeContent);
                 }
             });
         }
@@ -82,8 +84,8 @@ public class CreateRestApiServersCommand extends AbstractCommand implements Undo
         return RestApiUtil.buildDefaultRestApiJson();
     }
 
-    protected boolean deleteRestApi(String serverName, String groupName, ManageClient manageClient, boolean includeModules,
-            boolean includeContent) {
+    protected boolean deleteRestApi(String serverName, String groupName, ManageClient manageClient,
+            boolean includeModules, boolean includeContent) {
         if (new ServerManager(manageClient, groupName).exists(serverName)) {
             String path = format("%s/v1/rest-apis/%s?", manageClient.getBaseUrl(), serverName);
             if (includeModules) {

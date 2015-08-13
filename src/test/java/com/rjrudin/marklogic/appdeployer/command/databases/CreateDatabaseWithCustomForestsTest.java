@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import com.rjrudin.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.rjrudin.marklogic.appdeployer.command.forests.CreateContentForestsCommand;
+import com.rjrudin.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
 
 /**
  * So we could process content-database.json first (and any other JSON files that are merged together). We use that to
@@ -28,12 +29,16 @@ public class CreateDatabaseWithCustomForestsTest extends AbstractAppDeployerTest
         // initializeAppDeployer(new CreateContentDatabasesCommand(), new CreateSchemasDatabaseCommand(),
         // new CreateTriggersDatabaseCommand(), new CreateContentForestsCommand());
 
-        initializeAppDeployer(new CreateContentDatabasesCommand(), new CreateContentForestsCommand());
+        // We want both a main and a test app server in this test
+        appConfig.setTestRestPort(SAMPLE_APP_TEST_REST_PORT);
+
+        initializeAppDeployer(new CreateContentDatabasesCommand(), new CreateContentForestsCommand(),
+                new CreateRestApiServersCommand());
 
         try {
             appDeployer.deploy(appConfig);
         } finally {
-            //undeploySampleApp();
+            // undeploySampleApp();
         }
     }
 }

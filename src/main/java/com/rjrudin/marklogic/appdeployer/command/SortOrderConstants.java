@@ -23,7 +23,7 @@ public abstract class SortOrderConstants {
 
     // This would have to be after loading modules in case the rewriter is modified
     public static Integer UPDATE_REST_API_SERVERS = 600;
-    public static Integer MANAGE_OTHER_SERVERS = 650;
+    public static Integer CREATE_OTHER_SERVERS = 650;
 
     public static Integer CREATE_SCHEDULED_TASKS = 800;
 
@@ -34,4 +34,26 @@ public abstract class SortOrderConstants {
 
     public static Integer CREATE_SQL_VIEWS = 1000;
 
+    // Undo constants
+    public static Integer DELETE_GROUPS = 10000;
+
+    public static Integer DELETE_USERS = 9000;
+    public static Integer DELETE_CERTIFICATE_TEMPLATES = 9010;
+    public static Integer DELETE_CERTIFICATE_AUTHORITIES = 9020;
+    public static Integer DELETE_EXTERNAL_SECURITY = 9030;
+    public static Integer DELETE_PROTECTED_COLLECTIONS = 9040;
+    public static Integer DELETE_PRIVILEGES = 9050;
+    public static Integer DELETE_AMPS = 9060;
+    public static Integer DELETE_ROLES = 9070;
+
+    public static Integer DELETE_CONTENT_DATABASES = 8000;
+    public static Integer DELETE_TRIGGERS_DATABASE = 8010;
+    public static Integer DELETE_SCHEMAS_DATABASE = 8020;
+    public static Integer DELETE_MODULES_DATABASE = 8030;
+    public static Integer DELETE_FORESTS = 8040;
+
+    public static Integer DELETE_REST_API_SERVERS = 7000;
+    public static Integer DELETE_OTHER_SERVERS = 7010;
+
+    public static Integer DELETE_SCHEDULED_TASKS = 1000;
 }

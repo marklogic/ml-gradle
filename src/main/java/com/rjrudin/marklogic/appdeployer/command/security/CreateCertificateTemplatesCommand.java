@@ -12,7 +12,8 @@ public class CreateCertificateTemplatesCommand extends AbstractResourceCommand {
 
     public CreateCertificateTemplatesCommand() {
         setExecuteSortOrder(SortOrderConstants.CREATE_CERTIFICATE_TEMPLATES);
-
+        setUndoSortOrder(SortOrderConstants.DELETE_CERTIFICATE_TEMPLATES);
+        
         // Since an HTTP server file needs to refer to a certificate template by its ID, this is set to true
         setStoreResourceIdsAsCustomTokens(true);
     }

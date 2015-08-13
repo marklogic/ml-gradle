@@ -12,6 +12,7 @@ public class CreateAmpsCommand extends AbstractResourceCommand {
 
     public CreateAmpsCommand() {
         setExecuteSortOrder(SortOrderConstants.CREATE_AMPS);
+        setUndoSortOrder(SortOrderConstants.DELETE_AMPS);
     }
 
     @Override

@@ -26,7 +26,7 @@ public class CreateContentDatabasesCommand extends AbstractCommand implements Un
      */
     @Override
     public Integer getUndoSortOrder() {
-        return SortOrderConstants.CREATE_TRIGGERS_DATABASE - 1;
+        return SortOrderConstants.DELETE_CONTENT_DATABASES;
     }
 
     @Override

@@ -17,6 +17,7 @@ public abstract class AbstractResourceCommand extends AbstractCommand implements
     private boolean deleteResourcesOnUndo = true;
     private boolean restartAfterDelete = false;
     private boolean storeResourceIdsAsCustomTokens = false;
+    private int undoSortOrder = Integer.MAX_VALUE;
 
     protected abstract File getResourcesDir(CommandContext context);
 
@@ -24,7 +25,7 @@ public abstract class AbstractResourceCommand extends AbstractCommand implements
 
     @Override
     public Integer getUndoSortOrder() {
-        return getExecuteSortOrder();
+        return undoSortOrder;
     }
 
     @Override
@@ -163,5 +164,9 @@ public abstract class AbstractResourceCommand extends AbstractCommand implements
 
     public boolean isStoreResourceIdsAsCustomTokens() {
         return storeResourceIdsAsCustomTokens;
+    }
+
+    public void setUndoSortOrder(int undoSortOrder) {
+        this.undoSortOrder = undoSortOrder;
     }
 }

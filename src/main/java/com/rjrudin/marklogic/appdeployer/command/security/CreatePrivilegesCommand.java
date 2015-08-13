@@ -12,6 +12,7 @@ public class CreatePrivilegesCommand extends AbstractResourceCommand {
 
     public CreatePrivilegesCommand() {
         setExecuteSortOrder(SortOrderConstants.CREATE_PRIVILEGES);
+        setUndoSortOrder(SortOrderConstants.DELETE_PRIVILEGES);
     }
 
     @Override

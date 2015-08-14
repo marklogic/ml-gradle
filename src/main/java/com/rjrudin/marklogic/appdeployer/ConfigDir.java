@@ -44,14 +44,6 @@ public class ConfigDir {
         contentDatabaseFiles.add(new File(getDatabasesDir(), defaultContentDatabaseFilename));
     }
 
-    public File getTriggersDatabaseFile() {
-        return new File(new File(baseDir, databasesPath), "triggers-database.json");
-    }
-
-    public File getSchemasDatabaseFile() {
-        return new File(new File(baseDir, databasesPath), "schemas-database.json");
-    }
-
     public File getRestApiFile() {
         return new File(baseDir, restApiPath);
     }

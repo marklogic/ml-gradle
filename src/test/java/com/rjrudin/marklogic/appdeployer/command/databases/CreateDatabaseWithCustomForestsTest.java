@@ -14,7 +14,7 @@ import com.rjrudin.marklogic.rest.util.Fragment;
 public class CreateDatabaseWithCustomForestsTest extends AbstractAppDeployerTest {
 
     @Test
-    public void createDatabaseAndIgnoreForestFile() {
+    public void contentDatabaseWithNoForestFile() {
         // We want both main and test databases
         appConfig.setTestRestPort(SAMPLE_APP_TEST_REST_PORT);
 
@@ -32,6 +32,11 @@ public class CreateDatabaseWithCustomForestsTest extends AbstractAppDeployerTest
         try {
             appDeployer.deploy(appConfig);
 
+            assertTrue(dbMgr.exists(appConfig.getContentDatabaseName()));
+            assertTrue(dbMgr.exists(appConfig.getTestContentDatabaseName()));
+            assertTrue(dbMgr.exists(appConfig.getTriggersDatabaseName()));
+            assertTrue(dbMgr.exists(appConfig.getSchemasDatabaseName()));
+
             Fragment mainDb = dbMgr.getAsXml(appConfig.getContentDatabaseName());
             Fragment testDb = dbMgr.getAsXml(appConfig.getTestContentDatabaseName());
 
@@ -48,6 +53,11 @@ public class CreateDatabaseWithCustomForestsTest extends AbstractAppDeployerTest
 
         } finally {
             undeploySampleApp();
+
+            assertFalse(dbMgr.exists(appConfig.getContentDatabaseName()));
+            assertFalse(dbMgr.exists(appConfig.getTestContentDatabaseName()));
+            assertFalse(dbMgr.exists(appConfig.getTriggersDatabaseName()));
+            assertFalse(dbMgr.exists(appConfig.getSchemasDatabaseName()));
 
             for (int i = 1; i <= numberOfForests; i++) {
                 assertFalse(forestMgr.exists(appConfig.getContentDatabaseName() + "-1"));

@@ -5,11 +5,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.rjrudin.marklogic.appdeployer.AppConfig;
-import com.rjrudin.marklogic.appdeployer.command.AbstractCommand;
 import com.rjrudin.marklogic.appdeployer.command.CommandContext;
 import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
-import com.rjrudin.marklogic.appdeployer.command.UndoableCommand;
-import com.rjrudin.marklogic.appdeployer.command.forests.CreateForestsCommand;
 import com.rjrudin.marklogic.mgmt.SaveReceipt;
 import com.rjrudin.marklogic.mgmt.databases.DatabaseManager;
 import com.rjrudin.marklogic.rest.util.JsonNodeUtil;
@@ -21,58 +18,33 @@ import com.rjrudin.marklogic.rest.util.JsonNodeUtil;
  * file exists, then this command won't do anything, and it's then expected that a content database is created via the
  * command for creating a REST API instance.
  */
-public class CreateContentDatabasesCommand extends AbstractCommand implements UndoableCommand {
-
-    private String forestDelete = "data";
-    // Same default as /v1/rest-apis
-    private int forestsPerHost = 3;
-    private String forestFilename = "content-forest.json";
+public class CreateContentDatabasesCommand extends CreateDatabaseCommand {
 
     public CreateContentDatabasesCommand() {
         setExecuteSortOrder(SortOrderConstants.CREATE_CONTENT_DATABASES);
+        setUndoSortOrder(SortOrderConstants.DELETE_CONTENT_DATABASES);
+
+        // Same default as /v1/rest-apis
+        setForestsPerHost(3);
+        setForestFilename("content-forest.json");
     }
 
-    @Override
-    public Integer getUndoSortOrder() {
-        return SortOrderConstants.DELETE_CONTENT_DATABASES;
-    }
-
+    /**
+     * Calls the parent method and then adds support for a test content database.
+     */
     @Override
     public void execute(CommandContext context) {
+        super.execute(context);
+
         AppConfig appConfig = context.getAppConfig();
-
-        JsonNode node = mergeContentDatabaseFiles(appConfig);
-        if (node == null) {
-            logger.info("No content database files found, so no creating or updating content databases");
-            return;
-        }
-
-        String payload = node.toString();
-        String json = tokenReplacer.replaceTokens(payload, appConfig, false);
-
-        DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
-        SaveReceipt receipt = dbMgr.save(json);
-        createForestsIfDatabaseWasJustCreated(receipt, context);
-
         if (appConfig.isTestPortSet()) {
-            json = tokenReplacer.replaceTokens(payload, appConfig, true);
-            receipt = dbMgr.save(json);
-            createForestsIfDatabaseWasJustCreated(receipt, context);
-        }
-    }
-
-    protected void createForestsIfDatabaseWasJustCreated(SaveReceipt receipt, CommandContext context) {
-        // Location header is only set when the database has just been created
-        if (receipt.hasLocationHeader()) {
-            if (logger.isInfoEnabled()) {
-                logger.info("Creating forests for newly created database: " + receipt.getResourceId());
+            String payload = getPayload(context);
+            if (payload != null) {
+                DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
+                String json = tokenReplacer.replaceTokens(payload, appConfig, true);
+                SaveReceipt receipt = dbMgr.save(json);
+                createForestsIfDatabaseWasJustCreated(receipt, context);
             }
-            CreateForestsCommand c = new CreateForestsCommand();
-            c.setForestsPerHost(forestsPerHost);
-            c.setForestFilename(forestFilename);
-            c.setDatabaseName(receipt.getResourceId());
-            c.setForestPayload(CreateForestsCommand.DEFAULT_FOREST_PAYLOAD);
-            c.execute(context);
         }
     }
 
@@ -91,7 +63,7 @@ public class CreateContentDatabasesCommand extends AbstractCommand implements Un
             String json = tokenReplacer.replaceTokens(payload, appConfig, false);
 
             DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
-            dbMgr.setForestDelete(forestDelete);
+            dbMgr.setForestDelete(getForestDelete());
             dbMgr.delete(json);
 
             if (appConfig.isTestPortSet()) {
@@ -101,13 +73,23 @@ public class CreateContentDatabasesCommand extends AbstractCommand implements Un
         } else {
             // Try to delete the content database if it exists
             DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
-            dbMgr.setForestDelete(forestDelete);
+            dbMgr.setForestDelete(getForestDelete());
             dbMgr.deleteByName(appConfig.getContentDatabaseName());
 
             if (appConfig.isTestPortSet()) {
                 dbMgr.deleteByName(appConfig.getContentDatabaseName());
             }
         }
+    }
+
+    @Override
+    protected String getPayload(CommandContext context) {
+        JsonNode node = mergeContentDatabaseFiles(context.getAppConfig());
+        if (node == null) {
+            logger.info("No content database files found, so not processing");
+            return null;
+        }
+        return node.toString();
     }
 
     protected JsonNode mergeContentDatabaseFiles(AppConfig appConfig) {
@@ -118,27 +100,4 @@ public class CreateContentDatabasesCommand extends AbstractCommand implements Un
         return JsonNodeUtil.mergeJsonFiles(files);
     }
 
-    public String getForestDelete() {
-        return forestDelete;
-    }
-
-    public void setForestDelete(String forestDelete) {
-        this.forestDelete = forestDelete;
-    }
-
-    public int getForestsPerHost() {
-        return forestsPerHost;
-    }
-
-    public void setForestsPerHost(int forestsPerHost) {
-        this.forestsPerHost = forestsPerHost;
-    }
-
-    public String getForestFilename() {
-        return forestFilename;
-    }
-
-    public void setForestFilename(String forestFilename) {
-        this.forestFilename = forestFilename;
-    }
 }

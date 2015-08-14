@@ -9,7 +9,6 @@ import com.rjrudin.marklogic.appdeployer.command.Command;
 import com.rjrudin.marklogic.appdeployer.command.databases.CreateContentDatabasesCommand;
 import com.rjrudin.marklogic.appdeployer.command.databases.CreateSchemasDatabaseCommand;
 import com.rjrudin.marklogic.appdeployer.command.databases.CreateTriggersDatabaseCommand;
-import com.rjrudin.marklogic.appdeployer.command.forests.CreateContentForestsCommand;
 import com.rjrudin.marklogic.appdeployer.command.modules.LoadModulesCommand;
 import com.rjrudin.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
 import com.rjrudin.marklogic.junit.Fragment;
@@ -25,7 +24,7 @@ public class ManageViewSchemasTest extends AbstractManageResourceTest {
 
         initializeAppDeployer(new CreateRestApiServersCommand(), new CreateSchemasDatabaseCommand(),
                 new CreateTriggersDatabaseCommand(), new CreateContentDatabasesCommand(), newCommand(),
-                new LoadModulesCommand(), new CreateContentForestsCommand());
+                new LoadModulesCommand());
 
         appDeployer.deploy(appConfig);
     }

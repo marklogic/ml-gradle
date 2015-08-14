@@ -3,8 +3,6 @@ package com.rjrudin.marklogic.appdeployer.command.databases;
 import org.junit.Test;
 
 import com.rjrudin.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.rjrudin.marklogic.appdeployer.command.forests.CreateContentForestsCommand;
-import com.rjrudin.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
 import com.rjrudin.marklogic.mgmt.databases.DatabaseManager;
 import com.rjrudin.marklogic.mgmt.forests.ForestManager;
 import com.rjrudin.marklogic.rest.util.Fragment;
@@ -16,14 +14,17 @@ import com.rjrudin.marklogic.rest.util.Fragment;
 public class CreateDatabaseWithCustomForestsTest extends AbstractAppDeployerTest {
 
     @Test
-    public void test() {
+    public void createDatabaseAndIgnoreForestFile() {
         // We want both main and test databases
         appConfig.setTestRestPort(SAMPLE_APP_TEST_REST_PORT);
 
-        CreateContentForestsCommand command = new CreateContentForestsCommand();
-        command.setForestsPerHost(2);
-        initializeAppDeployer(new CreateContentDatabasesCommand(), command, new CreateRestApiServersCommand(),
-                new CreateSchemasDatabaseCommand(), new CreateTriggersDatabaseCommand());
+        final int numberOfForests = 4;
+
+        CreateContentDatabasesCommand command = new CreateContentDatabasesCommand();
+        command.setForestsPerHost(numberOfForests);
+        command.setForestFilename(null);
+
+        initializeAppDeployer(command, new CreateSchemasDatabaseCommand(), new CreateTriggersDatabaseCommand());
 
         ForestManager forestMgr = new ForestManager(manageClient);
         DatabaseManager dbMgr = new DatabaseManager(manageClient);
@@ -35,7 +36,7 @@ public class CreateDatabaseWithCustomForestsTest extends AbstractAppDeployerTest
             Fragment testDb = dbMgr.getAsXml(appConfig.getTestContentDatabaseName());
 
             // Assert that the content forests and test content forests were all created
-            for (int i = 1; i <= 2; i++) {
+            for (int i = 1; i <= numberOfForests; i++) {
                 String mainForestName = appConfig.getContentDatabaseName() + "-" + i;
                 assertTrue(forestMgr.exists(mainForestName));
                 assertTrue(mainDb.elementExists(format("//db:relation[db:nameref = '%s']", mainForestName)));
@@ -48,7 +49,7 @@ public class CreateDatabaseWithCustomForestsTest extends AbstractAppDeployerTest
         } finally {
             undeploySampleApp();
 
-            for (int i = 1; i <= 2; i++) {
+            for (int i = 1; i <= numberOfForests; i++) {
                 assertFalse(forestMgr.exists(appConfig.getContentDatabaseName() + "-1"));
                 assertFalse(forestMgr.exists(appConfig.getTestContentDatabaseName() + "-1"));
             }

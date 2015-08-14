@@ -2,6 +2,8 @@ package com.rjrudin.marklogic.appdeployer.command.forests;
 
 import java.io.File;
 
+import org.springframework.util.StringUtils;
+
 import com.rjrudin.marklogic.appdeployer.AppConfig;
 import com.rjrudin.marklogic.appdeployer.command.AbstractCommand;
 import com.rjrudin.marklogic.appdeployer.command.CommandContext;
@@ -14,62 +16,70 @@ import com.rjrudin.marklogic.mgmt.hosts.HostManager;
  */
 public class CreateForestsCommand extends AbstractCommand {
 
+    public static final String DEFAULT_FOREST_PAYLOAD = "{\"forest-name\": \"%%FOREST_NAME%%\", \"host\": \"%%FOREST_HOST%%\", "
+            + "\"database\": \"%%FOREST_DATABASE%%\"}";
+
     private int forestsPerHost = 1;
     private String databaseName;
     private String forestFilename;
-
-    private boolean createTestForests = false;
+    private String forestPayload;
 
     public CreateForestsCommand() {
         setExecuteSortOrder(SortOrderConstants.CREATE_FORESTS);
     }
 
+    /**
+     * Contrary to other commands that blindly process each file in a directory, this command first looks for a specific
+     * file, as defined by the forestFilename attribute. If that file is found, then its contents are used as the
+     * payload for creating forests. Otherwise, if the forestPayload attribute has been set, then its contents are used
+     * as the payload. If neither is true, then no forests are created.
+     */
     @Override
     public void execute(CommandContext context) {
-        File dir = new File(context.getAppConfig().getConfigDir().getBaseDir(), "forests");
-        if (dir.exists()) {
-            File f = new File(dir, forestFilename);
-            if (f.exists()) {
-                createForests(f, context);
+        String payload = null;
+        if (forestFilename != null) {
+            File dir = new File(context.getAppConfig().getConfigDir().getBaseDir(), "forests");
+            if (dir.exists()) {
+                File f = new File(dir, forestFilename);
+                if (f.exists()) {
+                    payload = copyFileToString(f);
+                }
             }
+        } else if (StringUtils.hasText(forestPayload)) {
+            if (logger.isInfoEnabled()) {
+                logger.info("Creating forests using configured payload: " + forestPayload);
+            }
+            payload = forestPayload;
         }
-    }
 
-    protected void createForests(File f, CommandContext context) {
-        String originalPayload = copyFileToString(f);
-        createForestsOnHosts(originalPayload, context, false);
-        if (createTestForests) {
-            createForestsOnHosts(originalPayload, context, true);
+        if (payload != null) {
+            createForests(payload, context);
         }
     }
 
     /**
      * This command manages a couple of its own tokens, as it's expected that the host and forest name should be
      * dynamically generated based on what hosts exist and how many forests should be created on each host.
-     * 
-     * @param originalPayload
-     * @param context
-     * @param isTestDatabase
      */
-    protected void createForestsOnHosts(String originalPayload, CommandContext context, boolean isTestDatabase) {
+    protected void createForests(String originalPayload, CommandContext context) {
         ForestManager mgr = new ForestManager(context.getManageClient());
         AppConfig appConfig = context.getAppConfig();
         for (String hostName : new HostManager(context.getManageClient()).getHostNames()) {
             for (int i = 1; i <= forestsPerHost; i++) {
                 String payload = tokenReplacer.replaceTokens(originalPayload, appConfig, false);
                 payload = payload.replace("%%FOREST_HOST%%", hostName);
-                payload = payload.replace("%%FOREST_NAME%%", getForestName(appConfig, i, isTestDatabase));
-                payload = payload.replace("%%FOREST_DATABASE%%", getForestDatabaseName(appConfig, isTestDatabase));
+                payload = payload.replace("%%FOREST_NAME%%", getForestName(appConfig, i));
+                payload = payload.replace("%%FOREST_DATABASE%%", getForestDatabaseName(appConfig));
                 mgr.save(payload);
             }
         }
     }
 
-    protected String getForestName(AppConfig appConfig, int forestNumber, boolean isTestDatabase) {
+    protected String getForestName(AppConfig appConfig, int forestNumber) {
         return databaseName + "-" + forestNumber;
     }
 
-    protected String getForestDatabaseName(AppConfig appConfig, boolean isTestDatabase) {
+    protected String getForestDatabaseName(AppConfig appConfig) {
         return databaseName;
     }
 
@@ -97,11 +107,11 @@ public class CreateForestsCommand extends AbstractCommand {
         this.forestFilename = forestFilename;
     }
 
-    public boolean isCreateTestForests() {
-        return createTestForests;
+    public String getForestPayload() {
+        return forestPayload;
     }
 
-    public void setCreateTestForests(boolean createTestForests) {
-        this.createTestForests = createTestForests;
+    public void setForestPayload(String forestPayload) {
+        this.forestPayload = forestPayload;
     }
 }

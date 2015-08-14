@@ -17,6 +17,10 @@ public class SaveReceipt {
         this.response = response;
     }
 
+    public boolean hasLocationHeader() {
+        return response != null && response.getHeaders().getLocation() != null;
+    }
+
     public String getResourceId() {
         return resourceId;
     }

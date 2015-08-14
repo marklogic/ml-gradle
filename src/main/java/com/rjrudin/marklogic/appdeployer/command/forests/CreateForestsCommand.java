@@ -30,8 +30,16 @@ public class CreateForestsCommand extends AbstractCommand {
         if (dir.exists()) {
             File f = new File(dir, forestFilename);
             if (f.exists()) {
-                createForests(f, new ForestManager(context.getManageClient()), context);
+                createForests(f, context);
             }
+        }
+    }
+
+    protected void createForests(File f, CommandContext context) {
+        String originalPayload = copyFileToString(f);
+        createForestsOnHosts(originalPayload, context, false);
+        if (createTestForests) {
+            createForestsOnHosts(originalPayload, context, true);
         }
     }
 
@@ -39,32 +47,20 @@ public class CreateForestsCommand extends AbstractCommand {
      * This command manages a couple of its own tokens, as it's expected that the host and forest name should be
      * dynamically generated based on what hosts exist and how many forests should be created on each host.
      * 
-     * @param f
-     * @param mgr
+     * @param originalPayload
      * @param context
+     * @param isTestDatabase
      */
-    protected void createForests(File f, ForestManager mgr, CommandContext context) {
-        String originalPayload = copyFileToString(f);
+    protected void createForestsOnHosts(String originalPayload, CommandContext context, boolean isTestDatabase) {
+        ForestManager mgr = new ForestManager(context.getManageClient());
         AppConfig appConfig = context.getAppConfig();
         for (String hostName : new HostManager(context.getManageClient()).getHostNames()) {
             for (int i = 1; i <= forestsPerHost; i++) {
                 String payload = tokenReplacer.replaceTokens(originalPayload, appConfig, false);
                 payload = payload.replace("%%FOREST_HOST%%", hostName);
-                payload = payload.replace("%%FOREST_NAME%%", getForestName(appConfig, i, false));
-                payload = payload.replace("%%FOREST_DATABASE%%", getForestDatabaseName(appConfig, false));
+                payload = payload.replace("%%FOREST_NAME%%", getForestName(appConfig, i, isTestDatabase));
+                payload = payload.replace("%%FOREST_DATABASE%%", getForestDatabaseName(appConfig, isTestDatabase));
                 mgr.save(payload);
-            }
-        }
-
-        if (createTestForests) {
-            for (String hostName : new HostManager(context.getManageClient()).getHostNames()) {
-                for (int i = 1; i <= forestsPerHost; i++) {
-                    String payload = tokenReplacer.replaceTokens(originalPayload, appConfig, false);
-                    payload = payload.replace("%%FOREST_HOST%%", hostName);
-                    payload = payload.replace("%%FOREST_NAME%%", getForestName(appConfig, i, true));
-                    payload = payload.replace("%%FOREST_DATABASE%%", getForestDatabaseName(appConfig, true));
-                    mgr.save(payload);
-                }
             }
         }
     }

@@ -6,6 +6,7 @@ import com.rjrudin.marklogic.appdeployer.command.CommandContext;
 public class CreateContentForestsCommand extends CreateForestsCommand {
 
     public CreateContentForestsCommand() {
+        // Using the same default as /v1/rest-apis
         setForestsPerHost(3);
         setForestFilename("content-forest.json");
     }

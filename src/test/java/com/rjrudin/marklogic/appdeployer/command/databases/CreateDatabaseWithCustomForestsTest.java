@@ -10,26 +10,14 @@ import com.rjrudin.marklogic.mgmt.forests.ForestManager;
 import com.rjrudin.marklogic.rest.util.Fragment;
 
 /**
- * So we could process content-database.json first (and any other JSON files that are merged together). We use that to
- * create the content database before creating the REST API instance. A database can specify its forests, so we should
- * create the forests first (which require IDs in the database file).
- * 
- * I think an AppConfig property of # of forests per database name would be the easiest way to configure. The forest
- * command would then create that number of forests. The database command would then either make N attach calls or
- * modify the database payload to specify all the forests (that would be a pain though because it needs forest IDs).
- * 
- * The hosts for a forest is tricky too - we'd need that in the config file so we can do a replacement on ML_HOST. But
- * we'd need to iterate over each host name instead of using ML_HOST, really. That means we'd need tokens specific to
- * the command, not to the whole deployment process.
- * 
- * Actually, we can create the database first, and then specify the "database" param for each forest - then we don't
- * need an "attach" step.
+ * The REST API command can be used to create a server with a content database, but that doesn't give any control over
+ * the details of the forests. CreateContentForestsCommand can be used for that kind of control.
  */
 public class CreateDatabaseWithCustomForestsTest extends AbstractAppDeployerTest {
 
     @Test
     public void test() {
-        // We want both a main and a test app server in this test
+        // We want both main and test databases
         appConfig.setTestRestPort(SAMPLE_APP_TEST_REST_PORT);
 
         CreateContentForestsCommand command = new CreateContentForestsCommand();

@@ -52,6 +52,22 @@ public class SimpleAppDeployer extends AbstractAppDeployer {
     }
 
     /**
+     * Convenience method for finding a command with the given class name, presumably so it can be
+     * modified/reconfigured.
+     * 
+     * @param className
+     * @return
+     */
+    public Command getCommand(String className) {
+        for (Command c : commands) {
+            if (c.getClass().getSimpleName().equals(className)) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Keep this public so that a client can easily manipulate the list in case a default set of commands has been
      * provided.
      */

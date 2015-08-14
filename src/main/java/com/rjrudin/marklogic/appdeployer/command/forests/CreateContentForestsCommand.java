@@ -19,8 +19,14 @@ public class CreateContentForestsCommand extends CreateForestsCommand {
     }
 
     @Override
-    protected String getForestDatabaseName(AppConfig appConfig, int forestNumber) {
-        return appConfig.getContentDatabaseName() + "-" + forestNumber;
+    protected String getForestName(AppConfig appConfig, int forestNumber, boolean isTestDatabase) {
+        String dbName = isTestDatabase ? appConfig.getTestContentDatabaseName() : appConfig.getContentDatabaseName();
+        return dbName + "-" + forestNumber;
+    }
+
+    @Override
+    protected String getForestDatabaseName(AppConfig appConfig, boolean isTestDatabase) {
+        return isTestDatabase ? appConfig.getTestContentDatabaseName() : appConfig.getContentDatabaseName();
     }
 
 }

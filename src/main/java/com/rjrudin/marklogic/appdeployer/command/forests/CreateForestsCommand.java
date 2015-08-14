@@ -9,6 +9,9 @@ import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
 import com.rjrudin.marklogic.mgmt.forests.ForestManager;
 import com.rjrudin.marklogic.mgmt.hosts.HostManager;
 
+/**
+ * Doesn't yet support deleting forests - currently assumed that this will be done by deleting a database.
+ */
 public class CreateForestsCommand extends AbstractCommand {
 
     private int forestsPerHost = 1;
@@ -47,14 +50,31 @@ public class CreateForestsCommand extends AbstractCommand {
             for (int i = 1; i <= forestsPerHost; i++) {
                 String payload = tokenReplacer.replaceTokens(originalPayload, appConfig, false);
                 payload = payload.replace("%%FOREST_HOST%%", hostName);
-                payload = payload.replace("%%FOREST_NAME%%", getForestDatabaseName(appConfig, i));
+                payload = payload.replace("%%FOREST_NAME%%", getForestName(appConfig, i, false));
+                payload = payload.replace("%%FOREST_DATABASE%%", getForestDatabaseName(appConfig, false));
                 mgr.save(payload);
+            }
+        }
+
+        if (createTestForests) {
+            for (String hostName : new HostManager(context.getManageClient()).getHostNames()) {
+                for (int i = 1; i <= forestsPerHost; i++) {
+                    String payload = tokenReplacer.replaceTokens(originalPayload, appConfig, false);
+                    payload = payload.replace("%%FOREST_HOST%%", hostName);
+                    payload = payload.replace("%%FOREST_NAME%%", getForestName(appConfig, i, true));
+                    payload = payload.replace("%%FOREST_DATABASE%%", getForestDatabaseName(appConfig, true));
+                    mgr.save(payload);
+                }
             }
         }
     }
 
-    protected String getForestDatabaseName(AppConfig appConfig, int forestNumber) {
+    protected String getForestName(AppConfig appConfig, int forestNumber, boolean isTestDatabase) {
         return databaseName + "-" + forestNumber;
+    }
+
+    protected String getForestDatabaseName(AppConfig appConfig, boolean isTestDatabase) {
+        return databaseName;
     }
 
     public int getForestsPerHost() {

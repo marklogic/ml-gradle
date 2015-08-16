@@ -9,7 +9,7 @@ buildscript {
         maven {url "http://rjrudin.github.io/marklogic-java/releases"}
     }
     dependencies { 
-        classpath "com.rjrudin:ml-gradle:2.0b3" 
+        classpath "com.rjrudin:ml-gradle:2.0b4" 
     }
 }
 
@@ -120,6 +120,7 @@ dependencies {
  * This instance can be modified to affect the behavior of ml-gradle.
  */
 ext {
+    // mlAppConfig is an instance of com.rjrudin.marklogic.appdeployer.AppConfig
     mlAppConfig {
         // Example of adding custom tokens; these will then be replaced in any JSON/XML config files
         customTokens.put("sample-key", "sample-value")
@@ -257,7 +258,7 @@ import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
 
 class ClearTriggersDatabaseCommand extends AbstractCommand {
     public Integer getExecuteSortOrder() {
-        return SortOrderConstants.LOAD_DEFAULT_PIPELINES - 1;
+        return SortOrderConstants.DEPLOY_DEFAULT_PIPELINES - 1;
     }
     public void execute(CommandContext context) {
         String dbName = context.getAppConfig().getTriggersDatabaseName();

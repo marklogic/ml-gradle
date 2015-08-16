@@ -8,25 +8,25 @@ import com.rjrudin.marklogic.appdeployer.AppDeployer
 import com.rjrudin.marklogic.appdeployer.ConfigDir
 import com.rjrudin.marklogic.appdeployer.command.Command
 import com.rjrudin.marklogic.appdeployer.command.CommandContext
-import com.rjrudin.marklogic.appdeployer.command.appservers.CreateOtherServersCommand
+import com.rjrudin.marklogic.appdeployer.command.appservers.DeployOtherServersCommand
 import com.rjrudin.marklogic.appdeployer.command.appservers.UpdateRestApiServersCommand
-import com.rjrudin.marklogic.appdeployer.command.cpf.CreateCpfConfigsCommand
-import com.rjrudin.marklogic.appdeployer.command.cpf.CreateDomainsCommand
-import com.rjrudin.marklogic.appdeployer.command.cpf.CreatePipelinesCommand
-import com.rjrudin.marklogic.appdeployer.command.databases.CreateSchemasDatabaseCommand
-import com.rjrudin.marklogic.appdeployer.command.databases.CreateTriggersDatabaseCommand
-import com.rjrudin.marklogic.appdeployer.command.databases.UpdateContentDatabasesCommand
+import com.rjrudin.marklogic.appdeployer.command.cpf.DeployCpfConfigsCommand
+import com.rjrudin.marklogic.appdeployer.command.cpf.DeployDomainsCommand
+import com.rjrudin.marklogic.appdeployer.command.cpf.DeployPipelinesCommand
+import com.rjrudin.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand
+import com.rjrudin.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand
+import com.rjrudin.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand
 import com.rjrudin.marklogic.appdeployer.command.modules.LoadModulesCommand
-import com.rjrudin.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand
-import com.rjrudin.marklogic.appdeployer.command.security.CreateAmpsCommand
-import com.rjrudin.marklogic.appdeployer.command.security.CreateCertificateTemplatesCommand
-import com.rjrudin.marklogic.appdeployer.command.security.CreateExternalSecurityCommand
-import com.rjrudin.marklogic.appdeployer.command.security.CreatePrivilegesCommand
-import com.rjrudin.marklogic.appdeployer.command.security.CreateProtectedCollectionsCommand
-import com.rjrudin.marklogic.appdeployer.command.security.CreateRolesCommand
-import com.rjrudin.marklogic.appdeployer.command.security.CreateUsersCommand
-import com.rjrudin.marklogic.appdeployer.command.tasks.CreateScheduledTasksCommand
-import com.rjrudin.marklogic.appdeployer.command.viewschemas.CreateViewSchemasCommand
+import com.rjrudin.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand
+import com.rjrudin.marklogic.appdeployer.command.security.DeployAmpsCommand
+import com.rjrudin.marklogic.appdeployer.command.security.DeployCertificateTemplatesCommand
+import com.rjrudin.marklogic.appdeployer.command.security.DeployExternalSecurityCommand
+import com.rjrudin.marklogic.appdeployer.command.security.DeployPrivilegesCommand
+import com.rjrudin.marklogic.appdeployer.command.security.DeployProtectedCollectionsCommand
+import com.rjrudin.marklogic.appdeployer.command.security.DeployRolesCommand
+import com.rjrudin.marklogic.appdeployer.command.security.DeployUsersCommand
+import com.rjrudin.marklogic.appdeployer.command.tasks.DeployScheduledTasksCommand
+import com.rjrudin.marklogic.appdeployer.command.viewschemas.DeployViewSchemasCommand
 import com.rjrudin.marklogic.appdeployer.impl.SimpleAppDeployer
 import com.rjrudin.marklogic.gradle.task.DeleteModuleTimestampsFileTask
 import com.rjrudin.marklogic.gradle.task.DeployAppTask
@@ -48,7 +48,7 @@ import com.rjrudin.marklogic.gradle.task.databases.UpdateContentDatabasesTask
 import com.rjrudin.marklogic.gradle.task.scaffold.GenerateScaffoldTask
 import com.rjrudin.marklogic.gradle.task.security.DeploySecurityTask
 import com.rjrudin.marklogic.gradle.task.servers.UpdateRestApiServersTask
-import com.rjrudin.marklogic.gradle.task.tasks.DeployTasksTask;
+import com.rjrudin.marklogic.gradle.task.tasks.DeployTasksTask
 import com.rjrudin.marklogic.gradle.task.viewschemas.DeployViewSchemasTask
 import com.rjrudin.marklogic.mgmt.ManageClient
 import com.rjrudin.marklogic.mgmt.ManageConfig
@@ -280,44 +280,49 @@ class MarkLogicPlugin implements Plugin<Project> {
 
         // Security
         List<Command> securityCommands = new ArrayList<Command>()
-        securityCommands.add(new CreateRolesCommand())
-        securityCommands.add(new CreateUsersCommand())
-        securityCommands.add(new CreateAmpsCommand())
-        securityCommands.add(new CreateCertificateTemplatesCommand())
-        securityCommands.add(new CreateExternalSecurityCommand())
-        securityCommands.add(new CreatePrivilegesCommand())
-        securityCommands.add(new CreateProtectedCollectionsCommand())
+        securityCommands.add(new DeployRolesCommand())
+        securityCommands.add(new DeployUsersCommand())
+        securityCommands.add(new DeployAmpsCommand())
+        securityCommands.add(new DeployCertificateTemplatesCommand())
+        securityCommands.add(new DeployExternalSecurityCommand())
+        securityCommands.add(new DeployPrivilegesCommand())
+        securityCommands.add(new DeployProtectedCollectionsCommand())
         project.extensions.add("mlSecurityCommands", securityCommands)
         commands.addAll(securityCommands)
 
         // Databases and appservers
-        commands.add(new CreateRestApiServersCommand())
-        commands.add(new CreateTriggersDatabaseCommand())
-        commands.add(new CreateSchemasDatabaseCommand())
-        commands.add(new CreateOtherServersCommand())
-        commands.add(new UpdateContentDatabasesCommand())
+        commands.add(new DeployRestApiServersCommand())
+        commands.add(new DeployTriggersDatabaseCommand())
+        commands.add(new DeploySchemasDatabaseCommand())
+        commands.add(new DeployOtherServersCommand())
         commands.add(new UpdateRestApiServersCommand())
+        
+        DeployContentDatabasesCommand dcdc = new DeployContentDatabasesCommand()
+        if (project.hasProperty("mlContentForestsPerHost")) {
+            dcdc.setForestsPerHost(Integer.parseInt(project.property("mlContentForestsPerHost")))
+        }
+        commands.add(dcdc)
 
         // Modules
         commands.add(new LoadModulesCommand())
 
         // CPF
         List<Command> cpfCommands = new ArrayList<Command>()
-        cpfCommands.add(new CreateCpfConfigsCommand())
-        cpfCommands.add(new CreateDomainsCommand())
-        cpfCommands.add(new CreatePipelinesCommand())
+        cpfCommands.add(new DeployCpfConfigsCommand())
+        cpfCommands.add(new DeployDomainsCommand())
+        cpfCommands.add(new DeployPipelinesCommand())
         project.extensions.add("mlCpfCommands", cpfCommands)
         commands.addAll(cpfCommands)
 
         // Tasks
         List<Command> taskCommands = new ArrayList<Command>()
-        taskCommands.add(new CreateScheduledTasksCommand())
+        taskCommands.add(new DeployScheduledTasksCommand())
         project.extensions.add("mlTaskCommands", taskCommands)
         commands.addAll(taskCommands)
 
         // SQL Views
         List<Command> viewCommands = new ArrayList<Command>()
-        viewCommands.add(new CreateViewSchemasCommand())
+        viewCommands.add(new DeployViewSchemasCommand())
         project.extensions.add("mlViewCommands", viewCommands)
         commands.addAll(viewCommands)
 

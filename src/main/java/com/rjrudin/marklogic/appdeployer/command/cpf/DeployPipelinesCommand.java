@@ -8,7 +8,7 @@ import com.rjrudin.marklogic.mgmt.cpf.PipelineManager;
 public class DeployPipelinesCommand extends AbstractCpfResourceCommand {
 
     public DeployPipelinesCommand() {
-        setExecuteSortOrder(SortOrderConstants.CREATE_PIPELINES);
+        setExecuteSortOrder(SortOrderConstants.DEPLOY_PIPELINES);
     }
 
     @Override

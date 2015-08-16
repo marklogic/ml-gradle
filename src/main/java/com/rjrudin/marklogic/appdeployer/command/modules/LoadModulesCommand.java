@@ -28,7 +28,7 @@ public class LoadModulesCommand extends AbstractCommand {
     private String password;
 
     public LoadModulesCommand() {
-        setExecuteSortOrder(SortOrderConstants.LOAD_MODULES_ORDER);
+        setExecuteSortOrder(SortOrderConstants.LOAD_MODULES);
     }
 
     @Override

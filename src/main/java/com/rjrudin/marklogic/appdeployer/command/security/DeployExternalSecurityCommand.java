@@ -11,7 +11,7 @@ import com.rjrudin.marklogic.mgmt.security.ExternalSecurityManager;
 public class DeployExternalSecurityCommand extends AbstractResourceCommand {
 
     public DeployExternalSecurityCommand() {
-        setExecuteSortOrder(SortOrderConstants.CREATE_EXTERNAL_SECURITY);
+        setExecuteSortOrder(SortOrderConstants.DEPLOY_EXTERNAL_SECURITY);
         setUndoSortOrder(SortOrderConstants.DELETE_EXTERNAL_SECURITY);
     }
 

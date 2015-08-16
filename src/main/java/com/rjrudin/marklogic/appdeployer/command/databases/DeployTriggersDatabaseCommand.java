@@ -6,7 +6,7 @@ import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
 public class DeployTriggersDatabaseCommand extends DeployDatabaseCommand {
 
     public DeployTriggersDatabaseCommand() {
-        setExecuteSortOrder(SortOrderConstants.CREATE_TRIGGERS_DATABASE);
+        setExecuteSortOrder(SortOrderConstants.DEPLOY_TRIGGERS_DATABASE);
         setUndoSortOrder(SortOrderConstants.DELETE_TRIGGERS_DATABASE);
         setDatabaseFilename("triggers-database.json");
     }

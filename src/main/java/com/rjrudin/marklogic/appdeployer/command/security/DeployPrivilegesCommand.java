@@ -11,7 +11,7 @@ import com.rjrudin.marklogic.mgmt.security.PrivilegeManager;
 public class DeployPrivilegesCommand extends AbstractResourceCommand {
 
     public DeployPrivilegesCommand() {
-        setExecuteSortOrder(SortOrderConstants.CREATE_PRIVILEGES);
+        setExecuteSortOrder(SortOrderConstants.DEPLOY_PRIVILEGES);
         setUndoSortOrder(SortOrderConstants.DELETE_PRIVILEGES);
     }
 

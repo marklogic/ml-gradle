@@ -26,7 +26,7 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
     private boolean deleteContentDatabase = false;
 
     public DeployRestApiServersCommand() {
-        setExecuteSortOrder(SortOrderConstants.CREATE_REST_API_SERVERS);
+        setExecuteSortOrder(SortOrderConstants.DEPLOY_REST_API_SERVERS);
     }
 
     @Override

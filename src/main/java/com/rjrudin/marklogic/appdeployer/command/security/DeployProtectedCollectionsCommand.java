@@ -11,7 +11,7 @@ import com.rjrudin.marklogic.mgmt.security.ProtectedCollectionsManager;
 public class DeployProtectedCollectionsCommand extends AbstractResourceCommand {
 
     public DeployProtectedCollectionsCommand() {
-        setExecuteSortOrder(SortOrderConstants.CREATE_PROTECTED_COLLECTIONS);
+        setExecuteSortOrder(SortOrderConstants.DEPLOY_PROTECTED_COLLECTIONS);
         setUndoSortOrder(SortOrderConstants.DELETE_PROTECTED_COLLECTIONS);
     }
 

@@ -21,7 +21,7 @@ import com.rjrudin.marklogic.rest.util.JsonNodeUtil;
 public class DeployContentDatabasesCommand extends DeployDatabaseCommand {
 
     public DeployContentDatabasesCommand() {
-        setExecuteSortOrder(SortOrderConstants.CREATE_CONTENT_DATABASES);
+        setExecuteSortOrder(SortOrderConstants.DEPLOY_CONTENT_DATABASES);
         setUndoSortOrder(SortOrderConstants.DELETE_CONTENT_DATABASES);
 
         // Same default as /v1/rest-apis

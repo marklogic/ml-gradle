@@ -25,7 +25,7 @@ public class DeployForestsCommand extends AbstractCommand {
     private String forestPayload;
 
     public DeployForestsCommand() {
-        setExecuteSortOrder(SortOrderConstants.CREATE_FORESTS);
+        setExecuteSortOrder(SortOrderConstants.DEPLOY_FORESTS);
     }
 
     /**

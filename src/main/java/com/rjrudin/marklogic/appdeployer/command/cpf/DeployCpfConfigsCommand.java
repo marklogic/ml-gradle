@@ -8,7 +8,7 @@ import com.rjrudin.marklogic.mgmt.cpf.CpfConfigManager;
 public class DeployCpfConfigsCommand extends AbstractCpfResourceCommand {
 
     public DeployCpfConfigsCommand() {
-        setExecuteSortOrder(SortOrderConstants.CREATE_CPF_CONFIGS);
+        setExecuteSortOrder(SortOrderConstants.DEPLOY_CPF_CONFIGS);
     }
 
     @Override

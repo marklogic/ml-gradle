@@ -8,7 +8,7 @@ import com.rjrudin.marklogic.mgmt.cpf.PipelineManager;
 public class DeployDefaultPipelinesCommand extends AbstractCommand {
 
     public DeployDefaultPipelinesCommand() {
-        setExecuteSortOrder(SortOrderConstants.LOAD_DEFAULT_PIPELINES);
+        setExecuteSortOrder(SortOrderConstants.DEPLOY_DEFAULT_PIPELINES);
     }
 
     @Override

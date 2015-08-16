@@ -24,7 +24,7 @@ public class LoadAssetsViaXccCommand extends AbstractCommand {
     
     public LoadAssetsViaXccCommand(String... assetPaths) {
         this.assetPaths = assetPaths;
-        setExecuteSortOrder(SortOrderConstants.LOAD_MODULES_ORDER - 10);
+        setExecuteSortOrder(SortOrderConstants.LOAD_MODULES - 10);
     }
 
     @Override

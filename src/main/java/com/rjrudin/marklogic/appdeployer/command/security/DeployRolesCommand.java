@@ -11,7 +11,7 @@ import com.rjrudin.marklogic.mgmt.security.RoleManager;
 public class DeployRolesCommand extends AbstractResourceCommand {
 
     public DeployRolesCommand() {
-        setExecuteSortOrder(SortOrderConstants.CREATE_ROLES);
+        setExecuteSortOrder(SortOrderConstants.DEPLOY_ROLES);
         setUndoSortOrder(SortOrderConstants.DELETE_ROLES);
     }
 

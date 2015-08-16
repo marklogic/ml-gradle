@@ -12,7 +12,7 @@ import com.rjrudin.marklogic.mgmt.security.CertificateAuthorityManager;
 public class DeployCertificateAuthoritiesCommand extends AbstractCommand {
 
     public DeployCertificateAuthoritiesCommand() {
-        setExecuteSortOrder(SortOrderConstants.CREATE_CERTIFICATE_AUTHORITIES);
+        setExecuteSortOrder(SortOrderConstants.DEPLOY_CERTIFICATE_AUTHORITIES);
     }
 
     @Override

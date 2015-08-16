@@ -13,7 +13,7 @@ public class DeployScheduledTasksCommand extends AbstractResourceCommand {
     private String groupName;
 
     public DeployScheduledTasksCommand() {
-        setExecuteSortOrder(SortOrderConstants.CREATE_SCHEDULED_TASKS);
+        setExecuteSortOrder(SortOrderConstants.DEPLOY_SCHEDULED_TASKS);
         setUndoSortOrder(SortOrderConstants.DELETE_SCHEDULED_TASKS);
     }
 

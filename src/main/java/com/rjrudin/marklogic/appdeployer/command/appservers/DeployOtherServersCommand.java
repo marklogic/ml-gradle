@@ -15,7 +15,7 @@ import com.rjrudin.marklogic.mgmt.appservers.ServerManager;
 public class DeployOtherServersCommand extends AbstractResourceCommand {
 
     public DeployOtherServersCommand() {
-        setExecuteSortOrder(SortOrderConstants.CREATE_OTHER_SERVERS);
+        setExecuteSortOrder(SortOrderConstants.DEPLOY_OTHER_SERVERS);
         setUndoSortOrder(SortOrderConstants.DELETE_OTHER_SERVERS);
         setRestartAfterDelete(true);
     }

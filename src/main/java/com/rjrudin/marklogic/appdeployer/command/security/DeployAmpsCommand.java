@@ -11,7 +11,7 @@ import com.rjrudin.marklogic.mgmt.security.AmpManager;
 public class DeployAmpsCommand extends AbstractResourceCommand {
 
     public DeployAmpsCommand() {
-        setExecuteSortOrder(SortOrderConstants.CREATE_AMPS);
+        setExecuteSortOrder(SortOrderConstants.DEPLOY_AMPS);
         setUndoSortOrder(SortOrderConstants.DELETE_AMPS);
     }
 

@@ -11,7 +11,7 @@ import com.rjrudin.marklogic.mgmt.security.UserManager;
 public class DeployUsersCommand extends AbstractResourceCommand {
 
     public DeployUsersCommand() {
-        setExecuteSortOrder(SortOrderConstants.CREATE_USERS);
+        setExecuteSortOrder(SortOrderConstants.DEPLOY_USERS);
         setUndoSortOrder(SortOrderConstants.DELETE_USERS);
     }
 

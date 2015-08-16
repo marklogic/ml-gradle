@@ -11,7 +11,7 @@ import com.rjrudin.marklogic.mgmt.groups.GroupManager;
 public class DeployGroupsCommand extends AbstractResourceCommand {
 
     public DeployGroupsCommand() {
-        setExecuteSortOrder(SortOrderConstants.CREATE_GROUPS);
+        setExecuteSortOrder(SortOrderConstants.DEPLOY_GROUPS);
         setUndoSortOrder(SortOrderConstants.DELETE_GROUPS);
     }
 

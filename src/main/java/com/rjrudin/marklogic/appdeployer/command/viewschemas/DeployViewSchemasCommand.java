@@ -21,7 +21,7 @@ public class DeployViewSchemasCommand extends AbstractResourceCommand {
     public DeployViewSchemasCommand() {
         // Don't need to delete anything, as view-schemas all live in a database
         setDeleteResourcesOnUndo(false);
-        setExecuteSortOrder(SortOrderConstants.CREATE_SQL_VIEWS);
+        setExecuteSortOrder(SortOrderConstants.DEPLOY_SQL_VIEWS);
     }
 
     @Override

@@ -8,9 +8,9 @@ import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
 import com.rjrudin.marklogic.mgmt.ResourceManager;
 import com.rjrudin.marklogic.mgmt.security.ProtectedCollectionsManager;
 
-public class CreateProtectedCollectionsCommand extends AbstractResourceCommand {
+public class DeployProtectedCollectionsCommand extends AbstractResourceCommand {
 
-    public CreateProtectedCollectionsCommand() {
+    public DeployProtectedCollectionsCommand() {
         setExecuteSortOrder(SortOrderConstants.CREATE_PROTECTED_COLLECTIONS);
         setUndoSortOrder(SortOrderConstants.DELETE_PROTECTED_COLLECTIONS);
     }

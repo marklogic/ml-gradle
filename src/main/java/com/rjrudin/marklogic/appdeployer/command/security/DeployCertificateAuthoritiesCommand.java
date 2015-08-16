@@ -9,9 +9,9 @@ import com.rjrudin.marklogic.appdeployer.command.CommandContext;
 import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
 import com.rjrudin.marklogic.mgmt.security.CertificateAuthorityManager;
 
-public class CreateCertificateAuthoritiesCommand extends AbstractCommand {
+public class DeployCertificateAuthoritiesCommand extends AbstractCommand {
 
-    public CreateCertificateAuthoritiesCommand() {
+    public DeployCertificateAuthoritiesCommand() {
         setExecuteSortOrder(SortOrderConstants.CREATE_CERTIFICATE_AUTHORITIES);
     }
 

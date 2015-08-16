@@ -6,11 +6,11 @@ import org.springframework.web.client.RestTemplate;
 
 import com.rjrudin.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.rjrudin.marklogic.appdeployer.command.Command;
-import com.rjrudin.marklogic.appdeployer.command.databases.CreateContentDatabasesCommand;
-import com.rjrudin.marklogic.appdeployer.command.databases.CreateSchemasDatabaseCommand;
-import com.rjrudin.marklogic.appdeployer.command.databases.CreateTriggersDatabaseCommand;
+import com.rjrudin.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
+import com.rjrudin.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand;
+import com.rjrudin.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
 import com.rjrudin.marklogic.appdeployer.command.modules.LoadModulesCommand;
-import com.rjrudin.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
+import com.rjrudin.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.rjrudin.marklogic.junit.Fragment;
 import com.rjrudin.marklogic.mgmt.ResourceManager;
 import com.rjrudin.marklogic.mgmt.viewschemas.ViewSchemaManager;
@@ -22,8 +22,8 @@ public class ManageViewSchemasTest extends AbstractManageResourceTest {
     protected void initializeAndDeploy() {
         deleteModuleTimestampsFile();
 
-        initializeAppDeployer(new CreateRestApiServersCommand(), new CreateSchemasDatabaseCommand(),
-                new CreateTriggersDatabaseCommand(), new CreateContentDatabasesCommand(), newCommand(),
+        initializeAppDeployer(new DeployRestApiServersCommand(), new DeploySchemasDatabaseCommand(),
+                new DeployTriggersDatabaseCommand(), new DeployContentDatabasesCommand(), newCommand(),
                 new LoadModulesCommand());
 
         appDeployer.deploy(appConfig);
@@ -36,7 +36,7 @@ public class ManageViewSchemasTest extends AbstractManageResourceTest {
 
     @Override
     protected Command newCommand() {
-        return new CreateViewSchemasCommand();
+        return new DeployViewSchemasCommand();
     }
 
     @Override

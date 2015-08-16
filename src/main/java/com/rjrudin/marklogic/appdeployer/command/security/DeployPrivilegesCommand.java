@@ -6,23 +6,23 @@ import com.rjrudin.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.rjrudin.marklogic.appdeployer.command.CommandContext;
 import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
 import com.rjrudin.marklogic.mgmt.ResourceManager;
-import com.rjrudin.marklogic.mgmt.security.ExternalSecurityManager;
+import com.rjrudin.marklogic.mgmt.security.PrivilegeManager;
 
-public class CreateExternalSecurityCommand extends AbstractResourceCommand {
+public class DeployPrivilegesCommand extends AbstractResourceCommand {
 
-    public CreateExternalSecurityCommand() {
-        setExecuteSortOrder(SortOrderConstants.CREATE_EXTERNAL_SECURITY);
-        setUndoSortOrder(SortOrderConstants.DELETE_EXTERNAL_SECURITY);
+    public DeployPrivilegesCommand() {
+        setExecuteSortOrder(SortOrderConstants.CREATE_PRIVILEGES);
+        setUndoSortOrder(SortOrderConstants.DELETE_PRIVILEGES);
     }
 
     @Override
     protected File getResourcesDir(CommandContext context) {
-        return new File(context.getAppConfig().getConfigDir().getSecurityDir(), "external-security");
+        return new File(context.getAppConfig().getConfigDir().getSecurityDir(), "privileges");
     }
 
     @Override
     protected ResourceManager getResourceManager(CommandContext context) {
-        return new ExternalSecurityManager(context.getManageClient());
+        return new PrivilegeManager(context.getManageClient());
     }
 
 }

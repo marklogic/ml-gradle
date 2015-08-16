@@ -4,13 +4,13 @@ import org.junit.After;
 import org.junit.Test;
 
 import com.rjrudin.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.rjrudin.marklogic.appdeployer.command.cpf.CreateCpfConfigsCommand;
-import com.rjrudin.marklogic.appdeployer.command.cpf.CreateDomainsCommand;
-import com.rjrudin.marklogic.appdeployer.command.cpf.CreatePipelinesCommand;
-import com.rjrudin.marklogic.appdeployer.command.databases.CreateSchemasDatabaseCommand;
-import com.rjrudin.marklogic.appdeployer.command.databases.CreateTriggersDatabaseCommand;
-import com.rjrudin.marklogic.appdeployer.command.databases.CreateContentDatabasesCommand;
-import com.rjrudin.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
+import com.rjrudin.marklogic.appdeployer.command.cpf.DeployCpfConfigsCommand;
+import com.rjrudin.marklogic.appdeployer.command.cpf.DeployDomainsCommand;
+import com.rjrudin.marklogic.appdeployer.command.cpf.DeployPipelinesCommand;
+import com.rjrudin.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand;
+import com.rjrudin.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
+import com.rjrudin.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
+import com.rjrudin.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.rjrudin.marklogic.mgmt.cpf.CpfConfigManager;
 import com.rjrudin.marklogic.mgmt.cpf.DomainManager;
 import com.rjrudin.marklogic.mgmt.cpf.PipelineManager;
@@ -24,9 +24,9 @@ public class ManageCpfTest extends AbstractAppDeployerTest {
 
     @Test
     public void test() {
-        initializeAppDeployer(new CreateRestApiServersCommand(), new CreateContentDatabasesCommand(),
-                new CreateSchemasDatabaseCommand(), new CreateTriggersDatabaseCommand(), new CreateDomainsCommand(),
-                new CreateCpfConfigsCommand(), new CreatePipelinesCommand());
+        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployContentDatabasesCommand(),
+                new DeploySchemasDatabaseCommand(), new DeployTriggersDatabaseCommand(), new DeployDomainsCommand(),
+                new DeployCpfConfigsCommand(), new DeployPipelinesCommand());
 
         appDeployer.deploy(appConfig);
 

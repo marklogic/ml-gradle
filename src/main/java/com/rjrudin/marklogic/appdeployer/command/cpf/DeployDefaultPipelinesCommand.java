@@ -5,9 +5,9 @@ import com.rjrudin.marklogic.appdeployer.command.CommandContext;
 import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
 import com.rjrudin.marklogic.mgmt.cpf.PipelineManager;
 
-public class LoadDefaultPipelinesCommand extends AbstractCommand {
+public class DeployDefaultPipelinesCommand extends AbstractCommand {
 
-    public LoadDefaultPipelinesCommand() {
+    public DeployDefaultPipelinesCommand() {
         setExecuteSortOrder(SortOrderConstants.LOAD_DEFAULT_PIPELINES);
     }
 

@@ -20,11 +20,11 @@ public class CreateDatabaseWithCustomForestsTest extends AbstractAppDeployerTest
 
         final int numberOfForests = 4;
 
-        CreateContentDatabasesCommand command = new CreateContentDatabasesCommand();
+        DeployContentDatabasesCommand command = new DeployContentDatabasesCommand();
         command.setForestsPerHost(numberOfForests);
         command.setForestFilename(null);
 
-        initializeAppDeployer(command, new CreateSchemasDatabaseCommand(), new CreateTriggersDatabaseCommand());
+        initializeAppDeployer(command, new DeploySchemasDatabaseCommand(), new DeployTriggersDatabaseCommand());
 
         ForestManager forestMgr = new ForestManager(manageClient);
         DatabaseManager dbMgr = new DatabaseManager(manageClient);

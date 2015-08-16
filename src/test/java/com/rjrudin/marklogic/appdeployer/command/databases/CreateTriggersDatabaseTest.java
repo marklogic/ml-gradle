@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import com.rjrudin.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.rjrudin.marklogic.appdeployer.ConfigDir;
-import com.rjrudin.marklogic.appdeployer.command.databases.CreateTriggersDatabaseCommand;
+import com.rjrudin.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
 import com.rjrudin.marklogic.mgmt.databases.DatabaseManager;
 import com.rjrudin.marklogic.mgmt.forests.ForestManager;
 
@@ -14,7 +14,7 @@ public class CreateTriggersDatabaseTest extends AbstractAppDeployerTest {
 
     @Test
     public void createAndDelete() {
-        initializeAppDeployer(new CreateTriggersDatabaseCommand());
+        initializeAppDeployer(new DeployTriggersDatabaseCommand());
 
         appDeployer.deploy(appConfig);
 
@@ -40,7 +40,7 @@ public class CreateTriggersDatabaseTest extends AbstractAppDeployerTest {
     public void createViaAppConfigProperty() {
         appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/empty-ml-config")));
 
-        initializeAppDeployer(new CreateTriggersDatabaseCommand());
+        initializeAppDeployer(new DeployTriggersDatabaseCommand());
         appDeployer.deploy(appConfig);
 
         DatabaseManager dbMgr = new DatabaseManager(manageClient);
@@ -59,7 +59,7 @@ public class CreateTriggersDatabaseTest extends AbstractAppDeployerTest {
         appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/empty-ml-config")));
         appConfig.setCreateTriggersDatabase(false);
 
-        initializeAppDeployer(new CreateTriggersDatabaseCommand());
+        initializeAppDeployer(new DeployTriggersDatabaseCommand());
         appDeployer.deploy(appConfig);
 
         DatabaseManager dbMgr = new DatabaseManager(manageClient);

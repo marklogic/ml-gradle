@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import com.rjrudin.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.rjrudin.marklogic.appdeployer.ConfigDir;
-import com.rjrudin.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
+import com.rjrudin.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.rjrudin.marklogic.mgmt.databases.DatabaseManager;
 import com.rjrudin.marklogic.rest.util.Fragment;
 
@@ -32,8 +32,8 @@ public class UpdateContentDatabasesTest extends AbstractAppDeployerTest {
         // We want both a main and a test app server in this test
         appConfig.setTestRestPort(SAMPLE_APP_TEST_REST_PORT);
 
-        initializeAppDeployer(new CreateRestApiServersCommand(), new CreateTriggersDatabaseCommand(),
-                new CreateContentDatabasesCommand(), new CreateSchemasDatabaseCommand());
+        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployTriggersDatabaseCommand(),
+                new DeployContentDatabasesCommand(), new DeploySchemasDatabaseCommand());
 
         appDeployer.deploy(appConfig);
 
@@ -49,8 +49,8 @@ public class UpdateContentDatabasesTest extends AbstractAppDeployerTest {
         ConfigDir dir = appConfig.getConfigDir();
         dir.getContentDatabaseFiles().add(new File(dir.getDatabasesDir(), "more-content-db-config.json"));
 
-        initializeAppDeployer(new CreateRestApiServersCommand(), new CreateTriggersDatabaseCommand(),
-                new CreateContentDatabasesCommand(), new CreateSchemasDatabaseCommand());
+        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployTriggersDatabaseCommand(),
+                new DeployContentDatabasesCommand(), new DeploySchemasDatabaseCommand());
 
         appDeployer.deploy(appConfig);
 

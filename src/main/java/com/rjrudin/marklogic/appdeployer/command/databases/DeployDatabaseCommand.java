@@ -6,7 +6,7 @@ import com.rjrudin.marklogic.appdeployer.AppConfig;
 import com.rjrudin.marklogic.appdeployer.command.AbstractCommand;
 import com.rjrudin.marklogic.appdeployer.command.CommandContext;
 import com.rjrudin.marklogic.appdeployer.command.UndoableCommand;
-import com.rjrudin.marklogic.appdeployer.command.forests.CreateForestsCommand;
+import com.rjrudin.marklogic.appdeployer.command.forests.DeployForestsCommand;
 import com.rjrudin.marklogic.mgmt.SaveReceipt;
 import com.rjrudin.marklogic.mgmt.databases.DatabaseManager;
 
@@ -14,7 +14,7 @@ import com.rjrudin.marklogic.mgmt.databases.DatabaseManager;
  * Can be used for creating any kind of database with any sorts of forests. Specifying a config file for the database or
  * for the forests is optional. In order to create forests with different parameters, use CreateForestsCommand.
  */
-public class CreateDatabaseCommand extends AbstractCommand implements UndoableCommand {
+public class DeployDatabaseCommand extends AbstractCommand implements UndoableCommand {
 
     private String databaseFilename;
 
@@ -82,11 +82,11 @@ public class CreateDatabaseCommand extends AbstractCommand implements UndoableCo
             if (logger.isInfoEnabled()) {
                 logger.info("Creating forests for newly created database: " + receipt.getResourceId());
             }
-            CreateForestsCommand c = new CreateForestsCommand();
+            DeployForestsCommand c = new DeployForestsCommand();
             c.setForestsPerHost(forestsPerHost);
             c.setForestFilename(forestFilename);
             c.setDatabaseName(receipt.getResourceId());
-            c.setForestPayload(CreateForestsCommand.DEFAULT_FOREST_PAYLOAD);
+            c.setForestPayload(DeployForestsCommand.DEFAULT_FOREST_PAYLOAD);
             c.execute(context);
         }
     }

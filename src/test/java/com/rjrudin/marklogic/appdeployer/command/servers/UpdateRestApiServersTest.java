@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import com.rjrudin.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.rjrudin.marklogic.appdeployer.command.appservers.UpdateRestApiServersCommand;
-import com.rjrudin.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
+import com.rjrudin.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.rjrudin.marklogic.mgmt.appservers.ServerManager;
 import com.rjrudin.marklogic.rest.util.Fragment;
 
@@ -29,7 +29,7 @@ public class UpdateRestApiServersTest extends AbstractAppDeployerTest {
                 appConfig.getTestRestServerName(), "digest");
 
         // Now redeploy with the update command
-        initializeAppDeployer(new CreateRestApiServersCommand(), new UpdateRestApiServersCommand());
+        initializeAppDeployer(new DeployRestApiServersCommand(), new UpdateRestApiServersCommand());
         appDeployer.deploy(appConfig);
 
         assertAuthentication(

@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import com.rjrudin.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.rjrudin.marklogic.appdeployer.command.modules.LoadAssetsViaXccCommand;
-import com.rjrudin.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
+import com.rjrudin.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.rjrudin.marklogic.rest.util.Fragment;
 import com.rjrudin.marklogic.xcc.XccTemplate;
 
@@ -30,7 +30,7 @@ public class LoadAssetsViaXccTest extends AbstractAppDeployerTest {
         LoadAssetsViaXccCommand command = new LoadAssetsViaXccCommand("src/test/resources/sample-app/more-modules");
         command.setCollections(new String[] { "blue", "red" });
 
-        initializeAppDeployer(new CreateRestApiServersCommand(), command);
+        initializeAppDeployer(new DeployRestApiServersCommand(), command);
         appDeployer.deploy(appConfig);
 
         assertModulesWereLoaded("/app/hello-lib.xqy", "/app/models/world-lib.xqy");
@@ -42,7 +42,7 @@ public class LoadAssetsViaXccTest extends AbstractAppDeployerTest {
                 "src/test/resources/sample-app/other-modules");
         command.setPermissions("rest-admin,read,rest-admin,update,rest-extension-user,execute,rest-extension-user,update");
 
-        initializeAppDeployer(new CreateRestApiServersCommand(), command);
+        initializeAppDeployer(new DeployRestApiServersCommand(), command);
         appDeployer.deploy(appConfig);
 
         assertModuleHasPermissionCount("/app/hello-lib.xqy", 4);

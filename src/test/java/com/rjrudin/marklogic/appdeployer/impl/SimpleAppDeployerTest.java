@@ -4,28 +4,28 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.rjrudin.marklogic.appdeployer.command.databases.CreateContentDatabasesCommand;
-import com.rjrudin.marklogic.appdeployer.command.databases.CreateTriggersDatabaseCommand;
-import com.rjrudin.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
+import com.rjrudin.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
+import com.rjrudin.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
+import com.rjrudin.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 
 public class SimpleAppDeployerTest extends Assert {
 
     private SimpleAppDeployer deployer;
-    private CreateRestApiServersCommand restApiCommand;
-    private CreateContentDatabasesCommand dbCommand;
+    private DeployRestApiServersCommand restApiCommand;
+    private DeployContentDatabasesCommand dbCommand;
 
     @Before
     public void setup() {
-        restApiCommand = new CreateRestApiServersCommand();
-        dbCommand = new CreateContentDatabasesCommand();
+        restApiCommand = new DeployRestApiServersCommand();
+        dbCommand = new DeployContentDatabasesCommand();
         deployer = new SimpleAppDeployer(restApiCommand, dbCommand);
     }
 
     @Test
     public void getCommandOfType() {
-        assertEquals(restApiCommand, deployer.getCommandOfType(CreateRestApiServersCommand.class));
-        assertEquals(dbCommand, deployer.getCommandOfType(CreateContentDatabasesCommand.class));
-        assertNull(deployer.getCommandOfType(CreateTriggersDatabaseCommand.class));
+        assertEquals(restApiCommand, deployer.getCommandOfType(DeployRestApiServersCommand.class));
+        assertEquals(dbCommand, deployer.getCommandOfType(DeployContentDatabasesCommand.class));
+        assertNull(deployer.getCommandOfType(DeployTriggersDatabaseCommand.class));
     }
 
     @Test

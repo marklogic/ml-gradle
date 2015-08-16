@@ -16,7 +16,7 @@ public class ManageCertificateTemplatesTest extends AbstractManageResourceTest {
 
     @Override
     protected Command newCommand() {
-        return new CreateCertificateTemplatesCommand();
+        return new DeployCertificateTemplatesCommand();
     }
 
     @Override

@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import com.rjrudin.marklogic.appdeployer.command.Command;
-import com.rjrudin.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
+import com.rjrudin.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.rjrudin.marklogic.appdeployer.impl.SimpleAppDeployer;
 import com.rjrudin.marklogic.mgmt.AbstractMgmtTest;
 import com.rjrudin.marklogic.mgmt.ManageConfig;
@@ -53,7 +53,7 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
     }
 
     protected void initializeAppDeployer() {
-        initializeAppDeployer(new CreateRestApiServersCommand());
+        initializeAppDeployer(new DeployRestApiServersCommand());
     }
 
     /**

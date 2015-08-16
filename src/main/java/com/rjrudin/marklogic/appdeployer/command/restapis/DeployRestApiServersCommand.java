@@ -20,12 +20,12 @@ import com.rjrudin.marklogic.mgmt.restapis.RestApiManager;
  * database. The content database is expected to be deleted by an instance of CreateContentDatabasesCommand. If you're
  * not using that command, just set deleteContentDatabase to true.
  */
-public class CreateRestApiServersCommand extends AbstractCommand implements UndoableCommand {
+public class DeployRestApiServersCommand extends AbstractCommand implements UndoableCommand {
 
     private boolean deleteModulesDatabase = true;
     private boolean deleteContentDatabase = false;
 
-    public CreateRestApiServersCommand() {
+    public DeployRestApiServersCommand() {
         setExecuteSortOrder(SortOrderConstants.CREATE_REST_API_SERVERS);
     }
 

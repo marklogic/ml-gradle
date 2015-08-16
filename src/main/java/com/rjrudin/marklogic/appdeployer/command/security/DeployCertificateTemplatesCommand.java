@@ -8,9 +8,9 @@ import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
 import com.rjrudin.marklogic.mgmt.ResourceManager;
 import com.rjrudin.marklogic.mgmt.security.CertificateTemplateManager;
 
-public class CreateCertificateTemplatesCommand extends AbstractResourceCommand {
+public class DeployCertificateTemplatesCommand extends AbstractResourceCommand {
 
-    public CreateCertificateTemplatesCommand() {
+    public DeployCertificateTemplatesCommand() {
         setExecuteSortOrder(SortOrderConstants.CREATE_CERTIFICATE_TEMPLATES);
         setUndoSortOrder(SortOrderConstants.DELETE_CERTIFICATE_TEMPLATES);
         

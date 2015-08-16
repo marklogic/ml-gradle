@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import com.rjrudin.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.rjrudin.marklogic.appdeployer.command.modules.LoadModulesCommand;
-import com.rjrudin.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
+import com.rjrudin.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.rjrudin.marklogic.junit.PermissionsFragment;
 import com.rjrudin.marklogic.xcc.XccTemplate;
 
@@ -29,7 +29,7 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
     public void loadModulesFromMultiplePaths() {
         appConfig.getModulePaths().add("src/test/resources/sample-app/build/mlRestApi/some-library/ml-modules");
 
-        initializeAppDeployer(new CreateRestApiServersCommand(), new LoadModulesCommand());
+        initializeAppDeployer(new DeployRestApiServersCommand(), new LoadModulesCommand());
 
         appDeployer.deploy(appConfig);
 
@@ -44,7 +44,7 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
         LoadModulesCommand c = new LoadModulesCommand();
         c.setCustomAssetRolesAndCapabilities("app-user,execute");
 
-        initializeAppDeployer(new CreateRestApiServersCommand(), c);
+        initializeAppDeployer(new DeployRestApiServersCommand(), c);
 
         appDeployer.deploy(appConfig);
 
@@ -59,7 +59,7 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
     @Test
     public void testServerExists() {
         appConfig.setTestRestPort(8541);
-        initializeAppDeployer(new CreateRestApiServersCommand(), new LoadModulesCommand());
+        initializeAppDeployer(new DeployRestApiServersCommand(), new LoadModulesCommand());
         appDeployer.deploy(appConfig);
 
         assertEquals(

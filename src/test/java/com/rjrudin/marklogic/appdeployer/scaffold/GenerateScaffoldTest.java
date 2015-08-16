@@ -6,11 +6,11 @@ import org.junit.Test;
 
 import com.rjrudin.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.rjrudin.marklogic.appdeployer.ConfigDir;
-import com.rjrudin.marklogic.appdeployer.command.databases.CreateTriggersDatabaseCommand;
+import com.rjrudin.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
 import com.rjrudin.marklogic.appdeployer.command.modules.LoadModulesCommand;
-import com.rjrudin.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
-import com.rjrudin.marklogic.appdeployer.command.security.CreateRolesCommand;
-import com.rjrudin.marklogic.appdeployer.command.security.CreateUsersCommand;
+import com.rjrudin.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
+import com.rjrudin.marklogic.appdeployer.command.security.DeployRolesCommand;
+import com.rjrudin.marklogic.appdeployer.command.security.DeployUsersCommand;
 import com.rjrudin.marklogic.appdeployer.scaffold.ScaffoldGenerator;
 import com.rjrudin.marklogic.mgmt.databases.DatabaseManager;
 import com.rjrudin.marklogic.mgmt.security.RoleManager;
@@ -37,8 +37,8 @@ public class GenerateScaffoldTest extends AbstractAppDeployerTest {
         appConfig.getModulePaths().clear();
         appConfig.getModulePaths().add(path + "/src/main/ml-modules");
 
-        initializeAppDeployer(new CreateRestApiServersCommand(), new CreateTriggersDatabaseCommand(),
-                new CreateUsersCommand(), new CreateRolesCommand(), new LoadModulesCommand());
+        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployTriggersDatabaseCommand(),
+                new DeployUsersCommand(), new DeployRolesCommand(), new LoadModulesCommand());
         appDeployer.deploy(appConfig);
 
         try {

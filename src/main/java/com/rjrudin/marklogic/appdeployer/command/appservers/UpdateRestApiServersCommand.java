@@ -8,6 +8,9 @@ import com.rjrudin.marklogic.appdeployer.command.CommandContext;
 import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
 import com.rjrudin.marklogic.mgmt.appservers.ServerManager;
 
+/**
+ * Command for updating an existing REST API server that was presumably created via /v1/rest-apis.
+ */
 public class UpdateRestApiServersCommand extends AbstractCommand {
 
     public UpdateRestApiServersCommand() {

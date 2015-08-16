@@ -2,7 +2,7 @@ package com.rjrudin.marklogic.appdeployer.command.tasks;
 
 import com.rjrudin.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.rjrudin.marklogic.appdeployer.command.Command;
-import com.rjrudin.marklogic.appdeployer.command.tasks.CreateScheduledTasksCommand;
+import com.rjrudin.marklogic.appdeployer.command.tasks.DeployScheduledTasksCommand;
 import com.rjrudin.marklogic.mgmt.ResourceManager;
 import com.rjrudin.marklogic.mgmt.tasks.TaskManager;
 
@@ -15,7 +15,7 @@ public class ManageScheduledTasksTest extends AbstractManageResourceTest {
 
     @Override
     protected Command newCommand() {
-        return new CreateScheduledTasksCommand();
+        return new DeployScheduledTasksCommand();
     }
 
     /**

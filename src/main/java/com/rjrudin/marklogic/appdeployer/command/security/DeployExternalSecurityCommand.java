@@ -6,23 +6,23 @@ import com.rjrudin.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.rjrudin.marklogic.appdeployer.command.CommandContext;
 import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
 import com.rjrudin.marklogic.mgmt.ResourceManager;
-import com.rjrudin.marklogic.mgmt.security.AmpManager;
+import com.rjrudin.marklogic.mgmt.security.ExternalSecurityManager;
 
-public class CreateAmpsCommand extends AbstractResourceCommand {
+public class DeployExternalSecurityCommand extends AbstractResourceCommand {
 
-    public CreateAmpsCommand() {
-        setExecuteSortOrder(SortOrderConstants.CREATE_AMPS);
-        setUndoSortOrder(SortOrderConstants.DELETE_AMPS);
+    public DeployExternalSecurityCommand() {
+        setExecuteSortOrder(SortOrderConstants.CREATE_EXTERNAL_SECURITY);
+        setUndoSortOrder(SortOrderConstants.DELETE_EXTERNAL_SECURITY);
     }
 
     @Override
     protected File getResourcesDir(CommandContext context) {
-        return new File(context.getAppConfig().getConfigDir().getSecurityDir(), "amps");
+        return new File(context.getAppConfig().getConfigDir().getSecurityDir(), "external-security");
     }
 
     @Override
     protected ResourceManager getResourceManager(CommandContext context) {
-        return new AmpManager(context.getManageClient());
+        return new ExternalSecurityManager(context.getManageClient());
     }
 
 }

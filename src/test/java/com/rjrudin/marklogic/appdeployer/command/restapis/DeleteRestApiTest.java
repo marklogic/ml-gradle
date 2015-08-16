@@ -6,9 +6,9 @@ import org.junit.Test;
 
 import com.rjrudin.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.rjrudin.marklogic.appdeployer.ConfigDir;
-import com.rjrudin.marklogic.appdeployer.command.databases.CreateContentDatabasesCommand;
-import com.rjrudin.marklogic.appdeployer.command.databases.CreateSchemasDatabaseCommand;
-import com.rjrudin.marklogic.appdeployer.command.databases.CreateTriggersDatabaseCommand;
+import com.rjrudin.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
+import com.rjrudin.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand;
+import com.rjrudin.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
 import com.rjrudin.marklogic.mgmt.appservers.ServerManager;
 import com.rjrudin.marklogic.mgmt.databases.DatabaseManager;
 import com.rjrudin.marklogic.mgmt.restapis.RestApiManager;
@@ -24,7 +24,7 @@ public class DeleteRestApiTest extends AbstractAppDeployerTest {
         RestApiManager mgr = new RestApiManager(manageClient);
         ServerManager serverMgr = new ServerManager(manageClient, appConfig.getGroupName());
 
-        initializeAppDeployer(new CreateRestApiServersCommand());
+        initializeAppDeployer(new DeployRestApiServersCommand());
         appDeployer.deploy(appConfig);
 
         assertTrue("The REST API server should exist", mgr.restApiServerExists(SAMPLE_APP_NAME));
@@ -40,10 +40,10 @@ public class DeleteRestApiTest extends AbstractAppDeployerTest {
         DatabaseManager dbMgr = new DatabaseManager(manageClient);
         final String dbName = appConfig.getContentDatabaseName();
 
-        CreateRestApiServersCommand command = new CreateRestApiServersCommand();
+        DeployRestApiServersCommand command = new DeployRestApiServersCommand();
         command.setDeleteContentDatabase(true);
-        initializeAppDeployer(new CreateRestApiServersCommand(), new CreateContentDatabasesCommand(),
-                new CreateTriggersDatabaseCommand(), new CreateSchemasDatabaseCommand());
+        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployContentDatabasesCommand(),
+                new DeployTriggersDatabaseCommand(), new DeploySchemasDatabaseCommand());
 
         appDeployer.deploy(appConfig);
         assertTrue("The content database should have been created by the REST API command", dbMgr.exists(dbName));
@@ -61,7 +61,7 @@ public class DeleteRestApiTest extends AbstractAppDeployerTest {
 
         appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/empty-ml-config")));
 
-        initializeAppDeployer(new CreateRestApiServersCommand(), new CreateContentDatabasesCommand());
+        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployContentDatabasesCommand());
 
         appDeployer.deploy(appConfig);
         assertTrue("The content database should have been created by the REST API command", dbMgr.exists(dbName));
@@ -80,7 +80,7 @@ public class DeleteRestApiTest extends AbstractAppDeployerTest {
 
         appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/empty-ml-config")));
 
-        CreateRestApiServersCommand command = new CreateRestApiServersCommand();
+        DeployRestApiServersCommand command = new DeployRestApiServersCommand();
         assertFalse("By default, this command shouldn't delete the content database", command.isDeleteContentDatabase());
         assertTrue("By default, this command should delete the modules database", command.isDeleteModulesDatabase());
 

@@ -3,22 +3,22 @@ package com.rjrudin.marklogic.appdeployer.command.cpf;
 import com.rjrudin.marklogic.appdeployer.command.CommandContext;
 import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
 import com.rjrudin.marklogic.mgmt.cpf.AbstractCpfResourceManager;
-import com.rjrudin.marklogic.mgmt.cpf.DomainManager;
+import com.rjrudin.marklogic.mgmt.cpf.CpfConfigManager;
 
-public class CreateDomainsCommand extends AbstractCpfResourceCommand {
+public class DeployCpfConfigsCommand extends AbstractCpfResourceCommand {
 
-    public CreateDomainsCommand() {
-        setExecuteSortOrder(SortOrderConstants.CREATE_DOMAINS);
+    public DeployCpfConfigsCommand() {
+        setExecuteSortOrder(SortOrderConstants.CREATE_CPF_CONFIGS);
     }
 
     @Override
     protected String getCpfDirectoryName() {
-        return "domains";
+        return "cpf-configs";
     }
 
     @Override
     protected AbstractCpfResourceManager getResourceManager(CommandContext context) {
-        return new DomainManager(context.getManageClient());
+        return new CpfConfigManager(context.getManageClient());
     }
 
 }

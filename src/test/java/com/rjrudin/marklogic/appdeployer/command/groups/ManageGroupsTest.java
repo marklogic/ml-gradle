@@ -2,7 +2,7 @@ package com.rjrudin.marklogic.appdeployer.command.groups;
 
 import com.rjrudin.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.rjrudin.marklogic.appdeployer.command.Command;
-import com.rjrudin.marklogic.appdeployer.command.groups.CreateGroupsCommand;
+import com.rjrudin.marklogic.appdeployer.command.groups.DeployGroupsCommand;
 import com.rjrudin.marklogic.mgmt.ResourceManager;
 import com.rjrudin.marklogic.mgmt.groups.GroupManager;
 import com.rjrudin.marklogic.rest.util.Fragment;
@@ -16,7 +16,7 @@ public class ManageGroupsTest extends AbstractManageResourceTest {
 
     @Override
     protected Command newCommand() {
-        return new CreateGroupsCommand();
+        return new DeployGroupsCommand();
     }
 
     @Override

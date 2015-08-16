@@ -8,9 +8,9 @@ import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
 import com.rjrudin.marklogic.mgmt.ResourceManager;
 import com.rjrudin.marklogic.mgmt.groups.GroupManager;
 
-public class CreateGroupsCommand extends AbstractResourceCommand {
+public class DeployGroupsCommand extends AbstractResourceCommand {
 
-    public CreateGroupsCommand() {
+    public DeployGroupsCommand() {
         setExecuteSortOrder(SortOrderConstants.CREATE_GROUPS);
         setUndoSortOrder(SortOrderConstants.DELETE_GROUPS);
     }

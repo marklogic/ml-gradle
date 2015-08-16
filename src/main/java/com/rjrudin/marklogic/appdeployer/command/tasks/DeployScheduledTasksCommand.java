@@ -8,11 +8,11 @@ import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
 import com.rjrudin.marklogic.mgmt.ResourceManager;
 import com.rjrudin.marklogic.mgmt.tasks.TaskManager;
 
-public class CreateScheduledTasksCommand extends AbstractResourceCommand {
+public class DeployScheduledTasksCommand extends AbstractResourceCommand {
 
     private String groupName;
 
-    public CreateScheduledTasksCommand() {
+    public DeployScheduledTasksCommand() {
         setExecuteSortOrder(SortOrderConstants.CREATE_SCHEDULED_TASKS);
         setUndoSortOrder(SortOrderConstants.DELETE_SCHEDULED_TASKS);
     }

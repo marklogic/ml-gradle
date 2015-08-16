@@ -18,9 +18,9 @@ import com.rjrudin.marklogic.rest.util.JsonNodeUtil;
  * file exists, then this command won't do anything, and it's then expected that a content database is created via the
  * command for creating a REST API instance.
  */
-public class CreateContentDatabasesCommand extends CreateDatabaseCommand {
+public class DeployContentDatabasesCommand extends DeployDatabaseCommand {
 
-    public CreateContentDatabasesCommand() {
+    public DeployContentDatabasesCommand() {
         setExecuteSortOrder(SortOrderConstants.CREATE_CONTENT_DATABASES);
         setUndoSortOrder(SortOrderConstants.DELETE_CONTENT_DATABASES);
 

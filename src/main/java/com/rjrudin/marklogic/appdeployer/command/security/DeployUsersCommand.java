@@ -8,9 +8,9 @@ import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
 import com.rjrudin.marklogic.mgmt.ResourceManager;
 import com.rjrudin.marklogic.mgmt.security.UserManager;
 
-public class CreateUsersCommand extends AbstractResourceCommand {
+public class DeployUsersCommand extends AbstractResourceCommand {
 
-    public CreateUsersCommand() {
+    public DeployUsersCommand() {
         setExecuteSortOrder(SortOrderConstants.CREATE_USERS);
         setUndoSortOrder(SortOrderConstants.DELETE_USERS);
     }

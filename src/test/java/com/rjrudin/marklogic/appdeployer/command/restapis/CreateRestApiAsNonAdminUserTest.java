@@ -10,9 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.rjrudin.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.rjrudin.marklogic.appdeployer.ConfigDir;
 import com.rjrudin.marklogic.appdeployer.command.modules.LoadModulesCommand;
-import com.rjrudin.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
-import com.rjrudin.marklogic.appdeployer.command.security.CreateRolesCommand;
-import com.rjrudin.marklogic.appdeployer.command.security.CreateUsersCommand;
+import com.rjrudin.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
+import com.rjrudin.marklogic.appdeployer.command.security.DeployRolesCommand;
+import com.rjrudin.marklogic.appdeployer.command.security.DeployUsersCommand;
 import com.rjrudin.marklogic.junit.PermissionsFragment;
 import com.rjrudin.marklogic.mgmt.ManageClient;
 import com.rjrudin.marklogic.mgmt.ManageConfig;
@@ -55,7 +55,7 @@ public class CreateRestApiAsNonAdminUserTest extends AbstractAppDeployerTest {
         appConfig.setRestAdminUsername("sample-app-rest-admin");
         appConfig.setRestAdminPassword("sample-app-rest-admin");
 
-        initializeAppDeployer(new CreateRestApiServersCommand(), new CreateRolesCommand(), new CreateUsersCommand(),
+        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployRolesCommand(), new DeployUsersCommand(),
                 new LoadModulesCommand());
         appDeployer.deploy(appConfig);
 

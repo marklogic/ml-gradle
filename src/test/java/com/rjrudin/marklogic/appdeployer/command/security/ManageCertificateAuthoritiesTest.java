@@ -3,7 +3,7 @@ package com.rjrudin.marklogic.appdeployer.command.security;
 import org.junit.Test;
 
 import com.rjrudin.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.rjrudin.marklogic.appdeployer.command.security.CreateCertificateAuthoritiesCommand;
+import com.rjrudin.marklogic.appdeployer.command.security.DeployCertificateAuthoritiesCommand;
 import com.rjrudin.marklogic.mgmt.security.CertificateAuthorityManager;
 import com.rjrudin.marklogic.rest.util.ResourcesFragment;
 
@@ -18,7 +18,7 @@ public class ManageCertificateAuthoritiesTest extends AbstractAppDeployerTest {
     @Test
     public void test() {
         // Run the command to create a certificate authority
-        initializeAppDeployer(new CreateCertificateAuthoritiesCommand());
+        initializeAppDeployer(new DeployCertificateAuthoritiesCommand());
         appDeployer.deploy(appConfig);
 
         // Get the ID of the created certificate authority

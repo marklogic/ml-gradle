@@ -2,7 +2,7 @@ package com.rjrudin.marklogic.appdeployer.command.security;
 
 import com.rjrudin.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.rjrudin.marklogic.appdeployer.command.Command;
-import com.rjrudin.marklogic.appdeployer.command.security.CreatePrivilegesCommand;
+import com.rjrudin.marklogic.appdeployer.command.security.DeployPrivilegesCommand;
 import com.rjrudin.marklogic.mgmt.ResourceManager;
 import com.rjrudin.marklogic.mgmt.security.PrivilegeManager;
 
@@ -18,7 +18,7 @@ public class ManagePrivilegesTest extends AbstractManageResourceTest {
 
     @Override
     protected Command newCommand() {
-        return new CreatePrivilegesCommand();
+        return new DeployPrivilegesCommand();
     }
 
     @Override

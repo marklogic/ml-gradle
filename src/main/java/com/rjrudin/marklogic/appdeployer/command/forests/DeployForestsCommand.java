@@ -14,7 +14,7 @@ import com.rjrudin.marklogic.mgmt.hosts.HostManager;
 /**
  * Doesn't yet support deleting forests - currently assumed that this will be done by deleting a database.
  */
-public class CreateForestsCommand extends AbstractCommand {
+public class DeployForestsCommand extends AbstractCommand {
 
     public static final String DEFAULT_FOREST_PAYLOAD = "{\"forest-name\": \"%%FOREST_NAME%%\", \"host\": \"%%FOREST_HOST%%\", "
             + "\"database\": \"%%FOREST_DATABASE%%\"}";
@@ -24,7 +24,7 @@ public class CreateForestsCommand extends AbstractCommand {
     private String forestFilename;
     private String forestPayload;
 
-    public CreateForestsCommand() {
+    public DeployForestsCommand() {
         setExecuteSortOrder(SortOrderConstants.CREATE_FORESTS);
     }
 

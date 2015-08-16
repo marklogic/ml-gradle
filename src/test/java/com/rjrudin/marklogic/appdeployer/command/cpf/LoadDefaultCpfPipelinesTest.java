@@ -4,10 +4,10 @@ import org.junit.After;
 import org.junit.Test;
 
 import com.rjrudin.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.rjrudin.marklogic.appdeployer.command.databases.CreateSchemasDatabaseCommand;
-import com.rjrudin.marklogic.appdeployer.command.databases.CreateTriggersDatabaseCommand;
-import com.rjrudin.marklogic.appdeployer.command.databases.CreateContentDatabasesCommand;
-import com.rjrudin.marklogic.appdeployer.command.restapis.CreateRestApiServersCommand;
+import com.rjrudin.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand;
+import com.rjrudin.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
+import com.rjrudin.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
+import com.rjrudin.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.rjrudin.marklogic.mgmt.cpf.PipelineManager;
 import com.rjrudin.marklogic.rest.util.ResourcesFragment;
 
@@ -20,8 +20,8 @@ public class LoadDefaultCpfPipelinesTest extends AbstractAppDeployerTest {
 
     @Test
     public void loadDefaultCpfPipelines() {
-        initializeAppDeployer(new CreateRestApiServersCommand(), new CreateContentDatabasesCommand(),
-                new CreateSchemasDatabaseCommand(), new CreateTriggersDatabaseCommand());
+        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployContentDatabasesCommand(),
+                new DeploySchemasDatabaseCommand(), new DeployTriggersDatabaseCommand());
 
         appDeployer.deploy(appConfig);
 

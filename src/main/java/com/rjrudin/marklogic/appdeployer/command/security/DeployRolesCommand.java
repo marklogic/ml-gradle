@@ -8,9 +8,9 @@ import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
 import com.rjrudin.marklogic.mgmt.ResourceManager;
 import com.rjrudin.marklogic.mgmt.security.RoleManager;
 
-public class CreateRolesCommand extends AbstractResourceCommand {
+public class DeployRolesCommand extends AbstractResourceCommand {
 
-    public CreateRolesCommand() {
+    public DeployRolesCommand() {
         setExecuteSortOrder(SortOrderConstants.CREATE_ROLES);
         setUndoSortOrder(SortOrderConstants.DELETE_ROLES);
     }

@@ -16,9 +16,9 @@ import com.rjrudin.marklogic.mgmt.viewschemas.ViewSchemaManager;
  * view-schemas folder. If it exists, we'll process each file in the directory. We don't need to do anything on undeploy
  * fortunately.
  */
-public class CreateViewSchemasCommand extends AbstractResourceCommand {
+public class DeployViewSchemasCommand extends AbstractResourceCommand {
 
-    public CreateViewSchemasCommand() {
+    public DeployViewSchemasCommand() {
         // Don't need to delete anything, as view-schemas all live in a database
         setDeleteResourcesOnUndo(false);
         setExecuteSortOrder(SortOrderConstants.CREATE_SQL_VIEWS);

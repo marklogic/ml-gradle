@@ -9,8 +9,14 @@ public class CreateTriggersDatabaseCommand extends CreateDatabaseCommand {
         setExecuteSortOrder(SortOrderConstants.CREATE_TRIGGERS_DATABASE);
         setUndoSortOrder(SortOrderConstants.DELETE_TRIGGERS_DATABASE);
         setDatabaseFilename("triggers-database.json");
+    }
 
-        setCreateDatabaseWithoutFile(true);
+    @Override
+    public void execute(CommandContext context) {
+        if (context.getAppConfig().isCreateTriggersDatabase()) {
+            setCreateDatabaseWithoutFile(true);
+        }
+        super.execute(context);
     }
 
     protected String buildDefaultDatabasePayload(CommandContext context) {

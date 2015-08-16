@@ -13,7 +13,7 @@ import com.rjrudin.marklogic.rest.util.JsonNodeUtil;
 
 /**
  * For ease of use, this command handles creating forests the the content database, either based on a file in the
- * forests directory, or based on the default payload in the CreateForestsCommand class. This allows a developer to only
+ * forests directory, or based on the default payload in the DeployForestsCommand class. This allows a developer to only
  * have to define a content database file and not have to define a forest file as well. Note that if no content database
  * file exists, then this command won't do anything, and it's then expected that a content database is created via the
  * command for creating a REST API instance.

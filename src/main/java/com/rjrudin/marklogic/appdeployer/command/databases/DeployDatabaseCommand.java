@@ -12,7 +12,7 @@ import com.rjrudin.marklogic.mgmt.databases.DatabaseManager;
 
 /**
  * Can be used for creating any kind of database with any sorts of forests. Specifying a config file for the database or
- * for the forests is optional. In order to create forests with different parameters, use CreateForestsCommand.
+ * for the forests is optional. In order to create forests with different parameters, use DeployForestsCommand.
  */
 public class DeployDatabaseCommand extends AbstractCommand implements UndoableCommand {
 

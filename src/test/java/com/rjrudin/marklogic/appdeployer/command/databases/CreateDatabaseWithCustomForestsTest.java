@@ -9,7 +9,7 @@ import com.rjrudin.marklogic.rest.util.Fragment;
 
 /**
  * The REST API command can be used to create a server with a content database, but that doesn't give any control over
- * the details of the forests. CreateContentForestsCommand can be used for that kind of control.
+ * the details of the forests. DeployForestsCommand can be used for that kind of control.
  */
 public class CreateDatabaseWithCustomForestsTest extends AbstractAppDeployerTest {
 

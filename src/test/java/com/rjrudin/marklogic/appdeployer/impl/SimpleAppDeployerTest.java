@@ -30,8 +30,8 @@ public class SimpleAppDeployerTest extends Assert {
 
     @Test
     public void getCommand() {
-        assertEquals(restApiCommand, deployer.getCommand("CreateRestApiServersCommand"));
-        assertEquals(dbCommand, deployer.getCommand("CreateContentDatabasesCommand"));
+        assertEquals(restApiCommand, deployer.getCommand("DeployRestApiServersCommand"));
+        assertEquals(dbCommand, deployer.getCommand("DeployContentDatabasesCommand"));
         assertNull(deployer.getCommand("SomeOtherCommand"));
     }
 }

@@ -17,7 +17,7 @@ import com.rjrudin.marklogic.mgmt.restapis.RestApiManager;
 
 /**
  * By default, when this command deletes a REST API server, it will delete the modules database but not the content
- * database. The content database is expected to be deleted by an instance of CreateContentDatabasesCommand. If you're
+ * database. The content database is expected to be deleted by an instance of DeployContentDatabasesCommand. If you're
  * not using that command, just set deleteContentDatabase to true.
  */
 public class DeployRestApiServersCommand extends AbstractCommand implements UndoableCommand {

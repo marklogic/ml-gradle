@@ -10,6 +10,10 @@ import com.rjrudin.marklogic.appdeployer.command.forests.CreateForestsCommand;
 import com.rjrudin.marklogic.mgmt.SaveReceipt;
 import com.rjrudin.marklogic.mgmt.databases.DatabaseManager;
 
+/**
+ * Can be used for creating any kind of database with any sorts of forests. Specifying a config file for the database or
+ * for the forests is optional. In order to create forests with different parameters, use CreateForestsCommand.
+ */
 public class CreateDatabaseCommand extends AbstractCommand implements UndoableCommand {
 
     private String databaseFilename;

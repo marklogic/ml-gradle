@@ -3,7 +3,6 @@ package com.rjrudin.marklogic.gradle.task.client
 import org.gradle.api.tasks.TaskAction
 
 import com.rjrudin.marklogic.appdeployer.AppDeployer
-import com.rjrudin.marklogic.appdeployer.command.Command
 import com.rjrudin.marklogic.appdeployer.command.modules.LoadModulesCommand
 import com.rjrudin.marklogic.appdeployer.impl.SimpleAppDeployer
 import com.rjrudin.marklogic.gradle.task.MarkLogicTask
@@ -17,17 +16,14 @@ class LoadModulesTask extends MarkLogicTask {
         // don't want to have to duplicate on this task
         AppDeployer d = getAppDeployer()
         if (d instanceof SimpleAppDeployer) {
-            List<Command> commands = ((SimpleAppDeployer)d).getCommands()
-            for (Command c : commands) {
-                if (c instanceof LoadModulesCommand) {
-                    command = c
-                    break
-                }
-            }
+            command = d.getCommand("LoadModulesCommand")
         }
 
         if (command == null) {
             command = new LoadModulesCommand()
+            if (project.hasProperty("mlModulePermissions")) {
+                command.setDefaultAssetRolesAndCapabilities(project.property("mlModulePermissions"))
+            }
         }
 
         new LoadModulesCommand().execute(getCommandContext())

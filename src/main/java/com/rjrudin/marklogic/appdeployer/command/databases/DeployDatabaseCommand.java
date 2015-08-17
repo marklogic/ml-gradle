@@ -16,17 +16,39 @@ import com.rjrudin.marklogic.mgmt.databases.DatabaseManager;
  */
 public class DeployDatabaseCommand extends AbstractCommand implements UndoableCommand {
 
+    /**
+     * Optional XML/JSON filename for the database
+     */
     private String databaseFilename;
 
-    // Provide an easy way of creating a database based on a name without a file being provided
+    /**
+     * Provide an easy way of creating a database based on a name without a file being provided. If this is false and
+     * databaseFilename is null, then no database will be deployed.
+     */
     private boolean createDatabaseWithoutFile = false;
+
+    /**
+     * The name of the database to be deployed; used for constructing forest names, and thus required if you're creating
+     * forests.
+     */
     private String databaseName;
 
-    private String forestDelete = "data";
+    /**
+     * Optional name of the file in the forests directory that will be used to create each forest. If not provided, a
+     * "vanilla" forest is created on each host with a name based on the databaseName attribute.
+     */
+    private String forestFilename;
+
+    /**
+     * Number of forests to create per host for this database.
+     */
     private int forestsPerHost = 1;
 
-    // Optional name of the file in the forests directory
-    private String forestFilename;
+    /**
+     * Applied when the database is deleted - see
+     * http://docs.marklogic.com/REST/DELETE/manage/v2/databases/[id-or-name].
+     */
+    private String forestDelete = "data";
 
     private int undoSortOrder;
 

@@ -2,6 +2,7 @@ package com.rjrudin.marklogic.gradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.slf4j.LoggerFactory;
 
 import com.rjrudin.marklogic.appdeployer.AppConfig
 import com.rjrudin.marklogic.appdeployer.AppDeployer
@@ -57,8 +58,10 @@ import com.rjrudin.marklogic.mgmt.admin.AdminManager
 
 class MarkLogicPlugin implements Plugin<Project> {
 
+    org.slf4j.Logger logger = LoggerFactory.getLogger(getClass())
+    
     void apply(Project project) {
-        println "\nInitializing ml-gradle"
+        logger.info("\nInitializing ml-gradle")
 
         initializeAppConfig(project)
         initializeManageConfig(project)
@@ -117,7 +120,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         String taskGroup = "ml-gradle Tasks"
         project.task("mlDeployTasks", type: DeployTasksTask, group: taskGroup, description: "Deploy only scheduled tasks")
 
-        println "Finished initializing ml-gradle\n"
+        logger.info("Finished initializing ml-gradle\n")
     }
 
     /**
@@ -130,28 +133,28 @@ class MarkLogicPlugin implements Plugin<Project> {
         AppConfig appConfig = new AppConfig()
         if (project.hasProperty("mlConfigDir")) {
             def prop = project.property("mlConfigDir")
-            println "Setting config dir to: " + prop
+            logger.info("Setting config dir to: " + prop)
             appConfig.setConfigDir(new ConfigDir(new File(prop)))
         }
         if (project.hasProperty("mlAppName")) {
             def name = project.property("mlAppName")
-            println "App name: " + name
+            logger.info("App name: " + name)
             appConfig.setName(name)
         }
         if (project.hasProperty("mlHost")) {
             def host = project.property("mlHost")
-            println "App host: " + host
+            logger.info("App host: " + host)
             appConfig.setHost(host)
         }
 
         if (project.hasProperty("mlRestPort")) {
             def port = project.property("mlRestPort")
-            println "App REST port: " + port
+            logger.info("App REST port: " + port)
             appConfig.setRestPort(Integer.parseInt(port))
         }
         if (project.hasProperty("mlTestRestPort")) {
             def port = project.property("mlTestRestPort")
-            println "App test REST port: " + port
+            logger.info("App test REST port: " + port)
             appConfig.setTestRestPort(Integer.parseInt(port))
         }
 
@@ -163,7 +166,7 @@ class MarkLogicPlugin implements Plugin<Project> {
             restUsername = project.property("mlUsername")
         }
         if (restUsername != null) {
-            println "REST Admin username: " + restUsername
+            logger.info("REST Admin username: " + restUsername)
             appConfig.setRestAdminUsername(restUsername)
         }
 
@@ -185,7 +188,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         ManageConfig manageConfig = new ManageConfig()
         if (project.hasProperty("mlHost")) {
             def host = project.property("mlHost")
-            println "Manage host: " + host
+            logger.info("Manage host: " + host)
             manageConfig.setHost(host)
         }
 
@@ -197,7 +200,7 @@ class MarkLogicPlugin implements Plugin<Project> {
             username = project.property("mlUsername")
         }
         if (username != null) {
-            println "Manage username: " + username
+            logger.info("Manage username: " + username)
             manageConfig.setUsername(username)
         }
 
@@ -226,7 +229,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         AdminConfig adminConfig = new AdminConfig()
         if (project.hasProperty("mlHost")) {
             def host = project.property("mlHost")
-            println "Admin host: " + host
+            logger.info("Admin host: " + host)
             adminConfig.setHost(host)
         }
 
@@ -238,7 +241,7 @@ class MarkLogicPlugin implements Plugin<Project> {
             username = project.property("mlUsername")
         }
         if (username != null) {
-            println "Admin username: " + username
+            logger.info("Admin username: " + username)
             adminConfig.setUsername(username)
         }
 

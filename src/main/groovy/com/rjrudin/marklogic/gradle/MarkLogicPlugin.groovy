@@ -303,6 +303,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         DeployContentDatabasesCommand dcdc = new DeployContentDatabasesCommand()
         if (project.hasProperty("mlContentForestsPerHost")) {
             int num = Integer.parseInt(project.property("mlContentForestsPerHost"))
+            logger.info("Setting content forests per host to: " + num)
             dcdc.setForestsPerHost(num)
         }
         commands.add(dcdc)
@@ -310,7 +311,9 @@ class MarkLogicPlugin implements Plugin<Project> {
         // Modules
         LoadModulesCommand lmc = new LoadModulesCommand()
         if (project.hasProperty("mlModulePermissions")) {
-            lmc.setDefaultAssetRolesAndCapabilities(project.property("mlModulePermissions"))
+            String perms = project.property("mlModulePermissions")
+            logger.info("Setting module permissions to: " + perms)
+            lmc.setDefaultAssetRolesAndCapabilities(perms)
         }
         commands.add(lmc)
 

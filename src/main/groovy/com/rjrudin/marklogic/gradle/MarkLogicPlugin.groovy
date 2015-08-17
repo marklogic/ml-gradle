@@ -299,12 +299,17 @@ class MarkLogicPlugin implements Plugin<Project> {
         
         DeployContentDatabasesCommand dcdc = new DeployContentDatabasesCommand()
         if (project.hasProperty("mlContentForestsPerHost")) {
-            dcdc.setForestsPerHost(Integer.parseInt(project.property("mlContentForestsPerHost")))
+            int num = Integer.parseInt(project.property("mlContentForestsPerHost"))
+            dcdc.setForestsPerHost(num)
         }
         commands.add(dcdc)
 
         // Modules
-        commands.add(new LoadModulesCommand())
+        LoadModulesCommand lmc = new LoadModulesCommand()
+        if (project.hasProperty("mlModulePermissions")) {
+            lmc.setDefaultAssetRolesAndCapabilities(project.property("mlModulePermissions"))
+        }
+        commands.add(lmc)
 
         // CPF
         List<Command> cpfCommands = new ArrayList<Command>()

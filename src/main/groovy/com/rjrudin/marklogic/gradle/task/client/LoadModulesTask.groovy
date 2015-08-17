@@ -26,6 +26,6 @@ class LoadModulesTask extends MarkLogicTask {
             }
         }
 
-        new LoadModulesCommand().execute(getCommandContext())
+        command.execute(getCommandContext())
     }
 }

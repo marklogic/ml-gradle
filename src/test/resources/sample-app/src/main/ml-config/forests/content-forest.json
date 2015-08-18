@@ -1,5 +1,5 @@
 {
   "forest-name": "%%FOREST_NAME%%",
   "host": "%%FOREST_HOST%%",
-  "database": "%%FOREST_DATABASE%%"
+  "database": "%%DATABASE%%"
 }

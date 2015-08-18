@@ -45,7 +45,9 @@ public class DeployForestsCommand extends AbstractCommand {
                     payload = copyFileToString(f);
                 }
             }
-        } else if (StringUtils.hasText(forestPayload)) {
+        }
+
+        if (payload == null && StringUtils.hasText(forestPayload)) {
             if (logger.isInfoEnabled()) {
                 logger.info("Creating forests using configured payload: " + forestPayload);
             }

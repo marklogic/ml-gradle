@@ -1,5 +1,7 @@
 package com.rjrudin.marklogic.appdeployer.command.databases;
 
+import java.io.File;
+
 import org.junit.Test;
 
 import com.rjrudin.marklogic.appdeployer.AbstractAppDeployerTest;
@@ -62,6 +64,42 @@ public class CreateDatabaseWithCustomForestsTest extends AbstractAppDeployerTest
             for (int i = 1; i <= numberOfForests; i++) {
                 assertFalse(forestMgr.exists(appConfig.getContentDatabaseName() + "-1"));
                 assertFalse(forestMgr.exists(appConfig.getTestContentDatabaseName() + "-1"));
+            }
+        }
+    }
+
+    @Test
+    public void configDirWithDatabaseFileButNoForestFile() {
+        appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/db-only-config"));
+
+        final int numberOfForests = 2;
+
+        DeployContentDatabasesCommand command = new DeployContentDatabasesCommand();
+        command.setForestsPerHost(numberOfForests);
+        initializeAppDeployer(command);
+
+        ForestManager forestMgr = new ForestManager(manageClient);
+        DatabaseManager dbMgr = new DatabaseManager(manageClient);
+
+        try {
+            appDeployer.deploy(appConfig);
+
+            assertTrue(dbMgr.exists(appConfig.getContentDatabaseName()));
+
+            Fragment mainDb = dbMgr.getAsXml(appConfig.getContentDatabaseName());
+
+            for (int i = 1; i <= numberOfForests; i++) {
+                String mainForestName = appConfig.getContentDatabaseName() + "-" + i;
+                assertTrue(forestMgr.exists(mainForestName));
+                assertTrue(mainDb.elementExists(format("//db:relation[db:nameref = '%s']", mainForestName)));
+            }
+        } finally {
+            undeploySampleApp();
+
+            assertFalse(dbMgr.exists(appConfig.getContentDatabaseName()));
+
+            for (int i = 1; i <= numberOfForests; i++) {
+                assertFalse(forestMgr.exists(appConfig.getContentDatabaseName() + "-1"));
             }
         }
     }

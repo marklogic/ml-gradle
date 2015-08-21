@@ -1,0 +1,6 @@
+<group-properties xmlns="http://marklogic.com/manage">
+  <group-name>Default</group-name>
+  <!-- Note that when ml-gradle sees any element/field in a group payload that contains "cache-size", it will wait for MarkLogic 
+    to restart, as cache size changes force a restart -->
+  <list-cache-size>2048</list-cache-size>
+</group-properties>

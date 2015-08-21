@@ -2,7 +2,7 @@ package com.rjrudin.marklogic.gradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.slf4j.LoggerFactory;
+import org.slf4j.LoggerFactory
 
 import com.rjrudin.marklogic.appdeployer.AppConfig
 import com.rjrudin.marklogic.appdeployer.AppDeployer
@@ -17,6 +17,7 @@ import com.rjrudin.marklogic.appdeployer.command.cpf.DeployPipelinesCommand
 import com.rjrudin.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand
 import com.rjrudin.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand
 import com.rjrudin.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand
+import com.rjrudin.marklogic.appdeployer.command.groups.DeployGroupsCommand
 import com.rjrudin.marklogic.appdeployer.command.modules.LoadModulesCommand
 import com.rjrudin.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand
 import com.rjrudin.marklogic.appdeployer.command.security.DeployAmpsCommand
@@ -45,10 +46,11 @@ import com.rjrudin.marklogic.gradle.task.databases.ClearContentDatabaseTask
 import com.rjrudin.marklogic.gradle.task.databases.ClearModulesDatabaseTask
 import com.rjrudin.marklogic.gradle.task.databases.ClearSchemasDatabaseTask
 import com.rjrudin.marklogic.gradle.task.databases.ClearTriggersDatabaseTask
-import com.rjrudin.marklogic.gradle.task.databases.UpdateContentDatabasesTask
+import com.rjrudin.marklogic.gradle.task.databases.DeployDatabasesTask
+import com.rjrudin.marklogic.gradle.task.groups.DeployGroupsTask
 import com.rjrudin.marklogic.gradle.task.scaffold.GenerateScaffoldTask
 import com.rjrudin.marklogic.gradle.task.security.DeploySecurityTask
-import com.rjrudin.marklogic.gradle.task.servers.UpdateRestApiServersTask
+import com.rjrudin.marklogic.gradle.task.servers.DeployServersTask
 import com.rjrudin.marklogic.gradle.task.tasks.DeployTasksTask
 import com.rjrudin.marklogic.gradle.task.viewschemas.DeployViewSchemasTask
 import com.rjrudin.marklogic.mgmt.ManageClient
@@ -85,7 +87,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlInstallAdmin", type: InstallAdminTask, group: adminGroup, description: "Perform a one-time installation of an admin user")
 
         String cpfGroup = "ml-gradle CPF"
-        project.task("mlDeployCpf", type: DeployCpfTask, group: cpfGroup, description: "Deploy only CPF pipelines, domains, and configurations").mustRunAfter("mlClearTriggersDatabase")
+        project.task("mlDeployCpf", type: DeployCpfTask, group: cpfGroup, description: "Deploy each CPF resource - domains, pipelines, and CPF configs").mustRunAfter("mlClearTriggersDatabase")
         project.task("mlRedeployCpf", group: cpfGroup, dependsOn: ["mlClearTriggersDatabase", "mlDeployCpf"], description: "Clears the triggers database and then calls mlDeployCpf; be sure to reload custom triggers after doing this, as they will be deleted as well")
         project.task("mlLoadDefaultPipelines", type: LoadDefaultPipelinesTask, group: cpfGroup, description: "Load default pipelines into a triggers database")
 
@@ -94,7 +96,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlClearModulesDatabase", type: ClearModulesDatabaseTask, group: dbGroup, dependsOn: "mlDeleteModuleTimestampsFile", description: "Deletes potentially all of the documents in the modules database; has a property for excluding documents from deletion")
         project.task("mlClearSchemasDatabase", type: ClearSchemasDatabaseTask, group: dbGroup, description: "Deletes all documents in the schemas database")
         project.task("mlClearTriggersDatabase", type: ClearTriggersDatabaseTask, group: dbGroup, description: "Deletes all documents in the triggers database")
-        project.task("mlUpdateContentDatabase", type: UpdateContentDatabasesTask, group: dbGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the content databases based on the content database configuration file(s)")
+        project.task("mlDeployDatabases", type: DeployDatabasesTask, group: dbGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Deploy each database, updating it if it exists")
 
         String devGroup = "ml-gradle Development"
         project.task("mlScaffold", type: GenerateScaffoldTask, group: devGroup, description: "Generate project scaffold for a new project")
@@ -102,6 +104,9 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlCreateTransform", type: CreateTransformTask, group: devGroup, description: "Create a new transform in the modules transforms directory")
         project.task("mlPrepareRestApiDependencies", type: PrepareRestApiDependenciesTask, group: devGroup, dependsOn: project.configurations["mlRestApi"], description: "Downloads (if necessary) and unzips in the build directory all mlRestApi dependencies")
 
+        String groupsGroup = "ml-gradle Group"
+        project.task("mlDeployGroups", type: DeployGroupsTask, group: groupsGroup, description: "Deploy each group, updating it if it exists")
+        
         String modulesGroup = "ml-gradle Modules"
         project.task("mlLoadModules", type: LoadModulesTask, group: modulesGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Loads modules from directories defined by mlAppConfig or via a property on this task").mustRunAfter(["mlClearModulesDatabase"])
         project.task("mlReloadModules", group: modulesGroup, dependsOn: ["mlClearModulesDatabase", "mlLoadModules"], description: "Reloads modules by first clearing the modules database and then loading modules")
@@ -109,16 +114,16 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlDeleteModuleTimestampsFile", type: DeleteModuleTimestampsFileTask, group: modulesGroup, description: "Delete the properties file in the build directory that keeps track of when each module was last loaded")
 
         String serverGroup = "ml-gradle Server"
-        project.task("mlUpdateRestApiServers", type: UpdateRestApiServersTask, group: serverGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the REST API servers")
+        project.task("mlDeployServers", type: DeployServersTask, group: serverGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the REST API server (if it exists) and deploys each other server, updating it if it exists")
 
         String securityGroup = "ml-gradle Security"
-        project.task("mlDeploySecurity", type: DeploySecurityTask, group: securityGroup, description: "Deploy only security resources")
+        project.task("mlDeploySecurity", type: DeploySecurityTask, group: securityGroup, description: "Deploy each security resource, updating it if it exists")
 
         String sqlGroup = "ml-gradle SQL"
-        project.task("mlDeployViewSchemas", type: DeployViewSchemasTask, group: sqlGroup, description: "Deploy only SQL view schemas")
+        project.task("mlDeployViewSchemas", type: DeployViewSchemasTask, group: sqlGroup, description: "Deploy each SQL view schema, updating it if it exists")
 
         String taskGroup = "ml-gradle Tasks"
-        project.task("mlDeployTasks", type: DeployTasksTask, group: taskGroup, description: "Deploy only scheduled tasks")
+        project.task("mlDeployTasks", type: DeployTasksTask, group: taskGroup, description: "Deploy each scheduled task, updating it if it exists")
 
         logger.info("Finished initializing ml-gradle\n")
     }
@@ -293,20 +298,29 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.extensions.add("mlSecurityCommands", securityCommands)
         commands.addAll(securityCommands)
 
-        // Databases and appservers
-        commands.add(new DeployRestApiServersCommand())
-        commands.add(new DeployTriggersDatabaseCommand())
-        commands.add(new DeploySchemasDatabaseCommand())
-        commands.add(new DeployOtherServersCommand())
-        commands.add(new UpdateRestApiServersCommand())
-        
+        // Databases
+        List<Command> dbCommands = new ArrayList<Command>()
         DeployContentDatabasesCommand dcdc = new DeployContentDatabasesCommand()
         if (project.hasProperty("mlContentForestsPerHost")) {
             int num = Integer.parseInt(project.property("mlContentForestsPerHost"))
             logger.info("Setting content forests per host to: " + num)
             dcdc.setForestsPerHost(num)
         }
-        commands.add(dcdc)
+        dbCommands.add(dcdc)
+        dbCommands.add(new DeployTriggersDatabaseCommand())
+        dbCommands.add(new DeploySchemasDatabaseCommand())
+        project.extensions.add("mlDatabaseCommands", dbCommands)
+        commands.addAll(dbCommands)
+        
+        // REST API instance creation
+        commands.add(new DeployRestApiServersCommand())
+        
+        // App servers
+        List<Command> serverCommands = new ArrayList<Command>()
+        serverCommands.add(new DeployOtherServersCommand())
+        serverCommands.add(new UpdateRestApiServersCommand())
+        project.extensions.add("mlServerCommands", serverCommands)
+        commands.addAll(serverCommands)
 
         // Modules
         LoadModulesCommand lmc = new LoadModulesCommand()
@@ -325,6 +339,12 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.extensions.add("mlCpfCommands", cpfCommands)
         commands.addAll(cpfCommands)
 
+        // Groups
+        List<Command> groupCommands = new ArrayList<Command>()
+        groupCommands.add(new DeployGroupsCommand())
+        project.extensions.add("mlGroupCommands", groupCommands)
+        commands.addAll(groupCommands)
+        
         // Tasks
         List<Command> taskCommands = new ArrayList<Command>()
         taskCommands.add(new DeployScheduledTasksCommand())

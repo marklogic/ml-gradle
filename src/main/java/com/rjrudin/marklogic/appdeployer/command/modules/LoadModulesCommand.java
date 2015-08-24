@@ -8,7 +8,6 @@ import com.rjrudin.marklogic.appdeployer.AppConfig;
 import com.rjrudin.marklogic.appdeployer.command.AbstractCommand;
 import com.rjrudin.marklogic.appdeployer.command.CommandContext;
 import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
-import com.rjrudin.marklogic.modulesloader.ModulesLoader;
 import com.rjrudin.marklogic.modulesloader.impl.DefaultModulesLoader;
 import com.rjrudin.marklogic.modulesloader.impl.TestServerModulesFinder;
 import com.rjrudin.marklogic.modulesloader.impl.XccAssetLoader;
@@ -18,7 +17,7 @@ import com.rjrudin.marklogic.modulesloader.impl.XccAssetLoader;
  */
 public class LoadModulesCommand extends AbstractCommand {
 
-    private ModulesLoader modulesLoader;
+    private DefaultModulesLoader modulesLoader;
 
     // As defined by the REST API
     private String defaultAssetRolesAndCapabilities = "rest-admin,read,rest-admin,update,rest-extension-user,execute";
@@ -40,6 +39,13 @@ public class LoadModulesCommand extends AbstractCommand {
         }
     }
 
+    /**
+     * If we have multiple module paths, we want to load via XCC the assets for each first, and then iterate over the
+     * paths again and load all the REST API resources. This ensures that if the REST server for loading REST API
+     * resources has a custom rewriter, it's guaranteed to be loaded before we try to load any REST API resources.
+     * 
+     * @param context
+     */
     protected void loadModulesIntoMainServer(CommandContext context) {
         if (modulesLoader == null) {
             this.modulesLoader = new DefaultModulesLoader(newXccAssetLoader(context));
@@ -50,8 +56,15 @@ public class LoadModulesCommand extends AbstractCommand {
         DatabaseClient client = DatabaseClientFactory.newClient(config.getHost(), config.getRestPort(),
                 config.getRestAdminUsername(), config.getRestAdminPassword(), config.getAuthentication());
 
+        this.modulesLoader.setModulesFinder(new AssetModulesFinder());
         for (String modulesPath : config.getModulePaths()) {
-            logger.info("Loading modules from dir: " + modulesPath);
+            logger.info("Loading asset modules from dir: " + modulesPath);
+            modulesLoader.loadModules(new File(modulesPath), client);
+        }
+
+        this.modulesLoader.setModulesFinder(new AllButAssetsModulesFinder());
+        for (String modulesPath : config.getModulePaths()) {
+            logger.info("Loading all non-asset modules from dir: " + modulesPath);
             modulesLoader.loadModules(new File(modulesPath), client);
         }
     }
@@ -104,7 +117,7 @@ public class LoadModulesCommand extends AbstractCommand {
         return l;
     }
 
-    public void setModulesLoader(ModulesLoader modulesLoader) {
+    public void setModulesLoader(DefaultModulesLoader modulesLoader) {
         this.modulesLoader = modulesLoader;
     }
 

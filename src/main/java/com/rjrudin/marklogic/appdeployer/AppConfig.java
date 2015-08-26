@@ -5,7 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.net.ssl.SSLContext;
+
 import com.marklogic.client.DatabaseClientFactory.Authentication;
+import com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier;
 
 /**
  * Encapsulates the connection information for an application and where its modules can be found. Should possibly add
@@ -19,7 +22,9 @@ public class AppConfig {
     // Username/password combo for using the client REST API - e.g. to load modules
     private String restAdminUsername;
     private String restAdminPassword;
-    private Authentication authentication = Authentication.DIGEST;
+    private SSLContext restSslContext;
+    private SSLHostnameVerifier restSslHostnameVerifier;
+    private Authentication restAuthentication = Authentication.DIGEST;
 
     private Integer restPort;
     private Integer testRestPort;
@@ -145,12 +150,12 @@ public class AppConfig {
         this.groupName = groupName;
     }
 
-    public Authentication getAuthentication() {
-        return authentication;
+    public Authentication getRestAuthentication() {
+        return restAuthentication;
     }
 
-    public void setAuthentication(Authentication authentication) {
-        this.authentication = authentication;
+    public void setRestAuthentication(Authentication authentication) {
+        this.restAuthentication = authentication;
     }
 
     public ConfigDir getConfigDir() {
@@ -175,6 +180,22 @@ public class AppConfig {
 
     public void setCreateTriggersDatabase(boolean createTriggerDatabase) {
         this.createTriggersDatabase = createTriggerDatabase;
+    }
+
+    public SSLContext getRestSslContext() {
+        return restSslContext;
+    }
+
+    public void setRestSslContext(SSLContext restSslContext) {
+        this.restSslContext = restSslContext;
+    }
+
+    public SSLHostnameVerifier getRestSslHostnameVerifier() {
+        return restSslHostnameVerifier;
+    }
+
+    public void setRestSslHostnameVerifier(SSLHostnameVerifier restSslHostnameVerifier) {
+        this.restSslHostnameVerifier = restSslHostnameVerifier;
     }
 
 }

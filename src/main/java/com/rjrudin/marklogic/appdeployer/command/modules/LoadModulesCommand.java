@@ -54,7 +54,8 @@ public class LoadModulesCommand extends AbstractCommand {
         AppConfig config = context.getAppConfig();
 
         DatabaseClient client = DatabaseClientFactory.newClient(config.getHost(), config.getRestPort(),
-                config.getRestAdminUsername(), config.getRestAdminPassword(), config.getAuthentication());
+                config.getRestAdminUsername(), config.getRestAdminPassword(), config.getRestAuthentication(),
+                config.getRestSslContext(), config.getRestSslHostnameVerifier());
 
         this.modulesLoader.setModulesFinder(new AssetModulesFinder());
         for (String modulesPath : config.getModulePaths()) {
@@ -79,7 +80,7 @@ public class LoadModulesCommand extends AbstractCommand {
         AppConfig config = context.getAppConfig();
 
         DatabaseClient client = DatabaseClientFactory.newClient(config.getHost(), config.getTestRestPort(),
-                config.getRestAdminUsername(), config.getRestAdminPassword(), config.getAuthentication());
+                config.getRestAdminUsername(), config.getRestAdminPassword(), config.getRestAuthentication());
 
         // Don't need an XccAssetLoader here, as only options/properties are loaded for the test server
         DefaultModulesLoader l = new DefaultModulesLoader(null);

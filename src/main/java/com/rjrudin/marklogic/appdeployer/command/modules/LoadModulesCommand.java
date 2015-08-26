@@ -57,16 +57,20 @@ public class LoadModulesCommand extends AbstractCommand {
                 config.getRestAdminUsername(), config.getRestAdminPassword(), config.getRestAuthentication(),
                 config.getRestSslContext(), config.getRestSslHostnameVerifier());
 
-        this.modulesLoader.setModulesFinder(new AssetModulesFinder());
-        for (String modulesPath : config.getModulePaths()) {
-            logger.info("Loading asset modules from dir: " + modulesPath);
-            modulesLoader.loadModules(new File(modulesPath), client);
-        }
+        try {
+            this.modulesLoader.setModulesFinder(new AssetModulesFinder());
+            for (String modulesPath : config.getModulePaths()) {
+                logger.info("Loading asset modules from dir: " + modulesPath);
+                modulesLoader.loadModules(new File(modulesPath), client);
+            }
 
-        this.modulesLoader.setModulesFinder(new AllButAssetsModulesFinder());
-        for (String modulesPath : config.getModulePaths()) {
-            logger.info("Loading all non-asset modules from dir: " + modulesPath);
-            modulesLoader.loadModules(new File(modulesPath), client);
+            this.modulesLoader.setModulesFinder(new AllButAssetsModulesFinder());
+            for (String modulesPath : config.getModulePaths()) {
+                logger.info("Loading all non-asset modules from dir: " + modulesPath);
+                modulesLoader.loadModules(new File(modulesPath), client);
+            }
+        } finally {
+            client.release();
         }
     }
 
@@ -80,16 +84,21 @@ public class LoadModulesCommand extends AbstractCommand {
         AppConfig config = context.getAppConfig();
 
         DatabaseClient client = DatabaseClientFactory.newClient(config.getHost(), config.getTestRestPort(),
-                config.getRestAdminUsername(), config.getRestAdminPassword(), config.getRestAuthentication());
+                config.getRestAdminUsername(), config.getRestAdminPassword(), config.getRestAuthentication(),
+                config.getRestSslContext(), config.getRestSslHostnameVerifier());
 
-        // Don't need an XccAssetLoader here, as only options/properties are loaded for the test server
-        DefaultModulesLoader l = new DefaultModulesLoader(null);
-        l.setModulesFinder(new TestServerModulesFinder());
-        l.setModulesManager(null);
+        try {
+            // Don't need an XccAssetLoader here, as only options/properties are loaded for the test server
+            DefaultModulesLoader l = new DefaultModulesLoader(null);
+            l.setModulesFinder(new TestServerModulesFinder());
+            l.setModulesManager(null);
 
-        for (String modulesPath : config.getModulePaths()) {
-            logger.info("Loading modules into test server from dir: " + modulesPath);
-            l.loadModules(new File(modulesPath), client);
+            for (String modulesPath : config.getModulePaths()) {
+                logger.info("Loading modules into test server from dir: " + modulesPath);
+                l.loadModules(new File(modulesPath), client);
+            }
+        } finally {
+            client.release();
         }
     }
 

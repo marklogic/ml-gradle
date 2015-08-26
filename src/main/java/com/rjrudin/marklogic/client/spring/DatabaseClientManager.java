@@ -24,7 +24,8 @@ public class DatabaseClientManager extends LoggingObject implements FactoryBean<
                 logger.info("Connecting to REST server with: " + config);
             }
             client = DatabaseClientFactory.newClient(config.getHost(), config.getPort(), config.getUsername(),
-                    config.getPassword(), config.getAuthentication());
+                    config.getPassword(), config.getAuthentication(), config.getSslContext(),
+                    config.getSslHostnameVerifier());
         }
         return client;
     }

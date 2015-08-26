@@ -1,6 +1,9 @@
 package com.rjrudin.marklogic.client;
 
+import javax.net.ssl.SSLContext;
+
 import com.marklogic.client.DatabaseClientFactory.Authentication;
+import com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier;
 
 public class DatabaseClientConfig {
 
@@ -8,19 +11,15 @@ public class DatabaseClientConfig {
     private int port;
     private String username;
     private String password;
-    private String description;
     private Authentication authentication = Authentication.DIGEST;
+    private SSLContext sslContext;
+    private SSLHostnameVerifier sslHostnameVerifier;
 
     public DatabaseClientConfig(String host, int port, String username, String password) {
-        this(host, port, username, password, null);
-    }
-
-    public DatabaseClientConfig(String host, int port, String username, String password, String description) {
         this.host = host;
         this.port = port;
         this.username = username;
         this.password = password;
-        this.description = description;
     }
 
     @Override
@@ -44,20 +43,12 @@ public class DatabaseClientConfig {
         return password;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
     public Authentication getAuthentication() {
         return authentication;
     }
 
     public void setAuthentication(Authentication authentication) {
         this.authentication = authentication;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public void setHost(String host) {
@@ -74,6 +65,22 @@ public class DatabaseClientConfig {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public SSLContext getSslContext() {
+        return sslContext;
+    }
+
+    public void setSslContext(SSLContext sslContext) {
+        this.sslContext = sslContext;
+    }
+
+    public SSLHostnameVerifier getSslHostnameVerifier() {
+        return sslHostnameVerifier;
+    }
+
+    public void setSslHostnameVerifier(SSLHostnameVerifier sslHostnameVerifier) {
+        this.sslHostnameVerifier = sslHostnameVerifier;
     }
 
 }

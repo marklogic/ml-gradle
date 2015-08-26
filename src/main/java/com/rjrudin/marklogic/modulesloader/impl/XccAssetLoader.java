@@ -17,6 +17,7 @@ import com.marklogic.xcc.ContentCreateOptions;
 import com.marklogic.xcc.ContentFactory;
 import com.marklogic.xcc.ContentSource;
 import com.marklogic.xcc.ContentSourceFactory;
+import com.marklogic.xcc.SecurityOptions;
 import com.marklogic.xcc.Session;
 import com.marklogic.xcc.exceptions.RequestException;
 import com.rjrudin.marklogic.client.LoggingObject;
@@ -39,6 +40,7 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
     private String host;
     private Integer port = 8000;
     private String databaseName;
+    private SecurityOptions securityOptions;
 
     // Default permissions and collections for each module
     private String permissions = "rest-admin,read,rest-admin,update,rest-extension-user,execute";
@@ -55,27 +57,6 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
     private Set<File> filesLoaded;
 
     private ModulesManager modulesManager;
-
-    public void initializeActiveSession() {
-        if (databaseName != null) {
-            logger.info(format("Initializing XCC session; host: %s; username: %s; database name: %s", host, username,
-                    databaseName));
-            ContentSource cs = ContentSourceFactory.newContentSource(host, port, username, password, databaseName);
-            activeSession = cs.newSession();
-        } else {
-            logger.info(format("Initializing XCC session; host: %s; username: %s", host, username));
-            ContentSource cs = ContentSourceFactory.newContentSource(host, port, username, password);
-            activeSession = cs.newSession();
-        }
-    }
-
-    public void closeActiveSession() {
-        if (activeSession != null) {
-            logger.info("Closing XCC session");
-            activeSession.close();
-            activeSession = null;
-        }
-    }
 
     /**
      * For walking one or many paths and loading modules in each of them.
@@ -98,6 +79,27 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
             return filesLoaded;
         } finally {
             closeActiveSession();
+        }
+    }
+
+    protected void initializeActiveSession() {
+        if (databaseName != null) {
+            logger.info(format("Initializing XCC session; host: %s; username: %s; database name: %s", host, username,
+                    databaseName));
+        } else {
+            logger.info(format("Initializing XCC session; host: %s; username: %s", host, username));
+        }
+        
+        ContentSource cs = ContentSourceFactory.newContentSource(host, port, username, password, databaseName,
+                securityOptions);
+        activeSession = cs.newSession();
+    }
+
+    protected void closeActiveSession() {
+        if (activeSession != null) {
+            logger.info("Closing XCC session");
+            activeSession.close();
+            activeSession = null;
         }
     }
 

@@ -4,6 +4,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.slf4j.LoggerFactory
 
+import com.marklogic.client.DatabaseClientFactory
 import com.rjrudin.marklogic.appdeployer.AppConfig
 import com.rjrudin.marklogic.appdeployer.AppDeployer
 import com.rjrudin.marklogic.appdeployer.ConfigDir
@@ -57,6 +58,7 @@ import com.rjrudin.marklogic.mgmt.ManageClient
 import com.rjrudin.marklogic.mgmt.ManageConfig
 import com.rjrudin.marklogic.mgmt.admin.AdminConfig
 import com.rjrudin.marklogic.mgmt.admin.AdminManager
+import com.rjrudin.marklogic.modulesloader.ssl.SimpleX509TrustManager
 
 class MarkLogicPlugin implements Plugin<Project> {
 
@@ -186,6 +188,12 @@ class MarkLogicPlugin implements Plugin<Project> {
             appConfig.setRestAdminPassword(restPassword)
         }
 
+        if (project.hasProperty("mlSimpleSsl")) {
+            logger.info("Using simple SSL context and 'ANY' hostname verifier for authenticating against client REST API server")
+            appConfig.setRestSslContext(SimpleX509TrustManager.newSSLContext())
+            appConfig.setRestSslHostnameVerifier(DatabaseClientFactory.SSLHostnameVerifier.ANY)
+        }
+        
         project.extensions.add("mlAppConfig", appConfig)
     }
 

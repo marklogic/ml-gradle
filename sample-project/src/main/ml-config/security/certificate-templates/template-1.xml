@@ -6,7 +6,12 @@
   <req>
     <version>0</version>
     <subject>
+      <countryName>US</countryName>
+      <stateOrProvinceName>VA</stateOrProvinceName>
+      <localityName>McLean</localityName>
       <organizationName>MarkLogic</organizationName>
+      <organizationalUnitName>Sales</organizationalUnitName>
+      <emailAddress>nobody@marklogic.com</emailAddress>
     </subject>
   </req>
 </certificate-template-properties>

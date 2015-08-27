@@ -99,10 +99,10 @@ configurations {
  */
 dependencies {
     // This is needed at runtime in order to run gradle mlWatch
-    runtime "com.rjrudin:ml-javaclient-util:2.2"
+    runtime "com.rjrudin:ml-javaclient-util:2.2.1"
     
     // Needed to compile and run the JUnit tests
-    testCompile "com.rjrudin:ml-junit:2.2"
+    testCompile "com.rjrudin:ml-junit:2.2.2"
     testCompile "com.jayway.restassured:rest-assured:2.4.1"
 
     // Located at https://github.com/rjrudin/marklogic-java/tree/gh-pages/releases/com/marklogic/corb

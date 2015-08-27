@@ -1,7 +1,12 @@
 package com.rjrudin.marklogic.mgmt.security;
 
+import org.springframework.http.ResponseEntity;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.rjrudin.marklogic.mgmt.AbstractResourceManager;
 import com.rjrudin.marklogic.mgmt.ManageClient;
+import com.rjrudin.marklogic.rest.util.Fragment;
 
 /**
  * For 8.0-2, the docs suggest that either ID or name can be used for accessing a certificate template, but only ID
@@ -42,5 +47,40 @@ public class CertificateTemplateManager extends AbstractResourceManager {
 
     public String getIdForName(String name) {
         return getAsXml().getIdForNameOrId(name);
+    }
+
+    public ResponseEntity<String> generateTemporaryCertificate(String templateIdOrName, String commonName) {
+        return generateTemporaryCertificate(templateIdOrName, commonName, 365, null, null, true);
+    }
+
+    public ResponseEntity<String> generateTemporaryCertificate(String templateIdOrName, String commonName,
+            int validFor, String dnsName, String ipAddress, boolean ifNecessary) {
+        ObjectNode node = new ObjectMapper().createObjectNode();
+        node.put("operation", "generate-temporary-certificate");
+        node.put("valid-for", validFor);
+        node.put("common-name", commonName);
+        if (dnsName != null) {
+            node.put("dns-name", dnsName);
+        }
+        if (ipAddress != null) {
+            node.put("ip-addr", ipAddress);
+        }
+        node.put("if-necessary", ifNecessary);
+
+        String json = node.toString();
+        if (logger.isInfoEnabled()) {
+            logger.info(format("Generating temporary certificate for template %s with payload: %s", templateIdOrName,
+                    json));
+        }
+        return postPayload(getManageClient(), getResourcePath(templateIdOrName), json);
+    }
+
+    public Fragment getCertificatesForTemplate(String templateIdOrName) {
+        ObjectNode node = new ObjectMapper().createObjectNode();
+        node.put("operation", "get-certificates-for-template");
+
+        String json = node.toString();
+        String xml = postPayload(getManageClient(), getResourcePath(templateIdOrName), json).getBody();
+        return new Fragment(xml);
     }
 }

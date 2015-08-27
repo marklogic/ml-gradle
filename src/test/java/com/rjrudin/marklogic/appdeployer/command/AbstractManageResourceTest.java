@@ -3,7 +3,6 @@ package com.rjrudin.marklogic.appdeployer.command;
 import org.junit.Test;
 
 import com.rjrudin.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.rjrudin.marklogic.appdeployer.command.Command;
 import com.rjrudin.marklogic.mgmt.ResourceManager;
 
 /**

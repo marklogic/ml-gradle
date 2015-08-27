@@ -1,4 +1,5 @@
 {
   "server-name": "%%NAME%%",
-  "authentication": "digestbasic"
+  "authentication": "digestbasic",
+  "ssl-certificate-template": "%%certificate-templates-id-sample-project-template%%"
 }

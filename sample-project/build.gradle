@@ -99,10 +99,10 @@ configurations {
  */
 dependencies {
     // This is needed at runtime in order to run gradle mlWatch
-    runtime "com.rjrudin:ml-javaclient-util:2.2"
+    runtime "com.rjrudin:ml-javaclient-util:2.2.1"
     
     // Needed to compile and run the JUnit tests
-    testCompile "com.rjrudin:ml-junit:2.2"
+    testCompile "com.rjrudin:ml-junit:2.2.2"
     testCompile "com.jayway.restassured:rest-assured:2.4.1"
 
     // Located at https://github.com/rjrudin/marklogic-java/tree/gh-pages/releases/com/marklogic/corb
@@ -208,6 +208,19 @@ task exportSampleData(type: com.rjrudin.marklogic.gradle.task.MlcpTask) {
  */
 ext {
     //mlAppDeployer.commands.add(new com.marklogic.appdeployer.command.cpf.LoadDefaultPipelinesCommand())
+}
+
+
+/*
+ * Since our REST API server uses a certificate template, we need to execute an extra command to generate a temporary
+ * certificate for this template - without that, the REST API server won't be able to receive HTTP or HTTPS requests.
+ */
+ext {
+    def command = new com.rjrudin.marklogic.appdeployer.command.security.GenerateTemporaryCertificateCommand()
+    command.setTemplateIdOrName("sample-project-template")
+    command.setCommonName("localhost")
+    command.setValidFor(365)
+    mlAppDeployer.commands.add(command)
 }
 
 

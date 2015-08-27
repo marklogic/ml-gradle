@@ -20,11 +20,13 @@ public abstract class SortOrderConstants {
     public static Integer DEPLOY_FORESTS = 130;
 
     public static Integer DEPLOY_REST_API_SERVERS = 200;
-    public static Integer LOAD_MODULES = 500;
+    public static Integer UPDATE_REST_API_SERVERS = 250;
+    public static Integer DEPLOY_OTHER_SERVERS = 300;
 
-    // This would have to be after loading modules in case the rewriter is modified
-    public static Integer UPDATE_REST_API_SERVERS = 600;
-    public static Integer DEPLOY_OTHER_SERVERS = 650;
+    // Modules have to be loaded after the REST API server has been updated, for if the deployer is expecting to load
+    // modules via SSL, then the REST API server must already be configured with a certificate template
+    public static Integer LOAD_MODULES = 400;
+
 
     public static Integer DEPLOY_SCHEDULED_TASKS = 800;
 

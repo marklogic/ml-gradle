@@ -18,9 +18,9 @@ public class DeployFlexrepTest extends AbstractAppDeployerTest {
         appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/flexrep-config"));
 
         initializeAppDeployer(new DeployContentDatabasesCommand(), new DeployTriggersDatabaseCommand(),
-                new DeployCpfConfigsCommand(), new DeployDomainsCommand(), new DeployPipelinesCommand());
+                new DeployCpfConfigsCommand(), new DeployDomainsCommand(), new DeployPipelinesCommand(),
+                new DeployFlexrepConfigCommand());
 
         appDeployer.deploy(appConfig);
-
     }
 }

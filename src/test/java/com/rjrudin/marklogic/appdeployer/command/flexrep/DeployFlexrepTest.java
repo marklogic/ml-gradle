@@ -19,7 +19,7 @@ public class DeployFlexrepTest extends AbstractAppDeployerTest {
 
         initializeAppDeployer(new DeployContentDatabasesCommand(), new DeployTriggersDatabaseCommand(),
                 new DeployCpfConfigsCommand(), new DeployDomainsCommand(), new DeployPipelinesCommand(),
-                new DeployFlexrepConfigCommand());
+                new DeployFlexrepConfigCommand(), new DeployTargetsCommand("sample-app-domain-1"));
 
         appDeployer.deploy(appConfig);
     }

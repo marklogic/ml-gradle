@@ -15,8 +15,8 @@ public class DeployUsersCommand extends AbstractResourceCommand {
         setUndoSortOrder(SortOrderConstants.DELETE_USERS);
     }
 
-    protected File getResourcesDir(CommandContext context) {
-        return new File(context.getAppConfig().getConfigDir().getSecurityDir(), "users");
+    protected File[] getResourceDirs(CommandContext context) {
+        return new File[] { new File(context.getAppConfig().getConfigDir().getSecurityDir(), "users") };
     }
 
     @Override

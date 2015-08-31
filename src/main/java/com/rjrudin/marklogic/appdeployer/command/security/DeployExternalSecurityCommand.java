@@ -16,8 +16,8 @@ public class DeployExternalSecurityCommand extends AbstractResourceCommand {
     }
 
     @Override
-    protected File getResourcesDir(CommandContext context) {
-        return new File(context.getAppConfig().getConfigDir().getSecurityDir(), "external-security");
+    protected File[] getResourceDirs(CommandContext context) {
+        return new File[] { new File(context.getAppConfig().getConfigDir().getSecurityDir(), "external-security") };
     }
 
     @Override

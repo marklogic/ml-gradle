@@ -15,8 +15,8 @@ public class DeployRolesCommand extends AbstractResourceCommand {
         setUndoSortOrder(SortOrderConstants.DELETE_ROLES);
     }
 
-    protected File getResourcesDir(CommandContext context) {
-        return new File(context.getAppConfig().getConfigDir().getSecurityDir(), "roles");
+    protected File[] getResourceDirs(CommandContext context) {
+        return new File[] { new File(context.getAppConfig().getConfigDir().getSecurityDir(), "roles") };
     }
 
     @Override

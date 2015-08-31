@@ -18,11 +18,6 @@ public class FlexrepConfigManager extends AbstractResourceManager {
     }
 
     @Override
-    public String getResourcePath(String resourceNameOrId) {
-        return super.getResourcePath(resourceNameOrId);
-    }
-
-    @Override
     protected String getIdFieldName() {
         return "domain-name";
     }

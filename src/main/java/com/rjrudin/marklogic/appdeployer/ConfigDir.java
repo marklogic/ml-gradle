@@ -60,6 +60,10 @@ public class ConfigDir {
         return new File(baseDir, "cpf");
     }
 
+    public File getFlexrepDir() {
+        return new File(baseDir, "flexrep");
+    }
+
     public void setDatabasesPath(String databasesPath) {
         this.databasesPath = databasesPath;
     }

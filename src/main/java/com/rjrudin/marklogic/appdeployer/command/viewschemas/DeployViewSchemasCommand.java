@@ -25,8 +25,8 @@ public class DeployViewSchemasCommand extends AbstractResourceCommand {
     }
 
     @Override
-    protected File getResourcesDir(CommandContext context) {
-        return new File(context.getAppConfig().getConfigDir().getBaseDir(), "view-schemas");
+    protected File[] getResourceDirs(CommandContext context) {
+        return new File[] { new File(context.getAppConfig().getConfigDir().getBaseDir(), "view-schemas") };
     }
 
     @Override

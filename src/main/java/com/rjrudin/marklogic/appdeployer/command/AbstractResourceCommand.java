@@ -19,7 +19,7 @@ public abstract class AbstractResourceCommand extends AbstractCommand implements
     private boolean storeResourceIdsAsCustomTokens = false;
     private int undoSortOrder = Integer.MAX_VALUE;
 
-    protected abstract File getResourcesDir(CommandContext context);
+    protected abstract File[] getResourceDirs(CommandContext context);
 
     protected abstract ResourceManager getResourceManager(CommandContext context);
 
@@ -30,14 +30,15 @@ public abstract class AbstractResourceCommand extends AbstractCommand implements
 
     @Override
     public void execute(CommandContext context) {
-        File resourceDir = getResourcesDir(context);
-        if (resourceDir.exists()) {
-            ResourceManager mgr = getResourceManager(context);
-            for (File f : listFilesInDirectory(resourceDir)) {
-                if (isResourceFile(f)) {
-                    SaveReceipt receipt = saveResource(mgr, context, f);
+        for (File resourceDir : getResourceDirs(context)) {
+            if (resourceDir.exists()) {
+                ResourceManager mgr = getResourceManager(context);
+                for (File f : listFilesInDirectory(resourceDir)) {
+                    if (isResourceFile(f)) {
+                        SaveReceipt receipt = saveResource(mgr, context, f);
 
-                    afterResourceSaved(mgr, context, f, receipt);
+                        afterResourceSaved(mgr, context, f, receipt);
+                    }
                 }
             }
         }
@@ -116,12 +117,13 @@ public abstract class AbstractResourceCommand extends AbstractCommand implements
     @Override
     public void undo(CommandContext context) {
         if (deleteResourcesOnUndo) {
-            File resourceDir = getResourcesDir(context);
-            if (resourceDir.exists()) {
-                final ResourceManager mgr = getResourceManager(context);
-                for (File f : listFilesInDirectory(resourceDir)) {
-                    if (isResourceFile(f)) {
-                        deleteResource(mgr, context, f);
+            for (File resourceDir : getResourceDirs(context)) {
+                if (resourceDir.exists()) {
+                    final ResourceManager mgr = getResourceManager(context);
+                    for (File f : listFilesInDirectory(resourceDir)) {
+                        if (isResourceFile(f)) {
+                            deleteResource(mgr, context, f);
+                        }
                     }
                 }
             }

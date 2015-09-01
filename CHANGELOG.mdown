@@ -5,3 +5,6 @@ with releases.
 ## 1.2
 
 * [#5](https://github.com/rjrudin/ml-gradle/issues/5) Added Corb Task
+
+
+TODO Reconcile this with what's in gradle.properties

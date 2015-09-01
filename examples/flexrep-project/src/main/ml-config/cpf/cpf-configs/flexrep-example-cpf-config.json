@@ -1,0 +1,11 @@
+{
+  "domain-name": "flexrep-example-domain",
+  "restart-user-name": "admin",
+  "eval-module": "%%MODULES_DATABASE%%",
+  "eval-root": "/",
+  "conversion-enabled": false,
+  "permission": [{
+    "role-name": "app-user",
+    "capability": "read"
+  }]
+}

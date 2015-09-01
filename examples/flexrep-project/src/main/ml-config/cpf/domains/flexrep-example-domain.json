@@ -1,0 +1,9 @@
+{
+   "domain-name": "flexrep-example-domain",
+   "description": "Test domain for flexrep-example",
+   "scope": "collection",
+   "uri": "flexrep-example",
+   "eval-module": "%%MODULES_DATABASE%%",
+   "eval-root": "/",
+   "pipeline": ["Status Change Handling", "Flexible Replication"]
+ }

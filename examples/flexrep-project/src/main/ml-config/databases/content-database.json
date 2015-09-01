@@ -1,0 +1,4 @@
+{
+  "database-name": "%%DATABASE%%",
+  "triggers-database": "%%TRIGGERS_DATABASE%%"
+}

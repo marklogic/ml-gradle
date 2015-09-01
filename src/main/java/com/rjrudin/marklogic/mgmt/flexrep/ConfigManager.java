@@ -3,11 +3,11 @@ package com.rjrudin.marklogic.mgmt.flexrep;
 import com.rjrudin.marklogic.mgmt.AbstractResourceManager;
 import com.rjrudin.marklogic.mgmt.ManageClient;
 
-public class FlexrepConfigManager extends AbstractResourceManager {
+public class ConfigManager extends AbstractResourceManager {
 
     private String databaseIdOrName;
 
-    public FlexrepConfigManager(ManageClient client, String databaseIdOrName) {
+    public ConfigManager(ManageClient client, String databaseIdOrName) {
         super(client);
         this.databaseIdOrName = databaseIdOrName;
     }

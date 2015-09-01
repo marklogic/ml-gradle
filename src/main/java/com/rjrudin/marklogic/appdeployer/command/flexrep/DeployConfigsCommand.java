@@ -5,12 +5,12 @@ import java.io.File;
 import com.rjrudin.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.rjrudin.marklogic.appdeployer.command.CommandContext;
 import com.rjrudin.marklogic.mgmt.ResourceManager;
-import com.rjrudin.marklogic.mgmt.flexrep.FlexrepConfigManager;
+import com.rjrudin.marklogic.mgmt.flexrep.ConfigManager;
 
 /**
  * Defaults to the content database name in the AppConfig instance. Can be overridden via the databaseNameOrId property.
  */
-public class DeployFlexrepConfigCommand extends AbstractResourceCommand {
+public class DeployConfigsCommand extends AbstractResourceCommand {
 
     private String databaseIdOrName;
 
@@ -22,7 +22,7 @@ public class DeployFlexrepConfigCommand extends AbstractResourceCommand {
     @Override
     protected ResourceManager getResourceManager(CommandContext context) {
         String db = databaseIdOrName != null ? databaseIdOrName : context.getAppConfig().getContentDatabaseName();
-        return new FlexrepConfigManager(context.getManageClient(), db);
+        return new ConfigManager(context.getManageClient(), db);
     }
 
     public void setDatabaseIdOrName(String databaseIdOrName) {

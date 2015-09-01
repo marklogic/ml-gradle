@@ -35,7 +35,10 @@ public abstract class SortOrderConstants {
     public static Integer DEPLOY_DOMAINS = 910;
     public static Integer DEPLOY_CPF_CONFIGS = 920;
 
-    public static Integer DEPLOY_SQL_VIEWS = 1000;
+    public static Integer DEPLOY_FLEXREP_CONFIGS = 1000;
+    public static Integer DEPLOY_FLEXREP_TARGETS = 1010;
+    
+    public static Integer DEPLOY_SQL_VIEWS = 1100;
 
     // Undo constants
     public static Integer DELETE_GROUPS = 10000;

@@ -2,6 +2,7 @@ package com.rjrudin.marklogic.appdeployer.command.flexrep;
 
 import java.io.File;
 
+import org.junit.After;
 import org.junit.Test;
 
 import com.rjrudin.marklogic.appdeployer.AbstractAppDeployerTest;
@@ -12,6 +13,11 @@ import com.rjrudin.marklogic.appdeployer.command.databases.DeployContentDatabase
 import com.rjrudin.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
 
 public class DeployFlexrepTest extends AbstractAppDeployerTest {
+
+    @After
+    public void tearDown() {
+        undeploySampleApp();
+    }
 
     @Test
     public void configureMaster() {

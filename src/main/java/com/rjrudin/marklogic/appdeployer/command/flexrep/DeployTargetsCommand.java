@@ -4,6 +4,7 @@ import java.io.File;
 
 import com.rjrudin.marklogic.appdeployer.command.AbstractCommand;
 import com.rjrudin.marklogic.appdeployer.command.CommandContext;
+import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
 import com.rjrudin.marklogic.mgmt.flexrep.TargetManager;
 
 /**
@@ -16,6 +17,10 @@ public class DeployTargetsCommand extends AbstractCommand {
 
     private String databaseIdOrName;
     private String targetDirectorySuffix = "-targets";
+
+    public DeployTargetsCommand() {
+        setExecuteSortOrder(SortOrderConstants.DEPLOY_FLEXREP_TARGETS);
+    }
 
     @Override
     public void execute(CommandContext context) {

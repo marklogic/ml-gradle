@@ -18,6 +18,8 @@ import com.rjrudin.marklogic.appdeployer.command.cpf.DeployPipelinesCommand
 import com.rjrudin.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand
 import com.rjrudin.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand
 import com.rjrudin.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand
+import com.rjrudin.marklogic.appdeployer.command.flexrep.DeployConfigsCommand
+import com.rjrudin.marklogic.appdeployer.command.flexrep.DeployTargetsCommand
 import com.rjrudin.marklogic.appdeployer.command.groups.DeployGroupsCommand
 import com.rjrudin.marklogic.appdeployer.command.modules.LoadModulesCommand
 import com.rjrudin.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand
@@ -48,6 +50,7 @@ import com.rjrudin.marklogic.gradle.task.databases.ClearModulesDatabaseTask
 import com.rjrudin.marklogic.gradle.task.databases.ClearSchemasDatabaseTask
 import com.rjrudin.marklogic.gradle.task.databases.ClearTriggersDatabaseTask
 import com.rjrudin.marklogic.gradle.task.databases.DeployDatabasesTask
+import com.rjrudin.marklogic.gradle.task.flexrep.DeployFlexrepTask;
 import com.rjrudin.marklogic.gradle.task.groups.DeployGroupsTask
 import com.rjrudin.marklogic.gradle.task.scaffold.GenerateScaffoldTask
 import com.rjrudin.marklogic.gradle.task.security.DeploySecurityTask
@@ -106,6 +109,9 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlCreateTransform", type: CreateTransformTask, group: devGroup, description: "Create a new transform in the modules transforms directory")
         project.task("mlPrepareRestApiDependencies", type: PrepareRestApiDependenciesTask, group: devGroup, dependsOn: project.configurations["mlRestApi"], description: "Downloads (if necessary) and unzips in the build directory all mlRestApi dependencies")
 
+        String flexrepGroup = "ml-gradle Flexible Replication"
+        project.task("mlDeployFlexrep", type: DeployFlexrepTask, group: flexrepGroup, description: "Deploy Flexrep configs and targets")
+        
         String groupsGroup = "ml-gradle Group"
         project.task("mlDeployGroups", type: DeployGroupsTask, group: groupsGroup, description: "Deploy each group, updating it if it exists")
         
@@ -347,6 +353,13 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.extensions.add("mlCpfCommands", cpfCommands)
         commands.addAll(cpfCommands)
 
+        // Flexrep
+        List<Command> flexrepCommands = new ArrayList<Command>()
+        flexrepCommands.add(new DeployConfigsCommand())
+        flexrepCommands.add(new DeployTargetsCommand())
+        project.extensions.add("mlFlexrepCommands", flexrepCommands)
+        commands.addAll(flexrepCommands)
+        
         // Groups
         List<Command> groupCommands = new ArrayList<Command>()
         groupCommands.add(new DeployGroupsCommand())

@@ -19,12 +19,10 @@ public abstract class AbstractCpfResourceCommand extends AbstractCommand {
         File dir = new File(config.getConfigDir().getCpfDir(), getCpfDirectoryName());
         if (dir.exists()) {
             AbstractCpfResourceManager mgr = getResourceManager(context);
-            for (File f : dir.listFiles()) {
-                if (isResourceFile(f)) {
-                    String payload = copyFileToString(f);
-                    payload = tokenReplacer.replaceTokens(payload, config, false);
-                    mgr.save(config.getTriggersDatabaseName(), payload);
-                }
+            for (File f : listFilesInDirectory(dir)) {
+                String payload = copyFileToString(f);
+                payload = tokenReplacer.replaceTokens(payload, config, false);
+                mgr.save(config.getTriggersDatabaseName(), payload);
             }
         }
     }

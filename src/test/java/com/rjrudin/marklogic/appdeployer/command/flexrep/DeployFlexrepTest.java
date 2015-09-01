@@ -14,12 +14,12 @@ import com.rjrudin.marklogic.appdeployer.command.databases.DeployTriggersDatabas
 public class DeployFlexrepTest extends AbstractAppDeployerTest {
 
     @Test
-    public void test() {
+    public void configureMaster() {
         appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/flexrep-config"));
 
         initializeAppDeployer(new DeployContentDatabasesCommand(), new DeployTriggersDatabaseCommand(),
                 new DeployCpfConfigsCommand(), new DeployDomainsCommand(), new DeployPipelinesCommand(),
-                new DeployFlexrepConfigCommand(), new DeployTargetsCommand("sample-app-domain-1"));
+                new DeployFlexrepConfigCommand(), new DeployTargetsCommand());
 
         appDeployer.deploy(appConfig);
     }

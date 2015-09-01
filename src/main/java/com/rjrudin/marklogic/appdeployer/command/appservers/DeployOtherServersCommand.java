@@ -4,6 +4,7 @@ import java.io.File;
 
 import com.rjrudin.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.rjrudin.marklogic.appdeployer.command.CommandContext;
+import com.rjrudin.marklogic.appdeployer.command.ResourceFilenameFilter;
 import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
 import com.rjrudin.marklogic.mgmt.ResourceManager;
 import com.rjrudin.marklogic.mgmt.appservers.ServerManager;
@@ -18,6 +19,12 @@ public class DeployOtherServersCommand extends AbstractResourceCommand {
         setExecuteSortOrder(SortOrderConstants.DEPLOY_OTHER_SERVERS);
         setUndoSortOrder(SortOrderConstants.DELETE_OTHER_SERVERS);
         setRestartAfterDelete(true);
+        setResourceFilenameFilter(new ResourceFilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return super.accept(dir, name) && !name.startsWith("rest-api-server");
+            }
+        });
     }
 
     @Override
@@ -28,11 +35,6 @@ public class DeployOtherServersCommand extends AbstractResourceCommand {
     @Override
     protected ResourceManager getResourceManager(CommandContext context) {
         return new ServerManager(context.getManageClient(), context.getAppConfig().getGroupName());
-    }
-
-    @Override
-    protected boolean isResourceFile(File f) {
-        return super.isResourceFile(f) && !f.getName().startsWith("rest-api-server");
     }
 
     @Override

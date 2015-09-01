@@ -43,10 +43,8 @@ public class DeployViewSchemasCommand extends AbstractResourceCommand {
         if (viewDir.exists()) {
             ViewManager viewMgr = new ViewManager(context.getManageClient(), context.getAppConfig()
                     .getContentDatabaseName(), viewSchemaName);
-            for (File viewFile : viewDir.listFiles()) {
-                if (isResourceFile(viewFile)) {
-                    saveResource(viewMgr, context, viewFile);
-                }
+            for (File viewFile : listFilesInDirectory(viewDir)) {
+                saveResource(viewMgr, context, viewFile);
             }
         }
     }

@@ -10,3 +10,14 @@ buildscript {
 }
 
 apply plugin: 'ml-gradle'
+
+ext {
+    def command = new com.rjrudin.marklogic.appdeployer.command.databases.DeployDatabaseCommand()
+    command.setDatabaseName("flexrep-example-replica-db")
+    command.setCreateDatabaseWithoutFile(true)
+    mlAppDeployer.commands.add(command)
+    
+    mlAppConfig {
+        customTokens.put("%%REPLICA_TARGET_URL%%", mlReplicaTargetUrl)
+    }
+}

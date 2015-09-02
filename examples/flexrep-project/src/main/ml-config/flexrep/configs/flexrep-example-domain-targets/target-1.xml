@@ -9,6 +9,6 @@
   <replicate-cpf>false</replicate-cpf>
   <enabled>true</enabled>
   <urls>
-    <url>http://localhost:%%REPLICA_HTTP_PORT%%/</url>
+    <url>%%REPLICA_TARGET_URL%%/</url>
   </urls>
 </flexrep-target-properties>

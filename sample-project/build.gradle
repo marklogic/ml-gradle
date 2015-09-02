@@ -86,7 +86,7 @@ configurations {
     corb
 
     // This configuration captures the dependencies for running mlcp (Content Pump). This is only needed if you want
-    // to run mlcp via Gradle tasks. If you do, using com.marklogic.gradle.task.MlcpTask is a useful starting point, as
+    // to run mlcp via Gradle tasks. If you do, using com.rjrudin.marklogic.gradle.task.MlcpTask is a useful starting point, as
     // shown below.
     mlcp
 }
@@ -116,7 +116,7 @@ dependencies {
 
 
 /*
- * ml-gradle adds an instance of com.marklogic.appdeployer.AppConfig to the Gradle project under the key "mlAppConfig".
+ * ml-gradle adds an instance of com.rjrudin.marklogic.appdeployer.AppConfig to the Gradle project under the key "mlAppConfig".
  * This instance can be modified to affect the behavior of ml-gradle.
  */
 ext {
@@ -207,7 +207,7 @@ task exportSampleData(type: com.rjrudin.marklogic.gradle.task.MlcpTask) {
  * domains, which means you can safely reference them in your domain configuration files. 
  */
 ext {
-    //mlAppDeployer.commands.add(new com.marklogic.appdeployer.command.cpf.LoadDefaultPipelinesCommand())
+    //mlAppDeployer.commands.add(new com.rjrudin.marklogic.appdeployer.command.cpf.LoadDefaultPipelinesCommand())
 }
 
 

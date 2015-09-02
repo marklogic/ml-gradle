@@ -17,7 +17,8 @@ public abstract class SortOrderConstants {
     public static Integer DEPLOY_TRIGGERS_DATABASE = 100;
     public static Integer DEPLOY_SCHEMAS_DATABASE = 100;
     public static Integer DEPLOY_CONTENT_DATABASES = 120;
-    public static Integer DEPLOY_FORESTS = 130;
+    public static Integer DEPLOY_OTHER_DATABASES = 130;
+    public static Integer DEPLOY_FORESTS = 150;
 
     public static Integer DEPLOY_REST_API_SERVERS = 200;
     public static Integer UPDATE_REST_API_SERVERS = 250;
@@ -53,6 +54,7 @@ public abstract class SortOrderConstants {
     public static Integer DELETE_ROLES = 9070;
 
     public static Integer DELETE_CONTENT_DATABASES = 8000;
+    public static Integer DELETE_OTHER_DATABASES = 8005;
     public static Integer DELETE_TRIGGERS_DATABASE = 8010;
     public static Integer DELETE_SCHEMAS_DATABASE = 8020;
     public static Integer DELETE_FORESTS = 8040;

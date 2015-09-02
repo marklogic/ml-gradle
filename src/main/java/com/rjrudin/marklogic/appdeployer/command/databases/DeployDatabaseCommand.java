@@ -5,6 +5,7 @@ import java.io.File;
 import com.rjrudin.marklogic.appdeployer.AppConfig;
 import com.rjrudin.marklogic.appdeployer.command.AbstractCommand;
 import com.rjrudin.marklogic.appdeployer.command.CommandContext;
+import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
 import com.rjrudin.marklogic.appdeployer.command.UndoableCommand;
 import com.rjrudin.marklogic.appdeployer.command.forests.DeployForestsCommand;
 import com.rjrudin.marklogic.mgmt.SaveReceipt;
@@ -52,6 +53,11 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 
     private int undoSortOrder;
 
+    public DeployDatabaseCommand() {
+        setExecuteSortOrder(SortOrderConstants.DEPLOY_OTHER_DATABASES);
+        setUndoSortOrder(SortOrderConstants.DELETE_OTHER_DATABASES);
+    }
+
     @Override
     public Integer getUndoSortOrder() {
         return undoSortOrder;
@@ -82,18 +88,16 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
     }
 
     protected String getPayload(CommandContext context) {
-        if (databaseFilename == null) {
-            logger.warn("No database filename set, so not executing");
-            return null;
+        File f = null;
+        if (databaseFilename != null) {
+            f = new File(context.getAppConfig().getConfigDir().getDatabasesDir(), databaseFilename);
         }
-
-        File f = new File(context.getAppConfig().getConfigDir().getDatabasesDir(), databaseFilename);
-        if (f.exists()) {
+        if (f != null && f.exists()) {
             return copyFileToString(f);
         } else if (createDatabaseWithoutFile) {
             return buildDefaultDatabasePayload(context);
         } else {
-            logger.warn(format("Database file '%s' does not exist, so not executing", f.getAbsolutePath()));
+            logger.warn(format("Database file '%s' does not exist, so not executing", databaseFilename));
             return null;
         }
     }

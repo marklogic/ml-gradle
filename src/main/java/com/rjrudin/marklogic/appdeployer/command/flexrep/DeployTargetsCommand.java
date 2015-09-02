@@ -34,8 +34,7 @@ public class DeployTargetsCommand extends AbstractCommand {
 
     protected void deployTargets(File dir, CommandContext context) {
         String dbName = databaseIdOrName != null ? databaseIdOrName : context.getAppConfig().getContentDatabaseName();
-        String name = dir.getName();
-        String configName = name.substring(0, name.length() - targetDirectorySuffix.length());
+        String configName = extractConfigNameFromDirectory(dir);
 
         if (logger.isInfoEnabled()) {
             logger.info(format("Deploying flexrep targets with config name '%s' in directory: %s", configName,
@@ -46,7 +45,11 @@ public class DeployTargetsCommand extends AbstractCommand {
         for (File f : listFilesInDirectory(dir)) {
             saveResource(mgr, context, f);
         }
+    }
 
+    protected String extractConfigNameFromDirectory(File dir) {
+        String name = dir.getName();
+        return name.substring(0, name.length() - targetDirectorySuffix.length());
     }
 
     public void setDatabaseIdOrName(String databaseIdOrName) {

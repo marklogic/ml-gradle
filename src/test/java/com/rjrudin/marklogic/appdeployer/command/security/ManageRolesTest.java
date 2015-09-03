@@ -1,11 +1,14 @@
 package com.rjrudin.marklogic.appdeployer.command.security;
 
+import java.io.File;
+
 import org.junit.Test;
 
+import com.rjrudin.marklogic.appdeployer.ConfigDir;
 import com.rjrudin.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.rjrudin.marklogic.appdeployer.command.Command;
-import com.rjrudin.marklogic.appdeployer.command.security.DeployRolesCommand;
 import com.rjrudin.marklogic.mgmt.ResourceManager;
+import com.rjrudin.marklogic.mgmt.security.PrivilegeManager;
 import com.rjrudin.marklogic.mgmt.security.RoleManager;
 import com.rjrudin.marklogic.rest.util.Fragment;
 
@@ -43,6 +46,28 @@ public class ManageRolesTest extends AbstractManageResourceTest {
                     f.elementExists("/msec:role-default/msec:description[. = 'This is an updated description']"));
         } finally {
             appDeployer.undeploy(appConfig);
+        }
+
+    }
+
+    @Test
+    public void roleWithCustomPrivilege() {
+        appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/role-with-privilege-config")));
+
+        RoleManager roleMgr = new RoleManager(manageClient);
+        PrivilegeManager privMgr = new PrivilegeManager(manageClient);
+
+        initializeAppDeployer(new DeployRolesCommand(), new DeployPrivilegesCommand());
+        appDeployer.deploy(appConfig);
+
+        try {
+            assertTrue(roleMgr.exists("sample-app-role1"));
+            assertTrue(privMgr.exists("sample-app-execute-1"));
+        } finally {
+            undeploySampleApp();
+
+            assertFalse(roleMgr.exists("sample-app-role1"));
+            assertFalse(privMgr.exists("sample-app-execute-1"));
         }
 
     }

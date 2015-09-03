@@ -49,9 +49,11 @@ public abstract class SortOrderConstants {
     public static Integer DELETE_CERTIFICATE_AUTHORITIES = 9020;
     public static Integer DELETE_EXTERNAL_SECURITY = 9030;
     public static Integer DELETE_PROTECTED_COLLECTIONS = 9040;
-    public static Integer DELETE_PRIVILEGES = 9050;
-    public static Integer DELETE_AMPS = 9060;
-    public static Integer DELETE_ROLES = 9070;
+    // Amps can reference roles, so must delete amps first
+    public static Integer DELETE_AMPS = 9050;
+    // Roles can reference privileges, so must delete roles first
+    public static Integer DELETE_ROLES = 9060;
+    public static Integer DELETE_PRIVILEGES = 9070;
 
     public static Integer DELETE_CONTENT_DATABASES = 8000;
     public static Integer DELETE_OTHER_DATABASES = 8005;

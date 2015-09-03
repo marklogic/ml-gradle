@@ -1,22 +1,36 @@
+/*
+ * This project demonstrates how ml-gradle can configure a basic Flexrep setup, where the master and replica databases 
+ * are both on the same host (not likely in reality, but it's sufficient for demonstration purposes). To test this
+ * out, run "gradle mlDeploy" and then use qconsole to insert a document into the "flexrep-example" collection in the
+ * master database ("flexrep-example-content"), and then you can verify that it is replicated to the flexrep-example-replica-db
+ * database. 
+ * 
+ * In an environment where the replica database and server are on a separate host, you would most likely have separate
+ * build.gradle files with separate config directories, each specifying the tasks and configuration needed for the 
+ * cluster that it is responsible for.
+ */
 buildscript {
     repositories {
         mavenCentral()
         maven {url "http://developer.marklogic.com/maven2/"}
         maven {url "http://rjrudin.github.io/marklogic-java/releases"}
     }
-    dependencies {
-        classpath mlGradleDependency
-    }
+    dependencies { classpath mlGradleDependency }
 }
 
 apply plugin: 'ml-gradle'
 
 ext {
+    /*
+     * We need a replica database for this project; this is an example of adding a new command to create an arbitrary
+     * database. We don't need anything special for our replica database, so we set createDatabaseWithoutFile to true
+     * so that we don't have to provide a database config file.
+     */
     def command = new com.rjrudin.marklogic.appdeployer.command.databases.DeployDatabaseCommand()
     command.setDatabaseName("flexrep-example-replica-db")
     command.setCreateDatabaseWithoutFile(true)
     mlAppDeployer.commands.add(command)
-    
+
     mlAppConfig {
         customTokens.put("%%REPLICA_TARGET_URL%%", mlReplicaTargetUrl)
     }

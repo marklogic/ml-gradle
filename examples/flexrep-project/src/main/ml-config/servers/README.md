@@ -1,0 +1,2 @@
+The replica HTTP server requires that the following fields be set to the values defined in the XML file - root, 
+error-handler, and url-rewriter. The other fields can be customized for your application.

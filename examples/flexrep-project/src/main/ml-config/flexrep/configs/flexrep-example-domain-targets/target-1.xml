@@ -11,4 +11,8 @@
   <urls>
     <url>%%REPLICA_TARGET_URL%%/</url>
   </urls>
+  <http-options>
+    <username>admin</username>
+    <password>admin</password>
+  </http-options>
 </flexrep-target-properties>

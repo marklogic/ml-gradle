@@ -1,0 +1,1 @@
+Flexrep depends on CPF, so we have a simple CPF config that references our example domain.

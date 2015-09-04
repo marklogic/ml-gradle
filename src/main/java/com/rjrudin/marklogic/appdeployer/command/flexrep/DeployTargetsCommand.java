@@ -25,9 +25,11 @@ public class DeployTargetsCommand extends AbstractCommand {
     @Override
     public void execute(CommandContext context) {
         File configDir = new File(context.getAppConfig().getConfigDir().getFlexrepDir(), "configs");
-        for (File f : configDir.listFiles()) {
-            if (f.isDirectory() && f.getName().endsWith(targetDirectorySuffix)) {
-                deployTargets(f, context);
+        if (configDir != null && configDir.exists()) {
+            for (File f : configDir.listFiles()) {
+                if (f.isDirectory() && f.getName().endsWith(targetDirectorySuffix)) {
+                    deployTargets(f, context);
+                }
             }
         }
     }

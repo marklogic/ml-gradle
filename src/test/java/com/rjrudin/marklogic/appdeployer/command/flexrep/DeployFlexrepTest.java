@@ -37,6 +37,16 @@ public class DeployFlexrepTest extends AbstractAppDeployerTest {
         assertConfigAndTargetAreDeployed();
     }
 
+    @Test
+    public void noFlexrepDir() {
+        appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/empty-ml-config"));
+
+        initializeAppDeployer(new DeployTargetsCommand());
+
+        // Just making sure we don't get a null-pointer due to the flexrep directory not existing
+        appDeployer.deploy(appConfig);
+    }
+
     private void assertConfigAndTargetAreDeployed() {
         ConfigManager configMgr = new ConfigManager(manageClient, appConfig.getContentDatabaseName());
         configMgr.exists("sample-app-domain-1");

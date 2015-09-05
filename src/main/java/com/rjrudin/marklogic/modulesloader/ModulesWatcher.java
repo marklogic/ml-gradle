@@ -13,6 +13,9 @@ import com.marklogic.client.DatabaseClientFactory.Authentication;
 import com.rjrudin.marklogic.modulesloader.impl.DefaultModulesLoader;
 import com.rjrudin.marklogic.modulesloader.impl.XccAssetLoader;
 
+/**
+ * Simple main program that every second asks a DefaultModulesLoader to load any new/modified modules.
+ */
 public class ModulesWatcher {
 
     private static final Logger logger = LoggerFactory.getLogger(ModulesWatcher.class);
@@ -25,7 +28,8 @@ public class ModulesWatcher {
      * <li>Third arg is the REST API port to connect to on the MarkLogic host (must support XDBC calls)</li>
      * <li>Fourth arg is the MarkLogic username to connect with</li>
      * <li>Fifth arg is the password for the MarkLogic username</li>
-     * <li>The optional sixth arg is the fully-qualified class name of a ModulesLoader implementation</li>
+     * <li>The optional sixth arg is a string matching one of the enumerated values in the Java Client Authentication
+     * class</li>
      * </ol>
      * 
      * @param args
@@ -38,26 +42,22 @@ public class ModulesWatcher {
         String username = args[3];
         String password = args[4];
 
-        ModulesLoader loader = null;
+        Authentication auth = Authentication.DIGEST;
         if (args.length > 5) {
-            logger.info("Using " + args[5] + " to load modules");
-            loader = (DefaultModulesLoader) Class.forName(args[5]).newInstance();
-        } else {
-            logger.info("Using " + DefaultModulesLoader.class.getName() + " to load modules");
-            XccAssetLoader xal = new XccAssetLoader();
-            xal.setHost(host);
-            xal.setPort(port);
-            xal.setUsername(username);
-            xal.setPassword(password);
-
-            DefaultModulesLoader impl = new DefaultModulesLoader(xal);
-            impl.setCatchExceptions(true);
-            loader = impl;
+            auth = Authentication.valueOf(args[5]);
         }
 
+        XccAssetLoader xal = new XccAssetLoader();
+        xal.setHost(host);
+        xal.setPort(port);
+        xal.setUsername(username);
+        xal.setPassword(password);
+
+        DefaultModulesLoader loader = new DefaultModulesLoader(xal);
+        loader.setCatchExceptions(true);
+
         logger.info(String.format("Connecting to http://%s:%d as user %s", host, port, username));
-        final DatabaseClient client = DatabaseClientFactory.newClient(host, port, username, password,
-                Authentication.DIGEST);
+        final DatabaseClient client = DatabaseClientFactory.newClient(host, port, username, password, auth);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
@@ -76,7 +76,7 @@ public class ModulesWatcher {
 
         while (true) {
             if (logger.isTraceEnabled()) {
-                logger.trace("Auto-installing any modified files");
+                logger.trace("Checking for modules to load");
             }
             for (File dir : dirs) {
                 loader.loadModules(dir, client);

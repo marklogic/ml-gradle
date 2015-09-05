@@ -15,7 +15,6 @@ import com.rjrudin.marklogic.modulesloader.ModulesFinder;
  */
 public abstract class BaseModulesFinder implements ModulesFinder {
 
-    private FilenameFilter assetFilenameFilter = new AssetFilenameFilter();
     private FilenameFilter transformFilenameFilter = new TransformFilenameFilter();
     private FilenameFilter namespaceFilenameFilter = new NamespaceFilenameFilter();
 
@@ -50,7 +49,7 @@ public abstract class BaseModulesFinder implements ModulesFinder {
         modules.setServices(services);
     }
 
-    protected void addAssets(Modules modules, File baseDir) {
+    protected void addAssetDirectories(Modules modules, File baseDir) {
         List<File> dirs = new ArrayList<>();
         File dir = new File(baseDir, "ext");
         if (dir.exists()) {
@@ -105,14 +104,6 @@ public abstract class BaseModulesFinder implements ModulesFinder {
 
     public void setTransformFilenameFilter(FilenameFilter transformFilenameFilter) {
         this.transformFilenameFilter = transformFilenameFilter;
-    }
-
-    public FilenameFilter getAssetFilenameFilter() {
-        return assetFilenameFilter;
-    }
-
-    public void setAssetFilenameFilter(FilenameFilter assetFilenameFilter) {
-        this.assetFilenameFilter = assetFilenameFilter;
     }
 
     public FilenameFilter getNamespaceFilenameFilter() {

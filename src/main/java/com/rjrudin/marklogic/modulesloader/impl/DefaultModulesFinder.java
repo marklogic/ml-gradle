@@ -14,7 +14,7 @@ public class DefaultModulesFinder extends BaseModulesFinder implements ModulesFi
     public Modules findModules(File baseDir) {
         Modules modules = new Modules();
         addServices(modules, baseDir);
-        addAssets(modules, baseDir);
+        addAssetDirectories(modules, baseDir);
         addOptions(modules, baseDir);
         addTransforms(modules, baseDir);
         addNamespaces(modules, baseDir);

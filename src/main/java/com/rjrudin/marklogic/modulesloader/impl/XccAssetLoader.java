@@ -1,6 +1,7 @@
 package com.rjrudin.marklogic.modulesloader.impl;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
@@ -42,6 +43,9 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
     private String databaseName;
     private SecurityOptions securityOptions;
 
+    // Controls what files/directories are processed
+    private FileFilter fileFilter = new AssetFileFilter();
+
     // Default permissions and collections for each module
     private String permissions = "rest-admin,read,rest-admin,update,rest-extension-user,execute";
     private String[] collections;
@@ -63,7 +67,6 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
      */
     public Set<File> loadAssetsViaXcc(String... paths) {
         initializeActiveSession();
-
         filesLoaded = new HashSet<>();
         try {
             for (String path : paths) {
@@ -82,6 +85,9 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
         }
     }
 
+    /**
+     * Initialize the XCC session.
+     */
     protected void initializeActiveSession() {
         if (databaseName != null) {
             logger.info(format("Initializing XCC session; host: %s; username: %s; database name: %s", host, username,
@@ -89,12 +95,15 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
         } else {
             logger.info(format("Initializing XCC session; host: %s; username: %s", host, username));
         }
-        
+
         ContentSource cs = ContentSourceFactory.newContentSource(host, port, username, password, databaseName,
                 securityOptions);
         activeSession = cs.newSession();
     }
 
+    /**
+     * Close the XCC session.
+     */
     protected void closeActiveSession() {
         if (activeSession != null) {
             logger.info("Closing XCC session");
@@ -103,9 +112,31 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
         }
     }
 
+    /**
+     * FileVisitor method that determines if we should visit the directory or not via the fileFilter.
+     */
+    @Override
+    public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes attributes) throws IOException {
+        boolean accept = fileFilter.accept(path.toFile());
+        if (accept) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Visiting directory: " + path);
+            }
+            return FileVisitResult.CONTINUE;
+        } else {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Skipping directory: " + path);
+            }
+            return FileVisitResult.SKIP_SUBTREE;
+        }
+    }
+
+    /**
+     * FileVisitor method that loads the file into the modules database if the fileFilter accepts it.
+     */
     @Override
     public FileVisitResult visitFile(Path path, BasicFileAttributes attributes) throws IOException {
-        if (attributes.isRegularFile()) {
+        if (fileFilter.accept(path.toFile())) {
             Path relPath = currentAssetPath.relativize(path);
             String uri = "/" + relPath.toString().replace("\\", "/");
             if (isCurrentRootPathForRestApiAssets()) {
@@ -114,6 +145,7 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
             loadFile(uri, path.toFile());
             filesLoaded.add(path.toFile());
         }
+
         return FileVisitResult.CONTINUE;
     }
 
@@ -127,6 +159,12 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
         return this.currentRootPath != null && this.currentRootPath.toFile().getName().equals("ext");
     }
 
+    /**
+     * Does the actual work of loading a file into the modules database via XCC.
+     * 
+     * @param uri
+     * @param f
+     */
     protected void loadFile(String uri, File f) {
         if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(f)) {
             return;
@@ -155,17 +193,12 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
     }
 
     @Override
-    public FileVisitResult postVisitDirectory(Path arg0, IOException arg1) throws IOException {
+    public FileVisitResult postVisitDirectory(Path path, IOException exception) throws IOException {
         return FileVisitResult.CONTINUE;
     }
 
     @Override
-    public FileVisitResult preVisitDirectory(Path arg0, BasicFileAttributes arg1) throws IOException {
-        return FileVisitResult.CONTINUE;
-    }
-
-    @Override
-    public FileVisitResult visitFileFailed(Path arg0, IOException arg1) throws IOException {
+    public FileVisitResult visitFileFailed(Path path, IOException exception) throws IOException {
         return FileVisitResult.CONTINUE;
     }
 
@@ -207,5 +240,9 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
 
     public void setModulesManager(ModulesManager modulesManager) {
         this.modulesManager = modulesManager;
+    }
+
+    public void setFileFilter(FileFilter fileFilter) {
+        this.fileFilter = fileFilter;
     }
 }

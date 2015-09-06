@@ -1,6 +1,7 @@
 package com.rjrudin.marklogic.appdeployer.command.modules;
 
 import java.io.File;
+import java.io.FileFilter;
 
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
@@ -18,6 +19,7 @@ import com.rjrudin.marklogic.modulesloader.impl.XccAssetLoader;
 public class LoadModulesCommand extends AbstractCommand {
 
     private DefaultModulesLoader modulesLoader;
+    private FileFilter assetFileFilter;
 
     // As defined by the REST API
     private String defaultAssetRolesAndCapabilities = "rest-admin,read,rest-admin,update,rest-extension-user,execute";
@@ -124,6 +126,11 @@ public class LoadModulesCommand extends AbstractCommand {
             logger.info("Will load asset modules with roles and capabilities of: " + permissions);
             l.setPermissions(permissions);
         }
+        
+        if (assetFileFilter != null) {
+            l.setFileFilter(assetFileFilter);
+        }
+        
         return l;
     }
 
@@ -145,5 +152,9 @@ public class LoadModulesCommand extends AbstractCommand {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setAssetFileFilter(FileFilter assetFileFilter) {
+        this.assetFileFilter = assetFileFilter;
     }
 }

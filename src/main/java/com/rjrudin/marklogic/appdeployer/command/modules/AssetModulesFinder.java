@@ -10,7 +10,7 @@ public class AssetModulesFinder extends BaseModulesFinder {
     @Override
     public Modules findModules(File baseDir) {
         Modules modules = new Modules();
-        addAssets(modules, baseDir);
+        addAssetDirectories(modules, baseDir);
         return modules;
     }
 }

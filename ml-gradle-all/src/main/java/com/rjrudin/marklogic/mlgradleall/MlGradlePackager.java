@@ -21,7 +21,7 @@ public class MlGradlePackager {
             destDir.delete();
         }
         destDir.mkdirs();
-        processDependency("ml-gradle", "2.0b6");
+        processDependency("ml-gradle", "2.0b7");
         processDependency("ml-junit", "2.2.2");
     }
 

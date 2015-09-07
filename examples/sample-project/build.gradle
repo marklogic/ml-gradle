@@ -8,9 +8,7 @@ buildscript {
         maven {url "http://developer.marklogic.com/maven2/"}
         maven {url "http://rjrudin.github.io/marklogic-java/releases"}
     }
-    dependencies { 
-        classpath "com.rjrudin:ml-gradle:2.0b7" 
-    }
+    dependencies { classpath mlGradleDependency }
 }
 
 
@@ -99,7 +97,7 @@ configurations {
  */
 dependencies {
     // Needed to compile and run the JUnit tests
-    testCompile "com.rjrudin:ml-junit:2.2.2"
+    testCompile "com.rjrudin:ml-junit:2.3"
     testCompile "com.jayway.restassured:rest-assured:2.4.1"
 
     // Located at https://github.com/rjrudin/marklogic-java/tree/gh-pages/releases/com/marklogic/corb

@@ -3,7 +3,6 @@ package com.rjrudin.marklogic.gradle.task
 import org.gradle.api.DefaultTask
 
 import com.marklogic.client.DatabaseClient
-import com.marklogic.client.DatabaseClientFactory
 import com.rjrudin.marklogic.appdeployer.AppConfig
 import com.rjrudin.marklogic.appdeployer.AppDeployer
 import com.rjrudin.marklogic.appdeployer.command.Command
@@ -36,16 +35,15 @@ class MarkLogicTask extends DefaultTask {
     AdminManager getAdminManager() {
         getProject().property("mlAdminManager")
     }
-    
+
     DatabaseClient newClient() {
-        AppConfig config = getAppConfig()
-        return DatabaseClientFactory.newClient(config.host, config.restPort, config.getRestAdminUsername(), config.getRestAdminPassword(), config.authentication)
+        getAppConfig().newDatabaseClient()
     }
     
     void deployWithCommandListProperty(String propertyName) {
         deployWithCommands(getProject().property(propertyName))
     }
-    
+
     void deployWithCommands(List<Command> commands) {
         SimpleAppDeployer deployer = new SimpleAppDeployer(getManageClient(), getAdminManager())
         deployer.setCommands(commands)

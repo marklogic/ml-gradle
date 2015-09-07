@@ -9,7 +9,7 @@ buildscript {
         maven {url "http://rjrudin.github.io/marklogic-java/releases"}
     }
     dependencies { 
-        classpath "com.rjrudin:ml-gradle:2.0b6" 
+        classpath "com.rjrudin:ml-gradle:2.0b7" 
     }
 }
 
@@ -53,7 +53,7 @@ apply plugin: 'ml-gradle'
 
 
 /*
- * The Java plugin is used to compile and run JUnit tests. It also is needed for the "mlWatch" task.
+ * The Java plugin is used to compile and run JUnit tests.
  */
 apply plugin: 'java'
 
@@ -98,9 +98,6 @@ configurations {
  * using that library in tests that must invoke MarkLogic HTTP endpoints.
  */
 dependencies {
-    // This is needed at runtime in order to run gradle mlWatch
-    runtime "com.rjrudin:ml-javaclient-util:2.2.1"
-    
     // Needed to compile and run the JUnit tests
     testCompile "com.rjrudin:ml-junit:2.2.2"
     testCompile "com.jayway.restassured:rest-assured:2.4.1"

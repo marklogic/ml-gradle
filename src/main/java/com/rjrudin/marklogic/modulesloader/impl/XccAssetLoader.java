@@ -70,7 +70,9 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
         filesLoaded = new HashSet<>();
         try {
             for (String path : paths) {
-                logger.info(format("Loading assets from path: %s", path));
+                if (logger.isInfoEnabled()) {
+                    logger.info(format("Loading assets from path: %s", path));
+                }
                 this.currentAssetPath = Paths.get(path);
                 this.currentRootPath = this.currentAssetPath;
                 try {
@@ -89,11 +91,13 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
      * Initialize the XCC session.
      */
     protected void initializeActiveSession() {
-        if (databaseName != null) {
-            logger.info(format("Initializing XCC session; host: %s; username: %s; database name: %s", host, username,
-                    databaseName));
-        } else {
-            logger.info(format("Initializing XCC session; host: %s; username: %s", host, username));
+        if (logger.isDebugEnabled()) {
+            if (databaseName != null) {
+                logger.debug(format("Initializing XCC session; host: %s; username: %s; database name: %s", host,
+                        username, databaseName));
+            } else {
+                logger.debug(format("Initializing XCC session; host: %s; username: %s", host, username));
+            }
         }
 
         ContentSource cs = ContentSourceFactory.newContentSource(host, port, username, password, databaseName,
@@ -106,7 +110,7 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
      */
     protected void closeActiveSession() {
         if (activeSession != null) {
-            logger.info("Closing XCC session");
+            logger.debug("Closing XCC session");
             activeSession.close();
             activeSession = null;
         }

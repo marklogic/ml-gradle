@@ -70,8 +70,8 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
         filesLoaded = new HashSet<>();
         try {
             for (String path : paths) {
-                if (logger.isInfoEnabled()) {
-                    logger.info(format("Loading assets from path: %s", path));
+                if (logger.isDebugEnabled()) {
+                    logger.debug(format("Loading assets from path: %s", path));
                 }
                 this.currentAssetPath = Paths.get(path);
                 this.currentRootPath = this.currentAssetPath;

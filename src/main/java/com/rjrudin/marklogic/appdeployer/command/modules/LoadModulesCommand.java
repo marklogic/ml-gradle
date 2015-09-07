@@ -25,8 +25,8 @@ public class LoadModulesCommand extends AbstractCommand {
     private String defaultAssetRolesAndCapabilities = "rest-admin,read,rest-admin,update,rest-extension-user,execute";
     private String customAssetRolesAndCapabilities;
 
-    private String username;
-    private String password;
+    private String xccUsername;
+    private String xccPassword;
 
     public LoadModulesCommand() {
         setExecuteSortOrder(SortOrderConstants.LOAD_MODULES);
@@ -54,10 +54,7 @@ public class LoadModulesCommand extends AbstractCommand {
         }
 
         AppConfig config = context.getAppConfig();
-
-        DatabaseClient client = DatabaseClientFactory.newClient(config.getHost(), config.getRestPort(),
-                config.getRestAdminUsername(), config.getRestAdminPassword(), config.getRestAuthentication(),
-                config.getRestSslContext(), config.getRestSslHostnameVerifier());
+        DatabaseClient client = config.newDatabaseClient();
 
         try {
             this.modulesLoader.setModulesFinder(new AssetModulesFinder());
@@ -104,12 +101,19 @@ public class LoadModulesCommand extends AbstractCommand {
         }
     }
 
-    protected XccAssetLoader newXccAssetLoader(CommandContext context) {
+    /**
+     * Making this public so that other commands can reuse this logic; TODO should really move this to a non-command
+     * object.
+     * 
+     * @param context
+     * @return
+     */
+    public XccAssetLoader newXccAssetLoader(CommandContext context) {
         XccAssetLoader l = new XccAssetLoader();
         AppConfig config = context.getAppConfig();
         l.setHost(config.getHost());
-        l.setUsername(username != null ? username : config.getRestAdminUsername());
-        l.setPassword(password != null ? password : config.getRestAdminPassword());
+        l.setUsername(xccUsername != null ? xccUsername : config.getRestAdminUsername());
+        l.setPassword(xccPassword != null ? xccPassword : config.getRestAdminPassword());
         l.setDatabaseName(config.getModulesDatabaseName());
 
         String permissions = null;
@@ -126,11 +130,11 @@ public class LoadModulesCommand extends AbstractCommand {
             logger.info("Will load asset modules with roles and capabilities of: " + permissions);
             l.setPermissions(permissions);
         }
-        
+
         if (assetFileFilter != null) {
             l.setFileFilter(assetFileFilter);
         }
-        
+
         return l;
     }
 
@@ -146,12 +150,12 @@ public class LoadModulesCommand extends AbstractCommand {
         this.defaultAssetRolesAndCapabilities = defaultAssetRolesAndCapabilities;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setXccUsername(String username) {
+        this.xccUsername = username;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setXccPassword(String password) {
+        this.xccPassword = password;
     }
 
     public void setAssetFileFilter(FileFilter assetFileFilter) {

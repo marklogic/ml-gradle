@@ -7,6 +7,8 @@ import java.util.Map;
 
 import javax.net.ssl.SSLContext;
 
+import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.DatabaseClientFactory.Authentication;
 import com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier;
 
@@ -48,6 +50,11 @@ public class AppConfig {
         modulePaths = new ArrayList<String>();
         modulePaths.add(defaultModulePath);
         configDir = new ConfigDir();
+    }
+
+    public DatabaseClient newDatabaseClient() {
+        return DatabaseClientFactory.newClient(getHost(), getRestPort(), getRestAdminUsername(),
+                getRestAdminPassword(), getRestAuthentication(), getRestSslContext(), getRestSslHostnameVerifier());
     }
 
     public boolean isTestPortSet() {

@@ -8,12 +8,13 @@ import com.marklogic.client.DatabaseClient;
 public interface ModulesLoader {
 
     /**
-     * Use the given DatabaseClient to load modules found in the given directory. Return a set
-     * containing any files that were loaded.
+     * Use the given DatabaseClient to load modules found in the given directory. Return a set containing any files that
+     * were loaded.
      * 
      * @param directory
+     * @param modulesFinder
      * @param client
      * @return
      */
-    public Set<File> loadModules(File directory, DatabaseClient client);
+    public Set<File> loadModules(File directory, ModulesFinder modulesFinder, DatabaseClient client);
 }

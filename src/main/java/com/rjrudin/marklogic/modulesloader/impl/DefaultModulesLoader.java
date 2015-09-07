@@ -41,7 +41,6 @@ public class DefaultModulesLoader extends LoggingObject implements com.rjrudin.m
 
     private XccAssetLoader xccAssetLoader;
     private ExtensionMetadataProvider extensionMetadataProvider;
-    private ModulesFinder modulesFinder;
     private ModulesManager modulesManager;
 
     /**
@@ -53,12 +52,11 @@ public class DefaultModulesLoader extends LoggingObject implements com.rjrudin.m
 
     public DefaultModulesLoader(XccAssetLoader xccAssetLoader) {
         this.extensionMetadataProvider = new DefaultExtensionMetadataProvider();
-        this.modulesFinder = new DefaultModulesFinder();
         this.modulesManager = new PropertiesModuleManager();
         this.xccAssetLoader = xccAssetLoader;
     }
 
-    public Set<File> loadModules(File baseDir, DatabaseClient client) {
+    public Set<File> loadModules(File baseDir, ModulesFinder modulesFinder, DatabaseClient client) {
         setDatabaseClient(client);
 
         if (modulesManager != null) {
@@ -339,10 +337,6 @@ public class DefaultModulesLoader extends LoggingObject implements com.rjrudin.m
 
     public void setExtensionMetadataProvider(ExtensionMetadataProvider extensionMetadataProvider) {
         this.extensionMetadataProvider = extensionMetadataProvider;
-    }
-
-    public void setModulesFinder(ModulesFinder extensionFilesFinder) {
-        this.modulesFinder = extensionFilesFinder;
     }
 
     public void setModulesManager(ModulesManager configurationFilesManager) {

@@ -9,16 +9,18 @@ import com.rjrudin.marklogic.appdeployer.AppConfig;
 import com.rjrudin.marklogic.appdeployer.command.AbstractCommand;
 import com.rjrudin.marklogic.appdeployer.command.CommandContext;
 import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
+import com.rjrudin.marklogic.modulesloader.ModulesLoader;
 import com.rjrudin.marklogic.modulesloader.impl.DefaultModulesLoader;
 import com.rjrudin.marklogic.modulesloader.impl.TestServerModulesFinder;
 import com.rjrudin.marklogic.modulesloader.impl.XccAssetLoader;
 
 /**
- * By default, uses XCC to load modules, as that's normally much faster than using the /v1/ext REST API endpoint.
+ * Command for loading modules via an instance of DefaultModulesLoader, which depends on an instance of XccAssetLoader -
+ * these are all in the ml-javaclient-util library.
  */
 public class LoadModulesCommand extends AbstractCommand {
 
-    private DefaultModulesLoader modulesLoader;
+    private ModulesLoader modulesLoader;
     private FileFilter assetFileFilter;
 
     // As defined by the REST API
@@ -30,6 +32,17 @@ public class LoadModulesCommand extends AbstractCommand {
 
     public LoadModulesCommand() {
         setExecuteSortOrder(SortOrderConstants.LOAD_MODULES);
+    }
+
+    /**
+     * Public so that a client can initialize the ModulesLoader and then access it via the getter; this is useful for a
+     * tool like ml-gradle, where the ModulesLoader can be reused by multiple tasks.
+     * 
+     * @param context
+     */
+    public void initializeDefaultModulesLoader(CommandContext context) {
+        logger.info("Initializing instance of DefaultModulesLoader");
+        this.modulesLoader = new DefaultModulesLoader(newXccAssetLoader(context));
     }
 
     @Override
@@ -50,23 +63,21 @@ public class LoadModulesCommand extends AbstractCommand {
      */
     protected void loadModulesIntoMainServer(CommandContext context) {
         if (modulesLoader == null) {
-            this.modulesLoader = new DefaultModulesLoader(newXccAssetLoader(context));
+            initializeDefaultModulesLoader(context);
         }
 
         AppConfig config = context.getAppConfig();
         DatabaseClient client = config.newDatabaseClient();
 
         try {
-            this.modulesLoader.setModulesFinder(new AssetModulesFinder());
             for (String modulesPath : config.getModulePaths()) {
                 logger.info("Loading asset modules from dir: " + modulesPath);
-                modulesLoader.loadModules(new File(modulesPath), client);
+                modulesLoader.loadModules(new File(modulesPath), new AssetModulesFinder(), client);
             }
 
-            this.modulesLoader.setModulesFinder(new AllButAssetsModulesFinder());
             for (String modulesPath : config.getModulePaths()) {
                 logger.info("Loading all non-asset modules from dir: " + modulesPath);
-                modulesLoader.loadModules(new File(modulesPath), client);
+                modulesLoader.loadModules(new File(modulesPath), new AllButAssetsModulesFinder(), client);
             }
         } finally {
             client.release();
@@ -86,29 +97,26 @@ public class LoadModulesCommand extends AbstractCommand {
                 config.getRestAdminUsername(), config.getRestAdminPassword(), config.getRestAuthentication(),
                 config.getRestSslContext(), config.getRestSslHostnameVerifier());
 
-        try {
-            // Don't need an XccAssetLoader here, as only options/properties are loaded for the test server
-            DefaultModulesLoader l = new DefaultModulesLoader(null);
-            l.setModulesFinder(new TestServerModulesFinder());
-            l.setModulesManager(null);
+        ModulesLoader testLoader = buildTestModulesLoader(context);
 
+        try {
             for (String modulesPath : config.getModulePaths()) {
                 logger.info("Loading modules into test server from dir: " + modulesPath);
-                l.loadModules(new File(modulesPath), client);
+                testLoader.loadModules(new File(modulesPath), new TestServerModulesFinder(), client);
             }
         } finally {
             client.release();
         }
     }
 
-    /**
-     * Making this public so that other commands can reuse this logic; TODO should really move this to a non-command
-     * object.
-     * 
-     * @param context
-     * @return
-     */
-    public XccAssetLoader newXccAssetLoader(CommandContext context) {
+    protected ModulesLoader buildTestModulesLoader(CommandContext context) {
+        // Don't need an XccAssetLoader here, as only options/properties are loaded for the test server
+        DefaultModulesLoader l = new DefaultModulesLoader(null);
+        l.setModulesManager(null);
+        return l;
+    }
+
+    protected XccAssetLoader newXccAssetLoader(CommandContext context) {
         XccAssetLoader l = new XccAssetLoader();
         AppConfig config = context.getAppConfig();
         l.setHost(config.getHost());
@@ -138,7 +146,7 @@ public class LoadModulesCommand extends AbstractCommand {
         return l;
     }
 
-    public void setModulesLoader(DefaultModulesLoader modulesLoader) {
+    public void setModulesLoader(ModulesLoader modulesLoader) {
         this.modulesLoader = modulesLoader;
     }
 
@@ -160,5 +168,9 @@ public class LoadModulesCommand extends AbstractCommand {
 
     public void setAssetFileFilter(FileFilter assetFileFilter) {
         this.assetFileFilter = assetFileFilter;
+    }
+
+    public ModulesLoader getModulesLoader() {
+        return modulesLoader;
     }
 }

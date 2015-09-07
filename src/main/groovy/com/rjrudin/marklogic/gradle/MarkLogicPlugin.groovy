@@ -290,14 +290,14 @@ class MarkLogicPlugin implements Plugin<Project> {
         CommandContext context = new CommandContext(project.extensions.getByName("mlAppConfig"), manageClient, adminManager)
         project.extensions.add("mlCommandContext", context)
 
-        project.extensions.add("mlAppDeployer", newAppDeployer(project, manageClient, adminManager))
+        project.extensions.add("mlAppDeployer", newAppDeployer(project, context))
     }
 
     /**
      * Creates an AppDeployer with a default set of commands. A developer can then modify this in an
      * ext block.
      */
-    AppDeployer newAppDeployer(Project project, ManageClient manageClient, AdminManager adminManager) {
+    AppDeployer newAppDeployer(Project project, CommandContext context) {
         List<Command> commands = new ArrayList<Command>()
 
         // Security
@@ -343,6 +343,8 @@ class MarkLogicPlugin implements Plugin<Project> {
             logger.info("Setting module permissions to: " + perms)
             lmc.setDefaultAssetRolesAndCapabilities(perms)
         }
+        lmc.initializeDefaultModulesLoader(context)
+        project.extensions.add("mlLoadModulesCommand", lmc)
         commands.add(lmc)
 
         // CPF
@@ -378,7 +380,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.extensions.add("mlViewCommands", viewCommands)
         commands.addAll(viewCommands)
 
-        SimpleAppDeployer deployer = new SimpleAppDeployer(manageClient, adminManager)
+        SimpleAppDeployer deployer = new SimpleAppDeployer(context.getManageClient(), context.getAdminManager())
         deployer.setCommands(commands)
         return deployer
     }

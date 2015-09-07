@@ -62,11 +62,11 @@ To see exactly what mlDeploy is doing, just run Gradle with the "-i" or "--info"
 Exploring the sample project
 -----
 
-To start customizing your application, your best bet is to examine the [sample-project application](https://github.com/rjrudin/ml-gradle/blob/master/sample-project) in this repository. There are three primary things to examine:
+To start customizing your application, your best bet is to examine the [sample-project application](https://github.com/rjrudin/ml-gradle/blob/master/examples/sample-project) in this repository. There are three primary things to examine:
 
-1. The [build.gradle file](https://github.com/rjrudin/ml-gradle/blob/master/sample-project/build.gradle) provides examples of configuring and extending ml-gradle. 
-1. The [ml-config directory](https://github.com/rjrudin/ml-gradle/tree/master/sample-project/src/main/ml-config) provides examples of all of the MarkLogic management resources currently supported by ml-gradle.
-1. The [ml-modules directory](https://github.com/rjrudin/ml-gradle/tree/master/sample-project/src/main/ml-modules) provides examples of the different kinds of modules that can be loaded (application modules are loaded via the MarkLogic Client REST API, not the Management REST API). 
+1. The [build.gradle file](https://github.com/rjrudin/ml-gradle/blob/master/examples/sample-project/build.gradle) provides examples of configuring and extending ml-gradle. 
+1. The [ml-config directory](https://github.com/rjrudin/ml-gradle/tree/master/examples/sample-project/src/main/ml-config) provides examples of all of the MarkLogic management resources currently supported by ml-gradle.
+1. The [ml-modules directory](https://github.com/rjrudin/ml-gradle/tree/master/examples/sample-project/src/main/ml-modules) provides examples of the different kinds of modules that can be loaded (application modules are loaded via the MarkLogic Client REST API, not the Management REST API). 
 
 To quickly generate a useful set of configuration files, just run:
 
@@ -80,7 +80,7 @@ Digging deeper into ml-gradle
 There are two things to learn with ml-gradle - what the ml-app-deployer library lets you do, and what ml-gradle adds on top of it. The main thing to know about ml-app-deployer is where it expects Management API configuration files to be placed so that they're automatically processed by ml-app-deployer and thus by ml-gradle. 
 
 To learn more about what ml-gradle provides on top of ml-app-deployer, you should start by 
-[examining the build.gradle file](https://github.com/rjrudin/ml-gradle/blob/master/sample-project/build.gradle) in the 
+[examining the build.gradle file](https://github.com/rjrudin/ml-gradle/blob/master/examples/sample-project/build.gradle) in the 
 sample-project directory of this repository. This is intended to show all the different features of ml-gradle. To understand the ml-gradle code itself, you should start with [the MarkLogicPlugin](https://github.com/rjrudin/ml-gradle/blob/master/src/main/groovy/com/rjrudin/marklogic/gradle/MarkLogicPlugin.groovy), as it lists out all the registered tasks. 
 
 If you have a project already, then a good way to start is by copying the aforementioned build.gradle file into your project. You can remove all the optional stuff to start with a bare minimum Gradle file, and then start adding things back in as you realize a need for them.

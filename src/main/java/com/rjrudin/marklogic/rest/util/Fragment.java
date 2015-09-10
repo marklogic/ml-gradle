@@ -41,7 +41,7 @@ public class Fragment {
             }
             this.namespaces = list.toArray(new Namespace[] {});
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(String.format("Unable to parse XML, cause: %s; XML: %s", e.getMessage(), xml), e);
         }
     }
 

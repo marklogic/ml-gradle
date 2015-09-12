@@ -19,6 +19,14 @@ public class DeployTriggersDatabaseCommand extends DeployDatabaseCommand {
         super.execute(context);
     }
 
+    @Override
+    public void undo(CommandContext context) {
+        if (context.getAppConfig().isCreateTriggersDatabase()) {
+            setCreateDatabaseWithoutFile(true);
+        }
+        super.undo(context);
+    }
+    
     protected String buildDefaultDatabasePayload(CommandContext context) {
         return format("{\"database-name\": \"%s\"}", context.getAppConfig().getTriggersDatabaseName());
     }

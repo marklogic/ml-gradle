@@ -11,10 +11,7 @@ import com.rjrudin.marklogic.mgmt.hosts.HostManager;
 
 public class CreateMlAppReplicasCommand extends AbstractCommand {
 
-    private int securityReplicasPerHost = 1;
-    private int schemasReplicasPerHost = 1;
-    private int appServicesReplicasPerHost = 1;
-    private int metersReplicasPerHost = 1;
+    private Map<String, Integer> forestNamesAndReplicaCounts = new HashMap<>();
 
     public CreateMlAppReplicasCommand() {
         // As this task has no dependencies, it should be safe to execute it first
@@ -27,11 +24,17 @@ public class CreateMlAppReplicasCommand extends AbstractCommand {
         ForestManager forestMgr = new ForestManager(context.getManageClient());
 
         List<String> hostIds = hostMgr.getHostIds();
-
         logger.info("All host ids: " + hostIds);
 
-        // Find the host that has the default security/schemas/app-services/meters forests on it
-        String primaryForestName = "Security";
+        for (String forestName : forestNamesAndReplicaCounts.keySet()) {
+            int replicaCount = forestNamesAndReplicaCounts.get(forestName);
+            if (replicaCount > 0) {
+                doResource(forestName, replicaCount, hostIds, forestMgr);
+            }
+        }
+    }
+
+    protected void doResource(String primaryForestName, int replicaCount, List<String> hostIds, ForestManager forestMgr) {
         String primaryForestHostId = forestMgr.getHostId(primaryForestName);
         logger.info(primaryForestName + " host: " + primaryForestHostId);
 
@@ -40,14 +43,12 @@ public class CreateMlAppReplicasCommand extends AbstractCommand {
         Map<String, String> replicaNamesAndHostIds = new HashMap<>();
         for (String hostId : hostIds) {
             if (!hostId.equals(primaryForestHostId)) {
-                String name = primaryForestName + "-" + resourceCounter;
-                if (forestMgr.exists(name)) {
-                    logger.info(format("Replica forest %s already exists, so not creating", name));
-                } else {
+                for (int i = 0; i < replicaCount; i++) {
+                    String name = primaryForestName + "-" + resourceCounter;
                     forestMgr.createForestWithName(name, hostId);
+                    replicaNamesAndHostIds.put(name, hostId);
+                    resourceCounter++;
                 }
-                replicaNamesAndHostIds.put(name, hostId);
-                resourceCounter++;
             }
         }
 
@@ -56,19 +57,11 @@ public class CreateMlAppReplicasCommand extends AbstractCommand {
         }
     }
 
-    public void setSecurityReplicasPerHost(int securityReplicasPerHost) {
-        this.securityReplicasPerHost = securityReplicasPerHost;
+    public void setForestNamesAndReplicaCounts(Map<String, Integer> forestNamesAndReplicaCounts) {
+        this.forestNamesAndReplicaCounts = forestNamesAndReplicaCounts;
     }
 
-    public void setSchemasReplicasPerHost(int schemasReplicasPerHost) {
-        this.schemasReplicasPerHost = schemasReplicasPerHost;
-    }
-
-    public void setAppServicesReplicasPerHost(int appServicesReplicasPerHost) {
-        this.appServicesReplicasPerHost = appServicesReplicasPerHost;
-    }
-
-    public void setMetersReplicasPerHost(int metersReplicasPerHost) {
-        this.metersReplicasPerHost = metersReplicasPerHost;
+    public Map<String, Integer> getForestNamesAndReplicaCounts() {
+        return forestNamesAndReplicaCounts;
     }
 }

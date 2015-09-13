@@ -17,7 +17,7 @@ public class ForestManager extends AbstractResourceManager {
 
     public void createForestWithName(String name, String host) {
         if (forestExists(name)) {
-            logger.info(format("Forest already exists with name: %s", name));
+            logger.info(format("Forest already exists with name, so not creating: %s", name));
         } else {
             logger.info(format("Creating forest %s on host %s", name, host));
             createForest(format("{\"forest-name\":\"%s\", \"host\":\"%s\"}", name, host));

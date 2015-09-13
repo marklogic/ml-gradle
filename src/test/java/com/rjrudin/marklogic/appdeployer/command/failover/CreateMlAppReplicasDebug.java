@@ -12,12 +12,14 @@ import com.rjrudin.marklogic.mgmt.ManageConfig;
 public class CreateMlAppReplicasDebug {
 
     public static void main(String[] args) {
-        ManageConfig config = new ManageConfig("obp-test-1.demo.marklogic.com", 8002, "admin", args[0]);
+        ManageConfig config = new ManageConfig(args[0], 8002, "admin", args[1]);
         ManageClient manageClient = new ManageClient(config);
         AppConfig appConfig = new AppConfig();
         CommandContext context = new CommandContext(appConfig, manageClient, null);
 
         CreateMlAppReplicasCommand command = new CreateMlAppReplicasCommand();
+        command.getForestNamesAndReplicaCounts().put("Security", 1);
+        command.getForestNamesAndReplicaCounts().put("Schemas", 2);
         command.execute(context);
     }
 }

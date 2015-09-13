@@ -59,6 +59,11 @@ public class ForestManager extends AbstractResourceManager {
         return f.elementExists("/node()/f:relations/f:relation-group[f:typeref = 'databases']");
     }
 
+    public String getHostId(String forestIdOrName) {
+        Fragment f = getManageClient().getXml(format("/manage/v2/forests/%s", forestIdOrName));
+        return f.getElementValue("/node()/f:relations/f:relation-group[f:typeref = 'hosts']/f:relation/f:idref");
+    }
+
     @Override
     protected String[] getDeleteResourceParams(String payload) {
         return this.deleteLevel != null ? new String[] { "level", deleteLevel } : null;

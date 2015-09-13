@@ -31,6 +31,15 @@ public class AppConfig {
     private Integer restPort;
     private Integer testRestPort;
 
+    // These can all be set to override the default names
+    private String restServerName;
+    private String testRestServerName;
+    private String contentDatabaseName;
+    private String testContentDatabaseName;
+    private String modulesDatabaseName;
+    private String triggersDatabaseName;
+    private String schemasDatabaseName;
+
     private List<String> modulePaths;
     private ConfigDir configDir;
 
@@ -61,36 +70,32 @@ public class AppConfig {
         return testRestPort != null && testRestPort > 0;
     }
 
-    public String getPackageName() {
-        return name + "-package";
-    }
-
     public String getRestServerName() {
-        return name;
+        return restServerName != null ? restServerName : name;
     }
 
     public String getTestRestServerName() {
-        return name + "-test";
+        return testRestServerName != null ? testRestServerName : name + "-test";
     }
 
     public String getContentDatabaseName() {
-        return name + "-content";
+        return contentDatabaseName != null ? contentDatabaseName : name + "-content";
     }
 
     public String getTestContentDatabaseName() {
-        return name + "-test-content";
+        return testContentDatabaseName != null ? testContentDatabaseName : name + "-test-content";
     }
 
     public String getModulesDatabaseName() {
-        return name + "-modules";
+        return modulesDatabaseName != null ? modulesDatabaseName : name + "-modules";
     }
 
     public String getTriggersDatabaseName() {
-        return name + "-triggers";
+        return triggersDatabaseName != null ? triggersDatabaseName : name + "-triggers";
     }
 
     public String getSchemasDatabaseName() {
-        return name + "-schemas";
+        return schemasDatabaseName != null ? schemasDatabaseName : name + "-schemas";
     }
 
     public String getName() {
@@ -203,6 +208,34 @@ public class AppConfig {
 
     public void setRestSslHostnameVerifier(SSLHostnameVerifier restSslHostnameVerifier) {
         this.restSslHostnameVerifier = restSslHostnameVerifier;
+    }
+
+    public void setRestServerName(String restServerName) {
+        this.restServerName = restServerName;
+    }
+
+    public void setTestRestServerName(String testRestServerName) {
+        this.testRestServerName = testRestServerName;
+    }
+
+    public void setContentDatabaseName(String contentDatabaseName) {
+        this.contentDatabaseName = contentDatabaseName;
+    }
+
+    public void setTestContentDatabaseName(String testContentDatabaseName) {
+        this.testContentDatabaseName = testContentDatabaseName;
+    }
+
+    public void setModulesDatabaseName(String modulesDatabaseName) {
+        this.modulesDatabaseName = modulesDatabaseName;
+    }
+
+    public void setTriggersDatabaseName(String triggersDatabaseName) {
+        this.triggersDatabaseName = triggersDatabaseName;
+    }
+
+    public void setSchemasDatabaseName(String schemasDatabaseName) {
+        this.schemasDatabaseName = schemasDatabaseName;
     }
 
 }

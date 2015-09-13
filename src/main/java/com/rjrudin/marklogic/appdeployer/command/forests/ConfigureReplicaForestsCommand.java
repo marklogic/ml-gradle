@@ -1,4 +1,4 @@
-package com.rjrudin.marklogic.appdeployer.command.failover;
+package com.rjrudin.marklogic.appdeployer.command.forests;
 
 import java.util.HashMap;
 import java.util.List;
@@ -9,13 +9,21 @@ import com.rjrudin.marklogic.appdeployer.command.CommandContext;
 import com.rjrudin.marklogic.mgmt.forests.ForestManager;
 import com.rjrudin.marklogic.mgmt.hosts.HostManager;
 
-public class CreateMlAppReplicasCommand extends AbstractCommand {
+/**
+ * Command for configuring - i.e. creating and setting - replica forests for an existing primary forests. Very useful
+ * for the out-of-the-box forests such as Security, Schemas, App-Services, and Meters, which normally need replicas for
+ * failover in a cluster.
+ */
+public class ConfigureReplicaForestsCommand extends AbstractCommand {
 
     private Map<String, Integer> forestNamesAndReplicaCounts = new HashMap<>();
 
-    public CreateMlAppReplicasCommand() {
-        // As this task has no dependencies, it should be safe to execute it first
-        setExecuteSortOrder(0);
+    /**
+     * By default, the execute sort order is Integer.MAX_VALUE as a way of guaranteeing that the referenced primary
+     * forests already exist. Feel free to customize as needed.
+     */
+    public ConfigureReplicaForestsCommand() {
+        setExecuteSortOrder(Integer.MAX_VALUE);
     }
 
     @Override
@@ -29,16 +37,24 @@ public class CreateMlAppReplicasCommand extends AbstractCommand {
         for (String forestName : forestNamesAndReplicaCounts.keySet()) {
             int replicaCount = forestNamesAndReplicaCounts.get(forestName);
             if (replicaCount > 0) {
-                doResource(forestName, replicaCount, hostIds, forestMgr);
+                configureReplicaForests(forestName, replicaCount, hostIds, forestMgr);
             }
         }
     }
 
-    protected void doResource(String primaryForestName, int replicaCount, List<String> hostIds, ForestManager forestMgr) {
+    /**
+     * Creates forests as needed (they may already exists) and then sets those forests as the replicas for the given
+     * primaryForestName.
+     * 
+     * @param primaryForestName
+     * @param replicaCount
+     * @param hostIds
+     * @param forestMgr
+     */
+    protected void configureReplicaForests(String primaryForestName, int replicaCount, List<String> hostIds,
+            ForestManager forestMgr) {
         String primaryForestHostId = forestMgr.getHostId(primaryForestName);
-        logger.info(primaryForestName + " host: " + primaryForestHostId);
 
-        // Now for each other host, create N replicas on the host
         int resourceCounter = 2;
         Map<String, String> replicaNamesAndHostIds = new HashMap<>();
         for (String hostId : hostIds) {

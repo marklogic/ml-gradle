@@ -59,6 +59,10 @@ public class ConfigureForestReplicasCommand extends AbstractCommand {
      */
     protected void configureReplicaForests(String primaryForestName, int replicaCount, List<String> hostIds,
             ForestManager forestMgr) {
+        if (logger.isInfoEnabled()) {
+            logger.info("Configuring forest replicas for primary forest: " + primaryForestName);
+        }
+
         String primaryForestHostId = forestMgr.getHostId(primaryForestName);
 
         int resourceCounter = 2;

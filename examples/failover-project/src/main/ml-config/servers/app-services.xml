@@ -1,0 +1,9 @@
+<http-server-properties xmlns="http://marklogic.com/manage">
+  <server-name>App-Services</server-name>
+  <!-- By default, the App-Services server uses Documents and Modules as its content/modules databases. Keeping those and 
+    supporting failover for this server would require replicas of Documents and Modules. But if you're only really using qconsole, 
+    you can safely set the content database to App-Services and the modules-database to "filesystem" (i.e. 0), which means you 
+    only need replica forests for App-Services, which you need anyways for qconsole to work. -->
+  <content-database>App-Services</content-database>
+  <modules-database>0</modules-database>
+</http-server-properties>

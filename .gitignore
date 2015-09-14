@@ -18,3 +18,4 @@ examples/disconnected-project/build/
 examples/disconnected-project/.gradle/
 examples/flexrep-project/.gradle/
 examples/sample-project/local.gradle
+examples/failover-project/.gradle/

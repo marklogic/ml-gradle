@@ -1,0 +1,12 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {url "http://developer.marklogic.com/maven2/"}
+        maven {url "http://rjrudin.github.io/marklogic-java/releases"}
+    }
+    dependencies { classpath mlGradleDependency }
+}
+
+apply plugin: 'ml-gradle'
+
+mlConfigureForestReplicas.command.forestNamesAndReplicaCounts = [ "Security": 2, "Schemas": 1, "Meters": 1, "App-Services": 1]

@@ -2,9 +2,19 @@
 This changelog is in its infancy, but the plan is to start tracking all changes via issues and then associating them
 with releases. 
 
-## 1.2
-
-* [#5](https://github.com/rjrudin/ml-gradle/issues/5) Added Corb Task
-
-
 TODO Reconcile this with what's in gradle.properties
+
+## 2.0b8
+
+* [#40](https://github.com/rjrudin/ml-gradle/issues/40) Can now easily configure replica forests, particularly for
+out-of-the-box forests like Security, Schemas, Meters, and App-Services 
+* Reworked mlWatch so that it reuses the instance of LoadModulesCommand that's created by MarkLogicPlugin
+
+## 2.0b7
+
+* [#38](https://github.com/rjrudin/ml-gradle/issues/38) mlWatch now supports all connection options, including SSL 
+* Now using ml-app-deployer 2.0b6, which allows for a custom FileFilter on LoadModulesCommand
+ 
+## 2.0b6
+
+* [#36](https://github.com/rjrudin/ml-gradle/issues/36) Added mlDeployFlexrep

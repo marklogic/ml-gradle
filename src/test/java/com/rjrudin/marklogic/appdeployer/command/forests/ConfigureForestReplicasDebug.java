@@ -9,7 +9,7 @@ import com.rjrudin.marklogic.mgmt.ManageConfig;
  * Not an actual test, as this depends on an environment with multiple hosts, which is normally not the case on a
  * development machine.
  */
-public class ConfigureReplicaForestsDebug {
+public class ConfigureForestReplicasDebug {
 
     public static void main(String[] args) {
         final String host = args[0];
@@ -20,7 +20,7 @@ public class ConfigureReplicaForestsDebug {
         AppConfig appConfig = new AppConfig();
         CommandContext context = new CommandContext(appConfig, manageClient, null);
 
-        ConfigureReplicaForestsCommand command = new ConfigureReplicaForestsCommand();
+        ConfigureForestReplicasCommand command = new ConfigureForestReplicasCommand();
         command.getForestNamesAndReplicaCounts().put("Security", 1);
         command.getForestNamesAndReplicaCounts().put("Schemas", 2);
         command.execute(context);

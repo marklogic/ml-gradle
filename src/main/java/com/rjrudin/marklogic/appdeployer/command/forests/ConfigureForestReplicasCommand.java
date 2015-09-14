@@ -14,7 +14,7 @@ import com.rjrudin.marklogic.mgmt.hosts.HostManager;
  * for the out-of-the-box forests such as Security, Schemas, App-Services, and Meters, which normally need replicas for
  * failover in a cluster.
  */
-public class ConfigureReplicaForestsCommand extends AbstractCommand {
+public class ConfigureForestReplicasCommand extends AbstractCommand {
 
     private Map<String, Integer> forestNamesAndReplicaCounts = new HashMap<>();
 
@@ -22,7 +22,7 @@ public class ConfigureReplicaForestsCommand extends AbstractCommand {
      * By default, the execute sort order is Integer.MAX_VALUE as a way of guaranteeing that the referenced primary
      * forests already exist. Feel free to customize as needed.
      */
-    public ConfigureReplicaForestsCommand() {
+    public ConfigureForestReplicasCommand() {
         setExecuteSortOrder(Integer.MAX_VALUE);
     }
 
@@ -32,7 +32,13 @@ public class ConfigureReplicaForestsCommand extends AbstractCommand {
         ForestManager forestMgr = new ForestManager(context.getManageClient());
 
         List<String> hostIds = hostMgr.getHostIds();
-        logger.info("All host ids: " + hostIds);
+        if (hostIds.size() == 1) {
+            if (logger.isInfoEnabled()) {
+                logger.info("Only found one host ID, so not configuring any replica forests; host ID: "
+                        + hostIds.get(0));
+            }
+            return;
+        }
 
         for (String forestName : forestNamesAndReplicaCounts.keySet()) {
             int replicaCount = forestNamesAndReplicaCounts.get(forestName);

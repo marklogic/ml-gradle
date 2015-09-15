@@ -21,6 +21,8 @@ dependencies {
     testCompile 'junit:junit:4+'
 }
 
+javadoc.destinationDir = file(javadocsDir + "/" + project.name)
+
 publishing {
     publications {
         mainJava(MavenPublication) { from components.java }

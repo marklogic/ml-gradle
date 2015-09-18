@@ -122,7 +122,8 @@ public abstract class AbstractResourceManager extends AbstractManager implements
     /**
      * Can be overridden by subclass to provide custom querystring parameters.
      * 
-     * @param node
+     * @param payload
+     *            XML or JSON payload
      * @return
      */
     protected String[] getUpdateResourceParams(String payload) {
@@ -133,6 +134,7 @@ public abstract class AbstractResourceManager extends AbstractManager implements
      * Defaults to the "update" resource parameters.
      * 
      * @param payload
+     *            XML or JSON payload
      * @return
      */
     protected String[] getDeleteResourceParams(String payload) {

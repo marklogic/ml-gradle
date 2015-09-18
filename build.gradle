@@ -19,6 +19,8 @@ dependencies {
   testCompile 'com.rjrudin:ml-junit:2.3'
 }
 
+javadoc.destinationDir = file(javadocsDir + "/" + project.name)
+
 // This ensures that Gradle includes in the published jar any non-java files under src/main/java
 sourceSets.main.resources.srcDir 'src/main/java'
 

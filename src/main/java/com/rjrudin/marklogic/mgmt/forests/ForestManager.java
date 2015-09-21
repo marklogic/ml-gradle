@@ -1,12 +1,20 @@
 package com.rjrudin.marklogic.mgmt.forests;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.rjrudin.marklogic.mgmt.AbstractResourceManager;
 import com.rjrudin.marklogic.mgmt.ManageClient;
 import com.rjrudin.marklogic.rest.util.Fragment;
 
+/**
+ * Provides methods wrapping /manage/v2/forests endpoints.
+ */
 public class ForestManager extends AbstractResourceManager {
+
+    public final static String DELETE_FULL = "full";
+    public final static String DELETE_CONFIG = "config-only";
 
     private String deleteLevel;
 
@@ -89,6 +97,45 @@ public class ForestManager extends AbstractResourceManager {
         getManageClient().putJson(getPropertiesPath(forestIdOrName), json);
         if (logger.isInfoEnabled()) {
             logger.info(format("Finished setting replicas for forest %s", forestIdOrName));
+        }
+    }
+
+    /**
+     * Convenience method for detaching a forest from any replicas it has; this is often used before deleting those
+     * replicas
+     * 
+     * @param forestIdOrName
+     */
+    public void setReplicasToNone(String forestIdOrName) {
+        setReplicas(forestIdOrName, new HashMap<String, String>());
+    }
+
+    /**
+     * Returns a list of IDs for each replica forest for the given forest ID or name.
+     * 
+     * @param forestIdOrName
+     * @return
+     */
+    public List<String> getReplicaIds(String forestIdOrName) {
+        String path = getResourcePath(forestIdOrName) + "?view=config&format=xml";
+        return getManageClient().getXml(path).getElementValues(
+                "/f:forest-config/f:config-properties/f:forest-replicas/f:forest-replica");
+    }
+
+    /**
+     * Deletes (with a level of "full") all replicas for the given forest.
+     * 
+     * @param forestIdOrName
+     */
+    public void deleteReplicas(String forestIdOrName) {
+        List<String> replicaIds = getReplicaIds(forestIdOrName);
+        if (replicaIds.isEmpty()) {
+            logger.info(format("Forest '%s' has no replicas, so not deleting anything", forestIdOrName));
+            return;
+        }
+        setReplicasToNone(forestIdOrName);
+        for (String id : replicaIds) {
+            delete(id, DELETE_FULL);
         }
     }
 

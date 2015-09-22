@@ -8,6 +8,7 @@ TODO Reconcile this with what's in gradle.properties
 ## 2.0b9
 
 * [#42](https://github.com/rjrudin/ml-gradle/issues/42) Can now easily delete replica forests via mlDeleteForestReplicas
+* Using version 2.0b9 of ml-app-deployer, which fixes a problem with creating forests on multiple hosts.
 
 ## 2.0b8
 

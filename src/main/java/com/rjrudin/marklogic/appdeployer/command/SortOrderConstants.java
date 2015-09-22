@@ -55,11 +55,16 @@ public abstract class SortOrderConstants {
     public static Integer DELETE_ROLES = 9060;
     public static Integer DELETE_PRIVILEGES = 9070;
 
-    public static Integer DELETE_CONTENT_DATABASES = 8000;
-    public static Integer DELETE_OTHER_DATABASES = 8005;
-    public static Integer DELETE_TRIGGERS_DATABASE = 8010;
-    public static Integer DELETE_SCHEMAS_DATABASE = 8020;
-    public static Integer DELETE_FORESTS = 8040;
+    /*
+     * This executes before databases are deleted, as deleting databases normally deletes the primary forests, so we
+     * need to make sure the replicas are deleted first.
+     */
+    public static Integer DELETE_FOREST_REPLICAS = 8000;
+    
+    public static Integer DELETE_CONTENT_DATABASES = 8100;
+    public static Integer DELETE_OTHER_DATABASES = 8120;
+    public static Integer DELETE_TRIGGERS_DATABASE = 8140;
+    public static Integer DELETE_SCHEMAS_DATABASE = 8160;
 
     public static Integer DELETE_REST_API_SERVERS = 7000;
     public static Integer DELETE_OTHER_SERVERS = 7010;

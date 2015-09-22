@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.rjrudin.marklogic.appdeployer.command.AbstractUndoableCommand;
 import com.rjrudin.marklogic.appdeployer.command.CommandContext;
+import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
 import com.rjrudin.marklogic.mgmt.forests.ForestManager;
 import com.rjrudin.marklogic.mgmt.hosts.HostManager;
 
@@ -25,6 +26,7 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
      */
     public ConfigureForestReplicasCommand() {
         setExecuteSortOrder(Integer.MAX_VALUE);
+        setUndoSortOrder(SortOrderConstants.DELETE_FOREST_REPLICAS);
     }
 
     @Override

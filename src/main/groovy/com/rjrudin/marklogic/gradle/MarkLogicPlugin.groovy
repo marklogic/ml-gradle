@@ -50,8 +50,9 @@ import com.rjrudin.marklogic.gradle.task.databases.ClearModulesDatabaseTask
 import com.rjrudin.marklogic.gradle.task.databases.ClearSchemasDatabaseTask
 import com.rjrudin.marklogic.gradle.task.databases.ClearTriggersDatabaseTask
 import com.rjrudin.marklogic.gradle.task.databases.DeployDatabasesTask
-import com.rjrudin.marklogic.gradle.task.flexrep.DeployFlexrepTask;
-import com.rjrudin.marklogic.gradle.task.forests.ConfigureForestReplicasTask;
+import com.rjrudin.marklogic.gradle.task.flexrep.DeployFlexrepTask
+import com.rjrudin.marklogic.gradle.task.forests.ConfigureForestReplicasTask
+import com.rjrudin.marklogic.gradle.task.forests.DeleteForestReplicasTask
 import com.rjrudin.marklogic.gradle.task.groups.DeployGroupsTask
 import com.rjrudin.marklogic.gradle.task.scaffold.GenerateScaffoldTask
 import com.rjrudin.marklogic.gradle.task.security.DeploySecurityTask
@@ -115,6 +116,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         
         String forestGroup = "ml-gradle Forest"
         project.task("mlConfigureForestReplicas", type: ConfigureForestReplicasTask, group: forestGroup, description: "Configure forest replicas via the command.forestNamesAndReplicaCounts map")
+        project.task("mlDeleteForestReplicas", type: DeleteForestReplicasTask, group: forestGroup, description: "Delete forest replicas via the command.forestNamesAndReplicaCounts map")
         
         String groupsGroup = "ml-gradle Group"
         project.task("mlDeployGroups", type: DeployGroupsTask, group: groupsGroup, description: "Deploy each group, updating it if it exists")

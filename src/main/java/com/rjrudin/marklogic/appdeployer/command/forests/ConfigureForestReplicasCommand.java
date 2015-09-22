@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.rjrudin.marklogic.appdeployer.command.AbstractCommand;
+import com.rjrudin.marklogic.appdeployer.command.AbstractUndoableCommand;
 import com.rjrudin.marklogic.appdeployer.command.CommandContext;
 import com.rjrudin.marklogic.mgmt.forests.ForestManager;
 import com.rjrudin.marklogic.mgmt.hosts.HostManager;
@@ -14,9 +14,10 @@ import com.rjrudin.marklogic.mgmt.hosts.HostManager;
  * for the out-of-the-box forests such as Security, Schemas, App-Services, and Meters, which normally need replicas for
  * failover in a cluster.
  */
-public class ConfigureForestReplicasCommand extends AbstractCommand {
+public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 
     private Map<String, Integer> forestNamesAndReplicaCounts = new HashMap<>();
+    private boolean deleteReplicasOnUndo = true;
 
     /**
      * By default, the execute sort order is Integer.MAX_VALUE as a way of guaranteeing that the referenced primary
@@ -59,9 +60,7 @@ public class ConfigureForestReplicasCommand extends AbstractCommand {
      */
     protected void configureReplicaForests(String primaryForestName, int replicaCount, List<String> hostIds,
             ForestManager forestMgr) {
-        if (logger.isInfoEnabled()) {
-            logger.info("Configuring forest replicas for primary forest: " + primaryForestName);
-        }
+        logger.info(format("Configuring forest replicas for primary forest %s", primaryForestName));
 
         String primaryForestHostId = forestMgr.getHostId(primaryForestName);
 
@@ -81,6 +80,22 @@ public class ConfigureForestReplicasCommand extends AbstractCommand {
         if (!replicaNamesAndHostIds.isEmpty()) {
             forestMgr.setReplicas(primaryForestName, replicaNamesAndHostIds);
         }
+
+        logger.info(format("Finished configuring forest replicas for primary forest %s", primaryForestName));
+    }
+
+    @Override
+    public void undo(CommandContext context) {
+        if (deleteReplicasOnUndo) {
+            ForestManager mgr = new ForestManager(context.getManageClient());
+            for (String forestName : forestNamesAndReplicaCounts.keySet()) {
+                logger.info(format("Deleting forest replicas for primary forest %s", forestName));
+                mgr.deleteReplicas(forestName);
+                logger.info(format("Finished deleting forest replicas for primary forest %s", forestName));
+            }
+        } else {
+            logger.info("deleteReplicasOnUndo is set to false, so not deleting any replicas");
+        }
     }
 
     public void setForestNamesAndReplicaCounts(Map<String, Integer> forestNamesAndReplicaCounts) {
@@ -89,5 +104,9 @@ public class ConfigureForestReplicasCommand extends AbstractCommand {
 
     public Map<String, Integer> getForestNamesAndReplicaCounts() {
         return forestNamesAndReplicaCounts;
+    }
+
+    public void setDeleteReplicasOnUndo(boolean deleteReplicasOnUndo) {
+        this.deleteReplicasOnUndo = deleteReplicasOnUndo;
     }
 }

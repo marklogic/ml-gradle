@@ -4,7 +4,6 @@ import com.rjrudin.marklogic.appdeployer.AppConfig;
 import com.rjrudin.marklogic.appdeployer.command.CommandContext;
 import com.rjrudin.marklogic.mgmt.ManageClient;
 import com.rjrudin.marklogic.mgmt.ManageConfig;
-import com.rjrudin.marklogic.mgmt.databases.DatabaseManager;
 
 /**
  * Not an actual test, as this depends on an environment with multiple hosts, which is normally not the case on a
@@ -21,13 +20,13 @@ public class ConfigureForestReplicasDebug {
         AppConfig appConfig = new AppConfig();
         CommandContext context = new CommandContext(appConfig, manageClient, null);
 
+        // Configure replicas
         ConfigureForestReplicasCommand command = new ConfigureForestReplicasCommand();
         command.getForestNamesAndReplicaCounts().put("Security", 1);
         command.getForestNamesAndReplicaCounts().put("Schemas", 2);
         command.execute(context);
 
-        DatabaseManager dbMgr = new DatabaseManager(manageClient);
-        dbMgr.deleteReplicaForests("Security");
-        dbMgr.deleteReplicaForests("Schemas");
+        // And then delete those replicas
+        command.undo(context);
     }
 }

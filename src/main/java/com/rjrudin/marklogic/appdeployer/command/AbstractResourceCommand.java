@@ -10,20 +10,14 @@ import com.rjrudin.marklogic.mgmt.admin.ActionRequiringRestart;
  * Provides a basic implementation for creating/updating a resource while an app is being deployed and then deleting it
  * while the app is being undeployed.
  */
-public abstract class AbstractResourceCommand extends AbstractCommand implements UndoableCommand {
+public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 
     private boolean deleteResourcesOnUndo = true;
     private boolean restartAfterDelete = false;
-    private int undoSortOrder = Integer.MAX_VALUE;
 
     protected abstract File[] getResourceDirs(CommandContext context);
 
     protected abstract ResourceManager getResourceManager(CommandContext context);
-
-    @Override
-    public Integer getUndoSortOrder() {
-        return undoSortOrder;
-    }
 
     @Override
     public void execute(CommandContext context) {
@@ -93,9 +87,5 @@ public abstract class AbstractResourceCommand extends AbstractCommand implements
 
     public boolean isRestartAfterDelete() {
         return restartAfterDelete;
-    }
-
-    public void setUndoSortOrder(int undoSortOrder) {
-        this.undoSortOrder = undoSortOrder;
     }
 }

@@ -9,6 +9,9 @@ buildscript {
 
 apply plugin: 'ml-gradle'
 
+ext {
+    myForestNamesAndReplicasCounts = [ "Security": 2, "Schemas": 1, "Meters": 1, "App-Services": 1]
+}
 /*
  * The mlConfigureForestReplicas task exposes an instance of ConfigureForestReplicasCommand as the "command" attribute. 
  * This allows us to easily modify the forestNamesAndReplicaCounts map, where each key is the name of a primary forest, 
@@ -19,4 +22,11 @@ apply plugin: 'ml-gradle'
  * failover for your own forests, you can use this approach, but you may also wish to create forest config files under
  * src/main/ml-config/forests.
  */
-mlConfigureForestReplicas.command.forestNamesAndReplicaCounts = [ "Security": 2, "Schemas": 1, "Meters": 1, "App-Services": 1]
+mlConfigureForestReplicas.command.forestNamesAndReplicaCounts = myForestNamesAndReplicasCounts
+
+/*
+ * mlDeleteForestReplicas can then use the same map as mlConfigureForestReplicas, as it will delete replicas for all of
+ * the forests identified by the keys in the map. This task could be called before mlUndeploy, for example, to first
+ * delete all of the forest replicas, thus allowing the primary forests to be deleted safely.
+ */
+mlDeleteForestReplicas.command.forestNamesAndReplicaCounts = myForestNamesAndReplicasCounts

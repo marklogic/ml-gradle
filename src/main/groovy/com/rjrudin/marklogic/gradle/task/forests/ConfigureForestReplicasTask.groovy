@@ -14,7 +14,7 @@ class ConfigureForestReplicasTask extends MarkLogicTask {
     ConfigureForestReplicasCommand command = new ConfigureForestReplicasCommand()
 
     @TaskAction
-    void configureReplicaForests() {
+    void configureForestReplicas() {
         command.execute(getCommandContext())
     }
 }

@@ -8,3 +8,4 @@ TODO Reconcile this with what's in gradle.properties
 
 * [#56](https://github.com/rjrudin/ml-app-deployer/issues/56) ConfigureForestReplicasCommand now supports "undo", using
 new methods in ForestManager to delete replica forests. Also extracted AbstractUndoableCommand.
+* [#57](https://github.com/rjrudin/ml-app-deployer/issues/57) Fixed creation of forests on multiple hosts

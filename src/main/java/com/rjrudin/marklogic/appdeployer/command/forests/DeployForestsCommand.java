@@ -1,6 +1,7 @@
 package com.rjrudin.marklogic.appdeployer.command.forests;
 
 import java.io.File;
+import java.util.List;
 
 import org.springframework.util.StringUtils;
 
@@ -66,11 +67,17 @@ public class DeployForestsCommand extends AbstractCommand {
     protected void createForests(String originalPayload, CommandContext context) {
         ForestManager mgr = new ForestManager(context.getManageClient());
         AppConfig appConfig = context.getAppConfig();
-        for (String hostName : new HostManager(context.getManageClient()).getHostNames()) {
-            for (int i = 1; i <= forestsPerHost; i++) {
+        List<String> hostNames = new HostManager(context.getManageClient()).getHostNames();
+        int size = hostNames.size();
+        for (int i = 0; i < size; i++) {
+            String hostName = hostNames.get(i);
+            logger.info(format("Creating forests on host %s", hostName));
+            int startNumber = (i * forestsPerHost) + 1;
+            int endNumber = (i + 1) * forestsPerHost;
+            for (int j = startNumber; j <= endNumber; j++) {
                 String payload = tokenReplacer.replaceTokens(originalPayload, appConfig, false);
                 payload = payload.replace("%%FOREST_HOST%%", hostName);
-                payload = payload.replace("%%FOREST_NAME%%", getForestName(appConfig, i));
+                payload = payload.replace("%%FOREST_NAME%%", getForestName(appConfig, j));
                 payload = payload.replace("%%FOREST_DATABASE%%", getForestDatabaseName(appConfig));
                 mgr.save(payload);
             }

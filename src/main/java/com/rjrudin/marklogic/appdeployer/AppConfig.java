@@ -28,8 +28,11 @@ public class AppConfig {
      */
     public final static String DEFAULT_MODULES_PATH = "src/main/ml-modules";
 
+    public final static String DEFAULT_HOST = "localhost";
+    public final static String DEFAULT_GROUP = "Default";
+
     private String name;
-    private String host = "localhost";
+    private String host = DEFAULT_HOST;
 
     // Username/password combo for using the client REST API - e.g. to load modules
     private String restAdminUsername;
@@ -53,7 +56,7 @@ public class AppConfig {
     private List<String> modulePaths;
     private ConfigDir configDir;
 
-    private String groupName = "Default";
+    private String groupName = DEFAULT_GROUP;
 
     // Passed into the TokenReplacer that subclasses of AbstractCommand use
     private Map<String, String> customTokens = new HashMap<>();
@@ -112,22 +115,38 @@ public class AppConfig {
         return contentDatabaseName != null ? contentDatabaseName : name + "-content";
     }
 
+    /**
+     * @return {@code testContentDatabaseName} if it is set; {@code name}-test-content otherwise
+     */
     public String getTestContentDatabaseName() {
         return testContentDatabaseName != null ? testContentDatabaseName : name + "-test-content";
     }
 
+    /**
+     * @return {@code modulesDatabaseName} if it is set; {@code name}-modules otherwise
+     */
     public String getModulesDatabaseName() {
         return modulesDatabaseName != null ? modulesDatabaseName : name + "-modules";
     }
 
+    /**
+     * @return {@code triggersDatabaseName} if it is set; {@code name}-triggers otherwise
+     */
     public String getTriggersDatabaseName() {
         return triggersDatabaseName != null ? triggersDatabaseName : name + "-triggers";
     }
 
+    /**
+     * @return {@code schemasDatabaseName} if it is set; {@code name}-schemas otherwise
+     */
     public String getSchemasDatabaseName() {
         return schemasDatabaseName != null ? schemasDatabaseName : name + "-schemas";
     }
 
+    /**
+     * @return the name of the application, which is then used to generate app server and database names unless those
+     *         are set via their respective properties
+     */
     public String getName() {
         return name;
     }
@@ -136,6 +155,9 @@ public class AppConfig {
         this.name = name;
     }
 
+    /**
+     * @return the host that clients using this class will connect to
+     */
     public String getHost() {
         return host;
     }
@@ -144,6 +166,9 @@ public class AppConfig {
         this.host = host;
     }
 
+    /**
+     * @return the name of a MarkLogic user with the rest-admin role who can then load modules via a REST API server
+     */
     public String getRestAdminUsername() {
         return restAdminUsername;
     }
@@ -152,6 +177,9 @@ public class AppConfig {
         this.restAdminUsername = username;
     }
 
+    /**
+     * @return the password for the user identified by {@code restAdminUsername}
+     */
     public String getRestAdminPassword() {
         return restAdminPassword;
     }
@@ -160,6 +188,9 @@ public class AppConfig {
         this.restAdminPassword = password;
     }
 
+    /**
+     * @return the port of the REST API server used for loading modules
+     */
     public Integer getRestPort() {
         return restPort;
     }
@@ -168,6 +199,10 @@ public class AppConfig {
         this.restPort = restPort;
     }
 
+    /**
+     * @return the post of the REST API server used for loading modules that are specific to a test server (currently,
+     *         just search options)
+     */
     public Integer getTestRestPort() {
         return testRestPort;
     }
@@ -176,6 +211,9 @@ public class AppConfig {
         this.testRestPort = testRestPort;
     }
 
+    /**
+     * @return a list of all the paths from which modules should be loaded into a REST API server modules database
+     */
     public List<String> getModulePaths() {
         return modulePaths;
     }
@@ -184,6 +222,10 @@ public class AppConfig {
         this.modulePaths = modulePaths;
     }
 
+    /**
+     * @return the name of the group in which the application associated with this configuration should have its app
+     *         servers and other group-specific resources
+     */
     public String getGroupName() {
         return groupName;
     }
@@ -192,6 +234,10 @@ public class AppConfig {
         this.groupName = groupName;
     }
 
+    /**
+     * @return the MarkLogic Java Client {@code Authentication} object that is used for authenticating with a REST API
+     *         server for loading modules
+     */
     public Authentication getRestAuthentication() {
         return restAuthentication;
     }

@@ -13,10 +13,20 @@ import com.marklogic.client.DatabaseClientFactory.Authentication;
 import com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier;
 
 /**
- * Encapsulates the connection information for an application and where its modules can be found. Should possibly add
- * ConfigDir to this.
+ * Encapsulates common configuration properties for an application deployed to MarkLogic. These properties include not
+ * just names of application resources - such as app servers and databases - but also connection information for loading
+ * modules into an application as well as paths for modules and configuration files.
+ * 
+ * An instance of this class is passed in as the main argument to the methods in the {@code AppDeployer} interface,
+ * meaning that you're free to not just configure this as needed but also subclass it and add anything that you would
+ * like.
  */
 public class AppConfig {
+
+    /**
+     * The default path from which modules will be loaded into a modules database.
+     */
+    public final static String DEFAULT_MODULES_PATH = "src/main/ml-modules";
 
     private String name;
     private String host = "localhost";
@@ -52,7 +62,7 @@ public class AppConfig {
     private boolean createTriggersDatabase = true;
 
     public AppConfig() {
-        this("src/main/ml-modules");
+        this(DEFAULT_MODULES_PATH);
     }
 
     public AppConfig(String defaultModulePath) {
@@ -61,23 +71,43 @@ public class AppConfig {
         configDir = new ConfigDir();
     }
 
+    /**
+     * Convenience method for constructing a MarkLogic Java API DatabaseClient based on the host, restPort,
+     * restAdminUsername, restAdminPassword, restAuthentication, restSslContext, and restSslHostnameVerifier properties.
+     * 
+     * @return
+     */
     public DatabaseClient newDatabaseClient() {
         return DatabaseClientFactory.newClient(getHost(), getRestPort(), getRestAdminUsername(),
                 getRestAdminPassword(), getRestAuthentication(), getRestSslContext(), getRestSslHostnameVerifier());
     }
 
+    /**
+     * @return true if {@code testRestPort} is set and greater than zero. This is used as an indicator that an
+     *         application wants test resources - most likely a separate app server and content database - created as
+     *         part of a deployment.
+     */
     public boolean isTestPortSet() {
         return testRestPort != null && testRestPort > 0;
     }
 
+    /**
+     * @return {@code restServerName} if it is set; {@code name} otherwise
+     */
     public String getRestServerName() {
         return restServerName != null ? restServerName : name;
     }
 
+    /**
+     * @return {@code testRestServerName} if it is set; {@code name}-test otherwise
+     */
     public String getTestRestServerName() {
         return testRestServerName != null ? testRestServerName : name + "-test";
     }
 
+    /**
+     * @return {@code contentDatabaseName} if it is set; {@code name}-content otherwise
+     */
     public String getContentDatabaseName() {
         return contentDatabaseName != null ? contentDatabaseName : name + "-content";
     }

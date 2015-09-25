@@ -246,6 +246,11 @@ public class AppConfig {
         this.restAuthentication = authentication;
     }
 
+    /**
+     * @return a {@code ConfigDir} instance that defines the location of the configuration directory (where files are
+     *         stored that are then loaded via MarkLogic Management API endpoints) as well as paths to specific
+     *         resources within that directory
+     */
     public ConfigDir getConfigDir() {
         return configDir;
     }
@@ -254,6 +259,11 @@ public class AppConfig {
         this.configDir = configDir;
     }
 
+    /**
+     * @return a map of tokens that are intended to be replaced with their associated values in configuration files.
+     *         This map allows for externalized properties to be passed into configuration files - e.g. Gradle
+     *         properties can be swapped in for tokens in configuration files at deploy time.
+     */
     public Map<String, String> getCustomTokens() {
         return customTokens;
     }
@@ -262,6 +272,10 @@ public class AppConfig {
         this.customTokens = customTokens;
     }
 
+    /**
+     * @return whether a triggers database should be created by default; defaults to true, as it's very common to need a
+     *         triggers database, such as for CPF, Alerting, custom triggers, etc.
+     */
     public boolean isCreateTriggersDatabase() {
         return createTriggersDatabase;
     }
@@ -270,6 +284,10 @@ public class AppConfig {
         this.createTriggersDatabase = createTriggerDatabase;
     }
 
+    /**
+     * @return a Java {@code SSLContext} for making an SSL connection with the REST API server for loading modules; null
+     *         if an SSL connection is not required
+     */
     public SSLContext getRestSslContext() {
         return restSslContext;
     }
@@ -278,6 +296,10 @@ public class AppConfig {
         this.restSslContext = restSslContext;
     }
 
+    /**
+     * @return a MarkLogic Java Client {@code SSLHostnameVerifier} that is used to make an SSL connection to the REST
+     *         API server for loading modules; null if an SSL connection is not required
+     */
     public SSLHostnameVerifier getRestSslHostnameVerifier() {
         return restSslHostnameVerifier;
     }

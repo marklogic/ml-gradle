@@ -19,3 +19,5 @@ examples/disconnected-project/.gradle/
 examples/flexrep-project/.gradle/
 examples/sample-project/local.gradle
 examples/failover-project/.gradle/
+examples/mlcp-project/.gradle/
+examples/mlcp-project/data/export/

@@ -35,7 +35,7 @@ To use ml-gradle right away, you'll need Gradle installed first. And of course y
         maven {url "http://rjrudin.github.io/marklogic-java/releases"}
       }
       dependencies {
-        classpath "com.rjrudin:ml-gradle:2.0b6"
+        classpath "com.rjrudin:ml-gradle:2.0b9"
       }
     }
     

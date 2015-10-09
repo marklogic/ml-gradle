@@ -9,6 +9,7 @@ public class DeployTriggersDatabaseCommand extends DeployDatabaseCommand {
         setExecuteSortOrder(SortOrderConstants.DEPLOY_TRIGGERS_DATABASE);
         setUndoSortOrder(SortOrderConstants.DELETE_TRIGGERS_DATABASE);
         setDatabaseFilename("triggers-database.json");
+        setCreateForestsOnEachHost(false);
     }
 
     @Override

@@ -24,6 +24,7 @@ public class DeployForestsCommand extends AbstractCommand {
     private String databaseName;
     private String forestFilename;
     private String forestPayload;
+    private boolean createForestsOnEachHost = true;
 
     public DeployForestsCommand() {
         setExecuteSortOrder(SortOrderConstants.DEPLOY_FORESTS);
@@ -69,6 +70,10 @@ public class DeployForestsCommand extends AbstractCommand {
         AppConfig appConfig = context.getAppConfig();
         List<String> hostNames = new HostManager(context.getManageClient()).getHostNames();
         int size = hostNames.size();
+        if (!createForestsOnEachHost) {
+            logger.info(format("Only creating forests on the first host: " + hostNames.get(0)));
+            size = 1;
+        }
         for (int i = 0; i < size; i++) {
             String hostName = hostNames.get(i);
             logger.info(format("Creating forests on host %s", hostName));
@@ -122,5 +127,13 @@ public class DeployForestsCommand extends AbstractCommand {
 
     public void setForestPayload(String forestPayload) {
         this.forestPayload = forestPayload;
+    }
+
+    public boolean isCreateForestsOnEachHost() {
+        return createForestsOnEachHost;
+    }
+
+    public void setCreateForestsOnEachHost(boolean createForestsOnEachHost) {
+        this.createForestsOnEachHost = createForestsOnEachHost;
     }
 }

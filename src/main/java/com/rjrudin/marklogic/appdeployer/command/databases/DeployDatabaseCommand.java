@@ -46,6 +46,11 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
     private int forestsPerHost = 1;
 
     /**
+     * Passed on to DeployForestsCommand.
+     */
+    private boolean createForestsOnEachHost = true;
+
+    /**
      * Applied when the database is deleted - see
      * http://docs.marklogic.com/REST/DELETE/manage/v2/databases/[id-or-name].
      */
@@ -108,13 +113,25 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
             if (logger.isInfoEnabled()) {
                 logger.info("Creating forests for newly created database: " + receipt.getResourceId());
             }
-            DeployForestsCommand c = new DeployForestsCommand();
-            c.setForestsPerHost(forestsPerHost);
-            c.setForestFilename(forestFilename);
-            c.setDatabaseName(receipt.getResourceId());
-            c.setForestPayload(DeployForestsCommand.DEFAULT_FOREST_PAYLOAD);
-            c.execute(context);
+            buildDeployForestsCommand(receipt, context).execute(context);
         }
+    }
+
+    /**
+     * Allows for how an instance of DeployForestsCommand is built to be overridden by a subclass.
+     * 
+     * @param receipt
+     * @param context
+     * @return
+     */
+    protected DeployForestsCommand buildDeployForestsCommand(SaveReceipt receipt, CommandContext context) {
+        DeployForestsCommand c = new DeployForestsCommand();
+        c.setCreateForestsOnEachHost(createForestsOnEachHost);
+        c.setForestsPerHost(forestsPerHost);
+        c.setForestFilename(forestFilename);
+        c.setDatabaseName(receipt.getResourceId());
+        c.setForestPayload(DeployForestsCommand.DEFAULT_FOREST_PAYLOAD);
+        return c;
     }
 
     protected String buildDefaultDatabasePayload(CommandContext context) {
@@ -171,5 +188,13 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 
     public void setDatabaseName(String databaseName) {
         this.databaseName = databaseName;
+    }
+
+    public boolean isCreateForestsOnEachHost() {
+        return createForestsOnEachHost;
+    }
+
+    public void setCreateForestsOnEachHost(boolean createForestsOnEachHost) {
+        this.createForestsOnEachHost = createForestsOnEachHost;
     }
 }

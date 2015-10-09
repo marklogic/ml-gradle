@@ -4,6 +4,11 @@ with releases.
 
 TODO Reconcile this with what's in gradle.properties
 
+## 2.0b10
+
+* [#59](https://github.com/rjrudin/ml-app-deployer/issues/59) Allow for forests to only be created on a single host,
+and DeployTriggersDatabaseCommand and DeploySchemasDatabaseCommand now default to this
+
 ## 2.0b9
 
 * [#56](https://github.com/rjrudin/ml-app-deployer/issues/56) ConfigureForestReplicasCommand now supports "undo", using

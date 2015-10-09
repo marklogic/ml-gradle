@@ -35,6 +35,7 @@ import com.rjrudin.marklogic.appdeployer.command.viewschemas.DeployViewSchemasCo
 import com.rjrudin.marklogic.appdeployer.impl.SimpleAppDeployer
 import com.rjrudin.marklogic.gradle.task.DeleteModuleTimestampsFileTask
 import com.rjrudin.marklogic.gradle.task.DeployAppTask
+import com.rjrudin.marklogic.gradle.task.PrintCommandsTask
 import com.rjrudin.marklogic.gradle.task.UndeployAppTask
 import com.rjrudin.marklogic.gradle.task.admin.InitTask
 import com.rjrudin.marklogic.gradle.task.admin.InstallAdminTask
@@ -68,7 +69,7 @@ import com.rjrudin.marklogic.modulesloader.ssl.SimpleX509TrustManager
 class MarkLogicPlugin implements Plugin<Project> {
 
     org.slf4j.Logger logger = LoggerFactory.getLogger(getClass())
-    
+
     void apply(Project project) {
         logger.info("\nInitializing ml-gradle")
 
@@ -88,6 +89,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlPostUndeploy", group: deployGroup, description: "Add dependsOn to this task to add tasks at the end of mlUndeploy").mustRunAfter(["mlUndeployApp"])
         project.task("mlDeploy", group: deployGroup, dependsOn: ["mlDeployApp", "mlPostDeploy"], description: "Deploys the application and allows for additional steps via mlPostDeploy.dependsOn")
         project.task("mlUndeploy", group: deployGroup, dependsOn: ["mlUndeployApp", "mlPostUndeploy"], description: "Undeploys the application and allows for additional steps via mlPostUndeploy.dependsOn")
+        project.task("mlRedeploy", group: deployGroup, dependsOn: ["mlDeploy", "mlReloadModules"], description: "Deploys the application and then reloads modules")
 
         String adminGroup = "ml-gradle Admin"
         project.task("mlInit", type: InitTask, group: adminGroup, description: "Perform a one-time initialization of a MarkLogic server")
@@ -113,17 +115,17 @@ class MarkLogicPlugin implements Plugin<Project> {
 
         String flexrepGroup = "ml-gradle Flexible Replication"
         project.task("mlDeployFlexrep", type: DeployFlexrepTask, group: flexrepGroup, description: "Deploy Flexrep configs and targets")
-        
+
         String forestGroup = "ml-gradle Forest"
         project.task("mlConfigureForestReplicas", type: ConfigureForestReplicasTask, group: forestGroup, description: "Configure forest replicas via the command.forestNamesAndReplicaCounts map")
         project.task("mlDeleteForestReplicas", type: DeleteForestReplicasTask, group: forestGroup, description: "Delete forest replicas via the command.forestNamesAndReplicaCounts map")
-        
+
         String groupsGroup = "ml-gradle Group"
         project.task("mlDeployGroups", type: DeployGroupsTask, group: groupsGroup, description: "Deploy each group, updating it if it exists")
-        
+
         String modulesGroup = "ml-gradle Modules"
         project.task("mlLoadModules", type: LoadModulesTask, group: modulesGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Loads modules from directories defined by mlAppConfig or via a property on this task").mustRunAfter(["mlClearModulesDatabase"])
-        project.task("mlReloadModules", group: modulesGroup, dependsOn: ["mlClearModulesDatabase", "mlLoadModules"], description: "Reloads modules by first clearing the modules database and then loading modules")
+        project.task("mlReloadModules", group: modulesGroup, dependsOn: ["mlClearModulesDatabase", "mlLoadModules"], description: "Reloads modules by first clearing the modules database and then loading modules").mustRunAfter(["mlDeploy"])
         project.task("mlWatch", type: WatchTask, group: modulesGroup, description: "Run a loop that checks for new/modified modules every second and loads any that it finds")
         project.task("mlDeleteModuleTimestampsFile", type: DeleteModuleTimestampsFileTask, group: modulesGroup, description: "Delete the properties file in the build directory that keeps track of when each module was last loaded")
 
@@ -138,6 +140,9 @@ class MarkLogicPlugin implements Plugin<Project> {
 
         String taskGroup = "ml-gradle Tasks"
         project.task("mlDeployTasks", type: DeployTasksTask, group: taskGroup, description: "Deploy each scheduled task, updating it if it exists")
+
+        String generalGroup = "ml-gradle General"
+        project.task("mlPrintCommands", type: PrintCommandsTask, group: generalGroup, description: "Print information about each command used by mlDeploy and mlUndeploy")
 
         logger.info("Finished initializing ml-gradle\n")
     }
@@ -205,7 +210,7 @@ class MarkLogicPlugin implements Plugin<Project> {
             appConfig.setRestSslContext(SimpleX509TrustManager.newSSLContext())
             appConfig.setRestSslHostnameVerifier(DatabaseClientFactory.SSLHostnameVerifier.ANY)
         }
-        
+
         project.extensions.add("mlAppConfig", appConfig)
     }
 
@@ -331,10 +336,10 @@ class MarkLogicPlugin implements Plugin<Project> {
         dbCommands.add(new DeploySchemasDatabaseCommand())
         project.extensions.add("mlDatabaseCommands", dbCommands)
         commands.addAll(dbCommands)
-        
+
         // REST API instance creation
         commands.add(new DeployRestApiServersCommand())
-        
+
         // App servers
         List<Command> serverCommands = new ArrayList<Command>()
         serverCommands.add(new DeployOtherServersCommand())
@@ -367,13 +372,13 @@ class MarkLogicPlugin implements Plugin<Project> {
         flexrepCommands.add(new DeployTargetsCommand())
         project.extensions.add("mlFlexrepCommands", flexrepCommands)
         commands.addAll(flexrepCommands)
-        
+
         // Groups
         List<Command> groupCommands = new ArrayList<Command>()
         groupCommands.add(new DeployGroupsCommand())
         project.extensions.add("mlGroupCommands", groupCommands)
         commands.addAll(groupCommands)
-        
+
         // Tasks
         List<Command> taskCommands = new ArrayList<Command>()
         taskCommands.add(new DeployScheduledTasksCommand())

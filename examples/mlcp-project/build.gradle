@@ -1,0 +1,72 @@
+/*
+ * This buildscript shows how mlcp dependencies can be easily declared and then uses in a Gradle configuration named
+ * "mlcp". This configuration is then used as the classpath for MlcpTask, which is a simple extension of Gradle's
+ * JavaExec task that exposes a number of mlcp arguments as task attributes. 
+ */
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {url "http://developer.marklogic.com/maven2/"}
+        maven {url "http://rjrudin.github.io/marklogic-java/releases"}
+    }
+    dependencies { classpath mlGradleDependency }
+}
+
+
+apply plugin: 'ml-gradle'
+
+repositories {
+    mavenCentral()
+    maven {url "http://developer.marklogic.com/maven2/"}
+    maven {url "http://rjrudin.github.io/marklogic-java/releases"}
+
+    // Needed for hadoop dependencies for mlcp
+    maven {url "http://repository.cloudera.com/artifactory/cloudera-repos/" }
+}
+
+
+configurations {
+    // This configuration captures the dependencies for running mlcp (Content Pump). This is only needed if you want
+    // to run mlcp via Gradle tasks. If you do, using com.rjrudin.marklogic.gradle.task.MlcpTask is a useful starting point, as
+    // shown below.
+    mlcp
+}
+
+
+dependencies {
+    mlcp "com.marklogic:mlcp-Hadoop2:1.3-2"
+    mlcp "com.marklogic:marklogic-mapreduce2:2.1.3"
+}
+
+
+/*
+ * Example of using MlcpTask to import data with mlcp.
+ */
+task importSampleData(type: com.rjrudin.marklogic.gradle.task.MlcpTask) {
+    classpath = configurations.mlcp
+    command = "IMPORT"
+    database = mlAppConfig.contentDatabaseName
+    input_file_path = "data/import"
+    output_collections = "sample-import"
+    output_permissions = "rest-reader,read,rest-writer,update"
+    output_uri_replace = ".*import,'/import'"
+}
+
+
+/*
+ * Example of using MlcpTask to export data with mlcp. This example also shows how the connection values can be 
+ * overridden. 
+ */
+task exportSampleData(type: com.rjrudin.marklogic.gradle.task.MlcpTask) {
+    description = "Example of using mlcp and MlcpTask to export documents; note the args array is used for any args MlcpTask doesn't yet have as task attrsibutes"
+    classpath = configurations.mlcp
+    command = "EXPORT"
+    host = "localhost" // defaults to mlHost
+    port = 8000 // defaults to 8000
+    username = "admin" // defaults to mlRestAdminUsername, which defaults to mlUsername
+    password = "admin" // defaults to mlRestAdminPassword, which defaults to mlPassword
+    database = mlAppConfig.contentDatabaseName
+    output_file_path = "data/export"
+    args = ["-collection_filter", "sample-import"]
+}
+

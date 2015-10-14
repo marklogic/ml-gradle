@@ -40,6 +40,8 @@ public class AdminManager extends AbstractManager {
         String json = null;
         if (licenseKey != null && licensee != null) {
             json = format("{\"license-key\":\"%s\", \"licensee\":\"%s\"}", licenseKey, licensee);
+        } else {
+            json = "{}";
         }
         final String payload = json;
 
@@ -84,6 +86,8 @@ public class AdminManager extends AbstractManager {
         if (username != null && password != null) {
             json = format("{\"admin-username\":\"%s\", \"admin-password\":\"%s\", \"realm\":\"public\"}", username,
                     password);
+        } else {
+            json = "{}";
         }
         final String payload = json;
 

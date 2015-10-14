@@ -99,3 +99,7 @@ To see ml-gradle in action, you can deploy the sample-project application by doi
 1. gradle mlDeploy
 
 Finally, check out all the Wiki pages on the right for more information about ml-gradle. 
+
+## When will there be a 2.0 final of ml-gradle?
+
+This will be created in conjunction with the release of MarkLogic 8.0-4, which includes support for triggers and alerts, along with a number of fixes. 

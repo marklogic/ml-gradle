@@ -12,6 +12,13 @@ public class AmpManager extends AbstractResourceManager {
 
     public AmpManager(ManageClient client) {
         super(client);
+        /*
+         * Turning this off as part of version 2.0b10 - having issues with ML being able to create an amp but then
+         * getting a 404 when it tries to update the amp. Seems to be due to using a modules database - viewing the
+         * amp via the Mgmt API shows the modules database as being "filesystem", but the Admin app correctly shows
+         * the modules database.
+         */
+        setUpdateAllowed(false);
     }
 
     @Override

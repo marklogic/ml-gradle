@@ -8,5 +8,6 @@ public class DeploySchemasDatabaseCommand extends DeployDatabaseCommand {
         setExecuteSortOrder(SortOrderConstants.DEPLOY_SCHEMAS_DATABASE);
         setUndoSortOrder(SortOrderConstants.DELETE_SCHEMAS_DATABASE);
         setDatabaseFilename("schemas-database.json");
+        setCreateForestsOnEachHost(false);
     }
 }

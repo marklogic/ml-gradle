@@ -7,7 +7,6 @@ public abstract class SortOrderConstants {
     public static Integer DEPLOY_PRIVILEGES = 10;
     public static Integer DEPLOY_ROLES = 20;
     public static Integer DEPLOY_USERS = 30;
-    public static Integer DEPLOY_AMPS = 40;
     public static Integer DEPLOY_CERTIFICATE_TEMPLATES = 50;
     public static Integer GENERATE_TEMPORARY_CERTIFICATE = 55;
     public static Integer DEPLOY_CERTIFICATE_AUTHORITIES = 60;
@@ -28,6 +27,8 @@ public abstract class SortOrderConstants {
     // modules via SSL, then the REST API server must already be configured with a certificate template
     public static Integer LOAD_MODULES = 400;
 
+    // The modules database must exist before we deploy amps
+    public static Integer DEPLOY_AMPS = 450;
 
     public static Integer DEPLOY_SCHEDULED_TASKS = 800;
 

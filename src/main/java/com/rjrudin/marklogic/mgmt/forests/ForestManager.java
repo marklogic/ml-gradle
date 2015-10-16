@@ -139,6 +139,11 @@ public class ForestManager extends AbstractResourceManager {
         }
     }
 
+    public ForestStatus getForestStatus(String forestIdOrName) {
+        String path = getResourcePath(forestIdOrName) + "?view=status&format=xml";
+        return new ForestStatus(getManageClient().getXml(path));
+    }
+
     @Override
     protected String[] getDeleteResourceParams(String payload) {
         return this.deleteLevel != null ? new String[] { "level", deleteLevel } : null;

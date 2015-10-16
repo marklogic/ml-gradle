@@ -7,16 +7,22 @@ import java.util.Map;
 import com.rjrudin.marklogic.appdeployer.command.AbstractUndoableCommand;
 import com.rjrudin.marklogic.appdeployer.command.CommandContext;
 import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
+import com.rjrudin.marklogic.mgmt.databases.DatabaseManager;
 import com.rjrudin.marklogic.mgmt.forests.ForestManager;
+import com.rjrudin.marklogic.mgmt.forests.ForestStatus;
 import com.rjrudin.marklogic.mgmt.hosts.HostManager;
 
 /**
- * Command for configuring - i.e. creating and setting - replica forests for an existing primary forests. Very useful
- * for the out-of-the-box forests such as Security, Schemas, App-Services, and Meters, which normally need replicas for
- * failover in a cluster.
+ * Command for configuring - i.e. creating and setting - replica forests for existing databases and/or primary forests.
+ * It's normally easier to just specify the databases that you want to configure forest replicas for, but this command
+ * does provide the ability to configure replicas for specific forests.
+ * 
+ * Very useful for the out-of-the-box forests such as Security, Schemas, App-Services, and Meters, which normally need
+ * replicas for failover in a cluster.
  */
 public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 
+    private Map<String, Integer> databaseNamesAndReplicaCounts = new HashMap<>();
     private Map<String, Integer> forestNamesAndReplicaCounts = new HashMap<>();
     private boolean deleteReplicasOnUndo = true;
 
@@ -25,7 +31,7 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
      * forests already exist. Feel free to customize as needed.
      */
     public ConfigureForestReplicasCommand() {
-        setExecuteSortOrder(Integer.MAX_VALUE);
+        setExecuteSortOrder(SortOrderConstants.DEPLOY_FOREST_REPLICAS);
         setUndoSortOrder(SortOrderConstants.DELETE_FOREST_REPLICAS);
     }
 
@@ -43,6 +49,13 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
             return;
         }
 
+        for (String databaseName : databaseNamesAndReplicaCounts.keySet()) {
+            int replicaCount = databaseNamesAndReplicaCounts.get(databaseName);
+            if (replicaCount > 0) {
+                configureDatabaseReplicaForests(databaseName, replicaCount, hostIds, context);
+            }
+        }
+
         for (String forestName : forestNamesAndReplicaCounts.keySet()) {
             int replicaCount = forestNamesAndReplicaCounts.get(forestName);
             if (replicaCount > 0) {
@@ -52,26 +65,55 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
     }
 
     /**
+     * For the given database, find all of its primary forests. Then for each primary forest, just call
+     * configureReplicaForests? And that should be smart enough to say - if the primary forest already has replicas,
+     * then don't do anything.
+     * 
+     * @param databaseName
+     * @param replicaCount
+     * @param hostIds
+     */
+    protected void configureDatabaseReplicaForests(String databaseName, int replicaCount, List<String> hostIds,
+            CommandContext context) {
+        ForestManager forestMgr = new ForestManager(context.getManageClient());
+        DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
+        List<String> forestNames = dbMgr.getForestNames(databaseName);
+        logger.info("Forests: " + forestNames);
+        for (String name : forestNames) {
+            configureReplicaForests(name, replicaCount, hostIds, forestMgr);
+        }
+    }
+
+    /**
      * Creates forests as needed (they may already exists) and then sets those forests as the replicas for the given
      * primaryForestName.
      * 
-     * @param primaryForestName
+     * @param forestIdOrName
      * @param replicaCount
      * @param hostIds
      * @param forestMgr
      */
-    protected void configureReplicaForests(String primaryForestName, int replicaCount, List<String> hostIds,
+    protected void configureReplicaForests(String forestIdOrName, int replicaCount, List<String> hostIds,
             ForestManager forestMgr) {
-        logger.info(format("Configuring forest replicas for primary forest %s", primaryForestName));
+        ForestStatus status = forestMgr.getForestStatus(forestIdOrName);
+        if (!status.isPrimary()) {
+            logger.info(format("Forest %s is not a primary forest, so not configuring replica forests", forestIdOrName));
+            return;
+        }
+        if (status.hasReplicas()) {
+            logger.info(format("Forest %s already has replicas, so not configuring replica forests", forestIdOrName));
+            return;
+        }
 
-        String primaryForestHostId = forestMgr.getHostId(primaryForestName);
+        logger.info(format("Configuring forest replicas for primary forest %s", forestIdOrName));
+        String primaryForestHostId = forestMgr.getHostId(forestIdOrName);
 
         int resourceCounter = 2;
         Map<String, String> replicaNamesAndHostIds = new HashMap<>();
         for (String hostId : hostIds) {
             if (!hostId.equals(primaryForestHostId)) {
                 for (int i = 0; i < replicaCount; i++) {
-                    String name = primaryForestName + "-" + resourceCounter;
+                    String name = forestIdOrName + "-" + resourceCounter;
                     forestMgr.createForestWithName(name, hostId);
                     replicaNamesAndHostIds.put(name, hostId);
                     resourceCounter++;
@@ -80,10 +122,9 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
         }
 
         if (!replicaNamesAndHostIds.isEmpty()) {
-            forestMgr.setReplicas(primaryForestName, replicaNamesAndHostIds);
+            forestMgr.setReplicas(forestIdOrName, replicaNamesAndHostIds);
         }
-
-        logger.info(format("Finished configuring forest replicas for primary forest %s", primaryForestName));
+        logger.info(format("Finished configuring forest replicas for primary forest %s", forestIdOrName));
     }
 
     @Override
@@ -110,5 +151,13 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 
     public void setDeleteReplicasOnUndo(boolean deleteReplicasOnUndo) {
         this.deleteReplicasOnUndo = deleteReplicasOnUndo;
+    }
+
+    public Map<String, Integer> getDatabaseNamesAndReplicaCounts() {
+        return databaseNamesAndReplicaCounts;
+    }
+
+    public void setDatabaseNamesAndReplicaCounts(Map<String, Integer> databaseNamesAndReplicaCounts) {
+        this.databaseNamesAndReplicaCounts = databaseNamesAndReplicaCounts;
     }
 }

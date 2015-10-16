@@ -28,11 +28,29 @@ public class DatabaseManager extends AbstractResourceManager {
         delete(json);
     }
 
+    /**
+     * @param databaseNameOrId
+     * @return the IDs of all forests - primary and replica - related to the database
+     */
     public List<String> getForestIds(String databaseNameOrId) {
         Fragment f = getAsXml(databaseNameOrId);
         return f.getElementValues("/node()/db:relations/db:relation-group[db:typeref='forests']/db:relation/db:idref");
     }
 
+    /**
+     * @param databaseNameOrId
+     * @return the names of all forests - primary and replica - related to the database
+     */
+    public List<String> getForestNames(String databaseNameOrId) {
+        Fragment f = getAsXml(databaseNameOrId);
+        return f.getElementValues("/node()/db:relations/db:relation-group[db:typeref='forests']/db:relation/db:nameref");
+    }
+
+    /**
+     * @param databaseNameOrId
+     * @return the IDs of all primary forests related to the database. A primary forest is any forest that has replica
+     *         forests configured for it.
+     */
     public List<String> getPrimaryForestIds(String databaseNameOrId) {
         List<String> primaryForestIds = new ArrayList<String>();
         ForestManager mgr = new ForestManager(getManageClient());

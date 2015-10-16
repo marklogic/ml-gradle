@@ -37,6 +37,10 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 
     @Override
     public void execute(CommandContext context) {
+        if ((databaseNamesAndReplicaCounts == null || databaseNamesAndReplicaCounts.isEmpty())
+                && (forestNamesAndReplicaCounts == null || forestNamesAndReplicaCounts.isEmpty())) {
+            return;
+        }
         HostManager hostMgr = new HostManager(context.getManageClient());
         ForestManager forestMgr = new ForestManager(context.getManageClient());
 

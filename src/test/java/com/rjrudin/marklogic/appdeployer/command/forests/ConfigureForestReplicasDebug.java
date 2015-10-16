@@ -22,9 +22,9 @@ public class ConfigureForestReplicasDebug {
 
         // Configure replicas
         ConfigureForestReplicasCommand command = new ConfigureForestReplicasCommand();
-        //command.getForestNamesAndReplicaCounts().put("Security", 1);
-        //command.getForestNamesAndReplicaCounts().put("Schemas", 2);
-        command.getDatabaseNamesAndReplicaCounts().put("failover-example-content", 1);
+        // command.getForestNamesAndReplicaCounts().put("Security", 1);
+        // command.getForestNamesAndReplicaCounts().put("Schemas", 2);
+        command.getDatabaseNamesAndReplicaCounts().put("failover-example-content", 2);
         command.execute(context);
 
         // And then delete those replicas

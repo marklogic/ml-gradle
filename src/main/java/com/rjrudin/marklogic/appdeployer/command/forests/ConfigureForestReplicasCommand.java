@@ -64,6 +64,39 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
         }
     }
 
+    @Override
+    public void undo(CommandContext context) {
+        if (deleteReplicasOnUndo) {
+            DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
+            ForestManager forestMgr = new ForestManager(context.getManageClient());
+
+            for (String databaseName : databaseNamesAndReplicaCounts.keySet()) {
+                logger.info(format("Deleting forest replicas for database %s", databaseName));
+                for (String forestName : dbMgr.getForestNames(databaseName)) {
+                    deleteReplicas(forestName, forestMgr);
+                }
+                logger.info(format("Finished deleting forest replicas for database %s", databaseName));
+            }
+
+            for (String forestName : forestNamesAndReplicaCounts.keySet()) {
+                deleteReplicas(forestName, forestMgr);
+            }
+        } else {
+            logger.info("deleteReplicasOnUndo is set to false, so not deleting any replicas");
+        }
+    }
+
+    protected void deleteReplicas(String forestName, ForestManager forestMgr) {
+        if (forestMgr.exists(forestName)) {
+            ForestStatus status = forestMgr.getForestStatus(forestName);
+            if (status.isPrimary() && status.hasReplicas()) {
+                logger.info(format("Deleting forest replicas for primary forest %s", forestName));
+                forestMgr.deleteReplicas(forestName);
+                logger.info(format("Finished deleting forest replicas for primary forest %s", forestName));
+            }
+        }
+    }
+
     /**
      * For the given database, find all of its primary forests. Then for each primary forest, just call
      * configureReplicaForests? And that should be smart enough to say - if the primary forest already has replicas,
@@ -125,20 +158,6 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
             forestMgr.setReplicas(forestIdOrName, replicaNamesAndHostIds);
         }
         logger.info(format("Finished configuring forest replicas for primary forest %s", forestIdOrName));
-    }
-
-    @Override
-    public void undo(CommandContext context) {
-        if (deleteReplicasOnUndo) {
-            ForestManager mgr = new ForestManager(context.getManageClient());
-            for (String forestName : forestNamesAndReplicaCounts.keySet()) {
-                logger.info(format("Deleting forest replicas for primary forest %s", forestName));
-                mgr.deleteReplicas(forestName);
-                logger.info(format("Finished deleting forest replicas for primary forest %s", forestName));
-            }
-        } else {
-            logger.info("deleteReplicasOnUndo is set to false, so not deleting any replicas");
-        }
     }
 
     public void setForestNamesAndReplicaCounts(Map<String, Integer> forestNamesAndReplicaCounts) {

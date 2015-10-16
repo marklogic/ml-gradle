@@ -20,6 +20,7 @@ import com.rjrudin.marklogic.appdeployer.command.databases.DeploySchemasDatabase
 import com.rjrudin.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand
 import com.rjrudin.marklogic.appdeployer.command.flexrep.DeployConfigsCommand
 import com.rjrudin.marklogic.appdeployer.command.flexrep.DeployTargetsCommand
+import com.rjrudin.marklogic.appdeployer.command.forests.ConfigureForestReplicasCommand
 import com.rjrudin.marklogic.appdeployer.command.groups.DeployGroupsCommand
 import com.rjrudin.marklogic.appdeployer.command.modules.LoadModulesCommand
 import com.rjrudin.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand
@@ -54,6 +55,7 @@ import com.rjrudin.marklogic.gradle.task.databases.DeployDatabasesTask
 import com.rjrudin.marklogic.gradle.task.flexrep.DeployFlexrepTask
 import com.rjrudin.marklogic.gradle.task.forests.ConfigureForestReplicasTask
 import com.rjrudin.marklogic.gradle.task.forests.DeleteForestReplicasTask
+import com.rjrudin.marklogic.gradle.task.forests.DeployForestReplicasTask
 import com.rjrudin.marklogic.gradle.task.groups.DeployGroupsTask
 import com.rjrudin.marklogic.gradle.task.scaffold.GenerateScaffoldTask
 import com.rjrudin.marklogic.gradle.task.security.DeploySecurityTask
@@ -117,9 +119,10 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlDeployFlexrep", type: DeployFlexrepTask, group: flexrepGroup, description: "Deploy Flexrep configs and targets")
 
         String forestGroup = "ml-gradle Forest"
-        project.task("mlConfigureForestReplicas", type: ConfigureForestReplicasTask, group: forestGroup, description: "Configure forest replicas via the command.forestNamesAndReplicaCounts map")
+        project.task("mlConfigureForestReplicas", type: ConfigureForestReplicasTask, group: forestGroup, description: "Deprecated - configure forest replicas via the command.forestNamesAndReplicaCounts map")
         project.task("mlDeleteForestReplicas", type: DeleteForestReplicasTask, group: forestGroup, description: "Delete forest replicas via the command.forestNamesAndReplicaCounts map")
-
+        project.task("mlDeployForestReplicas", type: DeployForestReplicasTask, group: forestGroup, description: "Prefer this over mlConfigureForestReplicas; it does the same thing, but uses the ConfigureForestReplicasCommand that is used by mlDeploy")
+        
         String groupsGroup = "ml-gradle Group"
         project.task("mlDeployGroups", type: DeployGroupsTask, group: groupsGroup, description: "Deploy each group, updating it if it exists")
 
@@ -379,6 +382,16 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.extensions.add("mlGroupCommands", groupCommands)
         commands.addAll(groupCommands)
 
+        // Forest replicas
+        List<Command> replicaCommands = new ArrayList<Command>()
+        ConfigureForestReplicasCommand cfrc = new ConfigureForestReplicasCommand()
+        if (project.hasProperty("mlForestReplicas")) {
+            cfrc.setDatabaseNamesAndReplicaCountsAsString(project.property("mlForestReplicas"))
+        }
+        replicaCommands.add(cfrc)
+        project.extensions.add("mlForestReplicaCommands", replicaCommands)
+        commands.addAll(replicaCommands)
+        
         // Tasks
         List<Command> taskCommands = new ArrayList<Command>()
         taskCommands.add(new DeployScheduledTasksCommand())

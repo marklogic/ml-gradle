@@ -35,6 +35,22 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
         setUndoSortOrder(SortOrderConstants.DELETE_FOREST_REPLICAS);
     }
 
+    /**
+     * Allows for the map of database names and counts to be configured as a comma-delimited string of the form:
+     * "dbName,replicaCount,dbName,replicaCount,etc".
+     * 
+     * @param str
+     */
+    public void setDatabaseNamesAndReplicaCountsAsString(String str) {
+        databaseNamesAndReplicaCounts.clear();
+        String[] tokens = str.split(",");
+        for (int i = 0; i < tokens.length; i += 2) {
+            String dbName = tokens[i];
+            int count = Integer.parseInt(tokens[i + 1]);
+            databaseNamesAndReplicaCounts.put(dbName, count);
+        }
+    }
+
     @Override
     public void execute(CommandContext context) {
         if ((databaseNamesAndReplicaCounts == null || databaseNamesAndReplicaCounts.isEmpty())

@@ -168,19 +168,6 @@ ext {
 
 
 /*
- * Since our REST API server uses a certificate template, we need to execute an extra command to generate a temporary
- * certificate for this template - without that, the REST API server won't be able to receive HTTP or HTTPS requests.
- */
-ext {
-    def command = new com.rjrudin.marklogic.appdeployer.command.security.GenerateTemporaryCertificateCommand()
-    command.setTemplateIdOrName("sample-project-template")
-    command.setCommonName("localhost")
-    command.setValidFor(365)
-    mlAppDeployer.commands.add(command)
-}
-
-
-/*
  * As of ML 8.0-3, triggers can not yet be managed via the Management REST API, so we still rely on a custom Gradle task
  * that uses XCC to create the trigger.
  */

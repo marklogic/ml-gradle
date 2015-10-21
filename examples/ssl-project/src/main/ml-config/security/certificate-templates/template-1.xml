@@ -1,6 +1,6 @@
 <certificate-template-properties xmlns="http://marklogic.com/manage">
-  <template-name>sample-project-template</template-name>
-  <template-description>Sample description</template-description>
+  <template-name>ssl-project-template</template-name>
+  <template-description>This template is used to demonstrate how ml-gradle can enable SSL for an app server</template-description>
   <key-type>rsa</key-type>
   <key-options />
   <req>

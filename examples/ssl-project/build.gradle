@@ -1,0 +1,30 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {url "http://developer.marklogic.com/maven2/"}
+        maven {url "http://rjrudin.github.io/marklogic-java/releases"}
+    }
+    dependencies { classpath mlGradleDependency }
+}
+
+apply plugin: 'ml-gradle'
+
+repositories {
+    mavenCentral()
+    maven {url "http://developer.marklogic.com/maven2/"}
+    maven {url "http://rjrudin.github.io/marklogic-java/releases"}
+}
+
+
+/*
+ * Since our REST API server uses a certificate template, we need to execute an extra command to generate a temporary
+ * certificate for this template - without that, the REST API server won't be able to receive HTTP or HTTPS requests.
+ */
+ext {
+    def command = new com.rjrudin.marklogic.appdeployer.command.security.GenerateTemporaryCertificateCommand()
+    command.setTemplateIdOrName("sample-project-template")
+    command.setCommonName("localhost")
+    command.setValidFor(365)
+    mlAppDeployer.commands.add(command)
+}
+

@@ -25,6 +25,7 @@ import com.rjrudin.marklogic.appdeployer.command.groups.DeployGroupsCommand
 import com.rjrudin.marklogic.appdeployer.command.modules.LoadModulesCommand
 import com.rjrudin.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand
 import com.rjrudin.marklogic.appdeployer.command.security.DeployAmpsCommand
+import com.rjrudin.marklogic.appdeployer.command.security.DeployCertificateAuthoritiesCommand
 import com.rjrudin.marklogic.appdeployer.command.security.DeployCertificateTemplatesCommand
 import com.rjrudin.marklogic.appdeployer.command.security.DeployExternalSecurityCommand
 import com.rjrudin.marklogic.appdeployer.command.security.DeployPrivilegesCommand
@@ -58,7 +59,15 @@ import com.rjrudin.marklogic.gradle.task.forests.DeleteForestReplicasTask
 import com.rjrudin.marklogic.gradle.task.forests.DeployForestReplicasTask
 import com.rjrudin.marklogic.gradle.task.groups.DeployGroupsTask
 import com.rjrudin.marklogic.gradle.task.scaffold.GenerateScaffoldTask
+import com.rjrudin.marklogic.gradle.task.security.DeployAmpsTask
+import com.rjrudin.marklogic.gradle.task.security.DeployCertificateAuthoritiesTask
+import com.rjrudin.marklogic.gradle.task.security.DeployCertificateTemplatesTask
+import com.rjrudin.marklogic.gradle.task.security.DeployExternalSecurityTask
+import com.rjrudin.marklogic.gradle.task.security.DeployPrivilegesTask
+import com.rjrudin.marklogic.gradle.task.security.DeployProtectedCollectionsTask
+import com.rjrudin.marklogic.gradle.task.security.DeployRolesTask
 import com.rjrudin.marklogic.gradle.task.security.DeploySecurityTask
+import com.rjrudin.marklogic.gradle.task.security.DeployUsersTask
 import com.rjrudin.marklogic.gradle.task.servers.DeployServersTask
 import com.rjrudin.marklogic.gradle.task.tasks.DeployTasksTask
 import com.rjrudin.marklogic.gradle.task.viewschemas.DeployViewSchemasTask
@@ -89,7 +98,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         String deployGroup = "ml-gradle Deploy"
         project.task("mlPostDeploy", group: deployGroup, description: "Add dependsOn to this task to add tasks at the end of mlDeploy").mustRunAfter(["mlDeployApp"])
         project.task("mlPostUndeploy", group: deployGroup, description: "Add dependsOn to this task to add tasks at the end of mlUndeploy").mustRunAfter(["mlUndeployApp"])
-        project.task("mlDeploy", group: deployGroup, dependsOn: ["mlDeployApp", "mlPostDeploy"], description: "Deploys the application and allows for additional steps via mlPostDeploy.dependsOn")
+        project.task("mlDeploy", group: deployGroup, dependsOn: ["mlDeployApp", "mlPostDeploy"], description: "Deploys the application and allows for additional steps via mlPostDeploy.dependsOn").mustRunAfter("mlClearModulesDatabase")
         project.task("mlUndeploy", group: deployGroup, dependsOn: ["mlUndeployApp", "mlPostUndeploy"], description: "Undeploys the application and allows for additional steps via mlPostUndeploy.dependsOn")
         project.task("mlRedeploy", group: deployGroup, dependsOn: ["mlClearModulesDatabase", "mlDeploy"], description: "Clears the modules database and then deploys the application")
 
@@ -104,7 +113,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 
         String dbGroup = "ml-gradle Database"
         project.task("mlClearContentDatabase", type: ClearContentDatabaseTask, group: dbGroup, description: "Deletes all documents in the content database; requires -PdeleteAll=true to be set so you don't accidentally do this")
-        project.task("mlClearModulesDatabase", type: ClearModulesDatabaseTask, group: dbGroup, dependsOn: "mlDeleteModuleTimestampsFile", description: "Deletes potentially all of the documents in the modules database; has a property for excluding documents from deletion").mustRunAfter("mlDeploy")
+        project.task("mlClearModulesDatabase", type: ClearModulesDatabaseTask, group: dbGroup, dependsOn: "mlDeleteModuleTimestampsFile", description: "Deletes potentially all of the documents in the modules database; has a property for excluding documents from deletion")
         project.task("mlClearSchemasDatabase", type: ClearSchemasDatabaseTask, group: dbGroup, description: "Deletes all documents in the schemas database")
         project.task("mlClearTriggersDatabase", type: ClearTriggersDatabaseTask, group: dbGroup, description: "Deletes all documents in the triggers database")
         project.task("mlDeployDatabases", type: DeployDatabasesTask, group: dbGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Deploy each database, updating it if it exists")
@@ -136,8 +145,16 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlDeployServers", type: DeployServersTask, group: serverGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the REST API server (if it exists) and deploys each other server, updating it if it exists")
 
         String securityGroup = "ml-gradle Security"
+        project.task("mlDeployAmps", type: DeployAmpsTask, group: securityGroup, description: "Deploy each amp, updating it if it exists")
+        project.task("mlDeployCertificateAuthorities", type: DeployCertificateAuthoritiesTask, group: securityGroup, description: "Deploy each certificate authority, updating it if it exists")
+        project.task("mlDeployCertificateTemplates", type: DeployCertificateTemplatesTask, group: securityGroup, description: "Deploy each certificate template, updating it if it exists")
+        project.task("mlDeployExternalSecurity", type: DeployExternalSecurityTask, group: securityGroup, description: "Deploy external security configurations, updating each if it exists")
+        project.task("mlDeployPrivileges", type: DeployPrivilegesTask, group: securityGroup, description: "Deploy each privilege, updating it if it exists")
+        project.task("mlDeployProtectedCollections", type: DeployProtectedCollectionsTask, group: securityGroup, description: "Deploy each protected collection, updating it if it exists")
+        project.task("mlDeployRoles", type: DeployRolesTask, group: securityGroup, description: "Deploy each role, updating it if it exists")
         project.task("mlDeploySecurity", type: DeploySecurityTask, group: securityGroup, description: "Deploy each security resource, updating it if it exists")
-
+        project.task("mlDeployUsers", type: DeployUsersTask, group: securityGroup, description: "Deploy each user, updating it if it exists")
+        
         String sqlGroup = "ml-gradle SQL"
         project.task("mlDeployViewSchemas", type: DeployViewSchemasTask, group: sqlGroup, description: "Deploy each SQL view schema, updating it if it exists")
 
@@ -320,6 +337,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         securityCommands.add(new DeployUsersCommand())
         securityCommands.add(new DeployAmpsCommand())
         securityCommands.add(new DeployCertificateTemplatesCommand())
+        securityCommands.add(new DeployCertificateAuthoritiesCommand())
         securityCommands.add(new DeployExternalSecurityCommand())
         securityCommands.add(new DeployPrivilegesCommand())
         securityCommands.add(new DeployProtectedCollectionsCommand())

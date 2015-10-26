@@ -201,6 +201,28 @@ ext {
 
 
 /*
+ * ml-gradle does not blindly process every file in the ml-config/databases directory. It checks for specific files
+ * for a content database, a schemas database, and a triggers database. There are specific commands for each file, and
+ * each command provides a number of options for configuring the forests for a database. One reason ml-gradle does not
+ * blindly process every file (as opposed to doing so for every other ML resource) is that this approach would make it
+ * very difficult to configure the forests for each database.
+ * 
+ * So, if you want to create a database in addition to a content/schemas/triggers database, you'll need to add a new
+ * command to do so, as shown here. Please see ml-app-deployer for more info on what you can customize on an instance
+ * of DeployDatabaseCommand.
+ * 
+ * Note also that mlDatabaseCommands is a property initialized by ml-gradle that contains a list of command objects. This
+ * list is used when the "mlDeployDatabases" task is run, so it's a good idea to add a command for your custom database
+ * to this list, in addition to adding it to mlAppDeployer.
+ */
+ext {
+    def otherDbCommand = new com.rjrudin.marklogic.appdeployer.command.databases.DeployDatabaseCommand("other-database.json")
+    mlAppDeployer.commands.add(otherDbCommand)
+    mlDatabaseCommands.add(otherDbCommand)
+}
+
+
+/*
  * Below is an example of a custom command, which also fixes a bug in ML that should be fixed in the 8.0-4 release. The 
  * bug is - when a pipeline is updated via the Management REST API,  pipeline states are dropped. To address this, we 
  * insert a command to clear the triggers database before any CPF resources are created, thus forcing a create instead 

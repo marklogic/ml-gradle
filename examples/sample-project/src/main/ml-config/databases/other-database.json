@@ -1,0 +1,5 @@
+{
+  "database-name": "sample-project-other",
+  "schema-database": "%%SCHEMAS_DATABASE%%",
+  "triggers-database": "%%TRIGGERS_DATABASE%%"
+}

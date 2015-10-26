@@ -63,6 +63,11 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
         setUndoSortOrder(SortOrderConstants.DELETE_OTHER_DATABASES);
     }
 
+    public DeployDatabaseCommand(String databaseFilename) {
+        this();
+        this.databaseFilename = databaseFilename;
+    }
+    
     @Override
     public Integer getUndoSortOrder() {
         return undoSortOrder;

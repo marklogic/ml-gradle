@@ -163,7 +163,7 @@ task runCorb(dependsOn: ['mlLoadModules'], type: JavaExec) {
  * domains, which means you can safely reference them in your domain configuration files. 
  */
 ext {
-    //mlAppDeployer.commands.add(new com.rjrudin.marklogic.appdeployer.command.cpf.LoadDefaultPipelinesCommand())
+    //mlAppDeployer.commands.add(new com.rjrudin.marklogic.appdeployer.command.cpf.DeployDefaultPipelinesCommand())
 }
 
 

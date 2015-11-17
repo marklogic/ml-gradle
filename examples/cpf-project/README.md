@@ -17,6 +17,11 @@ Steps to deploy and test:
 The mlDeploy task will deploy an application to MarkLogic based on the configuration files under src/main/ml-config
 and with the modules under src/main/ml-modules. The test task will then run the single JUnit test under src/test/java.
 
+The above commands assume that you're deploying to a MarkLogic instance on your localhost. If you need to point to a different host,
+just do (you can run mlDepoy and test together):
+
+1. ./gradlew -PmlHost=some-other-host mlDeploy test
+
 You can also run the test in Eclipse by running "./gradlew eclipse", and then importing this project into Eclipse. 
 
 To tinker with the CPF config:

@@ -8,3 +8,16 @@ buildscript {
 }
 
 apply plugin: 'ml-gradle'
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+repositories {
+    mavenCentral()
+    maven {url "http://developer.marklogic.com/maven2/"}
+    maven {url "http://rjrudin.github.io/marklogic-java/releases"}
+}
+
+dependencies {
+    testCompile "com.rjrudin:ml-junit:2.3"
+    testCompile "com.jayway.restassured:rest-assured:2.4.1"
+}

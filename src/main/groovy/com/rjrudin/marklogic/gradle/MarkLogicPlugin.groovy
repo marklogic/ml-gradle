@@ -185,11 +185,10 @@ class MarkLogicPlugin implements Plugin<Project> {
             logger.info("App name: " + name)
             appConfig.setName(name)
         }
-        if (project.hasProperty("mlHost")) {
-            def host = project.property("mlHost")
-            logger.info("App host: " + host)
-            appConfig.setHost(host)
-        }
+      
+        logger.info("App host: " + host(project))
+        appConfig.setHost(host(project))
+        
 
         if (project.hasProperty("mlRestPort")) {
             def port = project.property("mlRestPort")
@@ -236,11 +235,10 @@ class MarkLogicPlugin implements Plugin<Project> {
 
     void initializeManageConfig(Project project) {
         ManageConfig manageConfig = new ManageConfig()
-        if (project.hasProperty("mlHost")) {
-            def host = project.property("mlHost")
-            logger.info("Manage host: " + host)
-            manageConfig.setHost(host)
-        }
+        
+        logger.info("Manage host: " + host(project))
+        manageConfig.setHost(host(project))
+        
 
         String username = null
         if (project.hasProperty("mlManageUsername")) {
@@ -277,11 +275,9 @@ class MarkLogicPlugin implements Plugin<Project> {
 
     void initializeAdminConfig(Project project) {
         AdminConfig adminConfig = new AdminConfig()
-        if (project.hasProperty("mlHost")) {
-            def host = project.property("mlHost")
-            logger.info("Admin host: " + host)
-            adminConfig.setHost(host)
-        }
+
+        logger.info("Admin host: " + host(project))
+        adminConfig.setHost(host(project))
 
         String username = null
         if (project.hasProperty("mlAdminUsername")) {
@@ -425,5 +421,9 @@ class MarkLogicPlugin implements Plugin<Project> {
         SimpleAppDeployer deployer = new SimpleAppDeployer(context.getManageClient(), context.getAdminManager())
         deployer.setCommands(commands)
         return deployer
+    }
+    
+    def host(project) { 
+      project.hasProperty("mlHost") ? project.property("mlHost") : project.property("marklogic.host")
     }
 }

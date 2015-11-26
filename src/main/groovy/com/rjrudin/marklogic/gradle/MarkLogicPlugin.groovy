@@ -68,9 +68,17 @@ import com.rjrudin.marklogic.gradle.task.security.DeployProtectedCollectionsTask
 import com.rjrudin.marklogic.gradle.task.security.DeployRolesTask
 import com.rjrudin.marklogic.gradle.task.security.DeploySecurityTask
 import com.rjrudin.marklogic.gradle.task.security.DeployUsersTask
+import com.rjrudin.marklogic.gradle.task.security.UndeployAmpsTask
+import com.rjrudin.marklogic.gradle.task.security.UndeployCertificateTemplatesTask
+import com.rjrudin.marklogic.gradle.task.security.UndeployExternalSecurityTask
+import com.rjrudin.marklogic.gradle.task.security.UndeployPrivilegesTask
+import com.rjrudin.marklogic.gradle.task.security.UndeployProtectedCollectionsTask
+import com.rjrudin.marklogic.gradle.task.security.UndeployRolesTask
+import com.rjrudin.marklogic.gradle.task.security.UndeploySecurityTask
+import com.rjrudin.marklogic.gradle.task.security.UndeployUsersTask
 import com.rjrudin.marklogic.gradle.task.servers.DeployServersTask
 import com.rjrudin.marklogic.gradle.task.tasks.DeployTasksTask
-import com.rjrudin.marklogic.gradle.task.tasks.UndeployTasksTask;
+import com.rjrudin.marklogic.gradle.task.tasks.UndeployTasksTask
 import com.rjrudin.marklogic.gradle.task.viewschemas.DeployViewSchemasTask
 import com.rjrudin.marklogic.mgmt.ManageClient
 import com.rjrudin.marklogic.mgmt.ManageConfig
@@ -155,6 +163,14 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlDeployRoles", type: DeployRolesTask, group: securityGroup, description: "Deploy each role, updating it if it exists")
         project.task("mlDeploySecurity", type: DeploySecurityTask, group: securityGroup, description: "Deploy each security resource, updating it if it exists")
         project.task("mlDeployUsers", type: DeployUsersTask, group: securityGroup, description: "Deploy each user, updating it if it exists")
+        project.task("mlUndeployAmps", type: UndeployAmpsTask, group: securityGroup, description: "Undeploy (delete) each amp")
+        project.task("mlUndeployCertificateTemplates", type: UndeployCertificateTemplatesTask, group: securityGroup, description: "Undeploy (delete) each certificate template")
+        project.task("mlUndeployExternalSecurity", type: UndeployExternalSecurityTask, group: securityGroup, description: "Undeploy (delete) each external security configuration")
+        project.task("mlUndeployPrivileges", type: UndeployPrivilegesTask, group: securityGroup, description: "Undeploy (delete) each privilege")
+        project.task("mlUndeployProtectedCollections", type: UndeployProtectedCollectionsTask, group: securityGroup, description: "Undeploy (delete) each protected collection")
+        project.task("mlUndeployRoles", type: UndeployRolesTask, group: securityGroup, description: "Undeploy (delete) each role")
+        project.task("mlUndeployUsers", type: UndeployUsersTask, group: securityGroup, description: "Undeploy (delete) each user")
+        project.task("mlUndeploySecurity", type: UndeploySecurityTask, group: securityGroup, description: "Undeploy (delete) all security resources")
         
         String sqlGroup = "ml-gradle SQL"
         project.task("mlDeployViewSchemas", type: DeployViewSchemasTask, group: sqlGroup, description: "Deploy each SQL view schema, updating it if it exists")

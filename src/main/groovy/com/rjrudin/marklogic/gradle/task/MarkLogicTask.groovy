@@ -64,4 +64,9 @@ class MarkLogicTask extends DefaultTask {
         SimpleAppDeployer d = (SimpleAppDeployer)getAppDeployer()
         new SimpleAppDeployer(getManageClient(), getAdminManager(), d.getCommand(className)).deploy(getAppConfig())
     }
+    
+    void undeployWithCommandWithClassName(String className) {
+        SimpleAppDeployer d = (SimpleAppDeployer)getAppDeployer()
+        new SimpleAppDeployer(getManageClient(), getAdminManager(), d.getCommand(className)).undeploy(getAppConfig())
+    }
 }

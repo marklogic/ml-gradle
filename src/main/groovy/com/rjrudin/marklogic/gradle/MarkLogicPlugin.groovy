@@ -70,6 +70,7 @@ import com.rjrudin.marklogic.gradle.task.security.DeploySecurityTask
 import com.rjrudin.marklogic.gradle.task.security.DeployUsersTask
 import com.rjrudin.marklogic.gradle.task.servers.DeployServersTask
 import com.rjrudin.marklogic.gradle.task.tasks.DeployTasksTask
+import com.rjrudin.marklogic.gradle.task.tasks.UndeployTasksTask;
 import com.rjrudin.marklogic.gradle.task.viewschemas.DeployViewSchemasTask
 import com.rjrudin.marklogic.mgmt.ManageClient
 import com.rjrudin.marklogic.mgmt.ManageConfig
@@ -160,7 +161,8 @@ class MarkLogicPlugin implements Plugin<Project> {
 
         String taskGroup = "ml-gradle Tasks"
         project.task("mlDeployTasks", type: DeployTasksTask, group: taskGroup, description: "Deploy each scheduled task, updating it if it exists")
-
+        project.task("mlUndeployTasks", type: UndeployTasksTask, group: taskGroup, description: "Undeploy (delete) each scheduled task")
+        
         String generalGroup = "ml-gradle General"
         project.task("mlPrintCommands", type: PrintCommandsTask, group: generalGroup, description: "Print information about each command used by mlDeploy and mlUndeploy")
 

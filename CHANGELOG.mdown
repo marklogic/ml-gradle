@@ -4,6 +4,9 @@
 
 * Added mlUndeployTasks
 * Added undeploy tasks for security resources
+* Added alert and trigger commands to mlDeploy
+* Added mlDeployAlerting
+* Added mlDeployTriggers
 
 ## 2.0b12
 

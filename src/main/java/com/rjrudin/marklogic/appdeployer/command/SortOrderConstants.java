@@ -30,6 +30,8 @@ public abstract class SortOrderConstants {
     // The modules database must exist before we deploy amps
     public static Integer DEPLOY_AMPS = 450;
 
+    public static Integer DEPLOY_TRIGGERS = 700;
+    
     public static Integer DEPLOY_SCHEDULED_TASKS = 800;
 
     public static Integer DEPLOY_DEFAULT_PIPELINES = 900;

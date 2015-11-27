@@ -30,9 +30,13 @@ public class SimpleAppDeployer extends AbstractAppDeployer {
      * @param commandArray
      */
     protected void buildModifiableCommandList(Command... commandArray) {
-        commands = new ArrayList<Command>(commandArray.length);
-        for (Command c : commandArray) {
-            commands.add(c);
+        if (commandArray != null) {
+            commands = new ArrayList<Command>(commandArray.length);
+            for (Command c : commandArray) {
+                commands.add(c);
+            }
+        } else {
+            commands = new ArrayList<Command>();
         }
     }
 

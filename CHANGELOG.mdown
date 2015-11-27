@@ -1,8 +1,18 @@
 # ml-app-deployer releases
-This changelog is in its infancy, but the plan is to start tracking all changes via issues and then associating them
-with releases. 
 
-TODO Reconcile this with what's in gradle.properties
+## 2.0b13
+
+* Added SetSslFipsEnabledCommand
+ 
+## 2.0b12
+
+* Added null-check in SimpleAppDeployer
+* Added convenience constructor to DeployDatabaseCommand to simplify creating a new command for a custom database
+
+## 2.0b11
+
+* [#62](https://github.com/rjrudin/ml-app-deployer/issues/62) Amps are now deployed after the modules database is created.
+* [#61](https://github.com/rjrudin/ml-app-deployer/issues/61) Forest replicas can now be created as part of mlDeploy
 
 ## 2.0b10
 

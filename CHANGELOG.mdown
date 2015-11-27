@@ -3,6 +3,7 @@
 ## 2.0b13
 
 * Added SetSslFipsEnabledCommand
+* [#67](https://github.com/rjrudin/ml-app-deployer/issues/67) Now supporting triggers (requires ML 8.0-4)
  
 ## 2.0b12
 

@@ -23,6 +23,7 @@ import com.rjrudin.marklogic.rest.util.RestTemplateUtil;
  */
 public class ManageClient extends LoggingObject {
 
+    private ManageConfig manageConfig;
     private RestTemplate restTemplate;
     private RestTemplate adminRestTemplate;
     private String baseUrl;
@@ -39,6 +40,7 @@ public class ManageClient extends LoggingObject {
     }
 
     public void initialize(ManageConfig config) {
+        this.manageConfig = config;
         if (logger.isInfoEnabled()) {
             logger.info("Initializing ManageClient with manage config of: " + config);
         }
@@ -169,5 +171,9 @@ public class ManageClient extends LoggingObject {
 
     public RestTemplate getAdminRestTemplate() {
         return adminRestTemplate;
+    }
+
+    public ManageConfig getManageConfig() {
+        return manageConfig;
     }
 }

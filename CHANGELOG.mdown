@@ -1,9 +1,9 @@
 # ml-app-deployer releases
-This changelog is in its infancy, but the plan is to start tracking all changes via issues and then associating them
-with releases. 
 
-TODO Reconcile this with what's in gradle.properties
+## 2.0b13
 
+* Added SetSslFipsEnabledCommand
+ 
 ## 2.0b12
 
 * Added null-check in SimpleAppDeployer

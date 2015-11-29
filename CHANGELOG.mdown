@@ -1,5 +1,9 @@
 # ml-gradle releases
 
+## 2.0b14
+
+* Support for dot notation for marklogic properties
+
 ## 2.0b13
 
 * Added mlUndeployTasks

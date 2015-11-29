@@ -180,28 +180,24 @@ class MarkLogicPlugin implements Plugin<Project> {
             logger.info("Setting config dir to: " + prop)
             appConfig.setConfigDir(new ConfigDir(new File(prop)))
         }
-        if (project.hasProperty("mlAppName")) {
-            def name = project.property("mlAppName")
-            logger.info("App name: " + name)
-            appConfig.setName(name)
-        }
-      
-        logger.info("App host: " + host(project))
-        appConfig.setHost(host(project))
         
+        def name = project.hasProperty("mlAppName") ? project.property("mlAppName") : project.property("marklogic.application.name")
+        logger.info("App name: " + name)
+        appConfig.setName(name)
+      
+        logger.info("App host: " + getHost(project))
+        appConfig.setHost(getHost(project))
+        
+        def port = project.hasProperty("mlRestPort") ? project.property("mlRestPort") : project.property("marklogic.rest.port") 
+        logger.info("App REST port: " + port)
+        appConfig.setRestPort(Integer.parseInt(port))
+        
+        def testPort = project.hasProperty("mlTestRestPort") ? project.property("mlTestRestPort") : project.property("marklogic.rest.test.port")
+        logger.info("App test REST port: " + testPort)
+        appConfig.setTestRestPort(Integer.parseInt(testPort))
 
-        if (project.hasProperty("mlRestPort")) {
-            def port = project.property("mlRestPort")
-            logger.info("App REST port: " + port)
-            appConfig.setRestPort(Integer.parseInt(port))
-        }
-        if (project.hasProperty("mlTestRestPort")) {
-            def port = project.property("mlTestRestPort")
-            logger.info("App test REST port: " + port)
-            appConfig.setTestRestPort(Integer.parseInt(port))
-        }
-
-        String restUsername = null
+        String restUsername = project.hasProperty("mlRestAdminUsername") ? project.property("mlRestAdminUsername") : project.property("marklogic.username.admin.rest")
+        
         if (project.hasProperty("mlRestAdminUsername")) {
             restUsername = project.property("mlRestAdminUsername")
         }
@@ -236,8 +232,8 @@ class MarkLogicPlugin implements Plugin<Project> {
     void initializeManageConfig(Project project) {
         ManageConfig manageConfig = new ManageConfig()
         
-        logger.info("Manage host: " + host(project))
-        manageConfig.setHost(host(project))
+        logger.info("Manage host: " + getHost(project))
+        manageConfig.setHost(getHost(project))
         
 
         String username = null
@@ -276,8 +272,8 @@ class MarkLogicPlugin implements Plugin<Project> {
     void initializeAdminConfig(Project project) {
         AdminConfig adminConfig = new AdminConfig()
 
-        logger.info("Admin host: " + host(project))
-        adminConfig.setHost(host(project))
+        logger.info("Admin host: " + getHost(project))
+        adminConfig.setHost(getHost(project))
 
         String username = null
         if (project.hasProperty("mlAdminUsername")) {
@@ -423,7 +419,8 @@ class MarkLogicPlugin implements Plugin<Project> {
         return deployer
     }
     
-    def host(project) { 
+    def getHost(project) { 
       project.hasProperty("mlHost") ? project.property("mlHost") : project.property("marklogic.host")
-    }
+    }    
+    
 }

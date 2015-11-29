@@ -130,7 +130,7 @@ ext {
         // For the tasks below that depend on XCC - such as for running corb or creating triggers - the following URL
         // will be used. In this sample project, the sample-project-rest-admin user has the privileges necessary to
         // create triggers, so we use that user.
-        contentXccUrl = "xcc://${mlRestAdminUsername}:${mlRestAdminPassword}@${"marklogic.host"}:8000/${mlAppConfig.contentDatabaseName}"
+        contentXccUrl = "xcc://${"marklogic.admin.rest.username"}:${"marklogic.admin.rest.password"}@${"marklogic.host"}:8000/${mlAppConfig.contentDatabaseName}"
     }
 }
 

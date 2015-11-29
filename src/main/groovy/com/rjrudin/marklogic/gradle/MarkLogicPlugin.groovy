@@ -196,31 +196,24 @@ class MarkLogicPlugin implements Plugin<Project> {
         logger.info("App test REST port: " + testPort)
         appConfig.setTestRestPort(Integer.parseInt(testPort))
 
-        String restUsername = project.hasProperty("mlRestAdminUsername") ? project.property("mlRestAdminUsername") : project.property("marklogic.username.admin.rest")
-        
-        if (project.hasProperty("mlRestAdminUsername")) {
-            restUsername = project.property("mlRestAdminUsername")
+        String restUsername = project.hasProperty("mlRestAdminUsername") ? project.property("mlRestAdminUsername") : project.property("marklogic.admin.rest.username")
+        if (restUsername) {
+          restUsername = getUsername(project)
         }
-        else if (project.hasProperty("mlUsername")) {
-            restUsername = project.property("mlUsername")
-        }
-        if (restUsername != null) {
+        if (restUsername) {
             logger.info("REST Admin username: " + restUsername)
             appConfig.setRestAdminUsername(restUsername)
         }
 
-        String restPassword = null
-        if (project.hasProperty("mlRestAdminPassword")) {
-            restPassword = project.property("mlRestAdminPassword")
+        String restPassword = project.hasProperty("mlRestAdminPassword") ? project.property("mlRestAdminPassword") : project.property("marklogic.admin.rest.password")
+        if (restPassword) {
+            restPassword = getPassword(project)
         }
-        else if (project.hasProperty("mlPassword")) {
-            restPassword = project.property("mlPassword")
-        }
-        if (restPassword != null) {
+        if (restPassword) {
             appConfig.setRestAdminPassword(restPassword)
         }
 
-        if (project.hasProperty("mlSimpleSsl")) {
+        if (project.hasProperty("mlSimpleSsl") || project.hasProperty("marklogic.simple.ssl")) {
             logger.info("Using simple SSL context and 'ANY' hostname verifier for authenticating against client REST API server")
             appConfig.setRestSslContext(SimpleX509TrustManager.newSSLContext())
             appConfig.setRestSslHostnameVerifier(DatabaseClientFactory.SSLHostnameVerifier.ANY)
@@ -236,36 +229,32 @@ class MarkLogicPlugin implements Plugin<Project> {
         manageConfig.setHost(getHost(project))
         
 
-        String username = null
-        if (project.hasProperty("mlManageUsername")) {
-            username = project.property("mlManageUsername")
-        }
-        else if (project.hasProperty("mlUsername")) {
-            username = project.property("mlUsername")
-        }
-        if (username != null) {
+        String username = project.hasProperty("mlManageUsername") ? project.property("mlManageUsername") : project.property("marklogic.manage.username") 
+        if (username) {
+            username = getUsername(project)
+        }        
+        if (username) {
             logger.info("Manage username: " + username)
             manageConfig.setUsername(username)
         }
-
+        
         String password = null
         if (project.hasProperty("mlManagePassword")) {
             password = project.property("mlManagePassword")
         }
-        else if (project.hasProperty("mlPassword")) {
-            password = project.property("mlPassword")
+        if (password) {
+            password = getPassword(project)
         }
-        if (password != null) {
+        if (password) {
             manageConfig.setPassword(password)
         }
 
-        if (project.hasProperty("mlAdminUsername")) {
-            manageConfig.setAdminUsername(project.property("mlAdminUsername"))
-        }
-        if (project.hasProperty("mlAdminPassword")) {
-            manageConfig.setAdminPassword(project.property("mlAdminPassword"))
-        }
-
+        String adminUsername = project.hasProperty("mlAdminUsername") ? project.property("mlAdminUsername") : project.property("marklogic.admin.username")
+        manageConfig.setAdminUsername(adminUsername)
+        
+        String adminPassword = project.hasProperty("mlAdminPassword") ? project.property("mlAdminPassword") : project.property("marklogic.admin.password")
+        manageConfig.setAdminPassword(adminPassword)
+        
         project.extensions.add("mlManageConfig", manageConfig)
     }
 
@@ -275,24 +264,18 @@ class MarkLogicPlugin implements Plugin<Project> {
         logger.info("Admin host: " + getHost(project))
         adminConfig.setHost(getHost(project))
 
-        String username = null
-        if (project.hasProperty("mlAdminUsername")) {
-            username = project.property("mlAdminUsername")
-        }
-        else if (project.hasProperty("mlUsername")) {
-            username = project.property("mlUsername")
+        String username = project.hasProperty("mlAdminUsername") ? project.property("mlAdminUsername") : project.property("marklogic.admin.username")
+        if (username) {
+            username = getUsername(project)
         }
         if (username != null) {
             logger.info("Admin username: " + username)
             adminConfig.setUsername(username)
         }
 
-        String password = null
-        if (project.hasProperty("mlAdminPassword")) {
-            password = project.property("mlAdminPassword")
-        }
-        else if (project.hasProperty("mlPassword")) {
-            password = project.property("mlPassword")
+        String password = project.hasProperty("mlAdminPassword") ? project.property("mlAdminPassword") : project.property("marklogic.admin.password")
+        if (password) {
+            password = getPassword(project)
         }
         if (password != null) {
             adminConfig.setPassword(password)
@@ -422,5 +405,13 @@ class MarkLogicPlugin implements Plugin<Project> {
     def getHost(project) { 
       project.hasProperty("mlHost") ? project.property("mlHost") : project.property("marklogic.host")
     }    
+    
+    def getUsername(project) {
+      project.hasProperty("mlUsername") ? project.property("mlUsername") : project.property("marklogic.username")
+    }
+    
+    def getPassword(project) {
+      project.hasProperty("mlPassword") ? project.property("mlPassword") : project.property("marklogic.password")
+    }
     
 }

@@ -10,6 +10,9 @@ import com.rjrudin.marklogic.appdeployer.AppDeployer
 import com.rjrudin.marklogic.appdeployer.ConfigDir
 import com.rjrudin.marklogic.appdeployer.command.Command
 import com.rjrudin.marklogic.appdeployer.command.CommandContext
+import com.rjrudin.marklogic.appdeployer.command.alert.DeployAlertActionsCommand
+import com.rjrudin.marklogic.appdeployer.command.alert.DeployAlertConfigsCommand
+import com.rjrudin.marklogic.appdeployer.command.alert.DeployAlertRulesCommand
 import com.rjrudin.marklogic.appdeployer.command.appservers.DeployOtherServersCommand
 import com.rjrudin.marklogic.appdeployer.command.appservers.UpdateRestApiServersCommand
 import com.rjrudin.marklogic.appdeployer.command.cpf.DeployCpfConfigsCommand
@@ -33,6 +36,7 @@ import com.rjrudin.marklogic.appdeployer.command.security.DeployProtectedCollect
 import com.rjrudin.marklogic.appdeployer.command.security.DeployRolesCommand
 import com.rjrudin.marklogic.appdeployer.command.security.DeployUsersCommand
 import com.rjrudin.marklogic.appdeployer.command.tasks.DeployScheduledTasksCommand
+import com.rjrudin.marklogic.appdeployer.command.triggers.DeployTriggersCommand
 import com.rjrudin.marklogic.appdeployer.command.viewschemas.DeployViewSchemasCommand
 import com.rjrudin.marklogic.appdeployer.impl.SimpleAppDeployer
 import com.rjrudin.marklogic.gradle.task.DeleteModuleTimestampsFileTask
@@ -41,6 +45,7 @@ import com.rjrudin.marklogic.gradle.task.PrintCommandsTask
 import com.rjrudin.marklogic.gradle.task.UndeployAppTask
 import com.rjrudin.marklogic.gradle.task.admin.InitTask
 import com.rjrudin.marklogic.gradle.task.admin.InstallAdminTask
+import com.rjrudin.marklogic.gradle.task.alert.DeployAlertingTask
 import com.rjrudin.marklogic.gradle.task.client.CreateResourceTask
 import com.rjrudin.marklogic.gradle.task.client.CreateTransformTask
 import com.rjrudin.marklogic.gradle.task.client.LoadModulesTask
@@ -68,8 +73,18 @@ import com.rjrudin.marklogic.gradle.task.security.DeployProtectedCollectionsTask
 import com.rjrudin.marklogic.gradle.task.security.DeployRolesTask
 import com.rjrudin.marklogic.gradle.task.security.DeploySecurityTask
 import com.rjrudin.marklogic.gradle.task.security.DeployUsersTask
+import com.rjrudin.marklogic.gradle.task.security.UndeployAmpsTask
+import com.rjrudin.marklogic.gradle.task.security.UndeployCertificateTemplatesTask
+import com.rjrudin.marklogic.gradle.task.security.UndeployExternalSecurityTask
+import com.rjrudin.marklogic.gradle.task.security.UndeployPrivilegesTask
+import com.rjrudin.marklogic.gradle.task.security.UndeployProtectedCollectionsTask
+import com.rjrudin.marklogic.gradle.task.security.UndeployRolesTask
+import com.rjrudin.marklogic.gradle.task.security.UndeploySecurityTask
+import com.rjrudin.marklogic.gradle.task.security.UndeployUsersTask
 import com.rjrudin.marklogic.gradle.task.servers.DeployServersTask
 import com.rjrudin.marklogic.gradle.task.tasks.DeployTasksTask
+import com.rjrudin.marklogic.gradle.task.tasks.UndeployTasksTask
+import com.rjrudin.marklogic.gradle.task.trigger.DeployTriggersTask;
 import com.rjrudin.marklogic.gradle.task.viewschemas.DeployViewSchemasTask
 import com.rjrudin.marklogic.mgmt.ManageClient
 import com.rjrudin.marklogic.mgmt.ManageConfig
@@ -106,6 +121,9 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlInit", type: InitTask, group: adminGroup, description: "Perform a one-time initialization of a MarkLogic server")
         project.task("mlInstallAdmin", type: InstallAdminTask, group: adminGroup, description: "Perform a one-time installation of an admin user")
 
+        String alertGroup = "ml-gradle Alert"
+        project.task("mlDeployAlerting", type: DeployAlertingTask, group: alertGroup, description: "Deploy each alerting resource - configs, actions, and rules")
+        
         String cpfGroup = "ml-gradle CPF"
         project.task("mlDeployCpf", type: DeployCpfTask, group: cpfGroup, description: "Deploy each CPF resource - domains, pipelines, and CPF configs").mustRunAfter("mlClearTriggersDatabase")
         project.task("mlRedeployCpf", group: cpfGroup, dependsOn: ["mlClearTriggersDatabase", "mlDeployCpf"], description: "Clears the triggers database and then calls mlDeployCpf; be sure to reload custom triggers after doing this, as they will be deleted as well")
@@ -154,13 +172,25 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlDeployRoles", type: DeployRolesTask, group: securityGroup, description: "Deploy each role, updating it if it exists")
         project.task("mlDeploySecurity", type: DeploySecurityTask, group: securityGroup, description: "Deploy each security resource, updating it if it exists")
         project.task("mlDeployUsers", type: DeployUsersTask, group: securityGroup, description: "Deploy each user, updating it if it exists")
+        project.task("mlUndeployAmps", type: UndeployAmpsTask, group: securityGroup, description: "Undeploy (delete) each amp")
+        project.task("mlUndeployCertificateTemplates", type: UndeployCertificateTemplatesTask, group: securityGroup, description: "Undeploy (delete) each certificate template")
+        project.task("mlUndeployExternalSecurity", type: UndeployExternalSecurityTask, group: securityGroup, description: "Undeploy (delete) each external security configuration")
+        project.task("mlUndeployPrivileges", type: UndeployPrivilegesTask, group: securityGroup, description: "Undeploy (delete) each privilege")
+        project.task("mlUndeployProtectedCollections", type: UndeployProtectedCollectionsTask, group: securityGroup, description: "Undeploy (delete) each protected collection")
+        project.task("mlUndeployRoles", type: UndeployRolesTask, group: securityGroup, description: "Undeploy (delete) each role")
+        project.task("mlUndeployUsers", type: UndeployUsersTask, group: securityGroup, description: "Undeploy (delete) each user")
+        project.task("mlUndeploySecurity", type: UndeploySecurityTask, group: securityGroup, description: "Undeploy (delete) all security resources")
         
         String sqlGroup = "ml-gradle SQL"
         project.task("mlDeployViewSchemas", type: DeployViewSchemasTask, group: sqlGroup, description: "Deploy each SQL view schema, updating it if it exists")
 
-        String taskGroup = "ml-gradle Tasks"
+        String taskGroup = "ml-gradle Task"
         project.task("mlDeployTasks", type: DeployTasksTask, group: taskGroup, description: "Deploy each scheduled task, updating it if it exists")
-
+        project.task("mlUndeployTasks", type: UndeployTasksTask, group: taskGroup, description: "Undeploy (delete) each scheduled task")
+        
+        String triggerGroup = "ml-gradle Trigger"
+        project.task("mlDeployTriggers", type: DeployTriggersTask, group: triggerGroup, description: "Deploy each trigger, updating it if it exists")
+        
         String generalGroup = "ml-gradle General"
         project.task("mlPrintCommands", type: PrintCommandsTask, group: generalGroup, description: "Print information about each command used by mlDeploy and mlUndeploy")
 
@@ -354,6 +384,14 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.extensions.add("mlLoadModulesCommand", lmc)
         commands.add(lmc)
 
+        // Alerting
+        List<Command> alertCommands = new ArrayList<Command>()
+        alertCommands.add(new DeployAlertConfigsCommand())
+        alertCommands.add(new DeployAlertActionsCommand())
+        alertCommands.add(new DeployAlertRulesCommand())
+        project.extensions.add("mlAlertCommands", alertCommands)
+        commands.addAll(alertCommands)
+        
         // CPF
         List<Command> cpfCommands = new ArrayList<Command>()
         cpfCommands.add(new DeployCpfConfigsCommand())
@@ -391,6 +429,12 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.extensions.add("mlTaskCommands", taskCommands)
         commands.addAll(taskCommands)
 
+        // Triggers
+        List<Command> triggerCommands = new ArrayList<Command>()
+        triggerCommands.add(new DeployTriggersCommand())
+        project.extensions.add("mlTriggerCommands", triggerCommands)
+        commands.addAll(triggerCommands)
+        
         // SQL Views
         List<Command> viewCommands = new ArrayList<Command>()
         viewCommands.add(new DeployViewSchemasCommand())

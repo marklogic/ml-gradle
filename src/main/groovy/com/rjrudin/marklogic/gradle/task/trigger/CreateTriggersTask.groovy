@@ -5,6 +5,10 @@ import org.gradle.api.tasks.TaskAction
 import com.rjrudin.marklogic.gradle.task.MarkLogicTask;
 import com.rjrudin.marklogic.gradle.xcc.XccHelper
 
+/**
+ * This is only needed for MarkLogic 8.0-3 and earlier - 8.0-4 supports triggers via the Management API. It's also
+ * mis-named a bit - you can only create/recreate a single trigger with it.
+ */
 class CreateTriggersTask extends MarkLogicTask {
 
     String xccUrl

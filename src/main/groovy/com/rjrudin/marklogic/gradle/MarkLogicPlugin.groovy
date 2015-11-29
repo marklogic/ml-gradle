@@ -210,52 +210,40 @@ class MarkLogicPlugin implements Plugin<Project> {
             logger.info("Setting config dir to: " + prop)
             appConfig.setConfigDir(new ConfigDir(new File(prop)))
         }
-        if (project.hasProperty("mlAppName")) {
-            def name = project.property("mlAppName")
-            logger.info("App name: " + name)
-            appConfig.setName(name)
-        }
-        if (project.hasProperty("mlHost")) {
-            def host = project.property("mlHost")
-            logger.info("App host: " + host)
-            appConfig.setHost(host)
-        }
+        
+        def name = project.hasProperty("mlAppName") ? project.property("mlAppName") : project.property("marklogic.application.name")
+        logger.info("App name: " + name)
+        appConfig.setName(name)
+      
+        logger.info("App host: " + getHost(project))
+        appConfig.setHost(getHost(project))
+        
+        def port = project.hasProperty("mlRestPort") ? project.property("mlRestPort") : project.property("marklogic.rest.port") 
+        logger.info("App REST port: " + port)
+        appConfig.setRestPort(Integer.parseInt(port))
+        
+        def testPort = project.hasProperty("mlTestRestPort") ? project.property("mlTestRestPort") : project.property("marklogic.rest.test.port")
+        logger.info("App test REST port: " + testPort)
+        appConfig.setTestRestPort(Integer.parseInt(testPort))
 
-        if (project.hasProperty("mlRestPort")) {
-            def port = project.property("mlRestPort")
-            logger.info("App REST port: " + port)
-            appConfig.setRestPort(Integer.parseInt(port))
+        String restUsername = project.hasProperty("mlRestAdminUsername") ? project.property("mlRestAdminUsername") : project.property("marklogic.admin.rest.username")
+        if (restUsername) {
+          restUsername = getUsername(project)
         }
-        if (project.hasProperty("mlTestRestPort")) {
-            def port = project.property("mlTestRestPort")
-            logger.info("App test REST port: " + port)
-            appConfig.setTestRestPort(Integer.parseInt(port))
-        }
-
-        String restUsername = null
-        if (project.hasProperty("mlRestAdminUsername")) {
-            restUsername = project.property("mlRestAdminUsername")
-        }
-        else if (project.hasProperty("mlUsername")) {
-            restUsername = project.property("mlUsername")
-        }
-        if (restUsername != null) {
+        if (restUsername) {
             logger.info("REST Admin username: " + restUsername)
             appConfig.setRestAdminUsername(restUsername)
         }
 
-        String restPassword = null
-        if (project.hasProperty("mlRestAdminPassword")) {
-            restPassword = project.property("mlRestAdminPassword")
+        String restPassword = project.hasProperty("mlRestAdminPassword") ? project.property("mlRestAdminPassword") : project.property("marklogic.admin.rest.password")
+        if (restPassword) {
+            restPassword = getPassword(project)
         }
-        else if (project.hasProperty("mlPassword")) {
-            restPassword = project.property("mlPassword")
-        }
-        if (restPassword != null) {
+        if (restPassword) {
             appConfig.setRestAdminPassword(restPassword)
         }
 
-        if (project.hasProperty("mlSimpleSsl")) {
+        if (project.hasProperty("mlSimpleSsl") || project.hasProperty("marklogic.simple.ssl")) {
             logger.info("Using simple SSL context and 'ANY' hostname verifier for authenticating against client REST API server")
             appConfig.setRestSslContext(SimpleX509TrustManager.newSSLContext())
             appConfig.setRestSslHostnameVerifier(DatabaseClientFactory.SSLHostnameVerifier.ANY)
@@ -266,71 +254,58 @@ class MarkLogicPlugin implements Plugin<Project> {
 
     void initializeManageConfig(Project project) {
         ManageConfig manageConfig = new ManageConfig()
-        if (project.hasProperty("mlHost")) {
-            def host = project.property("mlHost")
-            logger.info("Manage host: " + host)
-            manageConfig.setHost(host)
-        }
+        
+        logger.info("Manage host: " + getHost(project))
+        manageConfig.setHost(getHost(project))
+        
 
-        String username = null
-        if (project.hasProperty("mlManageUsername")) {
-            username = project.property("mlManageUsername")
-        }
-        else if (project.hasProperty("mlUsername")) {
-            username = project.property("mlUsername")
-        }
-        if (username != null) {
+        String username = project.hasProperty("mlManageUsername") ? project.property("mlManageUsername") : project.property("marklogic.manage.username") 
+        if (username) {
+            username = getUsername(project)
+        }        
+        if (username) {
             logger.info("Manage username: " + username)
             manageConfig.setUsername(username)
         }
-
+        
         String password = null
         if (project.hasProperty("mlManagePassword")) {
             password = project.property("mlManagePassword")
         }
-        else if (project.hasProperty("mlPassword")) {
-            password = project.property("mlPassword")
+        if (password) {
+            password = getPassword(project)
         }
-        if (password != null) {
+        if (password) {
             manageConfig.setPassword(password)
         }
 
-        if (project.hasProperty("mlAdminUsername")) {
-            manageConfig.setAdminUsername(project.property("mlAdminUsername"))
-        }
-        if (project.hasProperty("mlAdminPassword")) {
-            manageConfig.setAdminPassword(project.property("mlAdminPassword"))
-        }
-
+        String adminUsername = project.hasProperty("mlAdminUsername") ? project.property("mlAdminUsername") : project.property("marklogic.admin.username")
+        manageConfig.setAdminUsername(adminUsername)
+        
+        String adminPassword = project.hasProperty("mlAdminPassword") ? project.property("mlAdminPassword") : project.property("marklogic.admin.password")
+        manageConfig.setAdminPassword(adminPassword)
+        
         project.extensions.add("mlManageConfig", manageConfig)
     }
 
     void initializeAdminConfig(Project project) {
         AdminConfig adminConfig = new AdminConfig()
-        if (project.hasProperty("mlHost")) {
-            def host = project.property("mlHost")
-            logger.info("Admin host: " + host)
-            adminConfig.setHost(host)
-        }
 
-        String username = null
-        if (project.hasProperty("mlAdminUsername")) {
-            username = project.property("mlAdminUsername")
-        }
-        else if (project.hasProperty("mlUsername")) {
-            username = project.property("mlUsername")
+        logger.info("Admin host: " + getHost(project))
+        adminConfig.setHost(getHost(project))
+
+        String username = project.hasProperty("mlAdminUsername") ? project.property("mlAdminUsername") : project.property("marklogic.admin.username")
+        if (username) {
+            username = getUsername(project)
         }
         if (username != null) {
             logger.info("Admin username: " + username)
             adminConfig.setUsername(username)
         }
 
-        String password = null
-        if (project.hasProperty("mlAdminPassword")) {
-            password = project.property("mlAdminPassword")
-        }
-        else if (project.hasProperty("mlPassword")) {
-            password = project.property("mlPassword")
+        String password = project.hasProperty("mlAdminPassword") ? project.property("mlAdminPassword") : project.property("marklogic.admin.password")
+        if (password) {
+            password = getPassword(project)
         }
         if (password != null) {
             adminConfig.setPassword(password)
@@ -470,4 +445,17 @@ class MarkLogicPlugin implements Plugin<Project> {
         deployer.setCommands(commands)
         return deployer
     }
+    
+    def getHost(project) { 
+      project.hasProperty("mlHost") ? project.property("mlHost") : project.property("marklogic.host")
+    }    
+    
+    def getUsername(project) {
+      project.hasProperty("mlUsername") ? project.property("mlUsername") : project.property("marklogic.username")
+    }
+    
+    def getPassword(project) {
+      project.hasProperty("mlPassword") ? project.property("mlPassword") : project.property("marklogic.password")
+    }
+    
 }

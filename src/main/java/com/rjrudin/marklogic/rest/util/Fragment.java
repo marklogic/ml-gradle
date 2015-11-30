@@ -36,6 +36,7 @@ public class Fragment {
             list.add(Namespace.getNamespace("s", "http://marklogic.com/manage/servers"));
             list.add(Namespace.getNamespace("msec", "http://marklogic.com/manage/security"));
             list.add(Namespace.getNamespace("sec", "http://marklogic.com/xdmp/security"));
+            list.add(Namespace.getNamespace("arp", "http://marklogic.com/manage/alert-rule/properties"));
             for (Namespace n : namespaces) {
                 list.add(n);
             }

@@ -60,6 +60,10 @@ public class ConfigDir {
         return new File(baseDir, "cpf");
     }
 
+    public File getAlertDir() {
+        return new File(baseDir, "alert");
+    }
+    
     public File getFlexrepDir() {
         return new File(baseDir, "flexrep");
     }

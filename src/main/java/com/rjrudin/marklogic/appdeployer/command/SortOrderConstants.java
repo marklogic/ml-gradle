@@ -31,6 +31,9 @@ public abstract class SortOrderConstants {
     public static Integer DEPLOY_AMPS = 450;
 
     public static Integer DEPLOY_TRIGGERS = 700;
+    public static Integer DEPLOY_ALERT_CONFIGS = 710;
+    public static Integer DEPLOY_ALERT_ACTIONS = 720;
+    public static Integer DEPLOY_ALERT_RULES = 730;
     
     public static Integer DEPLOY_SCHEDULED_TASKS = 800;
 

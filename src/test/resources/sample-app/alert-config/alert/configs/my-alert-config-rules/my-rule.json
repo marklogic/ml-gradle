@@ -1,0 +1,12 @@
+{
+  "name": "my-rule",
+  "description": "log to ErrorLog.txt",
+  "user-name": "admin",
+  "query": {
+    "word-query": {
+      "text": "Yorick"
+    }
+  },
+  "action-name": "xdmp:log2",
+  "option": []
+}

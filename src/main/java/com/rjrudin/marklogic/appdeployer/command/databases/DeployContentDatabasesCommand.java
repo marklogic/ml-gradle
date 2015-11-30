@@ -21,11 +21,14 @@ import com.rjrudin.marklogic.rest.util.JsonNodeUtil;
 public class DeployContentDatabasesCommand extends DeployDatabaseCommand {
 
     public DeployContentDatabasesCommand() {
+        // Same default as /v1/rest-apis
+        this(3);
+    }
+
+    public DeployContentDatabasesCommand(int forestsPerHost) {
         setExecuteSortOrder(SortOrderConstants.DEPLOY_CONTENT_DATABASES);
         setUndoSortOrder(SortOrderConstants.DELETE_CONTENT_DATABASES);
-
-        // Same default as /v1/rest-apis
-        setForestsPerHost(3);
+        setForestsPerHost(forestsPerHost);
         setForestFilename("content-forest.json");
     }
 

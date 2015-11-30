@@ -7,7 +7,6 @@ buildscript {
         mavenCentral()
         maven {url "http://developer.marklogic.com/maven2/"}
         maven {url "http://rjrudin.github.io/marklogic-java/releases"}
-        mavenLocal()
     }
     dependencies { classpath mlGradleDependency }
 }
@@ -130,7 +129,7 @@ ext {
         // For the tasks below that depend on XCC - such as for running corb or creating triggers - the following URL
         // will be used. In this sample project, the sample-project-rest-admin user has the privileges necessary to
         // create triggers, so we use that user.
-        contentXccUrl = "xcc://${property('marklogic.admin.rest.username')}:${property('marklogic.admin.rest.password')}@${property('marklogic.host')}:${property('marklogic.rest.port')}/${mlAppConfig.contentDatabaseName}"
+        contentXccUrl = "xcc://${mlRestAdminUsername}:${mlRestAdminPassword}@${mlHost}:8000/${mlAppConfig.contentDatabaseName}"
     }
 }
 

@@ -45,7 +45,8 @@ public class AlertConfigManager extends AbstractResourceManager {
             if (logger.isInfoEnabled()) {
                 logger.info("Immediately updating alert config after it's been created to ensure that CPF domains are set");
             }
-            super.save(payload);
+            // Calling updateResource instead of save to avoid any chance of an infinite loop
+            return super.updateResource(payload, getResourceId(payload));
         }
         return receipt;
     }

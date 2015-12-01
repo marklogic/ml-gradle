@@ -1,0 +1,34 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {url "http://developer.marklogic.com/maven2/"}
+        maven {url "http://rjrudin.github.io/marklogic-java/releases"}
+    }
+    dependencies { classpath mlGradleDependency }
+}
+
+apply plugin: 'ml-gradle'
+
+/**
+ * This command is added to mlAppDeployer so that all the default pipelines are loaded. This gets around an issue 
+ * where pipelines that have options elements in them - such as the Alerting pipeline - can't be loaded via the Mgmt
+ * API because the options element fails schema validation. Loading all the default pipelines when we only need
+ * Status Change Handling and Alerting is fine - the unused pipelines just sit there with no impact on anything.
+ */
+ext {
+    mlAppDeployer.commands.add(new com.rjrudin.marklogic.appdeployer.command.cpf.DeployDefaultPipelinesCommand())
+}
+
+/**
+ * The below configuration is just used to support writing a JUnit test.
+ */
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+repositories {
+    mavenCentral()
+    maven {url "http://developer.marklogic.com/maven2/"}
+    maven {url "http://rjrudin.github.io/marklogic-java/releases"}
+}
+
+dependencies { testCompile "com.rjrudin:ml-junit:2.3" }

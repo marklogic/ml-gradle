@@ -1,0 +1,43 @@
+<pipeline-properties xmlns="http://marklogic.com/manage/pipeline/properties">
+  <pipeline-name>Alerting</pipeline-name>
+  <pipeline-description>
+    Generates alerts for any alerting configurations that reference a domain. This pipeline should
+    be used with the status change handling pipeline.
+  </pipeline-description>
+  <success-action>
+    <module>/MarkLogic/cpf/actions/success-action.xqy</module>
+  </success-action>
+  <failure-action>
+    <module>/MarkLogic/cpf/actions/failure-action.xqy</module>
+  </failure-action>
+  <state-transition>
+    <annotation>Alert on a document and transition to state "alerted".</annotation>
+    <state>http://marklogic.com/states/initial</state>
+    <on-success>http://marklogic.com/states/alerted</on-success>
+    <on-failure>http://marklogic.com/states/error</on-failure>
+    <priority>6000</priority>
+    <execute>
+      <condition>
+        <module>/MarkLogic/cpf/actions/format-condition.xqy</module>
+        <options xmlns="/MarkLogic/cpf/actions/format-condition.xqy">
+          <format>text</format>
+          <format>xml</format>
+        </options>
+      </condition>
+      <action>
+        <module>/MarkLogic/alert/cpf/alert-action.xqy</module>
+        <options xmlns="/MarkLogic/cpf/actions/format-condition.xqy" />
+      </action>
+    </execute>
+  </state-transition>
+  <state-transition>
+    <annotation>
+      Document has been updated: reprocess if need be. Note: the preconditions will avoid reprocessing of
+      active documents, so we will avoid falling into a processing loop when the processing updates a document.
+    </annotation>
+    <state>http://marklogic.com/states/updated</state>
+    <on-success>http://marklogic.com/states/initial</on-success>
+    <on-failure>http://marklogic.com/states/error</on-failure>
+    <priority>6000</priority>
+  </state-transition>
+</pipeline-properties>

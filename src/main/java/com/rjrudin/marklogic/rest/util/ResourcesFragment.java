@@ -44,6 +44,10 @@ public class ResourcesFragment extends Fragment {
         return getListItemValues("idref");
     }
 
+    public List<String> getListItemNameRefs() {
+        return getListItemValues("nameref");
+    }
+
     public List<String> getListItemValues(String elementName) {
         String xpath = "/node()/*[local-name(.) = 'list-items']/node()/*[local-name(.) = '%s']";
         return getElementValues(String.format(xpath, elementName));

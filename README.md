@@ -24,7 +24,12 @@ Here are some of the main features of ml-gradle:
 1. Can treat packages of MarkLogic code as [true third-party dependencies](https://github.com/rjrudin/ml-gradle/wiki/Common-tasks#preparing-rest-api-dependencies), resolving them just like you would a dependency on a jar, as well as automatically loading such code into your modules database
 1. Can easily run MarkLogic Content Pump and Corb without having to copy jars around and worry about a classpath
 
-ml-gradle quick start
+What are all of the tasks I can perform with ml-gradle?
+-----
+See [the Wiki page on all tasks](https://github.com/rjrudin/ml-gradle/wiki/All-tasks).
+
+
+How can I start using ml-gradle?
 =========
 To use ml-gradle right away, you'll need Gradle installed first. And of course you'll need Marklogic installed somewhere - it doesn't have to be the same computer as the one you're running Gradle on. Then create a directory for your project and add a build.gradle file and a gradle.properties file. Here's the simplest build.gradle file possible:
 
@@ -58,6 +63,7 @@ You'll end up with a new REST API server on port 8200 with a modules database an
 To see exactly what mlDeploy is doing, just run Gradle with the "-i" or "--info" option (it's normally useful to do this in any case with Gradle):
 
     gradle -i mlDeploy
+
 
 Exploring the sample project
 -----

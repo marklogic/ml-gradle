@@ -5,7 +5,8 @@
 * Added SetSslFipsEnabledCommand
 * [#67](https://github.com/rjrudin/ml-app-deployer/issues/67) Now supporting triggers (requires ML 8.0-4)
 * [#68](https://github.com/rjrudin/ml-app-deployer/issues/68) Now supporting alert configs, actions, and rules (requires ML 8.0-4)
- 
+* Can delete all scheduled tasks with TaskManager
+
 ## 2.0b12
 
 * Added null-check in SimpleAppDeployer

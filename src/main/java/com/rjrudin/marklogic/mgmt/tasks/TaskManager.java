@@ -65,7 +65,17 @@ public class TaskManager extends AbstractResourceManager {
                 resourceNameOrId));
     }
 
+    public void deleteAllScheduledTasks() {
+        for (String id : getAsXml().getListItemIdRefs()) {
+            deleteAtPath(getResourcesPath() + "/" + id + "?group-id=" + groupName);
+        }
+    }
+
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+
+    public String getGroupName() {
+        return groupName;
     }
 }

@@ -45,12 +45,15 @@ import com.rjrudin.marklogic.gradle.task.PrintCommandsTask
 import com.rjrudin.marklogic.gradle.task.UndeployAppTask
 import com.rjrudin.marklogic.gradle.task.admin.InitTask
 import com.rjrudin.marklogic.gradle.task.admin.InstallAdminTask
+import com.rjrudin.marklogic.gradle.task.alert.DeleteAllAlertConfigsTask;
 import com.rjrudin.marklogic.gradle.task.alert.DeployAlertingTask
 import com.rjrudin.marklogic.gradle.task.client.CreateResourceTask
 import com.rjrudin.marklogic.gradle.task.client.CreateTransformTask
 import com.rjrudin.marklogic.gradle.task.client.LoadModulesTask
 import com.rjrudin.marklogic.gradle.task.client.PrepareRestApiDependenciesTask
 import com.rjrudin.marklogic.gradle.task.client.WatchTask
+import com.rjrudin.marklogic.gradle.task.cluster.DisableSslFipsTask
+import com.rjrudin.marklogic.gradle.task.cluster.EnableSslFipsTask
 import com.rjrudin.marklogic.gradle.task.cpf.DeployCpfTask
 import com.rjrudin.marklogic.gradle.task.cpf.LoadDefaultPipelinesTask
 import com.rjrudin.marklogic.gradle.task.databases.ClearContentDatabaseTask
@@ -58,6 +61,7 @@ import com.rjrudin.marklogic.gradle.task.databases.ClearModulesDatabaseTask
 import com.rjrudin.marklogic.gradle.task.databases.ClearSchemasDatabaseTask
 import com.rjrudin.marklogic.gradle.task.databases.ClearTriggersDatabaseTask
 import com.rjrudin.marklogic.gradle.task.databases.DeployDatabasesTask
+import com.rjrudin.marklogic.gradle.task.flexrep.DeleteAllFlexrepConfigsTask;
 import com.rjrudin.marklogic.gradle.task.flexrep.DeployFlexrepTask
 import com.rjrudin.marklogic.gradle.task.forests.ConfigureForestReplicasTask
 import com.rjrudin.marklogic.gradle.task.forests.DeleteForestReplicasTask
@@ -82,9 +86,10 @@ import com.rjrudin.marklogic.gradle.task.security.UndeployRolesTask
 import com.rjrudin.marklogic.gradle.task.security.UndeploySecurityTask
 import com.rjrudin.marklogic.gradle.task.security.UndeployUsersTask
 import com.rjrudin.marklogic.gradle.task.servers.DeployServersTask
+import com.rjrudin.marklogic.gradle.task.tasks.DeleteAllTasksTask;
 import com.rjrudin.marklogic.gradle.task.tasks.DeployTasksTask
 import com.rjrudin.marklogic.gradle.task.tasks.UndeployTasksTask
-import com.rjrudin.marklogic.gradle.task.trigger.DeployTriggersTask;
+import com.rjrudin.marklogic.gradle.task.trigger.DeployTriggersTask
 import com.rjrudin.marklogic.gradle.task.viewschemas.DeployViewSchemasTask
 import com.rjrudin.marklogic.mgmt.ManageClient
 import com.rjrudin.marklogic.mgmt.ManageConfig
@@ -122,6 +127,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlInstallAdmin", type: InstallAdminTask, group: adminGroup, description: "Perform a one-time installation of an admin user")
 
         String alertGroup = "ml-gradle Alert"
+        project.task("mlDeleteAllAlertConfigs", type: DeleteAllAlertConfigsTask, group: alertGroup, description: "Delete all alert configs, which also deletes all of the actions rules associated with them")
         project.task("mlDeployAlerting", type: DeployAlertingTask, group: alertGroup, description: "Deploy each alerting resource - configs, actions, and rules")
         
         String cpfGroup = "ml-gradle CPF"
@@ -129,6 +135,10 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlRedeployCpf", group: cpfGroup, dependsOn: ["mlClearTriggersDatabase", "mlDeployCpf"], description: "Clears the triggers database and then calls mlDeployCpf; be sure to reload custom triggers after doing this, as they will be deleted as well")
         project.task("mlLoadDefaultPipelines", type: LoadDefaultPipelinesTask, group: cpfGroup, description: "Load default pipelines into a triggers database")
 
+        String clusterGroup = "ml-gradle Cluster"
+        project.task("mlDisableSslFips", type: DisableSslFipsTask, group: clusterGroup, description: "Disable SSL FIPS across the cluster")
+        project.task("mlEnableSslFips", type: EnableSslFipsTask, group: clusterGroup, description: "Enable SSL FIPS across the cluster")
+        
         String dbGroup = "ml-gradle Database"
         project.task("mlClearContentDatabase", type: ClearContentDatabaseTask, group: dbGroup, description: "Deletes all documents in the content database; requires -PdeleteAll=true to be set so you don't accidentally do this")
         project.task("mlClearModulesDatabase", type: ClearModulesDatabaseTask, group: dbGroup, dependsOn: "mlDeleteModuleTimestampsFile", description: "Deletes potentially all of the documents in the modules database; has a property for excluding documents from deletion")
@@ -143,6 +153,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlPrepareRestApiDependencies", type: PrepareRestApiDependenciesTask, group: devGroup, dependsOn: project.configurations["mlRestApi"], description: "Downloads (if necessary) and unzips in the build directory all mlRestApi dependencies")
 
         String flexrepGroup = "ml-gradle Flexible Replication"
+        project.task("mlDeleteAllFlexrepConfigs", type: DeleteAllFlexrepConfigsTask, group: flexrepGroup, description: "Delete all Flexrep configs and their associated targets")
         project.task("mlDeployFlexrep", type: DeployFlexrepTask, group: flexrepGroup, description: "Deploy Flexrep configs and targets")
 
         String forestGroup = "ml-gradle Forest"
@@ -185,6 +196,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlDeployViewSchemas", type: DeployViewSchemasTask, group: sqlGroup, description: "Deploy each SQL view schema, updating it if it exists")
 
         String taskGroup = "ml-gradle Task"
+        project.task("mlDeleteAllTasks", type: DeleteAllTasksTask, group: taskGroup, description: "Delete all scheduled tasks in the cluster")
         project.task("mlDeployTasks", type: DeployTasksTask, group: taskGroup, description: "Deploy each scheduled task, updating it if it exists")
         project.task("mlUndeployTasks", type: UndeployTasksTask, group: taskGroup, description: "Undeploy (delete) each scheduled task")
         

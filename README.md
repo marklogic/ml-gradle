@@ -25,7 +25,7 @@ Here are some of the main features of ml-gradle:
 1. Can easily run MarkLogic Content Pump and Corb without having to copy jars around and worry about a classpath
 
 What are all of the tasks I can perform with ml-gradle?
------
+=========
 See [the Wiki page on all tasks](https://github.com/rjrudin/ml-gradle/wiki/All-tasks).
 
 

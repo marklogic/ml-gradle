@@ -63,47 +63,85 @@ public class ManageClient extends LoggingObject {
     }
 
     public ResponseEntity<String> putJson(String path, String json) {
+        logRequest(path, "JSON", "PUT");
         return restTemplate.exchange(baseUrl + path, HttpMethod.PUT, buildJsonEntity(json), String.class);
     }
 
     public ResponseEntity<String> putJsonAsAdmin(String path, String json) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Sending JSON PUT request as user with MarkLogic admin role");
-        }
+        logAdminRequest(path, "JSON", "PUT");
         return adminRestTemplate.exchange(baseUrl + path, HttpMethod.PUT, buildJsonEntity(json), String.class);
     }
 
     public ResponseEntity<String> putXml(String path, String xml) {
+        logRequest(path, "XML", "PUT");
         return restTemplate.exchange(baseUrl + path, HttpMethod.PUT, buildXmlEntity(xml), String.class);
     }
 
     public ResponseEntity<String> putXmlAsAdmin(String path, String xml) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Sending XML PUT request as user with MarkLogic admin role");
-        }
+        logAdminRequest(path, "XML", "PUT");
         return adminRestTemplate.exchange(baseUrl + path, HttpMethod.PUT, buildXmlEntity(xml), String.class);
     }
 
     public ResponseEntity<String> postJson(String path, String json) {
+        logRequest(path, "JSON", "POST");
         return restTemplate.exchange(baseUrl + path, HttpMethod.POST, buildJsonEntity(json), String.class);
     }
 
     public ResponseEntity<String> postJsonAsAdmin(String path, String json) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Sending JSON POST request as user with MarkLogic admin role");
-        }
+        logAdminRequest(path, "JSON", "POST");
         return adminRestTemplate.exchange(baseUrl + path, HttpMethod.POST, buildJsonEntity(json), String.class);
     }
 
     public ResponseEntity<String> postXml(String path, String xml) {
+        logRequest(path, "XML", "POST");
         return restTemplate.exchange(baseUrl + path, HttpMethod.POST, buildXmlEntity(xml), String.class);
     }
 
     public ResponseEntity<String> postXmlAsAdmin(String path, String xml) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Sending XML POST request as user with MarkLogic admin role");
-        }
+        logAdminRequest(path, "XML", "POST");
         return adminRestTemplate.exchange(baseUrl + path, HttpMethod.POST, buildXmlEntity(xml), String.class);
+    }
+
+    public ResponseEntity<String> postForm(String path, String... params) {
+        logRequest(path, "form", "POST");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+        for (int i = 0; i < params.length; i += 2) {
+            map.add(params[i], params[i + 1]);
+        }
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+        return restTemplate.exchange(baseUrl + path, HttpMethod.POST, entity, String.class);
+    }
+
+    public Fragment getXml(String path, String... namespacePrefixesAndUris) {
+        logRequest(path, "XML", "GET");
+        String xml = getRestTemplate().getForObject(getBaseUrl() + path, String.class);
+        List<Namespace> list = new ArrayList<Namespace>();
+        for (int i = 0; i < namespacePrefixesAndUris.length; i += 2) {
+            list.add(Namespace.getNamespace(namespacePrefixesAndUris[i], namespacePrefixesAndUris[i + 1]));
+        }
+        return new Fragment(xml, list.toArray(new Namespace[] {}));
+    }
+
+    public Fragment getXmlAsAdmin(String path, String... namespacePrefixesAndUris) {
+        logAdminRequest(path, "XML", "GET");
+        String xml = getAdminRestTemplate().getForObject(getBaseUrl() + path, String.class);
+        List<Namespace> list = new ArrayList<Namespace>();
+        for (int i = 0; i < namespacePrefixesAndUris.length; i += 2) {
+            list.add(Namespace.getNamespace(namespacePrefixesAndUris[i], namespacePrefixesAndUris[i + 1]));
+        }
+        return new Fragment(xml, list.toArray(new Namespace[] {}));
+    }
+
+    public void delete(String path) {
+        logRequest(path, "", "DELETE");
+        restTemplate.delete(baseUrl + path);
+    }
+
+    public void deleteAsAdmin(String path) {
+        logAdminRequest(path, "", "DELETE");
+        adminRestTemplate.delete(baseUrl + path);
     }
 
     public HttpEntity<String> buildJsonEntity(String json) {
@@ -118,47 +156,18 @@ public class ManageClient extends LoggingObject {
         return new HttpEntity<String>(xml, headers);
     }
 
-    public ResponseEntity<String> postForm(String path, String... params) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
-        for (int i = 0; i < params.length; i += 2) {
-            map.add(params[i], params[i + 1]);
+    protected void logRequest(String path, String contentType, String method) {
+        if (logger.isInfoEnabled()) {
+            logger.info(String.format("Sending %s %s request as user '%s' to path: %s", contentType, method,
+                    manageConfig.getUsername(), path));
         }
-        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<MultiValueMap<String, String>>(map, headers);
-        return restTemplate.exchange(baseUrl + path, HttpMethod.POST, entity, String.class);
     }
 
-    public Fragment getXml(String path, String... namespacePrefixesAndUris) {
-        String xml = getRestTemplate().getForObject(getBaseUrl() + path, String.class);
-        List<Namespace> list = new ArrayList<Namespace>();
-        for (int i = 0; i < namespacePrefixesAndUris.length; i += 2) {
-            list.add(Namespace.getNamespace(namespacePrefixesAndUris[i], namespacePrefixesAndUris[i + 1]));
+    protected void logAdminRequest(String path, String contentType, String method) {
+        if (logger.isInfoEnabled()) {
+            logger.info(String.format("Sending %s %s request as user with admin role '%s' to path: %s", contentType,
+                    method, manageConfig.getUsername(), path));
         }
-        return new Fragment(xml, list.toArray(new Namespace[] {}));
-    }
-
-    public Fragment getXmlAsAdmin(String path, String... namespacePrefixesAndUris) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Sending GET request as user with MarkLogic admin role");
-        }
-        String xml = getAdminRestTemplate().getForObject(getBaseUrl() + path, String.class);
-        List<Namespace> list = new ArrayList<Namespace>();
-        for (int i = 0; i < namespacePrefixesAndUris.length; i += 2) {
-            list.add(Namespace.getNamespace(namespacePrefixesAndUris[i], namespacePrefixesAndUris[i + 1]));
-        }
-        return new Fragment(xml, list.toArray(new Namespace[] {}));
-    }
-
-    public void delete(String path) {
-        restTemplate.delete(baseUrl + path);
-    }
-
-    public void deleteAsAdmin(String path) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Sending DELETE request as user with MarkLogic admin role");
-        }
-        adminRestTemplate.delete(baseUrl + path);
     }
 
     public RestTemplate getRestTemplate() {

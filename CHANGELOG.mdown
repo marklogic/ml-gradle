@@ -7,6 +7,11 @@
 * Added alert and trigger commands to mlDeploy
 * Added mlDeployAlerting
 * Added mlDeployTriggers
+* Added mlDeleteAllAlertConfigs
+* Added mlDeleteAllFlexrepConfigs
+* Added mlDeleteAllTasks
+* Added mlDisableSslFips and mlEnableSslFips
+* Added mlRestartCluster
 
 ## 2.0b12
 

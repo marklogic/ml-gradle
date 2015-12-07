@@ -109,6 +109,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         initializeManageConfig(project)
         initializeAdminConfig(project)
         initializeAppDeployerObjects(project)
+        initializeGroovyShellSupport(project)
 
         project.getConfigurations().create("mlRestApi")
 
@@ -130,7 +131,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         String alertGroup = "ml-gradle Alert"
         project.task("mlDeleteAllAlertConfigs", type: DeleteAllAlertConfigsTask, group: alertGroup, description: "Delete all alert configs, which also deletes all of the actions rules associated with them")
         project.task("mlDeployAlerting", type: DeployAlertingTask, group: alertGroup, description: "Deploy each alerting resource - configs, actions, and rules - in the configuration directory")
-        
+
         String cpfGroup = "ml-gradle CPF"
         project.task("mlDeployCpf", type: DeployCpfTask, group: cpfGroup, description: "Deploy each CPF resource - domains, pipelines, and CPF configs - in the configuration directory").mustRunAfter("mlClearTriggersDatabase")
         project.task("mlRedeployCpf", group: cpfGroup, dependsOn: ["mlClearTriggersDatabase", "mlDeployCpf"], description: "Clears the triggers database and then calls mlDeployCpf; be sure to reload custom triggers after doing this, as they will be deleted as well")
@@ -140,7 +141,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlDisableSslFips", type: DisableSslFipsTask, group: clusterGroup, description: "Disable SSL FIPS across the cluster")
         project.task("mlEnableSslFips", type: EnableSslFipsTask, group: clusterGroup, description: "Enable SSL FIPS across the cluster")
         project.task("mlRestartCluster", type: RestartClusterTask, group: clusterGroup, description: "Restart the cluster")
-        
+
         String dbGroup = "ml-gradle Database"
         project.task("mlClearContentDatabase", type: ClearContentDatabaseTask, group: dbGroup, description: "Deletes all documents in the content database; requires -PdeleteAll=true to be set so you don't accidentally do this")
         project.task("mlClearModulesDatabase", type: ClearModulesDatabaseTask, group: dbGroup, dependsOn: "mlDeleteModuleTimestampsFile", description: "Deletes potentially all of the documents in the modules database; has a property for excluding documents from deletion")
@@ -162,7 +163,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlConfigureForestReplicas", type: ConfigureForestReplicasTask, group: forestGroup, description: "Deprecated - configure forest replicas via the command.forestNamesAndReplicaCounts map")
         project.task("mlDeleteForestReplicas", type: DeleteForestReplicasTask, group: forestGroup, description: "Delete forest replicas via the command.forestNamesAndReplicaCounts map")
         project.task("mlDeployForestReplicas", type: DeployForestReplicasTask, group: forestGroup, description: "Prefer this over mlConfigureForestReplicas; it does the same thing, but uses the ConfigureForestReplicasCommand that is used by mlDeploy")
-        
+
         String groupsGroup = "ml-gradle Group"
         project.task("mlDeployGroups", type: DeployGroupsTask, group: groupsGroup, description: "Deploy each group, updating it if it exists, in the configuration directory")
 
@@ -193,7 +194,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlUndeployRoles", type: UndeployRolesTask, group: securityGroup, description: "Undeploy (delete) each role in the configuration directory")
         project.task("mlUndeployUsers", type: UndeployUsersTask, group: securityGroup, description: "Undeploy (delete) each user in the configuration directory")
         project.task("mlUndeploySecurity", type: UndeploySecurityTask, group: securityGroup, description: "Undeploy (delete) all security resources in the configuration directory")
-        
+
         String sqlGroup = "ml-gradle SQL"
         project.task("mlDeployViewSchemas", type: DeployViewSchemasTask, group: sqlGroup, description: "Deploy each SQL view schema, updating it if it exists, in the configuration directory")
 
@@ -201,10 +202,10 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlDeleteAllTasks", type: DeleteAllTasksTask, group: taskGroup, description: "Delete all scheduled tasks in the cluster")
         project.task("mlDeployTasks", type: DeployTasksTask, group: taskGroup, description: "Deploy each scheduled task, updating it if it exists, in the configuration directory")
         project.task("mlUndeployTasks", type: UndeployTasksTask, group: taskGroup, description: "Undeploy (delete) each scheduled task in the configuration directory")
-        
+
         String triggerGroup = "ml-gradle Trigger"
         project.task("mlDeployTriggers", type: DeployTriggersTask, group: triggerGroup, description: "Deploy each trigger, updating it if it exists, in the configuration directory")
-        
+
         String generalGroup = "ml-gradle General"
         project.task("mlPrintCommands", type: PrintCommandsTask, group: generalGroup, description: "Print information about each command used by mlDeploy and mlUndeploy")
 
@@ -368,6 +369,30 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.extensions.add("mlAppDeployer", newAppDeployer(project, context))
     }
 
+    void initializeGroovyShellSupport(Project project) {
+        ManageConfig manageConfig = project.extensions.getByName("mlManageConfig")
+
+        // Set up useful JVM args for launching groovysh
+        def mlShellJvmArgs = ["-DmlManageHost=" + manageConfig.getHost(), "-DmlManagePort=" + manageConfig.getPort(), "-DmlManageUsername=" + manageConfig.getUsername(), "-DmlManagePassword=" + manageConfig.getPassword(), "-DmlAdminUsername=" + manageConfig.getAdminUsername(), "-DmlAdminPassword=" + manageConfig.getAdminPassword()]
+        project.extensions.add("mlShellJvmArgs", mlShellJvmArgs)
+
+        def script = "manageConfig = com.rjrudin.marklogic.mgmt.ManageConfig.buildFromSystemProps()\nclient = new com.rjrudin.marklogic.mgmt.ManageClient(manageConfig)"
+        def mlShellArgs = ["-e", script]
+        project.extensions.add("mlShellArgs", mlShellArgs)
+
+        /**
+         * If the groovysh plugin has already been applied, then we can jvmArgs and args on the shell task automatically.
+         * Otherwise, the shell task needs to be configured in the Gradle file. 
+         */
+        if (project.getExtensions().findByName("groovysh")) {
+            project.afterEvaluate {
+                def task = project.tasks.shell
+                task.jvmArgs = mlShellJvmArgs
+                task.args = mlShellArgs
+            }
+        }
+    }
+
     /**
      * Creates an AppDeployer with a default set of commands. A developer can then modify this in an
      * ext block.
@@ -430,7 +455,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         alertCommands.add(new DeployAlertRulesCommand())
         project.extensions.add("mlAlertCommands", alertCommands)
         commands.addAll(alertCommands)
-        
+
         // CPF
         List<Command> cpfCommands = new ArrayList<Command>()
         cpfCommands.add(new DeployCpfConfigsCommand())
@@ -461,7 +486,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         replicaCommands.add(cfrc)
         project.extensions.add("mlForestReplicaCommands", replicaCommands)
         commands.addAll(replicaCommands)
-        
+
         // Tasks
         List<Command> taskCommands = new ArrayList<Command>()
         taskCommands.add(new DeployScheduledTasksCommand())
@@ -473,7 +498,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         triggerCommands.add(new DeployTriggersCommand())
         project.extensions.add("mlTriggerCommands", triggerCommands)
         commands.addAll(triggerCommands)
-        
+
         // SQL Views
         List<Command> viewCommands = new ArrayList<Command>()
         viewCommands.add(new DeployViewSchemasCommand())

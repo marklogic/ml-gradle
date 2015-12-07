@@ -4,10 +4,14 @@ buildscript {
         maven {url "http://developer.marklogic.com/maven2/"}
         maven {url "http://rjrudin.github.io/marklogic-java/releases"}
     }
-    dependencies { classpath mlGradleDependency }
+    dependencies {
+        classpath mlGradleDependency
+        classpath 'com.tkruse.gradle:gradle-groovysh-plugin:1.0.7'
+    }
 }
 
 apply plugin: 'ml-gradle'
+apply plugin: 'com.github.tkruse.groovysh'
 
 /**
  * This command is added to mlAppDeployer so that all the default pipelines are loaded. This gets around an issue 
@@ -31,4 +35,7 @@ repositories {
     maven {url "http://rjrudin.github.io/marklogic-java/releases"}
 }
 
-dependencies { testCompile "com.rjrudin:ml-junit:2.3" }
+dependencies {
+    testCompile "com.rjrudin:ml-junit:2.3"
+    runtime "com.rjrudin:ml-app-deployer:2.0b13"
+}

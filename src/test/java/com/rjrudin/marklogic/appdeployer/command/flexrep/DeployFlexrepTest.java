@@ -25,7 +25,7 @@ public class DeployFlexrepTest extends AbstractAppDeployerTest {
     public void configureMaster() {
         appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/flexrep-config"));
 
-        initializeAppDeployer(new DeployContentDatabasesCommand(), new DeployTriggersDatabaseCommand(),
+        initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployTriggersDatabaseCommand(),
                 new DeployCpfConfigsCommand(), new DeployDomainsCommand(), new DeployPipelinesCommand(),
                 new DeployConfigsCommand(), new DeployTargetsCommand());
 
@@ -48,11 +48,20 @@ public class DeployFlexrepTest extends AbstractAppDeployerTest {
     }
 
     private void assertConfigAndTargetAreDeployed() {
+        final String domainName = "sample-app-domain-1";
         ConfigManager configMgr = new ConfigManager(manageClient, appConfig.getContentDatabaseName());
-        configMgr.exists("sample-app-domain-1");
+        configMgr.exists(domainName);
 
-        TargetManager targetMgr = new TargetManager(manageClient, appConfig.getContentDatabaseName(),
-                "sample-app-domain-1");
-        targetMgr.exists("sample-app-domain-1-target");
+        final String targetName = "sample-app-domain-1-target";
+        TargetManager targetMgr = new TargetManager(manageClient, appConfig.getContentDatabaseName(), domainName);
+        assertTrue(targetMgr.exists(targetName));
+
+        targetMgr.disableTarget(targetName);
+        assertEquals("false",
+                targetMgr.getPropertiesAsXml(targetName).getElementValue("/node()/node()[local-name(.) = 'enabled']"));
+
+        targetMgr.enableTarget(targetName);
+        assertEquals("true",
+                targetMgr.getPropertiesAsXml(targetName).getElementValue("/node()/node()[local-name(.) = 'enabled']"));
     }
 }

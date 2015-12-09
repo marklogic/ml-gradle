@@ -51,6 +51,9 @@ public abstract class AbstractResourceManager extends AbstractManager implements
                 .getXml(getPropertiesPath(resourceNameOrId));
     }
 
+    /**
+     * Determines whether to create a new resource or update an existing one based on the contents of the payload.
+     */
     public SaveReceipt save(String payload) {
         String resourceId = getResourceId(payload);
         String label = getResourceName();
@@ -58,11 +61,7 @@ public abstract class AbstractResourceManager extends AbstractManager implements
         ResponseEntity<String> response = null;
         if (exists(resourceId)) {
             if (updateAllowed) {
-                path = getPropertiesPath(resourceId);
-                path = appendParamsAndValuesToPath(path, getUpdateResourceParams(payload));
-                logger.info(format("Found %s with name of %s, so updating at path %s", label, resourceId, path));
-                response = putPayload(manageClient, path, payload);
-                logger.info(format("Updated %s at %s", label, path));
+                return updateResource(payload, resourceId);
             } else {
                 logger.info("Resource already exists and updates are not supported, so not updating: " + resourceId);
             }
@@ -72,6 +71,24 @@ public abstract class AbstractResourceManager extends AbstractManager implements
             response = postPayload(manageClient, path, payload);
             logger.info(format("Created %s: %s", label, resourceId));
         }
+        return new SaveReceipt(resourceId, payload, path, response);
+    }
+
+    /**
+     * Most clients should just use the save method, but this is public for scenarios where a client knows an update
+     * should be performed.
+     * 
+     * @param payload
+     * @param resourceId
+     * @return
+     */
+    public SaveReceipt updateResource(String payload, String resourceId) {
+        String path = getPropertiesPath(resourceId);
+        String label = getResourceName();
+        path = appendParamsAndValuesToPath(path, getUpdateResourceParams(payload));
+        logger.info(format("Found %s with name of %s, so updating at path %s", label, resourceId, path));
+        ResponseEntity<String> response = putPayload(manageClient, path, payload);
+        logger.info(format("Updated %s at %s", label, path));
         return new SaveReceipt(resourceId, payload, path, response);
     }
 
@@ -87,25 +104,28 @@ public abstract class AbstractResourceManager extends AbstractManager implements
 
     public boolean delete(String payload) {
         String resourceId = getResourceId(payload);
-        String label = getResourceName();
         if (!exists(resourceId)) {
-            logger.info(format("Could not find %s with name or ID of %s, so not deleting", label, resourceId));
+            logger.info(format("Could not find %s with name or ID of %s, so not deleting", getResourceName(), resourceId));
             return false;
         } else {
             String path = getResourcePath(resourceId);
             path = appendParamsAndValuesToPath(path, getDeleteResourceParams(payload));
-
-            logger.info(format("Deleting %s at path %s", label, path));
-            if (useAdminUser()) {
-                manageClient.deleteAsAdmin(path);
-            } else {
-                manageClient.delete(path);
-            }
-            logger.info(format("Deleted %s at path %s", label, path));
+            deleteAtPath(path);
             return true;
         }
     }
 
+    public void deleteAtPath(String path) {
+        String label = getResourceName();
+        logger.info(format("Deleting %s at path %s", label, path));
+        if (useAdminUser()) {
+            manageClient.deleteAsAdmin(path);
+        } else {
+            manageClient.delete(path);
+        }
+        logger.info(format("Deleted %s at path %s", label, path));
+    }
+    
     protected String appendParamsAndValuesToPath(String path, String... paramsAndValues) {
         if (paramsAndValues.length > 0) {
             path += "?";

@@ -22,4 +22,16 @@ public class ConfigManager extends AbstractResourceManager {
         return "domain-name";
     }
 
+    /**
+     * Iterate over every config and delete all the targets first, then delete the config.
+     */
+    public void deleteAllConfigs() {
+        for (String nameref : getAsXml().getListItemNameRefs()) {
+            TargetManager mgr = new TargetManager(getManageClient(), this.databaseIdOrName, nameref);
+            for (String idref : mgr.getAsXml().getListItemIdRefs()) {
+                mgr.deleteByIdField(idref);
+            }
+            deleteByIdField(nameref);
+        }
+    }
 }

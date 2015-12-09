@@ -19,8 +19,12 @@ public class DatabaseManager extends AbstractResourceManager {
     public void clearDatabase(String databaseIdOrName) {
         String path = format("/manage/v2/databases/%s", databaseIdOrName);
         logger.info(format("Clearing database %s", databaseIdOrName));
-        getManageClient().postJson(path, "{\"operation\":\"clear-database\"}");
-        logger.info(format("Cleared database %s", databaseIdOrName));
+        try {
+            getManageClient().postJson(path, "{\"operation\":\"clear-database\"}");
+            logger.info(format("Cleared database %s", databaseIdOrName));
+        } catch (Exception e) {
+            logger.error("Unable to clear database; cause: " + e.getMessage());
+        }
     }
 
     public void deleteByName(String databaseName) {

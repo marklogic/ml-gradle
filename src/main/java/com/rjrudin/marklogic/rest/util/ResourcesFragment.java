@@ -1,5 +1,7 @@
 package com.rjrudin.marklogic.rest.util;
 
+import java.util.List;
+
 import org.jdom2.Namespace;
 
 /**
@@ -36,5 +38,18 @@ public class ResourcesFragment extends Fragment {
                 + "[*[local-name(.) = 'nameref'] = '%s' or *[local-name(.) = 'idref'] = '%s']/*[local-name(.) = '%s']";
         xpath = String.format(xpath, resourceIdOrName, resourceIdOrName, elementLocalName);
         return getElementValue(xpath);
+    }
+
+    public List<String> getListItemIdRefs() {
+        return getListItemValues("idref");
+    }
+
+    public List<String> getListItemNameRefs() {
+        return getListItemValues("nameref");
+    }
+
+    public List<String> getListItemValues(String elementName) {
+        String xpath = "/node()/*[local-name(.) = 'list-items']/node()/*[local-name(.) = '%s']";
+        return getElementValues(String.format(xpath, elementName));
     }
 }

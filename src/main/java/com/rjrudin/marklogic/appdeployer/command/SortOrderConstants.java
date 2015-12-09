@@ -31,9 +31,6 @@ public abstract class SortOrderConstants {
     public static Integer DEPLOY_AMPS = 450;
 
     public static Integer DEPLOY_TRIGGERS = 700;
-    public static Integer DEPLOY_ALERT_CONFIGS = 710;
-    public static Integer DEPLOY_ALERT_ACTIONS = 720;
-    public static Integer DEPLOY_ALERT_RULES = 730;
     
     public static Integer DEPLOY_SCHEDULED_TASKS = 800;
 
@@ -41,6 +38,10 @@ public abstract class SortOrderConstants {
     public static Integer DEPLOY_PIPELINES = 905;
     public static Integer DEPLOY_DOMAINS = 910;
     public static Integer DEPLOY_CPF_CONFIGS = 920;
+
+    public static Integer DEPLOY_ALERT_CONFIGS = 950;
+    public static Integer DEPLOY_ALERT_ACTIONS = 960;
+    public static Integer DEPLOY_ALERT_RULES = 970;
 
     public static Integer DEPLOY_FLEXREP_CONFIGS = 1000;
     public static Integer DEPLOY_FLEXREP_TARGETS = 1010;

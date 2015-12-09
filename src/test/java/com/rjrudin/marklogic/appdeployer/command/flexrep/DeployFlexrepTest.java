@@ -35,6 +35,11 @@ public class DeployFlexrepTest extends AbstractAppDeployerTest {
         // Run deploy again to make sure nothing blows up
         appDeployer.deploy(appConfig);
         assertConfigAndTargetAreDeployed();
+
+        ConfigManager mgr = new ConfigManager(manageClient, appConfig.getContentDatabaseName());
+        mgr.deleteAllConfigs();
+        assertTrue("All of the configs should have been deleted, including their targets", mgr.getAsXml()
+                .getListItemIdRefs().isEmpty());
     }
 
     @Test

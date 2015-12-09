@@ -8,6 +8,7 @@ import com.rjrudin.marklogic.appdeployer.command.databases.DeployContentDatabase
 import com.rjrudin.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
 import com.rjrudin.marklogic.mgmt.ResourceManager;
 import com.rjrudin.marklogic.mgmt.alert.AlertActionManager;
+import com.rjrudin.marklogic.mgmt.alert.AlertConfigManager;
 import com.rjrudin.marklogic.mgmt.alert.AlertRuleManager;
 import com.rjrudin.marklogic.rest.util.Fragment;
 import com.rjrudin.marklogic.rest.util.ResourcesFragment;
@@ -41,14 +42,6 @@ public class ManageAlertActionsAndRulesTest extends AbstractManageResourceTest {
     }
 
     /**
-     * No need to do anything here, as "undo" isn't yet supported for alert stuff (for now, they're deleted when the
-     * content database is deleted).
-     */
-    @Override
-    protected void verifyResourcesWereDeleted(ResourceManager mgr) {
-    }
-
-    /**
      * Verify that both our action and our rule are present.
      */
     @Override
@@ -73,4 +66,25 @@ public class ManageAlertActionsAndRulesTest extends AbstractManageResourceTest {
         Fragment f = ruleMgr.getPropertiesAsXml("my-rule");
         assertEquals("log to ErrorLog.txt", f.getElementValue("/arp:alert-rule-properties/arp:description"));
     }
+
+    /**
+     * The command doesn't yet support "undo", but we can use this method to test deleting all the alert stuff ourselves
+     * from the content database, before the content database is deleted.
+     */
+    @Override
+    protected void afterResourcesCreatedAgain() {
+        AlertConfigManager mgr = new AlertConfigManager(manageClient, appConfig.getContentDatabaseName());
+        mgr.deleteAllConfigs();
+        assertTrue("All of the alert configs should have been deleted", mgr.getAsXml().getListItemIdRefs().isEmpty());
+    }
+
+    /**
+     * Nothing to do here, since the alert stuff is deleted when the content database is deleted.
+     */
+    @Override
+    protected void verifyResourcesWereDeleted(ResourceManager mgr) {
+        
+    }
+    
+    
 }

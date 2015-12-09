@@ -45,8 +45,19 @@ public class AlertConfigManager extends AbstractResourceManager {
             if (logger.isInfoEnabled()) {
                 logger.info("Immediately updating alert config after it's been created to ensure that CPF domains are set");
             }
-            super.save(payload);
+            // Calling updateResource instead of save to avoid any chance of an infinite loop
+            return super.updateResource(payload, getResourceId(payload));
         }
         return receipt;
+    }
+
+    /**
+     * Deletes all alert configs, which will also delete all actions and rules associated with each config (this is
+     * contrary to deleting a flexrep config, where the associated targets must first be deleted).
+     */
+    public void deleteAllConfigs() {
+        for (String nameref : getAsXml().getListItemNameRefs()) {
+            deleteByIdField(nameref);
+        }
     }
 }

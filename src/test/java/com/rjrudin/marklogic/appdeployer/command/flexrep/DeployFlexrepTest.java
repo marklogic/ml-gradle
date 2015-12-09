@@ -61,12 +61,17 @@ public class DeployFlexrepTest extends AbstractAppDeployerTest {
         TargetManager targetMgr = new TargetManager(manageClient, appConfig.getContentDatabaseName(), domainName);
         assertTrue(targetMgr.exists(targetName));
 
+        final String enabledXpath = "/node()/node()[local-name(.) = 'enabled']";
         targetMgr.disableTarget(targetName);
-        assertEquals("false",
-                targetMgr.getPropertiesAsXml(targetName).getElementValue("/node()/node()[local-name(.) = 'enabled']"));
+        assertEquals("false", targetMgr.getPropertiesAsXml(targetName).getElementValue(enabledXpath));
 
         targetMgr.enableTarget(targetName);
-        assertEquals("true",
-                targetMgr.getPropertiesAsXml(targetName).getElementValue("/node()/node()[local-name(.) = 'enabled']"));
+        assertEquals("true", targetMgr.getPropertiesAsXml(targetName).getElementValue(enabledXpath));
+
+        targetMgr.disableAllTargets();
+        assertEquals("false", targetMgr.getPropertiesAsXml(targetName).getElementValue(enabledXpath));
+
+        targetMgr.enableAllTargets();
+        assertEquals("true", targetMgr.getPropertiesAsXml(targetName).getElementValue(enabledXpath));
     }
 }

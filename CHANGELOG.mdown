@@ -1,5 +1,10 @@
 # ml-app-deployer releases
 
+## 2.0b14
+
+* Added disable/enable methods to TargetManager
+* Fixed bug with getAsXml(String resourceNameOrId) on ServerManager (it was omitting the required group-id param)
+
 ## 2.0b13
 
 * Added SetSslFipsEnabledCommand

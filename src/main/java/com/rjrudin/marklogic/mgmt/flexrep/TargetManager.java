@@ -19,6 +19,18 @@ public class TargetManager extends AbstractResourceManager {
         return format("/manage/v2/databases/%s/flexrep/configs/%s/targets", databaseIdOrName, configIdOrName);
     }
 
+    public void disableAllTargets() {
+        for (String name : getAsXml().getListItemNameRefs()) {
+            disableTarget(name);
+        }
+    }
+
+    public void enableAllTargets() {
+        for (String name : getAsXml().getListItemNameRefs()) {
+            enableTarget(name);
+        }
+    }
+
     public void disableTarget(String targetIdOrName) {
         getManageClient().putJson(getPropertiesPath(targetIdOrName), "{\"enabled\":false}");
     }

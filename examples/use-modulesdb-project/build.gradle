@@ -1,0 +1,19 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {url "http://developer.marklogic.com/maven2/"}
+        maven {url "http://rjrudin.github.io/marklogic-java/releases"}
+    }
+    dependencies { classpath mlGradleDependency }
+}
+
+apply plugin: 'ml-gradle'
+
+ext {
+    mlAppConfig {
+        modulesDatabaseName = "Modules"
+    }
+    
+    // Gotta tell ml-gradle not to delete the modules database when we undeploy this
+    mlAppDeployer.getCommand("DeployRestApiServersCommand").setDeleteModulesDatabase(false)
+}

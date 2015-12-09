@@ -16,4 +16,7 @@ ext {
     
     // Gotta tell ml-gradle not to delete the modules database when we undeploy this
     mlAppDeployer.getCommand("DeployRestApiServersCommand").setDeleteModulesDatabase(false)
+    
+    // Here's an example of not creating a REST API server at all - just remove the command
+    //mlAppDeployer.getCommands().remove(mlAppDeployer.getCommand("DeployRestApiServersCommand"))
 }

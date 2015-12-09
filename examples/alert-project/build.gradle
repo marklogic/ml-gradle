@@ -10,8 +10,8 @@ buildscript {
     }
 }
 
-apply plugin: 'ml-gradle'
 apply plugin: 'com.github.tkruse.groovysh'
+apply plugin: 'ml-gradle'
 
 /**
  * This command is added to mlAppDeployer so that all the default pipelines are loaded. This gets around an issue 
@@ -37,5 +37,5 @@ repositories {
 
 dependencies {
     testCompile "com.rjrudin:ml-junit:2.3"
-    runtime "com.rjrudin:ml-app-deployer:2.0b13"
+    runtime "com.rjrudin:ml-app-deployer:2.0r1"
 }

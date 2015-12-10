@@ -99,6 +99,7 @@ import com.rjrudin.marklogic.mgmt.ManageConfig
 import com.rjrudin.marklogic.mgmt.admin.AdminConfig
 import com.rjrudin.marklogic.mgmt.admin.AdminManager
 import com.rjrudin.marklogic.modulesloader.ssl.SimpleX509TrustManager
+import com.rjrudin.marklogic.modulesloader.xcc.DefaultDocumentFormatGetter
 
 class MarkLogicPlugin implements Plugin<Project> {
 
@@ -162,7 +163,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlDeployFlexrep", type: DeployFlexrepTask, group: flexrepGroup, description: "Deploy Flexrep configs and targets in the configuration directory")
         project.task("mlDisableAllFlexrepTargets", type: DisableAllFlexrepTargetsTask, group: flexrepGroup, description: "Disable every target on every flexrep config")
         project.task("mlEnableAllFlexrepTargets", type: EnableAllFlexrepTargetsTask, group: flexrepGroup, description: "Enable every target on every flexrep config")
-        
+
         String forestGroup = "ml-gradle Forest"
         project.task("mlConfigureForestReplicas", type: ConfigureForestReplicasTask, group: forestGroup, description: "Deprecated - configure forest replicas via the command.forestNamesAndReplicaCounts map")
         project.task("mlDeleteForestReplicas", type: DeleteForestReplicasTask, group: forestGroup, description: "Delete forest replicas via the command.forestNamesAndReplicaCounts map")
@@ -448,6 +449,15 @@ class MarkLogicPlugin implements Plugin<Project> {
             logger.info("Setting module permissions to: " + perms)
             lmc.setDefaultAssetRolesAndCapabilities(perms)
         }
+        if (project.hasProperty("mlAdditionalBinaryExtensions")) {
+            DefaultDocumentFormatGetter getter = new DefaultDocumentFormatGetter()
+            for (String val : project.property("mlAdditionalBinaryExtensions").split(",")) {
+                logger.info("Adding binary extension for loading modules: " + val)
+                getter.getBinaryExtensions().add(val);
+            }
+            lmc.setDocumentFormatGetter(getter)
+        }
+
         lmc.initializeDefaultModulesLoader(context)
         project.extensions.add("mlLoadModulesCommand", lmc)
         commands.add(lmc)

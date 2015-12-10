@@ -2,8 +2,10 @@
 
 ## 2.0b14
 
-* Added disable/enable methods to TargetManager
+* Added disableAll/enableAll methods to ConfigManager (flexrep)
+* Added disable/enable methods to TargetManager (flexrep)
 * Fixed bug with getAsXml(String resourceNameOrId) on ServerManager (it was omitting the required group-id param)
+* Allowing for DocumentFormatGetter to be overridden on LoadModulesCommand
 
 ## 2.0b13
 

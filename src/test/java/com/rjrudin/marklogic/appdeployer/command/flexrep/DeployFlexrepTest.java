@@ -73,5 +73,11 @@ public class DeployFlexrepTest extends AbstractAppDeployerTest {
 
         targetMgr.enableAllTargets();
         assertEquals("true", targetMgr.getPropertiesAsXml(targetName).getElementValue(enabledXpath));
+
+        configMgr.disableAllFlexrepTargets();
+        assertEquals("false", targetMgr.getPropertiesAsXml(targetName).getElementValue(enabledXpath));
+
+        configMgr.enableAllFlexrepTargets();
+        assertEquals("true", targetMgr.getPropertiesAsXml(targetName).getElementValue(enabledXpath));
     }
 }

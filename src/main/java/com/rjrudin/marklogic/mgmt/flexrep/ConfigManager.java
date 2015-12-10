@@ -34,4 +34,17 @@ public class ConfigManager extends AbstractResourceManager {
             deleteByIdField(nameref);
         }
     }
+
+    public void disableAllFlexrepTargets() {
+        for (String nameref : getAsXml().getListItemNameRefs()) {
+            new TargetManager(getManageClient(), this.databaseIdOrName, nameref).disableAllTargets();
+        }
+    }
+
+    public void enableAllFlexrepTargets() {
+        for (String nameref : getAsXml().getListItemNameRefs()) {
+            new TargetManager(getManageClient(), this.databaseIdOrName, nameref).enableAllTargets();
+        }
+    }
+
 }

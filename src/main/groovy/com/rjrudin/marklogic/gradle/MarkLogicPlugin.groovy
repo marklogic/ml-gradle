@@ -45,7 +45,7 @@ import com.rjrudin.marklogic.gradle.task.PrintCommandsTask
 import com.rjrudin.marklogic.gradle.task.UndeployAppTask
 import com.rjrudin.marklogic.gradle.task.admin.InitTask
 import com.rjrudin.marklogic.gradle.task.admin.InstallAdminTask
-import com.rjrudin.marklogic.gradle.task.alert.DeleteAllAlertConfigsTask;
+import com.rjrudin.marklogic.gradle.task.alert.DeleteAllAlertConfigsTask
 import com.rjrudin.marklogic.gradle.task.alert.DeployAlertingTask
 import com.rjrudin.marklogic.gradle.task.client.CreateResourceTask
 import com.rjrudin.marklogic.gradle.task.client.CreateTransformTask
@@ -54,7 +54,7 @@ import com.rjrudin.marklogic.gradle.task.client.PrepareRestApiDependenciesTask
 import com.rjrudin.marklogic.gradle.task.client.WatchTask
 import com.rjrudin.marklogic.gradle.task.cluster.DisableSslFipsTask
 import com.rjrudin.marklogic.gradle.task.cluster.EnableSslFipsTask
-import com.rjrudin.marklogic.gradle.task.cluster.RestartClusterTask;
+import com.rjrudin.marklogic.gradle.task.cluster.RestartClusterTask
 import com.rjrudin.marklogic.gradle.task.cpf.DeployCpfTask
 import com.rjrudin.marklogic.gradle.task.cpf.LoadDefaultPipelinesTask
 import com.rjrudin.marklogic.gradle.task.databases.ClearContentDatabaseTask
@@ -62,8 +62,10 @@ import com.rjrudin.marklogic.gradle.task.databases.ClearModulesDatabaseTask
 import com.rjrudin.marklogic.gradle.task.databases.ClearSchemasDatabaseTask
 import com.rjrudin.marklogic.gradle.task.databases.ClearTriggersDatabaseTask
 import com.rjrudin.marklogic.gradle.task.databases.DeployDatabasesTask
-import com.rjrudin.marklogic.gradle.task.flexrep.DeleteAllFlexrepConfigsTask;
+import com.rjrudin.marklogic.gradle.task.flexrep.DeleteAllFlexrepConfigsTask
 import com.rjrudin.marklogic.gradle.task.flexrep.DeployFlexrepTask
+import com.rjrudin.marklogic.gradle.task.flexrep.DisableAllFlexrepTargetsTask
+import com.rjrudin.marklogic.gradle.task.flexrep.EnableAllFlexrepTargetsTask
 import com.rjrudin.marklogic.gradle.task.forests.ConfigureForestReplicasTask
 import com.rjrudin.marklogic.gradle.task.forests.DeleteForestReplicasTask
 import com.rjrudin.marklogic.gradle.task.forests.DeployForestReplicasTask
@@ -87,7 +89,7 @@ import com.rjrudin.marklogic.gradle.task.security.UndeployRolesTask
 import com.rjrudin.marklogic.gradle.task.security.UndeploySecurityTask
 import com.rjrudin.marklogic.gradle.task.security.UndeployUsersTask
 import com.rjrudin.marklogic.gradle.task.servers.DeployServersTask
-import com.rjrudin.marklogic.gradle.task.tasks.DeleteAllTasksTask;
+import com.rjrudin.marklogic.gradle.task.tasks.DeleteAllTasksTask
 import com.rjrudin.marklogic.gradle.task.tasks.DeployTasksTask
 import com.rjrudin.marklogic.gradle.task.tasks.UndeployTasksTask
 import com.rjrudin.marklogic.gradle.task.trigger.DeployTriggersTask
@@ -158,7 +160,9 @@ class MarkLogicPlugin implements Plugin<Project> {
         String flexrepGroup = "ml-gradle Flexible Replication"
         project.task("mlDeleteAllFlexrepConfigs", type: DeleteAllFlexrepConfigsTask, group: flexrepGroup, description: "Delete all Flexrep configs and their associated targets")
         project.task("mlDeployFlexrep", type: DeployFlexrepTask, group: flexrepGroup, description: "Deploy Flexrep configs and targets in the configuration directory")
-
+        project.task("mlDisableAllFlexrepTargets", type: DisableAllFlexrepTargetsTask, group: flexrepGroup, description: "Disable every target on every flexrep config")
+        project.task("mlEnableAllFlexrepTargets", type: EnableAllFlexrepTargetsTask, group: flexrepGroup, description: "Enable every target on every flexrep config")
+        
         String forestGroup = "ml-gradle Forest"
         project.task("mlConfigureForestReplicas", type: ConfigureForestReplicasTask, group: forestGroup, description: "Deprecated - configure forest replicas via the command.forestNamesAndReplicaCounts map")
         project.task("mlDeleteForestReplicas", type: DeleteForestReplicasTask, group: forestGroup, description: "Delete forest replicas via the command.forestNamesAndReplicaCounts map")

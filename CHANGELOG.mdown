@@ -1,5 +1,10 @@
 # ml-gradle releases
 
+## 2.0b14
+
+* Now supports mlAdditionalBinaryExtensions
+* Added targets for disabling/enabling all flexrep configs
+
 ## 2.0b13
 
 * Added mlUndeployTasks

@@ -13,7 +13,7 @@ import com.rjrudin.marklogic.modulesloader.ModulesLoader;
 import com.rjrudin.marklogic.modulesloader.impl.DefaultModulesLoader;
 import com.rjrudin.marklogic.modulesloader.impl.TestServerModulesFinder;
 import com.rjrudin.marklogic.modulesloader.impl.XccAssetLoader;
-import com.rjrudin.marklogic.modulesloader.xcc.DefaultDocumentFormatGetter;
+import com.rjrudin.marklogic.modulesloader.xcc.DocumentFormatGetter;
 
 /**
  * Command for loading modules via an instance of DefaultModulesLoader, which depends on an instance of XccAssetLoader -
@@ -28,8 +28,8 @@ public class LoadModulesCommand extends AbstractCommand {
     private String defaultAssetRolesAndCapabilities = "rest-admin,read,rest-admin,update,rest-extension-user,execute";
     private String customAssetRolesAndCapabilities;
 
-    // Comma-delimited list of binary extensions that are passed onto XccAssetLoader
-    private String additionalBinaryExtensions;
+    // If set, will override the DocumentFormatGetter on the XccAssetLoader that's created
+    private DocumentFormatGetter documentFormatGetter;
 
     private String xccUsername;
     private String xccPassword;
@@ -147,13 +147,8 @@ public class LoadModulesCommand extends AbstractCommand {
             l.setFileFilter(assetFileFilter);
         }
 
-        if (additionalBinaryExtensions != null) {
-            DefaultDocumentFormatGetter getter = new DefaultDocumentFormatGetter();
-            String[] values = additionalBinaryExtensions.split(",");
-            for (String val : values) {
-                getter.getBinaryExtensions().add(val);
-            }
-            l.setDocumentFormatGetter(getter);
+        if (documentFormatGetter != null) {
+            l.setDocumentFormatGetter(documentFormatGetter);
         }
 
         return l;
@@ -187,7 +182,7 @@ public class LoadModulesCommand extends AbstractCommand {
         return modulesLoader;
     }
 
-    public void setAdditionalBinaryExtensions(String additionalBinaryExtensions) {
-        this.additionalBinaryExtensions = additionalBinaryExtensions;
+    public void setDocumentFormatGetter(DocumentFormatGetter documentFormatGetter) {
+        this.documentFormatGetter = documentFormatGetter;
     }
 }

@@ -354,4 +354,16 @@ public class DefaultModulesLoader extends LoggingObject implements com.rjrudin.m
     public void setXccAssetLoader(XccAssetLoader xccAssetLoader) {
         this.xccAssetLoader = xccAssetLoader;
     }
+
+    public XccAssetLoader getXccAssetLoader() {
+        return xccAssetLoader;
+    }
+
+    public ExtensionMetadataProvider getExtensionMetadataProvider() {
+        return extensionMetadataProvider;
+    }
+
+    public ModulesManager getModulesManager() {
+        return modulesManager;
+    }
 }

@@ -1,0 +1,23 @@
+# ml-gradle releases
+
+## 2.3.1
+
+## 2.3
+
+* Reworked ModulesLoader to take a ModulesFinder as an argument
+
+## 2.2.2
+
+* XccAssetLoader now supports a FileFilter; removed ModulesWatcher, it's now all in ml-gradle
+
+## 2.2.1
+
+* Added SSL support to XccAssetLoader and DatabaseClientManager; added SimpleTrustManager
+
+## 2.2
+
+* Always loading modules via XCC
+
+## 2.1
+
+* Repackaged

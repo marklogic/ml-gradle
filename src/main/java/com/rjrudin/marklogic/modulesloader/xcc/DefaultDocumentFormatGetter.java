@@ -18,7 +18,7 @@ public class DefaultDocumentFormatGetter implements DocumentFormatGetter {
             return DocumentFormat.JSON;
         } else if (name.endsWith(".swf") || name.endsWith(".jpeg") || name.endsWith(".jpg") || name.endsWith(".png")
                 || name.endsWith(".gif") || name.endsWith(".svg") || name.endsWith(".ttf") || name.endsWith(".eot")
-                || name.endsWith(".woff") || name.endsWith(".cur")) {
+                || name.endsWith(".woff") || name.endsWith(".cur") || name.endsWith(".ico")) {
             return DocumentFormat.BINARY;
         }
         return DocumentFormat.TEXT;

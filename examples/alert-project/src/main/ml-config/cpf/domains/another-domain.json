@@ -1,0 +1,9 @@
+{
+   "domain-name": "another-domain",
+   "description": "Another CPF domain for alerting",
+   "scope": "collection",
+   "uri": "another",
+   "eval-module": "%%MODULES_DATABASE%%",
+   "eval-root": "/",
+   "pipeline": ["Status Change Handling", "Alerting"]
+ }

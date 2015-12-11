@@ -1,0 +1,10 @@
+<alert-config-properties xmlns="http://marklogic.com/manage/alert-config/properties">
+  <uri>another-alert-config</uri>
+  <name>Another Alerting App</name>
+  <description>Another alerting config for this sample application</description>
+  <triggers />
+  <domains>
+    <domain>another-domain</domain>
+  </domains>
+  <options />
+</alert-config-properties>

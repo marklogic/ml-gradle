@@ -13,11 +13,6 @@ public class ServerManager extends AbstractResourceManager {
     }
 
     @Override
-    protected String[] getDeleteResourceParams(String payload) {
-        return new String[] { "group-id", groupName };
-    }
-
-    @Override
     public String getResourcePath(String resourceNameOrId) {
         return format("%s/%s?group-id=%s", getResourcesPath(), resourceNameOrId, groupName);
     }

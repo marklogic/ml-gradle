@@ -16,7 +16,7 @@ public class ForestManager extends AbstractResourceManager {
     public final static String DELETE_FULL = "full";
     public final static String DELETE_CONFIG = "config-only";
 
-    private String deleteLevel;
+    private String deleteLevel = DELETE_FULL;
 
     public ForestManager(ManageClient client) {
         super(client);

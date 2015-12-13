@@ -51,6 +51,9 @@ public abstract class AbstractResourceManager extends AbstractManager implements
                 .getXml(getPropertiesPath(resourceNameOrId));
     }
 
+    public String getAsJson(String resourceNameOrId) {
+        return manageClient.getJson(getPropertiesPath(resourceNameOrId));
+    }
     /**
      * Determines whether to create a new resource or update an existing one based on the contents of the payload.
      */
@@ -127,7 +130,7 @@ public abstract class AbstractResourceManager extends AbstractManager implements
     }
     
     protected String appendParamsAndValuesToPath(String path, String... paramsAndValues) {
-        if (paramsAndValues.length > 0) {
+        if (paramsAndValues != null && paramsAndValues.length > 0) {
             path += "?";
             for (int i = 0; i < paramsAndValues.length; i += 2) {
                 if (i > 0) {

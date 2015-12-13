@@ -59,5 +59,12 @@ public interface ResourceManager {
      * @param resourceNameOrId
      * @return
      */
+    public String getAsJson(String resourceNameOrId);
+    
+    /**
+     * 
+     * @param resourceNameOrId
+     * @return
+     */
     public Fragment getPropertiesAsXml(String resourceNameOrId);
 }

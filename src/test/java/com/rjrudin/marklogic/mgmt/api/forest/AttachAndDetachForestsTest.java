@@ -1,0 +1,63 @@
+package com.rjrudin.marklogic.mgmt.api.forest;
+
+import org.junit.After;
+import org.junit.Test;
+
+import com.rjrudin.marklogic.mgmt.api.AbstractApiTest;
+import com.rjrudin.marklogic.mgmt.api.database.Database;
+
+public class AttachAndDetachForestsTest extends AbstractApiTest {
+
+    private Database db;
+    private Forest f1, f2;
+
+    private final static String DB_NAME = "api-db";
+    private final static String FOREST1_NAME = "api-forest-1";
+    private final static String FOREST2_NAME = "api-forest-2";
+
+    @After
+    public void teardown() {
+        deleteIfExists(db, f1, f2);
+    }
+
+    @Test
+    public void test() {
+        // Create a database
+        db = api.newDatabase(DB_NAME);
+        assertFalse(db.exists());
+        db.save();
+        assertTrue(db.exists());
+
+        // Attach a forest using one-liner
+        f1 = db.attachNewForest(FOREST1_NAME);
+        assertTrue(f1.exists());
+        db = api.getDatabase(DB_NAME);
+        assertTrue(db.getForest().contains(FOREST1_NAME));
+
+        // Attach a forest using multiple steps
+        f2 = api.newForest("api-forest-2");
+        assertFalse(f2.exists());
+        f2.save();
+        assertTrue(f2.exists());
+        db.attach(f2);
+        db = api.getDatabase(DB_NAME);
+        assertTrue(db.getForest().contains(FOREST2_NAME));
+
+        // Detach the 2nd forest
+        db.detach(f2);
+        assertTrue(f2.exists());
+        db = api.getDatabase(DB_NAME);
+        assertTrue(db.getForest().contains(FOREST1_NAME));
+        assertFalse(db.getForest().contains(FOREST2_NAME));
+
+        // Delete the database
+        db.delete();
+        assertFalse(db.exists());
+        assertFalse(f1.exists());
+        assertTrue(f2.exists());
+
+        // Delete the detached forest
+        f2.delete();
+        assertFalse(f2.exists());
+    }
+}

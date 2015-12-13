@@ -3,7 +3,6 @@ package com.rjrudin.marklogic.mgmt;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -11,8 +10,6 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 
 import com.rjrudin.marklogic.junit.BaseTestHelper;
 import com.rjrudin.marklogic.junit.spring.LoggingTestExecutionListener;
-import com.rjrudin.marklogic.mgmt.ManageClient;
-import com.rjrudin.marklogic.mgmt.ManageConfig;
 import com.rjrudin.marklogic.mgmt.admin.AdminConfig;
 import com.rjrudin.marklogic.mgmt.admin.AdminManager;
 
@@ -33,8 +30,6 @@ public abstract class AbstractMgmtTest extends BaseTestHelper {
     // Intended to be used by subclasses
     protected ManageClient manageClient;
     protected AdminManager adminManager;
-
-    protected static HttpStatus.Series[] httpStatus;
 
     @Before
     public void initializeManageClient() {

@@ -19,6 +19,8 @@ public class RestTemplateUtil {
         prov.setCredentials(new AuthScope(host, port, AuthScope.ANY_REALM), new UsernamePasswordCredentials(username,
                 password));
         HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(prov).build();
-        return new RestTemplate(new HttpComponentsClientHttpRequestFactory(client));
+        RestTemplate rt = new RestTemplate(new HttpComponentsClientHttpRequestFactory(client));
+        rt.setErrorHandler(new MgmtResponseErrorHandler());
+        return rt;
     }
 }

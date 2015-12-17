@@ -62,8 +62,8 @@ public class AdminManager extends AbstractManager {
                     return HttpStatus.ACCEPTED.equals(response.getStatusCode());
                 } catch (HttpClientErrorException hcee) {
                     String body = hcee.getResponseBodyAsString();
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Response body: " + body);
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("Response body: " + body);
                     }
                     if (body != null && body.contains("MANAGE-ALREADYINIT")) {
                         logger.info("MarkLogic has already been initialized");
@@ -147,8 +147,8 @@ public class AdminManager extends AbstractManager {
             }
         } catch (Exception ex) {
             logger.info("Waiting for MarkLogic to restart...");
-            if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception while waiting for MarkLogic to restart: " + ex.getMessage(), ex);
+            if (logger.isTraceEnabled()) {
+                logger.trace("Caught exception while waiting for MarkLogic to restart: " + ex.getMessage(), ex);
             }
             waitForRestart();
         }

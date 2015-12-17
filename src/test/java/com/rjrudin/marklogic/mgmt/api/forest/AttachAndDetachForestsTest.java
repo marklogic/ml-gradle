@@ -23,7 +23,7 @@ public class AttachAndDetachForestsTest extends AbstractApiTest {
     @Test
     public void test() {
         // Create a database
-        db = api.newDatabase(DB_NAME);
+        db = api.db(DB_NAME);
         assertFalse(db.exists());
         db.save();
         assertTrue(db.exists());
@@ -31,22 +31,22 @@ public class AttachAndDetachForestsTest extends AbstractApiTest {
         // Attach a forest using one-liner
         f1 = db.attachNewForest(FOREST1_NAME);
         assertTrue(f1.exists());
-        db = api.getDatabase(DB_NAME);
+        db = api.db(DB_NAME);
         assertTrue(db.getForest().contains(FOREST1_NAME));
 
         // Attach a forest using multiple steps
-        f2 = api.newForest("api-forest-2");
+        f2 = api.forest("api-forest-2");
         assertFalse(f2.exists());
         f2.save();
         assertTrue(f2.exists());
         db.attach(f2);
-        db = api.getDatabase(DB_NAME);
+        db = api.db(DB_NAME);
         assertTrue(db.getForest().contains(FOREST2_NAME));
 
         // Detach the 2nd forest
         db.detach(f2);
         assertTrue(f2.exists());
-        db = api.getDatabase(DB_NAME);
+        db = api.db(DB_NAME);
         assertTrue(db.getForest().contains(FOREST1_NAME));
         assertFalse(db.getForest().contains(FOREST2_NAME));
 

@@ -1,5 +1,7 @@
 package com.rjrudin.marklogic.mgmt.restapis;
 
+import org.springframework.http.ResponseEntity;
+
 import com.rjrudin.marklogic.client.LoggingObject;
 import com.rjrudin.marklogic.mgmt.ManageClient;
 import com.rjrudin.marklogic.rest.util.Fragment;
@@ -15,14 +17,16 @@ public class RestApiManager extends LoggingObject {
         this.client = client;
     }
 
-    public void createRestApi(String name, String json) {
+    public ResponseEntity<String> createRestApi(String name, String json) {
         logger.info("Checking for existence of REST API with name: " + name);
         if (restApiServerExists(name)) {
             logger.info("REST API server already exists with name: " + name);
+            return null;
         } else {
             logger.info("Creating REST API: " + json);
-            client.postJson("/v1/rest-apis", json);
+            ResponseEntity<String> re = client.postJson("/v1/rest-apis", json);
             logger.info("Created REST API");
+            return re;
         }
     }
 

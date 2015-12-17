@@ -26,40 +26,10 @@ public class ManageConfig extends RestConfig {
         setAdminPassword(password);
     }
 
-    /**
-     * Convenience method for building a new instance from the following system properties: mlManageHost, mlManagePort,
-     * mlManageUsername, mlManagePassword, mlAdminUsername, and mlAdminPassword. First created to assist with groovysh
-     * integration.
-     * 
-     * @return
-     */
-    public static ManageConfig buildFromSystemProps() {
-        ManageConfig c = new ManageConfig();
-        String prop = System.getProperty("mlManageHost");
-        if (prop != null) {
-            c.setHost(prop);
-        }
-        prop = System.getProperty("mlManagePort");
-        if (prop != null) {
-            c.setPort(Integer.parseInt(prop));
-        }
-        prop = System.getProperty("mlManageUsername");
-        if (prop != null) {
-            c.setUsername(prop);
-        }
-        prop = System.getProperty("mlManagePassword");
-        if (prop != null) {
-            c.setPassword(prop);
-        }
-        prop = System.getProperty("mlAdminUsername");
-        if (prop != null) {
-            c.setAdminUsername(prop);
-        }
-        prop = System.getProperty("mlAdminPassword");
-        if (prop != null) {
-            c.setAdminPassword(prop);
-        }
-        return c;
+    @Override
+    public String toString() {
+        return String.format("[ManageConfig host: %s, port: %d, username: %s, admin username: %s]", getHost(),
+                getPort(), getUsername(), adminUsername);
     }
 
     public String getAdminUsername() {

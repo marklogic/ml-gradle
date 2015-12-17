@@ -53,6 +53,11 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 
     @Override
     public void execute(CommandContext context) {
+        String str = context.getAppConfig().getDatabaseNamesAndReplicaCounts();
+        if (str != null) {
+            setDatabaseNamesAndReplicaCountsAsString(str);
+        }
+
         if ((databaseNamesAndReplicaCounts == null || databaseNamesAndReplicaCounts.isEmpty())
                 && (forestNamesAndReplicaCounts == null || forestNamesAndReplicaCounts.isEmpty())) {
             return;

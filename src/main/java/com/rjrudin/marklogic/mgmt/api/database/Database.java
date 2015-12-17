@@ -113,6 +113,17 @@ public class Database extends Resource {
         return databaseName;
     }
 
+    public void addForest(Forest f) {
+        addForest(f.getForestName());
+    }
+    
+    public void addForest(String forestName) {
+        if (forest == null) {
+            forest = new ArrayList<>();
+        }
+        forest.add(forestName);
+    }
+
     public void clear() {
         new DatabaseManager(getClient()).clearDatabase(databaseName);
     }
@@ -136,7 +147,7 @@ public class Database extends Resource {
     }
 
     public Forest attachNewForest(String forestName) {
-        Forest f = getApi().newForest(forestName);
+        Forest f = getApi().forest(forestName);
         f.save();
         attach(f);
         return f;

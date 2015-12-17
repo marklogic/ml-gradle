@@ -54,6 +54,7 @@ public abstract class AbstractResourceManager extends AbstractManager implements
     public String getAsJson(String resourceNameOrId) {
         return manageClient.getJson(getPropertiesPath(resourceNameOrId));
     }
+
     /**
      * Determines whether to create a new resource or update an existing one based on the contents of the payload.
      */
@@ -100,21 +101,23 @@ public abstract class AbstractResourceManager extends AbstractManager implements
     }
 
     @Override
-    public boolean deleteByIdField(String resourceIdFieldValue) {
+    public DeleteReceipt deleteByIdField(String resourceIdFieldValue) {
         String payload = "{\"%s\":\"%s\"}";
         return delete(format(payload, getIdFieldName(), resourceIdFieldValue));
     }
 
-    public boolean delete(String payload) {
+    @Override
+    public DeleteReceipt delete(String payload) {
         String resourceId = getResourceId(payload);
         if (!exists(resourceId)) {
-            logger.info(format("Could not find %s with name or ID of %s, so not deleting", getResourceName(), resourceId));
-            return false;
+            logger.info(format("Could not find %s with name or ID of %s, so not deleting", getResourceName(),
+                    resourceId));
+            return new DeleteReceipt(resourceId, null, false);
         } else {
             String path = getResourcePath(resourceId);
             path = appendParamsAndValuesToPath(path, getDeleteResourceParams(payload));
             deleteAtPath(path);
-            return true;
+            return new DeleteReceipt(resourceId, path, true);
         }
     }
 
@@ -128,7 +131,7 @@ public abstract class AbstractResourceManager extends AbstractManager implements
         }
         logger.info(format("Deleted %s at path %s", label, path));
     }
-    
+
     protected String appendParamsAndValuesToPath(String path, String... paramsAndValues) {
         if (paramsAndValues != null && paramsAndValues.length > 0) {
             path += "?";

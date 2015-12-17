@@ -44,7 +44,7 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
     protected abstract List<Command> getCommands();
 
     public void deploy(AppConfig appConfig) {
-        logger.info(format("Deploying app %s with config dir of: %s", appConfig.getName(), appConfig.getConfigDir()
+        logger.info(format("Deploying app %s with config dir of: %s\n", appConfig.getName(), appConfig.getConfigDir()
                 .getBaseDir().getAbsolutePath()));
 
         List<Command> commands = getCommands();
@@ -53,16 +53,17 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
         CommandContext context = new CommandContext(appConfig, manageClient, adminManager);
 
         for (Command command : commands) {
-            logger.info(format("Invoking command [%s] with sort order [%d]", command.getClass().getName(),
-                    command.getExecuteSortOrder()));
+            String name = command.getClass().getName();
+            logger.info(format("Executing command [%s] with sort order [%d]", name, command.getExecuteSortOrder()));
             command.execute(context);
+            logger.info(format("Finished executing command [%s]\n", name));
         }
 
         logger.info(format("Deployed app %s", appConfig.getName()));
     }
 
     public void undeploy(AppConfig appConfig) {
-        logger.info(format("Undeploying app %s with config dir: %s", appConfig.getName(), appConfig.getConfigDir()
+        logger.info(format("Undeploying app %s with config dir: %s\n", appConfig.getName(), appConfig.getConfigDir()
                 .getBaseDir().getAbsolutePath()));
 
         List<Command> commands = getCommands();
@@ -77,11 +78,10 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
         Collections.sort(undoableCommands, new UndoComparator());
 
         for (UndoableCommand command : undoableCommands) {
-            logger.info(format("Invoking command [%s] with sort order [%d]", command.getClass().getName(),
-                    command.getUndoSortOrder()));
-
-            CommandContext context = new CommandContext(appConfig, manageClient, adminManager);
-            command.undo(context);
+            String name = command.getClass().getName();
+            logger.info(format("Undoing command [%s] with sort order [%d]", name, command.getUndoSortOrder()));
+            command.undo(new CommandContext(appConfig, manageClient, adminManager));
+            logger.info(format("Finished undoing command [%s]\n", name));
         }
 
         logger.info(format("Undeployed app %s", appConfig.getName()));

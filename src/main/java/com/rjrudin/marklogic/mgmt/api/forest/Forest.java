@@ -57,7 +57,7 @@ public class Forest extends Resource {
      * set, we have to fetch it from the cluster.
      */
     @Override
-    public void save() {
+    public String save() {
         if (host == null) {
             String host = new HostManager(getClient()).getHostNames().get(0);
             if (logger.isInfoEnabled()) {
@@ -65,7 +65,7 @@ public class Forest extends Resource {
             }
             this.host = host;
         }
-        super.save();
+        return super.save();
     }
 
     public String getForestName() {

@@ -24,7 +24,13 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
         for (File resourceDir : getResourceDirs(context)) {
             if (resourceDir.exists()) {
                 ResourceManager mgr = getResourceManager(context);
+                if (logger.isInfoEnabled()) {
+                    logger.info("Processing files in directory: " + resourceDir.getAbsolutePath());
+                }
                 for (File f : listFilesInDirectory(resourceDir)) {
+                    if (logger.isInfoEnabled()) {
+                        logger.info("Processing file: " + f.getAbsolutePath());
+                    }
                     SaveReceipt receipt = saveResource(mgr, context, f);
                     afterResourceSaved(mgr, context, f, receipt);
                 }
@@ -50,8 +56,14 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
         if (deleteResourcesOnUndo) {
             for (File resourceDir : getResourceDirs(context)) {
                 if (resourceDir.exists()) {
+                    if (logger.isInfoEnabled()) {
+                        logger.info("Processing files in directory: " + resourceDir.getAbsolutePath());
+                    }
                     final ResourceManager mgr = getResourceManager(context);
                     for (File f : listFilesInDirectory(resourceDir)) {
+                        if (logger.isInfoEnabled()) {
+                            logger.info("Processing file: " + f.getAbsolutePath());
+                        }
                         deleteResource(mgr, context, f);
                     }
                 }
@@ -65,7 +77,7 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
             context.getAdminManager().invokeActionRequiringRestart(new ActionRequiringRestart() {
                 @Override
                 public boolean execute() {
-                    return mgr.delete(payload);
+                    return mgr.delete(payload).isDeleted();
                 }
             });
         } else {

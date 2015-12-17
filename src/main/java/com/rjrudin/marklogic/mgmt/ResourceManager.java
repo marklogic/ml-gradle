@@ -31,7 +31,7 @@ public interface ResourceManager {
      *            a JSON or XML payload with the resource ID field in it
      * @return true if a resource was deleted; false otherwise
      */
-    public boolean delete(String payload);
+    public DeleteReceipt delete(String payload);
 
     /**
      * Deletes a resource with the given resource ID field value.
@@ -39,7 +39,7 @@ public interface ResourceManager {
      * @param resourceIdFieldValue
      * @return true if a resource was deleted; false otherwise
      */
-    public boolean deleteByIdField(String resourceIdFieldValue);
+    public DeleteReceipt deleteByIdField(String resourceIdFieldValue);
 
     /**
      * 
@@ -60,7 +60,7 @@ public interface ResourceManager {
      * @return
      */
     public String getAsJson(String resourceNameOrId);
-    
+
     /**
      * 
      * @param resourceNameOrId

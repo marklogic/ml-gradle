@@ -11,6 +11,9 @@ import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.DatabaseClientFactory.Authentication;
 import com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier;
+import com.rjrudin.marklogic.modulesloader.impl.XccAssetLoader;
+import com.rjrudin.marklogic.modulesloader.ssl.SimpleX509TrustManager;
+import com.rjrudin.marklogic.modulesloader.xcc.DefaultDocumentFormatGetter;
 
 /**
  * Encapsulates common configuration properties for an application deployed to MarkLogic. These properties include not
@@ -64,6 +67,19 @@ public class AppConfig {
     // Allows for creating a triggers database without a config file for one
     private boolean createTriggersDatabase = true;
 
+    // As defined by the REST API
+    private String defaultAssetRolesAndCapabilities = "rest-admin,read,rest-admin,update,rest-extension-user,execute";
+    private String customAssetRolesAndCapabilities;
+
+    // Additional module extensions that should be loaded as binaries into the modules database
+    private String[] additionalBinaryExtensions;
+
+    // Will override the number of forests that DeployContentDatabasesCommand creates
+    private Integer contentForestsPerHost;
+
+    // Comma-delimited string used for configuring forest replicas
+    private String databaseNamesAndReplicaCounts;
+
     public AppConfig() {
         this(DEFAULT_MODULES_PATH);
     }
@@ -72,6 +88,24 @@ public class AppConfig {
         modulePaths = new ArrayList<String>();
         modulePaths.add(defaultModulePath);
         configDir = new ConfigDir();
+    }
+
+    public void setSimpleSslConfig() {
+        setRestSslContext(SimpleX509TrustManager.newSSLContext());
+        setRestSslHostnameVerifier(DatabaseClientFactory.SSLHostnameVerifier.ANY);
+    }
+
+    /**
+     * @return a comma-separated string of roles and permissions that should be set on every asset that's loaded
+     */
+    public String getAssetRolesAndPermissions() {
+        if (defaultAssetRolesAndCapabilities != null) {
+            if (customAssetRolesAndCapabilities != null) {
+                return defaultAssetRolesAndCapabilities + customAssetRolesAndCapabilities;
+            }
+            return defaultAssetRolesAndCapabilities;
+        }
+        return customAssetRolesAndCapabilities;
     }
 
     /**
@@ -83,6 +117,43 @@ public class AppConfig {
     public DatabaseClient newDatabaseClient() {
         return DatabaseClientFactory.newClient(getHost(), getRestPort(), getRestAdminUsername(),
                 getRestAdminPassword(), getRestAuthentication(), getRestSslContext(), getRestSslHostnameVerifier());
+    }
+
+    /**
+     * Just like newDatabaseClient, but uses testRestPort.
+     * 
+     * @return
+     */
+    public DatabaseClient newTestDatabaseClient() {
+        return DatabaseClientFactory.newClient(getHost(), getTestRestPort(), getRestAdminUsername(),
+                getRestAdminPassword(), getRestAuthentication(), getRestSslContext(), getRestSslHostnameVerifier());
+    }
+
+    /**
+     * @return an XccAssetLoader based on the configuration properties in this class
+     */
+    public XccAssetLoader newXccAssetLoader() {
+        XccAssetLoader l = new XccAssetLoader();
+        l.setHost(getHost());
+        l.setUsername(getRestAdminUsername());
+        l.setPassword(getRestAdminPassword());
+        l.setDatabaseName(getModulesDatabaseName());
+
+        String permissions = getAssetRolesAndPermissions();
+        if (permissions != null) {
+            l.setPermissions(permissions);
+        }
+
+        String[] extensions = getAdditionalBinaryExtensions();
+        if (extensions != null) {
+            DefaultDocumentFormatGetter getter = new DefaultDocumentFormatGetter();
+            for (String ext : extensions) {
+                getter.getBinaryExtensions().add(ext);
+            }
+            l.setDocumentFormatGetter(getter);
+        }
+        return l;
+
     }
 
     /**
@@ -334,6 +405,38 @@ public class AppConfig {
 
     public void setSchemasDatabaseName(String schemasDatabaseName) {
         this.schemasDatabaseName = schemasDatabaseName;
+    }
+
+    public void setDefaultAssetRolesAndCapabilities(String defaultAssetRolesAndCapabilities) {
+        this.defaultAssetRolesAndCapabilities = defaultAssetRolesAndCapabilities;
+    }
+
+    public void setCustomAssetRolesAndCapabilities(String customAssetRolesAndCapabilities) {
+        this.customAssetRolesAndCapabilities = customAssetRolesAndCapabilities;
+    }
+
+    public String[] getAdditionalBinaryExtensions() {
+        return additionalBinaryExtensions;
+    }
+
+    public void setAdditionalBinaryExtensions(String[] additionalBinaryExtensions) {
+        this.additionalBinaryExtensions = additionalBinaryExtensions;
+    }
+
+    public Integer getContentForestsPerHost() {
+        return contentForestsPerHost;
+    }
+
+    public void setContentForestsPerHost(Integer contentForestsPerHost) {
+        this.contentForestsPerHost = contentForestsPerHost;
+    }
+
+    public String getDatabaseNamesAndReplicaCounts() {
+        return databaseNamesAndReplicaCounts;
+    }
+
+    public void setDatabaseNamesAndReplicaCounts(String databaseNamesAndReplicaCounts) {
+        this.databaseNamesAndReplicaCounts = databaseNamesAndReplicaCounts;
     }
 
 }

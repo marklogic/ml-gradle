@@ -1,6 +1,7 @@
 package com.rjrudin.marklogic.mgmt.groups;
 
 import com.rjrudin.marklogic.mgmt.AbstractResourceManager;
+import com.rjrudin.marklogic.mgmt.DeleteReceipt;
 import com.rjrudin.marklogic.mgmt.ManageClient;
 
 public class GroupManager extends AbstractResourceManager {
@@ -15,10 +16,10 @@ public class GroupManager extends AbstractResourceManager {
     }
 
     @Override
-    public boolean delete(String payload) {
+    public DeleteReceipt delete(String payload) {
         String resourceId = getResourceId(payload);
         if (resourceId != null && resourceId.toUpperCase().equals("DEFAULT")) {
-            return false;
+            return new DeleteReceipt(resourceId, null, false);
         }
         return super.delete(payload);
     }

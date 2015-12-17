@@ -37,6 +37,11 @@ public class DeployContentDatabasesCommand extends DeployDatabaseCommand {
      */
     @Override
     public void execute(CommandContext context) {
+        Integer count = context.getAppConfig().getContentForestsPerHost();
+        if (count != null) {
+            this.setForestsPerHost(count);
+        }
+        
         super.execute(context);
 
         AppConfig appConfig = context.getAppConfig();

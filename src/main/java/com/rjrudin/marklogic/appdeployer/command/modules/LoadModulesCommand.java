@@ -1,10 +1,8 @@
 package com.rjrudin.marklogic.appdeployer.command.modules;
 
 import java.io.File;
-import java.io.FileFilter;
 
 import com.marklogic.client.DatabaseClient;
-import com.marklogic.client.DatabaseClientFactory;
 import com.rjrudin.marklogic.appdeployer.AppConfig;
 import com.rjrudin.marklogic.appdeployer.command.AbstractCommand;
 import com.rjrudin.marklogic.appdeployer.command.CommandContext;
@@ -12,8 +10,6 @@ import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
 import com.rjrudin.marklogic.modulesloader.ModulesLoader;
 import com.rjrudin.marklogic.modulesloader.impl.DefaultModulesLoader;
 import com.rjrudin.marklogic.modulesloader.impl.TestServerModulesFinder;
-import com.rjrudin.marklogic.modulesloader.impl.XccAssetLoader;
-import com.rjrudin.marklogic.modulesloader.xcc.DocumentFormatGetter;
 
 /**
  * Command for loading modules via an instance of DefaultModulesLoader, which depends on an instance of XccAssetLoader -
@@ -22,17 +18,6 @@ import com.rjrudin.marklogic.modulesloader.xcc.DocumentFormatGetter;
 public class LoadModulesCommand extends AbstractCommand {
 
     private ModulesLoader modulesLoader;
-    private FileFilter assetFileFilter;
-
-    // As defined by the REST API
-    private String defaultAssetRolesAndCapabilities = "rest-admin,read,rest-admin,update,rest-extension-user,execute";
-    private String customAssetRolesAndCapabilities;
-
-    // If set, will override the DocumentFormatGetter on the XccAssetLoader that's created
-    private DocumentFormatGetter documentFormatGetter;
-
-    private String xccUsername;
-    private String xccPassword;
 
     public LoadModulesCommand() {
         setExecuteSortOrder(SortOrderConstants.LOAD_MODULES);
@@ -46,7 +31,7 @@ public class LoadModulesCommand extends AbstractCommand {
      */
     public void initializeDefaultModulesLoader(CommandContext context) {
         logger.info("Initializing instance of DefaultModulesLoader");
-        this.modulesLoader = new DefaultModulesLoader(newXccAssetLoader(context));
+        this.modulesLoader = new DefaultModulesLoader(context.getAppConfig().newXccAssetLoader());
     }
 
     @Override
@@ -96,13 +81,8 @@ public class LoadModulesCommand extends AbstractCommand {
      */
     protected void loadModulesIntoTestServer(CommandContext context) {
         AppConfig config = context.getAppConfig();
-
-        DatabaseClient client = DatabaseClientFactory.newClient(config.getHost(), config.getTestRestPort(),
-                config.getRestAdminUsername(), config.getRestAdminPassword(), config.getRestAuthentication(),
-                config.getRestSslContext(), config.getRestSslHostnameVerifier());
-
+        DatabaseClient client = config.newTestDatabaseClient();
         ModulesLoader testLoader = buildTestModulesLoader(context);
-
         try {
             for (String modulesPath : config.getModulePaths()) {
                 logger.info("Loading modules into test server from dir: " + modulesPath);
@@ -120,69 +100,11 @@ public class LoadModulesCommand extends AbstractCommand {
         return l;
     }
 
-    protected XccAssetLoader newXccAssetLoader(CommandContext context) {
-        XccAssetLoader l = new XccAssetLoader();
-        AppConfig config = context.getAppConfig();
-        l.setHost(config.getHost());
-        l.setUsername(xccUsername != null ? xccUsername : config.getRestAdminUsername());
-        l.setPassword(xccPassword != null ? xccPassword : config.getRestAdminPassword());
-        l.setDatabaseName(config.getModulesDatabaseName());
-
-        String permissions = null;
-        if (defaultAssetRolesAndCapabilities != null) {
-            permissions = defaultAssetRolesAndCapabilities;
-            if (customAssetRolesAndCapabilities != null) {
-                permissions += "," + customAssetRolesAndCapabilities;
-            }
-        } else {
-            permissions = customAssetRolesAndCapabilities;
-        }
-
-        if (permissions != null) {
-            logger.info("Will load asset modules with roles and capabilities of: " + permissions);
-            l.setPermissions(permissions);
-        }
-
-        if (assetFileFilter != null) {
-            l.setFileFilter(assetFileFilter);
-        }
-
-        if (documentFormatGetter != null) {
-            l.setDocumentFormatGetter(documentFormatGetter);
-        }
-
-        return l;
-    }
-
     public void setModulesLoader(ModulesLoader modulesLoader) {
         this.modulesLoader = modulesLoader;
     }
 
-    public void setCustomAssetRolesAndCapabilities(String customAssetRolesAndCapabilities) {
-        this.customAssetRolesAndCapabilities = customAssetRolesAndCapabilities;
-    }
-
-    public void setDefaultAssetRolesAndCapabilities(String defaultAssetRolesAndCapabilities) {
-        this.defaultAssetRolesAndCapabilities = defaultAssetRolesAndCapabilities;
-    }
-
-    public void setXccUsername(String username) {
-        this.xccUsername = username;
-    }
-
-    public void setXccPassword(String password) {
-        this.xccPassword = password;
-    }
-
-    public void setAssetFileFilter(FileFilter assetFileFilter) {
-        this.assetFileFilter = assetFileFilter;
-    }
-
     public ModulesLoader getModulesLoader() {
         return modulesLoader;
-    }
-
-    public void setDocumentFormatGetter(DocumentFormatGetter documentFormatGetter) {
-        this.documentFormatGetter = documentFormatGetter;
     }
 }

@@ -5,11 +5,17 @@ import com.rjrudin.marklogic.mgmt.ManageClient;
 
 public class ServerManager extends AbstractResourceManager {
 
+    public final static String DEFAULT_GROUP = "Default";
+
     private String groupName;
+
+    public ServerManager(ManageClient manageClient) {
+        this(manageClient, DEFAULT_GROUP);
+    }
 
     public ServerManager(ManageClient manageClient, String groupName) {
         super(manageClient);
-        this.groupName = groupName;
+        this.groupName = groupName != null ? groupName : DEFAULT_GROUP;
     }
 
     @Override

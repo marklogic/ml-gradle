@@ -5,7 +5,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.rjrudin.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.rjrudin.marklogic.appdeployer.command.modules.LoadModulesCommand;
 import com.rjrudin.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.rjrudin.marklogic.junit.PermissionsFragment;
 import com.rjrudin.marklogic.xcc.XccTemplate;
@@ -42,7 +41,7 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
     @Test
     public void loadModulesWithCustomPermissions() {
         LoadModulesCommand c = new LoadModulesCommand();
-        c.setCustomAssetRolesAndCapabilities("app-user,execute");
+        appConfig.setCustomAssetRolesAndCapabilities("app-user,execute");
 
         initializeAppDeployer(new DeployRestApiServersCommand(), c);
 

@@ -1,5 +1,10 @@
 # ml-app-deployer releases
 
+## 2.0b15
+
+* New resource API
+* Improved logging of commands, including directories/files being processed
+
 ## 2.0b14
 
 * Added disableAll/enableAll methods to ConfigManager (flexrep)

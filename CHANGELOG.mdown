@@ -1,5 +1,10 @@
 # ml-gradle releases
 
+## 2.0b15
+
+* New support for groovysh Gradle plugin
+* Using new properties in AppConfig as opposed to configuring properties directly on commands
+
 ## 2.0b14
 
 * Now supports mlAdditionalBinaryExtensions

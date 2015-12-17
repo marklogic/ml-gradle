@@ -1,0 +1,26 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url "http://developer.marklogic.com/maven2/" }
+        maven { url "http://rjrudin.github.io/marklogic-java/releases" }
+    }
+    dependencies {
+        classpath mlGradleDependency
+        classpath 'com.tkruse.gradle:gradle-groovysh-plugin:1.0.7'
+    }
+}
+
+// groovysh needs to be before ml-gradle so that ml-gradle can setup args for it
+apply plugin: 'com.github.tkruse.groovysh'
+apply plugin: 'ml-gradle'
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+repositories {
+    mavenCentral()
+    maven { url "http://developer.marklogic.com/maven2/" }
+    maven { url "http://rjrudin.github.io/marklogic-java/releases" }
+}
+
+dependencies { runtime "com.rjrudin:ml-app-deployer:2.0r1" }

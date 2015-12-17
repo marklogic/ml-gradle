@@ -21,3 +21,9 @@ examples/sample-project/local.gradle
 examples/failover-project/.gradle/
 examples/mlcp-project/.gradle/
 examples/mlcp-project/data/export/
+examples/shell-project/.gradle/
+examples/shell-project/build/
+examples/shell-project/.gradle
+examples/shell-project/.settings
+examples/shell-project/.project
+examples/shell-project/.classpath

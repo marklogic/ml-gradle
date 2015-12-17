@@ -4,10 +4,9 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.slf4j.LoggerFactory
 
-import com.marklogic.client.DatabaseClientFactory
 import com.rjrudin.marklogic.appdeployer.AppConfig
 import com.rjrudin.marklogic.appdeployer.AppDeployer
-import com.rjrudin.marklogic.appdeployer.ConfigDir
+import com.rjrudin.marklogic.appdeployer.DefaultAppConfigFactory
 import com.rjrudin.marklogic.appdeployer.command.Command
 import com.rjrudin.marklogic.appdeployer.command.CommandContext
 import com.rjrudin.marklogic.appdeployer.command.alert.DeployAlertActionsCommand
@@ -94,12 +93,12 @@ import com.rjrudin.marklogic.gradle.task.tasks.DeployTasksTask
 import com.rjrudin.marklogic.gradle.task.tasks.UndeployTasksTask
 import com.rjrudin.marklogic.gradle.task.trigger.DeployTriggersTask
 import com.rjrudin.marklogic.gradle.task.viewschemas.DeployViewSchemasTask
+import com.rjrudin.marklogic.mgmt.DefaultManageConfigFactory
 import com.rjrudin.marklogic.mgmt.ManageClient
 import com.rjrudin.marklogic.mgmt.ManageConfig
 import com.rjrudin.marklogic.mgmt.admin.AdminConfig
 import com.rjrudin.marklogic.mgmt.admin.AdminManager
-import com.rjrudin.marklogic.modulesloader.ssl.SimpleX509TrustManager
-import com.rjrudin.marklogic.modulesloader.xcc.DefaultDocumentFormatGetter
+import com.rjrudin.marklogic.mgmt.admin.DefaultAdminConfigFactory
 
 class MarkLogicPlugin implements Plugin<Project> {
 
@@ -108,11 +107,9 @@ class MarkLogicPlugin implements Plugin<Project> {
     void apply(Project project) {
         logger.info("\nInitializing ml-gradle")
 
-        initializeAppConfig(project)
-        initializeManageConfig(project)
-        initializeAdminConfig(project)
-        initializeAppDeployerObjects(project)
+        // Initialize groovysh support first so it doesn't pick up all the properties added when the AppDeployer is initialized
         initializeGroovyShellSupport(project)
+        initializeAppDeployerObjects(project)
 
         project.getConfigurations().create("mlRestApi")
 
@@ -217,171 +214,48 @@ class MarkLogicPlugin implements Plugin<Project> {
         logger.info("Finished initializing ml-gradle\n")
     }
 
-    /**
-     * Read in certain project properties and use them to initialize an instance of AppConfig. The properties are typically
-     * defined in gradle.properties.
-     * 
-     * @param project
-     */
-    void initializeAppConfig(Project project) {
-        AppConfig appConfig = new AppConfig()
-        if (project.hasProperty("mlConfigDir")) {
-            def prop = project.property("mlConfigDir")
-            logger.info("Setting config dir to: " + prop)
-            appConfig.setConfigDir(new ConfigDir(new File(prop)))
-        }
-        if (project.hasProperty("mlAppName")) {
-            def name = project.property("mlAppName")
-            logger.info("App name: " + name)
-            appConfig.setName(name)
-        }
-        if (project.hasProperty("mlHost")) {
-            def host = project.property("mlHost")
-            logger.info("App host: " + host)
-            appConfig.setHost(host)
-        }
-
-        if (project.hasProperty("mlRestPort")) {
-            def port = project.property("mlRestPort")
-            logger.info("App REST port: " + port)
-            appConfig.setRestPort(Integer.parseInt(port))
-        }
-        if (project.hasProperty("mlTestRestPort")) {
-            def port = project.property("mlTestRestPort")
-            logger.info("App test REST port: " + port)
-            appConfig.setTestRestPort(Integer.parseInt(port))
-        }
-
-        String restUsername = null
-        if (project.hasProperty("mlRestAdminUsername")) {
-            restUsername = project.property("mlRestAdminUsername")
-        }
-        else if (project.hasProperty("mlUsername")) {
-            restUsername = project.property("mlUsername")
-        }
-        if (restUsername != null) {
-            logger.info("REST Admin username: " + restUsername)
-            appConfig.setRestAdminUsername(restUsername)
-        }
-
-        String restPassword = null
-        if (project.hasProperty("mlRestAdminPassword")) {
-            restPassword = project.property("mlRestAdminPassword")
-        }
-        else if (project.hasProperty("mlPassword")) {
-            restPassword = project.property("mlPassword")
-        }
-        if (restPassword != null) {
-            appConfig.setRestAdminPassword(restPassword)
-        }
-
-        if (project.hasProperty("mlSimpleSsl")) {
-            logger.info("Using simple SSL context and 'ANY' hostname verifier for authenticating against client REST API server")
-            appConfig.setRestSslContext(SimpleX509TrustManager.newSSLContext())
-            appConfig.setRestSslHostnameVerifier(DatabaseClientFactory.SSLHostnameVerifier.ANY)
-        }
-
-        project.extensions.add("mlAppConfig", appConfig)
-    }
-
-    void initializeManageConfig(Project project) {
-        ManageConfig manageConfig = new ManageConfig()
-        if (project.hasProperty("mlHost")) {
-            def host = project.property("mlHost")
-            logger.info("Manage host: " + host)
-            manageConfig.setHost(host)
-        }
-
-        String username = null
-        if (project.hasProperty("mlManageUsername")) {
-            username = project.property("mlManageUsername")
-        }
-        else if (project.hasProperty("mlUsername")) {
-            username = project.property("mlUsername")
-        }
-        if (username != null) {
-            logger.info("Manage username: " + username)
-            manageConfig.setUsername(username)
-        }
-
-        String password = null
-        if (project.hasProperty("mlManagePassword")) {
-            password = project.property("mlManagePassword")
-        }
-        else if (project.hasProperty("mlPassword")) {
-            password = project.property("mlPassword")
-        }
-        if (password != null) {
-            manageConfig.setPassword(password)
-        }
-
-        if (project.hasProperty("mlAdminUsername")) {
-            manageConfig.setAdminUsername(project.property("mlAdminUsername"))
-        }
-        if (project.hasProperty("mlAdminPassword")) {
-            manageConfig.setAdminPassword(project.property("mlAdminPassword"))
-        }
-
-        project.extensions.add("mlManageConfig", manageConfig)
-    }
-
-    void initializeAdminConfig(Project project) {
-        AdminConfig adminConfig = new AdminConfig()
-        if (project.hasProperty("mlHost")) {
-            def host = project.property("mlHost")
-            logger.info("Admin host: " + host)
-            adminConfig.setHost(host)
-        }
-
-        String username = null
-        if (project.hasProperty("mlAdminUsername")) {
-            username = project.property("mlAdminUsername")
-        }
-        else if (project.hasProperty("mlUsername")) {
-            username = project.property("mlUsername")
-        }
-        if (username != null) {
-            logger.info("Admin username: " + username)
-            adminConfig.setUsername(username)
-        }
-
-        String password = null
-        if (project.hasProperty("mlAdminPassword")) {
-            password = project.property("mlAdminPassword")
-        }
-        else if (project.hasProperty("mlPassword")) {
-            password = project.property("mlPassword")
-        }
-        if (password != null) {
-            adminConfig.setPassword(password)
-        }
-
-        project.extensions.add("mlAdminConfig", adminConfig)
-    }
-
     void initializeAppDeployerObjects(Project project) {
-        ManageConfig manageConfig = project.extensions.getByName("mlManageConfig")
+        AdminConfig adminConfig = new DefaultAdminConfigFactory(new ProjectPropertySource(project)).newAdminConfig()
+        project.extensions.add("mlAdminConfig", adminConfig)
+
+        AppConfig appConfig = new DefaultAppConfigFactory(new ProjectPropertySource(project)).newAppConfig()
+        project.extensions.add("mlAppConfig", appConfig)
+
+        ManageConfig manageConfig = new DefaultManageConfigFactory(new ProjectPropertySource(project)).newManageConfig()
+        project.extensions.add("mlManageConfig", manageConfig)
 
         ManageClient manageClient = new ManageClient(manageConfig)
         project.extensions.add("mlManageClient", manageClient)
 
-        AdminManager adminManager = new AdminManager(project.extensions.getByName("mlAdminConfig"))
+        AdminManager adminManager = new AdminManager(adminConfig)
         project.extensions.add("mlAdminManager", adminManager)
 
-        CommandContext context = new CommandContext(project.extensions.getByName("mlAppConfig"), manageClient, adminManager)
+        CommandContext context = new CommandContext(appConfig, manageClient, adminManager)
         project.extensions.add("mlCommandContext", context)
 
         project.extensions.add("mlAppDeployer", newAppDeployer(project, context))
     }
 
     void initializeGroovyShellSupport(Project project) {
-        ManageConfig manageConfig = project.extensions.getByName("mlManageConfig")
-
-        // Set up useful JVM args for launching groovysh
-        def mlShellJvmArgs = ["-DmlManageHost=" + manageConfig.getHost(), "-DmlManagePort=" + manageConfig.getPort(), "-DmlManageUsername=" + manageConfig.getUsername(), "-DmlManagePassword=" + manageConfig.getPassword(), "-DmlAdminUsername=" + manageConfig.getAdminUsername(), "-DmlAdminPassword=" + manageConfig.getAdminPassword()]
+        def mlShellJvmArgs = []
+        for (String key : project.getProperties().keySet()) {
+            if (key.startsWith("ml")) {
+                mlShellJvmArgs.push("-D" + key + "=" + project.property(key))
+            }
+        }
+        println mlShellJvmArgs
         project.extensions.add("mlShellJvmArgs", mlShellJvmArgs)
 
-        def script = "manageConfig = com.rjrudin.marklogic.mgmt.ManageConfig.buildFromSystemProps()\nclient = new com.rjrudin.marklogic.mgmt.ManageClient(manageConfig)"
+        def script = "ml = com.rjrudin.marklogic.mgmt.api.APIUtil.newAPIFromSystemProps()"
+        if (project.hasProperty("mlShellWatchModules") && project.property("mlShellWatchModules").equals("true")) {
+            script += "\ncom.rjrudin.marklogic.appdeployer.util.ModulesWatcher.startFromSystemProps()"
+        }
+
+        // Allow project to add to the shell initialization script; mlShellScript will need to be in gradle.properties
+        if (project.hasProperty("mlShellScript")) {
+            script += "\n" + project.property("mlShellScript")
+        }
+
         def mlShellArgs = ["-e", script]
         project.extensions.add("mlShellArgs", mlShellArgs)
 
@@ -420,13 +294,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 
         // Databases
         List<Command> dbCommands = new ArrayList<Command>()
-        DeployContentDatabasesCommand dcdc = new DeployContentDatabasesCommand()
-        if (project.hasProperty("mlContentForestsPerHost")) {
-            int num = Integer.parseInt(project.property("mlContentForestsPerHost"))
-            logger.info("Setting content forests per host to: " + num)
-            dcdc.setForestsPerHost(num)
-        }
-        dbCommands.add(dcdc)
+        dbCommands.add(new DeployContentDatabasesCommand())
         dbCommands.add(new DeployTriggersDatabaseCommand())
         dbCommands.add(new DeploySchemasDatabaseCommand())
         project.extensions.add("mlDatabaseCommands", dbCommands)
@@ -444,20 +312,6 @@ class MarkLogicPlugin implements Plugin<Project> {
 
         // Modules
         LoadModulesCommand lmc = new LoadModulesCommand()
-        if (project.hasProperty("mlModulePermissions")) {
-            String perms = project.property("mlModulePermissions")
-            logger.info("Setting module permissions to: " + perms)
-            lmc.setDefaultAssetRolesAndCapabilities(perms)
-        }
-        if (project.hasProperty("mlAdditionalBinaryExtensions")) {
-            DefaultDocumentFormatGetter getter = new DefaultDocumentFormatGetter()
-            for (String val : project.property("mlAdditionalBinaryExtensions").split(",")) {
-                logger.info("Adding binary extension for loading modules: " + val)
-                getter.getBinaryExtensions().add(val);
-            }
-            lmc.setDocumentFormatGetter(getter)
-        }
-
         lmc.initializeDefaultModulesLoader(context)
         project.extensions.add("mlLoadModulesCommand", lmc)
         commands.add(lmc)
@@ -493,11 +347,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 
         // Forest replicas
         List<Command> replicaCommands = new ArrayList<Command>()
-        ConfigureForestReplicasCommand cfrc = new ConfigureForestReplicasCommand()
-        if (project.hasProperty("mlForestReplicas")) {
-            cfrc.setDatabaseNamesAndReplicaCountsAsString(project.property("mlForestReplicas"))
-        }
-        replicaCommands.add(cfrc)
+        replicaCommands.add(new ConfigureForestReplicasCommand())
         project.extensions.add("mlForestReplicaCommands", replicaCommands)
         commands.addAll(replicaCommands)
 

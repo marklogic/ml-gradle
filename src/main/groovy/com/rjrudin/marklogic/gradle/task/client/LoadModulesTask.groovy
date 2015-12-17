@@ -18,14 +18,9 @@ class LoadModulesTask extends MarkLogicTask {
         if (d instanceof SimpleAppDeployer) {
             command = d.getCommand("LoadModulesCommand")
         }
-
         if (command == null) {
             command = new LoadModulesCommand()
-            if (project.hasProperty("mlModulePermissions")) {
-                command.setDefaultAssetRolesAndCapabilities(project.property("mlModulePermissions"))
-            }
         }
-
         command.execute(getCommandContext())
     }
 }

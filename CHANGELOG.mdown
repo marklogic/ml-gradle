@@ -2,6 +2,7 @@
 
 ## 2.0b16
 
+* Fixed issue with setting custom asset permissions; now just have appConfig.setModulePermissions via mlModulePermissions
 * [#72](https://github.com/rjrudin/ml-app-deployer/issues/72) Now waits for a restart properly after deleting an app server (worked fine for REST API servers, but not ODBC/XDBC servers)
 
 ## 2.0b15

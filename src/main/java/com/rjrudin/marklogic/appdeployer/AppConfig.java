@@ -68,8 +68,7 @@ public class AppConfig {
     private boolean createTriggersDatabase = true;
 
     // As defined by the REST API
-    private String defaultAssetRolesAndCapabilities = "rest-admin,read,rest-admin,update,rest-extension-user,execute";
-    private String customAssetRolesAndCapabilities;
+    private String modulePermissions = "rest-admin,read,rest-admin,update,rest-extension-user,execute";
 
     // Additional module extensions that should be loaded as binaries into the modules database
     private String[] additionalBinaryExtensions;
@@ -93,19 +92,6 @@ public class AppConfig {
     public void setSimpleSslConfig() {
         setRestSslContext(SimpleX509TrustManager.newSSLContext());
         setRestSslHostnameVerifier(DatabaseClientFactory.SSLHostnameVerifier.ANY);
-    }
-
-    /**
-     * @return a comma-separated string of roles and permissions that should be set on every asset that's loaded
-     */
-    public String getAssetRolesAndPermissions() {
-        if (defaultAssetRolesAndCapabilities != null) {
-            if (customAssetRolesAndCapabilities != null) {
-                return defaultAssetRolesAndCapabilities + customAssetRolesAndCapabilities;
-            }
-            return defaultAssetRolesAndCapabilities;
-        }
-        return customAssetRolesAndCapabilities;
     }
 
     /**
@@ -139,7 +125,7 @@ public class AppConfig {
         l.setPassword(getRestAdminPassword());
         l.setDatabaseName(getModulesDatabaseName());
 
-        String permissions = getAssetRolesAndPermissions();
+        String permissions = getModulePermissions();
         if (permissions != null) {
             l.setPermissions(permissions);
         }
@@ -407,14 +393,6 @@ public class AppConfig {
         this.schemasDatabaseName = schemasDatabaseName;
     }
 
-    public void setDefaultAssetRolesAndCapabilities(String defaultAssetRolesAndCapabilities) {
-        this.defaultAssetRolesAndCapabilities = defaultAssetRolesAndCapabilities;
-    }
-
-    public void setCustomAssetRolesAndCapabilities(String customAssetRolesAndCapabilities) {
-        this.customAssetRolesAndCapabilities = customAssetRolesAndCapabilities;
-    }
-
     public String[] getAdditionalBinaryExtensions() {
         return additionalBinaryExtensions;
     }
@@ -437,6 +415,14 @@ public class AppConfig {
 
     public void setDatabaseNamesAndReplicaCounts(String databaseNamesAndReplicaCounts) {
         this.databaseNamesAndReplicaCounts = databaseNamesAndReplicaCounts;
+    }
+
+    public String getModulePermissions() {
+        return modulePermissions;
+    }
+
+    public void setModulePermissions(String assetPermissions) {
+        this.modulePermissions = assetPermissions;
     }
 
 }

@@ -73,7 +73,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
         prop = getProperty("mlModulePermissions");
         if (prop != null) {
             logger.info("Module permissions: " + prop);
-            c.setCustomAssetRolesAndCapabilities(prop);
+            c.setModulePermissions(prop);
         }
 
         prop = getProperty("mlAdditionalBinaryExtensions");

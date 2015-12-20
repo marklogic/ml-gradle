@@ -9,6 +9,7 @@ public class DeleteReceipt {
     public DeleteReceipt(String resourceId, String path, boolean deleted) {
         this.resourceId = resourceId;
         this.path = path;
+        this.deleted = deleted;
     }
 
     public String getResourceId() {

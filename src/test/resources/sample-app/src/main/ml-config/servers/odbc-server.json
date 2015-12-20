@@ -4,6 +4,6 @@
   "root": "/",
   "group-name": "%%GROUP%%",
   "port": %%ODBC_PORT%%,
-  "modules-database": "%%MODULES_DATABASE%%",
+  "modules-database": "Modules",
   "content-database": "%%DATABASE%%"
 }

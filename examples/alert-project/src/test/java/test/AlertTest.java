@@ -7,7 +7,7 @@ import com.marklogic.client.document.XMLDocumentManager;
 import com.marklogic.client.io.DocumentMetadataHandle;
 import com.marklogic.client.io.Format;
 import com.marklogic.client.io.StringHandle;
-import com.rjrudin.marklogic.junit.spring.AbstractSpringTest;
+import com.marklogic.junit.spring.AbstractSpringTest;
 
 @ContextConfiguration(classes = { TestConfig.class })
 public class AlertTest extends AbstractSpringTest {

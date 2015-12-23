@@ -20,7 +20,7 @@ apply plugin: 'ml-gradle'
  * Status Change Handling and Alerting is fine - the unused pipelines just sit there with no impact on anything.
  */
 ext {
-    mlAppDeployer.commands.add(new com.rjrudin.marklogic.appdeployer.command.cpf.DeployDefaultPipelinesCommand())
+    mlAppDeployer.commands.add(new com.marklogic.appdeployer.command.cpf.DeployDefaultPipelinesCommand())
 }
 
 /**
@@ -36,6 +36,6 @@ repositories {
 }
 
 dependencies {
-    testCompile "com.rjrudin:ml-junit:2.3"
-    runtime "com.rjrudin:ml-app-deployer:2.0r1"
+    testCompile "com.marklogic:ml-junit:2.4"
+    runtime "com.marklogic:ml-app-deployer:2.0rc1"
 }

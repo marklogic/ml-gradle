@@ -3,7 +3,7 @@ package sample;
 import org.junit.Test;
 
 import com.marklogic.client.io.StringHandle;
-import com.rjrudin.marklogic.junit.Fragment;
+import com.marklogic.junit.Fragment;
 
 public class WriteAndReadDocumentTest extends AbstractSampleProjectTest {
 

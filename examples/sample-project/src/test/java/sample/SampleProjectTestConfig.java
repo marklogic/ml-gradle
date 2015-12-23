@@ -4,8 +4,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
-import com.rjrudin.marklogic.client.DatabaseClientConfig;
-import com.rjrudin.marklogic.junit.spring.BasicTestConfig;
+import com.marklogic.client.DatabaseClientConfig;
+import com.marklogic.junit.spring.BasicTestConfig;
 
 @Configuration
 @PropertySource({ "file:gradle.properties" })

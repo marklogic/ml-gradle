@@ -16,7 +16,7 @@ public class GroupManager extends AbstractResourceManager {
     }
 
     @Override
-    public DeleteReceipt delete(String payload) {
+    public DeleteReceipt delete(String payload, String... resourceUrlParams) {
         String resourceId = getResourceId(payload);
         if (resourceId != null && resourceId.toUpperCase().equals("DEFAULT")) {
             return new DeleteReceipt(resourceId, null, false);

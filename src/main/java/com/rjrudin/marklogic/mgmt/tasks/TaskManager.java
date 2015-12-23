@@ -23,8 +23,13 @@ public class TaskManager extends AbstractResourceManager {
         super(client);
     }
 
+    public TaskManager(ManageClient client, String groupName) {
+        super(client);
+        this.groupName = groupName;
+    }
+
     @Override
-    public String getResourcePath(String resourceNameOrId) {
+    public String getResourcePath(String resourceNameOrId, String... resourceUrlParams) {
         return getResourcesPath() + "/" + getTaskIdForTaskPath(resourceNameOrId);
     }
 
@@ -58,11 +63,42 @@ public class TaskManager extends AbstractResourceManager {
         return id;
     }
 
-    public boolean exists(String resourceNameOrId) {
+    @Override
+    public boolean exists(String resourceNameOrId, String... resourceUrlParams) {
         Fragment f = getAsXml();
         return f.elementExists(format(
                 "/node()/*[local-name(.) = 'list-items']/node()[*[local-name(.) = 'task-path'] = '%s']",
                 resourceNameOrId));
+    }
+
+    public void disableAllTasks() {
+        for (String id : getAsXml().getListItemIdRefs()) {
+            disableTask(id);
+        }
+    }
+
+    public void enableAllTasks() {
+        for (String id : getAsXml().getListItemIdRefs()) {
+            enableTask(id);
+        }
+    }
+
+    public void disableTask(String taskId) {
+        String json = format("{\"task-id\":\"%s\", \"task-enabled\":false}", taskId);
+        String path = getResourcesPath() + "/" + taskId + "/properties";
+        path = appendParamsAndValuesToPath(path, getUpdateResourceParams(json));
+        putPayload(getManageClient(), path, json);
+    }
+
+    public void enableTask(String taskId) {
+        String json = format("{\"task-id\":\"%s\", \"task-enabled\":true}", taskId);
+        String path = getResourcesPath() + "/" + taskId + "/properties";
+        path = appendParamsAndValuesToPath(path, getUpdateResourceParams(json));
+        putPayload(getManageClient(), path, json);
+    }
+
+    public void deleteAllTasks() {
+        deleteAllScheduledTasks();
     }
 
     public void deleteAllScheduledTasks() {

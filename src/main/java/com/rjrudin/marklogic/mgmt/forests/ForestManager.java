@@ -117,7 +117,7 @@ public class ForestManager extends AbstractResourceManager {
      * @return
      */
     public List<String> getReplicaIds(String forestIdOrName) {
-        String path = getResourcePath(forestIdOrName) + "?view=config&format=xml";
+        String path = getResourcePath(forestIdOrName, "view", "config", "format", "xml");
         return getManageClient().getXml(path).getElementValues(
                 "/f:forest-config/f:config-properties/f:forest-replicas/f:forest-replica");
     }
@@ -140,7 +140,7 @@ public class ForestManager extends AbstractResourceManager {
     }
 
     public ForestStatus getForestStatus(String forestIdOrName) {
-        String path = getResourcePath(forestIdOrName) + "?view=status&format=xml";
+        String path = getResourcePath(forestIdOrName, "view", "status", "format", "xml");
         return new ForestStatus(getManageClient().getXml(path));
     }
 

@@ -25,12 +25,12 @@ public class ProtectedCollectionsManager extends AbstractResourceManager {
     }
 
     @Override
-    public String getPropertiesPath(String resourceNameOrId) {
+    public String getPropertiesPath(String resourceNameOrId, String... resourceUrlParams) {
         return getResourcesPath() + "/properties?collection=" + resourceNameOrId;
     }
 
     @Override
-    public String getResourcePath(String resourceNameOrId) {
+    public String getResourcePath(String resourceNameOrId, String... resourceUrlParams) {
         return getResourcesPath() + "?collection=" + resourceNameOrId;
     }
 

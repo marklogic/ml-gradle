@@ -19,7 +19,7 @@ public class AlertConfigManager extends AbstractResourceManager {
     }
 
     @Override
-    public String getResourcePath(String resourceNameOrId) {
+    public String getResourcePath(String resourceNameOrId, String... resourceUrlParams) {
         return getResourcesPath();
     }
 

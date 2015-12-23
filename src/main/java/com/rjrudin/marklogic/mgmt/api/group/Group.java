@@ -8,6 +8,7 @@ import com.rjrudin.marklogic.mgmt.ResourceManager;
 import com.rjrudin.marklogic.mgmt.api.API;
 import com.rjrudin.marklogic.mgmt.api.Resource;
 import com.rjrudin.marklogic.mgmt.groups.GroupManager;
+import com.rjrudin.marklogic.mgmt.tasks.TaskManager;
 
 public class Group extends Resource {
 
@@ -51,7 +52,7 @@ public class Group extends Resource {
     private List<ModuleLocation> moduleLocation;
     private Boolean eventsActivated;
     private List<String> event;
-    private List<Audit> audit;
+    private Audit audit;
     private Long backgroundIoLimit;
     private Boolean meteringEnabled;
     private Boolean performanceMeteringEnabled;
@@ -131,6 +132,22 @@ public class Group extends Resource {
         } else {
             event.removeAll(Arrays.asList(events));
         }
+    }
+
+    public void disableTasks() {
+        newTaskManager().disableAllTasks();
+    }
+
+    public void enableTasks() {
+        newTaskManager().enableAllTasks();
+    }
+
+    public void deleteTasks() {
+        newTaskManager().deleteAllScheduledTasks();
+    }
+
+    public TaskManager newTaskManager() {
+        return new TaskManager(getClient(), getGroupName());
     }
 
     @Override
@@ -442,11 +459,11 @@ public class Group extends Resource {
         this.event = event;
     }
 
-    public List<Audit> getAudit() {
+    public Audit getAudit() {
         return audit;
     }
 
-    public void setAudit(List<Audit> audit) {
+    public void setAudit(Audit audit) {
         this.audit = audit;
     }
 
@@ -545,9 +562,4 @@ public class Group extends Resource {
     public void setSecurityDatabase(String securityDatabase) {
         this.securityDatabase = securityDatabase;
     }
-
-    public static String getDefaultGroupName() {
-        return DEFAULT_GROUP_NAME;
-    }
-
 }

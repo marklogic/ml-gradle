@@ -1,5 +1,6 @@
 package com.rjrudin.marklogic.mgmt.api.security;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.rjrudin.marklogic.mgmt.ResourceManager;
@@ -15,7 +16,7 @@ public class Role extends Resource {
     private List<String> externalName;
     private List<String> role;
     private List<Permission> permission;
-    private List<Privilege> privilege;
+    private List<RolePrivilege> privilege;
     private List<String> collection;
 
     public Role() {
@@ -24,6 +25,41 @@ public class Role extends Resource {
     public Role(API api, String roleName) {
         super(api);
         this.roleName = roleName;
+    }
+
+    public void addExternalName(String name) {
+        if (externalName == null) {
+            externalName = new ArrayList<>();
+        }
+        externalName.add(name);
+    }
+
+    public void addRole(String r) {
+        if (role == null) {
+            role = new ArrayList<String>();
+        }
+        role.add(r);
+    }
+
+    public void addPermission(Permission p) {
+        if (permission == null) {
+            permission = new ArrayList<>();
+        }
+        permission.add(p);
+    }
+
+    public void addPrivilege(RolePrivilege priv) {
+        if (privilege == null) {
+            privilege = new ArrayList<>();
+        }
+        privilege.add(priv);
+    }
+
+    public void addCollection(String c) {
+        if (collection == null) {
+            collection = new ArrayList<String>();
+        }
+        collection.add(c);
     }
 
     @Override
@@ -84,11 +120,11 @@ public class Role extends Resource {
         this.permission = permission;
     }
 
-    public List<Privilege> getPrivilege() {
+    public List<RolePrivilege> getPrivilege() {
         return privilege;
     }
 
-    public void setPrivilege(List<Privilege> privilege) {
+    public void setPrivilege(List<RolePrivilege> privilege) {
         this.privilege = privilege;
     }
 

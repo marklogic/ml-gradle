@@ -10,15 +10,29 @@ import com.rjrudin.marklogic.rest.util.Fragment;
 
 public class AmpManager extends AbstractResourceManager {
 
+    private String namespace;
+    private String documentUri;
+    private String modulesDatabase;
+
     public AmpManager(ManageClient client) {
         super(client);
         /*
          * Turning this off as part of version 2.0b10 - having issues with ML being able to create an amp but then
-         * getting a 404 when it tries to update the amp. Seems to be due to using a modules database - viewing the
-         * amp via the Mgmt API shows the modules database as being "filesystem", but the Admin app correctly shows
-         * the modules database.
+         * getting a 404 when it tries to update the amp. Seems to be due to using a modules database - viewing the amp
+         * via the Mgmt API shows the modules database as being "filesystem", but the Admin app correctly shows the
+         * modules database.
          */
         setUpdateAllowed(false);
+    }
+
+    public String getResourcePath(String resourceNameOrId) {
+        return super.getResourcePath(resourceNameOrId, "namespace", namespace, "document-uri", documentUri,
+                "modules-database", modulesDatabase);
+    }
+
+    public String getPropertiesPath(String resourceNameOrId) {
+        return super.getPropertiesPath(resourceNameOrId, "namespace", namespace, "document-uri", documentUri,
+                "modules-database", modulesDatabase);
     }
 
     @Override
@@ -63,5 +77,17 @@ public class AmpManager extends AbstractResourceManager {
             }
         }
         return params.toArray(new String[] {});
+    }
+
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
+    }
+
+    public void setDocumentUri(String documentUri) {
+        this.documentUri = documentUri;
+    }
+
+    public void setModulesDatabase(String modulesDatabase) {
+        this.modulesDatabase = modulesDatabase;
     }
 }

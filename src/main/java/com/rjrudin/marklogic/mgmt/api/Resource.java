@@ -56,7 +56,7 @@ public abstract class Resource extends ApiObject {
         if (logger.isInfoEnabled()) {
             logger.info(format("Deleting %s %s", name, label));
         }
-        DeleteReceipt receipt = getResourceManager().deleteByIdField(getResourceId());
+        DeleteReceipt receipt = getResourceManager().deleteByIdField(getResourceId(), getResourceUrlParams());
         if (logger.isInfoEnabled()) {
             logger.info(format("Deleted %s %s", name, label));
         }
@@ -81,7 +81,17 @@ public abstract class Resource extends ApiObject {
      * @return true of the resource exists, false otherwise
      */
     public boolean exists() {
-        return getResourceManager().exists(getResourceId());
+        return getResourceManager().exists(getResourceId(), getResourceUrlParams());
+    }
+
+    /**
+     * Some resources, such as amps, require additional parameters in the URL to uniquely identify the resource. A
+     * subclass can override this to provide those parameters.
+     * 
+     * @return
+     */
+    public String[] getResourceUrlParams() {
+        return null;
     }
 
     /**

@@ -19,12 +19,12 @@ public class ServerManager extends AbstractResourceManager {
     }
 
     @Override
-    public String getResourcePath(String resourceNameOrId) {
+    public String getResourcePath(String resourceNameOrId, String... resourceUrlParams) {
         return format("%s/%s?group-id=%s", getResourcesPath(), resourceNameOrId, groupName);
     }
 
     @Override
-    public String getPropertiesPath(String resourceNameOrId) {
+    public String getPropertiesPath(String resourceNameOrId, String... resourceUrlParams) {
         return format("%s/%s/properties?group-id=%s", getResourcesPath(), resourceNameOrId, groupName);
     }
 

@@ -10,7 +10,7 @@ public class TraceTest extends AbstractApiTest {
      * Tests configuring trace events on the default group via trace/untrace.
      */
     @Test
-    public void test() {
+    public void traceAndUntrace() {
         final String event = "api-test";
 
         Group g = api.group();

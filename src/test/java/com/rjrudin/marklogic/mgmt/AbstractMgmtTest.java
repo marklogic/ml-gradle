@@ -22,10 +22,10 @@ import com.rjrudin.marklogic.mgmt.admin.AdminManager;
 public abstract class AbstractMgmtTest extends BaseTestHelper {
 
     @Autowired
-    private ManageConfig manageConfig;
+    protected ManageConfig manageConfig;
 
     @Autowired
-    private AdminConfig adminConfig;
+    protected AdminConfig adminConfig;
 
     // Intended to be used by subclasses
     protected ManageClient manageClient;

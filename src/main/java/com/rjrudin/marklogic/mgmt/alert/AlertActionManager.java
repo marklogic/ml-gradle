@@ -20,12 +20,12 @@ public class AlertActionManager extends AbstractResourceManager {
     }
 
     @Override
-    public String getResourcePath(String resourceNameOrId) {
+    public String getResourcePath(String resourceNameOrId, String... resourceUrlParams) {
         return format("/manage/v2/databases/%s/alert/actions/%s?uri=%s", databaseIdOrName, resourceNameOrId, configUri);
     }
 
     @Override
-    public String getPropertiesPath(String resourceNameOrId) {
+    public String getPropertiesPath(String resourceNameOrId, String... resourceUrlParams) {
         return format("/manage/v2/databases/%s/alert/actions/%s/properties?uri=%s", databaseIdOrName, resourceNameOrId,
                 configUri);
     }

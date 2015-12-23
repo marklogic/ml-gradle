@@ -1,5 +1,6 @@
 package com.rjrudin.marklogic.mgmt.api.security;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.rjrudin.marklogic.mgmt.ResourceManager;
@@ -34,6 +35,34 @@ public class User extends Resource {
     @Override
     protected String getResourceId() {
         return userName;
+    }
+
+    public void addExternalName(String name) {
+        if (externalName == null) {
+            externalName = new ArrayList<>();
+        }
+        externalName.add(name);
+    }
+
+    public void addRole(String r) {
+        if (role == null) {
+            role = new ArrayList<String>();
+        }
+        role.add(r);
+    }
+
+    public void addPermission(Permission p) {
+        if (permission == null) {
+            permission = new ArrayList<>();
+        }
+        permission.add(p);
+    }
+
+    public void addCollection(String c) {
+        if (collection == null) {
+            collection = new ArrayList<String>();
+        }
+        collection.add(c);
     }
 
     public String getUserName() {

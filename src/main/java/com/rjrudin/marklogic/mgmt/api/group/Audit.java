@@ -7,7 +7,7 @@ public class Audit {
 
     private Boolean auditEnabled;
     private String rotateAuditFiles;
-    private Boolean keepAuditFiles;
+    private Integer keepAuditFiles;
     private List<AuditEvent> auditEvent;
     private List<AuditRestriction> auditRestriction;
 
@@ -41,11 +41,11 @@ public class Audit {
         this.rotateAuditFiles = rotateAuditFiles;
     }
 
-    public Boolean getKeepAuditFiles() {
+    public Integer getKeepAuditFiles() {
         return keepAuditFiles;
     }
 
-    public void setKeepAuditFiles(Boolean keepAuditFiles) {
+    public void setKeepAuditFiles(Integer keepAuditFiles) {
         this.keepAuditFiles = keepAuditFiles;
     }
 

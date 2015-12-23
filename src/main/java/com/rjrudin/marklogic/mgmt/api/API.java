@@ -6,7 +6,13 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.DatabaseClientFactory;
+import com.marklogic.client.DatabaseClientFactory.Authentication;
+import com.rjrudin.marklogic.appdeployer.DefaultAppConfigFactory;
+import com.rjrudin.marklogic.appdeployer.util.ClientHelper;
 import com.rjrudin.marklogic.client.LoggingObject;
+import com.rjrudin.marklogic.mgmt.DefaultManageConfigFactory;
 import com.rjrudin.marklogic.mgmt.ManageClient;
 import com.rjrudin.marklogic.mgmt.ManageConfig;
 import com.rjrudin.marklogic.mgmt.ResourceManager;
@@ -17,15 +23,27 @@ import com.rjrudin.marklogic.mgmt.api.database.Database;
 import com.rjrudin.marklogic.mgmt.api.forest.Forest;
 import com.rjrudin.marklogic.mgmt.api.group.Group;
 import com.rjrudin.marklogic.mgmt.api.restapi.RestApi;
+import com.rjrudin.marklogic.mgmt.api.security.Amp;
+import com.rjrudin.marklogic.mgmt.api.security.ExternalSecurity;
+import com.rjrudin.marklogic.mgmt.api.security.Privilege;
+import com.rjrudin.marklogic.mgmt.api.security.ProtectedCollection;
 import com.rjrudin.marklogic.mgmt.api.security.Role;
 import com.rjrudin.marklogic.mgmt.api.security.User;
 import com.rjrudin.marklogic.mgmt.api.server.Server;
+import com.rjrudin.marklogic.mgmt.api.task.Task;
 import com.rjrudin.marklogic.mgmt.appservers.ServerManager;
 import com.rjrudin.marklogic.mgmt.databases.DatabaseManager;
 import com.rjrudin.marklogic.mgmt.forests.ForestManager;
 import com.rjrudin.marklogic.mgmt.groups.GroupManager;
+import com.rjrudin.marklogic.mgmt.security.AmpManager;
+import com.rjrudin.marklogic.mgmt.security.ExternalSecurityManager;
+import com.rjrudin.marklogic.mgmt.security.PrivilegeManager;
+import com.rjrudin.marklogic.mgmt.security.ProtectedCollectionsManager;
 import com.rjrudin.marklogic.mgmt.security.RoleManager;
 import com.rjrudin.marklogic.mgmt.security.UserManager;
+import com.rjrudin.marklogic.mgmt.tasks.TaskManager;
+import com.rjrudin.marklogic.mgmt.util.SimplePropertySource;
+import com.rjrudin.marklogic.mgmt.util.SystemPropertySource;
 
 /**
  * Big facade-style class for the MarkLogic Management API. Use this to instantiate or access any resource, as it will
@@ -72,6 +90,84 @@ public class API extends LoggingObject {
         // This is needed at least for localname on Element instances
         m.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
         return m;
+    }
+
+    /**
+     * Connect to a (presumably) different host, using the same username/password combos that were used for the same
+     * connection. Useful in a development environment where you may have multiple clusters with the same admin
+     * username/password combo, and you want to switch quickly from one to another.
+     * 
+     * @param host
+     */
+    public void connect(String host) {
+        ManageConfig mc = this.manageClient.getManageConfig();
+        connect(host, mc.getUsername(), mc.getPassword(), mc.getAdminUsername(), mc.getAdminPassword());
+    }
+
+    /**
+     * Connect to a (presumably) different MarkLogic Management API. The username/password are assumed to work for both
+     * the Management API and the Admin API on port 8001.
+     * 
+     * @param host
+     * @param username
+     * @param password
+     */
+    public void connect(String host, String username, String password) {
+        connect(host, username, password, username, password);
+    }
+
+    /**
+     * Connect to a (presumably) different MarkLogic Management API.
+     * 
+     * @param host
+     * @param username
+     * @param password
+     * @param adminUsername
+     * @param adminPassword
+     */
+    public void connect(String host, String username, String password, String adminUsername, String adminPassword) {
+        if (logger.isInfoEnabled()) {
+            logger.info("Connecting to host: " + host);
+        }
+        SimplePropertySource sps = new SimplePropertySource("mlHost", host, "mlManageUsername", username,
+                "mlManagePassword", password, "mlAdminUsername", adminUsername, "mlAdminPassword", adminPassword);
+        this.manageClient = new ManageClient(new DefaultManageConfigFactory(sps).newManageConfig());
+        initializeAdminManager();
+        if (logger.isInfoEnabled()) {
+            logger.info("Connected to host: " + host);
+        }
+    }
+
+    /**
+     * Constructs a new ClientHelper, using newClient().
+     * 
+     * @return
+     */
+    public ClientHelper clientHelper() {
+        return new ClientHelper(newClient());
+    }
+
+    /**
+     * Constructs a new DatabaseClient, using system properties to create an AppConfig instance which is used to create
+     * a DatabaseClient.
+     * 
+     * @return
+     */
+    public DatabaseClient newClient() {
+        return new DefaultAppConfigFactory(new SystemPropertySource()).newAppConfig().newDatabaseClient();
+    }
+
+    /**
+     * Construct a new DatabaseClient, assuming DIGEST authentication.
+     * 
+     * @param host
+     * @param port
+     * @param user
+     * @param password
+     * @return
+     */
+    public DatabaseClient newClient(String host, Integer port, String user, String password) {
+        return DatabaseClientFactory.newClient(host, port, user, password, Authentication.DIGEST);
     }
 
     /**
@@ -176,6 +272,57 @@ public class API extends LoggingObject {
         return server(null);
     }
 
+    /**
+     * In order to get an amp, we need up to 4 things to uniquely identify based on
+     * http://docs.marklogic.com/REST/GET/manage/v2/amps/[id-or-name] . TODO Could make this nicer, where a call is made
+     * to the amps endpoint to find an amp with the given local name, and if only one exists, just use that.
+     * 
+     * @param localName
+     * @return
+     */
+    public Amp amp(String localName, String namespace, String documentUri, String modulesDatabase) {
+        Amp amp = new Amp(this, localName);
+        amp.setNamespace(namespace);
+        amp.setDocumentUri(documentUri);
+        amp.setModulesDatabase(modulesDatabase);
+        return localName != null && amp.exists() ? getResource(localName, new AmpManager(getManageClient()), Amp.class,
+                amp.getResourceUrlParams()) : amp;
+    }
+
+    public Amp getAmp() {
+        return amp(null, null, null, null);
+    }
+
+    public ExternalSecurity externalSecurity(String name) {
+        ExternalSecurity es = new ExternalSecurity(this, name);
+        return name != null && es.exists() ? getResource(name, new ExternalSecurityManager(getManageClient()),
+                ExternalSecurity.class) : es;
+    }
+
+    public ExternalSecurity externalSecurity() {
+        return externalSecurity(null);
+    }
+
+    public Privilege privilege(String name) {
+        Privilege p = new Privilege(this, name);
+        return name != null && p.exists() ? getResource(name, new PrivilegeManager(getManageClient()), Privilege.class)
+                : p;
+    }
+
+    public Privilege getPrivilege() {
+        return privilege(null);
+    }
+
+    public ProtectedCollection protectedCollection(String name) {
+        ProtectedCollection pc = new ProtectedCollection(this, name);
+        return name != null && pc.exists() ? getResource(name, new ProtectedCollectionsManager(getManageClient()),
+                ProtectedCollection.class) : pc;
+    }
+
+    public ProtectedCollection getProtectedCollection() {
+        return protectedCollection(null);
+    }
+
     public User user(String name) {
         User u = new User(this, name);
         return name != null && u.exists() ? getResource(name, new UserManager(getManageClient()), User.class) : u;
@@ -194,11 +341,21 @@ public class API extends LoggingObject {
         return role(null);
     }
 
-    protected <T extends Resource> T getResource(String name, ResourceManager mgr, Class<T> resourceClass) {
-        if (mgr.exists(name)) {
-            return buildFromJson(mgr.getAsJson(name), resourceClass);
+    public Task task(String taskId) {
+        Task t = new Task(this, taskId);
+        return taskId != null && t.exists() ? getResource(taskId, new TaskManager(getManageClient()), Task.class) : t;
+    }
+
+    public Task getTask() {
+        return task(null);
+    }
+
+    protected <T extends Resource> T getResource(String resourceNameOrId, ResourceManager mgr, Class<T> resourceClass,
+            String... resourceUrlParams) {
+        if (mgr.exists(resourceNameOrId)) {
+            return buildFromJson(mgr.getAsJson(resourceNameOrId, resourceUrlParams), resourceClass);
         }
-        throw new RuntimeException("Could not find resource with name: " + name);
+        throw new RuntimeException("Could not find resource with name or ID: " + resourceNameOrId);
     }
 
     protected <T extends Resource> T buildFromJson(String json, Class<T> clazz) {

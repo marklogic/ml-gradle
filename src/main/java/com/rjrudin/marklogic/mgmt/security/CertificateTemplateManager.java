@@ -35,13 +35,13 @@ public class CertificateTemplateManager extends AbstractResourceManager {
     }
 
     @Override
-    public String getResourcePath(String resourceNameOrId) {
+    public String getResourcePath(String resourceNameOrId, String... resourceUrlParams) {
         String id = getIdForName(resourceNameOrId);
         return format("%s/%s", getResourcesPath(), id);
     }
 
     @Override
-    public String getPropertiesPath(String resourceNameOrId) {
+    public String getPropertiesPath(String resourceNameOrId, String... resourceUrlParams) {
         return format("%s/properties", getResourcePath(resourceNameOrId));
     }
 

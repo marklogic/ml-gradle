@@ -23,15 +23,19 @@ public abstract class AbstractResourceManager extends AbstractManager implements
         return format("/manage/v2/%ss", getResourceName());
     }
 
-    public String getResourcePath(String resourceNameOrId) {
-        return format("%s/%s", getResourcesPath(), resourceNameOrId);
+    public String getResourcePath(String resourceNameOrId, String... resourceUrlParams) {
+        return appendParamsAndValuesToPath(format("%s/%s", getResourcesPath(), resourceNameOrId), resourceUrlParams);
     }
 
-    public String getPropertiesPath(String resourceNameOrId) {
-        return format("%s/properties", getResourcePath(resourceNameOrId));
+    public String getPropertiesPath(String resourceNameOrId, String... resourceUrlParams) {
+        return appendParamsAndValuesToPath(format("%s/properties", getResourcePath(resourceNameOrId)),
+                resourceUrlParams);
     }
 
-    public boolean exists(String resourceNameOrId) {
+    /**
+     * TODO Not sure yet whether we need to account for resourceUrlParams when doing an existence check.
+     */
+    public boolean exists(String resourceNameOrId, String... resourceUrlParams) {
         return getAsXml().resourceExists(resourceNameOrId);
     }
 
@@ -41,18 +45,19 @@ public abstract class AbstractResourceManager extends AbstractManager implements
         return new ResourcesFragment(f);
     }
 
-    public Fragment getAsXml(String resourceNameOrId) {
-        return useAdminUser() ? manageClient.getXmlAsAdmin(getResourcePath(resourceNameOrId)) : manageClient
-                .getXml(getResourcePath(resourceNameOrId));
+    public Fragment getAsXml(String resourceNameOrId, String... resourceUrlParams) {
+        String path = appendParamsAndValuesToPath(getResourcePath(resourceNameOrId, resourceUrlParams));
+        return useAdminUser() ? manageClient.getXmlAsAdmin(path) : manageClient.getXml(path);
     }
 
-    public Fragment getPropertiesAsXml(String resourceNameOrId) {
-        return useAdminUser() ? manageClient.getXmlAsAdmin(getPropertiesPath(resourceNameOrId)) : manageClient
-                .getXml(getPropertiesPath(resourceNameOrId));
+    public Fragment getPropertiesAsXml(String resourceNameOrId, String... resourceUrlParams) {
+        String path = appendParamsAndValuesToPath(getPropertiesPath(resourceNameOrId, resourceUrlParams));
+        return useAdminUser() ? manageClient.getXmlAsAdmin(path) : manageClient.getXml(path);
     }
 
-    public String getAsJson(String resourceNameOrId) {
-        return manageClient.getJson(getPropertiesPath(resourceNameOrId));
+    public String getAsJson(String resourceNameOrId, String... resourceUrlParams) {
+        String path = appendParamsAndValuesToPath(getPropertiesPath(resourceNameOrId, resourceUrlParams));
+        return manageClient.getJson(path);
     }
 
     /**
@@ -101,26 +106,31 @@ public abstract class AbstractResourceManager extends AbstractManager implements
     }
 
     @Override
-    public DeleteReceipt deleteByIdField(String resourceIdFieldValue) {
+    public DeleteReceipt deleteByIdField(String resourceIdFieldValue, String... resourceUrlParams) {
         String payload = "{\"%s\":\"%s\"}";
-        return delete(format(payload, getIdFieldName(), resourceIdFieldValue));
+        return delete(format(payload, getIdFieldName(), resourceIdFieldValue), resourceUrlParams);
     }
 
     @Override
-    public DeleteReceipt delete(String payload) {
+    public DeleteReceipt delete(String payload, String... resourceUrlParams) {
         String resourceId = getResourceId(payload);
         if (!exists(resourceId)) {
             logger.info(format("Could not find %s with name or ID of %s, so not deleting", getResourceName(),
                     resourceId));
             return new DeleteReceipt(resourceId, null, false);
         } else {
-            String path = getResourcePath(resourceId);
+            String path = getResourcePath(resourceId, resourceUrlParams);
             path = appendParamsAndValuesToPath(path, getDeleteResourceParams(payload));
             deleteAtPath(path);
             return new DeleteReceipt(resourceId, path, true);
         }
     }
 
+    /**
+     * Convenience method for performing a delete once the correct path for the resource has been constructed.
+     * 
+     * @param path
+     */
     public void deleteAtPath(String path) {
         String label = getResourceName();
         logger.info(format("Deleting %s at path %s", label, path));
@@ -132,14 +142,29 @@ public abstract class AbstractResourceManager extends AbstractManager implements
         logger.info(format("Deleted %s at path %s", label, path));
     }
 
+    /**
+     * TODO Could use something nicer here, particularly to properly encode the parameter values.
+     * 
+     * @param path
+     * @param paramsAndValues
+     * @return
+     */
     protected String appendParamsAndValuesToPath(String path, String... paramsAndValues) {
         if (paramsAndValues != null && paramsAndValues.length > 0) {
-            path += "?";
+            if (path.contains("?")) {
+                path += "&";
+            } else {
+                path += "?";
+            }
             for (int i = 0; i < paramsAndValues.length; i += 2) {
-                if (i > 0) {
-                    path += "&";
+                String name = paramsAndValues[i];
+                String value = paramsAndValues[i + 1];
+                if (name != null && value != null) {
+                    if (i > 0) {
+                        path += "&";
+                    }
+                    path += name + "=" + value;
                 }
-                path += paramsAndValues[i] + "=" + paramsAndValues[i + 1];
             }
         }
         return path;

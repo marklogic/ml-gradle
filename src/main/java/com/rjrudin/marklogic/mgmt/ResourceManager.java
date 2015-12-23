@@ -12,9 +12,11 @@ public interface ResourceManager {
 
     /**
      * @param resourceNameOrId
+     * @param resourceUrlParams
+     *            Some resources require URL parameters to uniquely identify them
      * @return true if a resource with the given name or ID exists, false otherwise
      */
-    public boolean exists(String resourceNameOrId);
+    public boolean exists(String resourceNameOrId, String... resourceUrlParams);
 
     /**
      * If a resource with a name in the the given payload exists, then update that resource; else create it.
@@ -29,42 +31,50 @@ public interface ResourceManager {
      * 
      * @param payload
      *            a JSON or XML payload with the resource ID field in it
+     * @param resourceUrlParams
+     *            Some resources require URL parameters to uniquely identify them
      * @return true if a resource was deleted; false otherwise
      */
-    public DeleteReceipt delete(String payload);
+    public DeleteReceipt delete(String payload, String... resourceUrlParams);
 
     /**
      * Deletes a resource with the given resource ID field value.
      * 
      * @param resourceIdFieldValue
+     * @param resourceUrlParams
+     *            Some resources require URL parameters to uniquely identify them
      * @return true if a resource was deleted; false otherwise
      */
-    public DeleteReceipt deleteByIdField(String resourceIdFieldValue);
+    public DeleteReceipt deleteByIdField(String resourceIdFieldValue, String... resourceUrlParams);
 
     /**
-     * 
-     * @return
+     * @return a ResourcesFragment instance containing the XML returned by the endpoint that lists all of the resources
      */
     public ResourcesFragment getAsXml();
 
     /**
-     * 
      * @param resourceNameOrId
+     * @param resourceUrlParams
+     *            Some resources require URL parameters to uniquely identify them
      * @return
      */
-    public Fragment getAsXml(String resourceNameOrId);
+    public Fragment getAsXml(String resourceNameOrId, String... resourceUrlParams);
 
     /**
      * 
      * @param resourceNameOrId
+     * @param resourceUrlParams
+     *            Some resources require URL parameters to uniquely identify them
      * @return
      */
-    public String getAsJson(String resourceNameOrId);
+    public String getAsJson(String resourceNameOrId, String... resourceUrlParams);
 
     /**
      * 
      * @param resourceNameOrId
+     * @param resourceUrlParams
+     *            Some resources require URL parameters to uniquely identify them
      * @return
      */
-    public Fragment getPropertiesAsXml(String resourceNameOrId);
+    public Fragment getPropertiesAsXml(String resourceNameOrId, String... resourceUrlParams);
 }

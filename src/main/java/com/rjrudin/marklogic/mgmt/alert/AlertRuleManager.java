@@ -37,13 +37,13 @@ public class AlertRuleManager extends AbstractResourceManager {
     }
 
     @Override
-    public String getResourcePath(String resourceNameOrId) {
+    public String getResourcePath(String resourceNameOrId, String... resourceUrlParams) {
         return format("/manage/v2/databases/%s/alert/actions/%s/rules/%s?uri=%s", databaseIdOrName, actionIdOrName,
                 resourceNameOrId, configUri);
     }
 
     @Override
-    public String getPropertiesPath(String resourceNameOrId) {
+    public String getPropertiesPath(String resourceNameOrId, String... resourceUrlParams) {
         return format("/manage/v2/databases/%s/alert/actions/%s/rules/%s/properties?uri=%s", databaseIdOrName,
                 actionIdOrName, resourceNameOrId, configUri);
     }

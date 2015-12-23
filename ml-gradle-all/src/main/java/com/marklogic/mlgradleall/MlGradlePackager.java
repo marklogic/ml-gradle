@@ -1,4 +1,4 @@
-package com.rjrudin.marklogic.mlgradleall;
+package com.marklogic.mlgradleall;
 
 import java.io.File;
 import java.io.FileReader;
@@ -9,12 +9,12 @@ import java.util.List;
 import org.jdom2.Namespace;
 import org.springframework.util.FileCopyUtils;
 
-import com.rjrudin.marklogic.junit.Fragment;
+import com.marklogic.junit.Fragment;
 
 public class MlGradlePackager {
 
-    private static File baseDir = new File("../../gh-pages-marklogic-java/releases/com/rjrudin");
-    private static File destDir = new File("build/ml-gradle-all/com/rjrudin");
+    private static File baseDir = new File("../../gh-pages-marklogic-java/releases/com/marklogic");
+    private static File destDir = new File("build/ml-gradle-all/com/marklogic");
 
     public static void main(String[] args) throws Exception {
         if (destDir.exists()) {
@@ -53,7 +53,7 @@ public class MlGradlePackager {
         if (f.exists()) {
             Namespace n = Namespace.getNamespace("p", "http://maven.apache.org/POM/4.0.0");
             Fragment xml = new Fragment(FileCopyUtils.copyToString(new FileReader(f)), n);
-            for (Fragment el : xml.getFragments("//p:dependency[p:groupId = 'com.rjrudin']")) {
+            for (Fragment el : xml.getFragments("//p:dependency[p:groupId = 'com.marklogic']")) {
                 list.add(el.getElementValue("/node()/p:artifactId"));
                 list.add(el.getElementValue("/node()/p:version"));
                 // list.add(el.getChildText("artifactId", n));

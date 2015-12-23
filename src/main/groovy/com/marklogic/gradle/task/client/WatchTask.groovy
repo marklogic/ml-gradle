@@ -2,11 +2,11 @@ package com.marklogic.gradle.task.client
 
 import org.gradle.api.tasks.TaskAction
 
-import com.marklogic.client.DatabaseClient
 import com.marklogic.appdeployer.command.modules.LoadModulesCommand
+import com.marklogic.client.DatabaseClient
+import com.marklogic.client.modulesloader.ModulesLoader
+import com.marklogic.client.modulesloader.impl.DefaultModulesFinder
 import com.marklogic.gradle.task.MarkLogicTask
-import com.marklogic.modulesloader.ModulesLoader
-import com.marklogic.modulesloader.impl.DefaultModulesFinder
 
 /**
  * Runs an infinite loop, and each second, it loads any new/modified modules. Often useful to run with the Gradle "-i" flag

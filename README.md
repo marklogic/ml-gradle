@@ -32,6 +32,8 @@ See [the Wiki page on all tasks](https://github.com/rjrudin/ml-gradle/wiki/All-t
 
 How can I start using ml-gradle?
 =========
+First, please note the [Wiki and FAQ](https://github.com/rjrudin/ml-gradle/wiki) which have answers to many of the questions you'll have or run into soon.
+
 To use ml-gradle right away, you'll need Gradle installed first. And of course you'll need Marklogic installed somewhere - it doesn't have to be the same computer as the one you're running Gradle on. Then create a directory for your project and add a build.gradle file and a gradle.properties file. Here's the simplest build.gradle file possible:
 
     buildscript {
@@ -73,16 +75,16 @@ And to see all the tasks available to you, just run:
 Exploring the sample project
 -----
 
-To start customizing your application, your best bet is to examine the [sample-project application](https://github.com/rjrudin/ml-gradle/blob/master/examples/sample-project) in this repository. There are three primary things to examine:
+To start customizing your application, your best bet is to examine the [sample-project application](https://github.com/rjrudin/ml-gradle/blob/master/examples/sample-project) in this repository (along with all the other sample projects in that directory). There are three primary things to examine:
 
 1. The [build.gradle file](https://github.com/rjrudin/ml-gradle/blob/master/examples/sample-project/build.gradle) provides examples of configuring and extending ml-gradle. 
-1. The [ml-config directory](https://github.com/rjrudin/ml-gradle/tree/master/examples/sample-project/src/main/ml-config) provides examples of all of the MarkLogic management resources currently supported by ml-gradle.
+1. The [ml-config directory](https://github.com/rjrudin/ml-gradle/tree/master/examples/sample-project/src/main/ml-config) provides examples of many of the MarkLogic management resources currently supported by ml-gradle.
 1. The [ml-modules directory](https://github.com/rjrudin/ml-gradle/tree/master/examples/sample-project/src/main/ml-modules) provides examples of the different kinds of modules that can be loaded (application modules are loaded via the MarkLogic Client REST API, not the Management REST API). 
 
 To try out the sample project, just do the following:
 
 1. Clone this repository
-1. cd sample-project
+1. cd examples/sample-project
 1. gradle mlDeploy
 
 For a new project - to quickly generate a useful set of configuration files, just run:
@@ -90,7 +92,3 @@ For a new project - to quickly generate a useful set of configuration files, jus
     gradle mlScaffold
 
 This will generate a directory structure containing several configuration files - one for a content database, a REST API server, an application role, an application user, and more. You can change these and add more configuration files based on the examples in the sample project mentioned above.
-
-Digging deeper into ml-gradle
-=========
-Check out the [Wiki and FAQ](https://github.com/rjrudin/ml-gradle/wiki)

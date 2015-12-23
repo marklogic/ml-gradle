@@ -11,7 +11,6 @@ import com.rjrudin.marklogic.appdeployer.command.modules.LoadModulesCommand;
 import com.rjrudin.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.rjrudin.marklogic.appdeployer.command.security.DeployRolesCommand;
 import com.rjrudin.marklogic.appdeployer.command.security.DeployUsersCommand;
-import com.rjrudin.marklogic.appdeployer.scaffold.ScaffoldGenerator;
 import com.rjrudin.marklogic.mgmt.databases.DatabaseManager;
 import com.rjrudin.marklogic.mgmt.security.RoleManager;
 import com.rjrudin.marklogic.mgmt.security.UserManager;

@@ -8,8 +8,8 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
-import com.rjrudin.marklogic.junit.BaseTestHelper;
-import com.rjrudin.marklogic.junit.spring.LoggingTestExecutionListener;
+import com.marklogic.junit.BaseTestHelper;
+import com.marklogic.junit.spring.LoggingTestExecutionListener;
 import com.rjrudin.marklogic.mgmt.admin.AdminConfig;
 import com.rjrudin.marklogic.mgmt.admin.AdminManager;
 

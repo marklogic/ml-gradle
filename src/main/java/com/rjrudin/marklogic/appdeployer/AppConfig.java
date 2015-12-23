@@ -11,9 +11,9 @@ import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.DatabaseClientFactory.Authentication;
 import com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier;
-import com.rjrudin.marklogic.modulesloader.impl.XccAssetLoader;
-import com.rjrudin.marklogic.modulesloader.ssl.SimpleX509TrustManager;
-import com.rjrudin.marklogic.modulesloader.xcc.DefaultDocumentFormatGetter;
+import com.marklogic.client.modulesloader.impl.XccAssetLoader;
+import com.marklogic.client.modulesloader.ssl.SimpleX509TrustManager;
+import com.marklogic.client.modulesloader.xcc.DefaultDocumentFormatGetter;
 
 /**
  * Encapsulates common configuration properties for an application deployed to MarkLogic. These properties include not

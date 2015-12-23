@@ -7,16 +7,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.marklogic.junit.PermissionsFragment;
+import com.marklogic.xcc.template.XccTemplate;
 import com.rjrudin.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.rjrudin.marklogic.appdeployer.ConfigDir;
 import com.rjrudin.marklogic.appdeployer.command.modules.LoadModulesCommand;
-import com.rjrudin.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.rjrudin.marklogic.appdeployer.command.security.DeployRolesCommand;
 import com.rjrudin.marklogic.appdeployer.command.security.DeployUsersCommand;
-import com.rjrudin.marklogic.junit.PermissionsFragment;
 import com.rjrudin.marklogic.mgmt.ManageClient;
 import com.rjrudin.marklogic.mgmt.ManageConfig;
-import com.rjrudin.marklogic.xcc.XccTemplate;
 
 public class CreateRestApiAsNonAdminUserTest extends AbstractAppDeployerTest {
 

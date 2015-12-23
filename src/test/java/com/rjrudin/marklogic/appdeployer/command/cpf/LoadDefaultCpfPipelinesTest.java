@@ -4,9 +4,9 @@ import org.junit.After;
 import org.junit.Test;
 
 import com.rjrudin.marklogic.appdeployer.AbstractAppDeployerTest;
+import com.rjrudin.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import com.rjrudin.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand;
 import com.rjrudin.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
-import com.rjrudin.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import com.rjrudin.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.rjrudin.marklogic.mgmt.cpf.PipelineManager;
 import com.rjrudin.marklogic.rest.util.ResourcesFragment;

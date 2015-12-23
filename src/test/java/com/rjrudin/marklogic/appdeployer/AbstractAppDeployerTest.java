@@ -7,12 +7,12 @@ import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import com.marklogic.xcc.template.XccTemplate;
 import com.rjrudin.marklogic.appdeployer.command.Command;
 import com.rjrudin.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.rjrudin.marklogic.appdeployer.impl.SimpleAppDeployer;
 import com.rjrudin.marklogic.mgmt.AbstractMgmtTest;
 import com.rjrudin.marklogic.mgmt.ManageConfig;
-import com.rjrudin.marklogic.xcc.XccTemplate;
 
 /**
  * Base class for tests that depend on an AppDeployer instance. You can extend this directly to write a test for a

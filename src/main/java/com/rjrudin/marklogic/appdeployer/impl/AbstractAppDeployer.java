@@ -5,12 +5,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import com.marklogic.client.helper.LoggingObject;
 import com.rjrudin.marklogic.appdeployer.AppConfig;
 import com.rjrudin.marklogic.appdeployer.AppDeployer;
 import com.rjrudin.marklogic.appdeployer.command.Command;
 import com.rjrudin.marklogic.appdeployer.command.CommandContext;
 import com.rjrudin.marklogic.appdeployer.command.UndoableCommand;
-import com.rjrudin.marklogic.client.LoggingObject;
 import com.rjrudin.marklogic.mgmt.ManageClient;
 import com.rjrudin.marklogic.mgmt.admin.AdminManager;
 

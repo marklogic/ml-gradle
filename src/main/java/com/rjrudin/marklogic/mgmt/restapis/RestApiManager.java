@@ -2,7 +2,7 @@ package com.rjrudin.marklogic.mgmt.restapis;
 
 import org.springframework.http.ResponseEntity;
 
-import com.rjrudin.marklogic.client.LoggingObject;
+import com.marklogic.client.helper.LoggingObject;
 import com.rjrudin.marklogic.mgmt.ManageClient;
 import com.rjrudin.marklogic.rest.util.Fragment;
 

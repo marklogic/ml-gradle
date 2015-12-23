@@ -2,7 +2,6 @@ package com.rjrudin.marklogic.appdeployer.command.groups;
 
 import com.rjrudin.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.rjrudin.marklogic.appdeployer.command.Command;
-import com.rjrudin.marklogic.appdeployer.command.groups.DeployGroupsCommand;
 import com.rjrudin.marklogic.mgmt.ResourceManager;
 import com.rjrudin.marklogic.mgmt.groups.GroupManager;
 import com.rjrudin.marklogic.rest.util.Fragment;

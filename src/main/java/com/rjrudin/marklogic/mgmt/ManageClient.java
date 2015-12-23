@@ -13,7 +13,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import com.rjrudin.marklogic.client.LoggingObject;
+import com.marklogic.client.helper.LoggingObject;
 import com.rjrudin.marklogic.rest.util.Fragment;
 import com.rjrudin.marklogic.rest.util.RestTemplateUtil;
 

@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import com.rjrudin.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.rjrudin.marklogic.appdeployer.ConfigDir;
-import com.rjrudin.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
 import com.rjrudin.marklogic.mgmt.databases.DatabaseManager;
 import com.rjrudin.marklogic.mgmt.forests.ForestManager;
 

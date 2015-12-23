@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
-import com.rjrudin.marklogic.mgmt.ManageConfig;
 import com.rjrudin.marklogic.mgmt.admin.AdminConfig;
 
 /**

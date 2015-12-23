@@ -5,7 +5,6 @@ import java.util.List;
 import org.junit.Test;
 
 import com.rjrudin.marklogic.mgmt.AbstractMgmtTest;
-import com.rjrudin.marklogic.mgmt.hosts.HostManager;
 
 public class ManageHostsTest extends AbstractMgmtTest {
 

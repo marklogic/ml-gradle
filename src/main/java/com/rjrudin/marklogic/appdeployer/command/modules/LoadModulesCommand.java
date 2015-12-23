@@ -3,13 +3,13 @@ package com.rjrudin.marklogic.appdeployer.command.modules;
 import java.io.File;
 
 import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.modulesloader.ModulesLoader;
+import com.marklogic.client.modulesloader.impl.DefaultModulesLoader;
+import com.marklogic.client.modulesloader.impl.TestServerModulesFinder;
 import com.rjrudin.marklogic.appdeployer.AppConfig;
 import com.rjrudin.marklogic.appdeployer.command.AbstractCommand;
 import com.rjrudin.marklogic.appdeployer.command.CommandContext;
 import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
-import com.rjrudin.marklogic.modulesloader.ModulesLoader;
-import com.rjrudin.marklogic.modulesloader.impl.DefaultModulesLoader;
-import com.rjrudin.marklogic.modulesloader.impl.TestServerModulesFinder;
 
 /**
  * Command for loading modules via an instance of DefaultModulesLoader, which depends on an instance of XccAssetLoader -

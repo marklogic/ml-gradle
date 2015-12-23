@@ -4,10 +4,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.marklogic.junit.PermissionsFragment;
+import com.marklogic.xcc.template.XccTemplate;
 import com.rjrudin.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.rjrudin.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
-import com.rjrudin.marklogic.junit.PermissionsFragment;
-import com.rjrudin.marklogic.xcc.XccTemplate;
 
 public class LoadModulesTest extends AbstractAppDeployerTest {
 

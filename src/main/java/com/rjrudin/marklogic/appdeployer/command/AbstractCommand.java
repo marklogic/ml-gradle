@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 import org.springframework.util.FileCopyUtils;
 
-import com.rjrudin.marklogic.client.LoggingObject;
+import com.marklogic.client.helper.LoggingObject;
 import com.rjrudin.marklogic.mgmt.ResourceManager;
 import com.rjrudin.marklogic.mgmt.SaveReceipt;
 

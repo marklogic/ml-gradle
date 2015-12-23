@@ -11,9 +11,9 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.marklogic.client.helper.LoggingObject;
 import com.rjrudin.marklogic.appdeployer.AppConfig;
 import com.rjrudin.marklogic.appdeployer.util.RestApiUtil;
-import com.rjrudin.marklogic.client.LoggingObject;
 
 /**
  * Lots of protected methods in here to encourage subclassing and overriding behavior.

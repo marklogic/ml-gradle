@@ -3,8 +3,6 @@ package com.rjrudin.marklogic.mgmt.api;
 import org.junit.Before;
 
 import com.rjrudin.marklogic.mgmt.AbstractMgmtTest;
-import com.rjrudin.marklogic.mgmt.api.API;
-import com.rjrudin.marklogic.mgmt.api.Resource;
 
 public abstract class AbstractApiTest extends AbstractMgmtTest {
 

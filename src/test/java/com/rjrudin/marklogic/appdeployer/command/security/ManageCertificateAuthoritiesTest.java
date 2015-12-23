@@ -3,7 +3,6 @@ package com.rjrudin.marklogic.appdeployer.command.security;
 import org.junit.Test;
 
 import com.rjrudin.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.rjrudin.marklogic.appdeployer.command.security.DeployCertificateAuthoritiesCommand;
 import com.rjrudin.marklogic.mgmt.security.CertificateAuthorityManager;
 import com.rjrudin.marklogic.rest.util.ResourcesFragment;
 

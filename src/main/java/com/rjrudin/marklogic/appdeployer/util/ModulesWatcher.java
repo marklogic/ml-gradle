@@ -4,15 +4,15 @@ import java.io.File;
 import java.util.List;
 
 import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.helper.LoggingObject;
+import com.marklogic.client.modulesloader.ModulesFinder;
+import com.marklogic.client.modulesloader.ModulesLoader;
+import com.marklogic.client.modulesloader.impl.DefaultModulesFinder;
+import com.marklogic.client.modulesloader.impl.DefaultModulesLoader;
+import com.marklogic.client.modulesloader.impl.XccAssetLoader;
 import com.rjrudin.marklogic.appdeployer.AppConfig;
 import com.rjrudin.marklogic.appdeployer.DefaultAppConfigFactory;
-import com.rjrudin.marklogic.client.LoggingObject;
 import com.rjrudin.marklogic.mgmt.util.SystemPropertySource;
-import com.rjrudin.marklogic.modulesloader.ModulesFinder;
-import com.rjrudin.marklogic.modulesloader.ModulesLoader;
-import com.rjrudin.marklogic.modulesloader.impl.DefaultModulesFinder;
-import com.rjrudin.marklogic.modulesloader.impl.DefaultModulesLoader;
-import com.rjrudin.marklogic.modulesloader.impl.XccAssetLoader;
 
 /**
  * This is a hacked together prototype of loading modules from within groovysh. The idea is that all the necessary

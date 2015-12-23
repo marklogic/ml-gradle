@@ -1,6 +1,6 @@
 package com.rjrudin.marklogic.mgmt.util;
 
-import com.rjrudin.marklogic.client.LoggingObject;
+import com.marklogic.client.helper.LoggingObject;
 
 /**
  * Helper class for factories that depend on a PropertySource for configuring the objects they produce.

@@ -4,7 +4,6 @@ import org.junit.Before;
 
 import com.rjrudin.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.rjrudin.marklogic.appdeployer.command.Command;
-import com.rjrudin.marklogic.appdeployer.command.security.DeployUsersCommand;
 import com.rjrudin.marklogic.mgmt.ResourceManager;
 import com.rjrudin.marklogic.mgmt.security.UserManager;
 import com.rjrudin.marklogic.rest.util.Fragment;

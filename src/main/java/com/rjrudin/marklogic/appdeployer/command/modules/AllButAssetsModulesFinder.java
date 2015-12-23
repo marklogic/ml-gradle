@@ -2,8 +2,8 @@ package com.rjrudin.marklogic.appdeployer.command.modules;
 
 import java.io.File;
 
-import com.rjrudin.marklogic.modulesloader.Modules;
-import com.rjrudin.marklogic.modulesloader.impl.BaseModulesFinder;
+import com.marklogic.client.modulesloader.Modules;
+import com.marklogic.client.modulesloader.impl.BaseModulesFinder;
 
 public class AllButAssetsModulesFinder extends BaseModulesFinder {
 

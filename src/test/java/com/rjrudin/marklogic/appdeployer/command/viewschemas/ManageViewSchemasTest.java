@@ -4,6 +4,7 @@ import org.jdom2.Namespace;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import com.marklogic.junit.Fragment;
 import com.rjrudin.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.rjrudin.marklogic.appdeployer.command.Command;
 import com.rjrudin.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
@@ -11,7 +12,6 @@ import com.rjrudin.marklogic.appdeployer.command.databases.DeploySchemasDatabase
 import com.rjrudin.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
 import com.rjrudin.marklogic.appdeployer.command.modules.LoadModulesCommand;
 import com.rjrudin.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
-import com.rjrudin.marklogic.junit.Fragment;
 import com.rjrudin.marklogic.mgmt.ResourceManager;
 import com.rjrudin.marklogic.mgmt.viewschemas.ViewSchemaManager;
 import com.rjrudin.marklogic.rest.util.RestTemplateUtil;

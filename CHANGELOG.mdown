@@ -1,5 +1,9 @@
 # ml-app-deployer releases
 
+## 2.0rc1
+
+* Repackaging to com.marklogic
+
 ## 2.0b16
 
 * Fixed issue with setting custom asset permissions; now just have appConfig.setModulePermissions via mlModulePermissions

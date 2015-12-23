@@ -1,11 +1,11 @@
-package com.rjrudin.marklogic.client.spring;
+package com.marklogic.client.spring;
 
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.marklogic.client.DatabaseClient;
-import com.rjrudin.marklogic.client.DatabaseClientConfig;
-import com.rjrudin.marklogic.client.DatabaseClientProvider;
+import com.marklogic.client.helper.DatabaseClientConfig;
+import com.marklogic.client.helper.DatabaseClientProvider;
 
 public class SimpleDatabaseClientProvider implements DatabaseClientProvider, DisposableBean {
 

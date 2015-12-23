@@ -1,9 +1,9 @@
-package com.rjrudin.marklogic.modulesloader.impl;
+package com.marklogic.client.modulesloader.impl;
 
 import java.io.File;
 
-import com.rjrudin.marklogic.modulesloader.Modules;
-import com.rjrudin.marklogic.modulesloader.ModulesFinder;
+import com.marklogic.client.modulesloader.Modules;
+import com.marklogic.client.modulesloader.ModulesFinder;
 
 /**
  * Default implementation that loads all of the different kinds of REST modules.

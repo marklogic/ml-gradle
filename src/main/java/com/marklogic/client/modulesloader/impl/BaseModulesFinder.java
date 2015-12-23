@@ -1,13 +1,13 @@
-package com.rjrudin.marklogic.modulesloader.impl;
+package com.marklogic.client.modulesloader.impl;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.rjrudin.marklogic.client.FilenameUtil;
-import com.rjrudin.marklogic.modulesloader.Modules;
-import com.rjrudin.marklogic.modulesloader.ModulesFinder;
+import com.marklogic.client.helper.FilenameUtil;
+import com.marklogic.client.modulesloader.Modules;
+import com.marklogic.client.modulesloader.ModulesFinder;
 
 /**
  * Abstract implementation that provides implementations for loading all the different kinds of modules, but doesn't

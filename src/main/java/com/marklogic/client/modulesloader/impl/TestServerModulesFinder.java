@@ -1,8 +1,8 @@
-package com.rjrudin.marklogic.modulesloader.impl;
+package com.marklogic.client.modulesloader.impl;
 
 import java.io.File;
 
-import com.rjrudin.marklogic.modulesloader.Modules;
+import com.marklogic.client.modulesloader.Modules;
 
 /**
  * Search options and REST properties are specific to a REST API server. So if you a REST API server for testing

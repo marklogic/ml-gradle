@@ -1,4 +1,4 @@
-package com.rjrudin.marklogic.modulesloader;
+package com.marklogic.client.modulesloader;
 
 import java.io.File;
 import java.util.List;

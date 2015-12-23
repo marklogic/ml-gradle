@@ -1,4 +1,4 @@
-package com.rjrudin.marklogic.modulesloader.impl;
+package com.marklogic.client.modulesloader.impl;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -13,10 +13,10 @@ import com.marklogic.client.admin.ExtensionMetadata;
 import com.marklogic.client.admin.ExtensionMetadata.ScriptLanguage;
 import com.marklogic.client.admin.MethodType;
 import com.marklogic.client.admin.ResourceExtensionsManager.MethodParameters;
-import com.rjrudin.marklogic.client.FilenameUtil;
-import com.rjrudin.marklogic.client.LoggingObject;
-import com.rjrudin.marklogic.modulesloader.ExtensionMetadataAndParams;
-import com.rjrudin.marklogic.modulesloader.ExtensionMetadataProvider;
+import com.marklogic.client.helper.FilenameUtil;
+import com.marklogic.client.helper.LoggingObject;
+import com.marklogic.client.modulesloader.ExtensionMetadataAndParams;
+import com.marklogic.client.modulesloader.ExtensionMetadataProvider;
 
 
 public class DefaultExtensionMetadataProvider extends LoggingObject implements ExtensionMetadataProvider {

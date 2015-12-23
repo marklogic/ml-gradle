@@ -1,4 +1,4 @@
-package com.rjrudin.marklogic.client;
+package com.marklogic.client.helper;
 
 import javax.net.ssl.SSLContext;
 

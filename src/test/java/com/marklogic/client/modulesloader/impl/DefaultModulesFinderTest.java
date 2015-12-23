@@ -1,4 +1,4 @@
-package com.rjrudin.marklogic.modulesloader.impl;
+package com.marklogic.client.modulesloader.impl;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,8 +8,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 
-import com.rjrudin.marklogic.modulesloader.Modules;
-import com.rjrudin.marklogic.modulesloader.ModulesFinder;
+import com.marklogic.client.modulesloader.Modules;
+import com.marklogic.client.modulesloader.ModulesFinder;
+import com.marklogic.client.modulesloader.impl.DefaultModulesFinder;
 
 public class DefaultModulesFinderTest extends Assert {
 

@@ -1,4 +1,4 @@
-package com.rjrudin.marklogic.modulesloader.impl;
+package com.marklogic.client.modulesloader.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -6,8 +6,8 @@ import java.io.FileWriter;
 import java.util.Date;
 import java.util.Properties;
 
-import com.rjrudin.marklogic.client.LoggingObject;
-import com.rjrudin.marklogic.modulesloader.ModulesManager;
+import com.marklogic.client.helper.LoggingObject;
+import com.marklogic.client.modulesloader.ModulesManager;
 
 public class PropertiesModuleManager extends LoggingObject implements ModulesManager {
 

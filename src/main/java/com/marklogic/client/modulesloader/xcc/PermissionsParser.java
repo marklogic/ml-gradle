@@ -1,4 +1,4 @@
-package com.rjrudin.marklogic.modulesloader.xcc;
+package com.marklogic.client.modulesloader.xcc;
 
 import com.marklogic.xcc.ContentPermission;
 

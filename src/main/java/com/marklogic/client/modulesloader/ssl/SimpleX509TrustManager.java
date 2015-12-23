@@ -1,4 +1,4 @@
-package com.rjrudin.marklogic.modulesloader.ssl;
+package com.marklogic.client.modulesloader.ssl;
 
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;

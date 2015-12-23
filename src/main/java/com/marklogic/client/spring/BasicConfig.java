@@ -1,4 +1,4 @@
-package com.rjrudin.marklogic.client.spring;
+package com.marklogic.client.spring;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -6,9 +6,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
-import com.rjrudin.marklogic.client.DatabaseClientConfig;
-import com.rjrudin.marklogic.client.DatabaseClientProvider;
-import com.rjrudin.marklogic.xcc.XccTemplate;
+import com.marklogic.client.helper.DatabaseClientConfig;
+import com.marklogic.client.helper.DatabaseClientProvider;
+import com.marklogic.xcc.template.XccTemplate;
 
 /**
  * Provides a basic configuration for Spring-based applications. Assumes that properties can be found in the

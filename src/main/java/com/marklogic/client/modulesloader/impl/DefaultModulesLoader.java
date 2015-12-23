@@ -1,4 +1,4 @@
-package com.rjrudin.marklogic.modulesloader.impl;
+package com.marklogic.client.modulesloader.impl;
 
 import java.io.File;
 import java.io.FileReader;
@@ -20,22 +20,22 @@ import com.marklogic.client.admin.ResourceExtensionsManager;
 import com.marklogic.client.admin.ResourceExtensionsManager.MethodParameters;
 import com.marklogic.client.admin.ServerConfigurationManager;
 import com.marklogic.client.admin.ServerConfigurationManager.UpdatePolicy;
+import com.marklogic.client.helper.FilenameUtil;
+import com.marklogic.client.helper.LoggingObject;
 import com.marklogic.client.admin.TransformExtensionsManager;
 import com.marklogic.client.io.FileHandle;
 import com.marklogic.client.io.Format;
-import com.rjrudin.marklogic.client.FilenameUtil;
-import com.rjrudin.marklogic.client.LoggingObject;
-import com.rjrudin.marklogic.modulesloader.ExtensionMetadataAndParams;
-import com.rjrudin.marklogic.modulesloader.ExtensionMetadataProvider;
-import com.rjrudin.marklogic.modulesloader.Modules;
-import com.rjrudin.marklogic.modulesloader.ModulesFinder;
-import com.rjrudin.marklogic.modulesloader.ModulesManager;
+import com.marklogic.client.modulesloader.ExtensionMetadataAndParams;
+import com.marklogic.client.modulesloader.ExtensionMetadataProvider;
+import com.marklogic.client.modulesloader.Modules;
+import com.marklogic.client.modulesloader.ModulesFinder;
+import com.marklogic.client.modulesloader.ModulesManager;
 
 /**
  * Uses the REST API for loading all modules except "assets", which are loaded via XCC for speed reasons. Note that this
  * class will not be threadsafe since XccAssetLoader is not currently threadsafe either.
  */
-public class DefaultModulesLoader extends LoggingObject implements com.rjrudin.marklogic.modulesloader.ModulesLoader {
+public class DefaultModulesLoader extends LoggingObject implements com.marklogic.client.modulesloader.ModulesLoader {
 
     private DatabaseClient client;
 

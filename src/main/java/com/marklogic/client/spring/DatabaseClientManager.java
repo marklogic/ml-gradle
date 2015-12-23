@@ -1,12 +1,12 @@
-package com.rjrudin.marklogic.client.spring;
+package com.marklogic.client.spring;
 
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
-import com.rjrudin.marklogic.client.DatabaseClientConfig;
-import com.rjrudin.marklogic.client.LoggingObject;
+import com.marklogic.client.helper.DatabaseClientConfig;
+import com.marklogic.client.helper.LoggingObject;
 
 /**
  * Note that ML7 has a DatabaseClientFactory.Bean that removes the need for most of this code, although it does not have

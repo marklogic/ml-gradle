@@ -1,4 +1,4 @@
-package com.rjrudin.marklogic.client;
+package com.marklogic.client.helper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,5 +60,13 @@ public class ClientHelper extends LoggingObject {
             uris.add(s.getUri());
         }
         return uris;
+    }
+
+    public String eval(String expr) {
+        return getClient().newServerEval().xquery(expr).evalAs(String.class);
+    }
+
+    public void release() {
+        getClient().release();
     }
 }

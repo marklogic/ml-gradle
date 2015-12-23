@@ -1,4 +1,4 @@
-package com.rjrudin.marklogic.modulesloader.impl;
+package com.marklogic.client.modulesloader.impl;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,8 +10,8 @@ import org.springframework.core.io.ClassPathResource;
 
 import com.marklogic.client.admin.MethodType;
 import com.marklogic.client.admin.ResourceExtensionsManager.MethodParameters;
-import com.rjrudin.marklogic.modulesloader.ExtensionMetadataAndParams;
-import com.rjrudin.marklogic.modulesloader.impl.DefaultExtensionMetadataProvider;
+import com.marklogic.client.modulesloader.ExtensionMetadataAndParams;
+import com.marklogic.client.modulesloader.impl.DefaultExtensionMetadataProvider;
 
 public class XmlExtensionMetadataProviderTest extends Assert {
 

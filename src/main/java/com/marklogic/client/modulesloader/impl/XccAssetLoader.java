@@ -1,4 +1,4 @@
-package com.rjrudin.marklogic.modulesloader.impl;
+package com.marklogic.client.modulesloader.impl;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -13,6 +13,12 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.marklogic.client.helper.LoggingObject;
+import com.marklogic.client.modulesloader.ModulesManager;
+import com.marklogic.client.modulesloader.xcc.CommaDelimitedPermissionsParser;
+import com.marklogic.client.modulesloader.xcc.DefaultDocumentFormatGetter;
+import com.marklogic.client.modulesloader.xcc.DocumentFormatGetter;
+import com.marklogic.client.modulesloader.xcc.PermissionsParser;
 import com.marklogic.xcc.Content;
 import com.marklogic.xcc.ContentCreateOptions;
 import com.marklogic.xcc.ContentFactory;
@@ -21,12 +27,6 @@ import com.marklogic.xcc.ContentSourceFactory;
 import com.marklogic.xcc.SecurityOptions;
 import com.marklogic.xcc.Session;
 import com.marklogic.xcc.exceptions.RequestException;
-import com.rjrudin.marklogic.client.LoggingObject;
-import com.rjrudin.marklogic.modulesloader.ModulesManager;
-import com.rjrudin.marklogic.modulesloader.xcc.CommaDelimitedPermissionsParser;
-import com.rjrudin.marklogic.modulesloader.xcc.DefaultDocumentFormatGetter;
-import com.rjrudin.marklogic.modulesloader.xcc.DocumentFormatGetter;
-import com.rjrudin.marklogic.modulesloader.xcc.PermissionsParser;
 
 /**
  * Handles loading assets - as defined by the REST API, which are typically under the /ext directory - via XCC.

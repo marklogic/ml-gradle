@@ -1,6 +1,9 @@
 # ml-gradle releases
 
-## 2.3.1
+## 2.4
+
+* Repackaged to com.marklogic
+* Depending on 3.0.4 of client-api-java 
 
 ## 2.3
 

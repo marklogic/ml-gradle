@@ -18,6 +18,6 @@ repositories {
 }
 
 dependencies {
-    testCompile "com.rjrudin:ml-junit:2.3"
+    testCompile "com.marklogic:ml-junit:2.4"
     testCompile "com.jayway.restassured:rest-assured:2.4.1"
 }

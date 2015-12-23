@@ -2,7 +2,7 @@ package sample;
 
 import org.junit.Test;
 
-import com.rjrudin.marklogic.client.DatabaseClientConfig;
+import com.marklogic.client.DatabaseClientConfig;
 
 public class GetClientConfigTest extends AbstractSampleProjectTest {
 

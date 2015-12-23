@@ -27,7 +27,7 @@ repositories {
 
 configurations {
     // This configuration captures the dependencies for running mlcp (Content Pump). This is only needed if you want
-    // to run mlcp via Gradle tasks. If you do, using com.rjrudin.marklogic.gradle.task.MlcpTask is a useful starting point, as
+    // to run mlcp via Gradle tasks. If you do, using com.marklogic.gradle.task.MlcpTask is a useful starting point, as
     // shown below.
     mlcp
 }
@@ -42,7 +42,7 @@ dependencies {
 /*
  * Example of using MlcpTask to import data with mlcp.
  */
-task importSampleData(type: com.rjrudin.marklogic.gradle.task.MlcpTask) {
+task importSampleData(type: com.marklogic.gradle.task.MlcpTask) {
     classpath = configurations.mlcp
     command = "IMPORT"
     database = mlAppConfig.contentDatabaseName
@@ -57,7 +57,7 @@ task importSampleData(type: com.rjrudin.marklogic.gradle.task.MlcpTask) {
  * Example of using MlcpTask to export data with mlcp. This example also shows how the connection values can be 
  * overridden. 
  */
-task exportSampleData(type: com.rjrudin.marklogic.gradle.task.MlcpTask) {
+task exportSampleData(type: com.marklogic.gradle.task.MlcpTask) {
     description = "Example of using mlcp and MlcpTask to export documents; note the args array is used for any args MlcpTask doesn't yet have as task attrsibutes"
     classpath = configurations.mlcp
     command = "EXPORT"

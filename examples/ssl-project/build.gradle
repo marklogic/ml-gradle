@@ -21,7 +21,7 @@ repositories {
  * certificate for this template - without that, the REST API server won't be able to receive HTTP or HTTPS requests.
  */
 ext {
-    def command = new com.rjrudin.marklogic.appdeployer.command.security.GenerateTemporaryCertificateCommand()
+    def command = new com.marklogic.appdeployer.command.security.GenerateTemporaryCertificateCommand()
     command.setTemplateIdOrName("sample-project-template")
     command.setCommonName("localhost")
     command.setValidFor(365)

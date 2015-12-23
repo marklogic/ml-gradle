@@ -26,7 +26,7 @@ ext {
      * database. We don't need anything special for our replica database, so we set createDatabaseWithoutFile to true
      * so that we don't have to provide a database config file.
      */
-    def command = new com.rjrudin.marklogic.appdeployer.command.databases.DeployDatabaseCommand()
+    def command = new com.marklogic.appdeployer.command.databases.DeployDatabaseCommand()
     command.setDatabaseName("flexrep-example-replica-db")
     command.setCreateDatabaseWithoutFile(true)
     mlAppDeployer.commands.add(command)

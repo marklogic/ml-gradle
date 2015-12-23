@@ -11,9 +11,9 @@ import com.marklogic.client.io.DocumentMetadataHandle;
 import com.marklogic.client.io.DocumentMetadataHandle.DocumentProperties;
 import com.marklogic.client.io.Format;
 import com.marklogic.client.io.StringHandle;
-import com.rjrudin.marklogic.junit.spring.AbstractSpringTest;
-import com.rjrudin.marklogic.junit.spring.ModulesLoaderTestExecutionListener;
-import com.rjrudin.marklogic.junit.spring.ModulesPath;
+import com.marklogic.junit.spring.AbstractSpringTest;
+import com.marklogic.junit.spring.ModulesLoaderTestExecutionListener;
+import com.marklogic.junit.spring.ModulesPath;
 
 @ContextConfiguration(classes = { TestConfig.class })
 @TestExecutionListeners(value = { ModulesLoaderTestExecutionListener.class })

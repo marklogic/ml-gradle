@@ -89,7 +89,7 @@ configurations {
  */
 dependencies {
     // Needed to compile and run the JUnit tests
-    testCompile "com.rjrudin:ml-junit:2.3"
+    testCompile "com.marklogic:ml-junit:2.4"
     testCompile "com.jayway.restassured:rest-assured:2.4.1"
 
     // Located at https://github.com/rjrudin/marklogic-java/tree/gh-pages/releases/com/marklogic/corb
@@ -99,11 +99,11 @@ dependencies {
 
 
 /*
- * ml-gradle adds an instance of com.rjrudin.marklogic.appdeployer.AppConfig to the Gradle project under the key "mlAppConfig".
+ * ml-gradle adds an instance of com.marklogic.appdeployer.AppConfig to the Gradle project under the key "mlAppConfig".
  * This instance can be modified to affect the behavior of ml-gradle.
  */
 ext {
-    // mlAppConfig is an instance of com.rjrudin.marklogic.appdeployer.AppConfig
+    // mlAppConfig is an instance of com.marklogic.appdeployer.AppConfig
     mlAppConfig {
         // Example of adding custom tokens; these will then be replaced in any JSON/XML config files
         customTokens.put("sample-key", "sample-value")
@@ -163,7 +163,7 @@ task runCorb(dependsOn: ['mlLoadModules'], type: JavaExec) {
  * domains, which means you can safely reference them in your domain configuration files. 
  */
 ext {
-    //mlAppDeployer.commands.add(new com.rjrudin.marklogic.appdeployer.command.cpf.DeployDefaultPipelinesCommand())
+    //mlAppDeployer.commands.add(new com.marklogic.appdeployer.command.cpf.DeployDefaultPipelinesCommand())
 }
 
 
@@ -171,7 +171,7 @@ ext {
  * As of ML 8.0-3, triggers can not yet be managed via the Management REST API, so we still rely on a custom Gradle task
  * that uses XCC to create the trigger.
  */
-task createSampleTrigger(type: com.rjrudin.marklogic.gradle.task.trigger.CreateTriggersTask) {
+task createSampleTrigger(type: com.marklogic.gradle.task.trigger.CreateTriggersTask) {
     xccUrl = contentXccUrl
     triggerName = "sample-project-trigger"
     description = "This is an example of creating a trigger"
@@ -216,7 +216,7 @@ ext {
  * to this list, in addition to adding it to mlAppDeployer.
  */
 ext {
-    def otherDbCommand = new com.rjrudin.marklogic.appdeployer.command.databases.DeployDatabaseCommand("other-database.json")
+    def otherDbCommand = new com.marklogic.appdeployer.command.databases.DeployDatabaseCommand("other-database.json")
     mlAppDeployer.commands.add(otherDbCommand)
     mlDatabaseCommands.add(otherDbCommand)
 }
@@ -230,9 +230,9 @@ ext {
  * be used to easily make any call to the Management REST API. Note that this class could also be defined in the Gradle
  * buildSrc directory, which is really a better option for keeping your build.gradle file slim.
  */
-import com.rjrudin.marklogic.appdeployer.command.AbstractCommand;
-import com.rjrudin.marklogic.appdeployer.command.CommandContext;
-import com.rjrudin.marklogic.appdeployer.command.SortOrderConstants;
+import com.marklogic.appdeployer.command.AbstractCommand;
+import com.marklogic.appdeployer.command.CommandContext;
+import com.marklogic.appdeployer.command.SortOrderConstants;
 
 class ClearTriggersDatabaseCommand extends AbstractCommand {
     public Integer getExecuteSortOrder() {
@@ -252,7 +252,7 @@ class ClearTriggersDatabaseCommand extends AbstractCommand {
  * mlDeploy is invoked. Below is a task that extends MarkLogicTask, which provides access to a number of helpful 
  * objects for implementing custom functionality.
  */
-task mergeContentDatabase(type: com.rjrudin.marklogic.gradle.task.MarkLogicTask) {
+task mergeContentDatabase(type: com.marklogic.gradle.task.MarkLogicTask) {
     description = "Call this task to initiate a merge on the content database"
     doLast {
         getManageClient().postJson("/manage/v2/databases/" + getAppConfig().getContentDatabaseName(), '{"operation":"merge-database"}')

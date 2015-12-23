@@ -17,6 +17,7 @@ import com.marklogic.rest.util.RestTemplateUtil;
 public class AdminManager extends AbstractManager {
 
     private int waitForRestartCheckInterval = 1000;
+    private int waitForRestartLimit = 30;
     private RestTemplate restTemplate;
     private AdminConfig adminConfig;
 
@@ -139,6 +140,15 @@ public class AdminManager extends AbstractManager {
     }
 
     public void waitForRestart() {
+        waitForRestartInternal(1);
+    }
+
+    private void waitForRestartInternal(int attempt) {
+        if (attempt > this.waitForRestartLimit) {
+            logger.error("Reached limit of " + waitForRestartLimit
+                    + ", and MarkLogic has not restarted yet; check MarkLogic status");
+            return;
+        }
         try {
             Thread.sleep(waitForRestartCheckInterval);
             getLastRestartTimestamp();
@@ -146,11 +156,12 @@ public class AdminManager extends AbstractManager {
                 logger.info("Finished waiting for MarkLogic to restart");
             }
         } catch (Exception ex) {
-            logger.info("Waiting for MarkLogic to restart...");
+            attempt++;
+            logger.info("Waiting for MarkLogic to restart, attempt: " + attempt);
             if (logger.isTraceEnabled()) {
                 logger.trace("Caught exception while waiting for MarkLogic to restart: " + ex.getMessage(), ex);
             }
-            waitForRestart();
+            waitForRestartInternal(attempt);
         }
     }
 
@@ -159,8 +170,7 @@ public class AdminManager extends AbstractManager {
      */
     public void setSslFipsEnabled(final boolean enabled) {
         final String xquery = "import module namespace admin = 'http://marklogic.com/xdmp/admin' at '/MarkLogic/admin.xqy'; "
-                + "admin:save-configuration(admin:cluster-set-ssl-fips-enabled(admin:get-configuration(), "
-                + enabled
+                + "admin:save-configuration(admin:cluster-set-ssl-fips-enabled(admin:get-configuration(), " + enabled
                 + "()))";
 
         invokeActionRequiringRestart(new ActionRequiringRestart() {
@@ -189,6 +199,10 @@ public class AdminManager extends AbstractManager {
 
     public void setWaitForRestartCheckInterval(int waitForRestartCheckInterval) {
         this.waitForRestartCheckInterval = waitForRestartCheckInterval;
+    }
+
+    public void setWaitForRestartLimit(int waitForRestartLimit) {
+        this.waitForRestartLimit = waitForRestartLimit;
     }
 
 }

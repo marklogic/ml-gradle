@@ -4,16 +4,13 @@ import java.io.File;
 import java.io.FileFilter;
 
 /**
- * Simple implementation that accepts every file and ignores any directory starting with ".".
+ * Simple implementation that accepts every file and ignores anything starting with ".".
  */
 public class AssetFileFilter implements FileFilter {
 
     @Override
     public boolean accept(File f) {
-        if (f.isDirectory()) {
-            return !f.getName().startsWith(".");
-        }
-        return true;
+        return f != null && !f.getName().startsWith(".");
     }
 
 }

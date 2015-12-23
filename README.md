@@ -15,7 +15,7 @@ ml-gradle is a good fit for you and your team if:
 2. You're using Gradle, or you think Gradle would be a useful build tool to add to your development/deployment process. If you're currently using Ant or Maven and are wondering about Gradle, there are many comparisons of these tools on the Internet; I'll just say I recommend making this shift. If you are using Ant, it's easy to invoke Ant tasks from Gradle. And if you can't move away from Maven, you can try [this Maven plugin for invoking Gradle](https://github.com/if6was9/gradle-maven-plugin).
 3. (Optional) You're interested in managing other people's MarkLogic modules as [true third-party dependencies](https://github.com/rjrudin/ml-gradle/wiki/Common-tasks#preparing-rest-api-dependencies) instead of having to clone their code into your own project. This leverages Gradle's normal dependency management. 
 
-If you don't want to use Gradle, then ml-gradle is most likely not a good fit for you - I recommend instead using the [Roxy deployer](https://github.com/marklogic/roxy) for managing how you configure MarkLogic. 
+If you don't want to use Gradle, then ml-gradle may not be a good fit for you - consider using the [Roxy deployer](https://github.com/marklogic/roxy) instead. One thing to remember though is that many of MarkLogic's libraries are in Java - mlcp, corb, recordloader, xqsync, the Java Client API - and thus if you're not using a Java-friendly build tool, you'll have to manage all these dependencies yourself as well as cook up ways to invoke each of them with the correct classpath. 
 
 Here are some of the main features of ml-gradle:
 

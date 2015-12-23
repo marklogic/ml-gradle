@@ -1,0 +1,1 @@
+This should be loaded, whereas .DS_Store should not be since it starts with a ".".

@@ -23,4 +23,4 @@ repositories {
     maven { url "http://rjrudin.github.io/marklogic-java/releases" }
 }
 
-dependencies { runtime "com.marklogic:ml-app-deployer:2.0rc+" }
+dependencies { runtime "com.marklogic:ml-app-deployer:2.0rc1" }

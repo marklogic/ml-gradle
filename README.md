@@ -12,10 +12,11 @@ Why use ml-gradle?
 ml-gradle is a good fit for you and your team if:
 
 1. You're using MarkLogic 8
-2. You're using Gradle, or you think Gradle would be a useful build tool to add to your development/deployment process. If you're currently using Ant or Maven and are wondering about Gradle, there are many comparisons of these tools on the Internet; I'll just say I recommend making this shift. If you are using Ant, it's easy to invoke Ant tasks from Gradle. And if you can't move away from Maven, you can try [this Maven plugin for invoking Gradle](https://github.com/if6was9/gradle-maven-plugin).
-3. (Optional) You're interested in managing other people's MarkLogic modules as [true third-party dependencies](https://github.com/rjrudin/ml-gradle/wiki/Common-tasks#preparing-rest-api-dependencies) instead of having to clone their code into your own project. This leverages Gradle's normal dependency management. 
+1. You're using Gradle, or you think Gradle would be a useful build tool to add to your development/deployment process. If you're currently using Ant or Maven and are wondering about Gradle, there are many comparisons of these tools on the Internet; I'll just say I recommend making this shift. If you are using Ant, it's easy to invoke Ant tasks from Gradle. And if you can't move away from Maven, you can try [this Maven plugin for invoking Gradle](https://github.com/if6was9/gradle-maven-plugin).
+1. You'd like to use a Java-friendly build tool, as many of MarkLogic's tools - mlcp, corb, recordloader, xqsync, the Java Client API - are in Java, and you'd like to use a tool that can manage all those dependencies for you and make it easy to use them with the correct classpath and arguments.
+1. (Optional) You're interested in managing other people's MarkLogic modules as [true third-party dependencies](https://github.com/rjrudin/ml-gradle/wiki/Common-tasks#preparing-rest-api-dependencies) instead of having to clone their code into your own project. This leverages Gradle's normal dependency management. 
 
-If you don't want to use Gradle, then ml-gradle may not be a good fit for you - consider using the [Roxy deployer](https://github.com/marklogic/roxy) instead. One thing to remember though is that many of MarkLogic's libraries are in Java - mlcp, corb, recordloader, xqsync, the Java Client API - and thus if you're not using a Java-friendly build tool, you'll have to manage all these dependencies yourself as well as cook up ways to invoke each of them with the correct classpath. 
+If you don't want to use Gradle, then ml-gradle may not be a good fit for you - consider using the [Roxy deployer](https://github.com/marklogic/roxy) instead. Just remember that as stated above, many of MarkLogic's tools are in Java, so if you're not using something like Gradle/Maven/etc, you'll need to devise your own way of managing the dependencies for those tools and how to invoke them with the correct classpath and arguments. 
 
 Here are some of the main features of ml-gradle:
 
@@ -64,6 +65,10 @@ To see exactly what mlDeploy is doing, just run Gradle with the "-i" or "--info"
 
     gradle -i mlDeploy
 
+And to see all the tasks available to you, just run:
+
+    gradle tasks
+    
 
 Exploring the sample project
 -----
@@ -74,38 +79,18 @@ To start customizing your application, your best bet is to examine the [sample-p
 1. The [ml-config directory](https://github.com/rjrudin/ml-gradle/tree/master/examples/sample-project/src/main/ml-config) provides examples of all of the MarkLogic management resources currently supported by ml-gradle.
 1. The [ml-modules directory](https://github.com/rjrudin/ml-gradle/tree/master/examples/sample-project/src/main/ml-modules) provides examples of the different kinds of modules that can be loaded (application modules are loaded via the MarkLogic Client REST API, not the Management REST API). 
 
-To quickly generate a useful set of configuration files, just run:
+To try out the sample project, just do the following:
+
+1. Clone this repository
+1. cd sample-project
+1. gradle mlDeploy
+
+For a new project - to quickly generate a useful set of configuration files, just run:
 
     gradle mlScaffold
 
 This will generate a directory structure containing several configuration files - one for a content database, a REST API server, an application role, an application user, and more. You can change these and add more configuration files based on the examples in the sample project mentioned above.
 
-
 Digging deeper into ml-gradle
 =========
-There are two things to learn with ml-gradle - what the ml-app-deployer library lets you do, and what ml-gradle adds on top of it. The main thing to know about ml-app-deployer is where it expects Management API configuration files to be placed so that they're automatically processed by ml-app-deployer and thus by ml-gradle. 
-
-To learn more about what ml-gradle provides on top of ml-app-deployer, you should start by 
-[examining the build.gradle file](https://github.com/rjrudin/ml-gradle/blob/master/examples/sample-project/build.gradle) in the 
-sample-project directory of this repository. This is intended to show all the different features of ml-gradle. To understand the ml-gradle code itself, you should start with [the MarkLogicPlugin](https://github.com/rjrudin/ml-gradle/blob/master/src/main/groovy/com/marklogic/gradle/MarkLogicPlugin.groovy), as it lists out all the registered tasks. 
-
-If you have a project already, then a good way to start is by copying the aforementioned build.gradle file into your project. You can remove all the optional stuff to start with a bare minimum Gradle file, and then start adding things back in as you realize a need for them.
-
-Once you have a Gradle file with ml-gradle applied, you can see a list of all tasks added by ml-gradle by running:
-
-    gradle tasks
-
-You can also see a list of the tasks with all their dependencies - this is helpful for knowing how tasks relate to one another:
-
-    gradle tasks --all 
-
-To see ml-gradle in action, you can deploy the sample-project application by doing the following (assuming you've cloned this repository already):
-
-1. cd sample-project
-1. gradle mlDeploy
-
-Finally, check out all the Wiki pages on the right for more information about ml-gradle. 
-
-## When will there be a 2.0 final of ml-gradle?
-
-This will be created in conjunction with the release of MarkLogic 8.0-4, which includes support for triggers and alerts, along with a number of fixes. 
+Check out the [Wiki and FAQ](https://github.com/rjrudin/ml-gradle/wiki)

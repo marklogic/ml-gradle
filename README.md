@@ -25,11 +25,6 @@ Here are some of the main features of ml-gradle:
 1. Can treat packages of MarkLogic code as [true third-party dependencies](https://github.com/rjrudin/ml-gradle/wiki/Common-tasks#preparing-rest-api-dependencies), resolving them just like you would a dependency on a jar, as well as automatically loading such code into your modules database
 1. Can easily run MarkLogic Content Pump and Corb without having to copy jars around and worry about a classpath
 
-What are all of the tasks I can perform with ml-gradle?
-=========
-See [the Wiki page on all tasks](https://github.com/rjrudin/ml-gradle/wiki/All-tasks).
-
-
 How can I start using ml-gradle?
 =========
 First, please note the [Wiki and FAQ](https://github.com/rjrudin/ml-gradle/wiki) which have answers to many of the questions you'll have or run into soon.
@@ -71,6 +66,7 @@ And to see all the tasks available to you, just run:
 
     gradle tasks
     
+You can also get a preview of those tasks at [the Wiki page on all tasks](https://github.com/rjrudin/ml-gradle/wiki/All-tasks).
 
 Exploring the sample project
 -----

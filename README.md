@@ -19,9 +19,9 @@ Under the hood, it depends on Spring's [RestTemplate](http://docs.spring.io/spri
 
 The general pattern for using the management client library is:
 
-1. Create an instance of [ManageConfig](https://github.com/rjrudin/ml-app-deployer/blob/master/src/main/java/com/rjrudin/marklogic/mgmt/ManageConfig.java), which specifies connection information for the management REST API instance.
-2. Create an instance of [ManageClient](https://github.com/rjrudin/ml-app-deployer/blob/master/src/main/java/com/rjrudin/marklogic/mgmt/ManageClient.java) using ManageConfig. ManageClient simply wraps a RestTemplate with some convenience methods.
-3. Using ManageClient, create a Manager class based on the management resource you want to configure. For example, to create or modify or delete a database, create a [DatabaseManager](https://github.com/rjrudin/ml-app-deployer/blob/master/src/main/java/com/rjrudin/marklogic/mgmt/databases/DatabaseManager.java) to talk to the [database endpoints](http://docs.marklogic.com/REST/management/databases). 
+1. Create an instance of [ManageConfig](https://github.com/rjrudin/ml-app-deployer/blob/master/src/main/java/com/marklogic/mgmt/ManageConfig.java), which specifies connection information for the management REST API instance.
+2. Create an instance of [ManageClient](https://github.com/rjrudin/ml-app-deployer/blob/master/src/main/java/com/marklogic/mgmt/ManageClient.java) using ManageConfig. ManageClient simply wraps a RestTemplate with some convenience methods.
+3. Using ManageClient, create a Manager class based on the management resource you want to configure. For example, to create or modify or delete a database, create a [DatabaseManager](https://github.com/rjrudin/ml-app-deployer/blob/master/src/main/java/com/marklogic/mgmt/databases/DatabaseManager.java) to talk to the [database endpoints](http://docs.marklogic.com/REST/management/databases). 
 
 Here's a brief example of what that looks like:
 

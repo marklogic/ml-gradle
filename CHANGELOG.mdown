@@ -1,6 +1,11 @@
 # ml-app-deployer releases
 
-## 2.0rc1
+
+## 2.0rc2 - TBD
+
+* [#73](https://github.com/rjrudin/ml-app-deployer/issues/73) Added support for setting a FileFilter on AppConfig for controlling what assets are loaded
+
+## 2.0rc1 - 2015-12-23
 
 * Repackaging to com.marklogic
 

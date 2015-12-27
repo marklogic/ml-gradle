@@ -1,5 +1,6 @@
 package com.marklogic.appdeployer;
 
+import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,6 +71,8 @@ public class AppConfig {
     // As defined by the REST API
     private String modulePermissions = "rest-admin,read,rest-admin,update,rest-extension-user,execute";
 
+    private FileFilter assetFileFilter;
+
     // Additional module extensions that should be loaded as binaries into the modules database
     private String[] additionalBinaryExtensions;
 
@@ -101,8 +104,8 @@ public class AppConfig {
      * @return
      */
     public DatabaseClient newDatabaseClient() {
-        return DatabaseClientFactory.newClient(getHost(), getRestPort(), getRestAdminUsername(),
-                getRestAdminPassword(), getRestAuthentication(), getRestSslContext(), getRestSslHostnameVerifier());
+        return DatabaseClientFactory.newClient(getHost(), getRestPort(), getRestAdminUsername(), getRestAdminPassword(),
+                getRestAuthentication(), getRestSslContext(), getRestSslHostnameVerifier());
     }
 
     /**
@@ -138,6 +141,11 @@ public class AppConfig {
             }
             l.setDocumentFormatGetter(getter);
         }
+
+        if (assetFileFilter != null) {
+            l.setFileFilter(assetFileFilter);
+        }
+
         return l;
 
     }
@@ -423,6 +431,14 @@ public class AppConfig {
 
     public void setModulePermissions(String assetPermissions) {
         this.modulePermissions = assetPermissions;
+    }
+
+    public FileFilter getAssetFileFilter() {
+        return assetFileFilter;
+    }
+
+    public void setAssetFileFilter(FileFilter assetFileFilter) {
+        this.assetFileFilter = assetFileFilter;
     }
 
 }

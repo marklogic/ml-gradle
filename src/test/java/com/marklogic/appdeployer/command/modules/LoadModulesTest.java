@@ -1,13 +1,16 @@
 package com.marklogic.appdeployer.command.modules;
 
+import java.io.File;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.marklogic.junit.PermissionsFragment;
-import com.marklogic.xcc.template.XccTemplate;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
+import com.marklogic.client.modulesloader.impl.AssetFileFilter;
+import com.marklogic.junit.PermissionsFragment;
+import com.marklogic.xcc.template.XccTemplate;
 
 public class LoadModulesTest extends AbstractAppDeployerTest {
 
@@ -56,19 +59,27 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
     }
 
     @Test
+    public void loadModulesWithAssetFileFilter() {
+        LoadModulesCommand c = new LoadModulesCommand();
+        appConfig.setAssetFileFilter(new TestFileFilter());
+
+        initializeAppDeployer(new DeployRestApiServersCommand(), c);
+        appDeployer.deploy(appConfig);
+        
+        assertEquals("true", xccTemplate.executeAdhocQuery("doc-available('/ext/lib/test.xqy')"));
+        assertEquals("false", xccTemplate.executeAdhocQuery("doc-available('/ext/lib/test2.xqy')"));
+    }
+
+    @Test
     public void testServerExists() {
         appConfig.setTestRestPort(8541);
         initializeAppDeployer(new DeployRestApiServersCommand(), new LoadModulesCommand());
         appDeployer.deploy(appConfig);
 
-        assertEquals(
-                "true",
-                xccTemplate
-                        .executeAdhocQuery("fn:doc-available('/Default/sample-app/rest-api/options/sample-app-options.xml')"));
-        assertEquals(
-                "true",
-                xccTemplate
-                        .executeAdhocQuery("fn:doc-available('/Default/sample-app-test/rest-api/options/sample-app-options.xml')"));
+        assertEquals("true", xccTemplate
+                .executeAdhocQuery("fn:doc-available('/Default/sample-app/rest-api/options/sample-app-options.xml')"));
+        assertEquals("true", xccTemplate.executeAdhocQuery(
+                "fn:doc-available('/Default/sample-app-test/rest-api/options/sample-app-options.xml')"));
     }
 
     private void assertModuleExistsWithDefaultPermissions(String message, String uri) {
@@ -85,6 +96,15 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
         perms.assertPermissionExists("rest-admin", "read");
         perms.assertPermissionExists("rest-admin", "update");
         perms.assertPermissionExists("rest-extension-user", "execute");
+    }
+
+}
+
+class TestFileFilter extends AssetFileFilter {
+
+    @Override
+    public boolean accept(File f) {
+        return !f.getName().equals("test2.xqy") && super.accept(f);
     }
 
 }

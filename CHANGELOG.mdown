@@ -1,5 +1,9 @@
 # ml-gradle releases
 
+## 2.0rc1
+
+* Repackaged under com.marklogic
+
 ## 2.0b16
 
 * Fixes from ml-app-deployer 2.0b16

@@ -22,7 +22,7 @@ repositories {
  */
 ext {
     def command = new com.marklogic.appdeployer.command.security.GenerateTemporaryCertificateCommand()
-    command.setTemplateIdOrName("sample-project-template")
+    command.setTemplateIdOrName("ssl-project-template")
     command.setCommonName("localhost")
     command.setValidFor(365)
     mlAppDeployer.commands.add(command)

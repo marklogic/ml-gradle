@@ -1,6 +1,10 @@
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
+plugins {
+  id "java"
+  id "maven-publish"
+  id "eclipse"
+  id "idea"
+  id "com.jfrog.bintray" version "1.5"
+}
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
@@ -33,6 +37,23 @@ publishing {
   repositories {
     maven {
       url publishUrl
+    }
+  }
+}
+
+if (project.hasProperty("myBintrayUser")) {
+  bintray {
+    user = myBintrayUser
+    key = myBintrayKey
+    publications = ['mainJava']
+    pkg {
+      repo = 'maven'
+      name = project.name
+      licenses = ['Apache-2.0']
+      vcsUrl = 'https://github.com/rjrudin/' + project.name + '.git'
+      version {
+        name = version
+      }
     }
   }
 }

@@ -1,13 +1,16 @@
-apply plugin: 'groovy'
-apply plugin: 'maven-publish'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
+plugins {
+  id "groovy"
+  id "maven-publish"
+  id "eclipse"
+  id "idea"
+  id "com.jfrog.bintray" version "1.5"
+}
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
 
 repositories {
-  mavenCentral()
+  jcenter()
   maven {url "http://developer.marklogic.com/maven2/"}
   maven {url "http://rjrudin.github.io/marklogic-java/releases"}
 }
@@ -31,3 +34,19 @@ publishing {
   }
 }
 
+if (project.hasProperty("myBintrayUser")) {
+  bintray {
+    user = myBintrayUser
+    key = myBintrayKey
+    publications = ['mainJava']
+    pkg {
+      repo = 'maven'
+      name = project.name
+      licenses = ['Apache-2.0']
+      vcsUrl = 'https://github.com/rjrudin/' + project.name + '.git'
+      version {
+        name = version
+      }
+    }
+  }
+}

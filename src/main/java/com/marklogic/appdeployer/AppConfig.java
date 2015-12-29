@@ -28,6 +28,25 @@ import com.marklogic.client.modulesloader.xcc.DefaultDocumentFormatGetter;
 public class AppConfig {
 
     /**
+     * This is set purely for development purposes so that an app can be created without specifying an app name.
+     */
+    public static final String DEFAULT_APP_NAME = "my-app";
+
+    /**
+     * These are assumed as sensible defaults in a development environment, where teams often use admin/admin for the
+     * admin login. They are of course expected to change in a real environment.
+     */
+    public static final String DEFAULT_USERNAME = "admin";
+    public static final String DEFAULT_PASSWORD = "admin";
+
+    /**
+     * This is set purely for development purposes so that an app can be configured without specifying a port. The
+     * v1/rest-apis endpoint will select an open port if none is provided, but some work is then required to figure out
+     * what that port is before modules are loaded.
+     */
+    public static final Integer DEFAULT_PORT = 8003;
+
+    /**
      * The default path from which modules will be loaded into a modules database.
      */
     public final static String DEFAULT_MODULES_PATH = "src/main/ml-modules";
@@ -35,20 +54,21 @@ public class AppConfig {
     public final static String DEFAULT_HOST = "localhost";
     public final static String DEFAULT_GROUP = "Default";
 
-    private String name;
+    private String name = DEFAULT_APP_NAME;
     private String host = DEFAULT_HOST;
 
     // Username/password combo for using the client REST API - e.g. to load modules
-    private String restAdminUsername;
-    private String restAdminPassword;
+    private String restAdminUsername = DEFAULT_USERNAME;
+    private String restAdminPassword = DEFAULT_PASSWORD;
     private SSLContext restSslContext;
     private SSLHostnameVerifier restSslHostnameVerifier;
     private Authentication restAuthentication = Authentication.DIGEST;
 
-    private Integer restPort;
+    private Integer restPort = DEFAULT_PORT;
     private Integer testRestPort;
 
-    // These can all be set to override the default names
+    // These can all be set to override the default names that are generated off of the "name" attribute.
+    private String groupName = DEFAULT_GROUP;
     private String restServerName;
     private String testRestServerName;
     private String contentDatabaseName;
@@ -59,8 +79,6 @@ public class AppConfig {
 
     private List<String> modulePaths;
     private ConfigDir configDir;
-
-    private String groupName = DEFAULT_GROUP;
 
     // Passed into the TokenReplacer that subclasses of AbstractCommand use
     private Map<String, String> customTokens = new HashMap<>();

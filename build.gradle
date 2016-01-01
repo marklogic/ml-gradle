@@ -32,10 +32,20 @@ dependencies {
   compile mlAppDeployerDependency
 }
 
+task sourcesJar(type: Jar, dependsOn: classes) {
+  classifier 'sources' 
+  from sourceSets.main.allJava
+  from sourceSets.main.allGroovy
+}
+
 publishing {
   publications {
     mainJava(MavenPublication) {
       from components.java
+    }
+    sourcesJava(MavenPublication) {
+      from components.java
+      artifact sourcesJar
     }
   }
   repositories {
@@ -44,12 +54,12 @@ publishing {
     }
   }
 }
-
+ 
 if (project.hasProperty("myBintrayUser")) {
   bintray {
     user = myBintrayUser
     key = myBintrayKey
-    publications = ['mainJava']
+    publications = ['mainJava', 'sourcesJava']
     pkg {
       repo = 'maven'
       name = project.name

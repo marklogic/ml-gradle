@@ -10,7 +10,7 @@ sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
 
 repositories {
-  mavenCentral()
+  jcenter()
   maven {url "http://developer.marklogic.com/maven2/"}
   maven {url "http://rjrudin.github.io/marklogic-java/releases"}
 }
@@ -23,15 +23,24 @@ dependencies {
   testCompile 'com.marklogic:ml-junit:2.4'
 }
 
-javadoc.destinationDir = file(javadocsDir + "/" + project.name)
-
 // This ensures that Gradle includes in the published jar any non-java files under src/main/java
 sourceSets.main.resources.srcDir 'src/main/java'
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+  classifier 'sources' 
+  from sourceSets.main.allJava
+}
+
+javadoc.destinationDir = file(javadocsDir + "/" + project.name)
 
 publishing {
   publications {
     mainJava(MavenPublication) {
       from components.java
+    }
+    sourcesJava(MavenPublication) {
+      from components.java
+      artifact sourcesJar
     }
   }
   repositories {
@@ -40,12 +49,12 @@ publishing {
     }
   }
 }
-
+ 
 if (project.hasProperty("myBintrayUser")) {
   bintray {
     user = myBintrayUser
     key = myBintrayKey
-    publications = ['mainJava']
+    publications = ['mainJava', 'sourcesJava']
     pkg {
       repo = 'maven'
       name = project.name

@@ -11,8 +11,6 @@ targetCompatibility = "1.7"
 
 repositories {
   jcenter()
-  maven {url "http://developer.marklogic.com/maven2/"}
-  maven {url "http://rjrudin.github.io/marklogic-java/releases"}
 }
 
 dependencies {
@@ -61,7 +59,8 @@ if (project.hasProperty("myBintrayUser")) {
       licenses = ['Apache-2.0']
       vcsUrl = 'https://github.com/rjrudin/' + project.name + '.git'
       version {
-        name = version
+        name = "2.0rc1"
+        released = new Date()
       }
     }
   }

@@ -11,6 +11,7 @@ targetCompatibility = "1.7"
 
 repositories {
   jcenter()
+  maven {url "https://dl.bintray.com/rjrudin/maven/"}
 }
 
 dependencies {

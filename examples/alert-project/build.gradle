@@ -1,17 +1,14 @@
 buildscript {
     repositories {
-        mavenCentral()
-        maven {url "http://developer.marklogic.com/maven2/"}
-        maven {url "http://rjrudin.github.io/marklogic-java/releases"}
-    }
-    dependencies {
-        classpath mlGradleDependency
-        classpath 'com.tkruse.gradle:gradle-groovysh-plugin:1.0.7'
+        jcenter()
     }
 }
 
-apply plugin: 'com.github.tkruse.groovysh'
-apply plugin: 'ml-gradle'
+plugins {
+  id "java"
+  id "eclipse"
+  id "com.marklogic.ml-gradle" version "2.0rc1"
+}
 
 /**
  * This command is added to mlAppDeployer so that all the default pipelines are loaded. This gets around an issue 
@@ -23,16 +20,8 @@ ext {
     mlAppDeployer.commands.add(new com.marklogic.appdeployer.command.cpf.DeployDefaultPipelinesCommand())
 }
 
-/**
- * The below configuration is just used to support writing a JUnit test.
- */
-apply plugin: 'java'
-apply plugin: 'eclipse'
-
 repositories {
-    mavenCentral()
-    maven {url "http://developer.marklogic.com/maven2/"}
-    maven {url "http://rjrudin.github.io/marklogic-java/releases"}
+  jcenter()
 }
 
 dependencies {

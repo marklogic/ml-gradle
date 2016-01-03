@@ -1,7 +1,6 @@
 buildscript {
   repositories {
-    maven { url "http://developer.marklogic.com/maven2/" }
-    maven {url "http://rjrudin.github.io/marklogic-java/releases"}
+    jcenter()
   }
 }
 
@@ -9,13 +8,11 @@ plugins {
   id "java"
   id "eclipse"
   id "com.github.tkruse.groovysh" version "1.0.8"
-  id "com.marklogic.ml-gradle" version "2.0rc1.1"
+  id "com.marklogic.ml-gradle" version "2.0rc1"
 }
 
 repositories {
   jcenter()
-  maven { url "http://developer.marklogic.com/maven2/" }
-  maven {url "http://rjrudin.github.io/marklogic-java/releases"}
 }
 
 dependencies { 

@@ -243,7 +243,6 @@ class MarkLogicPlugin implements Plugin<Project> {
                 mlShellJvmArgs.push("-D" + key + "=" + project.property(key))
             }
         }
-        println mlShellJvmArgs
         project.extensions.add("mlShellJvmArgs", mlShellJvmArgs)
 
         def script = "ml = com.marklogic.mgmt.api.APIUtil.newAPIFromSystemProps()"

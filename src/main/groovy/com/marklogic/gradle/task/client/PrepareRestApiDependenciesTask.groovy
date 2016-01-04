@@ -48,8 +48,6 @@ class PrepareRestApiDependenciesTask extends MarkLogicTask {
             } else {
                 println "No mlRestApi dependencies found, so no preparation of dependencies required\n"
             }
-        } else {
-            println "No mlRestApi configuration found, so no preparation of mlRestApi dependencies required\n"
         }
     }
 }

@@ -1,11 +1,12 @@
 buildscript {
   repositories {
     jcenter()
+    maven {url "http://developer.marklogic.com/maven2/"}
   }
 }
 
 plugins {
-  id "com.marklogic.ml-gradle" version "2.0rc2"
+  id "com.marklogic.ml-gradle" version "2.0rc3"
 }
 
 ext {

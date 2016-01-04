@@ -5,6 +5,7 @@
 buildscript {
     repositories {
         jcenter()
+        maven {url "http://developer.marklogic.com/maven2/"}
     }
 
     /*
@@ -38,7 +39,7 @@ buildscript {
  * that those blocks can override properties before ml-gradle initializes itself.
  */
 plugins {
-  id "com.marklogic.ml-gradle" version "2.0rc2" 
+  id "com.marklogic.ml-gradle" version "2.0rc3" 
 
   // The following plugins are optional
 
@@ -83,7 +84,7 @@ configurations {
  */
 dependencies {
     // Needed to compile and run the JUnit tests
-    testCompile "com.marklogic:ml-junit:2.4"
+    testCompile "com.marklogic:ml-junit:2.5"
     testCompile "com.jayway.restassured:rest-assured:2.4.1"
 
     // Located at https://github.com/rjrudin/marklogic-java/tree/gh-pages/releases/com/marklogic/corb

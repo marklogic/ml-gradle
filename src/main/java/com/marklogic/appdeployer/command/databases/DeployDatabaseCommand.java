@@ -107,7 +107,9 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
         } else if (createDatabaseWithoutFile) {
             return buildDefaultDatabasePayload(context);
         } else {
-            logger.warn(format("Database file '%s' does not exist, so not executing", databaseFilename));
+            if (logger.isInfoEnabled()) {
+                logger.info(format("Database file '%s' does not exist, so not executing", databaseFilename));
+            }
             return null;
         }
     }

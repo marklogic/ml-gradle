@@ -45,8 +45,6 @@ class PrepareRestApiDependenciesTask extends MarkLogicTask {
                 getAppConfig().setModulePaths(newModulePaths)
 
                 println "Finished unzipping mlRestApi dependencies; will now include modules at " + getAppConfig().modulePaths + "\n"
-            } else {
-                println "No mlRestApi dependencies found, so no preparation of dependencies required\n"
             }
         }
     }

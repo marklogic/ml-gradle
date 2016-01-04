@@ -360,7 +360,7 @@ public class API extends LoggingObject {
 
     protected <T extends Resource> T buildFromJson(String json, Class<T> clazz) {
         try {
-            T resource = getObjectMapper().readerFor(clazz).readValue(json);
+            T resource = getObjectMapper().reader(clazz).readValue(json);
             resource.setApi(this);
             resource.setObjectMapper(getObjectMapper());
             return resource;

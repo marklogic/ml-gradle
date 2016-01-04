@@ -1,5 +1,9 @@
 # ml-gradle releases
 
+## 2.5
+
+* Added classes from ml-xcc-util
+
 ## 2.4
 
 * Repackaged to com.marklogic

@@ -18,6 +18,7 @@ buildscript {
     else {
         repositories {
             jcenter()
+            maven {url "http://developer.marklogic.com/maven2/"}
         }
         dependencies { classpath mlGradleDependency }
     }
@@ -56,7 +57,6 @@ else {
     repositories {
         mavenCentral()
         maven {url "http://developer.marklogic.com/maven2/"}
-        maven {url "http://rjrudin.github.io/marklogic-java/releases"}
         maven {url "http://repository.cloudera.com/artifactory/cloudera-repos/" }
     }
 

@@ -1,17 +1,17 @@
 buildscript {
-    repositories {
-        mavenCentral()
-        maven {url "http://developer.marklogic.com/maven2/"}
-        maven {url "http://rjrudin.github.io/marklogic-java/releases"}
-    }
-    dependencies { classpath mlGradleDependency }
+  repositories {
+    jcenter()
+  }
 }
 
-apply plugin: 'ml-gradle'
+plugins {
+  id "com.marklogic.ml-gradle" version "2.0rc2"
+}
 
 ext {
     myForestNamesAndReplicasCounts = [ "Security": 2, "Schemas": 1, "Meters": 1, "App-Services": 1]
 }
+
 /*
  * The mlConfigureForestReplicas task exposes an instance of ConfigureForestReplicasCommand as the "command" attribute. 
  * This allows us to easily modify the forestNamesAndReplicaCounts map, where each key is the name of a primary forest, 

@@ -1,18 +1,15 @@
 buildscript {
-    repositories {
-        mavenCentral()
-        maven {url "http://developer.marklogic.com/maven2/"}
-        maven {url "http://rjrudin.github.io/marklogic-java/releases"}
-    }
-    dependencies { classpath mlGradleDependency }
+  repositories {
+    jcenter()
+  }
 }
 
-apply plugin: 'ml-gradle'
+plugins {
+  id "com.marklogic.ml-gradle" version "2.0rc2"  
+}
 
 repositories {
-    mavenCentral()
-    maven {url "http://developer.marklogic.com/maven2/"}
-    maven {url "http://rjrudin.github.io/marklogic-java/releases"}
+  jcenter()
 }
 
 

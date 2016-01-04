@@ -1,13 +1,13 @@
 buildscript {
-    repositories {
-        jcenter()
-    }
+  repositories {
+    jcenter()
+  }
 }
 
 plugins {
   id "java"
   id "eclipse"
-  id "com.marklogic.ml-gradle" version "2.0rc1"
+  id "com.marklogic.ml-gradle" version "2.0rc2"
 }
 
 /**
@@ -17,7 +17,7 @@ plugins {
  * Status Change Handling and Alerting is fine - the unused pipelines just sit there with no impact on anything.
  */
 ext {
-    mlAppDeployer.commands.add(new com.marklogic.appdeployer.command.cpf.DeployDefaultPipelinesCommand())
+  mlAppDeployer.commands.add(new com.marklogic.appdeployer.command.cpf.DeployDefaultPipelinesCommand())
 }
 
 repositories {
@@ -25,6 +25,5 @@ repositories {
 }
 
 dependencies {
-    testCompile "com.marklogic:ml-junit:2.4"
-    runtime "com.marklogic:ml-app-deployer:2.0rc1"
+  testCompile "com.marklogic:ml-junit:2.4"
 }

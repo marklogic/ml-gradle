@@ -17,16 +17,13 @@ buildscript {
     }
     else {
         repositories {
-            mavenCentral()
-            maven {url "http://developer.marklogic.com/maven2/"}
-            maven {url "http://rjrudin.github.io/marklogic-java/releases"}
+            jcenter()
         }
-
         dependencies { classpath mlGradleDependency }
     }
 }
 
-apply plugin: "ml-gradle"
+apply plugin: "com.marklogic.ml-gradle"
 
 configurations {
     mlcp

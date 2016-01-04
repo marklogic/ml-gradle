@@ -4,21 +4,18 @@
  * JavaExec task that exposes a number of mlcp arguments as task attributes. 
  */
 buildscript {
-    repositories {
-        mavenCentral()
-        maven {url "http://developer.marklogic.com/maven2/"}
-        maven {url "http://rjrudin.github.io/marklogic-java/releases"}
-    }
-    dependencies { classpath mlGradleDependency }
+  repositories {
+    jcenter()
+  }
 }
 
-
-apply plugin: 'ml-gradle'
+plugins {
+  id "com.marklogic.ml-gradle" version "2.0rc2"  
+}
 
 repositories {
-    mavenCentral()
+    jcenter()
     maven {url "http://developer.marklogic.com/maven2/"}
-    maven {url "http://rjrudin.github.io/marklogic-java/releases"}
 
     // Needed for hadoop dependencies for mlcp
     maven {url "http://repository.cloudera.com/artifactory/cloudera-repos/" }

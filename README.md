@@ -33,16 +33,13 @@ To use ml-gradle right away, you'll need Gradle installed first. And of course y
 
     buildscript {
       repositories {
-        mavenCentral()
-        maven {url "http://developer.marklogic.com/maven2/"}
-        maven {url "http://rjrudin.github.io/marklogic-java/releases"}
-      }
-      dependencies {
-        classpath "com.marklogic:ml-gradle:2.0rc1"
+        jcenter()
       }
     }
     
-    apply plugin: 'ml-gradle'
+    plugins {
+      id "com.marklogic.ml-gradle" version "2.0rc2"
+    }
 
 And here's the simplest gradle.properties file possible (you can of course customize these properties as needed, particularly the port - make sure that it's open on the host you're deploying to):
 

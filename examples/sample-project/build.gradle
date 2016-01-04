@@ -4,37 +4,32 @@
  */
 buildscript {
     repositories {
-        mavenCentral()
-        maven {url "http://developer.marklogic.com/maven2/"}
-        maven {url "http://rjrudin.github.io/marklogic-java/releases"}
+        jcenter()
     }
-    dependencies { classpath mlGradleDependency }
-}
 
+    /*
+     * This block is optional, and it shows one way to override properties based on an environment property that is
+     * set when calling Gradle. For example, you could run "gradle -Penv=qa mlDeploy" in order to apply the env-qa.gradle
+     * build file, which would set properties based on the QA environment. This doesn't have anything to do with ml-gradle -
+     * it just shows one technique for overriding properties. See env-prod.gradle and env-qa.gradle for more details. 
+     */
+    if (project.hasProperty("env")) {
+        def buildFile = "env-" + project.property("env") + ".gradle"
+        println "Applying environment-based build file: " + buildFile
+        apply from: buildFile
+    }
 
-/*
- * This first block is optional, and it shows one way to override properties based on an environment property that is
- * set when calling Gradle. For example, you could run "gradle -Penv=qa mlDeploy" in order to apply the env-qa.gradle
- * build file, which would set properties based on the QA environment. This doesn't have anything to do with ml-gradle -
- * it just shows one technique for overriding properties. See env-prod.gradle and env-qa.gradle for more details. 
- */
-if (project.hasProperty("env")) {
-    def buildFile = "env-" + project.property("env") + ".gradle"
-    println "Applying environment-based build file: " + buildFile
-    apply from: buildFile
-}
-
-
-/*
- * This is another optional block, and it's a similar technique to the block above, but it instead is used for local
- * development. A developer can create a non-version-controlled local.gradle file and, within that file, override any
- * properties that are defined in gradle.properties. This also isn't specific to ml-gradle - it's just one way with
- * Gradle to allow a developer to easily override gradle.properties for local development purposes. 
- */
-if (new File("local.gradle").exists()) {
-    println "Applying local.gradle file"
-    apply from: "local.gradle"
-    println "Applied local.gradle file"
+    /*
+     * This is another optional block, and it's a similar technique to the block above, but it instead is used for local
+     * development. A developer can create a non-version-controlled local.gradle file and, within that file, override any
+     * properties that are defined in gradle.properties. This also isn't specific to ml-gradle - it's just one way with
+     * Gradle to allow a developer to easily override gradle.properties for local development purposes. 
+     */
+    if (new File("local.gradle").exists()) {
+        println "Applying local.gradle file"
+        apply from: "local.gradle"
+        println "Applied local.gradle file"
+    }
 }
 
 
@@ -42,26 +37,23 @@ if (new File("local.gradle").exists()) {
  * In order to use ml-gradle, it must be applied. This occurs after the two above blocks for overriding properties so
  * that those blocks can override properties before ml-gradle initializes itself.
  */
-apply plugin: 'ml-gradle'
+plugins {
+  id "com.marklogic.ml-gradle" version "2.0rc2" 
+
+  // The following plugins are optional
+
+  // The Java plugin is used to compile and run JUnit tests
+  id "java"
+
+  // These plugins are used to generate IDE files
+  id "eclipse"
+  id "idea"
+}
 
 
 /*
  * Everything below this line is optional and is intended to show different features provided by ml-gradle.
  */
-
-
-/*
- * The Java plugin is used to compile and run JUnit tests.
- */
-apply plugin: 'java'
-
-
-/*
- * For generating IDE project files you might consider leveraging the Eclipse or IntelliJ IDEA plugin.
- */
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-
 
 /*
  * This lists the repositories for finding project dependencies (which differ from buildscript dependencies - buildscript
@@ -69,8 +61,10 @@ apply plugin: 'idea'
  * dependencies expressed below.
  */
 repositories {
-    mavenCentral()
+    jcenter()
     maven {url "http://developer.marklogic.com/maven2/"}
+
+    // Stores the corb jar - this will be moved to bintray soon
     maven {url "http://rjrudin.github.io/marklogic-java/releases"}
 }
 

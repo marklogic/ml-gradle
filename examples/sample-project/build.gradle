@@ -1,13 +1,7 @@
 /*
- * This buildscript declares the ml-gradle dependency and the repositories that contain ml-gradle and its dependencies.
- * This block is always needed in order to use ml-gradle.
+ * This buildscript block is optional - it's only needed if you need one of the blocks of code inside it.
  */
 buildscript {
-    repositories {
-        jcenter()
-        maven {url "http://developer.marklogic.com/maven2/"}
-    }
-
     /*
      * This block is optional, and it shows one way to override properties based on an environment property that is
      * set when calling Gradle. For example, you could run "gradle -Penv=qa mlDeploy" in order to apply the env-qa.gradle
@@ -63,7 +57,6 @@ plugins {
  */
 repositories {
     jcenter()
-    maven {url "http://developer.marklogic.com/maven2/"}
 
     // Stores the corb jar - this will be moved to bintray soon
     maven {url "http://rjrudin.github.io/marklogic-java/releases"}
@@ -87,9 +80,8 @@ dependencies {
     testCompile "com.marklogic:ml-junit:2.5"
     testCompile "com.jayway.restassured:rest-assured:2.4.1"
 
-    // Located at https://github.com/rjrudin/marklogic-java/tree/gh-pages/releases/com/marklogic/corb
     corb "com.marklogic:corb:1.0"
-    corb "com.marklogic:marklogic-xcc:8.0.3"
+    corb "com.marklogic:marklogic-xcc:8.0.4"
 }
 
 
@@ -164,7 +156,7 @@ ext {
 
 /*
  * As of ML 8.0-3, triggers can not yet be managed via the Management REST API, so we still rely on a custom Gradle task
- * that uses XCC to create the trigger.
+ * that uses XCC to create the trigger. With 8.0-4, you should not use this approach - triggers can instead be defined under src/main/ml-config/triggers.
  */
 task createSampleTrigger(type: com.marklogic.gradle.task.trigger.CreateTriggersTask) {
     xccUrl = contentXccUrl

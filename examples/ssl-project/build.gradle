@@ -1,18 +1,6 @@
-buildscript {
-  repositories {
-    jcenter()
-    maven {url "http://developer.marklogic.com/maven2/"}
-  }
-}
-
 plugins {
   id "com.marklogic.ml-gradle" version "2.0rc3"
 }
-
-repositories {
-  jcenter()
-}
-
 
 /*
  * Since our REST API server uses a certificate template, we need to execute an extra command to generate a temporary
@@ -25,4 +13,3 @@ ext {
     command.setValidFor(365)
     mlAppDeployer.commands.add(command)
 }
-

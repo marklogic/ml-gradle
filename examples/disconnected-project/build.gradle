@@ -8,6 +8,9 @@
  * 
  * There are other ways to solve the problem of running Gradle when it's not possible to connect to artifact 
  * repositories - this is just one approach.
+ *
+ * I think the old "apply" approach for plugins is needed here, I don't think the plugins DSL will work
+ * against a file tree. 
  */
 buildscript {
     if (project.hasProperty("disconnected")) {
@@ -18,7 +21,6 @@ buildscript {
     else {
         repositories {
             jcenter()
-            maven {url "http://developer.marklogic.com/maven2/"}
         }
         dependencies { classpath mlGradleDependency }
     }

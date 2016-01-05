@@ -1,19 +1,11 @@
 /*
- * The most minimal ml-gradle file just has the below two things - we need to include the jcenter and MarkLogic Maven 
- * repositories, and we need to reference the ml-gradle plugin. 
+ * The most minimal ml-gradle file just has one thing - the ml-gradle plugin declaration.
  *
  * Without a gradle.properties file with properties such as mlAppName and mlRestPort, ml-gradle will use some sensible
  * defaults to generate a new application - an app name of my-app, port 8003, and a username/password combo of 
  * admin/admin.
  */
 
-buildscript {
-  repositories {
-  	jcenter()
-  	maven {url "http://developer.marklogic.com/maven2/"}
-  }
-}
-
 plugins {
-  id "com.marklogic.ml-gradle" version "2.0rc2"  
+  id "com.marklogic.ml-gradle" version "2.0rc3"  
 }

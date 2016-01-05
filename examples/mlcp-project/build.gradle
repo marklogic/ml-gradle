@@ -3,12 +3,6 @@
  * "mlcp". This configuration is then used as the classpath for MlcpTask, which is a simple extension of Gradle's
  * JavaExec task that exposes a number of mlcp arguments as task attributes. 
  */
-buildscript {
-  repositories {
-    jcenter()
-    maven {url "http://developer.marklogic.com/maven2/"}
-  }
-}
 
 plugins {
   id "com.marklogic.ml-gradle" version "2.0rc3"
@@ -16,6 +10,8 @@ plugins {
 
 repositories {
     jcenter()
+
+    // Needed for mlcp dependencies
     maven {url "http://developer.marklogic.com/maven2/"}
 
     // Needed for hadoop dependencies for mlcp

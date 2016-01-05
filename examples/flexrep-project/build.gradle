@@ -9,12 +9,6 @@
  * build.gradle files with separate config directories, each specifying the tasks and configuration needed for the 
  * cluster that it is responsible for.
  */
-buildscript {
-  repositories {
-    jcenter()
-    maven {url "http://developer.marklogic.com/maven2/"}
-  }
-}
 
 plugins {
   id "com.marklogic.ml-gradle" version "2.0rc3"

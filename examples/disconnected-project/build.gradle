@@ -1,6 +1,6 @@
 /*
  * This Gradle file shows one approach for supporting a "disconnected" build - i.e. one that doesn't use any 
- * repositories, but rather finds dependencies in a directory structre. You can run "gradle buildMlDeployer", and then
+ * repositories, but rather finds dependencies in a directory structure. You can run "gradle buildMlDeployer", and then
  * unzip that file anywhere and run all the ml-gradle tasks as you normally would. 
  * 
  * The presence of a property named "disconnected" is what tells the build file to run in disconnected mode. It is 
@@ -57,7 +57,7 @@ if (project.hasProperty("disconnected")) {
  */
 else {
     repositories {
-        mavenCentral()
+        jcenter()
         maven {url "http://developer.marklogic.com/maven2/"}
         maven {url "http://repository.cloudera.com/artifactory/cloudera-repos/" }
     }

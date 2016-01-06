@@ -6,6 +6,7 @@ import com.marklogic.appdeployer.command.modules.LoadModulesCommand
 import com.marklogic.client.DatabaseClient
 import com.marklogic.client.modulesloader.ModulesLoader
 import com.marklogic.client.modulesloader.impl.DefaultModulesFinder
+import com.marklogic.client.modulesloader.impl.DefaultModulesLoader
 import com.marklogic.gradle.task.MarkLogicTask
 
 /**
@@ -22,8 +23,12 @@ class WatchTask extends MarkLogicTask {
     @TaskAction
     public void watchModules() {
         LoadModulesCommand command = getProject().property("mlLoadModulesCommand")
+        
         ModulesLoader loader = command.getModulesLoader()
-
+        if (loader instanceof DefaultModulesLoader) {
+            ((DefaultModulesLoader)loader).setCatchExceptions(true)
+        }
+        
         List<String> paths = getAppConfig().getModulePaths()
         println "Watching modules in paths: " + paths
 

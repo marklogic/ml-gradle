@@ -29,7 +29,8 @@ project has many projects that you can use for testing out your change to ml-gra
 
 1. Make your changes to the ml-gradle source code
 1. Run "gradle -Pversion=issue-number publishToMavenLocal" (the version can be anything you want)
-1. Pick a project under ./examples, and replace the "plugins" block with the following code:
+
+Then pick a project under ./examples, and replace the "plugins" block with the following code:
 
     buildscript {
       repositories {

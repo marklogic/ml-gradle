@@ -1,5 +1,8 @@
 # ml-app-deployer releases
 
+## 2.0rc3 - TBD
+
+* [#74](https://github.com/rjrudin/ml-app-deployer/issues/74) New command for verifying that MarkLogic version is at least 8
 
 ## 2.0rc2 - 2016-01-03
 

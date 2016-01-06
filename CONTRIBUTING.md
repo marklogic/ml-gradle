@@ -29,7 +29,28 @@ project has many projects that you can use for testing out your change to ml-gra
 
 1. Make your changes to the ml-gradle source code
 1. Run "gradle -Pversion=issue-number publishToMavenLocal" (the version can be anything you want)
-1. Pick a project under ./examples, and add "buildscript {repositories { mavenLocal() } }" to the build.gradle file
-1. Then change the version of ml-gradle in that build.gradle file be whatever version you selected when publishing
-1. When running Gradle on the project, you should now get the version you published to your local Maven repo
+1. Pick a project under ./examples, and replace the "plugins" block with the following code:
+
+    buildscript {
+      repositories {
+        mavenLocal() 
+        jcenter()
+      } 
+      dependencies {
+        classpath "com.marklogic:ml-gradle:(the version number you chose)"
+      }
+    }
+    apply plugin: "com.marklogic.ml-gradle"
+
+The above unfortunately has to be done because while the "plugins" DSL in Gradle is very concise and automatically 
+includes jcenter() as a repository, it can't be used for finding plugins in your local Maven repository. So we have to
+replace it with the much more verbose syntax. Of course, after you're done testing with this, change the Gradle file
+back to just use the plugins DSL.
+
+After making the above changes, when you run any Gradle task, Gradle will use the ml-gradle plugin that you published
+to your local Maven repository. 
+
+You can then repeat this process as often as you want - i.e. make more changes in the ml-gradle source, publish a new
+copy to your local Maven repo, and test it in the project you chose. 
+
  

@@ -188,6 +188,9 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
                     logger.warn(
                             "Unable to load module from file: " + f.getAbsolutePath() + "; cause: " + e.getMessage(), e);
                     loadedModules.add(f);
+                    if (modulesManager != null) {
+                        modulesManager.saveLastInstalledTimestamp(f, new Date());
+                    }
                 } else {
                     throw e;
                 }
@@ -210,6 +213,9 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
                     logger.warn(
                             "Unable to load module from file: " + f.getAbsolutePath() + "; cause: " + e.getMessage(), e);
                     loadedModules.add(f);
+                    if (modulesManager != null) {
+                        modulesManager.saveLastInstalledTimestamp(f, new Date());
+                    }
                 } else {
                     throw e;
                 }

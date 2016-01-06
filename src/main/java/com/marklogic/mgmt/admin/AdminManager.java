@@ -12,6 +12,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.marklogic.mgmt.AbstractManager;
+import com.marklogic.rest.util.Fragment;
 import com.marklogic.rest.util.RestTemplateUtil;
 
 public class AdminManager extends AbstractManager {
@@ -197,6 +198,14 @@ public class AdminManager extends AbstractManager {
         });
     }
 
+    public Fragment getServerConfig() {
+        return new Fragment(restTemplate.getForObject(adminConfig.getBaseUrl() + "/admin/v1/server-config", String.class));
+    }
+    
+    public String getServerVersion() {
+        return getServerConfig().getElementValue("/m:host/m:version");
+    }
+    
     public void setWaitForRestartCheckInterval(int waitForRestartCheckInterval) {
         this.waitForRestartCheckInterval = waitForRestartCheckInterval;
     }

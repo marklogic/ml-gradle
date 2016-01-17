@@ -24,6 +24,7 @@ import com.marklogic.appdeployer.command.flexrep.DeployConfigsCommand
 import com.marklogic.appdeployer.command.flexrep.DeployTargetsCommand
 import com.marklogic.appdeployer.command.forests.ConfigureForestReplicasCommand
 import com.marklogic.appdeployer.command.groups.DeployGroupsCommand
+import com.marklogic.appdeployer.command.mimetypes.DeployMimetypesCommand
 import com.marklogic.appdeployer.command.modules.LoadModulesCommand
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand
 import com.marklogic.appdeployer.command.security.DeployAmpsCommand
@@ -69,6 +70,7 @@ import com.marklogic.gradle.task.forests.ConfigureForestReplicasTask
 import com.marklogic.gradle.task.forests.DeleteForestReplicasTask
 import com.marklogic.gradle.task.forests.DeployForestReplicasTask
 import com.marklogic.gradle.task.groups.DeployGroupsTask
+import com.marklogic.gradle.task.mimetypes.DeployMimetypesTask
 import com.marklogic.gradle.task.scaffold.GenerateScaffoldTask
 import com.marklogic.gradle.task.security.DeployAmpsTask
 import com.marklogic.gradle.task.security.DeployCertificateAuthoritiesTask
@@ -168,7 +170,10 @@ class MarkLogicPlugin implements Plugin<Project> {
 
         String groupsGroup = "ml-gradle Group"
         project.task("mlDeployGroups", type: DeployGroupsTask, group: groupsGroup, description: "Deploy each group, updating it if it exists, in the configuration directory")
-
+        
+        String mimetypesGroup = "ml-gradle Mimetypes"
+        project.task("mlDeployMimetypes", type: DeployMimetypesTask, group: mimetypesGroup, description: "Deploy each mimetype, updating it if it exists, in the configuration directory")
+        
         String modulesGroup = "ml-gradle Modules"
         project.task("mlLoadModules", type: LoadModulesTask, group: modulesGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Loads modules from directories defined by mlAppConfig or via a property on this task").mustRunAfter(["mlClearModulesDatabase"])
         project.task("mlReloadModules", group: modulesGroup, dependsOn: ["mlClearModulesDatabase", "mlLoadModules"], description: "Reloads modules by first clearing the modules database and then loading modules")
@@ -344,6 +349,11 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.extensions.add("mlGroupCommands", groupCommands)
         commands.addAll(groupCommands)
 
+        List<Command> mimetypeCommands = new ArrayList<Command>()
+        mimetypeCommands.add(new DeployMimetypesCommand())
+        project.extensions.add("mlMimetypeCommands", mimetypeCommands)
+        commands.addAll(mimetypeCommands)
+        
         // Forest replicas
         List<Command> replicaCommands = new ArrayList<Command>()
         replicaCommands.add(new ConfigureForestReplicasCommand())

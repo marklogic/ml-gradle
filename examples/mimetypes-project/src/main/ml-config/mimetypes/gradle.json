@@ -1,0 +1,7 @@
+{
+  "name": "text/gradle",
+  "extension": [
+    "gradle"
+  ],
+  "format": "text"
+}

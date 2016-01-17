@@ -12,7 +12,8 @@ public abstract class SortOrderConstants {
     public static Integer DEPLOY_CERTIFICATE_AUTHORITIES = 60;
     public static Integer DEPLOY_EXTERNAL_SECURITY = 70;
     public static Integer DEPLOY_PROTECTED_COLLECTIONS = 80;
-
+    public static Integer DEPLOY_MIMETYPES = 90;
+    
     public static Integer DEPLOY_TRIGGERS_DATABASE = 100;
     public static Integer DEPLOY_SCHEMAS_DATABASE = 100;
     public static Integer DEPLOY_CONTENT_DATABASES = 120;
@@ -53,6 +54,8 @@ public abstract class SortOrderConstants {
     // Undo constants
     public static Integer DELETE_GROUPS = 10000;
 
+    public static Integer DELETE_MIMETYPES = 9500;
+    
     public static Integer DELETE_USERS = 9000;
     public static Integer DELETE_CERTIFICATE_TEMPLATES = 9010;
     public static Integer DELETE_CERTIFICATE_AUTHORITIES = 9020;

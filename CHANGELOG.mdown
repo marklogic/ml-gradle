@@ -1,6 +1,6 @@
 # ml-app-deployer releases
 
-## 2.0rc3 - TBD
+## 2.0rc3 - 2016-01-17
 
 * [#74](https://github.com/rjrudin/ml-app-deployer/issues/74) New command for verifying that MarkLogic version is at least 8
 * [#75](https://github.com/rjrudin/ml-app-deployer/issues/75) Added mimetypes support

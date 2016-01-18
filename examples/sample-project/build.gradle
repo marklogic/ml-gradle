@@ -113,10 +113,8 @@ ext {
         // build/mlRestApi/(name of dependency)/ml-config/databases directory.
         configDir.contentDatabaseFiles.add(new File("src/main/ml-config/databases/more-content-database-config.json"))
 
-        // For the tasks below that depend on XCC - such as for running corb or creating triggers - the following URL
-        // will be used. In this sample project, the sample-project-rest-admin user has the privileges necessary to
-        // create triggers, so we use that user.
-        contentXccUrl = "xcc://${mlRestAdminUsername}:${mlRestAdminPassword}@${mlHost}:8000/${mlAppConfig.contentDatabaseName}"
+        // XCC URL for running corb task below and for creating triggers on pre-8.0-4 builds of MarkLogic
+        contentXccUrl = "xcc://${mlRestAdminUsername}:${mlRestAdminPassword}@${mlHost}:${mlRestPort}"
     }
 }
 

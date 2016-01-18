@@ -21,6 +21,13 @@
     </privilege>
     <!-- End privileges -->
     
+    <!-- Privileges for running corb -->
+    <privilege>
+      <privilege-name>xdbc:invoke</privilege-name>
+      <action>http://marklogic.com/xdmp/privileges/xdbc-invoke</action>
+      <kind>execute</kind>
+    </privilege>
+    
     <!-- Privileges for creating triggers -->
     <privilege>
       <privilege-name>create-trigger</privilege-name>

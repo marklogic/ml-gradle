@@ -13,6 +13,10 @@ public class SimplePropertySource implements PropertySource {
         }
     }
 
+    public SimplePropertySource(Properties props) {
+        this.props = props;
+    }
+
     @Override
     public String getProperty(String name) {
         return props.getProperty(name);

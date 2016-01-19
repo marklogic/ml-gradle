@@ -70,6 +70,12 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
             c.setRestAdminPassword(mlPassword);
         }
 
+        prop = getProperty("mlContentForestsPerHost");
+        if (prop != null) {
+            logger.info("Content forests per host: " + prop);
+            c.setContentForestsPerHost(Integer.parseInt(prop));
+        }
+
         prop = getProperty("mlModulePermissions");
         if (prop != null) {
             logger.info("Module permissions: " + prop);
@@ -84,7 +90,8 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
         }
 
         if (getProperty("mlSimpleSsl") != null) {
-            logger.info("Using simple SSL context and 'ANY' hostname verifier for authenticating against client REST API server");
+            logger.info(
+                    "Using simple SSL context and 'ANY' hostname verifier for authenticating against client REST API server");
             c.setSimpleSslConfig();
         }
 

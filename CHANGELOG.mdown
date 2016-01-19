@@ -1,5 +1,10 @@
 # ml-app-deployer releases
 
+## 2.0rc4 - TBD
+
+* [#78](https://github.com/rjrudin/ml-app-deployer/issues/78) Added support for mlContentForestsPerHost
+* [#77](https://github.com/rjrudin/ml-app-deployer/issues/77) Support Spring Boot-style properties with a "marklogic." prefix
+
 ## 2.0rc3 - 2016-01-17
 
 * [#74](https://github.com/rjrudin/ml-app-deployer/issues/74) New command for verifying that MarkLogic version is at least 8

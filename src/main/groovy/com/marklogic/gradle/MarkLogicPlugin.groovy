@@ -90,6 +90,7 @@ import com.marklogic.gradle.task.security.UndeployRolesTask
 import com.marklogic.gradle.task.security.UndeploySecurityTask
 import com.marklogic.gradle.task.security.UndeployUsersTask
 import com.marklogic.gradle.task.servers.DeployServersTask
+import com.marklogic.gradle.task.servers.UndeployOtherServersTask
 import com.marklogic.gradle.task.tasks.DeleteAllTasksTask
 import com.marklogic.gradle.task.tasks.DeployTasksTask
 import com.marklogic.gradle.task.tasks.UndeployTasksTask
@@ -182,7 +183,8 @@ class MarkLogicPlugin implements Plugin<Project> {
 
         String serverGroup = "ml-gradle Server"
         project.task("mlDeployServers", type: DeployServersTask, group: serverGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the REST API server (if it exists) and deploys each other server, updating it if it exists, in the configuration directory ")
-
+        project.task("mlUndeployOtherServers", type: UndeployOtherServersTask, group: serverGroup, description: "Delete any non-REST API servers (e.g. ODBC and XBC servers) defined by server files in the configuration directory")
+        
         String securityGroup = "ml-gradle Security"
         project.task("mlDeployAmps", type: DeployAmpsTask, group: securityGroup, description: "Deploy each amp, updating it if it exists, in the configuration directory")
         project.task("mlDeployCertificateAuthorities", type: DeployCertificateAuthoritiesTask, group: securityGroup, description: "Deploy each certificate authority, updating it if it exists, in the configuration directory")

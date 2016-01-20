@@ -59,7 +59,7 @@ if (project.hasProperty("myBintrayUser")) {
       licenses = ['Apache-2.0']
       vcsUrl = 'https://github.com/rjrudin/' + project.name + '.git'
       version {
-        name = "2.0rc3"
+        name = "2.0rc4"
         released = new Date()
       }
     }

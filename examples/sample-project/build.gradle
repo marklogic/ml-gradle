@@ -159,39 +159,6 @@ ext {
 
 
 /*
- * As of ML 8.0-3, triggers can not yet be managed via the Management REST API, so we still rely on a custom Gradle task
- * that uses XCC to create the trigger. With 8.0-4, you should not use this approach - triggers can instead be defined under src/main/ml-config/triggers.
- */
-task createSampleTrigger(type: com.marklogic.gradle.task.trigger.CreateTriggersTask) {
-    xccUrl = contentXccUrl
-    triggerName = "sample-project-trigger"
-    description = "This is an example of creating a trigger"
-    dataEventCommit = "post"
-    dataEventScopeArgs = ["some-collection"]
-    dataEventContentArgs = ["create", "modify", "delete"]
-    moduleRoot = "/"
-    modulePath = "/ext/sample-project/trigger/sample-trigger.xqy"
-}
-
-
-/*
- * Example of attaching the creation of our trigger to the end of the mlDeploy process. mlPostDeploy is an empty task
- * that is called by mlDeploy after mlAppDeploy runs; mlPostDeploy thus allows for any additional tasks to be added to
- * the deployment process. 
- */
-mlPostDeploy.dependsOn createSampleTrigger
-
-
-/*
- * Example of including a custom command in the deployment process. The order in which it's invoked is determined by
- * the command's "getExecuteSortOrder" method.
- */
-ext {
-    mlAppDeployer.commands.add(new ClearTriggersDatabaseCommand())
-}
-
-
-/*
  * ml-gradle does not blindly process every file in the ml-config/databases directory. It checks for specific files
  * for a content database, a schemas database, and a triggers database. There are specific commands for each file, and
  * each command provides a number of options for configuring the forests for a database. One reason ml-gradle does not
@@ -214,34 +181,43 @@ ext {
 
 
 /*
- * Below is an example of a custom command, which also fixes a bug in ML that should be fixed in the 8.0-4 release. The 
- * bug is - when a pipeline is updated via the Management REST API,  pipeline states are dropped. To address this, we 
- * insert a command to clear the triggers database before any CPF resources are created, thus forcing a create instead 
- * of an update, thereby bypassing the bug. This example also shows how the ManageClient instance in CommandContext can
- * be used to easily make any call to the Management REST API. Note that this class could also be defined in the Gradle
- * buildSrc directory, which is really a better option for keeping your build.gradle file slim.
+ * Example of a custom command, which in this case performs a merge on a database. The benefit of doing this in a 
+ * command (as opposed to a task) is that a command can be included in the mlDeploy and mlUndeploy tasks by adding it to
+ * the mlAppDeployer object, as shown below.
+ * 
+ * This example also shows how the ManageClient instance in CommandContext can be used to easily make any call to the 
+ * Management REST API. Note that this class could also be defined in the Gradle buildSrc directory, which is really a 
+ * better option for keeping your build.gradle file slim.
  */
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
-import com.marklogic.appdeployer.command.SortOrderConstants;
 
-class ClearTriggersDatabaseCommand extends AbstractCommand {
+class MergeContentDatabaseCommand extends AbstractCommand {
     public Integer getExecuteSortOrder() {
-        return SortOrderConstants.DEPLOY_DEFAULT_PIPELINES - 1;
+        return Integer.MAX_VALUE;
     }
     public void execute(CommandContext context) {
-        String dbName = context.getAppConfig().getTriggersDatabaseName();
-        logger.info("Clearing database: " + dbName);
-        context.getManageClient().postJson("/manage/v2/databases/" + dbName, '{"operation":"clear-database"}');
-        logger.info("Cleared database: " + dbName)
+        String dbName = context.getAppConfig().getContentDatabaseName();
+        logger.info("Merging database: " + dbName);
+        context.getManageClient().postJson("/manage/v2/databases/" + dbName, '{"operation":"merge-database"}');
+        logger.info("Merged database: " + dbName)
     }
 }
 
 
 /*
- * Sometimes, you need a custom step, but you want it to be a separate task - not a command that's included when 
- * mlDeploy is invoked. Below is a task that extends MarkLogicTask, which provides access to a number of helpful 
- * objects for implementing custom functionality.
+ * Example of including our custom command in the deployment process. The order in which it's invoked is determined by
+ * the command's "getExecuteSortOrder" method.
+ */
+ext {
+    //mlAppDeployer.commands.add(new MergeContentDatabaseCommand())
+}
+
+
+/*
+ * Below is an example of a custom task that merges a database - just like the command above. The benefit of creating a
+ * task versus a command is that we can invoke this without running a full mlDeploy. The MarkLogicTask class provides
+ * access to a number of helpful objects via methods like getAppConfig() and getManageClient().
  */
 task mergeContentDatabase(type: com.marklogic.gradle.task.MarkLogicTask) {
     description = "Call this task to initiate a merge on the content database"
@@ -249,3 +225,10 @@ task mergeContentDatabase(type: com.marklogic.gradle.task.MarkLogicTask) {
         getManageClient().postJson("/manage/v2/databases/" + getAppConfig().getContentDatabaseName(), '{"operation":"merge-database"}')
     }
 }
+
+/*
+ * Example of attaching our custom task to the end of the mlDeploy process. mlPostDeploy is an empty task
+ * that is called by mlDeploy after mlAppDeploy runs; mlPostDeploy thus allows for any additional tasks to be added to
+ * the deployment process. 
+ */
+//mlPostDeploy.dependsOn mergeContentDatabase

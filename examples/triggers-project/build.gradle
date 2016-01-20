@@ -1,0 +1,19 @@
+plugins {
+  id "com.marklogic.ml-gradle" version "2.0rc3"  
+}
+
+/**
+ * Starting with MarkLogic 8.0-4, triggers can be added via configuration files in the src/main/ml-config/triggers
+ * directory. Prior to that, you'll need to use a task like the one below, as previous version of MarkLogic don't
+ * support creating triggers via the Management REST API.
+ */
+task createSampleTrigger(type: com.marklogic.gradle.task.trigger.CreateTriggersTask) {
+    description = "This is an example of creating a trigger via XCC as opposed to the Management REST API"
+    xccUrl = "xcc://${mlUsername}:${mlPassword}@${mlHost}:${mlRestPort}"
+    triggerName = "sample-trigger"
+    dataEventCommit = "post"
+    dataEventScopeArgs = ["sample"]
+    dataEventContentArgs = ["create", "modify", "delete"]
+    moduleRoot = "/"
+    modulePath = "/ext/sample-trigger.xqy"
+}

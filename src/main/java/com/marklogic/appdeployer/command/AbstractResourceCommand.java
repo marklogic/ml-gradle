@@ -14,6 +14,7 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 
     private boolean deleteResourcesOnUndo = true;
     private boolean restartAfterDelete = false;
+    private boolean catchExceptionOnDeleteFailure = false;
 
     protected abstract File[] getResourceDirs(CommandContext context);
 
@@ -71,17 +72,38 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
         }
     }
 
+    /**
+     * If catchExceptionOnDeleteFailure is set to true, this will catch and log any exception that occurs when trying to
+     * delete the resource. This has been necessary when deleting two app servers in a row - for some reason, the 2nd
+     * delete will intermittently fail with a connection reset error, but the app server is in fact deleted
+     * successfully.
+     * 
+     * @param mgr
+     * @param context
+     * @param f
+     */
     protected void deleteResource(final ResourceManager mgr, CommandContext context, File f) {
         final String payload = tokenReplacer.replaceTokens(copyFileToString(f), context.getAppConfig(), false);
-        if (restartAfterDelete) {
-            context.getAdminManager().invokeActionRequiringRestart(new ActionRequiringRestart() {
-                @Override
-                public boolean execute() {
-                    return mgr.delete(payload).isDeleted();
+        try {
+            if (restartAfterDelete) {
+                context.getAdminManager().invokeActionRequiringRestart(new ActionRequiringRestart() {
+                    @Override
+                    public boolean execute() {
+                        return mgr.delete(payload).isDeleted();
+                    }
+                });
+            } else {
+                mgr.delete(payload);
+            }
+        } catch (RuntimeException e) {
+            if (catchExceptionOnDeleteFailure) {
+                logger.warn("Caught exception while trying to delete resource; cause: " + e.getMessage());
+                if (restartAfterDelete) {
+                    context.getAdminManager().waitForRestart();
                 }
-            });
-        } else {
-            mgr.delete(payload);
+            } else {
+                throw e;
+            }
         }
     }
 
@@ -99,5 +121,9 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 
     public boolean isRestartAfterDelete() {
         return restartAfterDelete;
+    }
+
+    public void setCatchExceptionOnDeleteFailure(boolean catchExceptionOnDeleteFailure) {
+        this.catchExceptionOnDeleteFailure = catchExceptionOnDeleteFailure;
     }
 }

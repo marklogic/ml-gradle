@@ -19,6 +19,7 @@ public class DeployOtherServersCommand extends AbstractResourceCommand {
         setExecuteSortOrder(SortOrderConstants.DEPLOY_OTHER_SERVERS);
         setUndoSortOrder(SortOrderConstants.DELETE_OTHER_SERVERS);
         setRestartAfterDelete(true);
+        setCatchExceptionOnDeleteFailure(true);
         setResourceFilenameFilter(new ResourceFilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {

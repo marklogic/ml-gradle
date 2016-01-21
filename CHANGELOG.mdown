@@ -1,11 +1,8 @@
-# ml-gradle releases
-
-## 2.5.1
-
-* [#13](https://github.com/rjrudin/ml-javaclient-util/issues/13) Added support for loading from any directory in source path 
+# ml-javaclient-util releases
 
 ## 2.5
 
+* [#13](https://github.com/rjrudin/ml-javaclient-util/issues/13) Added support for loading from any directory in source path 
 * Added classes from ml-xcc-util
 
 ## 2.4

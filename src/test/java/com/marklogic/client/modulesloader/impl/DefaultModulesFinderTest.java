@@ -10,7 +10,6 @@ import org.springframework.core.io.ClassPathResource;
 
 import com.marklogic.client.modulesloader.Modules;
 import com.marklogic.client.modulesloader.ModulesFinder;
-import com.marklogic.client.modulesloader.impl.DefaultModulesFinder;
 
 public class DefaultModulesFinderTest extends Assert {
 
@@ -20,15 +19,16 @@ public class DefaultModulesFinderTest extends Assert {
     public void baseDirWithExtensionsOfEachKind() throws IOException {
         Modules modules = sut.findModules(getBaseDir("sample-base-dir"));
         assertEquals(1, modules.getOptions().size());
-        assertEquals("Only recognized XQuery files should be included; the XML file should be ignored", 2, modules
-                .getServices().size());
-        assertEquals("Only recognized XSL files should be included; the XML file should be ignored", 4, modules
-                .getTransforms().size());
+        assertEquals("Only recognized XQuery files should be included; the XML file should be ignored", 2,
+                modules.getServices().size());
+        assertEquals("Only recognized XSL files should be included; the XML file should be ignored", 4,
+                modules.getTransforms().size());
 
         List<File> dirs = modules.getAssetDirectories();
-        assertEquals(2, dirs.size());
+        assertEquals(3, dirs.size());
         assertEquals("ext", dirs.get(0).getName());
         assertEquals("root", dirs.get(1).getName());
+        assertEquals("include-this-too", dirs.get(2).getName());
 
         assertEquals(
                 "Namespace files don't have to fit any filename format; the body of the file should be the namespace URI",

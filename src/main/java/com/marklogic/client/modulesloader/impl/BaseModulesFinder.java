@@ -3,6 +3,7 @@ package com.marklogic.client.modulesloader.impl;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.marklogic.client.helper.FilenameUtil;
@@ -18,6 +19,14 @@ public abstract class BaseModulesFinder implements ModulesFinder {
     private FilenameFilter transformFilenameFilter = new TransformFilenameFilter();
     private FilenameFilter namespaceFilenameFilter = new NamespaceFilenameFilter();
 
+    /**
+     * Whether to treat paths that aren't recognized by this class (i.e. not services, options, namespaces, or
+     * transforms) as asset paths that will then be loaded as asset modules.
+     */
+    private boolean includeUnrecognizedPathsAsAssetPaths = true;
+
+    private String extPath = "ext";
+    private String rootPath = "root";
     private String servicesPath = "services";
     private String optionsPath = "options";
     private String namespacesPath = "namespaces";
@@ -59,7 +68,22 @@ public abstract class BaseModulesFinder implements ModulesFinder {
         if (dir.exists()) {
             dirs.add(dir);
         }
+
+        if (includeUnrecognizedPathsAsAssetPaths) {
+            List<String> recognizedPaths = getRecognizedPaths();
+            for (File f : baseDir.listFiles()) {
+                if (f.isDirectory() && !recognizedPaths.contains(f.getName())) {
+                    dirs.add(f);
+                }
+            }
+        }
+
         modules.setAssetDirectories(dirs);
+    }
+
+    protected List<String> getRecognizedPaths() {
+        return Arrays
+                .asList(new String[] { extPath, rootPath, optionsPath, servicesPath, transformsPath, namespacesPath });
     }
 
     protected void addOptions(Modules modules, File baseDir) {
@@ -128,6 +152,22 @@ public abstract class BaseModulesFinder implements ModulesFinder {
 
     public void setTransformsPath(String transformsPath) {
         this.transformsPath = transformsPath;
+    }
+
+    public boolean isIncludeUnrecognizedPathsAsAssetPaths() {
+        return includeUnrecognizedPathsAsAssetPaths;
+    }
+
+    public void setIncludeUnrecognizedPathsAsAssetPaths(boolean includeUnrecognizedPathsAsAssetPaths) {
+        this.includeUnrecognizedPathsAsAssetPaths = includeUnrecognizedPathsAsAssetPaths;
+    }
+
+    public void setExtPath(String extPath) {
+        this.extPath = extPath;
+    }
+
+    public void setRootPath(String rootPath) {
+        this.rootPath = rootPath;
     }
 }
 

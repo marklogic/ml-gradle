@@ -1,5 +1,9 @@
 # ml-gradle releases
 
+## 2.5.1
+
+* [#13](https://github.com/rjrudin/ml-javaclient-util/issues/13) Added support for loading from any directory in source path 
+
 ## 2.5
 
 * Added classes from ml-xcc-util
@@ -28,3 +32,23 @@
 ## 2.1
 
 * Repackaged
+
+## Old changelog
+
+## 2.0   - ML8 compatibility
+
+## 2.0.1 - BasicConfig now assumes 8000 as the XDBC port
+
+## 2.0.2 - XccAssetLoader added to DefaultModulesLoader
+
+## 2.0.3 - Targeting Java 1.7
+
+## 2.0.4 - Depending on com.marklogic:java-client-api:3.0.2
+
+## 2.0.5 - Now supports *.sjs transforms
+
+## 2.0.6 - #8 now supports loading rest-properties.json file
+
+## 2.0.7 - #8 Fix for not loading rest-properties.json when it's not been modified
+
+## 2.0.8 - Added TestServerModulesFinder

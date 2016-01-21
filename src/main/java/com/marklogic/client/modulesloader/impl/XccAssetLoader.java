@@ -143,8 +143,12 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
         if (fileFilter.accept(path.toFile())) {
             Path relPath = currentAssetPath.relativize(path);
             String uri = "/" + relPath.toString().replace("\\", "/");
-            if (isCurrentRootPathForRestApiAssets()) {
-                uri = "/ext" + uri;
+            if (this.currentRootPath != null) {
+                String name = this.currentRootPath.toFile().getName();
+                // A bit of a hack to support the special "root" directory.
+                if (!"root".equals(name)) {
+                    uri = "/" + name + uri;
+                }
             }
             loadFile(uri, path.toFile());
             filesLoaded.add(path.toFile());
@@ -159,9 +163,9 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
      * 
      * @return
      */
-    protected boolean isCurrentRootPathForRestApiAssets() {
-        return this.currentRootPath != null && this.currentRootPath.toFile().getName().equals("ext");
-    }
+    // protected boolean isNotRootAssetsPath() {
+    // return this.currentRootPath != null && this.currentRootPath.toFile().getName().equals("root");
+    // }
 
     /**
      * Does the actual work of loading a file into the modules database via XCC.

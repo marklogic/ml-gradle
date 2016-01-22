@@ -64,8 +64,8 @@ plugins {
 repositories {
     jcenter()
 
-    // Stores the corb jar - this will be moved to bintray soon
-    maven {url "http://rjrudin.github.io/marklogic-java/releases"}
+    // corb2 jar is stored here, waiting for bintray to mirror it
+    maven {url "https://dl.bintray.com/rjrudin/maven/"}
 }
 
 
@@ -85,9 +85,9 @@ dependencies {
     // Needed to compile and run the JUnit tests
     testCompile "com.marklogic:ml-junit:2.5"
     testCompile "com.jayway.restassured:rest-assured:2.4.1"
-
-    corb "com.marklogic:corb:1.0"
-    corb "com.marklogic:marklogic-xcc:8.0.4"
+    
+    // corb jar available from jcenter
+    corb "com.marklogic:marklogic-corb:2.2.1"
 }
 
 

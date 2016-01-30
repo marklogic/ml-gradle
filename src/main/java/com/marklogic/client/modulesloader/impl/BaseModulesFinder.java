@@ -69,7 +69,7 @@ public abstract class BaseModulesFinder implements ModulesFinder {
             dirs.add(dir);
         }
 
-        if (includeUnrecognizedPathsAsAssetPaths) {
+        if (includeUnrecognizedPathsAsAssetPaths && baseDir != null && baseDir.exists()) {
             List<String> recognizedPaths = getRecognizedPaths();
             for (File f : baseDir.listFiles()) {
                 if (f.isDirectory() && !recognizedPaths.contains(f.getName())) {

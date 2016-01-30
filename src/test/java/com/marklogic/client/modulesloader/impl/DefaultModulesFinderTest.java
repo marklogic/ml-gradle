@@ -44,6 +44,15 @@ public class DefaultModulesFinderTest extends Assert {
         assertEquals(0, files.getTransforms().size());
     }
 
+    @Test
+    public void missingBaseDir() {
+        Modules files = sut.findModules(new File("base-dir-doesnt-exist"));
+        assertEquals(0, files.getAssetDirectories().size());
+        assertEquals(0, files.getOptions().size());
+        assertEquals(0, files.getServices().size());
+        assertEquals(0, files.getTransforms().size());
+    }
+    
     private File getBaseDir(String path) {
         try {
             return new ClassPathResource(path).getFile();

@@ -34,6 +34,8 @@ public abstract class BaseModulesFinder implements ModulesFinder {
     private String optionsPath = "options";
     private String namespacesPath = "namespaces";
     private String transformsPath = "transforms";
+    // special case for excluding from assets.
+    private String schemasPath = "schemas";
 
     /**
      * Only supports JSON for now.
@@ -86,7 +88,7 @@ public abstract class BaseModulesFinder implements ModulesFinder {
 
     protected List<String> getRecognizedPaths() {
         return Arrays
-                .asList(new String[] { extPath, rootPath, optionsPath, servicesPath, transformsPath, namespacesPath });
+                .asList(new String[] { extPath, rootPath, optionsPath, servicesPath, transformsPath, namespacesPath, schemasPath });
     }
 
     protected void addOptions(Modules modules, File baseDir) {

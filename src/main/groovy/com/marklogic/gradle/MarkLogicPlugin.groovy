@@ -72,6 +72,7 @@ import com.marklogic.gradle.task.forests.DeployForestReplicasTask
 import com.marklogic.gradle.task.groups.DeployGroupsTask
 import com.marklogic.gradle.task.mimetypes.DeployMimetypesTask
 import com.marklogic.gradle.task.scaffold.GenerateScaffoldTask
+import com.marklogic.gradle.task.schemasdata.LoadSchemasDataTask
 import com.marklogic.gradle.task.security.DeployAmpsTask
 import com.marklogic.gradle.task.security.DeployCertificateAuthoritiesTask
 import com.marklogic.gradle.task.security.DeployCertificateTemplatesTask
@@ -121,7 +122,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlUndeployApp", type: UndeployAppTask)
 
         String deployGroup = "ml-gradle Deploy"
-        project.task("mlPostDeploy", group: deployGroup, description: "Add dependsOn to this task to add tasks at the end of mlDeploy").mustRunAfter(["mlDeployApp"])
+        project.task("mlPostDeploy", group: deployGroup, dependsOn: "mlLoadSchemasData", description: "Add dependsOn to this task to add tasks at the end of mlDeploy").mustRunAfter(["mlDeployApp"])
         project.task("mlPostUndeploy", group: deployGroup, description: "Add dependsOn to this task to add tasks at the end of mlUndeploy").mustRunAfter(["mlUndeployApp"])
         project.task("mlDeploy", group: deployGroup, dependsOn: ["mlDeployApp", "mlPostDeploy"], description: "Deploys all application resources in the configuration directory and allows for additional steps via mlPostDeploy.dependsOn").mustRunAfter("mlClearModulesDatabase")
         project.task("mlUndeploy", group: deployGroup, dependsOn: ["mlUndeployApp", "mlPostUndeploy"], description: "Undeploys all application resources in the configuration directory and allows for additional steps via mlPostUndeploy.dependsOn")
@@ -181,6 +182,10 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlWatch", type: WatchTask, group: modulesGroup, description: "Run a loop that checks for new/modified modules every second and loads any that it finds")
         project.task("mlDeleteModuleTimestampsFile", type: DeleteModuleTimestampsFileTask, group: modulesGroup, description: "Delete the properties file in the build directory that keeps track of when each module was last loaded")
 
+        String schemasDataGroup = "ml-gradle Schemas"
+        project.task("mlLoadSchemasData", type: LoadSchemasDataTask, group: schemasDataGroup, description: "Loads special-purpose data into the schemas database (XSD schemas, Inference rules, and [MarkLogic 9] Extraction Templates)")
+        project.task("mlReloadSchemasData", type: LoadSchemasDataTask, dependsOn: ["mlClearSchemasDatabase", "mlLoadSchemasData"], group: schemasDataGroup, description: "Loads special-purpose data into the schemas database (XSD schemas, Inference rules, and [MarkLogic 9] Extraction Templates)")
+        
         String serverGroup = "ml-gradle Server"
         project.task("mlDeployServers", type: DeployServersTask, group: serverGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the REST API server (if it exists) and deploys each other server, updating it if it exists, in the configuration directory ")
         project.task("mlUndeployOtherServers", type: UndeployOtherServersTask, group: serverGroup, description: "Delete any non-REST API servers (e.g. ODBC and XBC servers) defined by server files in the configuration directory")

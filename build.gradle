@@ -24,6 +24,7 @@ targetCompatibility = "1.7"
 
 repositories {
   jcenter()
+  mavenLocal()
 }
 
 dependencies {
@@ -92,4 +93,9 @@ pluginBundle {
   mavenCoordinates {
     version = "2.0rc5"
   }
+}
+
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.6'
 }

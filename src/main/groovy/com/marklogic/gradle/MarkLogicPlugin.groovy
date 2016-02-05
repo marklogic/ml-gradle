@@ -26,6 +26,7 @@ import com.marklogic.appdeployer.command.forests.ConfigureForestReplicasCommand
 import com.marklogic.appdeployer.command.groups.DeployGroupsCommand
 import com.marklogic.appdeployer.command.mimetypes.DeployMimetypesCommand
 import com.marklogic.appdeployer.command.modules.LoadModulesCommand
+import com.marklogic.appdeployer.command.schemas.LoadSchemasCommand
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand
 import com.marklogic.appdeployer.command.security.DeployAmpsCommand
 import com.marklogic.appdeployer.command.security.DeployCertificateAuthoritiesCommand
@@ -72,6 +73,7 @@ import com.marklogic.gradle.task.forests.DeployForestReplicasTask
 import com.marklogic.gradle.task.groups.DeployGroupsTask
 import com.marklogic.gradle.task.mimetypes.DeployMimetypesTask
 import com.marklogic.gradle.task.scaffold.GenerateScaffoldTask
+import com.marklogic.gradle.task.schemas.LoadSchemasTask
 import com.marklogic.gradle.task.security.DeployAmpsTask
 import com.marklogic.gradle.task.security.DeployCertificateAuthoritiesTask
 import com.marklogic.gradle.task.security.DeployCertificateTemplatesTask
@@ -181,6 +183,10 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlWatch", type: WatchTask, group: modulesGroup, description: "Run a loop that checks for new/modified modules every second and loads any that it finds")
         project.task("mlDeleteModuleTimestampsFile", type: DeleteModuleTimestampsFileTask, group: modulesGroup, description: "Delete the properties file in the build directory that keeps track of when each module was last loaded")
 
+        String schemasGroup = "ml-gradle Schemas"
+        project.task("mlLoadSchemas", type: LoadSchemasTask, group: schemasGroup, description: "Loads special-purpose data into the schemas database (XSD schemas, Inference rules, and [MarkLogic 9] Extraction Templates)")
+        project.task("mlReloadSchemas", type: LoadSchemasTask, dependsOn: ["mlClearSchemasDatabase", "mlLoadSchemas"], group: schemasGroup, description: "Clears schemas database then loads special-purpose data into the schemas database (XSD schemas, Inference rules, and [MarkLogic 9] Extraction Templates)")
+        
         String serverGroup = "ml-gradle Server"
         project.task("mlDeployServers", type: DeployServersTask, group: serverGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the REST API server (if it exists) and deploys each other server, updating it if it exists, in the configuration directory ")
         project.task("mlUndeployOtherServers", type: UndeployOtherServersTask, group: serverGroup, description: "Delete any non-REST API servers (e.g. ODBC and XBC servers) defined by server files in the configuration directory")
@@ -306,6 +312,12 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.extensions.add("mlDatabaseCommands", dbCommands)
         commands.addAll(dbCommands)
 
+        // Schemas
+        List<Command> schemasCommands = new ArrayList<Command>()
+        schemasCommands.add(new LoadSchemasCommand())
+        project.extensions.add("mlLoadSchemasCommands", schemasCommands)
+        commands.addAll(schemasCommands)
+        
         // REST API instance creation
         commands.add(new DeployRestApiServersCommand())
 

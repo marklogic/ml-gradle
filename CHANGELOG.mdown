@@ -1,5 +1,9 @@
 # ml-app-deployer releases
 
+## 2.0 - 2016-02-08
+
+* No changes from 2.0rc4, just making final label
+
 ## 2.0rc4 - 2016-01-20
 
 * Added exception handling for intermittent case where, when deleting multiple XDBC/ODBC servers in a row, the 2nd one will fail

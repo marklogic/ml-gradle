@@ -63,7 +63,3 @@ files in the ml-config directory structure:
     
     // Calls each command, giving each a chance to undo what it did before
     deployer.undeploy(config); 
-
-## When will there be a 2.0 final of ml-app-deployer?
-
-This will be created in conjunction with the release of MarkLogic 8.0-4, which includes support for triggers and alerts, along with a number of fixes. 

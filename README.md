@@ -31,12 +31,6 @@ First, please note the [Wiki and FAQ](https://github.com/rjrudin/ml-gradle/wiki)
 
 To use ml-gradle right away, you'll need Gradle installed first. And of course you'll need Marklogic installed somewhere - it doesn't have to be the same computer as the one you're running Gradle on. Then create a directory for your project and add a build.gradle file and a gradle.properties file (a Gradle best practice is to put properties in this file so they can be easily overridden). Here's the simplest build.gradle file possible:
 
-    buildscript {
-      repositories {
-        maven {url "http://developer.marklogic.com/maven2/"} // XCC is needed for loading modules
-      }
-    }
-
     plugins {
       id "com.marklogic.ml-gradle" version "2.0"
     }

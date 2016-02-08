@@ -49,7 +49,8 @@ And here's a basic gradle.properties file (you can of course customize these pro
     mlAppName=quick-start
     mlRestPort=8200
 
-Then just run "gradle mlDeploy" in the directory containing these two files:
+Then just run "gradle mlDeploy" in the directory containing these two files (note that the first time you run this, Gradle
+may need to download a number of dependencies):
 
     gradle mlDeploy
     

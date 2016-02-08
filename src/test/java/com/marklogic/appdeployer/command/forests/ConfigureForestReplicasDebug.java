@@ -2,6 +2,7 @@ package com.marklogic.appdeployer.command.forests;
 
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.command.CommandContext;
+import com.marklogic.appdeployer.command.databases.DeployDatabaseCommand;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.ManageConfig;
 
@@ -18,16 +19,22 @@ public class ConfigureForestReplicasDebug {
         ManageConfig config = new ManageConfig(host, 8002, "admin", password);
         ManageClient manageClient = new ManageClient(config);
         AppConfig appConfig = new AppConfig();
+        appConfig.setDatabaseNamesAndReplicaCounts("testdb,1");
         CommandContext context = new CommandContext(appConfig, manageClient, null);
 
-        // Configure replicas
-        ConfigureForestReplicasCommand command = new ConfigureForestReplicasCommand();
-        // command.getForestNamesAndReplicaCounts().put("Security", 1);
-        // command.getForestNamesAndReplicaCounts().put("Schemas", 2);
-        //command.getDatabaseNamesAndReplicaCounts().put("failover-example-content", 2);
-        command.execute(context);
+        DeployDatabaseCommand ddc = new DeployDatabaseCommand();
+        ddc.setForestsPerHost(1);
+        ddc.setCreateDatabaseWithoutFile(true);
+        ddc.setDatabaseName("testdb");
 
-        // And then delete those replicas
-        command.undo(context);
+        ConfigureForestReplicasCommand cfrc = new ConfigureForestReplicasCommand();
+
+        // Deploy the database, and then configure replicas
+        ddc.execute(context);
+        cfrc.execute(context);
+
+        // Then delete the replicas, and then undeploy the database
+        cfrc.undo(context);
+        ddc.undo(context);
     }
 }

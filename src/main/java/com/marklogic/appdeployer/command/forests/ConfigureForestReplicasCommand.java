@@ -92,12 +92,18 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
     @Override
     public void undo(CommandContext context) {
         if (deleteReplicasOnUndo) {
+            String str = context.getAppConfig().getDatabaseNamesAndReplicaCounts();
+            if (str != null) {
+                setDatabaseNamesAndReplicaCountsAsString(str);
+            }
+            
             DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
             ForestManager forestMgr = new ForestManager(context.getManageClient());
 
             for (String databaseName : databaseNamesAndReplicaCounts.keySet()) {
                 logger.info(format("Deleting forest replicas for database %s", databaseName));
-                for (String forestName : dbMgr.getForestNames(databaseName)) {
+                List<String> forestNames = dbMgr.getForestNames(databaseName);
+                for (String forestName : forestNames) {
                     deleteReplicas(forestName, forestMgr);
                 }
                 logger.info(format("Finished deleting forest replicas for database %s", databaseName));

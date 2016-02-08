@@ -1,7 +1,7 @@
 plugins {
   id "java"
   id "eclipse"
-  id "com.marklogic.ml-gradle" version "2.0rc5"
+  id "com.marklogic.ml-gradle" version "2.0"
 }
 
 /**

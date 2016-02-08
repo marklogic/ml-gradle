@@ -66,7 +66,7 @@ if (project.hasProperty("myBintrayUser")) {
       licenses = ['Apache-2.0']
       vcsUrl = 'https://github.com/rjrudin/' + project.name + '.git'
       version {
-        name = "2.0rc5"
+        name = "2.0"
         released = new Date()
       }
     }
@@ -85,11 +85,11 @@ pluginBundle {
       displayName = 'ml-gradle for MarkLogic'
       description = 'Gradle plugin for configuring and deploying applications to MarkLogic'
       tags = ['marklogic']
-      version = "2.0rc5"
+      version = "2.0"
     }
   }
 
   mavenCoordinates {
-    version = "2.0rc5"
+    version = "2.0"
   }
 }

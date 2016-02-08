@@ -1,5 +1,9 @@
 # ml-gradle releases
 
+## 2.0 2016-02-08
+
+* No changes from 2.0rc5, just adding 2.0 label
+
 ## 2.0rc5 2016-01-20
 
 * [#65](https://github.com/rjrudin/ml-gradle/issues/65) mlWatch will keep running after a module fails to load

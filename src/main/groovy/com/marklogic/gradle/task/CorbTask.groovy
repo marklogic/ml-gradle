@@ -97,12 +97,11 @@ class CorbTask extends JavaExec {
   */
   public Map collectMemberVariables() {
     //look for member variables where name match corbOption naming conventions
-    this.class.declaredFields.collectEntries {
-      String name = it.name.replace("_","") //normalize removing leading/trailing "_"
-      String corbOptionKey = CORB_PROPERTY_PREFIX + name.capitalize()
+    this.metaClass.getProperties().collectEntries {
+      String corbOptionKey = CORB_PROPERTY_PREFIX + it.name.capitalize()
       //evaluate whether a value is set and the name matches the corbOptions key pattern
       if (this[it.name] && corbOptions[corbOptionKey]) {
-        [(corbOptions[corbOptionKey]): this[name] ]
+        [(corbOptions[corbOptionKey]): this[it.name] ]
       } else {
         [:]
       }

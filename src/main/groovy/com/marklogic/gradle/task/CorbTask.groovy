@@ -125,8 +125,7 @@ XQUERY_MODULE"
       //CoRB2 will evaluate System properties for options
       systemProperties(options)
 
-      println "super.exec() ${getSystemProperties()}"
-      //super.exec()
+      super.exec()
     }
 
   /**

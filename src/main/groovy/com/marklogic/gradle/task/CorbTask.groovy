@@ -27,7 +27,9 @@ class CorbTask extends JavaExec {
   @TaskAction
   @Override
   public void exec() {
-    setClasspath(getProject().configurations.corb)
+    if (getProject().configurations.findByName('corb')) {
+      setClasspath(getProject().configurations.corb)
+    }
     setMain("com.marklogic.developer.corb.Manager")
 
     Map options = buildCorbOptions()

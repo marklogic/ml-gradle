@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 import com.marklogic.client.modulesloader.Modules;
 import com.marklogic.client.modulesloader.ModulesFinder;
@@ -24,11 +25,11 @@ public class DefaultModulesFinderTest extends Assert {
         assertEquals("Only recognized XSL files should be included; the XML file should be ignored", 4,
                 modules.getTransforms().size());
 
-        List<File> dirs = modules.getAssetDirectories();
+        List<Resource> dirs = modules.getAssetDirectories();
         assertEquals(3, dirs.size());
-        assertEquals("ext", dirs.get(0).getName());
-        assertEquals("root", dirs.get(1).getName());
-        assertEquals("include-this-too", dirs.get(2).getName());
+        assertEquals("ext", dirs.get(0).getFile().getName());
+        assertEquals("root", dirs.get(1).getFile().getName());
+        assertEquals("include-this-too", dirs.get(2).getFile().getName());
 
         assertEquals(
                 "Namespace files don't have to fit any filename format; the body of the file should be the namespace URI",
@@ -52,7 +53,7 @@ public class DefaultModulesFinderTest extends Assert {
         assertEquals(0, files.getServices().size());
         assertEquals(0, files.getTransforms().size());
     }
-    
+
     private File getBaseDir(String path) {
         try {
             return new ClassPathResource(path).getFile();

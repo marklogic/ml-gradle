@@ -1,18 +1,20 @@
 package com.marklogic.client.modulesloader.impl;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.util.FileCopyUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.admin.ExtensionLibrariesManager;
 import com.marklogic.client.admin.ExtensionMetadata;
 import com.marklogic.client.admin.NamespacesManager;
 import com.marklogic.client.admin.QueryOptionsManager;
@@ -20,11 +22,11 @@ import com.marklogic.client.admin.ResourceExtensionsManager;
 import com.marklogic.client.admin.ResourceExtensionsManager.MethodParameters;
 import com.marklogic.client.admin.ServerConfigurationManager;
 import com.marklogic.client.admin.ServerConfigurationManager.UpdatePolicy;
+import com.marklogic.client.admin.TransformExtensionsManager;
 import com.marklogic.client.helper.FilenameUtil;
 import com.marklogic.client.helper.LoggingObject;
-import com.marklogic.client.admin.TransformExtensionsManager;
-import com.marklogic.client.io.FileHandle;
 import com.marklogic.client.io.Format;
+import com.marklogic.client.io.InputStreamHandle;
 import com.marklogic.client.modulesloader.ExtensionMetadataAndParams;
 import com.marklogic.client.modulesloader.ExtensionMetadataProvider;
 import com.marklogic.client.modulesloader.Modules;
@@ -49,6 +51,10 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
      * prevents the program from crashing and also from trying to load the module over and over.
      */
     private boolean catchExceptions = false;
+
+    public DefaultModulesLoader() {
+        this(null);
+    }
 
     public DefaultModulesLoader(XccAssetLoader xccAssetLoader) {
         this.extensionMetadataProvider = new DefaultExtensionMetadataProvider();
@@ -77,6 +83,69 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
         return loadedModules;
     }
 
+    public void loadClasspathModules(String rootPath, DatabaseClient client) {
+        setDatabaseClient(client);
+
+        Modules modules = new DefaultModulesFinder().findClasspathModules("classpath:" + rootPath);
+
+        ExtensionLibrariesManager mgr = client.newServerConfigManager().newExtensionLibrariesManager();
+        for (Resource r : modules.getAssets()) {
+            installAsset(r, rootPath, mgr);
+        }
+
+        for (Resource r : modules.getNamespaces()) {
+            installNamespace(r);
+        }
+
+        for (Resource r : modules.getOptions()) {
+            installQueryOptions(r);
+        }
+
+        for (Resource r : modules.getTransforms()) {
+            installTransform(r, new ExtensionMetadata());
+        }
+
+        for (Resource r : modules.getServices()) {
+            installService(r, new ExtensionMetadata());
+        }
+    }
+
+    /**
+     * This method is useful for when loading assets from a resource from the classpath. For loading modules from a
+     * filesystem, just use installAssets, which uses the much more powerful/flexible XccAssetLoader.
+     * 
+     * @param r
+     * @param rootPath
+     * @param mgr
+     */
+    public void installAsset(Resource r, String rootPath, ExtensionLibrariesManager mgr) {
+        try {
+            String path = r.getURL().getPath();
+            if (logger.isDebugEnabled()) {
+                logger.debug("Original asset URL path: " + path);
+            }
+            if (path.contains("!")) {
+                path = path.split("!")[1];
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Path after ! symbol: " + path);
+                }
+                if (path.startsWith(rootPath)) {
+                    path = path.substring(rootPath.length());
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Path without root path: " + path);
+                    }
+                }
+            }
+            if (logger.isInfoEnabled()) {
+                logger.info("Writing asset at path: " + path);
+            }
+            mgr.write(path, new InputStreamHandle(r.getInputStream()));
+        } catch (IOException ie) {
+            logger.error("Unable to load asset from resource: " + r.getFilename() + "; cause: " + ie.getMessage(), ie);
+            logger.error("Will continue trying to load other modules");
+        }
+    }
+
     /**
      * Only supports a JSON file.
      * 
@@ -84,8 +153,9 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
      * @param loadedModules
      */
     protected void loadProperties(Modules modules, Set<File> loadedModules) {
-        File f = modules.getPropertiesFile();
-        if (f != null && f.exists()) {
+        Resource r = modules.getPropertiesFile();
+        if (r != null && r.exists()) {
+            File f = getFileFromResource(r);
             if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(f)) {
                 return;
             }
@@ -136,8 +206,16 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
         }
     }
 
+    protected File getFileFromResource(Resource r) {
+        try {
+            return r.getFile();
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
     protected void loadAssets(Modules modules, Set<File> loadedModules) {
-        List<File> dirs = modules.getAssetDirectories();
+        List<Resource> dirs = modules.getAssetDirectories();
         if (dirs == null || dirs.isEmpty()) {
             return;
         }
@@ -148,7 +226,7 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
 
         String[] paths = new String[dirs.size()];
         for (int i = 0; i < dirs.size(); i++) {
-            paths[i] = dirs.get(i).getAbsolutePath();
+            paths[i] = getFileFromResource(dirs.get(i)).getAbsolutePath();
         }
         Set<File> files = xccAssetLoader.loadAssetsViaXcc(paths);
 
@@ -162,8 +240,8 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
             return;
         }
 
-        for (File f : modules.getOptions()) {
-            f = installQueryOptions(f);
+        for (Resource r : modules.getOptions()) {
+            File f = installQueryOptions(getFileFromResource(r));
             if (f != null) {
                 loadedModules.add(f);
             }
@@ -175,7 +253,8 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
             return;
         }
 
-        for (File f : modules.getTransforms()) {
+        for (Resource r : modules.getTransforms()) {
+            File f = getFileFromResource(r);
             ExtensionMetadataAndParams emap = extensionMetadataProvider.provideExtensionMetadataAndParams(f);
 
             try {
@@ -186,7 +265,8 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
             } catch (Exception e) {
                 if (catchExceptions) {
                     logger.warn(
-                            "Unable to load module from file: " + f.getAbsolutePath() + "; cause: " + e.getMessage(), e);
+                            "Unable to load module from file: " + f.getAbsolutePath() + "; cause: " + e.getMessage(),
+                            e);
                     loadedModules.add(f);
                     if (modulesManager != null) {
                         modulesManager.saveLastInstalledTimestamp(f, new Date());
@@ -203,15 +283,17 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
             return;
         }
 
-        for (File f : modules.getServices()) {
+        for (Resource r : modules.getServices()) {
+            File f = getFileFromResource(r);
             ExtensionMetadataAndParams emap = extensionMetadataProvider.provideExtensionMetadataAndParams(f);
 
             try {
-                f = installResource(f, emap.metadata, emap.methods.toArray(new MethodParameters[] {}));
+                f = installService(f, emap.metadata, emap.methods.toArray(new MethodParameters[] {}));
             } catch (Exception e) {
                 if (catchExceptions) {
                     logger.warn(
-                            "Unable to load module from file: " + f.getAbsolutePath() + "; cause: " + e.getMessage(), e);
+                            "Unable to load module from file: " + f.getAbsolutePath() + "; cause: " + e.getMessage(),
+                            e);
                     loadedModules.add(f);
                     if (modulesManager != null) {
                         modulesManager.saveLastInstalledTimestamp(f, new Date());
@@ -231,7 +313,8 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
             return;
         }
 
-        for (File f : modules.getNamespaces()) {
+        for (Resource r : modules.getNamespaces()) {
+            File f = getFileFromResource(r);
             f = installNamespace(f);
             if (f != null) {
                 loadedModules.add(f);
@@ -239,80 +322,115 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
         }
     }
 
-    public File installResource(File file, ExtensionMetadata metadata, MethodParameters... methodParams) {
+    public File installService(File file, ExtensionMetadata metadata, MethodParameters... methodParams) {
         if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(file)) {
             return null;
         }
 
-        ResourceExtensionsManager extMgr = client.newServerConfigManager().newResourceExtensionsManager();
-        String resourceName = getExtensionNameFromFile(file);
-        if (metadata.getTitle() == null) {
-            metadata.setTitle(resourceName + " resource extension");
-        }
-
-        logger.info(String.format("Loading %s resource extension from file %s", resourceName, file));
-        extMgr.writeServices(resourceName, new FileHandle(file), metadata, methodParams);
+        installService(new FileSystemResource(file), metadata, methodParams);
 
         if (modulesManager != null) {
             modulesManager.saveLastInstalledTimestamp(file, new Date());
         }
-
         return file;
+    }
+
+    public void installService(Resource r, ExtensionMetadata metadata, MethodParameters... methodParams) {
+        ResourceExtensionsManager extMgr = client.newServerConfigManager().newResourceExtensionsManager();
+        String resourceName = getExtensionNameFromFile(r);
+        if (metadata.getTitle() == null) {
+            metadata.setTitle(resourceName + " resource extension");
+        }
+
+        logger.info(String.format("Loading %s resource extension from file %s", resourceName, r.getFilename()));
+        try {
+            extMgr.writeServices(resourceName, new InputStreamHandle(r.getInputStream()), metadata, methodParams);
+        } catch (IOException ie) {
+            throw new RuntimeException("Unable to write service: " + ie.getMessage(), ie);
+        }
     }
 
     public File installTransform(File file, ExtensionMetadata metadata) {
         if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(file)) {
             return null;
         }
-        TransformExtensionsManager mgr = client.newServerConfigManager().newTransformExtensionsManager();
-        String transformName = getExtensionNameFromFile(file);
-        logger.info(String.format("Loading %s transform from file %s", transformName, file));
-        if (FilenameUtil.isXslFile(file.getName())) {
-            mgr.writeXSLTransform(transformName, new FileHandle(file), metadata);
-        } else if (FilenameUtil.isJavascriptFile(file.getName())) {
-            mgr.writeJavascriptTransform(transformName, new FileHandle(file), metadata);
-        } else {
-            mgr.writeXQueryTransform(transformName, new FileHandle(file), metadata);
-        }
+
+        installTransform(new FileSystemResource(file), metadata);
 
         if (modulesManager != null) {
             modulesManager.saveLastInstalledTimestamp(file, new Date());
         }
-
         return file;
+    }
+
+    public void installTransform(Resource r, ExtensionMetadata metadata) {
+        String filename = r.getFilename();
+        TransformExtensionsManager mgr = client.newServerConfigManager().newTransformExtensionsManager();
+        String transformName = getExtensionNameFromFile(r);
+        logger.info(String.format("Loading %s transform from resource %s", transformName, filename));
+        InputStreamHandle h = null;
+        try {
+            h = new InputStreamHandle(r.getInputStream());
+        } catch (IOException ie) {
+            throw new RuntimeException("Unable to read transform resource: " + ie.getMessage(), ie);
+        }
+        if (FilenameUtil.isXslFile(filename)) {
+            mgr.writeXSLTransform(transformName, h, metadata);
+        } else if (FilenameUtil.isJavascriptFile(filename)) {
+            mgr.writeJavascriptTransform(transformName, h, metadata);
+        } else {
+            mgr.writeXQueryTransform(transformName, h, metadata);
+        }
     }
 
     public File installQueryOptions(File f) {
         if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(f)) {
             return null;
         }
-        String name = getExtensionNameFromFile(f);
-        logger.info(String.format("Loading %s query options from file %s", name, f.getName()));
-        QueryOptionsManager mgr = client.newServerConfigManager().newQueryOptionsManager();
-        if (f.getName().endsWith(".json")) {
-            mgr.writeOptions(name, new FileHandle(f).withFormat(Format.JSON));
-        } else {
-            mgr.writeOptions(name, new FileHandle(f));
-        }
-
+        installQueryOptions(new FileSystemResource(f));
         if (modulesManager != null) {
             modulesManager.saveLastInstalledTimestamp(f, new Date());
         }
-
         return f;
+    }
+
+    public void installQueryOptions(Resource r) {
+        String filename = r.getFilename();
+        String name = getExtensionNameFromFile(r);
+        logger.info(String.format("Loading %s query options from file %s", name, filename));
+        QueryOptionsManager mgr = client.newServerConfigManager().newQueryOptionsManager();
+        InputStreamHandle h = null;
+        try {
+            h = new InputStreamHandle(r.getInputStream());
+        } catch (IOException ie) {
+            throw new RuntimeException("Unable to read transform resource: " + ie.getMessage(), ie);
+        }
+        if (filename.endsWith(".json")) {
+            mgr.writeOptions(name, h.withFormat(Format.JSON));
+        } else {
+            mgr.writeOptions(name, h);
+        }
     }
 
     public File installNamespace(File f) {
         if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(f)) {
             return null;
         }
-        String prefix = getExtensionNameFromFile(f);
+        installNamespace(new FileSystemResource(f));
+        if (modulesManager != null) {
+            modulesManager.saveLastInstalledTimestamp(f, new Date());
+        }
+        return f;
+    }
+
+    public void installNamespace(Resource r) {
+        String prefix = getExtensionNameFromFile(r);
         String namespaceUri = null;
         try {
-            namespaceUri = FileCopyUtils.copyToString(new FileReader(f));
+            namespaceUri = new String(FileCopyUtils.copyToByteArray(r.getInputStream()));
         } catch (IOException ie) {
-            logger.error("Unable to install namespace from file: " + f.getAbsolutePath(), ie);
-            return null;
+            logger.error("Unable to install namespace from file: " + r.getFilename(), ie);
+            return;
         }
         NamespacesManager mgr = client.newServerConfigManager().newNamespacesManager();
         String existingUri = mgr.readPrefix(prefix);
@@ -322,15 +440,10 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
         }
         logger.info(String.format("Adding namespace with prefix of %s and URI of %s", prefix, namespaceUri));
         mgr.addPrefix(prefix, namespaceUri);
-
-        if (modulesManager != null) {
-            modulesManager.saveLastInstalledTimestamp(f, new Date());
-        }
-        return f;
     }
 
-    protected String getExtensionNameFromFile(File file) {
-        String name = file.getName();
+    protected String getExtensionNameFromFile(Resource r) {
+        String name = r.getFilename();
         int pos = name.lastIndexOf('.');
         if (pos < 0)
             return name;

@@ -18,7 +18,11 @@ dependencies {
   compile 'com.marklogic:marklogic-xcc:8.0.4'
   compile 'org.jdom:jdom2:2.0.5'
   compile 'org.springframework:spring-context:4.1.5.RELEASE'
+  
   testCompile 'junit:junit:4+'
+  
+  // Used for testing loading modules from the classpath
+  testRuntime files("lib/modules.jar")
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
@@ -56,7 +60,7 @@ if (project.hasProperty("myBintrayUser")) {
       licenses = ['Apache-2.0']
       vcsUrl = 'https://github.com/rjrudin/' + project.name + '.git'
       version {
-        name = "2.5"
+        name = "2.6"
         released = new Date()
       }
     }

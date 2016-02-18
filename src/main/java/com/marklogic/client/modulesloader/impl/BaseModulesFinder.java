@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+
 import com.marklogic.client.helper.FilenameUtil;
 import com.marklogic.client.modulesloader.Modules;
 import com.marklogic.client.modulesloader.ModulesFinder;
@@ -41,17 +44,17 @@ public abstract class BaseModulesFinder implements ModulesFinder {
     protected void addPropertiesFile(Modules modules, File baseDir) {
         File jsonFile = new File(baseDir, "rest-properties.json");
         if (jsonFile.exists()) {
-            modules.setPropertiesFile(jsonFile);
+            modules.setPropertiesFile(new FileSystemResource(jsonFile));
         }
     }
 
     protected void addServices(Modules modules, File baseDir) {
         File servicesBaseDir = new File(baseDir, servicesPath);
-        List<File> services = new ArrayList<>();
+        List<Resource> services = new ArrayList<>();
         if (servicesBaseDir.exists()) {
             for (File f : servicesBaseDir.listFiles()) {
                 if (FilenameUtil.isXqueryFile(f.getName()) || FilenameUtil.isJavascriptFile(f.getName())) {
-                    services.add(f);
+                    services.add(new FileSystemResource(f));
                 }
             }
         }
@@ -59,21 +62,21 @@ public abstract class BaseModulesFinder implements ModulesFinder {
     }
 
     protected void addAssetDirectories(Modules modules, File baseDir) {
-        List<File> dirs = new ArrayList<>();
+        List<Resource> dirs = new ArrayList<>();
         File dir = new File(baseDir, "ext");
         if (dir.exists()) {
-            dirs.add(dir);
+            dirs.add(new FileSystemResource(dir));
         }
         dir = new File(baseDir, "root");
         if (dir.exists()) {
-            dirs.add(dir);
+            dirs.add(new FileSystemResource(dir));
         }
 
         if (includeUnrecognizedPathsAsAssetPaths && baseDir != null && baseDir.exists()) {
             List<String> recognizedPaths = getRecognizedPaths();
             for (File f : baseDir.listFiles()) {
                 if (f.isDirectory() && !recognizedPaths.contains(f.getName())) {
-                    dirs.add(f);
+                    dirs.add(new FileSystemResource(f));
                 }
             }
         }
@@ -88,12 +91,12 @@ public abstract class BaseModulesFinder implements ModulesFinder {
 
     protected void addOptions(Modules modules, File baseDir) {
         File queryOptionsBaseDir = new File(baseDir, optionsPath);
-        List<File> queryOptions = new ArrayList<>();
+        List<Resource> queryOptions = new ArrayList<>();
         if (queryOptionsBaseDir.exists()) {
             for (File f : queryOptionsBaseDir.listFiles()) {
                 String filename = f.getName();
                 if (filename.endsWith(".xml") || filename.endsWith(".json")) {
-                    queryOptions.add(f);
+                    queryOptions.add(new FileSystemResource(f));
                 }
             }
         }
@@ -102,10 +105,10 @@ public abstract class BaseModulesFinder implements ModulesFinder {
 
     protected void addNamespaces(Modules modules, File baseDir) {
         File namespacesDir = new File(baseDir, namespacesPath);
-        List<File> namespaces = new ArrayList<>();
+        List<Resource> namespaces = new ArrayList<>();
         if (namespacesDir.exists()) {
             for (File f : namespacesDir.listFiles(namespaceFilenameFilter)) {
-                namespaces.add(f);
+                namespaces.add(new FileSystemResource(f));
             }
         }
         modules.setNamespaces(namespaces);
@@ -113,10 +116,10 @@ public abstract class BaseModulesFinder implements ModulesFinder {
 
     protected void addTransforms(Modules modules, File baseDir) {
         File transformsBaseDir = new File(baseDir, transformsPath);
-        List<File> transforms = new ArrayList<>();
+        List<Resource> transforms = new ArrayList<>();
         if (transformsBaseDir.exists()) {
             for (File f : transformsBaseDir.listFiles(transformFilenameFilter)) {
-                transforms.add(f);
+                transforms.add(new FileSystemResource(f));
             }
         }
         modules.setTransforms(transforms);

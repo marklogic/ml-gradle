@@ -113,7 +113,7 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
     /**
      * This method is useful for when loading assets from a resource from the classpath. For loading modules from a
      * filesystem, just use installAssets, which uses the much more powerful/flexible XccAssetLoader.
-     * 
+     *
      * @param r
      * @param rootPath
      * @param mgr
@@ -148,7 +148,7 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
 
     /**
      * Only supports a JSON file.
-     * 
+     *
      * @param modules
      * @param loadedModules
      */
@@ -255,9 +255,9 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
 
         for (Resource r : modules.getTransforms()) {
             File f = getFileFromResource(r);
-            ExtensionMetadataAndParams emap = extensionMetadataProvider.provideExtensionMetadataAndParams(f);
 
             try {
+                ExtensionMetadataAndParams emap = extensionMetadataProvider.provideExtensionMetadataAndParams(r);
                 f = installTransform(f, emap.metadata);
                 if (f != null) {
                     loadedModules.add(f);
@@ -272,7 +272,7 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
                         modulesManager.saveLastInstalledTimestamp(f, new Date());
                     }
                 } else {
-                    throw e;
+                    throw new RuntimeException(e);
                 }
             }
         }
@@ -285,9 +285,8 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
 
         for (Resource r : modules.getServices()) {
             File f = getFileFromResource(r);
-            ExtensionMetadataAndParams emap = extensionMetadataProvider.provideExtensionMetadataAndParams(f);
-
             try {
+                ExtensionMetadataAndParams emap = extensionMetadataProvider.provideExtensionMetadataAndParams(r);
                 f = installService(f, emap.metadata, emap.methods.toArray(new MethodParameters[] {}));
             } catch (Exception e) {
                 if (catchExceptions) {
@@ -299,7 +298,7 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
                         modulesManager.saveLastInstalledTimestamp(f, new Date());
                     }
                 } else {
-                    throw e;
+                    throw new RuntimeException(e);
                 }
             }
             if (f != null) {

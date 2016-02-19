@@ -1,6 +1,6 @@
 package com.marklogic.client.modulesloader.impl;
 
-import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -8,6 +8,9 @@ import java.util.List;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 
 import com.marklogic.client.admin.ExtensionMetadata;
 import com.marklogic.client.admin.ExtensionMetadata.ScriptLanguage;
@@ -18,25 +21,26 @@ import com.marklogic.client.helper.LoggingObject;
 import com.marklogic.client.modulesloader.ExtensionMetadataAndParams;
 import com.marklogic.client.modulesloader.ExtensionMetadataProvider;
 
-
 public class DefaultExtensionMetadataProvider extends LoggingObject implements ExtensionMetadataProvider {
+    private ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
-    @Override
-    public ExtensionMetadataAndParams provideExtensionMetadataAndParams(File resourceFile) {
-        File metadataDir = new File(resourceFile.getParent(), "metadata");
-        File metadataFile = new File(metadataDir, getFilenameMinusExtension(resourceFile) + ".xml");
+    public ExtensionMetadataAndParams provideExtensionMetadataAndParams(Resource r) throws IOException {
+        String filename = getFilenameMinusExtension(r);
+        String metadataPath = r.getURL().toString().replace(r.getFilename(), "");
+        String metadataFile = metadataPath + "metadata/" + filename + ".xml";
 
         ExtensionMetadata m = new ExtensionMetadata();
         List<MethodParameters> paramList = new ArrayList<>();
 
-        if (FilenameUtil.isJavascriptFile(resourceFile.getName())) {
+        if (FilenameUtil.isJavascriptFile(r.getFilename())) {
             m.setScriptLanguage(ScriptLanguage.JAVASCRIPT);
             m.setVersion("1.0");
         }
 
-        if (metadataFile.exists()) {
+        Resource metadataResource = resolver.getResource(metadataFile);
+        if (metadataResource != null) {
             try {
-                Element root = new SAXBuilder().build(metadataFile).getRootElement();
+                Element root = new SAXBuilder().build(metadataResource.getInputStream()).getRootElement();
                 m.setTitle(root.getChildText("title"));
                 Element desc = root.getChild("description");
                 if (desc.getChildren() != null && desc.getChildren().size() == 1) {
@@ -57,20 +61,20 @@ public class DefaultExtensionMetadataProvider extends LoggingObject implements E
                     }
                 }
             } catch (Exception e) {
-                logger.warn("Unable to build metadata from resource file: " + resourceFile.getAbsolutePath()
+                logger.warn("Unable to build metadata from resource file: " + r.getURL().toString()
                         + "; cause: " + e.getMessage(), e);
-                setDefaults(m, resourceFile);
+                setDefaults(m, r);
             }
         } else {
-            setDefaults(m, resourceFile);
+            setDefaults(m, r);
         }
 
         return new ExtensionMetadataAndParams(m, paramList);
     }
 
-    protected String getFilenameMinusExtension(File file) {
+    protected String getFilenameMinusExtension(Resource file) {
         // Would think there's an easier way to do this in Java...
-        String[] tokens = file.getName().split("\\.");
+        String[] tokens = file.getFilename().split("\\.");
         tokens = Arrays.copyOfRange(tokens, 0, tokens.length - 1);
         String filename = tokens[0];
         for (int i = 1; i < tokens.length; i++) {
@@ -79,7 +83,7 @@ public class DefaultExtensionMetadataProvider extends LoggingObject implements E
         return filename;
     }
 
-    private void setDefaults(ExtensionMetadata metadata, File resourceFile) {
+    private void setDefaults(ExtensionMetadata metadata, Resource resourceFile) {
         metadata.setTitle(getFilenameMinusExtension(resourceFile));
     }
 }

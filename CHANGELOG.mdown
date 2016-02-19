@@ -1,8 +1,12 @@
 # ml-javaclient-util releases
 
+## 2.6.1
+
+* [#17](https://github.com/rjrudin/ml-javaclient-util/issues/17) Extension metadata can now be loaded from the classpath
+
 ## 2.6
 
-* [#15](https://github.com/rjrudin/ml-javaclient-util/issues/13) DefaultModulesLoader supports loading resources from the classpath.
+* [#15](https://github.com/rjrudin/ml-javaclient-util/issues/15) DefaultModulesLoader supports loading resources from the classpath.
 
 ## 2.5
 

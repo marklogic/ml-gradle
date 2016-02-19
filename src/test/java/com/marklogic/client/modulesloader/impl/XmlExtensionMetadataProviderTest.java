@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.ClassPathResource;
 
 import com.marklogic.client.admin.MethodType;
@@ -18,8 +19,8 @@ public class XmlExtensionMetadataProviderTest extends Assert {
     @Test
     public void test() throws IOException {
         DefaultExtensionMetadataProvider p = new DefaultExtensionMetadataProvider();
-        File resourceFile = new ClassPathResource("sample-base-dir/services/sample.xqy").getFile();
-        ExtensionMetadataAndParams emap = p.provideExtensionMetadataAndParams(resourceFile);
+        Resource resource = new ClassPathResource("sample-base-dir/services/sample.xqy");
+        ExtensionMetadataAndParams emap = p.provideExtensionMetadataAndParams(resource);
 
         assertEquals("Sample Service", emap.metadata.getTitle());
         assertEquals("Would be nice to support HTML in this.", emap.metadata.getDescription());

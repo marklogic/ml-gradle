@@ -1,18 +1,16 @@
 package com.marklogic.client.modulesloader.impl;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 import com.marklogic.client.admin.MethodType;
 import com.marklogic.client.admin.ResourceExtensionsManager.MethodParameters;
 import com.marklogic.client.modulesloader.ExtensionMetadataAndParams;
-import com.marklogic.client.modulesloader.impl.DefaultExtensionMetadataProvider;
 
 public class XmlExtensionMetadataProviderTest extends Assert {
 

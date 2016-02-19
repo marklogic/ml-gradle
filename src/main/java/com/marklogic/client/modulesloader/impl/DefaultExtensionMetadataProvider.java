@@ -1,6 +1,7 @@
 package com.marklogic.client.modulesloader.impl;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,11 +23,18 @@ import com.marklogic.client.modulesloader.ExtensionMetadataAndParams;
 import com.marklogic.client.modulesloader.ExtensionMetadataProvider;
 
 public class DefaultExtensionMetadataProvider extends LoggingObject implements ExtensionMetadataProvider {
+    
     private ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
-    public ExtensionMetadataAndParams provideExtensionMetadataAndParams(Resource r) throws IOException {
+    public ExtensionMetadataAndParams provideExtensionMetadataAndParams(Resource r) {
         String filename = getFilenameMinusExtension(r);
-        String metadataPath = r.getURL().toString().replace(r.getFilename(), "");
+        URL url = null;
+        try {
+            url = r.getURL();
+        } catch (IOException ie) {
+            throw new RuntimeException(ie);
+        }
+        String metadataPath = url.toString().replace(r.getFilename(), "");
         String metadataFile = metadataPath + "metadata/" + filename + ".xml";
 
         ExtensionMetadata m = new ExtensionMetadata();
@@ -61,7 +69,7 @@ public class DefaultExtensionMetadataProvider extends LoggingObject implements E
                     }
                 }
             } catch (Exception e) {
-                logger.warn("Unable to build metadata from resource file: " + r.getURL().toString()
+                logger.warn("Unable to build metadata from resource file: " + url.toString()
                         + "; cause: " + e.getMessage(), e);
                 setDefaults(m, r);
             }

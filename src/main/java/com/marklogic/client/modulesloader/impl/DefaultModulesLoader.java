@@ -262,7 +262,7 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
                 if (f != null) {
                     loadedModules.add(f);
                 }
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 if (catchExceptions) {
                     logger.warn(
                             "Unable to load module from file: " + f.getAbsolutePath() + "; cause: " + e.getMessage(),
@@ -272,7 +272,7 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
                         modulesManager.saveLastInstalledTimestamp(f, new Date());
                     }
                 } else {
-                    throw new RuntimeException(e);
+                    throw e;
                 }
             }
         }
@@ -288,7 +288,7 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
             try {
                 ExtensionMetadataAndParams emap = extensionMetadataProvider.provideExtensionMetadataAndParams(r);
                 f = installService(f, emap.metadata, emap.methods.toArray(new MethodParameters[] {}));
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 if (catchExceptions) {
                     logger.warn(
                             "Unable to load module from file: " + f.getAbsolutePath() + "; cause: " + e.getMessage(),
@@ -298,7 +298,7 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
                         modulesManager.saveLastInstalledTimestamp(f, new Date());
                     }
                 } else {
-                    throw new RuntimeException(e);
+                    throw e;
                 }
             }
             if (f != null) {

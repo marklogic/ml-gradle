@@ -1,0 +1,111 @@
+/*
+ * This buildscript shows how corb dependencies can be easily declared and then uses in a Gradle configuration named
+ * "corb". This configuration is then used as the classpath for CorbTask, which is an extension of Gradle's
+ * JavaExec task that exposes the corb options as task attributes. The CorbTask will apply any corb options set via
+ * task attributes, project properties, or System properties.
+ */
+plugins {
+    id "com.marklogic.ml-gradle" version "2.0"
+}
+
+repositories {
+    jcenter()
+
+    // Needed for corb dependencies: XCC, Jasypt(optional)
+    maven { url "http://developer.marklogic.com/maven2/" }
+
+    // Needed to resolve CoRB2
+    maven { url "http://rjrudin.github.io/marklogic-java/releases" }
+}
+
+configurations {
+    // This configuration captures the dependencies for running corb (Content Reprocessing in Bulk).
+    // This is only needed if you want to run corb via Gradle tasks.
+    // If you do, using com.marklogic.gradle.task.CorbTask is a useful starting point, as shown below.
+    corb
+}
+
+dependencies {
+    // required to run CoRB2
+    corb 'com.marklogic:marklogic-corb:2.2.1'
+
+    // optional
+    //corb 'org.jasypt:jasypt:1.9.2' // would be necessary to leverage JasyptDecrypter
+}
+
+/*
+ * ml-gradle adds an instance of com.marklogic.appdeployer.AppConfig to the Gradle project under the key "mlAppConfig".
+ * This instance can be modified to affect the behavior of ml-gradle.
+ */
+ext {
+    // mlAppConfig is an instance of com.marklogic.appdeployer.AppConfig
+    mlAppConfig {
+        // XCC URL for running corb task below and for creating triggers on pre-8.0-4 builds of MarkLogic
+        contentXccUrl = "xcc://${mlUsername}:${mlPassword}@${mlHost}:${mlRestPort}"
+    }
+}
+
+/*
+ * This is an example of both a custom Gradle task and an easy way of invoking Corb.
+ *
+ * Since a custom configuration named "corb" is defined above, the classpath is automatically set.
+ *
+ * Any of the CoRB2 options can be set for the task several ways:
+ * 1.) Properties of the task with a lowerCamelCased naming convention
+ *     (i.e. the CoRB2 option THREAD-COUNT is threadCount)
+ * 2.) Project properties with the naming convention of a "corb" prefix and the UpperCamelCased
+ *     option name (i.e. the CoRB2 option THREAD-COUNT is corbThreadCount and can
+ *     be specified on the commandline as -PcorbThreadCount=12)
+ * 3.) System properties with the CoRB2 option name. (i.e. THREAD-COUNT can be set on the commandline as
+ *       -DTHREAD-COUNT=16)
+ *
+ * A complete list of CoRB2 options can be found at: https://github.com/marklogic/corb2#options
+ *
+ * Examples of how to invoke corb and set options:
+ * 1.) specify options from a properties file using the CoRB2 OPTIONS-FILE option
+ *     gradle corb -PcorbOptionsFile=src/main/ml-modules/ext/corb2-project/corb/options.properties
+ * 2.) Set corb project properties on the commandline
+ *     gradle corb -PcorbUrisModule="src/main/ml-modules/ext/corb2-project/uris.xqy|ADHOC" -PcorbProcessModule="src/main/ml-modules/ext/corb2-project/corb/transform.xqy|ADHOC"
+ * 3.) Set CoRB2 options as System properties on the commandline
+ *     gradle corb -DURIS-MODULE="src/main/ml-modules/ext/corb2-project/uris.xqy|ADHOC" -DPROCESS-MODULE="src/main/ml-modules/ext/corb2-project/corb/transform.xqy|ADHOC"
+ */
+task corb(type: com.marklogic.gradle.task.CorbTask) {
+    /* Either uncomment and set the xccConnectionUri below and set an appropriate XCC connection string,
+     * or specify on the commandline as a project property: -PcorbXccConnectionUri=xcc://user:pass@host:port/content-database
+     * or specify as a System property: -DXCC-CONNECTION-URI=xcc://user:pass@host:port/content-database
+     * or instread of setting the XCC-CONNECTION-URI, set the individual XCC options
+     * (XCC-HOSTNAME, XCC-PORT, XCC-USERNAME, XCC-PASSWORD, XCC-DBNAME)
+     */
+    xccConnectionUri = contentXccUrl
+}
+
+/*
+ * An example corb task that executes the URIS-MODULE and PROCESS-MODULE files
+ * as ADHOC, running from the filesystem, without deploying to the modules database.
+ * This task does not depend on "mlLoadModules" to ensure that the Corb uris/transform modules are loaded.
+ * If you run gradle corbDeployed' gradle corbAdhoc
+ *
+ * Note that the sample uris.xqy and transform.xqy modules just print a log statement for each document in your
+ * content database, so unless there are documents, you won't see any result from this. You of course can modify
+ * the transform.xqy module to perform any action that you would like - this is just to show how to invoke corb from Gradle.
+ */
+task corbAdhoc(type: com.marklogic.gradle.task.CorbTask) {
+    xccConnectionUri = contentXccUrl
+    urisModule = "src/main/ml-modules/ext/corb2-project/corb/uris.xqy|ADHOC"
+    processModule = "src/main/ml-modules/ext/corb2-project/corb/transform.xqy|ADHOC"
+}
+
+/*
+ * An example of a task that depends on mlLoadModules, which will deploy the XQuery modules to the modules database,
+ * and then execute the modules from the modules database.
+ *
+ * Note that the sample uris.xqy and transform.xqy modules just print a log statement for each document in your
+ * content database, so unless there are documents, you won't see any result from this. You of course can modify
+ * the transform.xqy module to perform any action that you would like - this is just to show how to invoke corb from Gradle.
+ */
+task corbDeployed(type: com.marklogic.gradle.task.CorbTask, dependsOn: ['mlLoadModules']) {
+    xccConnectionUri = contentXccUrl
+    moduleRoot = "/ext/corb2-project/corb/"
+    urisModule = "uris.xqy"
+    processModule = "transform.xqy"
+}

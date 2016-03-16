@@ -44,10 +44,40 @@ public class ManageOtherServerTest extends AbstractAppDeployerTest {
 
         assertTrue(mgr.exists("sample-app-xdbc"));
         assertTrue(mgr.exists("sample-app-odbc"));
-        
+        assertFalse(
+                "The command should ignore the rest-api-server.json file, as that's processed by DeployRestApiServersCommand",
+                mgr.exists("sample-app"));
+
         appDeployer.undeploy(appConfig);
 
         assertFalse(mgr.exists("sample-app-xdbc"));
         assertFalse(mgr.exists("sample-app-odbc"));
+        assertFalse(mgr.exists("sample-app"));
+    }
+
+    @Test
+    public void ignoreOdbcServer() {
+        appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/other-servers")));
+
+        ServerManager mgr = new ServerManager(manageClient);
+
+        DeployOtherServersCommand c = new DeployOtherServersCommand();
+        c.setFilenamesToIgnore("odbc-server.json");
+        initializeAppDeployer(c);
+
+        appConfig.getCustomTokens().put("%%ODBC_PORT%%", "8048");
+        appConfig.getCustomTokens().put("%%XDBC_PORT%%", "8049");
+        appDeployer.deploy(appConfig);
+
+        final String message = "Both the ODBC and REST API server files should have been ignored";
+        assertTrue(mgr.exists("sample-app-xdbc"));
+        assertFalse(message, mgr.exists("sample-app-odbc"));
+        assertFalse(message, mgr.exists("sample-app"));
+
+        appDeployer.undeploy(appConfig);
+
+        assertFalse(mgr.exists("sample-app-xdbc"));
+        assertFalse(mgr.exists("sample-app-odbc"));
+        assertFalse(mgr.exists("sample-app"));
     }
 }

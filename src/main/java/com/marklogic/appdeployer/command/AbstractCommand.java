@@ -5,6 +5,8 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.util.FileCopyUtils;
 
@@ -33,6 +35,29 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
     }
 
     /**
+     * Convenience method for setting the names of files to ignore when reading resources from a directory. Will
+     * preserve any filenames already being ignored on the underlying FilenameFilter.
+     * 
+     * @param filenames
+     */
+    public void setFilenamesToIgnore(String... filenames) {
+        if (resourceFilenameFilter != null && resourceFilenameFilter instanceof ResourceFilenameFilter) {
+            ResourceFilenameFilter rff = (ResourceFilenameFilter) resourceFilenameFilter;
+            Set<String> set = null;
+            if (rff.getFilenamesToIgnore() != null) {
+                set = rff.getFilenamesToIgnore();
+            } else {
+                set = new HashSet<>();
+            }
+            for (String f : filenames) {
+                set.add(f);
+            }
+        } else {
+            this.resourceFilenameFilter = new ResourceFilenameFilter(filenames);
+        }
+    }
+
+    /**
      * Simplifies reading the contents of a File into a String.
      * 
      * @param f
@@ -42,8 +67,9 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
         try {
             return new String(FileCopyUtils.copyToByteArray(f));
         } catch (IOException ie) {
-            throw new RuntimeException("Unable to copy file to string from path: " + f.getAbsolutePath() + "; cause: "
-                    + ie.getMessage(), ie);
+            throw new RuntimeException(
+                    "Unable to copy file to string from path: " + f.getAbsolutePath() + "; cause: " + ie.getMessage(),
+                    ie);
         }
     }
 

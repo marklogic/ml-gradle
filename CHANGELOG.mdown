@@ -1,5 +1,9 @@
 # ml-javaclient-util releases
 
+## 2.7.0
+
+* [#19](https://github.com/rjrudin/ml-javaclient-util/issues/19) Can now load assets via the REST API (the /v1/documents endpoint)
+
 ## 2.6.1
 
 * [#17](https://github.com/rjrudin/ml-javaclient-util/issues/17) Extension metadata can now be loaded from the classpath

@@ -23,7 +23,7 @@ import com.marklogic.client.modulesloader.ExtensionMetadataAndParams;
 import com.marklogic.client.modulesloader.ExtensionMetadataProvider;
 
 public class DefaultExtensionMetadataProvider extends LoggingObject implements ExtensionMetadataProvider {
-    
+
     private ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
     public ExtensionMetadataAndParams provideExtensionMetadataAndParams(Resource r) {
@@ -69,8 +69,8 @@ public class DefaultExtensionMetadataProvider extends LoggingObject implements E
                     }
                 }
             } catch (Exception e) {
-                logger.warn("Unable to build metadata from resource file: " + url.toString()
-                        + "; cause: " + e.getMessage(), e);
+                logger.warn("Unable to build metadata from resource file: " + url.toString() + "; cause: "
+                        + e.getMessage());
                 setDefaults(m, r);
             }
         } else {

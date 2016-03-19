@@ -68,7 +68,7 @@ public class BasicConfig {
 
     @Bean
     public DatabaseClientProvider databaseClientProvider() {
-        return new SimpleDatabaseClientProvider();
+        return new SimpleDatabaseClientProvider(databaseClientConfig());
     }
 
     protected Integer getRestPort() {

@@ -4,12 +4,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.marklogic.client.io.Format;
+import com.marklogic.client.modulesloader.impl.FormatGetter;
 import com.marklogic.xcc.DocumentFormat;
 
 /**
  * Default impl. Feel free to enhance this, subclass it, or roll your own.
  */
-public class DefaultDocumentFormatGetter implements DocumentFormatGetter {
+public class DefaultDocumentFormatGetter implements DocumentFormatGetter, FormatGetter {
 
     public final static String[] DEFAULT_BINARY_EXTENSIONS = new String[] { ".swf", ".jpeg", ".jpg", ".png", ".gif",
             ".svg", ".ttf", ".eot", ".woff", ".cur", ".ico" };
@@ -20,6 +22,25 @@ public class DefaultDocumentFormatGetter implements DocumentFormatGetter {
         for (String ext : DEFAULT_BINARY_EXTENSIONS) {
             binaryExtensions.add(ext);
         }
+    }
+
+    @Override
+    public Format getFormat(File file) {
+        String name = file.getName();
+        if (name.endsWith(".xml") || name.endsWith(".xsl") || name.endsWith(".xslt")) {
+            return Format.XML;
+        } else if (name.endsWith(".json")) {
+            return Format.JSON;
+        }
+
+        boolean isBinary = false;
+        for (String ext : binaryExtensions) {
+            if (name.endsWith(ext)) {
+                isBinary = true;
+                break;
+            }
+        }
+        return isBinary ? Format.BINARY : Format.TEXT;
     }
 
     @Override
@@ -48,5 +69,4 @@ public class DefaultDocumentFormatGetter implements DocumentFormatGetter {
     public void setBinaryExtensions(List<String> binaryExtensions) {
         this.binaryExtensions = binaryExtensions;
     }
-
 }

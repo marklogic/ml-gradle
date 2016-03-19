@@ -31,17 +31,19 @@ import com.marklogic.client.modulesloader.ExtensionMetadataAndParams;
 import com.marklogic.client.modulesloader.ExtensionMetadataProvider;
 import com.marklogic.client.modulesloader.Modules;
 import com.marklogic.client.modulesloader.ModulesFinder;
+import com.marklogic.client.modulesloader.ModulesLoader;
 import com.marklogic.client.modulesloader.ModulesManager;
 
 /**
- * Uses the REST API for loading all modules except "assets", which are loaded via XCC for speed reasons. Note that this
- * class will not be threadsafe since XccAssetLoader is not currently threadsafe either.
+ * Default implementation of ModulesLoader. Loads everything except assets via the REST API. Assets are either loaded
+ * via an XccAssetLoader (faster) or via a RestApiAssetLoader (slower, but doesn't require additional privileges).
  */
-public class DefaultModulesLoader extends LoggingObject implements com.marklogic.client.modulesloader.ModulesLoader {
+public class DefaultModulesLoader extends LoggingObject implements ModulesLoader {
 
     private DatabaseClient client;
 
     private XccAssetLoader xccAssetLoader;
+    private RestApiAssetLoader restApiAssetLoader;
     private ExtensionMetadataProvider extensionMetadataProvider;
     private ModulesManager modulesManager;
 
@@ -52,17 +54,46 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
      */
     private boolean catchExceptions = false;
 
+    /**
+     * Use this when you don't need to load asset modules.
+     */
     public DefaultModulesLoader() {
-        this(null);
-    }
-
-    public DefaultModulesLoader(XccAssetLoader xccAssetLoader) {
         this.extensionMetadataProvider = new DefaultExtensionMetadataProvider();
         this.modulesManager = new PropertiesModuleManager();
+    }
+
+    /**
+     * Use this when you want to load asset modules via the REST API. The DatabaseClient used by RestApiAssetLoader
+     * should point to the modules database you're targeting; otherwise, the modules will end up in the content
+     * database.
+     * 
+     * @param restApiAssetLoader
+     */
+    public DefaultModulesLoader(RestApiAssetLoader restApiAssetLoader) {
+        this();
+        this.restApiAssetLoader = restApiAssetLoader;
+    }
+
+    /**
+     * Use this when you want to load modules via XCC. XCC is generally faster than the REST API.
+     * 
+     * @param xccAssetLoader
+     */
+    public DefaultModulesLoader(XccAssetLoader xccAssetLoader) {
+        this();
         this.xccAssetLoader = xccAssetLoader;
     }
 
+    /**
+     * Load modules from the given base directory, selecting modules via the given ModulesFinder, and loading them via
+     * the given DatabaseClient. Note that asset modules will not be loaded by the DatabaseClient that's passed in here,
+     * because the /v1/ext endpoint is so slow - load assets instead via a RestApiAssetLoader or an XccAssetLoader
+     * passed into a constructor for this class.
+     */
     public Set<File> loadModules(File baseDir, ModulesFinder modulesFinder, DatabaseClient client) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Loading modules from base directory: " + baseDir.getAbsolutePath());
+        }
         setDatabaseClient(client);
 
         if (modulesManager != null) {
@@ -80,9 +111,18 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
         loadTransforms(modules, loadedModules);
         loadResources(modules, loadedModules);
 
+        if (logger.isDebugEnabled()) {
+            logger.debug("Finished loading modules from base directory: " + baseDir.getAbsolutePath());
+        }
         return loadedModules;
     }
 
+    /**
+     * Specialized method for loading modules from the classpath. Currently does not support loading asset modules.
+     * 
+     * @param rootPath
+     * @param client
+     */
     public void loadClasspathModules(String rootPath, DatabaseClient client) {
         setDatabaseClient(client);
 
@@ -220,7 +260,9 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
             return;
         }
 
-        if (xccAssetLoader != null) {
+        if (restApiAssetLoader != null) {
+            restApiAssetLoader.setModulesManager(modulesManager);
+        } else if (xccAssetLoader != null) {
             xccAssetLoader.setModulesManager(modulesManager);
         }
 
@@ -228,7 +270,14 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
         for (int i = 0; i < dirs.size(); i++) {
             paths[i] = getFileFromResource(dirs.get(i)).getAbsolutePath();
         }
-        Set<File> files = xccAssetLoader.loadAssetsViaXcc(paths);
+
+        Set<File> files = null;
+
+        if (restApiAssetLoader != null) {
+            files = restApiAssetLoader.loadAssets(paths);
+        } else if (xccAssetLoader != null) {
+            files = xccAssetLoader.loadAssetsViaXcc(paths);
+        }
 
         if (files != null) {
             loadedModules.addAll(files);
@@ -483,5 +532,9 @@ public class DefaultModulesLoader extends LoggingObject implements com.marklogic
 
     public ModulesManager getModulesManager() {
         return modulesManager;
+    }
+
+    public void setRestApiAssetLoader(RestApiAssetLoader restApiAssetLoader) {
+        this.restApiAssetLoader = restApiAssetLoader;
     }
 }

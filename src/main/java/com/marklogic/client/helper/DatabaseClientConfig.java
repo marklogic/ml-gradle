@@ -11,6 +11,7 @@ public class DatabaseClientConfig {
     private int port;
     private String username;
     private String password;
+    private String database;
     private Authentication authentication = Authentication.DIGEST;
     private SSLContext sslContext;
     private SSLHostnameVerifier sslHostnameVerifier;
@@ -81,6 +82,14 @@ public class DatabaseClientConfig {
 
     public void setSslHostnameVerifier(SSLHostnameVerifier sslHostnameVerifier) {
         this.sslHostnameVerifier = sslHostnameVerifier;
+    }
+
+    public String getDatabase() {
+        return database;
+    }
+
+    public void setDatabase(String database) {
+        this.database = database;
     }
 
 }

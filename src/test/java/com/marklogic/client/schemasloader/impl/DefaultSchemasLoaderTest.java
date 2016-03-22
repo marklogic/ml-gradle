@@ -23,8 +23,8 @@ public class DefaultSchemasLoaderTest {
 		assertEquals("Found 3 files", 3, files.size());
 		
 		assertEquals("File Item 0", "my.ruleset", files.get(0).getName());
-		assertEquals("File Item 1", "my.xsd", files.get(1).getName());
-		assertEquals("File Item 2", "my.tde", files.get(2).getName());
+		assertEquals("File Item 1", "my.tde", files.get(1).getName());
+		assertEquals("File Item 2", "my.xsd", files.get(2).getName());
 	}
 
 	private File getBaseDir(String path) {

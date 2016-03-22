@@ -11,10 +11,11 @@ targetCompatibility = "1.7"
 
 repositories {
   jcenter()
+  mavenLocal()
 }
 
 dependencies {
-  compile 'com.marklogic:ml-javaclient-util:2.5'
+  compile 'com.marklogic:ml-javaclient-util:2.8.0'
   compile 'jaxen:jaxen:1.1.6'
   compile 'org.apache.httpcomponents:httpclient:4.3.5'
   compile 'org.springframework:spring-web:4.1.5.RELEASE'
@@ -64,4 +65,10 @@ if (project.hasProperty("myBintrayUser")) {
       }
     }
   }
+}
+
+
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '2.12'
 }

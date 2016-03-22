@@ -24,6 +24,9 @@ public abstract class SortOrderConstants {
     public static Integer UPDATE_REST_API_SERVERS = 250;
     public static Integer DEPLOY_OTHER_SERVERS = 300;
 
+    // Module code may depend on schemas, but not vice-versa.
+    public static Integer LOAD_SCHEMAS = 350;
+    
     // Modules have to be loaded after the REST API server has been updated, for if the deployer is expecting to load
     // modules via SSL, then the REST API server must already be configured with a certificate template
     public static Integer LOAD_MODULES = 400;

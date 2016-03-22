@@ -35,6 +35,12 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
             logger.info("Config dir: " + prop);
             c.setConfigDir(new ConfigDir(new File(prop)));
         }
+        
+        prop = getProperty("mlSchemasPath");
+        if (prop != null) {
+        	logger.info("Schemas path: " + prop);
+        	c.setSchemasPath(prop);
+        }
 
         prop = getProperty("mlHost");
         if (prop != null) {

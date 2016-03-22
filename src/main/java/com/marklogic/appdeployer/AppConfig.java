@@ -50,13 +50,14 @@ public class AppConfig {
      * The default path from which modules will be loaded into a modules database.
      */
     public final static String DEFAULT_MODULES_PATH = "src/main/ml-modules";
+    public final static String DEFAULT_SCHEMAS_PATH = "src/main/ml-schemas";
 
     public final static String DEFAULT_HOST = "localhost";
     public final static String DEFAULT_GROUP = "Default";
 
     private String name = DEFAULT_APP_NAME;
     private String host = DEFAULT_HOST;
-
+    
     // Username/password combo for using the client REST API - e.g. to load modules
     private String restAdminUsername = DEFAULT_USERNAME;
     private String restAdminPassword = DEFAULT_PASSWORD;
@@ -78,6 +79,7 @@ public class AppConfig {
     private String schemasDatabaseName;
 
     private List<String> modulePaths;
+    private String schemasPath;
     private ConfigDir configDir;
 
     // Passed into the TokenReplacer that subclasses of AbstractCommand use
@@ -100,14 +102,20 @@ public class AppConfig {
     // Comma-delimited string used for configuring forest replicas
     private String databaseNamesAndReplicaCounts;
 
-    public AppConfig() {
-        this(DEFAULT_MODULES_PATH);
+    
+	public AppConfig() {
+        this(DEFAULT_MODULES_PATH, DEFAULT_SCHEMAS_PATH);
     }
 
-    public AppConfig(String defaultModulePath) {
+	public AppConfig(String defaultModulePath) {
+	    this(defaultModulePath, DEFAULT_SCHEMAS_PATH);
+	}
+	
+    public AppConfig(String defaultModulePath, String defaultSchemasPath) {
         modulePaths = new ArrayList<String>();
         modulePaths.add(defaultModulePath);
         configDir = new ConfigDir();
+        schemasPath = defaultSchemasPath;
     }
 
     public void setSimpleSslConfig() {
@@ -135,6 +143,18 @@ public class AppConfig {
         return DatabaseClientFactory.newClient(getHost(), getTestRestPort(), getRestAdminUsername(),
                 getRestAdminPassword(), getRestAuthentication(), getRestSslContext(), getRestSslHostnameVerifier());
     }
+    
+    /**
+     * Like newDatabaseClient, but connects to schemas database.
+     * 
+     * @return
+     */
+	public DatabaseClient newSchemasDatabaseClient() {
+		return DatabaseClientFactory.newClient(getHost(),  getRestPort(), getSchemasDatabaseName(), 
+				getRestAdminUsername(), getRestAdminPassword(), getRestAuthentication(), 
+				getRestSslContext(), getRestSslHostnameVerifier());
+	}
+
 
     /**
      * @return an XccAssetLoader based on the configuration properties in this class
@@ -225,7 +245,7 @@ public class AppConfig {
     public String getSchemasDatabaseName() {
         return schemasDatabaseName != null ? schemasDatabaseName : name + "-schemas";
     }
-
+    
     /**
      * @return the name of the application, which is then used to generate app server and database names unless those
      *         are set via their respective properties
@@ -292,6 +312,17 @@ public class AppConfig {
 
     public void setTestRestPort(Integer testRestPort) {
         this.testRestPort = testRestPort;
+    }
+
+    /**
+     * @return a list of all the paths from which modules should be loaded into a REST API server modules database
+     */
+    public String getSchemasPath() {
+        return schemasPath;
+    }
+
+    public void setSchemasPath(String schemasPath) {
+        this.schemasPath = schemasPath;
     }
 
     /**
@@ -458,5 +489,4 @@ public class AppConfig {
     public void setAssetFileFilter(FileFilter assetFileFilter) {
         this.assetFileFilter = assetFileFilter;
     }
-
 }

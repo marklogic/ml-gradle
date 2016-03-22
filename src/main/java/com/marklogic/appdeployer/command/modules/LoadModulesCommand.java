@@ -94,8 +94,8 @@ public class LoadModulesCommand extends AbstractCommand {
     }
 
     protected ModulesLoader buildTestModulesLoader(CommandContext context) {
-        // Don't need an XccAssetLoader here, as only options/properties are loaded for the test server
-        DefaultModulesLoader l = new DefaultModulesLoader(null);
+        // Don't need an asset loader here, as only options/properties are loaded for the test server
+        DefaultModulesLoader l = new DefaultModulesLoader();
         l.setModulesManager(null);
         return l;
     }

@@ -29,6 +29,11 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
         setExecuteSortOrder(SortOrderConstants.DEPLOY_REST_API_SERVERS);
     }
 
+    public DeployRestApiServersCommand(boolean deleteContentDatabase) {
+        this();
+        this.deleteContentDatabase = deleteContentDatabase;
+    }
+
     @Override
     public Integer getUndoSortOrder() {
         return SortOrderConstants.DELETE_REST_API_SERVERS;

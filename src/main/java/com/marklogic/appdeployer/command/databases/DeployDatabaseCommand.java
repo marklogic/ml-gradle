@@ -81,7 +81,7 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
             String json = tokenReplacer.replaceTokens(payload, appConfig, false);
             DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
             SaveReceipt receipt = dbMgr.save(json);
-            createForestsIfDatabaseWasJustCreated(receipt, context);
+            buildDeployForestsCommand(receipt, context).execute(context);
         }
     }
 
@@ -111,16 +111,6 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
                 logger.info(format("Database file '%s' does not exist, so not executing", databaseFilename));
             }
             return null;
-        }
-    }
-
-    protected void createForestsIfDatabaseWasJustCreated(SaveReceipt receipt, CommandContext context) {
-        // Location header is only set when the database has just been created
-        if (receipt.hasLocationHeader()) {
-            if (logger.isInfoEnabled()) {
-                logger.info("Creating forests for newly created database: " + receipt.getResourceId());
-            }
-            buildDeployForestsCommand(receipt, context).execute(context);
         }
     }
 

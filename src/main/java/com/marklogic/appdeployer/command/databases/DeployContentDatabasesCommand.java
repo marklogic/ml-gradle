@@ -51,7 +51,7 @@ public class DeployContentDatabasesCommand extends DeployDatabaseCommand {
                 DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
                 String json = tokenReplacer.replaceTokens(payload, appConfig, true);
                 SaveReceipt receipt = dbMgr.save(json);
-                createForestsIfDatabaseWasJustCreated(receipt, context);
+                buildDeployForestsCommand(receipt, context).execute(context);
             }
         }
     }

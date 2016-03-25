@@ -52,18 +52,11 @@ public class DatabaseManager extends AbstractResourceManager {
 
     /**
      * @param databaseNameOrId
-     * @return the IDs of all primary forests related to the database. A primary forest is any forest that has replica
-     *         forests configured for it.
+     * @return the IDs of all primary forests related to the database. The properties endpoint for a database lists
+     * primary forest IDs, but not replica forest IDs.
      */
     public List<String> getPrimaryForestIds(String databaseNameOrId) {
-        List<String> primaryForestIds = new ArrayList<String>();
-        ForestManager mgr = new ForestManager(getManageClient());
-        for (String forestId : getForestIds(databaseNameOrId)) {
-            if (!mgr.getReplicaIds(forestId).isEmpty()) {
-                primaryForestIds.add(forestId);
-            }
-        }
-        return primaryForestIds;
+        return getPropertiesAsXml(databaseNameOrId).getElementValues("/node()/m:forests/m:forest");
     }
 
     public void deleteReplicaForests(String databaseNameOrId) {

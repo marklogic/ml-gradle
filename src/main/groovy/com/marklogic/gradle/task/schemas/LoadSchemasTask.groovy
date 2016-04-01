@@ -16,7 +16,7 @@ class LoadSchemasTask extends MarkLogicTask {
         // don't want to have to duplicate on this task
         AppDeployer d = getAppDeployer()
         if (d instanceof SimpleAppDeployer) {
-            command = d.getCommand("mlLoadSchemasCommands")
+            command = d.getCommand(LoadSchemasCommand)
         }
         if (command == null) {
             command = new LoadSchemasCommand()

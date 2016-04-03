@@ -184,7 +184,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlDeleteModuleTimestampsFile", type: DeleteModuleTimestampsFileTask, group: modulesGroup, description: "Delete the properties file in the build directory that keeps track of when each module was last loaded")
 
         String schemasGroup = "ml-gradle Schemas"
-        project.task("mlLoadSchemas", type: LoadSchemasTask, group: schemasGroup, description: "Loads special-purpose data into the schemas database (XSD schemas, Inference rules, and [MarkLogic 9] Extraction Templates)")
+        project.task("mlLoadSchemas", type: LoadSchemasTask, group: schemasGroup, description: "Loads special-purpose data into the schemas database (XSD schemas, Inference rules, and [MarkLogic 9] Extraction Templates)").mustRunAfter("mlClearSchemasDatabase")
         project.task("mlReloadSchemas", dependsOn: ["mlClearSchemasDatabase", "mlLoadSchemas"], group: schemasGroup, description: "Clears schemas database then loads special-purpose data into the schemas database (XSD schemas, Inference rules, and [MarkLogic 9] Extraction Templates)")
         
         String serverGroup = "ml-gradle Server"
@@ -313,10 +313,9 @@ class MarkLogicPlugin implements Plugin<Project> {
         commands.addAll(dbCommands)
 
         // Schemas
-        List<Command> schemasCommands = new ArrayList<Command>()
-        schemasCommands.add(new LoadSchemasCommand())
-        project.extensions.add("mlLoadSchemasCommands", schemasCommands)
-        commands.addAll(schemasCommands)
+        LoadSchemasCommand lsc = new LoadSchemasCommand()
+        project.extensions.add("mlLoadSchemasCommand", lsc)
+        commands.add(lsc)
         
         // REST API instance creation
         commands.add(new DeployRestApiServersCommand())

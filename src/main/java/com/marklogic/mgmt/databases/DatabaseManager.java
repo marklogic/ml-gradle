@@ -68,6 +68,19 @@ public class DatabaseManager extends AbstractResourceManager {
         logger.info(format("Finished deleting replica forests for database %s", databaseNameOrId));
     }
 
+    /**
+     * TODO Not sure, when setting updates-allowed on primary forests, if replica forests need to have their
+     * updates-allowed set as well.
+     *
+     * @param databaseNameOrId
+     */
+    public void setUpdatesAllowedOnPrimaryForests(String databaseNameOrId, String mode) {
+        ForestManager mgr = new ForestManager(getManageClient());
+        for (String forestId : getPrimaryForestIds(databaseNameOrId)) {
+            mgr.setUpdatesAllowed(forestId, mode);
+        }
+    }
+
     @Override
     protected String[] getDeleteResourceParams(String payload) {
         return forestDelete != null ? new String[] { "forest-delete", forestDelete } : new String[] {};

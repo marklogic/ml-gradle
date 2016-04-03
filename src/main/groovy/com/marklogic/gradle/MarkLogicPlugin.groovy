@@ -63,6 +63,7 @@ import com.marklogic.gradle.task.databases.ClearModulesDatabaseTask
 import com.marklogic.gradle.task.databases.ClearSchemasDatabaseTask
 import com.marklogic.gradle.task.databases.ClearTriggersDatabaseTask
 import com.marklogic.gradle.task.databases.DeployDatabasesTask
+import com.marklogic.gradle.task.databases.SetContentUpdatesAllowedTask;
 import com.marklogic.gradle.task.flexrep.DeleteAllFlexrepConfigsTask
 import com.marklogic.gradle.task.flexrep.DeployFlexrepTask
 import com.marklogic.gradle.task.flexrep.DisableAllFlexrepTargetsTask
@@ -153,7 +154,8 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlClearSchemasDatabase", type: ClearSchemasDatabaseTask, group: dbGroup, description: "Deletes all documents in the schemas database")
         project.task("mlClearTriggersDatabase", type: ClearTriggersDatabaseTask, group: dbGroup, description: "Deletes all documents in the triggers database")
         project.task("mlDeployDatabases", type: DeployDatabasesTask, group: dbGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Deploy each database, updating it if it exists, in the configuration directory")
-
+        project.task("mlSetContentUpdatesAllowed", type: SetContentUpdatesAllowedTask, group: dbGroup, description: "Sets updated-allowed on each primary forest for the content database; must set the mode via e.g. -Pmode=flash-backup")
+        
         String devGroup = "ml-gradle Development"
         project.task("mlScaffold", type: GenerateScaffoldTask, group: devGroup, description: "Generate project scaffold for a new project")
         project.task("mlCreateResource", type: CreateResourceTask, group: devGroup, description: "Create a new resource extension in the modules services directory")

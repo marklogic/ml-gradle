@@ -19,7 +19,7 @@ dependencies {
   compile 'jaxen:jaxen:1.1.6'
   compile 'org.apache.httpcomponents:httpclient:4.3.5'
   compile 'org.springframework:spring-web:4.1.5.RELEASE'
-  testCompile 'com.marklogic:ml-junit:2.5'
+  testCompile 'com.marklogic:ml-junit:2.6.0'
 }
 
 // This ensures that Gradle includes in the published jar any non-java files under src/main/java
@@ -60,7 +60,7 @@ if (project.hasProperty("myBintrayUser")) {
       licenses = ['Apache-2.0']
       vcsUrl = 'https://github.com/rjrudin/' + project.name + '.git'
       version {
-        name = "2.0"
+        name = "2.1.0"
         released = new Date()
       }
     }

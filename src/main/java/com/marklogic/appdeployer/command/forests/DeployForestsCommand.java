@@ -1,8 +1,11 @@
 package com.marklogic.appdeployer.command.forests;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
+import com.marklogic.appdeployer.command.Command;
+import com.marklogic.mgmt.databases.DatabaseManager;
 import org.springframework.util.StringUtils;
 
 import com.marklogic.appdeployer.AppConfig;
@@ -68,23 +71,33 @@ public class DeployForestsCommand extends AbstractCommand {
     protected void createForests(String originalPayload, CommandContext context) {
         ForestManager mgr = new ForestManager(context.getManageClient());
         AppConfig appConfig = context.getAppConfig();
+
+        // Find out which hosts to create forests on
         List<String> hostNames = new HostManager(context.getManageClient()).getHostNames();
-        int size = hostNames.size();
         if (!createForestsOnEachHost) {
-            logger.info(format("Only creating forests on the first host: " + hostNames.get(0)));
-            size = 1;
+            String first = hostNames.get(0);
+            logger.info(format("Only creating forests on the first host: " + first));
+            hostNames = new ArrayList<>();
+            hostNames.add(first);
         }
-        for (int i = 0; i < size; i++) {
-            String hostName = hostNames.get(i);
-            logger.info(format("Creating forests on host %s", hostName));
-            int startNumber = (i * forestsPerHost) + 1;
-            int endNumber = (i + 1) * forestsPerHost;
-            for (int j = startNumber; j <= endNumber; j++) {
-                String payload = tokenReplacer.replaceTokens(originalPayload, appConfig, false);
-                payload = payload.replace("%%FOREST_HOST%%", hostName);
-                payload = payload.replace("%%FOREST_NAME%%", getForestName(appConfig, j));
-                payload = payload.replace("%%FOREST_DATABASE%%", getForestDatabaseName(appConfig));
-                mgr.save(payload);
+
+        // Find out how many forests exist already
+        int countOfExistingForests = new DatabaseManager(context.getManageClient()).getPrimaryForestIds(getForestDatabaseName(appConfig)).size();
+        int desiredNumberOfForests = hostNames.size() * forestsPerHost;
+
+        // Loop over the number of forests to create, starting with count + 1, and iterating over the hosts
+        for (int i = countOfExistingForests + 1; i <= desiredNumberOfForests;) {
+            for (String hostName : hostNames) {
+                if (i <= desiredNumberOfForests) {
+                    String payload = tokenReplacer.replaceTokens(originalPayload, appConfig, false);
+                    payload = payload.replace("%%FOREST_HOST%%", hostName);
+                    String forestName = getForestName(appConfig, i);
+                    payload = payload.replace("%%FOREST_NAME%%", forestName);
+                    payload = payload.replace("%%FOREST_DATABASE%%", getForestDatabaseName(appConfig));
+                    logger.info(format("Creating forest %s on host %s", forestName, hostName));
+                    mgr.save(payload);
+                }
+                i++;
             }
         }
     }

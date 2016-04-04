@@ -52,18 +52,11 @@ public class DatabaseManager extends AbstractResourceManager {
 
     /**
      * @param databaseNameOrId
-     * @return the IDs of all primary forests related to the database. A primary forest is any forest that has replica
-     *         forests configured for it.
+     * @return the IDs of all primary forests related to the database. The properties endpoint for a database lists
+     * primary forest IDs, but not replica forest IDs.
      */
     public List<String> getPrimaryForestIds(String databaseNameOrId) {
-        List<String> primaryForestIds = new ArrayList<String>();
-        ForestManager mgr = new ForestManager(getManageClient());
-        for (String forestId : getForestIds(databaseNameOrId)) {
-            if (!mgr.getReplicaIds(forestId).isEmpty()) {
-                primaryForestIds.add(forestId);
-            }
-        }
-        return primaryForestIds;
+        return getPropertiesAsXml(databaseNameOrId).getElementValues("/node()/m:forests/m:forest");
     }
 
     public void deleteReplicaForests(String databaseNameOrId) {
@@ -73,6 +66,19 @@ public class DatabaseManager extends AbstractResourceManager {
             mgr.deleteReplicas(forestId);
         }
         logger.info(format("Finished deleting replica forests for database %s", databaseNameOrId));
+    }
+
+    /**
+     * TODO Not sure, when setting updates-allowed on primary forests, if replica forests need to have their
+     * updates-allowed set as well.
+     *
+     * @param databaseNameOrId
+     */
+    public void setUpdatesAllowedOnPrimaryForests(String databaseNameOrId, String mode) {
+        ForestManager mgr = new ForestManager(getManageClient());
+        for (String forestId : getPrimaryForestIds(databaseNameOrId)) {
+            mgr.setUpdatesAllowed(forestId, mode);
+        }
     }
 
     @Override

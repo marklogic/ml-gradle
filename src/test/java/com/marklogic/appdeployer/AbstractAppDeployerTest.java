@@ -41,7 +41,7 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
     }
 
     protected void initializeAppConfig() {
-        appConfig = new AppConfig("src/test/resources/sample-app/src/main/ml-modules");
+        appConfig = new AppConfig("src/test/resources/sample-app/src/main/ml-modules", "src/test/resources/sample-app/src/main/ml-schemas");
         appConfig.setName(SAMPLE_APP_NAME);
         appConfig.setRestPort(SAMPLE_APP_REST_PORT);
         ConfigDir configDir = new ConfigDir(new File("src/test/resources/sample-app/src/main/ml-config"));

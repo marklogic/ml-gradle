@@ -2,6 +2,10 @@ package com.marklogic.appdeployer.command.flexrep;
 
 import java.io.File;
 
+import com.marklogic.mgmt.appservers.ServerManager;
+import com.marklogic.mgmt.cpf.CpfConfigManager;
+import com.marklogic.mgmt.cpf.DomainManager;
+import com.marklogic.mgmt.cpf.PipelineManager;
 import org.junit.After;
 import org.junit.Test;
 
@@ -50,6 +54,52 @@ public class DeployFlexrepTest extends AbstractAppDeployerTest {
 
         // Just making sure we don't get a null-pointer due to the flexrep directory not existing
         appDeployer.deploy(appConfig);
+    }
+
+    @Test
+    public void masterFlexrep() {
+        appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/flexrep-combined"));
+
+        appConfig.setFlexrepPath("master");
+        initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployTriggersDatabaseCommand(), new DeployFlexrepCommand());
+
+        appDeployer.deploy(appConfig);
+
+        final String domainName = "master-domain";
+        final String db = appConfig.getContentDatabaseName();
+        assertTrue(new ServerManager(manageClient).exists("master-flexrep-server"));
+        assertTrue(new DomainManager(manageClient).exists(appConfig.getTriggersDatabaseName(), domainName));
+        assertTrue(new PipelineManager(manageClient).exists(appConfig.getTriggersDatabaseName(), "Flexible Replication"));
+        assertTrue(new PipelineManager(manageClient).exists(appConfig.getTriggersDatabaseName(), "Status Change Handling"));
+        assertTrue(new CpfConfigManager(manageClient).exists(appConfig.getTriggersDatabaseName(), domainName));
+        assertTrue(new ConfigManager(manageClient, db).exists(domainName));
+        assertTrue(new TargetManager(manageClient, db, domainName).exists("master-domain-target"));
+
+        undeploySampleApp();
+        assertFalse(new ServerManager(manageClient).exists("master-flexrep-server"));
+    }
+
+    @Test
+    public void replicaFlexrep() {
+        appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/flexrep-combined"));
+
+        appConfig.setFlexrepPath("replica");
+        initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployTriggersDatabaseCommand(), new DeployFlexrepCommand());
+
+        appDeployer.deploy(appConfig);
+
+        final String domainName = "replica-domain";
+        final String db = appConfig.getContentDatabaseName();
+        assertTrue(new ServerManager(manageClient).exists("replica-flexrep-server"));
+        assertTrue(new DomainManager(manageClient).exists(appConfig.getTriggersDatabaseName(), domainName));
+        assertTrue(new PipelineManager(manageClient).exists(appConfig.getTriggersDatabaseName(), "Flexible Replication"));
+        assertTrue(new PipelineManager(manageClient).exists(appConfig.getTriggersDatabaseName(), "Status Change Handling"));
+        assertTrue(new CpfConfigManager(manageClient).exists(appConfig.getTriggersDatabaseName(), domainName));
+        assertTrue(new ConfigManager(manageClient, db).exists(domainName));
+        assertTrue(new TargetManager(manageClient, db, domainName).exists("replica-domain-target"));
+
+        undeploySampleApp();
+        assertFalse(new ServerManager(manageClient).exists("master-flexrep-server"));
     }
 
     private void assertConfigAndTargetAreDeployed() {

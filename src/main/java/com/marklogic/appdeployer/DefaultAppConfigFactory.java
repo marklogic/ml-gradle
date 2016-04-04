@@ -35,6 +35,12 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
             logger.info("Config dir: " + prop);
             c.setConfigDir(new ConfigDir(new File(prop)));
         }
+        
+        prop = getProperty("mlSchemasPath");
+        if (prop != null) {
+        	logger.info("Schemas path: " + prop);
+        	c.setSchemasPath(prop);
+        }
 
         prop = getProperty("mlHost");
         if (prop != null) {
@@ -101,6 +107,11 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
             c.setDatabaseNamesAndReplicaCounts(prop);
         }
 
+        prop = getProperty("mlFlexrepPath");
+        if (prop != null) {
+            logger.info("Flexrep path: " + prop);
+            c.setFlexrepPath(prop);
+        }
         return c;
     }
 

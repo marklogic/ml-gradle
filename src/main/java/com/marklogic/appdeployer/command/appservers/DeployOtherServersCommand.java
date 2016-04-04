@@ -20,12 +20,7 @@ public class DeployOtherServersCommand extends AbstractResourceCommand {
         setUndoSortOrder(SortOrderConstants.DELETE_OTHER_SERVERS);
         setRestartAfterDelete(true);
         setCatchExceptionOnDeleteFailure(true);
-        setResourceFilenameFilter(new ResourceFilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return super.accept(dir, name) && !name.startsWith("rest-api-server");
-            }
-        });
+        setResourceFilenameFilter(new ResourceFilenameFilter("rest-api-server.xml", "rest-api-server.json"));
     }
 
     @Override

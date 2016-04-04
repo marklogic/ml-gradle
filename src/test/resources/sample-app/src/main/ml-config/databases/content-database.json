@@ -18,6 +18,8 @@
       "scalar-type": "int"
     }
   ],
+  "triple-index":true,
+  "collection-lexicon":true,
   "triggers-database": "%%TRIGGERS_DATABASE%%",
   "schema-database": "%%SCHEMAS_DATABASE%%"
 }

@@ -144,6 +144,12 @@ public class ForestManager extends AbstractResourceManager {
         return new ForestStatus(getManageClient().getXml(path));
     }
 
+    public void setUpdatesAllowed(String forestIdOrName, String mode) {
+        String path = getPropertiesPath(forestIdOrName);
+        String json = format("{\"updates-allowed\":\"%s\"}", mode);
+        getManageClient().putJson(path, json);
+    }
+
     @Override
     protected String[] getDeleteResourceParams(String payload) {
         return this.deleteLevel != null ? new String[] { "level", deleteLevel } : null;

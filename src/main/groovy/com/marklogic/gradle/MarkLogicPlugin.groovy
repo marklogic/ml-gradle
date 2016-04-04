@@ -21,13 +21,14 @@ import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand
 import com.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand
 import com.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand
 import com.marklogic.appdeployer.command.flexrep.DeployConfigsCommand
+import com.marklogic.appdeployer.command.flexrep.DeployFlexrepCommand
 import com.marklogic.appdeployer.command.flexrep.DeployTargetsCommand
 import com.marklogic.appdeployer.command.forests.ConfigureForestReplicasCommand
 import com.marklogic.appdeployer.command.groups.DeployGroupsCommand
 import com.marklogic.appdeployer.command.mimetypes.DeployMimetypesCommand
 import com.marklogic.appdeployer.command.modules.LoadModulesCommand
-import com.marklogic.appdeployer.command.schemas.LoadSchemasCommand
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand
+import com.marklogic.appdeployer.command.schemas.LoadSchemasCommand
 import com.marklogic.appdeployer.command.security.DeployAmpsCommand
 import com.marklogic.appdeployer.command.security.DeployCertificateAuthoritiesCommand
 import com.marklogic.appdeployer.command.security.DeployCertificateTemplatesCommand
@@ -63,8 +64,9 @@ import com.marklogic.gradle.task.databases.ClearModulesDatabaseTask
 import com.marklogic.gradle.task.databases.ClearSchemasDatabaseTask
 import com.marklogic.gradle.task.databases.ClearTriggersDatabaseTask
 import com.marklogic.gradle.task.databases.DeployDatabasesTask
-import com.marklogic.gradle.task.databases.SetContentUpdatesAllowedTask;
+import com.marklogic.gradle.task.databases.SetContentUpdatesAllowedTask
 import com.marklogic.gradle.task.flexrep.DeleteAllFlexrepConfigsTask
+import com.marklogic.gradle.task.flexrep.DeployFlexrepAtPathTask
 import com.marklogic.gradle.task.flexrep.DeployFlexrepTask
 import com.marklogic.gradle.task.flexrep.DisableAllFlexrepTargetsTask
 import com.marklogic.gradle.task.flexrep.EnableAllFlexrepTargetsTask
@@ -165,6 +167,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         String flexrepGroup = "ml-gradle Flexible Replication"
         project.task("mlDeleteAllFlexrepConfigs", type: DeleteAllFlexrepConfigsTask, group: flexrepGroup, description: "Delete all Flexrep configs and their associated targets")
         project.task("mlDeployFlexrep", type: DeployFlexrepTask, group: flexrepGroup, description: "Deploy Flexrep configs and targets in the configuration directory")
+        project.task("mlDeployFlexrepAtPath", type: DeployFlexrepAtPathTask, group: flexrepGroup, description: "Deploy all Flexrep resources in a directory under ml-config/flexrep with a name matching the property mlFlexrepPath")
         project.task("mlDisableAllFlexrepTargets", type: DisableAllFlexrepTargetsTask, group: flexrepGroup, description: "Disable every target on every flexrep config")
         project.task("mlEnableAllFlexrepTargets", type: EnableAllFlexrepTargetsTask, group: flexrepGroup, description: "Enable every target on every flexrep config")
 
@@ -355,6 +358,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         List<Command> flexrepCommands = new ArrayList<Command>()
         flexrepCommands.add(new DeployConfigsCommand())
         flexrepCommands.add(new DeployTargetsCommand())
+        flexrepCommands.add(new DeployFlexrepCommand())
         project.extensions.add("mlFlexrepCommands", flexrepCommands)
         commands.addAll(flexrepCommands)
 

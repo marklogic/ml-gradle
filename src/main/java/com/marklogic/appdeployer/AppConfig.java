@@ -102,7 +102,9 @@ public class AppConfig {
     // Comma-delimited string used for configuring forest replicas
     private String databaseNamesAndReplicaCounts;
 
-    
+    // Path to use for DeployFlexrepCommand
+    private String flexrepPath;
+
 	public AppConfig() {
         this(DEFAULT_MODULES_PATH, DEFAULT_SCHEMAS_PATH);
     }
@@ -488,5 +490,13 @@ public class AppConfig {
 
     public void setAssetFileFilter(FileFilter assetFileFilter) {
         this.assetFileFilter = assetFileFilter;
+    }
+
+    public String getFlexrepPath() {
+        return flexrepPath;
+    }
+
+    public void setFlexrepPath(String flexrepPath) {
+        this.flexrepPath = flexrepPath;
     }
 }

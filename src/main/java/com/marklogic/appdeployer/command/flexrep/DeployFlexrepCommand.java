@@ -21,14 +21,7 @@ import java.io.File;
  */
 public class DeployFlexrepCommand extends AbstractCommand implements UndoableCommand {
 
-    private String path;
-
     public DeployFlexrepCommand() {
-        this("master");
-    }
-
-    public DeployFlexrepCommand(String path) {
-        this.path = path;
         setExecuteSortOrder(SortOrderConstants.DEPLOY_OTHER_SERVERS);
     }
 
@@ -72,6 +65,7 @@ public class DeployFlexrepCommand extends AbstractCommand implements UndoableCom
     }
 
     protected File getFlexrepBaseDir(AppConfig appConfig) {
+        String path = appConfig.getFlexrepPath();
         if (path == null) {
             return null;
         }
@@ -88,9 +82,4 @@ public class DeployFlexrepCommand extends AbstractCommand implements UndoableCom
 
         return flexrepBaseDir;
     }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
 }

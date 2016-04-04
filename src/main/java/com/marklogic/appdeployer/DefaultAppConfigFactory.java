@@ -107,6 +107,11 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
             c.setDatabaseNamesAndReplicaCounts(prop);
         }
 
+        prop = getProperty("mlFlexrepPath");
+        if (prop != null) {
+            logger.info("Flexrep path: " + prop);
+            c.setFlexrepPath(prop);
+        }
         return c;
     }
 

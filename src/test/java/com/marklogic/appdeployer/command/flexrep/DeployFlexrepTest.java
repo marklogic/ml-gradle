@@ -60,7 +60,8 @@ public class DeployFlexrepTest extends AbstractAppDeployerTest {
     public void masterFlexrep() {
         appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/flexrep-combined"));
 
-        initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployTriggersDatabaseCommand(), new DeployFlexrepCommand("master"));
+        appConfig.setFlexrepPath("master");
+        initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployTriggersDatabaseCommand(), new DeployFlexrepCommand());
 
         appDeployer.deploy(appConfig);
 
@@ -82,7 +83,8 @@ public class DeployFlexrepTest extends AbstractAppDeployerTest {
     public void replicaFlexrep() {
         appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/flexrep-combined"));
 
-        initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployTriggersDatabaseCommand(), new DeployFlexrepCommand("replica"));
+        appConfig.setFlexrepPath("replica");
+        initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployTriggersDatabaseCommand(), new DeployFlexrepCommand());
 
         appDeployer.deploy(appConfig);
 

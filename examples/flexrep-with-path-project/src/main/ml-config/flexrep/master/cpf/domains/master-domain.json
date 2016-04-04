@@ -1,0 +1,10 @@
+{
+   "domain-name": "master-domain",
+   "description": "Test domain for sample app",
+   "scope": "directory",
+   "uri": "/master/",
+   "depth": "infinity",
+   "eval-module": "Modules",
+   "eval-root": "/",
+   "pipeline": ["Status Change Handling", "Flexible Replication"]
+ }

@@ -1,0 +1,11 @@
+{
+  "domain-name": "replica-domain",
+  "restart-user-name": "admin",
+  "eval-module": "Modules",
+  "eval-root": "/",
+  "conversion-enabled": false,
+  "permission": [{
+    "role-name": "app-user",
+    "capability": "read"
+  }]
+}

@@ -1,0 +1,149 @@
+<pipeline-properties xmlns="http://marklogic.com/manage/pipeline/properties">
+  <pipeline-id>6600933789859022149</pipeline-id>
+  <pipeline-name>Flexible Replication</pipeline-name>
+  <pipeline-description>
+    Attempts push replication if possible, otherwise updates document properties so that push or poll will occur later.
+  </pipeline-description>
+  <success-action>
+    <module>/MarkLogic/cpf/actions/success-action.xqy</module>
+  </success-action>
+  <failure-action>
+    <module>/MarkLogic/cpf/actions/failure-action.xqy</module>
+  </failure-action>
+  <state-transition>
+    <annotation>
+      Replicate a document and transition to state "replicated".
+    </annotation>
+    <state>http://marklogic.com/states/converted</state>
+    <on-success>http://marklogic.com/states/replicated</on-success>
+    <on-failure>http://marklogic.com/states/error</on-failure>
+    <priority>9100</priority>
+    <execute>
+      <condition>
+        <module>
+          /MarkLogic/conversion/actions/conversion-source-condition.xqy
+        </module>
+      </condition>
+      <action>
+        <module>/MarkLogic/flexrep/actions/replication-action.xqy</module>
+      </action>
+    </execute>
+  </state-transition>
+  <state-transition>
+    <annotation>
+      Replicate a document and transition to state "replicated".
+    </annotation>
+    <state>http://marklogic.com/states/structured-xhtml</state>
+    <on-success>http://marklogic.com/states/replicated</on-success>
+    <on-failure>http://marklogic.com/states/error</on-failure>
+    <priority>5000</priority>
+    <default-action>
+      <module>/MarkLogic/flexrep/actions/replication-action.xqy</module>
+    </default-action>
+  </state-transition>
+  <state-transition>
+    <annotation>
+      Replicate a document and transition to state "replicated".
+    </annotation>
+    <state>http://marklogic.com/states/initial</state>
+    <on-success>http://marklogic.com/states/replicated</on-success>
+    <on-failure>http://marklogic.com/states/error</on-failure>
+    <priority>5000</priority>
+    <default-action>
+      <module>/MarkLogic/flexrep/actions/replication-action.xqy</module>
+    </default-action>
+  </state-transition>
+  <state-transition>
+    <annotation>
+      Replicate a document and transition to state "replicated".
+    </annotation>
+    <state>http://marklogic.com/states/entities/enriched</state>
+    <on-success>http://marklogic.com/states/replicated</on-success>
+    <on-failure>http://marklogic.com/states/error</on-failure>
+    <priority>5000</priority>
+    <default-action>
+      <module>/MarkLogic/flexrep/actions/replication-action.xqy</module>
+    </default-action>
+  </state-transition>
+  <state-transition>
+    <annotation>
+      Replicate a document and transition to state "replicated".
+    </annotation>
+    <state>http://marklogic.com/states/xinclude/expanded</state>
+    <on-success>http://marklogic.com/states/replicated</on-success>
+    <on-failure>http://marklogic.com/states/error</on-failure>
+    <priority>5000</priority>
+    <default-action>
+      <module>/MarkLogic/flexrep/actions/replication-action.xqy</module>
+    </default-action>
+  </state-transition>
+  <state-transition>
+    <annotation>
+      Replicate a document and transition to state "replicated".
+    </annotation>
+    <state>http://marklogic.com/states/alerted</state>
+    <on-success>http://marklogic.com/states/replicated</on-success>
+    <on-failure>http://marklogic.com/states/error</on-failure>
+    <priority>5000</priority>
+    <default-action>
+      <module>/MarkLogic/flexrep/actions/replication-action.xqy</module>
+    </default-action>
+  </state-transition>
+  <state-transition>
+    <annotation>
+      Replicate a document and transition to state "replicated".
+    </annotation>
+    <state>http://marklogic.com/states/property-updated</state>
+    <on-success>http://marklogic.com/states/replicated</on-success>
+    <on-failure>http://marklogic.com/states/error</on-failure>
+    <priority>5000</priority>
+    <default-action>
+      <module>/MarkLogic/flexrep/actions/replication-action.xqy</module>
+    </default-action>
+  </state-transition>
+  <state-transition>
+    <annotation>
+      Document has been updated: reprocess if need be. Note: the preconditions will avoid reprocessing of active documents, so we
+      will avoid falling into a processing loop when the processing updates a document.
+    </annotation>
+    <state>http://marklogic.com/states/updated</state>
+    <on-success>http://marklogic.com/states/initial</on-success>
+    <on-failure>http://marklogic.com/states/error</on-failure>
+    <priority>5000</priority>
+  </state-transition>
+  <status-transition>
+    <annotation>
+      Leave a bread crumb that the document has been deleted.
+    </annotation>
+    <status>deleted</status>
+    <priority>5000</priority>
+    <always>true</always>
+    <default-action>
+      <module>/MarkLogic/flexrep/actions/delete-action.xqy</module>
+    </default-action>
+  </status-transition>
+  <event-transition>
+    <annotation>
+      Pull flexrep properties from prior version of document if needed.
+    </annotation>
+    <event>updated</event>
+    <priority>5000</priority>
+    <default-action>
+      <module>
+        /MarkLogic/flexrep/actions/on-event-pull-properties.xqy
+      </module>
+    </default-action>
+  </event-transition>
+  <event-transition>
+    <annotation>
+      Pull flexrep properties from prior version of document if needed.
+    </annotation>
+    <event>property-updated</event>
+    <priority>5000</priority>
+    <default-action>
+      <module>
+        /MarkLogic/flexrep/actions/on-event-pull-properties.xqy
+      </module>
+    </default-action>
+  </event-transition>
+</pipeline-properties>

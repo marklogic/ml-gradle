@@ -1,0 +1,10 @@
+<http-server-properties xmlns="http://marklogic.com/manage">
+    <server-name>master-flexrep-server</server-name>
+    <group-name>Default</group-name>
+    <server-type>http</server-type>
+    <root>FlexRep</root>
+    <port>8121</port>
+    <error-handler>/error-handler.xqy</error-handler>
+    <url-rewriter>/rewriter.xml</url-rewriter>
+    <content-database>Documents</content-database>
+</http-server-properties>

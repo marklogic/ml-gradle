@@ -21,12 +21,14 @@ import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand
 import com.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand
 import com.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand
 import com.marklogic.appdeployer.command.flexrep.DeployConfigsCommand
+import com.marklogic.appdeployer.command.flexrep.DeployFlexrepCommand
 import com.marklogic.appdeployer.command.flexrep.DeployTargetsCommand
 import com.marklogic.appdeployer.command.forests.ConfigureForestReplicasCommand
 import com.marklogic.appdeployer.command.groups.DeployGroupsCommand
 import com.marklogic.appdeployer.command.mimetypes.DeployMimetypesCommand
 import com.marklogic.appdeployer.command.modules.LoadModulesCommand
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand
+import com.marklogic.appdeployer.command.schemas.LoadSchemasCommand
 import com.marklogic.appdeployer.command.security.DeployAmpsCommand
 import com.marklogic.appdeployer.command.security.DeployCertificateAuthoritiesCommand
 import com.marklogic.appdeployer.command.security.DeployCertificateTemplatesCommand
@@ -62,7 +64,9 @@ import com.marklogic.gradle.task.databases.ClearModulesDatabaseTask
 import com.marklogic.gradle.task.databases.ClearSchemasDatabaseTask
 import com.marklogic.gradle.task.databases.ClearTriggersDatabaseTask
 import com.marklogic.gradle.task.databases.DeployDatabasesTask
+import com.marklogic.gradle.task.databases.SetContentUpdatesAllowedTask
 import com.marklogic.gradle.task.flexrep.DeleteAllFlexrepConfigsTask
+import com.marklogic.gradle.task.flexrep.DeployFlexrepAtPathTask
 import com.marklogic.gradle.task.flexrep.DeployFlexrepTask
 import com.marklogic.gradle.task.flexrep.DisableAllFlexrepTargetsTask
 import com.marklogic.gradle.task.flexrep.EnableAllFlexrepTargetsTask
@@ -72,6 +76,7 @@ import com.marklogic.gradle.task.forests.DeployForestReplicasTask
 import com.marklogic.gradle.task.groups.DeployGroupsTask
 import com.marklogic.gradle.task.mimetypes.DeployMimetypesTask
 import com.marklogic.gradle.task.scaffold.GenerateScaffoldTask
+import com.marklogic.gradle.task.schemas.LoadSchemasTask
 import com.marklogic.gradle.task.security.DeployAmpsTask
 import com.marklogic.gradle.task.security.DeployCertificateAuthoritiesTask
 import com.marklogic.gradle.task.security.DeployCertificateTemplatesTask
@@ -151,7 +156,8 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlClearSchemasDatabase", type: ClearSchemasDatabaseTask, group: dbGroup, description: "Deletes all documents in the schemas database")
         project.task("mlClearTriggersDatabase", type: ClearTriggersDatabaseTask, group: dbGroup, description: "Deletes all documents in the triggers database")
         project.task("mlDeployDatabases", type: DeployDatabasesTask, group: dbGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Deploy each database, updating it if it exists, in the configuration directory")
-
+        project.task("mlSetContentUpdatesAllowed", type: SetContentUpdatesAllowedTask, group: dbGroup, description: "Sets updated-allowed on each primary forest for the content database; must set the mode via e.g. -Pmode=flash-backup")
+        
         String devGroup = "ml-gradle Development"
         project.task("mlScaffold", type: GenerateScaffoldTask, group: devGroup, description: "Generate project scaffold for a new project")
         project.task("mlCreateResource", type: CreateResourceTask, group: devGroup, description: "Create a new resource extension in the modules services directory")
@@ -161,6 +167,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         String flexrepGroup = "ml-gradle Flexible Replication"
         project.task("mlDeleteAllFlexrepConfigs", type: DeleteAllFlexrepConfigsTask, group: flexrepGroup, description: "Delete all Flexrep configs and their associated targets")
         project.task("mlDeployFlexrep", type: DeployFlexrepTask, group: flexrepGroup, description: "Deploy Flexrep configs and targets in the configuration directory")
+        project.task("mlDeployFlexrepAtPath", type: DeployFlexrepAtPathTask, group: flexrepGroup, description: "Deploy all Flexrep resources in a directory under ml-config/flexrep with a name matching the property mlFlexrepPath")
         project.task("mlDisableAllFlexrepTargets", type: DisableAllFlexrepTargetsTask, group: flexrepGroup, description: "Disable every target on every flexrep config")
         project.task("mlEnableAllFlexrepTargets", type: EnableAllFlexrepTargetsTask, group: flexrepGroup, description: "Enable every target on every flexrep config")
 
@@ -181,6 +188,10 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlWatch", type: WatchTask, group: modulesGroup, description: "Run a loop that checks for new/modified modules every second and loads any that it finds")
         project.task("mlDeleteModuleTimestampsFile", type: DeleteModuleTimestampsFileTask, group: modulesGroup, description: "Delete the properties file in the build directory that keeps track of when each module was last loaded")
 
+        String schemasGroup = "ml-gradle Schemas"
+        project.task("mlLoadSchemas", type: LoadSchemasTask, group: schemasGroup, description: "Loads special-purpose data into the schemas database (XSD schemas, Inference rules, and [MarkLogic 9] Extraction Templates)").mustRunAfter("mlClearSchemasDatabase")
+        project.task("mlReloadSchemas", dependsOn: ["mlClearSchemasDatabase", "mlLoadSchemas"], group: schemasGroup, description: "Clears schemas database then loads special-purpose data into the schemas database (XSD schemas, Inference rules, and [MarkLogic 9] Extraction Templates)")
+        
         String serverGroup = "ml-gradle Server"
         project.task("mlDeployServers", type: DeployServersTask, group: serverGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the REST API server (if it exists) and deploys each other server, updating it if it exists, in the configuration directory ")
         project.task("mlUndeployOtherServers", type: UndeployOtherServersTask, group: serverGroup, description: "Delete any non-REST API servers (e.g. ODBC and XBC servers) defined by server files in the configuration directory")
@@ -306,6 +317,11 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.extensions.add("mlDatabaseCommands", dbCommands)
         commands.addAll(dbCommands)
 
+        // Schemas
+        LoadSchemasCommand lsc = new LoadSchemasCommand()
+        project.extensions.add("mlLoadSchemasCommand", lsc)
+        commands.add(lsc)
+        
         // REST API instance creation
         commands.add(new DeployRestApiServersCommand())
 
@@ -342,6 +358,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         List<Command> flexrepCommands = new ArrayList<Command>()
         flexrepCommands.add(new DeployConfigsCommand())
         flexrepCommands.add(new DeployTargetsCommand())
+        flexrepCommands.add(new DeployFlexrepCommand())
         project.extensions.add("mlFlexrepCommands", flexrepCommands)
         commands.addAll(flexrepCommands)
 

@@ -54,4 +54,4 @@ to your local Maven repository.
 You can then repeat this process as often as you want - i.e. make more changes in the ml-gradle source, publish a new
 copy to your local Maven repo, and test it in the project you chose. 
 
- 
+For a real example, see the "local-testing-project" project in the examples directory.

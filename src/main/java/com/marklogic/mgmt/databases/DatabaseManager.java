@@ -1,6 +1,5 @@
 package com.marklogic.mgmt.databases;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.marklogic.mgmt.AbstractResourceManager;

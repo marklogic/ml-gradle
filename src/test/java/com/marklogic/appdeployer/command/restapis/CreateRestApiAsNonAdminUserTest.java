@@ -54,7 +54,7 @@ public class CreateRestApiAsNonAdminUserTest extends AbstractAppDeployerTest {
         appConfig.setRestAdminUsername("sample-app-rest-admin");
         appConfig.setRestAdminPassword("sample-app-rest-admin");
 
-        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployRolesCommand(), new DeployUsersCommand(),
+        initializeAppDeployer(new DeployRestApiServersCommand(true), new DeployRolesCommand(), new DeployUsersCommand(),
                 new LoadModulesCommand());
         appDeployer.deploy(appConfig);
 

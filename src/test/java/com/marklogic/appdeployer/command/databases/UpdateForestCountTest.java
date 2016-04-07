@@ -1,13 +1,12 @@
 package com.marklogic.appdeployer.command.databases;
 
-import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.mgmt.databases.DatabaseManager;
-import com.marklogic.rest.util.Fragment;
+import java.io.File;
+
 import org.junit.After;
 import org.junit.Test;
 
-import java.io.File;
-import java.util.List;
+import com.marklogic.appdeployer.AbstractAppDeployerTest;
+import com.marklogic.mgmt.databases.DatabaseManager;
 
 /**
  * Verifies support for bumping up the number of content forests and then re-deploying. Does not yet support lowering

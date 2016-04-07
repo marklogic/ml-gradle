@@ -1,5 +1,7 @@
 # ml-app-deployer releases
 
+Future releases are being tracked on Github
+
 ## 2.0 - 2016-02-08
 
 * No changes from 2.0rc4, just making final label

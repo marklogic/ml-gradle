@@ -10,7 +10,6 @@ import com.marklogic.client.document.JSONDocumentManager;
 import com.marklogic.client.document.TextDocumentManager;
 import com.marklogic.client.document.XMLDocumentManager;
 import com.marklogic.client.helper.LoggingObject;
-import com.marklogic.client.impl.JSONDocumentImpl;
 import com.marklogic.client.io.DocumentMetadataHandle;
 import com.marklogic.client.io.FileHandle;
 import com.marklogic.client.io.Format;

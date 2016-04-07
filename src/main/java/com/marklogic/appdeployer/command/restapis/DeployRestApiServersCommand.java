@@ -25,12 +25,25 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
     private boolean deleteModulesDatabase = true;
     private boolean deleteContentDatabase = false;
 
+    private String restApiFilename;
+
     public DeployRestApiServersCommand() {
         setExecuteSortOrder(SortOrderConstants.DEPLOY_REST_API_SERVERS);
     }
 
+    public DeployRestApiServersCommand(String restApiFilename) {
+        this();
+        this.restApiFilename = restApiFilename;
+    }
+
     public DeployRestApiServersCommand(boolean deleteContentDatabase) {
         this();
+        this.deleteContentDatabase = deleteContentDatabase;
+    }
+
+    public DeployRestApiServersCommand(String restApiFilename, boolean deleteContentDatabase) {
+        this();
+        this.restApiFilename = restApiFilename;
         this.deleteContentDatabase = deleteContentDatabase;
     }
 
@@ -41,33 +54,54 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
 
     @Override
     public void execute(CommandContext context) {
-        File f = context.getAppConfig().getConfigDir().getRestApiFile();
-        String payload = null;
+        String payload = getRestApiPayload(context);
+        if (payload != null) {
+            RestApiManager mgr = new RestApiManager(context.getManageClient());
+            AppConfig appConfig = context.getAppConfig();
+
+            mgr.createRestApi(tokenReplacer.replaceTokens(payload, appConfig, false));
+
+            if (appConfig.isTestPortSet()) {
+                mgr.createRestApi(tokenReplacer.replaceTokens(payload, appConfig, true));
+            }
+        }
+    }
+
+    protected String getRestApiPayload(CommandContext context) {
+        File f = findRestApiConfigFile(context);
         if (f.exists()) {
-            payload = copyFileToString(f);
+            return copyFileToString(f);
         } else {
             logger.info(format("Could not find REST API file at %s, will use default payload", f.getAbsolutePath()));
-            payload = getDefaultRestApiPayload();
+            return getDefaultRestApiPayload();
         }
+    }
 
-        RestApiManager mgr = new RestApiManager(context.getManageClient());
-        AppConfig appConfig = context.getAppConfig();
-
-        mgr.createRestApi(appConfig.getRestServerName(), tokenReplacer.replaceTokens(payload, appConfig, false));
-
-        if (appConfig.isTestPortSet()) {
-            mgr.createRestApi(appConfig.getTestRestServerName(), tokenReplacer.replaceTokens(payload, appConfig, true));
+    protected File findRestApiConfigFile(CommandContext context) {
+        if (restApiFilename != null) {
+            return new File(context.getAppConfig().getConfigDir().getBaseDir(), restApiFilename);
+        } else {
+            return context.getAppConfig().getConfigDir().getRestApiFile();
         }
     }
 
     @Override
     public void undo(CommandContext context) {
+        deleteTestRestServer(context);
+        deleteMainRestServer(context);
+    }
+
+    /**
+     * If we have a test REST API, we first modify it to point at Documents for the modules database so we can safely
+     * delete each REST API
+     * 
+     * @param context
+     */
+    protected void deleteTestRestServer(CommandContext context) {
         final AppConfig appConfig = context.getAppConfig();
         final ManageClient manageClient = context.getManageClient();
 
         ServerManager mgr = new ServerManager(manageClient, appConfig.getGroupName());
-        // If we have a test REST API, first modify it to point at Documents for the modules database so we can safely
-        // delete each REST API
         if (appConfig.isTestPortSet() && mgr.exists(appConfig.getTestRestServerName())) {
             mgr.setModulesDatabaseToDocuments(appConfig.getTestRestServerName());
             context.getAdminManager().invokeActionRequiringRestart(new ActionRequiringRestart() {
@@ -78,13 +112,24 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
                 }
             });
         }
+    }
 
-        if (mgr.exists(appConfig.getRestServerName())) {
+    protected void deleteMainRestServer(CommandContext context) {
+        final AppConfig appConfig = context.getAppConfig();
+        final ManageClient manageClient = context.getManageClient();
+
+        ServerManager mgr = new ServerManager(manageClient, appConfig.getGroupName());
+
+        String payload = getRestApiPayload(context);
+        payload = tokenReplacer.replaceTokens(payload, appConfig, false);
+        final String serverName = new RestApiManager(manageClient).extractNameFromJson(payload);
+
+        if (mgr.exists(serverName)) {
             context.getAdminManager().invokeActionRequiringRestart(new ActionRequiringRestart() {
                 @Override
                 public boolean execute() {
-                    return deleteRestApi(appConfig.getRestServerName(), appConfig.getGroupName(), manageClient,
-                            deleteModulesDatabase, deleteContentDatabase);
+                    return deleteRestApi(serverName, appConfig.getGroupName(), manageClient, deleteModulesDatabase,
+                            deleteContentDatabase);
                 }
             });
         }
@@ -94,6 +139,11 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
         return RestApiUtil.buildDefaultRestApiJson();
     }
 
+    /**
+     * TODO Move this to RestApiManager.
+     * 
+     * @return
+     */
     protected boolean deleteRestApi(String serverName, String groupName, ManageClient manageClient,
             boolean includeModules, boolean includeContent) {
         if (new ServerManager(manageClient, groupName).exists(serverName)) {
@@ -128,6 +178,14 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
 
     public void setDeleteContentDatabase(boolean includeContent) {
         this.deleteContentDatabase = includeContent;
+    }
+
+    public String getRestApiFilename() {
+        return restApiFilename;
+    }
+
+    public void setRestApiFilename(String restApiFilename) {
+        this.restApiFilename = restApiFilename;
     }
 
 }

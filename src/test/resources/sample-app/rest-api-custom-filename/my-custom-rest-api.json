@@ -1,0 +1,12 @@
+{
+  "rest-api": {
+    "name": "my-custom-rest-api",
+    "group": "%%GROUP%%",
+    "database": "my-custom-content",
+    "modules-database": "my-custom-modules",
+    "port": "%%PORT%%",
+    "xdbc-enabled": true,
+    "forests-per-host": 1,
+    "error-format": "xml"
+  }
+}

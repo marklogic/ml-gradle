@@ -63,9 +63,6 @@ plugins {
  */
 repositories {
     jcenter()
-
-    // corb2 jar is stored here, waiting for bintray to mirror it
-    maven {url "https://dl.bintray.com/rjrudin/maven/"}
 }
 
 
@@ -87,7 +84,7 @@ dependencies {
     testCompile "com.jayway.restassured:rest-assured:2.4.1"
     
     // corb jar available from jcenter
-    corb "com.marklogic:marklogic-corb:2.2.1"
+    corb "com.marklogic:marklogic-corb:2.3.0"
 }
 
 

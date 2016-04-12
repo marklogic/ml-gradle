@@ -1,7 +1,7 @@
 /*
  * This buildscript shows how mlcp dependencies can be easily declared and then uses in a Gradle configuration named
  * "mlcp". This configuration is then used as the classpath for MlcpTask, which is a simple extension of Gradle's
- * JavaExec task that exposes a number of mlcp arguments as task attributes. 
+ * JavaExec task that exposes a number of mlcp arguments as task attributes.
  */
 
 plugins {
@@ -48,11 +48,11 @@ task importSampleData(type: com.marklogic.gradle.task.MlcpTask) {
 
 
 /*
- * Example of using MlcpTask to export data with mlcp. This example also shows how the connection values can be 
- * overridden. 
+ * Example of using MlcpTask to export data with mlcp. This example also shows how the connection values can be
+ * overridden.
  */
 task exportSampleData(type: com.marklogic.gradle.task.MlcpTask) {
-    description = "Example of using mlcp and MlcpTask to export documents; note the args array is used for any args MlcpTask doesn't yet have as task attrsibutes"
+    description = "Example of using mlcp and MlcpTask to export documents; note the args array is used for any args MlcpTask doesn't yet have as task attributes"
     classpath = configurations.mlcp
     command = "EXPORT"
     host = "localhost" // defaults to mlHost
@@ -63,4 +63,3 @@ task exportSampleData(type: com.marklogic.gradle.task.MlcpTask) {
     output_file_path = "data/export"
     args = ["-collection_filter", "sample-import"]
 }
-

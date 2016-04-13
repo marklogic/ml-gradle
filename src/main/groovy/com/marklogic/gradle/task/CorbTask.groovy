@@ -7,28 +7,52 @@ import com.marklogic.appdeployer.AppConfig
 
 class CorbTask extends JavaExec {
 
+  //default CORB option list
+  private static String[] DEFAULT_CORB_OPTIONS = "BATCH-SIZE,BATCH-URI-DELIM,COLLECTION-NAME,DECRYPTER,\
+ERROR-FILE-NAME,EXIT-CODE-NO-URIS,EXPORT_FILE_AS_ZIP,\
+EXPORT-FILE-BOTTOM-CONTENT,EXPORT-FILE-DIR,EXPORT-FILE-HEADER-LINE-COUNT,\
+EXPORT-FILE-NAME,EXPORT-FILE-PART-EXT,\
+EXPORT-FILE-SORT,EXPORT-FILE-SORT-COMPARATOR,\
+EXPORT-FILE-TOP-CONTENT,EXPORT-FILE-URI-TO-PATH,\
+FAIL-ON-ERROR,INSTALL,INIT-MODULE,INIT-TASK,JASYPT-PROPERTIES-FILE,\
+MAX_OPTS_FROM_MODULE,MODULES-DATABASE,MODULE-ROOT,OPTIONS-FILE,\
+POST-BATCH-MODULE,POST-BATCH-TASK,POST-BATCH-XQUERY-MODULE,\
+PRE-BATCH-MODULE,PRE-BATCH-TASK,PRE-BATCH-XQUERY-MODULE,\
+PRIVATE-KEY-ALGORITHM,PRIVATE-KEY-FILE,\
+PROCESS-MODULE,PROCESS-TASK,\
+QUERY-RETRY-LIMIT,QUERY-RETRY-INTERVAL,\
+SSL-CIPHER-SUITES,SSL-CONFIG-CLASS,SSL-ENABLED-PROTOCOLS,SSL-KEY-PASSWORD,\
+SSL-KEYSTORE,SSL-KEYSTORE-PASSWORD,SSL-KEYSTORE-TYPE,SSL-PROPERTIES-FILE,\
+THREAD-COUNT,URIS_BATCH_REF,URIS-FILE,URIS-LOADER,URIS-MODULE,URIS-REPLACE-PATTERN,\
+XCC_CONNECTION_RETRY_LIMIT,XCC-CONNECTION-RETRY-INTERVAL,XCC-CONNECTION-URI,\
+XCC-DBNAME,XCC-HOSTNAME,XCC-PASSWORD,XCC-PORT,XCC-USERNAME,\
+XQUERY-MODULE".tokenize(',')
+
   CorbTask() {
-      System.out.println("initializing CorbTask " )
-    //Augment with member variables and a mapping of CoRB2 Options
-    CorbTask.metaClass.corbOptions = Class.forName("com.marklogic.developer.corb.Options", true, Thread.currentThread().contextClassLoader)
+    String[] optionNames = DEFAULT_CORB_OPTIONS  
+    try {
+        optionNames = Class.forName("com.marklogic.developer.corb.Options", true, Thread.currentThread().contextClassLoader)
         .declaredFields
-        .findAll { !it.synthetic }
-        .collectEntries {
-            String option = it.name
-            String camelOption = option.toLowerCase().split('_|-').collect { it.capitalize() }.join('')
-            // create Map entry gradle property and original values, for easy lookup/translation
-            String lowerCamelOption = new StringBuffer(camelOption.length())
-                                        .append(Character.toLowerCase(camelOption.charAt(0)))
-                                        .append(camelOption.substring(1))
-                                        .toString();
+        .findAll { !it.synthetic }.collect { it.get(null) }
+    } catch (ClassNotFoundException ex) {}
+    
+    //Augment with member variables and a mapping of CoRB2 Options    
+    CorbTask.metaClass.corbOptions = optionNames.collectEntries { option ->
+        
+        String camelOption = option.toLowerCase().split('_|-').collect { it.capitalize() }.join('')
+        // create Map entry gradle property and original values, for easy lookup/translation
+        String lowerCamelOption = new StringBuffer(camelOption.length())
+                                    .append(Character.toLowerCase(camelOption.charAt(0)))
+                                    .append(camelOption.substring(1))
+                                    .toString();
 
-            //add the lowerCamelCased CoRB2 option as a member variable
-            this.metaClass[lowerCamelOption] = null
+        //add the lowerCamelCased CoRB2 option as a member variable
+        this.metaClass[lowerCamelOption] = null
 
-            // Create a 'corb' prefixed CamelCased entry (i.e. URIS-FILE => corbUrisFile )
-            // mapped to the original CoRB2 option for lookup/conversion
-            [(CORB_PROPERTY_PREFIX + camelOption): option]
-        }
+        // Create a 'corb' prefixed CamelCased entry (i.e. URIS-FILE => corbUrisFile )
+        // mapped to the original CoRB2 option for lookup/conversion
+        [(CORB_PROPERTY_PREFIX + camelOption): option]
+    }
   }
   // prefix for corb project properties, to ensure no conflicts with other project properties
   private static final String CORB_PROPERTY_PREFIX = "corb"

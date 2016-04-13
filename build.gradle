@@ -14,7 +14,7 @@ plugins {
   id "maven-publish"
   id "eclipse"
   id "idea"
-  id "com.jfrog.bintray" version "1.5"
+  id "com.jfrog.bintray" version "1.6"
 }
 
 apply plugin: "com.gradle.plugin-publish"

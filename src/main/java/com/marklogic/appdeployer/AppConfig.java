@@ -57,7 +57,7 @@ public class AppConfig {
 
     private String name = DEFAULT_APP_NAME;
     private String host = DEFAULT_HOST;
-    
+
     // Username/password combo for using the client REST API - e.g. to load modules
     private String restAdminUsername = DEFAULT_USERNAME;
     private String restAdminPassword = DEFAULT_PASSWORD;
@@ -105,14 +105,16 @@ public class AppConfig {
     // Path to use for DeployFlexrepCommand
     private String flexrepPath;
 
-	public AppConfig() {
+    private Map<String, Integer> forestCounts = new HashMap<>();
+
+    public AppConfig() {
         this(DEFAULT_MODULES_PATH, DEFAULT_SCHEMAS_PATH);
     }
 
-	public AppConfig(String defaultModulePath) {
-	    this(defaultModulePath, DEFAULT_SCHEMAS_PATH);
-	}
-	
+    public AppConfig(String defaultModulePath) {
+        this(defaultModulePath, DEFAULT_SCHEMAS_PATH);
+    }
+
     public AppConfig(String defaultModulePath, String defaultSchemasPath) {
         modulePaths = new ArrayList<String>();
         modulePaths.add(defaultModulePath);
@@ -145,18 +147,17 @@ public class AppConfig {
         return DatabaseClientFactory.newClient(getHost(), getTestRestPort(), getRestAdminUsername(),
                 getRestAdminPassword(), getRestAuthentication(), getRestSslContext(), getRestSslHostnameVerifier());
     }
-    
+
     /**
      * Like newDatabaseClient, but connects to schemas database.
      * 
      * @return
      */
-	public DatabaseClient newSchemasDatabaseClient() {
-		return DatabaseClientFactory.newClient(getHost(),  getRestPort(), getSchemasDatabaseName(), 
-				getRestAdminUsername(), getRestAdminPassword(), getRestAuthentication(), 
-				getRestSslContext(), getRestSslHostnameVerifier());
-	}
-
+    public DatabaseClient newSchemasDatabaseClient() {
+        return DatabaseClientFactory.newClient(getHost(), getRestPort(), getSchemasDatabaseName(),
+                getRestAdminUsername(), getRestAdminPassword(), getRestAuthentication(), getRestSslContext(),
+                getRestSslHostnameVerifier());
+    }
 
     /**
      * @return an XccAssetLoader based on the configuration properties in this class
@@ -247,7 +248,7 @@ public class AppConfig {
     public String getSchemasDatabaseName() {
         return schemasDatabaseName != null ? schemasDatabaseName : name + "-schemas";
     }
-    
+
     /**
      * @return the name of the application, which is then used to generate app server and database names unless those
      *         are set via their respective properties
@@ -498,5 +499,13 @@ public class AppConfig {
 
     public void setFlexrepPath(String flexrepPath) {
         this.flexrepPath = flexrepPath;
+    }
+
+    public Map<String, Integer> getForestCounts() {
+        return forestCounts;
+    }
+
+    public void setForestCounts(Map<String, Integer> forestCounts) {
+        this.forestCounts = forestCounts;
     }
 }

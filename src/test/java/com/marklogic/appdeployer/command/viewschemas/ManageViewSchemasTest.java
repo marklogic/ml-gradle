@@ -4,14 +4,13 @@ import org.jdom2.Namespace;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import com.marklogic.junit.Fragment;
 import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
 import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import com.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand;
 import com.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
-import com.marklogic.appdeployer.command.modules.LoadModulesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
+import com.marklogic.junit.Fragment;
 import com.marklogic.mgmt.ResourceManager;
 import com.marklogic.mgmt.viewschemas.ViewSchemaManager;
 import com.marklogic.rest.util.RestTemplateUtil;
@@ -20,11 +19,8 @@ public class ManageViewSchemasTest extends AbstractManageResourceTest {
 
     @Override
     protected void initializeAndDeploy() {
-        deleteModuleTimestampsFile();
-
         initializeAppDeployer(new DeployRestApiServersCommand(), new DeploySchemasDatabaseCommand(),
-                new DeployTriggersDatabaseCommand(), new DeployContentDatabasesCommand(), newCommand(),
-                new LoadModulesCommand());
+                new DeployTriggersDatabaseCommand(), new DeployContentDatabasesCommand(), newCommand(), buildLoadModulesCommand());
 
         appDeployer.deploy(appConfig);
     }
@@ -66,13 +62,13 @@ public class ManageViewSchemasTest extends AbstractManageResourceTest {
         clientTemplate.put(baseUrl + "/v1/documents?uri=doc1.xml&format=xml", "<order><amount>111</amount></order>");
         clientTemplate.put(baseUrl + "/v1/documents?uri=doc2.xml&format=xml", "<order><amount>222</amount></order>");
 
-        ResponseEntity<String> response = clientTemplate.getForEntity(baseUrl
-                + "/v1/resources/sql?rs:query=select * from ordertable", String.class);
+        ResponseEntity<String> response = clientTemplate
+                .getForEntity(baseUrl + "/v1/resources/sql?rs:query=select * from ordertable", String.class);
         String body = response.getBody();
         body = body.substring(body.indexOf("<json:array"));
 
-        Fragment xml = new Fragment("<results>" + body + "</results>", Namespace.getNamespace("json",
-                "http://marklogic.com/xdmp/json"));
+        Fragment xml = new Fragment("<results>" + body + "</results>",
+                Namespace.getNamespace("json", "http://marklogic.com/xdmp/json"));
         xml.assertElementValue("/results/json:array[1]/json:value", "amount");
         xml.assertElementValue("/results/json:array[2]/json:value", "111");
         xml.assertElementValue("/results/json:array[3]/json:value", "222");

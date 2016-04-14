@@ -1,13 +1,14 @@
 package com.marklogic.appdeployer.command.databases;
 
 import java.io.File;
+import java.util.Map;
 
-import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.appdeployer.command.UndoableCommand;
 import com.marklogic.appdeployer.command.forests.DeployForestsCommand;
+import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.databases.DatabaseManager;
 
@@ -29,8 +30,8 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
     private boolean createDatabaseWithoutFile = false;
 
     /**
-     * The name of the database to be deployed; used for constructing forest names, and thus required if you're creating
-     * forests.
+     * The name of the database to be deployed; only needs to be set if the database payload is automatically generated
+     * instead of being loaded from a file.
      */
     private String databaseName;
 
@@ -67,7 +68,12 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
         this();
         this.databaseFilename = databaseFilename;
     }
-    
+
+    @Override
+    public String toString() {
+        return databaseFilename;
+    }
+
     @Override
     public Integer getUndoSortOrder() {
         return undoSortOrder;
@@ -75,28 +81,42 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 
     @Override
     public void execute(CommandContext context) {
-        AppConfig appConfig = context.getAppConfig();
-        String payload = getPayload(context);
+        String payload = buildPayload(context);
         if (payload != null) {
-            String json = tokenReplacer.replaceTokens(payload, appConfig, false);
             DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
-            SaveReceipt receipt = dbMgr.save(json);
-            buildDeployForestsCommand(receipt, context).execute(context);
+            SaveReceipt receipt = dbMgr.save(payload);
+            buildDeployForestsCommand(payload, receipt, context).execute(context);
         }
     }
 
     @Override
     public void undo(CommandContext context) {
-        AppConfig appConfig = context.getAppConfig();
-        String payload = getPayload(context);
+        String payload = buildPayload(context);
         if (payload != null) {
-            String json = tokenReplacer.replaceTokens(payload, appConfig, false);
             DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
             dbMgr.setForestDelete(forestDelete);
-            dbMgr.delete(json);
+            dbMgr.delete(payload);
         }
     }
 
+    /**
+     * Builds the XML or JSON payload for this command, based on the given CommandContext.
+     * 
+     * @param context
+     * @return
+     */
+    public String buildPayload(CommandContext context) {
+        String payload = getPayload(context);
+        return payload != null ? tokenReplacer.replaceTokens(payload, context.getAppConfig(), false) : null;
+    }
+
+    /**
+     * Get the payload based on the given CommandContext. Only loads the payload, does not replace any tokens in it.
+     * Call buildPayload to construct a payload with all tokens replaced.
+     * 
+     * @param context
+     * @return
+     */
     protected String getPayload(CommandContext context) {
         File f = null;
         if (databaseFilename != null) {
@@ -117,18 +137,48 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
     /**
      * Allows for how an instance of DeployForestsCommand is built to be overridden by a subclass.
      * 
+     * @param dbPayload
+     *            Needed so we can look up forest counts based on the database name
      * @param receipt
      * @param context
      * @return
      */
-    protected DeployForestsCommand buildDeployForestsCommand(SaveReceipt receipt, CommandContext context) {
+    protected DeployForestsCommand buildDeployForestsCommand(String dbPayload, SaveReceipt receipt,
+            CommandContext context) {
         DeployForestsCommand c = new DeployForestsCommand();
         c.setCreateForestsOnEachHost(createForestsOnEachHost);
-        c.setForestsPerHost(forestsPerHost);
+        c.setForestsPerHost(determineForestCountPerHost(dbPayload, context));
         c.setForestFilename(forestFilename);
         c.setDatabaseName(receipt.getResourceId());
         c.setForestPayload(DeployForestsCommand.DEFAULT_FOREST_PAYLOAD);
         return c;
+    }
+
+    /**
+     * Checks the forestCounts map in AppConfig to see if the client has specified a number of forests per host for this
+     * database.
+     * 
+     * @param dbPayload
+     * @param context
+     * @return
+     */
+    protected int determineForestCountPerHost(String dbPayload, CommandContext context) {
+        int forestCount = forestsPerHost;
+        if (dbPayload != null) {
+            try {
+                String dbName = new PayloadParser().getPayloadFieldValue(dbPayload, "database-name");
+                Map<String, Integer> forestCounts = context.getAppConfig().getForestCounts();
+                if (forestCounts != null && forestCounts.containsKey(dbName)) {
+                    Integer i = forestCounts.get(dbName);
+                    if (i != null) {
+                        forestCount = i;
+                    }
+                }
+            } catch (Exception ex) {
+                logger.warn("Unable to determine forest counts, cause: " + ex.getMessage(), ex);
+            }
+        }
+        return forestCount;
     }
 
     protected String buildDefaultDatabasePayload(CommandContext context) {

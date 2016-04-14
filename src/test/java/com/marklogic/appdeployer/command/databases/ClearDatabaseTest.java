@@ -4,7 +4,6 @@ import org.junit.After;
 import org.junit.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.appdeployer.command.modules.LoadModulesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.mgmt.databases.DatabaseManager;
 
@@ -24,7 +23,7 @@ public class ClearDatabaseTest extends AbstractAppDeployerTest {
      */
     @Test
     public void modulesDatabase() {
-        initializeAppDeployer(new DeployRestApiServersCommand(), new LoadModulesCommand());
+        initializeAppDeployer(new DeployRestApiServersCommand(), buildLoadModulesCommand());
 
         appDeployer.deploy(appConfig);
 

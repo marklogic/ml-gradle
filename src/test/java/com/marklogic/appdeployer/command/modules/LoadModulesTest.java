@@ -18,9 +18,8 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 
     @Before
     public void setup() {
-        xccTemplate = new XccTemplate(format("xcc://%s:%s@%s:8000/%s", "admin",
-                "admin", appConfig.getHost(), appConfig.getModulesDatabaseName()));
-        deleteModuleTimestampsFile();
+        xccTemplate = new XccTemplate(format("xcc://%s:%s@%s:8000/%s", "admin", "admin", appConfig.getHost(),
+                appConfig.getModulesDatabaseName()));
     }
 
     @After
@@ -32,7 +31,7 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
     public void loadModulesFromMultiplePaths() {
         appConfig.getModulePaths().add("src/test/resources/sample-app/build/mlRestApi/some-library/ml-modules");
 
-        initializeAppDeployer(new DeployRestApiServersCommand(true), new LoadModulesCommand());
+        initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
 
         appDeployer.deploy(appConfig);
 
@@ -44,14 +43,14 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 
     @Test
     public void loadModulesWithCustomPermissions() {
-        LoadModulesCommand c = new LoadModulesCommand();
         appConfig.setModulePermissions(appConfig.getModulePermissions() + ",app-user,execute");
 
-        initializeAppDeployer(new DeployRestApiServersCommand(true), c);
+        initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
 
         appDeployer.deploy(appConfig);
 
         PermissionsFragment perms = getDocumentPermissions("/ext/sample-lib.xqy", xccTemplate);
+        perms.prettyPrint();
         perms.assertPermissionCount(4);
         perms.assertPermissionExists("rest-admin", "read");
         perms.assertPermissionExists("rest-admin", "update");
@@ -61,10 +60,9 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 
     @Test
     public void loadModulesWithAssetFileFilter() {
-        LoadModulesCommand c = new LoadModulesCommand();
         appConfig.setAssetFileFilter(new TestFileFilter());
 
-        initializeAppDeployer(new DeployRestApiServersCommand(true), c);
+        initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
         appDeployer.deploy(appConfig);
 
         assertEquals("true", xccTemplate.executeAdhocQuery("doc-available('/ext/lib/test.xqy')"));
@@ -75,11 +73,12 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
     public void testServerExists() {
         appConfig.getConfigDir().setBaseDir(new File(("src/test/resources/sample-app/db-only-config")));
         appConfig.setTestRestPort(8541);
-        initializeAppDeployer(new DeployRestApiServersCommand(true), new LoadModulesCommand());
+        initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
 
         appDeployer.deploy(appConfig);
 
-        String[] uris = new String[]{"/Default/sample-app/rest-api/options/sample-app-options.xml", "/Default/sample-app/rest-api/options/sample-app-options.xml"};
+        String[] uris = new String[] { "/Default/sample-app/rest-api/options/sample-app-options.xml",
+                "/Default/sample-app/rest-api/options/sample-app-options.xml" };
         for (String uri : uris) {
             assertEquals("true", xccTemplate.executeAdhocQuery(format("doc-available('%s')", uri)));
         }
@@ -100,7 +99,6 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
         perms.assertPermissionExists("rest-admin", "update");
         perms.assertPermissionExists("rest-extension-user", "execute");
     }
-
 }
 
 class TestFileFilter extends AssetFileFilter {

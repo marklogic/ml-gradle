@@ -15,15 +15,41 @@ public class DatabaseManager extends AbstractResourceManager {
         super(manageClient);
     }
 
+    /**
+     * This will catch and log any exception by default, as the most frequent reason why this fails is because the
+     * database doesn't exist yet.
+     * 
+     * @param databaseIdOrName
+     */
     public void clearDatabase(String databaseIdOrName) {
-        String path = format("/manage/v2/databases/%s", databaseIdOrName);
-        logger.info(format("Clearing database %s", databaseIdOrName));
+        clearDatabase(databaseIdOrName, true);
+    }
+
+    public void clearDatabase(String databaseIdOrName, boolean catchException) {
         try {
-            getManageClient().postJson(path, "{\"operation\":\"clear-database\"}");
-            logger.info(format("Cleared database %s", databaseIdOrName));
+            invokeOperation(databaseIdOrName, "clear-database");
         } catch (Exception e) {
-            logger.error("Unable to clear database; cause: " + e.getMessage());
+            if (catchException) {
+                logger.error("Unable to clear database; cause: " + e.getMessage());
+            } else {
+                throw e;
+            }
         }
+    }
+
+    public void mergeDatabase(String databaseIdOrName) {
+        invokeOperation(databaseIdOrName, "merge-database");
+    }
+
+    public void reindexDatabase(String databaseIdOrName) {
+        invokeOperation(databaseIdOrName, "reindex-database");
+    }
+    
+    private void invokeOperation(String databaseIdOrName, String operation) {
+        String path = format("/manage/v2/databases/%s", databaseIdOrName);
+        logger.info(format("Invoking operation %s on database %s", operation, databaseIdOrName));
+        getManageClient().postJson(path, format("{\"operation\":\"%s\"}", operation));
+        logger.info(format("Finished invoking operation %s on database %s", operation, databaseIdOrName));
     }
 
     public void deleteByName(String databaseName) {
@@ -46,13 +72,14 @@ public class DatabaseManager extends AbstractResourceManager {
      */
     public List<String> getForestNames(String databaseNameOrId) {
         Fragment f = getAsXml(databaseNameOrId);
-        return f.getElementValues("/node()/db:relations/db:relation-group[db:typeref='forests']/db:relation/db:nameref");
+        return f.getElementValues(
+                "/node()/db:relations/db:relation-group[db:typeref='forests']/db:relation/db:nameref");
     }
 
     /**
      * @param databaseNameOrId
      * @return the IDs of all primary forests related to the database. The properties endpoint for a database lists
-     * primary forest IDs, but not replica forest IDs.
+     *         primary forest IDs, but not replica forest IDs.
      */
     public List<String> getPrimaryForestIds(String databaseNameOrId) {
         return getPropertiesAsXml(databaseNameOrId).getElementValues("/node()/m:forests/m:forest");

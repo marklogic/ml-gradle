@@ -74,6 +74,10 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
         }
     }
 
+    protected void deploySampleApp() {
+        appDeployer.deploy(appConfig);
+    }
+    
     protected void undeploySampleApp() {
         try {
             appDeployer.undeploy(appConfig);
@@ -97,5 +101,9 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
         loader.setModulesManager(null);
         command.setModulesLoader(loader);
         return command;
+    }
+    
+    protected void setConfigBaseDir(String path) {
+        appConfig.getConfigDir().setBaseDir(new File("src/test/resources/" + path));
     }
 }

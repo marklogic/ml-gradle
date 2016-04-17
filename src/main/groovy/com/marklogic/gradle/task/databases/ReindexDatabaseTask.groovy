@@ -5,18 +5,18 @@ import org.gradle.api.tasks.TaskAction
 import com.marklogic.gradle.task.MarkLogicTask
 import com.marklogic.mgmt.databases.DatabaseManager
 
-class MergeDatabaseTask extends MarkLogicTask {
+class ReindexDatabaseTask extends MarkLogicTask {
 
     @TaskAction
-    void mergeDatabase() {
+    void reindexDatabase() {
         if (project.hasProperty("dbName")) {
             def dbName = project.property("dbName")
-            println "Sending request to merge database " + dbName
+            println "Sending request to reindex database " + dbName
             DatabaseManager mgr = new DatabaseManager(getManageClient())
-            mgr.mergeDatabase(dbName)
-            println "Finished sending request to merge database " + dbName
+            mgr.reindexDatabase(dbName)
+            println "Finished sending request to reindex database " + dbName
         } else {
-            println "To merge a the database, include the dbName parameter e.g. -PdbName=my-database"
+            println "To reindex a the database, include the dbName parameter e.g. -PdbName=my-database"
             return
         }
     }

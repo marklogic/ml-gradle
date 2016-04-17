@@ -334,7 +334,6 @@ class MarkLogicPlugin implements Plugin<Project> {
 
         // Modules
         LoadModulesCommand lmc = new LoadModulesCommand()
-        lmc.initializeDefaultModulesLoader(context)
         project.extensions.add("mlLoadModulesCommand", lmc)
         commands.add(lmc)
 

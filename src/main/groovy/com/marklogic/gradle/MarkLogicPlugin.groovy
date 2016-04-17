@@ -65,7 +65,9 @@ import com.marklogic.gradle.task.databases.ClearSchemasDatabaseTask
 import com.marklogic.gradle.task.databases.ClearTriggersDatabaseTask
 import com.marklogic.gradle.task.databases.DeployDatabasesTask
 import com.marklogic.gradle.task.databases.MergeContentDatabaseTask
-import com.marklogic.gradle.task.databases.MergeDatabaseTask;
+import com.marklogic.gradle.task.databases.MergeDatabaseTask
+import com.marklogic.gradle.task.databases.ReindexContentDatabaseTask
+import com.marklogic.gradle.task.databases.ReindexDatabaseTask
 import com.marklogic.gradle.task.databases.SetContentUpdatesAllowedTask
 import com.marklogic.gradle.task.flexrep.DeleteAllFlexrepConfigsTask
 import com.marklogic.gradle.task.flexrep.DeployFlexrepAtPathTask
@@ -160,6 +162,8 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlDeployDatabases", type: DeployDatabasesTask, group: dbGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Deploy each database, updating it if it exists, in the configuration directory")
         project.task("mlMergeContentDatabase", type: MergeContentDatabaseTask, group: dbGroup, description: "Merge the database named by mlAppConfig.contentDatabaseName")
         project.task("mlMergeDatabase", type: MergeDatabaseTask, group: dbGroup, description: "Merge the database named by the project property dbName; e.g. gradle mlMergeDatabase -PdbName=my-database")
+        project.task("mlReindexContentDatabase", type: ReindexContentDatabaseTask, group: dbGroup, description: "Reindex the database named by mlAppConfig.contentDatabaseName")
+        project.task("mlReindexDatabase", type: ReindexDatabaseTask, group: dbGroup, description: "Reindex the database named by the project property dbName; e.g. gradle mlReindexDatabase -PdbName=my-database")
         project.task("mlSetContentUpdatesAllowed", type: SetContentUpdatesAllowedTask, group: dbGroup, description: "Sets updated-allowed on each primary forest for the content database; must set the mode via e.g. -Pmode=flash-backup")
         
         String devGroup = "ml-gradle Development"

@@ -37,7 +37,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
     }
 
     /**
-     * As of 2016-01-18
+     * As of 2.2.0.
      */
     @Test
     public void allProperties() {
@@ -55,7 +55,8 @@ public class DefaultAppConfigFactoryTest extends Assert {
         p.setProperty("mlAdditionalBinaryExtensions", ".gradle,.properties");
         p.setProperty("mlConfigDir", "src/test/resources/sample-app/empty-ml-config");
         p.setProperty("mlSimpleSsl", "anyvalue");
-
+        p.setProperty("mlModulesDatabaseName", "my-modules");
+        
         sut = new DefaultAppConfigFactory(new SimplePropertySource(p));
         AppConfig config = sut.newAppConfig();
 
@@ -73,6 +74,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
         assertTrue(config.getConfigDir().getBaseDir().getAbsolutePath().contains("empty-ml-config"));
         assertNotNull(config.getRestSslContext());
         assertNotNull(config.getRestSslHostnameVerifier());
+        assertEquals("my-modules", config.getModulesDatabaseName());
     }
 
     @Test

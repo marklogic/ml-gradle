@@ -88,6 +88,12 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
             c.setModulePermissions(prop);
         }
 
+        prop = getProperty("mlModulesDatabaseName");
+        if (prop != null) {
+            logger.info("Modules database name: " + prop);
+            c.setModulesDatabaseName(prop);
+        }
+        
         prop = getProperty("mlAdditionalBinaryExtensions");
         if (prop != null) {
             String[] values = prop.split(",");

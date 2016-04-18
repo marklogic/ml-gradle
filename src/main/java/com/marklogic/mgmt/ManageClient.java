@@ -1,5 +1,6 @@
 package com.marklogic.mgmt;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +27,6 @@ public class ManageClient extends LoggingObject {
     private ManageConfig manageConfig;
     private RestTemplate restTemplate;
     private RestTemplate adminRestTemplate;
-    private String baseUrl;
 
     /**
      * Can use this constructor when the default values in ManageConfig will work.
@@ -55,51 +55,46 @@ public class ManageClient extends LoggingObject {
         } else {
             this.adminRestTemplate = restTemplate;
         }
-
-        this.baseUrl = config.getBaseUrl();
-        if (logger.isInfoEnabled()) {
-            logger.info("Initialized ManageClient with base URL of: " + baseUrl);
-        }
     }
 
     public ResponseEntity<String> putJson(String path, String json) {
         logRequest(path, "JSON", "PUT");
-        return restTemplate.exchange(baseUrl + path, HttpMethod.PUT, buildJsonEntity(json), String.class);
+        return restTemplate.exchange(buildUri(path), HttpMethod.PUT, buildJsonEntity(json), String.class);
     }
 
     public ResponseEntity<String> putJsonAsAdmin(String path, String json) {
         logAdminRequest(path, "JSON", "PUT");
-        return adminRestTemplate.exchange(baseUrl + path, HttpMethod.PUT, buildJsonEntity(json), String.class);
+        return adminRestTemplate.exchange(buildUri(path), HttpMethod.PUT, buildJsonEntity(json), String.class);
     }
 
     public ResponseEntity<String> putXml(String path, String xml) {
         logRequest(path, "XML", "PUT");
-        return restTemplate.exchange(baseUrl + path, HttpMethod.PUT, buildXmlEntity(xml), String.class);
+        return restTemplate.exchange(buildUri(path), HttpMethod.PUT, buildXmlEntity(xml), String.class);
     }
 
     public ResponseEntity<String> putXmlAsAdmin(String path, String xml) {
         logAdminRequest(path, "XML", "PUT");
-        return adminRestTemplate.exchange(baseUrl + path, HttpMethod.PUT, buildXmlEntity(xml), String.class);
+        return adminRestTemplate.exchange(buildUri(path), HttpMethod.PUT, buildXmlEntity(xml), String.class);
     }
 
     public ResponseEntity<String> postJson(String path, String json) {
         logRequest(path, "JSON", "POST");
-        return restTemplate.exchange(baseUrl + path, HttpMethod.POST, buildJsonEntity(json), String.class);
+        return restTemplate.exchange(buildUri(path), HttpMethod.POST, buildJsonEntity(json), String.class);
     }
 
     public ResponseEntity<String> postJsonAsAdmin(String path, String json) {
         logAdminRequest(path, "JSON", "POST");
-        return adminRestTemplate.exchange(baseUrl + path, HttpMethod.POST, buildJsonEntity(json), String.class);
+        return adminRestTemplate.exchange(buildUri(path), HttpMethod.POST, buildJsonEntity(json), String.class);
     }
 
     public ResponseEntity<String> postXml(String path, String xml) {
         logRequest(path, "XML", "POST");
-        return restTemplate.exchange(baseUrl + path, HttpMethod.POST, buildXmlEntity(xml), String.class);
+        return restTemplate.exchange(buildUri(path), HttpMethod.POST, buildXmlEntity(xml), String.class);
     }
 
     public ResponseEntity<String> postXmlAsAdmin(String path, String xml) {
         logAdminRequest(path, "XML", "POST");
-        return adminRestTemplate.exchange(baseUrl + path, HttpMethod.POST, buildXmlEntity(xml), String.class);
+        return adminRestTemplate.exchange(buildUri(path), HttpMethod.POST, buildXmlEntity(xml), String.class);
     }
 
     public ResponseEntity<String> postForm(String path, String... params) {
@@ -111,12 +106,12 @@ public class ManageClient extends LoggingObject {
             map.add(params[i], params[i + 1]);
         }
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<MultiValueMap<String, String>>(map, headers);
-        return restTemplate.exchange(baseUrl + path, HttpMethod.POST, entity, String.class);
+        return restTemplate.exchange(buildUri(path), HttpMethod.POST, entity, String.class);
     }
 
     public Fragment getXml(String path, String... namespacePrefixesAndUris) {
         logRequest(path, "XML", "GET");
-        String xml = getRestTemplate().getForObject(getBaseUrl() + path, String.class);
+        String xml = getRestTemplate().getForObject(buildUri(path), String.class);
         List<Namespace> list = new ArrayList<Namespace>();
         for (int i = 0; i < namespacePrefixesAndUris.length; i += 2) {
             list.add(Namespace.getNamespace(namespacePrefixesAndUris[i], namespacePrefixesAndUris[i + 1]));
@@ -126,7 +121,7 @@ public class ManageClient extends LoggingObject {
 
     public Fragment getXmlAsAdmin(String path, String... namespacePrefixesAndUris) {
         logAdminRequest(path, "XML", "GET");
-        String xml = getAdminRestTemplate().getForObject(getBaseUrl() + path, String.class);
+        String xml = getAdminRestTemplate().getForObject(buildUri(path), String.class);
         List<Namespace> list = new ArrayList<Namespace>();
         for (int i = 0; i < namespacePrefixesAndUris.length; i += 2) {
             list.add(Namespace.getNamespace(namespacePrefixesAndUris[i], namespacePrefixesAndUris[i + 1]));
@@ -138,18 +133,25 @@ public class ManageClient extends LoggingObject {
         logRequest(path, "JSON", "GET");
         HttpHeaders headers = new HttpHeaders();
         headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
-        return getRestTemplate().exchange(getBaseUrl() + path, HttpMethod.GET, new HttpEntity<>(headers), String.class)
+        return getRestTemplate().exchange(buildUri(path), HttpMethod.GET, new HttpEntity<>(headers), String.class)
                 .getBody();
+    }
+
+    public String getJson(URI uri) {
+        logRequest(uri.toString(), "JSON", "GET");
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
+        return getRestTemplate().exchange(uri, HttpMethod.GET, new HttpEntity<>(headers), String.class).getBody();
     }
 
     public void delete(String path) {
         logRequest(path, "", "DELETE");
-        restTemplate.delete(baseUrl + path);
+        restTemplate.delete(buildUri(path));
     }
 
     public void deleteAsAdmin(String path) {
         logAdminRequest(path, "", "DELETE");
-        adminRestTemplate.delete(baseUrl + path);
+        adminRestTemplate.delete(buildUri(path));
     }
 
     public HttpEntity<String> buildJsonEntity(String json) {
@@ -178,12 +180,12 @@ public class ManageClient extends LoggingObject {
         }
     }
 
-    public RestTemplate getRestTemplate() {
-        return restTemplate;
+    public URI buildUri(String path) {
+        return manageConfig.buildUri(path);
     }
 
-    public String getBaseUrl() {
-        return baseUrl;
+    public RestTemplate getRestTemplate() {
+        return restTemplate;
     }
 
     public RestTemplate getAdminRestTemplate() {

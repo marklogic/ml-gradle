@@ -1,11 +1,15 @@
 package com.marklogic.rest.util;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 public class RestConfig {
 
     private String host;
     private int port;
     private String username;
     private String password;
+    private String scheme = "http";
 
     public RestConfig() {
     }
@@ -19,11 +23,27 @@ public class RestConfig {
 
     @Override
     public String toString() {
-        return String.format("[host: %s, port: %d, username: %s]", host, port, username);
+        return String.format("[scheme: %s, host: %s, port: %d, username: %s]", scheme, host, port, username);
+    }
+
+    /**
+     * Using the java.net.URI constructor that takes a string. Using any other constructor runs into encoding problems,
+     * e.g. when a mimetype has a plus in it, that plus needs to be encoded, but doing as %2B will result in the % being
+     * double encoded.
+     * 
+     * @param path
+     * @return
+     */
+    public URI buildUri(String path) {
+        try {
+            return new URI(String.format("%s://%s:%d%s", getScheme(), getHost(), getPort(), path));
+        } catch (URISyntaxException ex) {
+            throw new RuntimeException("Unable to build URI for path: " + path + "; cause: " + ex.getMessage(), ex);
+        }
     }
 
     public String getBaseUrl() {
-        return String.format("http://%s:%d", host, port);
+        return String.format("%s://%s:%d", scheme, host, port);
     }
 
     public String getHost() {
@@ -56,5 +76,13 @@ public class RestConfig {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getScheme() {
+        return scheme;
+    }
+
+    public void setScheme(String scheme) {
+        this.scheme = scheme;
     }
 }

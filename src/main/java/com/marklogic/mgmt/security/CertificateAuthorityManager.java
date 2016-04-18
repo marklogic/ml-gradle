@@ -25,7 +25,7 @@ public class CertificateAuthorityManager extends AbstractManager {
         headers.setContentType(MediaType.TEXT_PLAIN);
 
         HttpEntity<String> entity = new HttpEntity<String>(payload, headers);
-        ResponseEntity<String> response = t.exchange(manageClient.getBaseUrl() + "/manage/v2/certificate-authorities",
+        ResponseEntity<String> response = t.exchange(manageClient.buildUri("/manage/v2/certificate-authorities"),
                 HttpMethod.POST, entity, String.class);
         return response;
     }
@@ -33,7 +33,7 @@ public class CertificateAuthorityManager extends AbstractManager {
     public ResourcesFragment getAsXml() {
         return new ResourcesFragment(manageClient.getXml("/manage/v2/certificate-authorities"));
     }
-    
+
     public void delete(String resourceIdOrName) {
         manageClient.delete("/manage/v2/certificate-authorities/" + resourceIdOrName);
     }

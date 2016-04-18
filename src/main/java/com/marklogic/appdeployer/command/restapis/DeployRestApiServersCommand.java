@@ -147,7 +147,7 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
     protected boolean deleteRestApi(String serverName, String groupName, ManageClient manageClient,
             boolean includeModules, boolean includeContent) {
         if (new ServerManager(manageClient, groupName).exists(serverName)) {
-            String path = format("%s/v1/rest-apis/%s?", manageClient.getBaseUrl(), serverName);
+            String path = format("/v1/rest-apis/%s?", serverName);
             if (includeModules) {
                 path += "include=modules&";
             }
@@ -155,7 +155,7 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
                 path += "include=content";
             }
             logger.info("Deleting REST API, path: " + path);
-            manageClient.getRestTemplate().exchange(path, HttpMethod.DELETE, null, String.class);
+            manageClient.getRestTemplate().exchange(manageClient.buildUri(path), HttpMethod.DELETE, null, String.class);
             logger.info("Deleted REST API");
             return true;
         } else {

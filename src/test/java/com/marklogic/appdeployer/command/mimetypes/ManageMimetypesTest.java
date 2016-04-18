@@ -19,7 +19,7 @@ public class ManageMimetypesTest extends AbstractManageResourceTest {
 
     @Override
     protected String[] getResourceNames() {
-        return new String[] { "text/gradle" };
+        return new String[] { "application/ditamap+xml" };
     }
 
 }

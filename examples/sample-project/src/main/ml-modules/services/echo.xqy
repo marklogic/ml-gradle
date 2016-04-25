@@ -2,6 +2,8 @@ xquery version "1.0-ml";
 
 module namespace service = "http://marklogic.com/rest-api/resource/echo";
 
+import module namespace sample = "urn:sampleapp" at "/ext/sample-project/lib/sample-lib.xqy";
+
 declare function get(
   $context as map:map,
   $params  as map:map
@@ -9,8 +11,7 @@ declare function get(
 {
   document {
     text {
-      "You said:", 
-      map:get($params, "text")
+      sample:echo(map:get($params, "text"))
     }
   }
 };

@@ -13,8 +13,15 @@ import com.marklogic.mgmt.appservers.ServerManager;
  */
 public class UpdateRestApiServersCommand extends AbstractCommand {
 
+    private String restApiFilename;
+
     public UpdateRestApiServersCommand() {
         setExecuteSortOrder(SortOrderConstants.UPDATE_REST_API_SERVERS);
+    }
+
+    public UpdateRestApiServersCommand(String restApiFilename) {
+        this();
+        this.restApiFilename = restApiFilename;
     }
 
     /**
@@ -23,7 +30,7 @@ public class UpdateRestApiServersCommand extends AbstractCommand {
      */
     @Override
     public void execute(CommandContext context) {
-        File f = context.getAppConfig().getConfigDir().getRestApiServerFile();
+        File f = findRestApiConfigFile(context);
         if (f.exists()) {
             AppConfig appConfig = context.getAppConfig();
 
@@ -43,4 +50,11 @@ public class UpdateRestApiServersCommand extends AbstractCommand {
         }
     }
 
+    protected File findRestApiConfigFile(CommandContext context) {
+        if (restApiFilename != null) {
+            return new File(context.getAppConfig().getConfigDir().getBaseDir(), restApiFilename);
+        } else {
+            return context.getAppConfig().getConfigDir().getRestApiServerFile();
+        }
+    }
 }

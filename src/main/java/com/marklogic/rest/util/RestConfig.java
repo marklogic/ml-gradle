@@ -30,13 +30,13 @@ public class RestConfig {
      * Using the java.net.URI constructor that takes a string. Using any other constructor runs into encoding problems,
      * e.g. when a mimetype has a plus in it, that plus needs to be encoded, but doing as %2B will result in the % being
      * double encoded.
-     * 
+     *
      * @param path
      * @return
      */
     public URI buildUri(String path) {
         try {
-            return new URI(String.format("%s://%s:%d%s", getScheme(), getHost(), getPort(), path));
+            return new URI(String.format("%s://%s:%d%s", getScheme(), getHost(), getPort(), path.replace(" ", "+")));
         } catch (URISyntaxException ex) {
             throw new RuntimeException("Unable to build URI for path: " + path + "; cause: " + ex.getMessage(), ex);
         }

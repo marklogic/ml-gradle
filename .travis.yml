@@ -1,0 +1,11 @@
+language: java
+jdk:
+  - oraclejdk7
+sudo: true
+before_install:
+  - echo 'America/Los_Angeles' | sudo tee /etc/timezone
+  - sudo dpkg-reconfigure --frontend noninteractive tzdata
+install:
+  - ./shared/dev-tasks/install-dependencies.sh
+script:
+  - '[ "${TRAVIS_SECURE_ENV_VARS}" = "false" ] && ./gradlew test'

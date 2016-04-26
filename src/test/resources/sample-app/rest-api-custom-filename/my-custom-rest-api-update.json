@@ -1,0 +1,4 @@
+{
+  "server-name": "my-custom-rest-api",
+  "default-error-format": "json"
+}

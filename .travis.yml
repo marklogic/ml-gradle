@@ -8,4 +8,4 @@ before_install:
 install:
   - ./shared/dev-tasks/install-dependencies.sh
 script:
-  - '[ "${TRAVIS_SECURE_ENV_VARS}" = "false" ] && ./gradlew test'
+  - ./shared/dev-tasks/run-tests.sh

@@ -14,7 +14,7 @@ import com.marklogic.xcc.DocumentFormat;
 public class DefaultDocumentFormatGetter implements DocumentFormatGetter, FormatGetter {
 
     public final static String[] DEFAULT_BINARY_EXTENSIONS = new String[] { ".swf", ".jpeg", ".jpg", ".png", ".gif",
-            ".svg", ".ttf", ".eot", ".woff", ".cur", ".ico" };
+            ".svg", ".ttf", ".eot", ".woff", ".woff2", ".otf", ".cur", ".ico" };
 
     private List<String> binaryExtensions = new ArrayList<String>();
 

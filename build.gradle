@@ -42,11 +42,6 @@ publishing {
       artifact sourcesJar
     }
   }
-  repositories {
-    maven {
-      url publishUrl
-    }
-  }
 }
  
 if (project.hasProperty("myBintrayUser")) {
@@ -60,7 +55,7 @@ if (project.hasProperty("myBintrayUser")) {
       licenses = ['Apache-2.0']
       vcsUrl = 'https://github.com/rjrudin/' + project.name + '.git'
       version {
-        name = "2.8.0"
+        name = "2.8.1"
         released = new Date()
       }
     }

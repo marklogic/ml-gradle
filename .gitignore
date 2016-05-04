@@ -28,3 +28,5 @@ examples/shell-project/.settings
 examples/shell-project/.project
 examples/shell-project/.classpath
 examples/minimal-project/.gradle
+.idea
+*.iml

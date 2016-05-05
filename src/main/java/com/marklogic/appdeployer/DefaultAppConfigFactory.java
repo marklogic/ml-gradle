@@ -60,6 +60,12 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
             c.setTestRestPort(Integer.parseInt(prop));
         }
 
+        prop = getProperty("mlAppServicesPort");
+        if (prop != null) {
+            logger.info("App services port: " + prop);
+            c.setAppServicesPort(Integer.parseInt(prop));
+        }
+
         prop = getProperty("mlRestAdminUsername");
         if (prop != null) {
             logger.info("REST admin username: " + prop);

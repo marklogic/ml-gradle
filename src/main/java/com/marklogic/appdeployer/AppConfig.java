@@ -67,6 +67,7 @@ public class AppConfig {
 
     private Integer restPort = DEFAULT_PORT;
     private Integer testRestPort;
+    private Integer appServicesPort = 8000;
 
     // These can all be set to override the default names that are generated off of the "name" attribute.
     private String groupName = DEFAULT_GROUP;
@@ -168,6 +169,9 @@ public class AppConfig {
         l.setUsername(getRestAdminUsername());
         l.setPassword(getRestAdminPassword());
         l.setDatabaseName(getModulesDatabaseName());
+        if (getAppServicesPort() != null) {
+            l.setPort(getAppServicesPort());
+        }
 
         String permissions = getModulePermissions();
         if (permissions != null) {
@@ -507,5 +511,13 @@ public class AppConfig {
 
     public void setForestCounts(Map<String, Integer> forestCounts) {
         this.forestCounts = forestCounts;
+    }
+
+    public Integer getAppServicesPort() {
+        return appServicesPort;
+    }
+
+    public void setAppServicesPort(Integer appServicesPort) {
+        this.appServicesPort = appServicesPort;
     }
 }

@@ -33,4 +33,11 @@ public class XmlExtensionMetadataProviderTest extends Assert {
         assertEquals("xs:boolean", method.get("edit").get(0));
     }
 
+    @Test
+    public void missingMetadata() throws Exception {
+        DefaultExtensionMetadataProvider p = new DefaultExtensionMetadataProvider();
+        Resource resource = new ClassPathResource("sample-base-dir/services/another-sample.xq");
+        ExtensionMetadataAndParams emap = p.provideExtensionMetadataAndParams(resource);
+        assertEquals("Title should default to the filename minus the extension", "another-sample", emap.metadata.getTitle());
+    }
 }

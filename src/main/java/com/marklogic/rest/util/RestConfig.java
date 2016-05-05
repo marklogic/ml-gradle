@@ -29,12 +29,16 @@ public class RestConfig {
     /**
      * Using the java.net.URI constructor that takes a string. Using any other constructor runs into encoding problems,
      * e.g. when a mimetype has a plus in it, that plus needs to be encoded, but doing as %2B will result in the % being
-     * double encoded.
+     * double encoded. Unfortunately, it seems some encoding is still needed - e.g. for a pipeline like "Flexible Replication"
+     * with a space in its name, the space must be encoded properly as a "+".
      * 
      * @param path
      * @return
      */
     public URI buildUri(String path) {
+        if (path.contains(" ")) {
+            path = path.replace(" ", "+");
+        }
         try {
             return new URI(String.format("%s://%s:%d%s", getScheme(), getHost(), getPort(), path));
         } catch (URISyntaxException ex) {
@@ -45,7 +49,7 @@ public class RestConfig {
     public String getBaseUrl() {
         return String.format("%s://%s:%d", scheme, host, port);
     }
-
+    
     public String getHost() {
         return host;
     }

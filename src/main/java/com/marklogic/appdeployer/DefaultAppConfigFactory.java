@@ -118,6 +118,13 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
             logger.info("Flexrep path: " + prop);
             c.setFlexrepPath(prop);
         }
+
+        prop = getProperty("mlGroupName");
+        if (prop != null) {
+            logger.info("Group name: " + prop);
+            c.setGroupName(prop);
+        }
+
         return c;
     }
 

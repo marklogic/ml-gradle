@@ -56,7 +56,8 @@ public class DefaultAppConfigFactoryTest extends Assert {
         p.setProperty("mlConfigDir", "src/test/resources/sample-app/empty-ml-config");
         p.setProperty("mlSimpleSsl", "anyvalue");
         p.setProperty("mlModulesDatabaseName", "my-modules");
-        
+        p.setProperty("mlGroupName", "other-group");
+
         sut = new DefaultAppConfigFactory(new SimplePropertySource(p));
         AppConfig config = sut.newAppConfig();
 
@@ -75,6 +76,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
         assertNotNull(config.getRestSslContext());
         assertNotNull(config.getRestSslHostnameVerifier());
         assertEquals("my-modules", config.getModulesDatabaseName());
+        assertEquals("other-group", config.getGroupName());
     }
 
     @Test

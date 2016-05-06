@@ -29,7 +29,17 @@ declare function transform(
   </xsl:template>
 </xsl:stylesheet>
 '''
-    
+
+	final static String METADATA_TEMPLATE = '''<metadata>
+  <title>%%TRANSFORM_NAME%%</title>
+  <description>
+    <div>
+      Use HTML content to provide a description of this template.
+    </div>
+  </description>
+</metadata>
+'''
+
     String transformsDir
 
     @TaskAction
@@ -37,24 +47,31 @@ declare function transform(
         String propName = "transformName"
         if (getProject().hasProperty(propName)) {
             transformsDir = transformsDir ? transformsDir : getAppConfig().getModulePaths().get(0) + "/transforms"
-            
+
             String name = getProject().getProperties().get(propName)
-            
+
             String defaultType = "xqy"
             String type = "xqy"
             String propType = "transformType"
             if (getProject().hasProperty(propType)) {
                 type = getProject().getProperties().get(propType)
             }
-            
+
             String template = type == "xqy" ? XQUERY_TEMPLATE : XSL_TEMPLATE
             String suffix = type == "xqy" ? ".xqy" : ".xsl"
             String transform = template.replace("%%TRANSFORM_NAME%%", name)
-            
+
             new File(transformsDir).mkdirs()
             def transformFile = new File(transformsDir, name + suffix)
             println "Creating new transform at " + transformFile.getAbsolutePath()
             transformFile.write(transform)
+
+			def metadataDir = new File(transformsDir, "metadata")
+			metadataDir.mkdirs()
+			String metadata = METADATA_TEMPLATE.replace("%%TRANSFORM_NAME%%", name)
+			def metadataFile = new File(metadataDir, name + ".xml")
+			println "Creating new transform metadata file at " + metadataFile.getAbsolutePath()
+			metadataFile.write(metadata)
         } else {
             println "Use -PtransformName=your-transform-name [-PtransformType=(xqy|xslt)] when invoking Gradle to specify a transform name"
         }

@@ -24,7 +24,12 @@ class WatchTask extends MarkLogicTask {
     public void watchModules() {
         LoadModulesCommand command = getProject().property("mlLoadModulesCommand")
         
+        // Adjust the loader to catch exceptions by default
         ModulesLoader loader = command.getModulesLoader()
+        if (loader == null) {
+            command.initializeDefaultModulesLoader(getCommandContext())
+            loader = command.getModulesLoader()
+        }
         if (loader instanceof DefaultModulesLoader) {
             ((DefaultModulesLoader)loader).setCatchExceptions(true)
         }

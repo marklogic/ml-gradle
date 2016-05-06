@@ -294,4 +294,8 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
     public void setModuleTokenReplacer(ModuleTokenReplacer moduleTokenReplacer) {
         this.moduleTokenReplacer = moduleTokenReplacer;
     }
+
+    public ModuleTokenReplacer getModuleTokenReplacer() {
+        return moduleTokenReplacer;
+    }
 }

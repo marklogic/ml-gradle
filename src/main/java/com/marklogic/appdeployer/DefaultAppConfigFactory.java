@@ -131,6 +131,18 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
             c.setGroupName(prop);
         }
 
+        prop = getProperty("mlReplaceTokensInModules");
+        if (prop != null) {
+            logger.info("Replace tokens in modules: " + prop);
+            c.setReplaceTokensInModules(Boolean.parseBoolean(prop));
+        }
+
+        prop = getProperty("mlUseRoxyTokenPrefix");
+        if (prop != null) {
+            logger.info("Use Roxy token prefix of '@ml.': " + prop);
+            c.setUseRoxyTokenPrefix(Boolean.parseBoolean(prop));
+        }
+
         return c;
     }
 

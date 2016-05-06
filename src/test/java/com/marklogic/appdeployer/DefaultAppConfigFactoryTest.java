@@ -58,6 +58,8 @@ public class DefaultAppConfigFactoryTest extends Assert {
         p.setProperty("mlModulesDatabaseName", "my-modules");
         p.setProperty("mlGroupName", "other-group");
         p.setProperty("mlAppServicesPort", "8123");
+        p.setProperty("mlReplaceTokensInModules", "false");
+        p.setProperty("mlUseRoxyTokenPrefix", "false");
 
         sut = new DefaultAppConfigFactory(new SimplePropertySource(p));
         AppConfig config = sut.newAppConfig();
@@ -79,6 +81,8 @@ public class DefaultAppConfigFactoryTest extends Assert {
         assertEquals("my-modules", config.getModulesDatabaseName());
         assertEquals("other-group", config.getGroupName());
         assertEquals((Integer) 8123, config.getAppServicesPort());
+        assertFalse(config.isReplaceTokensInModules());
+        assertFalse(config.isUseRoxyTokenPrefix());
     }
 
     @Test

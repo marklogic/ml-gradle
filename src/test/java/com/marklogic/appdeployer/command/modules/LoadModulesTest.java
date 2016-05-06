@@ -2,6 +2,7 @@ package com.marklogic.appdeployer.command.modules;
 
 import java.io.File;
 
+import com.marklogic.junit.Fragment;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,14 +60,29 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
     }
 
     @Test
-    public void loadModulesWithAssetFileFilter() {
+    public void loadModulesWithAssetFileFilterAndTokenReplacement() {
         appConfig.setAssetFileFilter(new TestFileFilter());
+
+        /**
+         * Add a couple tokens to replace in the modules. It's still a good practice to ensure these tokens don't
+         * hit on anything accidentally, so their names are capitalized. But since the module token replacement
+         * follows the Roxy convention by default and prefixes properties with "@ml.", our modules then need
+         * "@ml.%%COLOR%%", for example.
+         */
+        appConfig.getCustomTokens().put("COLOR", "red");
+        appConfig.getCustomTokens().put("DESCRIPTION", "${COLOR} description");
 
         initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
         appDeployer.deploy(appConfig);
 
         assertEquals("true", xccTemplate.executeAdhocQuery("doc-available('/ext/lib/test.xqy')"));
         assertEquals("false", xccTemplate.executeAdhocQuery("doc-available('/ext/lib/test2.xqy')"));
+
+        String xml = xccTemplate.executeAdhocQuery("doc('/ext/lib/test.xqy')");
+        Fragment f = parse(xml);
+        f.assertElementValue("/test/color", "red");
+        f.assertElementValue("/test/description", "red description");
+
     }
 
     @Test

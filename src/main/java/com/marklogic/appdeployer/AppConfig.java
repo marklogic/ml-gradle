@@ -1,26 +1,26 @@
 package com.marklogic.appdeployer;
 
-import java.io.FileFilter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.net.ssl.SSLContext;
-
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.DatabaseClientFactory.Authentication;
 import com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier;
 import com.marklogic.client.modulesloader.impl.XccAssetLoader;
 import com.marklogic.client.modulesloader.ssl.SimpleX509TrustManager;
+import com.marklogic.client.modulesloader.tokenreplacer.DefaultModuleTokenReplacer;
+import com.marklogic.client.modulesloader.tokenreplacer.ModuleTokenReplacer;
+import com.marklogic.client.modulesloader.tokenreplacer.PropertiesSource;
+import com.marklogic.client.modulesloader.tokenreplacer.RoxyModuleTokenReplacer;
 import com.marklogic.client.modulesloader.xcc.DefaultDocumentFormatGetter;
+
+import javax.net.ssl.SSLContext;
+import java.io.FileFilter;
+import java.util.*;
 
 /**
  * Encapsulates common configuration properties for an application deployed to MarkLogic. These properties include not
  * just names of application resources - such as app servers and databases - but also connection information for loading
  * modules into an application as well as paths for modules and configuration files.
- * 
+ * <p>
  * An instance of this class is passed in as the main argument to the methods in the {@code AppDeployer} interface,
  * meaning that you're free to not just configure this as needed but also subclass it and add anything that you would
  * like.
@@ -106,6 +106,13 @@ public class AppConfig {
     // Path to use for DeployFlexrepCommand
     private String flexrepPath;
 
+    // Whether or not to replace tokens in modules
+    private boolean replaceTokensInModules = true;
+    // Whether or not to prefix each module token with "@ml."
+    private boolean useRoxyTokenPrefix = true;
+    // Additional PropertiesSources instance to use for replacing module tokens
+    private List<PropertiesSource> moduleTokensPropertiesSources = new ArrayList<>();
+
     private Map<String, Integer> forestCounts = new HashMap<>();
 
     public AppConfig() {
@@ -131,7 +138,7 @@ public class AppConfig {
     /**
      * Convenience method for constructing a MarkLogic Java API DatabaseClient based on the host, restPort,
      * restAdminUsername, restAdminPassword, restAuthentication, restSslContext, and restSslHostnameVerifier properties.
-     * 
+     *
      * @return
      */
     public DatabaseClient newDatabaseClient() {
@@ -141,7 +148,7 @@ public class AppConfig {
 
     /**
      * Just like newDatabaseClient, but uses testRestPort.
-     * 
+     *
      * @return
      */
     public DatabaseClient newTestDatabaseClient() {
@@ -151,7 +158,7 @@ public class AppConfig {
 
     /**
      * Like newDatabaseClient, but connects to schemas database.
-     * 
+     *
      * @return
      */
     public DatabaseClient newSchemasDatabaseClient() {
@@ -191,14 +198,39 @@ public class AppConfig {
             l.setFileFilter(assetFileFilter);
         }
 
-        return l;
+        if (isReplaceTokensInModules()) {
+            l.setModuleTokenReplacer(buildModuleTokenReplacer());
+        }
 
+        return l;
+    }
+
+    protected ModuleTokenReplacer buildModuleTokenReplacer() {
+        DefaultModuleTokenReplacer r = isUseRoxyTokenPrefix() ? new RoxyModuleTokenReplacer() : new DefaultModuleTokenReplacer();
+        if (customTokens != null && !customTokens.isEmpty()) {
+            r.addPropertiesSource(new PropertiesSource() {
+                @Override
+                public Properties getProperties() {
+                    Properties p = new Properties();
+                    p.putAll(customTokens);
+                    return p;
+                }
+            });
+        }
+
+        if (getModuleTokensPropertiesSources() != null) {
+            for (PropertiesSource ps : getModuleTokensPropertiesSources()) {
+                r.addPropertiesSource(ps);
+            }
+        }
+
+        return r;
     }
 
     /**
      * @return true if {@code testRestPort} is set and greater than zero. This is used as an indicator that an
-     *         application wants test resources - most likely a separate app server and content database - created as
-     *         part of a deployment.
+     * application wants test resources - most likely a separate app server and content database - created as
+     * part of a deployment.
      */
     public boolean isTestPortSet() {
         return testRestPort != null && testRestPort > 0;
@@ -211,11 +243,19 @@ public class AppConfig {
         return restServerName != null ? restServerName : name;
     }
 
+    public void setRestServerName(String restServerName) {
+        this.restServerName = restServerName;
+    }
+
     /**
      * @return {@code testRestServerName} if it is set; {@code name}-test otherwise
      */
     public String getTestRestServerName() {
         return testRestServerName != null ? testRestServerName : name + "-test";
+    }
+
+    public void setTestRestServerName(String testRestServerName) {
+        this.testRestServerName = testRestServerName;
     }
 
     /**
@@ -225,11 +265,19 @@ public class AppConfig {
         return contentDatabaseName != null ? contentDatabaseName : name + "-content";
     }
 
+    public void setContentDatabaseName(String contentDatabaseName) {
+        this.contentDatabaseName = contentDatabaseName;
+    }
+
     /**
      * @return {@code testContentDatabaseName} if it is set; {@code name}-test-content otherwise
      */
     public String getTestContentDatabaseName() {
         return testContentDatabaseName != null ? testContentDatabaseName : name + "-test-content";
+    }
+
+    public void setTestContentDatabaseName(String testContentDatabaseName) {
+        this.testContentDatabaseName = testContentDatabaseName;
     }
 
     /**
@@ -239,11 +287,19 @@ public class AppConfig {
         return modulesDatabaseName != null ? modulesDatabaseName : name + "-modules";
     }
 
+    public void setModulesDatabaseName(String modulesDatabaseName) {
+        this.modulesDatabaseName = modulesDatabaseName;
+    }
+
     /**
      * @return {@code triggersDatabaseName} if it is set; {@code name}-triggers otherwise
      */
     public String getTriggersDatabaseName() {
         return triggersDatabaseName != null ? triggersDatabaseName : name + "-triggers";
+    }
+
+    public void setTriggersDatabaseName(String triggersDatabaseName) {
+        this.triggersDatabaseName = triggersDatabaseName;
     }
 
     /**
@@ -253,9 +309,13 @@ public class AppConfig {
         return schemasDatabaseName != null ? schemasDatabaseName : name + "-schemas";
     }
 
+    public void setSchemasDatabaseName(String schemasDatabaseName) {
+        this.schemasDatabaseName = schemasDatabaseName;
+    }
+
     /**
      * @return the name of the application, which is then used to generate app server and database names unless those
-     *         are set via their respective properties
+     * are set via their respective properties
      */
     public String getName() {
         return name;
@@ -311,7 +371,7 @@ public class AppConfig {
 
     /**
      * @return the post of the REST API server used for loading modules that are specific to a test server (currently,
-     *         just search options)
+     * just search options)
      */
     public Integer getTestRestPort() {
         return testRestPort;
@@ -345,7 +405,7 @@ public class AppConfig {
 
     /**
      * @return the name of the group in which the application associated with this configuration should have its app
-     *         servers and other group-specific resources
+     * servers and other group-specific resources
      */
     public String getGroupName() {
         return groupName;
@@ -357,7 +417,7 @@ public class AppConfig {
 
     /**
      * @return the MarkLogic Java Client {@code Authentication} object that is used for authenticating with a REST API
-     *         server for loading modules
+     * server for loading modules
      */
     public Authentication getRestAuthentication() {
         return restAuthentication;
@@ -369,8 +429,8 @@ public class AppConfig {
 
     /**
      * @return a {@code ConfigDir} instance that defines the location of the configuration directory (where files are
-     *         stored that are then loaded via MarkLogic Management API endpoints) as well as paths to specific
-     *         resources within that directory
+     * stored that are then loaded via MarkLogic Management API endpoints) as well as paths to specific
+     * resources within that directory
      */
     public ConfigDir getConfigDir() {
         return configDir;
@@ -382,8 +442,8 @@ public class AppConfig {
 
     /**
      * @return a map of tokens that are intended to be replaced with their associated values in configuration files.
-     *         This map allows for externalized properties to be passed into configuration files - e.g. Gradle
-     *         properties can be swapped in for tokens in configuration files at deploy time.
+     * This map allows for externalized properties to be passed into configuration files - e.g. Gradle
+     * properties can be swapped in for tokens in configuration files at deploy time.
      */
     public Map<String, String> getCustomTokens() {
         return customTokens;
@@ -395,7 +455,7 @@ public class AppConfig {
 
     /**
      * @return whether a triggers database should be created by default; defaults to true, as it's very common to need a
-     *         triggers database, such as for CPF, Alerting, custom triggers, etc.
+     * triggers database, such as for CPF, Alerting, custom triggers, etc.
      */
     public boolean isCreateTriggersDatabase() {
         return createTriggersDatabase;
@@ -407,7 +467,7 @@ public class AppConfig {
 
     /**
      * @return a Java {@code SSLContext} for making an SSL connection with the REST API server for loading modules; null
-     *         if an SSL connection is not required
+     * if an SSL connection is not required
      */
     public SSLContext getRestSslContext() {
         return restSslContext;
@@ -419,7 +479,7 @@ public class AppConfig {
 
     /**
      * @return a MarkLogic Java Client {@code SSLHostnameVerifier} that is used to make an SSL connection to the REST
-     *         API server for loading modules; null if an SSL connection is not required
+     * API server for loading modules; null if an SSL connection is not required
      */
     public SSLHostnameVerifier getRestSslHostnameVerifier() {
         return restSslHostnameVerifier;
@@ -427,34 +487,6 @@ public class AppConfig {
 
     public void setRestSslHostnameVerifier(SSLHostnameVerifier restSslHostnameVerifier) {
         this.restSslHostnameVerifier = restSslHostnameVerifier;
-    }
-
-    public void setRestServerName(String restServerName) {
-        this.restServerName = restServerName;
-    }
-
-    public void setTestRestServerName(String testRestServerName) {
-        this.testRestServerName = testRestServerName;
-    }
-
-    public void setContentDatabaseName(String contentDatabaseName) {
-        this.contentDatabaseName = contentDatabaseName;
-    }
-
-    public void setTestContentDatabaseName(String testContentDatabaseName) {
-        this.testContentDatabaseName = testContentDatabaseName;
-    }
-
-    public void setModulesDatabaseName(String modulesDatabaseName) {
-        this.modulesDatabaseName = modulesDatabaseName;
-    }
-
-    public void setTriggersDatabaseName(String triggersDatabaseName) {
-        this.triggersDatabaseName = triggersDatabaseName;
-    }
-
-    public void setSchemasDatabaseName(String schemasDatabaseName) {
-        this.schemasDatabaseName = schemasDatabaseName;
     }
 
     public String[] getAdditionalBinaryExtensions() {
@@ -519,5 +551,29 @@ public class AppConfig {
 
     public void setAppServicesPort(Integer appServicesPort) {
         this.appServicesPort = appServicesPort;
+    }
+
+    public boolean isReplaceTokensInModules() {
+        return replaceTokensInModules;
+    }
+
+    public void setReplaceTokensInModules(boolean replaceTokensInModules) {
+        this.replaceTokensInModules = replaceTokensInModules;
+    }
+
+    public boolean isUseRoxyTokenPrefix() {
+        return useRoxyTokenPrefix;
+    }
+
+    public void setUseRoxyTokenPrefix(boolean useRoxyTokenPrefix) {
+        this.useRoxyTokenPrefix = useRoxyTokenPrefix;
+    }
+
+    public List<PropertiesSource> getModuleTokensPropertiesSources() {
+        return moduleTokensPropertiesSources;
+    }
+
+    public void setModuleTokensPropertiesSources(List<PropertiesSource> moduleTokensPropertiesSources) {
+        this.moduleTokensPropertiesSources = moduleTokensPropertiesSources;
     }
 }

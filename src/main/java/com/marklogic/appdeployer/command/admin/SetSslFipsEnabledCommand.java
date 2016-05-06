@@ -13,7 +13,7 @@ public class SetSslFipsEnabledCommand extends AbstractCommand {
 
     @Override
     public void execute(CommandContext context) {
-        context.getAdminManager().setSslFipsEnabled(sslFipsEnabled);
+        context.getAdminManager().setSslFipsEnabled(sslFipsEnabled, context.getAppConfig().getAppServicesPort());
     }
 
     public boolean isSslFipsEnabled() {

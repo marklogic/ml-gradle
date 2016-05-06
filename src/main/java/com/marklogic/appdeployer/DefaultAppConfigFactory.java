@@ -60,6 +60,12 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
             c.setTestRestPort(Integer.parseInt(prop));
         }
 
+        prop = getProperty("mlAppServicesPort");
+        if (prop != null) {
+            logger.info("App services port: " + prop);
+            c.setAppServicesPort(Integer.parseInt(prop));
+        }
+
         prop = getProperty("mlRestAdminUsername");
         if (prop != null) {
             logger.info("REST admin username: " + prop);
@@ -88,6 +94,12 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
             c.setModulePermissions(prop);
         }
 
+        prop = getProperty("mlModulesDatabaseName");
+        if (prop != null) {
+            logger.info("Modules database name: " + prop);
+            c.setModulesDatabaseName(prop);
+        }
+        
         prop = getProperty("mlAdditionalBinaryExtensions");
         if (prop != null) {
             String[] values = prop.split(",");
@@ -112,6 +124,25 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
             logger.info("Flexrep path: " + prop);
             c.setFlexrepPath(prop);
         }
+
+        prop = getProperty("mlGroupName");
+        if (prop != null) {
+            logger.info("Group name: " + prop);
+            c.setGroupName(prop);
+        }
+
+        prop = getProperty("mlReplaceTokensInModules");
+        if (prop != null) {
+            logger.info("Replace tokens in modules: " + prop);
+            c.setReplaceTokensInModules(Boolean.parseBoolean(prop));
+        }
+
+        prop = getProperty("mlUseRoxyTokenPrefix");
+        if (prop != null) {
+            logger.info("Use Roxy token prefix of '@ml.': " + prop);
+            c.setUseRoxyTokenPrefix(Boolean.parseBoolean(prop));
+        }
+
         return c;
     }
 

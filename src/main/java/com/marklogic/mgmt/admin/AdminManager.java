@@ -1,5 +1,7 @@
 package com.marklogic.mgmt.admin;
 
+import java.net.URI;
+
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -39,7 +41,7 @@ public class AdminManager extends AbstractManager {
     }
 
     public void init(String licenseKey, String licensee) {
-        final String url = adminConfig.getBaseUrl() + "/admin/v1/init";
+        final URI uri = adminConfig.buildUri("/admin/v1/init");
 
         String json = null;
         if (licenseKey != null && licensee != null) {
@@ -49,7 +51,7 @@ public class AdminManager extends AbstractManager {
         }
         final String payload = json;
 
-        logger.info("Initializing MarkLogic at: " + url);
+        logger.info("Initializing MarkLogic at: " + uri);
         invokeActionRequiringRestart(new ActionRequiringRestart() {
             @Override
             public boolean execute() {
@@ -57,7 +59,7 @@ public class AdminManager extends AbstractManager {
                 headers.setContentType(MediaType.APPLICATION_JSON);
                 HttpEntity<String> entity = new HttpEntity<String>(payload, headers);
                 try {
-                    ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+                    ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.POST, entity, String.class);
                     logger.info("Initialization response: " + response);
                     // According to http://docs.marklogic.com/REST/POST/admin/v1/init, a 202 is sent back in the event a
                     // restart is needed. A 400 or 401 will be thrown as an error by RestTemplate.
@@ -84,7 +86,7 @@ public class AdminManager extends AbstractManager {
     }
 
     public void installAdmin(String username, String password) {
-        final String url = adminConfig.getBaseUrl() + "/admin/v1/instance-admin";
+        final URI uri = adminConfig.buildUri("/admin/v1/instance-admin");
 
         String json = null;
         if (username != null && password != null) {
@@ -95,7 +97,7 @@ public class AdminManager extends AbstractManager {
         }
         final String payload = json;
 
-        logger.info("Installing admin user at: " + url);
+        logger.info("Installing admin user at: " + uri);
         invokeActionRequiringRestart(new ActionRequiringRestart() {
             @Override
             public boolean execute() {
@@ -103,7 +105,7 @@ public class AdminManager extends AbstractManager {
                 headers.setContentType(MediaType.APPLICATION_JSON);
                 HttpEntity<String> entity = new HttpEntity<String>(payload, headers);
                 try {
-                    ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+                    ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.POST, entity, String.class);
                     logger.info("Admin installation response: " + response);
                     // According to http://docs.marklogic.com/REST/POST/admin/v1/init, a 202 is sent back in the event a
                     // restart is needed. A 400 or 401 will be thrown as an error by RestTemplate.
@@ -137,7 +139,7 @@ public class AdminManager extends AbstractManager {
     }
 
     public String getLastRestartTimestamp() {
-        return restTemplate.getForEntity(adminConfig.getBaseUrl() + "/admin/v1/timestamp", String.class).getBody();
+        return restTemplate.getForEntity(adminConfig.buildUri("/admin/v1/timestamp"), String.class).getBody();
     }
 
     public void waitForRestart() {
@@ -167,9 +169,9 @@ public class AdminManager extends AbstractManager {
     }
 
     /**
-     * Set whether SSL FIPS is enabled on the cluster or not by running against /v1/eval on 8000.
+     * Set whether SSL FIPS is enabled on the cluster or not by running against /v1/eval on the given appServicesPort.
      */
-    public void setSslFipsEnabled(final boolean enabled) {
+    public void setSslFipsEnabled(final boolean enabled, final int appServicesPort) {
         final String xquery = "import module namespace admin = 'http://marklogic.com/xdmp/admin' at '/MarkLogic/admin.xqy'; "
                 + "admin:save-configuration(admin:cluster-set-ssl-fips-enabled(admin:get-configuration(), " + enabled
                 + "()))";
@@ -177,7 +179,7 @@ public class AdminManager extends AbstractManager {
         invokeActionRequiringRestart(new ActionRequiringRestart() {
             @Override
             public boolean execute() {
-                RestTemplate rt = RestTemplateUtil.newRestTemplate(adminConfig.getHost(), 8000,
+                RestTemplate rt = RestTemplateUtil.newRestTemplate(adminConfig.getHost(), appServicesPort,
                         adminConfig.getUsername(), adminConfig.getPassword());
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -185,7 +187,7 @@ public class AdminManager extends AbstractManager {
                 map.add("xquery", xquery);
                 HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<MultiValueMap<String, String>>(map,
                         headers);
-                String url = format("http://%s:8000/v1/eval", adminConfig.getHost());
+                String url = format("http://%s:%d/v1/eval", adminConfig.getHost(), appServicesPort);
                 if (logger.isInfoEnabled()) {
                     logger.info("Setting SSL FIPS enabled: " + enabled);
                 }
@@ -199,13 +201,13 @@ public class AdminManager extends AbstractManager {
     }
 
     public Fragment getServerConfig() {
-        return new Fragment(restTemplate.getForObject(adminConfig.getBaseUrl() + "/admin/v1/server-config", String.class));
+        return new Fragment(restTemplate.getForObject(adminConfig.buildUri("/admin/v1/server-config"), String.class));
     }
-    
+
     public String getServerVersion() {
         return getServerConfig().getElementValue("/m:host/m:version");
     }
-    
+
     public void setWaitForRestartCheckInterval(int waitForRestartCheckInterval) {
         this.waitForRestartCheckInterval = waitForRestartCheckInterval;
     }
@@ -213,5 +215,4 @@ public class AdminManager extends AbstractManager {
     public void setWaitForRestartLimit(int waitForRestartLimit) {
         this.waitForRestartLimit = waitForRestartLimit;
     }
-
 }

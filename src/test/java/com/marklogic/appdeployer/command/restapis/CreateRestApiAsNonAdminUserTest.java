@@ -7,15 +7,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.marklogic.junit.PermissionsFragment;
-import com.marklogic.xcc.template.XccTemplate;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
-import com.marklogic.appdeployer.command.modules.LoadModulesCommand;
 import com.marklogic.appdeployer.command.security.DeployRolesCommand;
 import com.marklogic.appdeployer.command.security.DeployUsersCommand;
+import com.marklogic.junit.PermissionsFragment;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.ManageConfig;
+import com.marklogic.xcc.template.XccTemplate;
 
 public class CreateRestApiAsNonAdminUserTest extends AbstractAppDeployerTest {
 
@@ -27,7 +26,6 @@ public class CreateRestApiAsNonAdminUserTest extends AbstractAppDeployerTest {
     @Before
     public void setup() {
         xccTemplate = newModulesXccTemplate();
-        deleteModuleTimestampsFile();
     }
 
     @After
@@ -55,7 +53,7 @@ public class CreateRestApiAsNonAdminUserTest extends AbstractAppDeployerTest {
         appConfig.setRestAdminPassword("sample-app-rest-admin");
 
         initializeAppDeployer(new DeployRestApiServersCommand(true), new DeployRolesCommand(), new DeployUsersCommand(),
-                new LoadModulesCommand());
+                buildLoadModulesCommand());
         appDeployer.deploy(appConfig);
 
         // And now ensure that the module was loaded correctly

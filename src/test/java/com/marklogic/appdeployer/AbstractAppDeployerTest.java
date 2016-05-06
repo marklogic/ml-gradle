@@ -7,12 +7,14 @@ import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import com.marklogic.xcc.template.XccTemplate;
 import com.marklogic.appdeployer.command.Command;
+import com.marklogic.appdeployer.command.modules.LoadModulesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.appdeployer.impl.SimpleAppDeployer;
+import com.marklogic.client.modulesloader.impl.DefaultModulesLoader;
 import com.marklogic.mgmt.AbstractMgmtTest;
 import com.marklogic.mgmt.ManageConfig;
+import com.marklogic.xcc.template.XccTemplate;
 
 /**
  * Base class for tests that depend on an AppDeployer instance. You can extend this directly to write a test for a
@@ -72,6 +74,10 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
         }
     }
 
+    protected void deploySampleApp() {
+        appDeployer.deploy(appConfig);
+    }
+    
     protected void undeploySampleApp() {
         try {
             appDeployer.undeploy(appConfig);
@@ -86,14 +92,18 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
     }
 
     /**
-     * This ensures that modules aren't not loaded because of the timestamps file.
+     * This command is configured to always load modules, ignoring the cache file in the build directory.
+     * @return
      */
-    protected void deleteModuleTimestampsFile() {
-        File f = new File("build/ml-last-configured-timestamps.properties");
-        if (f.exists()) {
-            logger.info("Deleting module timestamps file: " + f.getAbsolutePath());
-            f.delete();
-        }
+    protected LoadModulesCommand buildLoadModulesCommand() {
+        LoadModulesCommand command = new LoadModulesCommand();
+        DefaultModulesLoader loader = new DefaultModulesLoader(appConfig.newXccAssetLoader());
+        loader.setModulesManager(null);
+        command.setModulesLoader(loader);
+        return command;
     }
-
+    
+    protected void setConfigBaseDir(String path) {
+        appConfig.getConfigDir().setBaseDir(new File("src/test/resources/" + path));
+    }
 }

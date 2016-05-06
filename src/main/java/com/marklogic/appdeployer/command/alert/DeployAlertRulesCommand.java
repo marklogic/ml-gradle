@@ -15,7 +15,7 @@ public class DeployAlertRulesCommand extends AbstractCommand {
     private PayloadParser payloadParser = new PayloadParser();
 
     public DeployAlertRulesCommand() {
-        setExecuteSortOrder(SortOrderConstants.DEPLOY_ALERT_ACTIONS);
+        setExecuteSortOrder(SortOrderConstants.DEPLOY_ALERT_RULES);
     }
 
     @Override

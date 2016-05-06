@@ -24,6 +24,7 @@ public abstract class AbstractResourceManager extends AbstractManager implements
     }
 
     public String getResourcePath(String resourceNameOrId, String... resourceUrlParams) {
+        resourceNameOrId = encodeResourceId(resourceNameOrId);
         return appendParamsAndValuesToPath(format("%s/%s", getResourcesPath(), resourceNameOrId), resourceUrlParams);
     }
 
@@ -40,8 +41,8 @@ public abstract class AbstractResourceManager extends AbstractManager implements
     }
 
     public ResourcesFragment getAsXml() {
-        Fragment f = useAdminUser() ? manageClient.getXmlAsAdmin(getResourcesPath()) : manageClient
-                .getXml(getResourcesPath());
+        Fragment f = useAdminUser() ? manageClient.getXmlAsAdmin(getResourcesPath())
+                : manageClient.getXml(getResourcesPath());
         return new ResourcesFragment(f);
     }
 
@@ -84,6 +85,19 @@ public abstract class AbstractResourceManager extends AbstractManager implements
     }
 
     /**
+     * Mimetypes are likely to have a "+" in them, which the Management REST API won't support in a path - it needs to
+     * be encoded. Other resources could have a "+" in their ID value as well. However, doing a full encoding doesn't
+     * seem to be a great idea, as that will e.g. encode a forward slash in a mimetype as well, which will result in a
+     * 404.
+     * 
+     * @param idValue
+     * @return
+     */
+    protected String encodeResourceId(String idValue) {
+        return idValue != null ? idValue.replace("+", "%2B") : idValue;
+    }
+
+    /**
      * Most clients should just use the save method, but this is public for scenarios where a client knows an update
      * should be performed.
      * 
@@ -115,8 +129,8 @@ public abstract class AbstractResourceManager extends AbstractManager implements
     public DeleteReceipt delete(String payload, String... resourceUrlParams) {
         String resourceId = getResourceId(payload);
         if (!exists(resourceId)) {
-            logger.info(format("Could not find %s with name or ID of %s, so not deleting", getResourceName(),
-                    resourceId));
+            logger.info(
+                    format("Could not find %s with name or ID of %s, so not deleting", getResourceName(), resourceId));
             return new DeleteReceipt(resourceId, null, false);
         } else {
             String path = getResourcePath(resourceId, resourceUrlParams);

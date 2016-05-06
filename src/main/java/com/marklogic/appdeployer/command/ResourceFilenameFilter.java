@@ -31,8 +31,8 @@ public class ResourceFilenameFilter extends LoggingObject implements FilenameFil
     @Override
     public boolean accept(File dir, String name) {
         if (filenamesToIgnore != null && filenamesToIgnore.contains(name)) {
-            if (logger.isInfoEnabled()) {
-                logger.info("Ignoring filename: " + name);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Ignoring filename: " + name);
             }
             return false;
         }

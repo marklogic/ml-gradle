@@ -79,6 +79,33 @@ public class AmpManager extends AbstractResourceManager {
         return params.toArray(new String[] {});
     }
 
+    /**
+     * In ML 8.0-5.1 deleting an amp fails if the database is specified on the
+     * delete url
+     */
+    @Override
+    protected String[] getDeleteResourceParams(String payload) {
+        List<String> params = new ArrayList<String>();
+        params.add("document-uri");
+        if (payloadParser.isJsonPayload(payload)) {
+            JsonNode node = payloadParser.parseJson(payload);
+            params.add(node.get("document-uri").asText());
+            if (node.has("namespace")) {
+                params.add("namespace");
+                params.add(node.get("namespace").asText());
+            }
+        } else {
+            Fragment f = new Fragment(payload);
+            params.add(f.getElementValue("/node()/*[local-name(.) = 'document-uri']"));
+
+            String val = f.getElementValue("/node()/*[local-name(.) = 'namespace']");
+            if (val != null) {
+                params.add("namespace");
+                params.add(val);
+            }
+        }
+        return params.toArray(new String[] {});    }
+
     public void setNamespace(String namespace) {
         this.namespace = namespace;
     }

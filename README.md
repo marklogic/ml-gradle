@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/rjrudin/ml-app-deployer.svg?branch=dev)](https://travis-ci.org/rjrudin/ml-app-deployer)
+
 ## What is ml-app-deployer?
 
 ml-app-deployer is a Java library that provides two capabilities:

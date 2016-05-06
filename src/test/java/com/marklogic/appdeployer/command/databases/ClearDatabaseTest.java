@@ -4,7 +4,6 @@ import org.junit.After;
 import org.junit.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.appdeployer.command.modules.LoadModulesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.mgmt.databases.DatabaseManager;
 
@@ -17,14 +16,14 @@ public class ClearDatabaseTest extends AbstractAppDeployerTest {
 
     /**
      * Testing against the modules database, but the operation is the same regardless of database.
-     * 
+     *
      * Also, for the modules database, ml-gradle 1.+ had the ability to exclude certain modules from being deleted in
      * case those modules were needed by the REST API rewriter. But in that case, it's usually preferable to just use
      * the XCC approach for loading asset modules.
      */
     @Test
     public void modulesDatabase() {
-        initializeAppDeployer(new DeployRestApiServersCommand(), new LoadModulesCommand());
+        initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
 
         appDeployer.deploy(appConfig);
 

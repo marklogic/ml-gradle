@@ -29,7 +29,7 @@ public class UpdateRestApiServersTest extends AbstractAppDeployerTest {
                 appConfig.getTestRestServerName(), "digest");
 
         // Now redeploy with the update command
-        initializeAppDeployer(new DeployRestApiServersCommand(), new UpdateRestApiServersCommand());
+        initializeAppDeployer(new DeployRestApiServersCommand(true), new UpdateRestApiServersCommand());
         appDeployer.deploy(appConfig);
 
         assertAuthentication(

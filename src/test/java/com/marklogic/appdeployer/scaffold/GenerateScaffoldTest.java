@@ -7,7 +7,6 @@ import org.junit.Test;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
-import com.marklogic.appdeployer.command.modules.LoadModulesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.appdeployer.command.security.DeployRolesCommand;
 import com.marklogic.appdeployer.command.security.DeployUsersCommand;
@@ -37,7 +36,7 @@ public class GenerateScaffoldTest extends AbstractAppDeployerTest {
         appConfig.getModulePaths().add(path + "/src/main/ml-modules");
 
         initializeAppDeployer(new DeployRestApiServersCommand(), new DeployTriggersDatabaseCommand(),
-                new DeployUsersCommand(), new DeployRolesCommand(), new LoadModulesCommand());
+                new DeployUsersCommand(), new DeployRolesCommand(), buildLoadModulesCommand());
         appDeployer.deploy(appConfig);
 
         try {

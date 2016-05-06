@@ -2,6 +2,7 @@ package com.marklogic.appdeployer.command.modules;
 
 import java.io.File;
 
+import com.marklogic.junit.Fragment;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,9 +19,8 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 
     @Before
     public void setup() {
-        xccTemplate = new XccTemplate(format("xcc://%s:%s@%s:8000/%s", "admin",
-                "admin", appConfig.getHost(), appConfig.getModulesDatabaseName()));
-        deleteModuleTimestampsFile();
+        xccTemplate = new XccTemplate(format("xcc://%s:%s@%s:8000/%s", "admin", "admin", appConfig.getHost(),
+                appConfig.getModulesDatabaseName()));
     }
 
     @After
@@ -32,7 +32,7 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
     public void loadModulesFromMultiplePaths() {
         appConfig.getModulePaths().add("src/test/resources/sample-app/build/mlRestApi/some-library/ml-modules");
 
-        initializeAppDeployer(new DeployRestApiServersCommand(true), new LoadModulesCommand());
+        initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
 
         appDeployer.deploy(appConfig);
 
@@ -44,14 +44,14 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 
     @Test
     public void loadModulesWithCustomPermissions() {
-        LoadModulesCommand c = new LoadModulesCommand();
         appConfig.setModulePermissions(appConfig.getModulePermissions() + ",app-user,execute");
 
-        initializeAppDeployer(new DeployRestApiServersCommand(true), c);
+        initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
 
         appDeployer.deploy(appConfig);
 
         PermissionsFragment perms = getDocumentPermissions("/ext/sample-lib.xqy", xccTemplate);
+        perms.prettyPrint();
         perms.assertPermissionCount(4);
         perms.assertPermissionExists("rest-admin", "read");
         perms.assertPermissionExists("rest-admin", "update");
@@ -60,26 +60,41 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
     }
 
     @Test
-    public void loadModulesWithAssetFileFilter() {
-        LoadModulesCommand c = new LoadModulesCommand();
+    public void loadModulesWithAssetFileFilterAndTokenReplacement() {
         appConfig.setAssetFileFilter(new TestFileFilter());
 
-        initializeAppDeployer(new DeployRestApiServersCommand(true), c);
+        /**
+         * Add a couple tokens to replace in the modules. It's still a good practice to ensure these tokens don't
+         * hit on anything accidentally, so their names are capitalized. But since the module token replacement
+         * follows the Roxy convention by default and prefixes properties with "@ml.", our modules then need
+         * "@ml.%%COLOR%%", for example.
+         */
+        appConfig.getCustomTokens().put("COLOR", "red");
+        appConfig.getCustomTokens().put("DESCRIPTION", "${COLOR} description");
+
+        initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
         appDeployer.deploy(appConfig);
 
         assertEquals("true", xccTemplate.executeAdhocQuery("doc-available('/ext/lib/test.xqy')"));
         assertEquals("false", xccTemplate.executeAdhocQuery("doc-available('/ext/lib/test2.xqy')"));
+
+        String xml = xccTemplate.executeAdhocQuery("doc('/ext/lib/test.xqy')");
+        Fragment f = parse(xml);
+        f.assertElementValue("/test/color", "red");
+        f.assertElementValue("/test/description", "red description");
+
     }
 
     @Test
     public void testServerExists() {
         appConfig.getConfigDir().setBaseDir(new File(("src/test/resources/sample-app/db-only-config")));
         appConfig.setTestRestPort(8541);
-        initializeAppDeployer(new DeployRestApiServersCommand(true), new LoadModulesCommand());
+        initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
 
         appDeployer.deploy(appConfig);
 
-        String[] uris = new String[]{"/Default/sample-app/rest-api/options/sample-app-options.xml", "/Default/sample-app/rest-api/options/sample-app-options.xml"};
+        String[] uris = new String[] { "/Default/sample-app/rest-api/options/sample-app-options.xml",
+                "/Default/sample-app/rest-api/options/sample-app-options.xml" };
         for (String uri : uris) {
             assertEquals("true", xccTemplate.executeAdhocQuery(format("doc-available('%s')", uri)));
         }
@@ -100,7 +115,6 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
         perms.assertPermissionExists("rest-admin", "update");
         perms.assertPermissionExists("rest-extension-user", "execute");
     }
-
 }
 
 class TestFileFilter extends AssetFileFilter {

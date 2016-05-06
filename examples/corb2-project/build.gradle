@@ -5,7 +5,7 @@
  * task attributes, project properties, or System properties.
  */
 plugins {
-    id "com.marklogic.ml-gradle" version "2.0"
+    id "com.marklogic.ml-gradle" version "2.1.0"
 }
 
 repositories {

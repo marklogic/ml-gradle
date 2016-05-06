@@ -9,3 +9,8 @@ install:
   - ./shared/dev-tasks/install-dependencies.sh
 script:
   - ./shared/dev-tasks/run-tests.sh
+
+#whitelist
+branches:
+  only:
+    - dev

@@ -3,9 +3,15 @@ buildscript {
     jcenter()
     mavenLocal()
   }
-  dependencies { 
+  dependencies {
     classpath "com.marklogic:ml-gradle:${mlGradleVersion}"
   }
 }
 
 apply plugin: "com.marklogic.ml-gradle"
+
+ext {
+	mlAppConfig {
+		customTokens.put("CUSTOM_TOKEN", "testing")
+	}
+}

@@ -14,3 +14,6 @@ trim_trailing_whitespace = false
 
 [*.java]
 indent_size = 4
+
+[*.groovy]
+indent_size = 4

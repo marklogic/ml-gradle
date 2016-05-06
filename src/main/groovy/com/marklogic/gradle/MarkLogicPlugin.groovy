@@ -165,7 +165,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlReindexContentDatabase", type: ReindexContentDatabaseTask, group: dbGroup, description: "Reindex the database named by mlAppConfig.contentDatabaseName")
         project.task("mlReindexDatabase", type: ReindexDatabaseTask, group: dbGroup, description: "Reindex the database named by the project property dbName; e.g. gradle mlReindexDatabase -PdbName=my-database")
         project.task("mlSetContentUpdatesAllowed", type: SetContentUpdatesAllowedTask, group: dbGroup, description: "Sets updated-allowed on each primary forest for the content database; must set the mode via e.g. -Pmode=flash-backup")
-        
+
         String devGroup = "ml-gradle Development"
         project.task("mlScaffold", type: GenerateScaffoldTask, group: devGroup, description: "Generate project scaffold for a new project")
         project.task("mlCreateResource", type: CreateResourceTask, group: devGroup, description: "Create a new resource extension in the modules services directory")
@@ -186,10 +186,10 @@ class MarkLogicPlugin implements Plugin<Project> {
 
         String groupsGroup = "ml-gradle Group"
         project.task("mlDeployGroups", type: DeployGroupsTask, group: groupsGroup, description: "Deploy each group, updating it if it exists, in the configuration directory")
-        
+
         String mimetypesGroup = "ml-gradle Mimetypes"
         project.task("mlDeployMimetypes", type: DeployMimetypesTask, group: mimetypesGroup, description: "Deploy each mimetype, updating it if it exists, in the configuration directory")
-        
+
         String modulesGroup = "ml-gradle Modules"
         project.task("mlLoadModules", type: LoadModulesTask, group: modulesGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Loads modules from directories defined by mlAppConfig or via a property on this task").mustRunAfter(["mlClearModulesDatabase"])
         project.task("mlReloadModules", group: modulesGroup, dependsOn: ["mlClearModulesDatabase", "mlLoadModules"], description: "Reloads modules by first clearing the modules database and then loading modules")
@@ -199,11 +199,11 @@ class MarkLogicPlugin implements Plugin<Project> {
         String schemasGroup = "ml-gradle Schemas"
         project.task("mlLoadSchemas", type: LoadSchemasTask, group: schemasGroup, description: "Loads special-purpose data into the schemas database (XSD schemas, Inference rules, and [MarkLogic 9] Extraction Templates)").mustRunAfter("mlClearSchemasDatabase")
         project.task("mlReloadSchemas", dependsOn: ["mlClearSchemasDatabase", "mlLoadSchemas"], group: schemasGroup, description: "Clears schemas database then loads special-purpose data into the schemas database (XSD schemas, Inference rules, and [MarkLogic 9] Extraction Templates)")
-        
+
         String serverGroup = "ml-gradle Server"
         project.task("mlDeployServers", type: DeployServersTask, group: serverGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the REST API server (if it exists) and deploys each other server, updating it if it exists, in the configuration directory ")
         project.task("mlUndeployOtherServers", type: UndeployOtherServersTask, group: serverGroup, description: "Delete any non-REST API servers (e.g. ODBC and XBC servers) defined by server files in the configuration directory")
-        
+
         String securityGroup = "ml-gradle Security"
         project.task("mlDeployAmps", type: DeployAmpsTask, group: securityGroup, description: "Deploy each amp, updating it if it exists, in the configuration directory")
         project.task("mlDeployCertificateAuthorities", type: DeployCertificateAuthoritiesTask, group: securityGroup, description: "Deploy each certificate authority, updating it if it exists, in the configuration directory")
@@ -244,7 +244,11 @@ class MarkLogicPlugin implements Plugin<Project> {
         AdminConfig adminConfig = new DefaultAdminConfigFactory(new ProjectPropertySource(project)).newAdminConfig()
         project.extensions.add("mlAdminConfig", adminConfig)
 
-        AppConfig appConfig = new DefaultAppConfigFactory(new ProjectPropertySource(project)).newAppConfig()
+		ProjectPropertySource propertySource = new ProjectPropertySource(project);
+        AppConfig appConfig = new DefaultAppConfigFactory(propertySource).newAppConfig()
+		if (appConfig.isReplaceTokensInModules()) {
+			appConfig.getModuleTokensPropertiesSources().add(propertySource);
+		}
         project.extensions.add("mlAppConfig", appConfig)
 
         ManageConfig manageConfig = new DefaultManageConfigFactory(new ProjectPropertySource(project)).newManageConfig()
@@ -286,7 +290,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 
         /**
          * If the groovysh plugin has already been applied, then we can jvmArgs and args on the shell task automatically.
-         * Otherwise, the shell task needs to be configured in the Gradle file. 
+         * Otherwise, the shell task needs to be configured in the Gradle file.
          */
         if (project.getExtensions().findByName("groovysh")) {
             project.afterEvaluate {
@@ -329,7 +333,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         LoadSchemasCommand lsc = new LoadSchemasCommand()
         project.extensions.add("mlLoadSchemasCommand", lsc)
         commands.add(lsc)
-        
+
         // REST API instance creation
         commands.add(new DeployRestApiServersCommand())
 
@@ -379,7 +383,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         mimetypeCommands.add(new DeployMimetypesCommand())
         project.extensions.add("mlMimetypeCommands", mimetypeCommands)
         commands.addAll(mimetypeCommands)
-        
+
         // Forest replicas
         List<Command> replicaCommands = new ArrayList<Command>()
         replicaCommands.add(new ConfigureForestReplicasCommand())

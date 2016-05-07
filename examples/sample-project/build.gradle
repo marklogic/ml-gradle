@@ -6,7 +6,7 @@ buildscript {
      * This block is optional, and it shows one way to override properties based on an environment property that is
      * set when calling Gradle. For example, you could run "gradle -Penv=qa mlDeploy" in order to apply the env-qa.gradle
      * build file, which would set properties based on the QA environment. This doesn't have anything to do with ml-gradle -
-     * it just shows one technique for overriding properties. See env-prod.gradle and env-qa.gradle for more details. 
+     * it just shows one technique for overriding properties. See env-prod.gradle and env-qa.gradle for more details.
      *
      * Also see https://github.com/stevesaliman/gradle-properties-plugin for an elegant way of supporting properties files
      * for different environments.
@@ -21,7 +21,7 @@ buildscript {
      * This is another optional block, and it's a similar technique to the block above, but it instead is used for local
      * development. A developer can create a non-version-controlled local.gradle file and, within that file, override any
      * properties that are defined in gradle.properties. This also isn't specific to ml-gradle - it's just one way with
-     * Gradle to allow a developer to easily override gradle.properties for local development purposes. 
+     * Gradle to allow a developer to easily override gradle.properties for local development purposes.
      *
      * Also see https://github.com/stevesaliman/gradle-properties-plugin for an elegant way of supporting properties files
      * for different environments.
@@ -39,7 +39,7 @@ buildscript {
  * that those blocks can override properties before ml-gradle initializes itself.
  */
 plugins {
-  id "com.marklogic.ml-gradle" version "2.1.0" 
+  id "com.marklogic.ml-gradle" version "2.2.0-RC1"
 
   // The following plugins are optional
 
@@ -63,9 +63,6 @@ plugins {
  */
 repositories {
     jcenter()
-
-    // corb2 jar is stored here, waiting for bintray to mirror it
-    maven {url "https://dl.bintray.com/rjrudin/maven/"}
 }
 
 
@@ -83,11 +80,11 @@ configurations {
  */
 dependencies {
     // Needed to compile and run the JUnit tests
-    testCompile "com.marklogic:ml-junit:2.5"
+    testCompile "com.marklogic:ml-junit:2.6.0"
     testCompile "com.jayway.restassured:rest-assured:2.4.1"
-    
+
     // corb jar available from jcenter
-    corb "com.marklogic:marklogic-corb:2.2.1"
+    corb "com.marklogic:marklogic-corb:2.3.0"
 }
 
 
@@ -135,7 +132,7 @@ sourceSets.test.resources.srcDir 'src/test/java'
 /*
  * This is an example of both a custom Gradle task and an easy way of invoking Corb. This depends on "mlLoadModules" to
  * ensure that the Corb uris/transform modules are loaded. It also uses as a classpath the custom configuration named
- * "corb" that we defined earlier. Note that the sample uris.xqy and transform.xqy modules just print a log statement 
+ * "corb" that we defined earlier. Note that the sample uris.xqy and transform.xqy modules just print a log statement
  * for each document in your content database, so unless there are documents, you won't see any result from this. You
  * of course can modify the transform.xqy module to perform any action that you would like - this is just to show how
  * to invoke corb from Gradle.
@@ -148,10 +145,10 @@ task runCorb(dependsOn: ['mlLoadModules'], type: JavaExec) {
 
 
 /*
- * The management API has an operation for loading the default CPF pipelines - 
+ * The management API has an operation for loading the default CPF pipelines -
  * http://docs.marklogic.com/REST/POST/manage/v2/databases/[id-or-name]/pipelines. To load these as part of your
- * deployment process, just uncomment the line below. These pipelines will be loaded before your custom pipelines and 
- * domains, which means you can safely reference them in your domain configuration files. 
+ * deployment process, just uncomment the line below. These pipelines will be loaded before your custom pipelines and
+ * domains, which means you can safely reference them in your domain configuration files.
  */
 ext {
     //mlAppDeployer.commands.add(new com.marklogic.appdeployer.command.cpf.DeployDefaultPipelinesCommand())
@@ -164,11 +161,11 @@ ext {
  * each command provides a number of options for configuring the forests for a database. One reason ml-gradle does not
  * blindly process every file (as opposed to doing so for every other ML resource) is that this approach would make it
  * very difficult to configure the forests for each database.
- * 
+ *
  * So, if you want to create a database in addition to a content/schemas/triggers database, you'll need to add a new
  * command to do so, as shown here. Please see ml-app-deployer for more info on what you can customize on an instance
  * of DeployDatabaseCommand.
- * 
+ *
  * Note also that mlDatabaseCommands is a property initialized by ml-gradle that contains a list of command objects. This
  * list is used when the "mlDeployDatabases" task is run, so it's a good idea to add a command for your custom database
  * to this list, in addition to adding it to mlAppDeployer.
@@ -181,12 +178,12 @@ ext {
 
 
 /*
- * Example of a custom command, which in this case performs a merge on a database. The benefit of doing this in a 
+ * Example of a custom command, which in this case performs a merge on a database. The benefit of doing this in a
  * command (as opposed to a task) is that a command can be included in the mlDeploy and mlUndeploy tasks by adding it to
  * the mlAppDeployer object, as shown below.
- * 
- * This example also shows how the ManageClient instance in CommandContext can be used to easily make any call to the 
- * Management REST API. Note that this class could also be defined in the Gradle buildSrc directory, which is really a 
+ *
+ * This example also shows how the ManageClient instance in CommandContext can be used to easily make any call to the
+ * Management REST API. Note that this class could also be defined in the Gradle buildSrc directory, which is really a
  * better option for keeping your build.gradle file slim.
  */
 import com.marklogic.appdeployer.command.AbstractCommand;
@@ -229,6 +226,6 @@ task mergeContentDatabase(type: com.marklogic.gradle.task.MarkLogicTask) {
 /*
  * Example of attaching our custom task to the end of the mlDeploy process. mlPostDeploy is an empty task
  * that is called by mlDeploy after mlAppDeploy runs; mlPostDeploy thus allows for any additional tasks to be added to
- * the deployment process. 
+ * the deployment process.
  */
 //mlPostDeploy.dependsOn mergeContentDatabase

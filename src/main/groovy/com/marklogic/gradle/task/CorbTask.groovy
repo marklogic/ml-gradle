@@ -7,15 +7,8 @@ import com.marklogic.appdeployer.AppConfig
 
 class CorbTask extends JavaExec {
 
-  CorbTask() {
-    //Augment with member variables and a mapping of CoRB2 options
-    /*
-    * TODO: replace hard-coded CSV of options with a reference to the CoRB Options class,
-    *       once the next version of CoRB2 is released:
-    *
-      CorbTask.metaClass.corbOptions = com.marklogic.developer.corb.Options.class.declaredFields.findAll { !it.synthetic }.collectEntries {
-    */
-    this.metaClass.corbOptions = "BATCH-SIZE,BATCH-URI-DELIM,COLLECTION-NAME,DECRYPTER,\
+  //default CORB option list
+  private static String[] DEFAULT_CORB_OPTIONS = "BATCH-SIZE,BATCH-URI-DELIM,COLLECTION-NAME,DECRYPTER,\
 ERROR-FILE-NAME,EXIT-CODE-NO-URIS,EXPORT_FILE_AS_ZIP,\
 EXPORT-FILE-BOTTOM-CONTENT,EXPORT-FILE-DIR,EXPORT-FILE-HEADER-LINE-COUNT,\
 EXPORT-FILE-NAME,EXPORT-FILE-PART-EXT,\
@@ -33,21 +26,32 @@ SSL-KEYSTORE,SSL-KEYSTORE-PASSWORD,SSL-KEYSTORE-TYPE,SSL-PROPERTIES-FILE,\
 THREAD-COUNT,URIS_BATCH_REF,URIS-FILE,URIS-LOADER,URIS-MODULE,URIS-REPLACE-PATTERN,\
 XCC_CONNECTION_RETRY_LIMIT,XCC-CONNECTION-RETRY-INTERVAL,XCC-CONNECTION-URI,\
 XCC-DBNAME,XCC-HOSTNAME,XCC-PASSWORD,XCC-PORT,XCC-USERNAME,\
-XQUERY_MODULE"
-      .tokenize(',').collectEntries {
-        String camel = it.toLowerCase().split('_|-').collect { it.capitalize() }.join('')
+XQUERY-MODULE".tokenize(',')
+
+  CorbTask() {
+    String[] optionNames = DEFAULT_CORB_OPTIONS  
+    try {
+        optionNames = Class.forName("com.marklogic.developer.corb.Options", true, Thread.currentThread().contextClassLoader)
+        .declaredFields
+        .findAll { !it.synthetic }.collect { it.get(null) }
+    } catch (ClassNotFoundException ex) {}
+    
+    //Augment with member variables and a mapping of CoRB2 Options    
+    CorbTask.metaClass.corbOptions = optionNames.collectEntries { option ->
+        
+        String camelOption = option.toLowerCase().split('_|-').collect { it.capitalize() }.join('')
         // create Map entry gradle property and original values, for easy lookup/translation
-        String lowerCamel = new StringBuffer(camel.length())
-                  .append(Character.toLowerCase(camel.charAt(0)))
-                  .append(camel.substring(1))
-                  .toString();
+        String lowerCamelOption = new StringBuffer(camelOption.length())
+                                    .append(Character.toLowerCase(camelOption.charAt(0)))
+                                    .append(camelOption.substring(1))
+                                    .toString();
 
         //add the lowerCamelCased CoRB2 option as a member variable
-        this.metaClass[lowerCamel] = null
+        this.metaClass[lowerCamelOption] = null
 
-        // Create a 'corb' prefixed camelCased entry (i.e. URIS-FILE => corbUrisFile )
+        // Create a 'corb' prefixed CamelCased entry (i.e. URIS-FILE => corbUrisFile )
         // mapped to the original CoRB2 option for lookup/conversion
-        [(CORB_PROPERTY_PREFIX + camel): it]
+        [(CORB_PROPERTY_PREFIX + camelOption): option]
     }
   }
   // prefix for corb project properties, to ensure no conflicts with other project properties
@@ -70,6 +74,7 @@ XQUERY_MODULE"
   @TaskAction
   @Override
   public void exec() {
+    //By convention, if there is a corb configuration, use it to set the classpath  
     if (getProject().configurations.findByName('corb')) {
       setClasspath(getProject().configurations.corb)
     }
@@ -171,4 +176,5 @@ XQUERY_MODULE"
       [(corbOptions[it]): project[it]]
     }
   }
+  
 }

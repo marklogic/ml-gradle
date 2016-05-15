@@ -1,0 +1,10 @@
+{
+	"role-name": "role-that-refers-to-itself",
+	"description": "Example of configuring a role that refers to itself",
+	"permission": [
+		{
+			"role-name": "role-that-refers-to-itself",
+			"capability": "read"
+		}
+	]
+}

@@ -40,6 +40,11 @@ dependencies {
 	//mlcp "com.marklogic:marklogic-mapreduce2:2.1.3"
 
 	/**
+	 * If you need to import delimited text, be sure to include this dependency as well.
+	 */
+	mlcp "org.apache.commons:commons-csv:1.2"
+
+	/**
 	 * mlcp uses Log4j for logging, and if Log4j can't find a configuration file, it will complain and you'll
 	 * get none of mlcp's usually-useful logging. It is recommended then that your Gradle configuration for
 	 * mlcp include a directory or some other resource that provides a log4j.properties file.
@@ -62,7 +67,7 @@ task importSampleData(type: com.marklogic.gradle.task.MlcpTask) {
 
 /**
  * Example of using mlcp to import RDF data - in this case, World Bank's publicly available topical
- * taxonomy. 
+ * taxonomy.
  */
 task importRdf(type: com.marklogic.gradle.task.MlcpTask) {
 	classpath = configurations.mlcp
@@ -73,6 +78,21 @@ task importRdf(type: com.marklogic.gradle.task.MlcpTask) {
 	output_uri_replace = ".*data,'/'"
 	output_collections = "world-bank-topical-taxonomy"
 	output_permissions = "rest-reader,read,rest-writer,update"
+}
+
+/**
+ * Example of importing semicolon-delimited text, in reference to:
+ * https://github.com/rjrudin/ml-gradle/issues/90
+ */
+task importSemicolonDelimitedText(type: com.marklogic.gradle.task.MlcpTask) {
+	classpath = configurations.mlcp
+	command = "IMPORT"
+	database = mlAppConfig.contentDatabaseName
+	input_file_path = "data/semicolon-delimited-file.txt"
+	input_file_type = "delimited_text"
+	output_uri_replace = ".*data,'/'"
+	output_permissions = "rest-reader,read,rest-writer,update"
+	args = ["-delimiter", ";"]
 }
 
 /**

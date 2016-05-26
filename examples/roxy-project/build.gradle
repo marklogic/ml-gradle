@@ -1,11 +1,14 @@
-/*
- * The most minimal ml-gradle file just has one thing - the ml-gradle plugin declaration.
- *
- * Without a gradle.properties file with properties such as mlAppName and mlRestPort, ml-gradle will use some sensible
- * defaults to generate a new application - an app name of my-app, port 8003, and a username/password combo of 
- * admin/admin.
- */
-
 plugins {
-  id "com.marklogic.ml-gradle" version "2.1.0"  
+  id "com.marklogic.ml-gradle" version "2.2.0"
+}
+
+/**
+ * ml-gradle defaults to a modules path of src/main/ml-modules. Roxy applications almost always store
+ * asset modules under ./src, so we need to modify the module paths. Note that since Roxy stores REST API
+ * extensions under ./ext, "gradle mlWatch" will not load these.
+ */
+ext {
+	mlAppConfig {
+		modulePaths = ["src"]
+	}
 }

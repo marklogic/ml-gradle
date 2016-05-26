@@ -26,6 +26,10 @@ What are the main features of ml-gradle?
 1. Can treat packages of MarkLogic code as [true third-party dependencies](https://github.com/rjrudin/ml-gradle/wiki/Preparing-REST-API-dependencies), resolving them just like you would a dependency on a jar, as well as automatically loading such code into your modules database
 1. Can take advantage of [all the features of Gradle](https://docs.gradle.org/current/userguide/overview.html)
 
+Can I use ml-gradle with Roxy?
+=========
+You bet! Starting with version 2.2.0, you can use "gradle mlWatch" to automatically load new/modified modules into the modules database of your Roxy application, and ml-gradle will substitute tokens based on Roxy properties as well. See [Loading modules in a Roxy project](https://github.com/rjrudin/ml-gradle/wiki/Loading-modules-on-a-Roxy-project) for more information.
+
 How can I start using ml-gradle?
 =========
 First, please note the [Wiki and FAQ](https://github.com/rjrudin/ml-gradle/wiki) which have answers to many of the questions you'll have or run into soon.

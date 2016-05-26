@@ -1,17 +1,17 @@
 /*
- * This project demonstrates how ml-gradle can configure a basic Flexrep setup, where the master and replica databases 
+ * This project demonstrates how ml-gradle can configure a basic Flexrep setup, where the master and replica databases
  * are both on the same host (not likely in reality, but it's sufficient for demonstration purposes). To test this
  * out, run "gradle mlDeploy" and then use qconsole to insert a document into the "flexrep-example" collection in the
  * master database ("flexrep-example-content"), and then you can verify that it is replicated to the flexrep-example-replica-db
- * database. 
- * 
+ * database.
+ *
  * In an environment where the replica database and server are on a separate host, you would most likely have separate
- * build.gradle files with separate config directories, each specifying the tasks and configuration needed for the 
+ * build.gradle files with separate config directories, each specifying the tasks and configuration needed for the
  * cluster that it is responsible for.
  */
 
 plugins {
-  id "com.marklogic.ml-gradle" version "2.1.0"
+  id "com.marklogic.ml-gradle" version "2.2.0"
 }
 
 ext {

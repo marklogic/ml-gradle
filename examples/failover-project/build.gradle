@@ -1,5 +1,5 @@
 plugins {
-  id "com.marklogic.ml-gradle" version "2.1.0"
+  id "com.marklogic.ml-gradle" version "2.2.0"
 }
 
 ext {
@@ -7,11 +7,11 @@ ext {
 }
 
 /*
- * The mlConfigureForestReplicas task exposes an instance of ConfigureForestReplicasCommand as the "command" attribute. 
- * This allows us to easily modify the forestNamesAndReplicaCounts map, where each key is the name of a primary forest, 
+ * The mlConfigureForestReplicas task exposes an instance of ConfigureForestReplicasCommand as the "command" attribute.
+ * This allows us to easily modify the forestNamesAndReplicaCounts map, where each key is the name of a primary forest,
  * and the value of each key is the number of replicas to create on each host in the cluster (except the host that the
  * primary forest resides on).
- * 
+ *
  * Note that this is usually most useful for supporting failover for MarkLogic apps such as Admin and App-Services. For
  * failover for your own forests, you can use this approach, but you may also wish to create forest config files under
  * src/main/ml-config/forests.

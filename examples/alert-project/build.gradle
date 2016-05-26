@@ -1,11 +1,11 @@
 plugins {
   id "java"
   id "eclipse"
-  id "com.marklogic.ml-gradle" version "2.1.0"
+  id "com.marklogic.ml-gradle" version "2.2.0"
 }
 
 /**
- * This command is added to mlAppDeployer so that all the default pipelines are loaded. This gets around an issue 
+ * This command is added to mlAppDeployer so that all the default pipelines are loaded. This gets around an issue
  * where pipelines that have options elements in them - such as the Alerting pipeline - can't be loaded via the Mgmt
  * API because the options element fails schema validation. Loading all the default pipelines when we only need
  * Status Change Handling and Alerting is fine - the unused pipelines just sit there with no impact on anything.
@@ -19,5 +19,5 @@ repositories {
 }
 
 dependencies {
-  testCompile "com.marklogic:ml-junit:2.5"
+  testCompile "com.marklogic:ml-junit:2.6.0"
 }

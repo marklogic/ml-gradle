@@ -6,16 +6,16 @@
  */
 
 /*
- * optionally, set buildscript dependency for CoRB, in order for the CorbTask 
- * to be enhanced with all of the current CoRB Options. If omitted, a default 
+ * optionally, set buildscript dependency for CoRB, in order for the CorbTask
+ * to be enhanced with all of the current CoRB Options. If omitted, a default
  * (possibly outdated) set of CoRB options will be applied to the CorbTask.
  */
 buildscript {
-  repositories {   
+  repositories {
     jcenter()
     // Needed for corb dependency: XCC
     maven { url "http://developer.marklogic.com/maven2/" }
-  } 
+  }
   dependencies {
     //Needed for CorbTask to dynamicaly generate properties from CORB Options class
     classpath 'com.marklogic:marklogic-corb:2.3.0'
@@ -23,12 +23,12 @@ buildscript {
 }
 
 plugins {
-    id "com.marklogic.ml-gradle" version "2.1.0"
+    id "com.marklogic.ml-gradle" version "2.2.0"
 }
 
 repositories {
     jcenter()
-    
+
     // Needed for corb dependency: XCC
     maven { url "http://developer.marklogic.com/maven2/" }
 }

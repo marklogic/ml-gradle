@@ -2,13 +2,13 @@ plugins {
   id "java"
   id "eclipse"
   id "com.github.tkruse.groovysh" version "1.0.8"
-  id "com.marklogic.ml-gradle" version "2.1.0"
+  id "com.marklogic.ml-gradle" version "2.2.0"
 }
 
 repositories {
   jcenter()
 }
 
-dependencies { 
-  runtime "com.marklogic:ml-app-deployer:2.0" 
+dependencies {
+  runtime "com.marklogic:ml-app-deployer:2.2.0"
 }

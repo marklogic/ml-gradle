@@ -18,7 +18,7 @@ buildscript {
   }
   dependencies {
     //Needed for CorbTask to dynamicaly generate properties from CORB Options class
-    classpath 'com.marklogic:marklogic-corb:2.3.0'
+    classpath 'com.marklogic:marklogic-corb:2.3.1'
   }
 }
 

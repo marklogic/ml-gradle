@@ -12,7 +12,7 @@ repositories {
 	jcenter()
 
 	// Needed for mlcp dependencies
-	maven { url "http://developer.marklogic.com/maven2/" }
+	maven { url "https://developer.marklogic.com/maven2/" }
 
 	// Needed for hadoop dependencies for mlcp
 	maven { url "http://repository.cloudera.com/artifactory/cloudera-repos/" }

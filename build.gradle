@@ -31,6 +31,7 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 }
 
 javadoc.destinationDir = file(javadocsDir + "/" + project.name)
+javadoc.failOnError = false
 
 publishing {
   publications {

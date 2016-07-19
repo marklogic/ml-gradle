@@ -12,6 +12,10 @@ import com.marklogic.rest.util.Fragment;
 
 /**
  * Provides methods wrapping /manage/v2/forests endpoints.
+ *
+ * The "save" method inherited from the parent class does not allow updates, as updates can fail for a variety of
+ * reasons with forests - e.g. if the host is different. If you need to update a forest, consider just using
+ * ManageClient to do it.
  */
 public class ForestManager extends AbstractResourceManager {
 
@@ -22,6 +26,7 @@ public class ForestManager extends AbstractResourceManager {
 
     public ForestManager(ManageClient client) {
         super(client);
+		setUpdateAllowed(false);
     }
 
     public void createJsonForestWithName(String name, String host) {

@@ -1,7 +1,9 @@
 package com.marklogic.appdeployer;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import com.marklogic.mgmt.util.PropertySource;
 import com.marklogic.mgmt.util.PropertySourceFactory;
@@ -141,6 +143,18 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
         if (prop != null) {
             logger.info("Use Roxy token prefix of '@ml.': " + prop);
             c.setUseRoxyTokenPrefix(Boolean.parseBoolean(prop));
+        }
+
+        prop = getProperty("mlModulePaths");
+        if (prop != null) {
+            logger.info("Module paths: " + prop);
+            String[] paths = prop.split(",");
+            // Ensure we have a modifiable list
+            List<String> list = new ArrayList<>();
+            for (String s : paths) {
+                list.add(s);
+            }
+            c.setModulePaths(list);
         }
 
         return c;

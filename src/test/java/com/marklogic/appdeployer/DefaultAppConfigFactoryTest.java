@@ -1,5 +1,6 @@
 package com.marklogic.appdeployer;
 
+import java.util.List;
 import java.util.Properties;
 
 import org.junit.Assert;
@@ -60,6 +61,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
         p.setProperty("mlAppServicesPort", "8123");
         p.setProperty("mlReplaceTokensInModules", "false");
         p.setProperty("mlUseRoxyTokenPrefix", "false");
+        p.setProperty("mlModulePaths", "path1,path2,path3");
 
         sut = new DefaultAppConfigFactory(new SimplePropertySource(p));
         AppConfig config = sut.newAppConfig();
@@ -83,6 +85,11 @@ public class DefaultAppConfigFactoryTest extends Assert {
         assertEquals((Integer) 8123, config.getAppServicesPort());
         assertFalse(config.isReplaceTokensInModules());
         assertFalse(config.isUseRoxyTokenPrefix());
+
+        List<String> paths = config.getModulePaths();
+        assertEquals("path1", paths.get(0));
+        assertEquals("path2", paths.get(1));
+        assertEquals("path3", paths.get(2));
     }
 
     @Test

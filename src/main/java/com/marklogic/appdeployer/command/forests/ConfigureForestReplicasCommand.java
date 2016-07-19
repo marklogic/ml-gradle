@@ -16,7 +16,7 @@ import com.marklogic.mgmt.hosts.HostManager;
  * Command for configuring - i.e. creating and setting - replica forests for existing databases and/or primary forests.
  * It's normally easier to just specify the databases that you want to configure forest replicas for, but this command
  * does provide the ability to configure replicas for specific forests.
- * 
+ *
  * Very useful for the out-of-the-box forests such as Security, Schemas, App-Services, and Meters, which normally need
  * replicas for failover in a cluster.
  */
@@ -38,7 +38,7 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
     /**
      * Allows for the map of database names and counts to be configured as a comma-delimited string of the form:
      * "dbName,replicaCount,dbName,replicaCount,etc".
-     * 
+     *
      * @param str
      */
     public void setDatabaseNamesAndReplicaCountsAsString(String str) {
@@ -96,7 +96,7 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
             if (str != null) {
                 setDatabaseNamesAndReplicaCountsAsString(str);
             }
-            
+
             DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
             ForestManager forestMgr = new ForestManager(context.getManageClient());
 
@@ -132,7 +132,7 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
      * For the given database, find all of its primary forests. Then for each primary forest, just call
      * configureReplicaForests? And that should be smart enough to say - if the primary forest already has replicas,
      * then don't do anything.
-     * 
+     *
      * @param databaseName
      * @param replicaCount
      * @param hostIds
@@ -151,7 +151,7 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
     /**
      * Creates forests as needed (they may already exists) and then sets those forests as the replicas for the given
      * primaryForestName.
-     * 
+     *
      * @param forestIdOrName
      * @param replicaCount
      * @param hostIds
@@ -178,7 +178,7 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
             if (!hostId.equals(primaryForestHostId)) {
                 for (int i = 0; i < replicaCount; i++) {
                     String name = forestIdOrName + "-" + resourceCounter;
-                    forestMgr.createForestWithName(name, hostId);
+                    forestMgr.createJsonForestWithName(name, hostId);
                     replicaNamesAndHostIds.put(name, hostId);
                     resourceCounter++;
                 }

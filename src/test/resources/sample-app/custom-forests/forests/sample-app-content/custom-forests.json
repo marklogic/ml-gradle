@@ -1,0 +1,14 @@
+[
+	{
+		"forest-name": "sample-app-content-custom-1",
+		"enabled": true,
+		"host": "%%CUSTOM_HOST%%",
+		"database": "%%DATABASE%%"
+	},
+	{
+		"forest-name": "sample-app-content-custom-2",
+		"enabled": true,
+		"host": "%%CUSTOM_HOST%%",
+		"database": "%%DATABASE%%"
+	}
+]

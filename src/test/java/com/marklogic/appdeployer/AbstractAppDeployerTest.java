@@ -28,11 +28,6 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
     protected final static Integer SAMPLE_APP_REST_PORT = 8540;
     protected final static Integer SAMPLE_APP_TEST_REST_PORT = 8541;
 
-    @Autowired
-    private ManageConfig manageConfig;
-
-    private ConfigurableApplicationContext appManagerContext;
-
     // Intended to be used by subclasses
     protected AppDeployer appDeployer;
     protected AppConfig appConfig;
@@ -60,24 +55,17 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
 
     /**
      * Initialize an AppDeployer with the given set of commands. Avoids having to create a Spring configuration.
-     * 
+     *
      * @param commands
      */
     protected void initializeAppDeployer(Command... commands) {
         appDeployer = new SimpleAppDeployer(manageClient, adminManager, commands);
     }
 
-    @After
-    public void closeAppContext() {
-        if (appManagerContext != null) {
-            appManagerContext.close();
-        }
-    }
-
     protected void deploySampleApp() {
         appDeployer.deploy(appConfig);
     }
-    
+
     protected void undeploySampleApp() {
         try {
             appDeployer.undeploy(appConfig);
@@ -102,7 +90,7 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
         command.setModulesLoader(loader);
         return command;
     }
-    
+
     protected void setConfigBaseDir(String path) {
         appConfig.getConfigDir().setBaseDir(new File("src/test/resources/" + path));
     }

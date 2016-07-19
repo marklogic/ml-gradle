@@ -37,7 +37,7 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
     /**
      * Convenience method for setting the names of files to ignore when reading resources from a directory. Will
      * preserve any filenames already being ignored on the underlying FilenameFilter.
-     * 
+     *
      * @param filenames
      */
     public void setFilenamesToIgnore(String... filenames) {
@@ -59,7 +59,7 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 
     /**
      * Simplifies reading the contents of a File into a String.
-     * 
+     *
      * @param f
      * @return
      */
@@ -73,17 +73,29 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
         }
     }
 
+	/**
+	 * Convenience function for reading the file into a string and replace tokens as well. Assumes this is not
+	 * for a test-only resource.
+	 *
+	 * @param f
+	 * @param context
+	 * @return
+	 */
+	protected String copyFileToString(File f, CommandContext context) {
+		String str = copyFileToString(f);
+		return str != null ? tokenReplacer.replaceTokens(str, context.getAppConfig(), false) : str;
+	}
+
     /**
      * Provides a basic implementation for saving a resource defined in a File, including replacing tokens.
-     * 
+     *
      * @param mgr
      * @param context
      * @param f
      * @return
      */
     protected SaveReceipt saveResource(ResourceManager mgr, CommandContext context, File f) {
-        String payload = copyFileToString(f);
-        payload = tokenReplacer.replaceTokens(payload, context.getAppConfig(), false);
+		String payload = copyFileToString(f, context);
         SaveReceipt receipt = mgr.save(payload);
         if (storeResourceIdsAsCustomTokens) {
             storeTokenForResourceId(receipt, context);
@@ -95,7 +107,7 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
      * Any resource that may be referenced by its ID by another resource will most likely need its ID stored as a custom
      * token so that it can be referenced by the other resource. To enable this, the subclass should set
      * storeResourceIdAsCustomToken to true.
-     * 
+     *
      * @param receipt
      * @param context
      */

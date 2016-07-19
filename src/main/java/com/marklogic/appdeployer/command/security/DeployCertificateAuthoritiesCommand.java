@@ -25,7 +25,7 @@ public class DeployCertificateAuthoritiesCommand extends AbstractCommand {
                     if (logger.isInfoEnabled()) {
                         logger.info("Creating certificate authority from file: " + f.getAbsolutePath());
                     }
-                    String payload = copyFileToString(f);
+                    String payload = copyFileToString(f, context);
                     ResponseEntity<String> response = mgr.create(payload);
                     if (logger.isInfoEnabled()) {
                         logger.info("Created certificate authority, location: " + response.getHeaders().getLocation());

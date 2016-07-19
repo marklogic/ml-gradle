@@ -44,7 +44,7 @@ public class DeployAlertRulesCommand extends AbstractCommand {
          * parse its contents.
          */
         for (File f : listFilesInDirectory(dir)) {
-            String payload = copyFileToString(f);
+            String payload = copyFileToString(f, context);
             String actionName = payloadParser.getPayloadFieldValue(payload, "action-name");
             AlertRuleManager mgr = new AlertRuleManager(context.getManageClient(), dbName, configUri, actionName);
             saveResource(mgr, context, f);

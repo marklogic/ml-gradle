@@ -1,9 +1,11 @@
 package com.marklogic.mgmt.forests;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.marklogic.mgmt.AbstractResourceManager;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.rest.util.Fragment;
@@ -20,15 +22,14 @@ public class ForestManager extends AbstractResourceManager {
 
     public ForestManager(ManageClient client) {
         super(client);
-        setUpdateAllowed(false);
     }
 
-    public void createForestWithName(String name, String host) {
+    public void createJsonForestWithName(String name, String host) {
         if (forestExists(name)) {
             logger.info(format("Forest already exists with name, so not creating: %s", name));
         } else {
             logger.info(format("Creating forest %s on host %s", name, host));
-            createForest(format("{\"forest-name\":\"%s\", \"host\":\"%s\"}", name, host));
+            createJsonForest(format("{\"forest-name\":\"%s\", \"host\":\"%s\"}", name, host));
             logger.info(format("Created forest %s on host %s", name, host));
         }
     }
@@ -43,7 +44,24 @@ public class ForestManager extends AbstractResourceManager {
         }
     }
 
-    public void createForest(String json) {
+	/**
+	 * Supports either an array of JSON objects or a single JSON object.
+	 *
+	 * @param json
+	 */
+	public void saveJsonForests(String json) {
+		JsonNode node = super.payloadParser.parseJson(json);
+		if (node.isArray()) {
+			Iterator<JsonNode> iter = node.iterator();
+			while (iter.hasNext()) {
+				save(iter.next().toString());
+			}
+		} else {
+			save(json);
+		}
+	}
+
+    public void createJsonForest(String json) {
         getManageClient().postJson("/manage/v2/forests", json);
     }
 
@@ -103,7 +121,7 @@ public class ForestManager extends AbstractResourceManager {
     /**
      * Convenience method for detaching a forest from any replicas it has; this is often used before deleting those
      * replicas
-     * 
+     *
      * @param forestIdOrName
      */
     public void setReplicasToNone(String forestIdOrName) {
@@ -112,7 +130,7 @@ public class ForestManager extends AbstractResourceManager {
 
     /**
      * Returns a list of IDs for each replica forest for the given forest ID or name.
-     * 
+     *
      * @param forestIdOrName
      * @return
      */
@@ -124,7 +142,7 @@ public class ForestManager extends AbstractResourceManager {
 
     /**
      * Deletes (with a level of "full") all replicas for the given forest.
-     * 
+     *
      * @param forestIdOrName
      */
     public void deleteReplicas(String forestIdOrName) {

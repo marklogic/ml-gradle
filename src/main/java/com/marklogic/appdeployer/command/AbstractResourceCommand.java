@@ -41,7 +41,7 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 
     /**
      * Subclasses can override this to add functionality after a resource has been saved.
-     * 
+     *
      * @param mgr
      * @param context
      * @param resourceFile
@@ -77,13 +77,13 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
      * delete the resource. This has been necessary when deleting two app servers in a row - for some reason, the 2nd
      * delete will intermittently fail with a connection reset error, but the app server is in fact deleted
      * successfully.
-     * 
+     *
      * @param mgr
      * @param context
      * @param f
      */
     protected void deleteResource(final ResourceManager mgr, CommandContext context, File f) {
-        final String payload = tokenReplacer.replaceTokens(copyFileToString(f), context.getAppConfig(), false);
+        final String payload = copyFileToString(f, context);
         try {
             if (restartAfterDelete) {
                 context.getAdminManager().invokeActionRequiringRestart(new ActionRequiringRestart() {

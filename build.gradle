@@ -28,7 +28,7 @@ dependencies {
 sourceSets.main.resources.srcDir 'src/main/java'
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-  classifier 'sources' 
+  classifier 'sources'
   from sourceSets.main.allJava
 }
 
@@ -46,7 +46,7 @@ publishing {
     }
   }
 }
- 
+
 if (project.hasProperty("myBintrayUser")) {
   bintray {
     user = myBintrayUser
@@ -58,7 +58,7 @@ if (project.hasProperty("myBintrayUser")) {
       licenses = ['Apache-2.0']
       vcsUrl = 'https://github.com/rjrudin/' + project.name + '.git'
       version {
-        name = "2.2.0"
+        name = "2.3.0-DEV"
         released = new Date()
       }
     }

@@ -1,5 +1,7 @@
 package com.marklogic.gradle
 
+import com.marklogic.appdeployer.command.forests.DeployCustomForestsCommand
+import com.marklogic.gradle.task.forests.DeployCustomForestsTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.slf4j.LoggerFactory
@@ -181,7 +183,8 @@ class MarkLogicPlugin implements Plugin<Project> {
 
         String forestGroup = "ml-gradle Forest"
         project.task("mlConfigureForestReplicas", type: ConfigureForestReplicasTask, group: forestGroup, description: "Deprecated - configure forest replicas via the command.forestNamesAndReplicaCounts map")
-        project.task("mlDeleteForestReplicas", type: DeleteForestReplicasTask, group: forestGroup, description: "Delete forest replicas via the command.forestNamesAndReplicaCounts map")
+        project.task("mlDeleteForestReplicas", type: DeleteForestReplicasTask, group: forestGroup, description: "Deprecated - delete forest replicas via the command.forestNamesAndReplicaCounts map")
+		project.task("mlDeployCustomForests", type: DeployCustomForestsTask, group: forestGroup, description: "Deploy custom forests as defined in subdirectories of the forests configuration directory")
         project.task("mlDeployForestReplicas", type: DeployForestReplicasTask, group: forestGroup, description: "Prefer this over mlConfigureForestReplicas; it does the same thing, but uses the ConfigureForestReplicasCommand that is used by mlDeploy")
 
         String groupsGroup = "ml-gradle Group"
@@ -383,6 +386,12 @@ class MarkLogicPlugin implements Plugin<Project> {
         mimetypeCommands.add(new DeployMimetypesCommand())
         project.extensions.add("mlMimetypeCommands", mimetypeCommands)
         commands.addAll(mimetypeCommands)
+
+		// Forests
+		List<Command> forestCommands = new ArrayList<Command>()
+		forestCommands.add(new DeployCustomForestsCommand())
+		project.extensions.add("mlForestCommands", forestCommands)
+		commands.addAll(forestCommands)
 
         // Forest replicas
         List<Command> replicaCommands = new ArrayList<Command>()

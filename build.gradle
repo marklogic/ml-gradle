@@ -72,7 +72,7 @@ if (project.hasProperty("myBintrayUser")) {
 pluginBundle {
   website = 'http://www.gradle.org/'
   vcsUrl = 'https://github.com/rjrudin/' + project.name + '.git'
-  description = 'Testing ml-gradle publishing'
+  description = 'Publishes ml-gradle'
   tags = ['marklogic']
 
   plugins {
@@ -81,11 +81,11 @@ pluginBundle {
       displayName = 'ml-gradle for MarkLogic'
       description = 'Gradle plugin for configuring and deploying applications to MarkLogic'
       tags = ['marklogic']
-      version = "2.2.0"
+      version = "2.3.0-RC1"
     }
   }
 
   mavenCoordinates {
-    version = "2.2.0"
+    version = "2.3.0-RC1"
   }
 }

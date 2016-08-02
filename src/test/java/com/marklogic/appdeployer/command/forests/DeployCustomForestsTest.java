@@ -5,17 +5,16 @@ import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import com.marklogic.mgmt.forests.ForestManager;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
 
 /**
  * Verifies that directories under ./forests/ are processed correctly.
- *
- * Renamed this to a Debug test so it's not executed by default as part of the test suite. The test fails on Travis,
- * as "localhost" doesn't resolve as a host name, and I'm not sure why that is yet.
  */
-public class DeployCustomForestsDebug extends AbstractAppDeployerTest {
+@Ignore("Failing on travis because it's not using the right hostname for forests, not sure how to fix yet")
+public class DeployCustomForestsTest extends AbstractAppDeployerTest {
 
 	@After
 	public void tearDown() {

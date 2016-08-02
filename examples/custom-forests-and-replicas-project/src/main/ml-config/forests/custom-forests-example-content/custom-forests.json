@@ -1,0 +1,14 @@
+[
+	{
+		"forest-name": "custom-forests-example-content-custom-1",
+		"enabled": true,
+		"host": "localhost",
+		"database": "%%DATABASE%%"
+	},
+	{
+		"forest-name": "custom-forests-example-content-custom-2",
+		"enabled": true,
+		"host": "localhost",
+		"database": "%%DATABASE%%"
+	}
+]

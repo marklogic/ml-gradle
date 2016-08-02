@@ -81,11 +81,11 @@ pluginBundle {
       displayName = 'ml-gradle for MarkLogic'
       description = 'Gradle plugin for configuring and deploying applications to MarkLogic'
       tags = ['marklogic']
-      version = "2.3.0-RC1"
+      version = "2.3.0"
     }
   }
 
   mavenCoordinates {
-    version = "2.3.0-RC1"
+    version = "2.3.0"
   }
 }

@@ -22,9 +22,11 @@ public class DeployCustomForestsCommand extends AbstractCommand {
 	@Override
 	public void execute(CommandContext context) {
 		File dir = new File(context.getAppConfig().getConfigDir().getBaseDir(), "forests");
-		for (File f : dir.listFiles()) {
-			if (f.isDirectory()) {
-				processDirectory(f, context);
+		if (dir != null && dir.exists()) {
+			for (File f : dir.listFiles()) {
+				if (f.isDirectory()) {
+					processDirectory(f, context);
+				}
 			}
 		}
 	}

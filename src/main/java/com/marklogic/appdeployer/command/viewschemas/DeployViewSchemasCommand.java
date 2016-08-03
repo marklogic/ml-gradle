@@ -12,11 +12,18 @@ import com.marklogic.mgmt.viewschemas.ViewManager;
 import com.marklogic.mgmt.viewschemas.ViewSchemaManager;
 
 /**
- * So for a given view-schema resource, after it's been processed, we'll check for a (name)-views folder in the
- * view-schemas folder. If it exists, we'll process each file in the directory. We don't need to do anything on undeploy
- * fortunately.
+ * Processes each file in the view-schemas directory. For each one, then checks for a (view schema name)-views
+ * directory in the view-schemas directory. If it exists, each file in that directory is processed as a view.
+ *
+ * This command defaults to storing view schemas and views in the schemas database associated with the default
+ * content database. This can be overridden by setting the "databaseIdOrName" property. Unfortunately, this does
+ * not yet allow for multiple databases to have view schemas. But you can achieve that by using multiple instances
+ * of this class, each with a different view schemas path, which can be set via setViewSchemasPath.
  */
 public class DeployViewSchemasCommand extends AbstractResourceCommand {
+
+	private String databaseIdOrName;
+	private String viewSchemasPath = "view-schemas";
 
     public DeployViewSchemasCommand() {
         // Don't need to delete anything, as view-schemas all live in a database
@@ -26,12 +33,13 @@ public class DeployViewSchemasCommand extends AbstractResourceCommand {
 
     @Override
     protected File[] getResourceDirs(CommandContext context) {
-        return new File[] { new File(context.getAppConfig().getConfigDir().getBaseDir(), "view-schemas") };
+        return new File[] { new File(context.getAppConfig().getConfigDir().getBaseDir(), viewSchemasPath) };
     }
 
     @Override
     protected ResourceManager getResourceManager(CommandContext context) {
-        return new ViewSchemaManager(context.getManageClient(), context.getAppConfig().getContentDatabaseName());
+		String dbName = databaseIdOrName != null ? databaseIdOrName : context.getAppConfig().getContentDatabaseName();
+        return new ViewSchemaManager(context.getManageClient(), dbName);
     }
 
     @Override
@@ -41,12 +49,19 @@ public class DeployViewSchemasCommand extends AbstractResourceCommand {
         String viewSchemaName = parser.getPayloadFieldValue(receipt.getPayload(), "view-schema-name");
         File viewDir = new File(resourceFile.getParentFile(), viewSchemaName + "-views");
         if (viewDir.exists()) {
-            ViewManager viewMgr = new ViewManager(context.getManageClient(), context.getAppConfig()
-                    .getContentDatabaseName(), viewSchemaName);
+			String dbName = databaseIdOrName != null ? databaseIdOrName : context.getAppConfig().getContentDatabaseName();
+            ViewManager viewMgr = new ViewManager(context.getManageClient(), dbName, viewSchemaName);
             for (File viewFile : listFilesInDirectory(viewDir)) {
                 saveResource(viewMgr, context, viewFile);
             }
         }
     }
 
+	public void setDatabaseIdOrName(String databaseIdOrName) {
+		this.databaseIdOrName = databaseIdOrName;
+	}
+
+	public void setViewSchemasPath(String viewSchemasPath) {
+		this.viewSchemasPath = viewSchemasPath;
+	}
 }

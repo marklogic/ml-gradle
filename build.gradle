@@ -5,7 +5,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath "com.gradle.publish:plugin-publish-plugin:0.9.2"
+    classpath "com.gradle.publish:plugin-publish-plugin:0.9.5"
   }
 }
 
@@ -81,11 +81,11 @@ pluginBundle {
       displayName = 'ml-gradle for MarkLogic'
       description = 'Gradle plugin for configuring and deploying applications to MarkLogic'
       tags = ['marklogic']
-      version = "2.3.0"
+      version = "2.3.1"
     }
   }
 
   mavenCoordinates {
-    version = "2.3.0"
+    version = "2.3.1"
   }
 }

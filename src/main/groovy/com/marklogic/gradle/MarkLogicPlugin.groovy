@@ -2,6 +2,7 @@ package com.marklogic.gradle
 
 import com.marklogic.appdeployer.command.forests.DeployCustomForestsCommand
 import com.marklogic.gradle.task.forests.DeployCustomForestsTask
+import com.sun.jersey.core.spi.component.ProviderServices
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.slf4j.LoggerFactory
@@ -114,12 +115,17 @@ import com.marklogic.mgmt.admin.AdminConfig
 import com.marklogic.mgmt.admin.AdminManager
 import com.marklogic.mgmt.admin.DefaultAdminConfigFactory
 
+import java.util.logging.Level
+import java.util.logging.Logger
+
 class MarkLogicPlugin implements Plugin<Project> {
 
     org.slf4j.Logger logger = LoggerFactory.getLogger(getClass())
 
     void apply(Project project) {
         logger.info("\nInitializing ml-gradle")
+
+		quietDownJerseyLogging()
 
         // Initialize groovysh support first so it doesn't pick up all the properties added when the AppDeployer is initialized
         initializeGroovyShellSupport(project)
@@ -421,4 +427,16 @@ class MarkLogicPlugin implements Plugin<Project> {
         deployer.setCommands(commands)
         return deployer
     }
+
+	/**
+	 * When the MarkLogic DatabaseClient class is used in Gradle, the Jersey ProviderServices class spits out
+	 * a lot of not helpful logging at the INFO level. So we bump it down to WARNING to avoid that.
+	 */
+	void quietDownJerseyLogging() {
+		try {
+			Logger.getLogger(ProviderServices.class.getName()).setLevel(Level.WARNING)
+		} catch (Exception e) {
+			// Ignore, not important
+		}
+	}
 }

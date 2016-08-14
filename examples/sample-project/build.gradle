@@ -155,19 +155,16 @@ ext {
 }
 
 /*
- * ml-gradle does not blindly process every file in the ml-config/databases directory. It checks for specific files
- * for a content database, a schemas database, and a triggers database. There are specific commands for each file, and
- * each command provides a number of options for configuring the forests for a database. So to create another database,
- * you'll need the block below.
- *
- * This will be improved in ml-gradle 2.3.1. Supports exists for this in ml-app-deployer already via the
- * DeployOtherDatabasesCommand, it's just not part of mlDeploy yet.
+ * Starting in ml-gradle 2.3.2, you can add as many JSON database file as you wish to the ml-config/databases
+ * directory, and ml-gradle will process each of them. Prior to 2.3.2, if you want to create a database with a file
+ * besides content-database.json, triggers-database.json, or schemas-database.json, you must also add a new instance
+ * of DeployDatabaseCommand, as shown below.
  */
-ext {
-	def otherDbCommand = new com.marklogic.appdeployer.command.databases.DeployDatabaseCommand("other-database.json")
-	mlAppDeployer.commands.add(otherDbCommand)
-	mlDatabaseCommands.add(otherDbCommand)
-}
+//ext {
+//	def otherDbCommand = new com.marklogic.appdeployer.command.databases.DeployDatabaseCommand("other-database.json")
+//	mlAppDeployer.commands.add(otherDbCommand)
+//	mlDatabaseCommands.add(otherDbCommand)
+//}
 
 
 /*

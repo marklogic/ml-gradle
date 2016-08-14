@@ -1,5 +1,6 @@
 package com.marklogic.gradle
 
+import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand
 import com.marklogic.appdeployer.command.forests.DeployCustomForestsCommand
 import com.marklogic.gradle.task.forests.DeployCustomForestsTask
 import com.sun.jersey.core.spi.component.ProviderServices
@@ -335,6 +336,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         dbCommands.add(new DeployContentDatabasesCommand())
         dbCommands.add(new DeployTriggersDatabaseCommand())
         dbCommands.add(new DeploySchemasDatabaseCommand())
+		dbCommands.add(new DeployOtherDatabasesCommand())
         project.extensions.add("mlDatabaseCommands", dbCommands)
         commands.addAll(dbCommands)
 

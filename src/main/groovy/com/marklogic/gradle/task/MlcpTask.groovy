@@ -34,6 +34,7 @@ class MlcpTask extends JavaExec {
     String namespace
     String options_file
     String output_file_path
+    String output_type
     String output_uri_prefix
     String output_uri_replace
     String output_permissions
@@ -116,6 +117,10 @@ class MlcpTask extends JavaExec {
         if (output_permissions) {
             newArgs.add("-output_permissions")
             newArgs.add(output_permissions)
+        }
+        if (output_type) {
+            newArgs.add("-output_type")
+            newArgs.add(output_type)
         }
         if (transform_module) {
             newArgs.add("-transform_module")

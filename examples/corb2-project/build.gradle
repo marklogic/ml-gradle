@@ -18,12 +18,12 @@ buildscript {
   }
   dependencies {
     //Needed for CorbTask to dynamicaly generate properties from CORB Options class
-    classpath 'com.marklogic:marklogic-corb:2.3.1'
+    classpath 'com.marklogic:marklogic-corb:2.3.2'
   }
 }
 
 plugins {
-    id "com.marklogic.ml-gradle" version "2.3.0"
+    id "com.marklogic.ml-gradle" version "2.3.2"
 }
 
 repositories {
@@ -42,7 +42,7 @@ configurations {
 
 dependencies {
     // required to run CoRB2
-    corb 'com.marklogic:marklogic-corb:2.3.0'
+    corb 'com.marklogic:marklogic-corb:2.3.2'
     // optional
     //corb 'org.jasypt:jasypt:1.9.2' // would be necessary to leverage JasyptDecrypter
 }

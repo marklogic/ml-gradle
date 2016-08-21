@@ -10,13 +10,13 @@ import com.marklogic.appdeployer.AppConfig
 
 
 /**
- * Provides parameters for some, but not all, mlcp arguments. Arguments that aren't supported can be passed in
- * via JavaExec's "args" property. The main benefit of using this class is that it assumes usage of the connection
- * properties found in the mlAppConfig project property.
- * 
- * Note that this defaults to using appConfig.restAdminUsername and appConfig.restAdminPassword. That user may not 
+ * Delegates properties to an instance of MlcpBean, which has properties for all MLCP arguments (and if it's out of date
+ * and missing one, you can pass them via this class's args property that's inherited from JavaExec). This task
+ * will also default the host/port to the values defined in the mlAppConfig instance populated by the plugin.
+ *
+ * Note that this defaults to using appConfig.restAdminUsername and appConfig.restAdminPassword. That user may not
  * have permission to perform the mlcp operation you wish to perform. In that case, just set the username/password
- * parameters of this task for the appropriate user.  
+ * parameters of this task for the appropriate user.
  */
 class MlcpTask extends JavaExec {
 
@@ -61,11 +61,25 @@ class MlcpTask extends JavaExec {
             }
         }
 
-        println "mlcp arguments, excluding password: " + newArgs
-        
+		// Ensure connection arguments are present
+		if (!newArgs.contains("-host")) {
+			newArgs.add("-host")
+			newArgs.add(config.getHost())
+		}
+		if (!newArgs.contains("-port")) {
+			newArgs.add("-port")
+			newArgs.add("8000")
+		}
+		if (!newArgs.contains("-username")) {
+			newArgs.add("-username")
+			newArgs.add(config.getRestAdminUsername())
+		}
+
+		println "mlcp arguments, excluding password: " + newArgs
+
         newArgs.add("-password")
         newArgs.add(password ? password : config.getRestAdminPassword())
-        
+
         setArgs(newArgs)
 
         super.exec()

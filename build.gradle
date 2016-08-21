@@ -24,11 +24,6 @@ targetCompatibility = "1.7"
 
 repositories {
   jcenter()
-
-  // Needed for mlcp and its Hadoop dependencies
-  maven {url "http://developer.marklogic.com/maven2/"}
-  maven {url "http://repository.cloudera.com/artifactory/cloudera-repos/" }
-
   mavenLocal() // Used for local development only
 }
 
@@ -87,11 +82,11 @@ pluginBundle {
       displayName = 'ml-gradle for MarkLogic'
       description = 'Gradle plugin for configuring and deploying applications to MarkLogic'
       tags = ['marklogic']
-      version = "2.3.2"
+      version = "2.3.3"
     }
   }
 
   mavenCoordinates {
-    version = "2.3.2"
+    version = "2.3.3"
   }
 }

@@ -4,9 +4,17 @@
  * JavaExec task that exposes a number of mlcp arguments as task attributes.
  */
 
-plugins {
-	id "com.marklogic.ml-gradle" version "2.3.0"
+buildscript {
+	repositories {
+		jcenter()
+		mavenLocal()
+	}
+	dependencies {
+		classpath "com.marklogic:ml-gradle:2.3.3"
+	}
 }
+
+apply plugin: "com.marklogic.ml-gradle"
 
 repositories {
 	jcenter()
@@ -92,7 +100,7 @@ task importSemicolonDelimitedText(type: com.marklogic.gradle.task.MlcpTask) {
 	input_file_type = "delimited_text"
 	output_uri_replace = ".*data,'/'"
 	output_permissions = "rest-reader,read,rest-writer,update"
-	args = ["-delimiter", ";"]
+	delimiter = ";"
 }
 
 /**
@@ -109,5 +117,5 @@ task exportSampleData(type: com.marklogic.gradle.task.MlcpTask) {
 	password = "admin" // defaults to mlRestAdminPassword, which defaults to mlPassword
 	database = mlAppConfig.contentDatabaseName
 	output_file_path = "data/export"
-	args = ["-collection_filter", "sample-import"]
+	collection_filter = "sample-import"
 }

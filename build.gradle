@@ -24,6 +24,11 @@ targetCompatibility = "1.7"
 
 repositories {
   jcenter()
+
+  // Needed for mlcp and its Hadoop dependencies
+  maven {url "http://developer.marklogic.com/maven2/"}
+  maven {url "http://repository.cloudera.com/artifactory/cloudera-repos/" }
+
   mavenLocal() // Used for local development only
 }
 
@@ -31,6 +36,7 @@ dependencies {
   compile gradleApi()
   compile localGroovy()
   compile mlAppDeployerDependency
+  compile mlcpUtilDependency
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {

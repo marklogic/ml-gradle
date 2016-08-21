@@ -39,7 +39,7 @@ buildscript {
  * that those blocks can override properties before ml-gradle initializes itself.
  */
 plugins {
-  id "com.marklogic.ml-gradle" version "2.3.2"
+  id "com.marklogic.ml-gradle" version "2.3.3"
 
   // The following plugins are optional
 

@@ -2,7 +2,7 @@ plugins {
   id "java"
   id "eclipse"
   id "com.github.tkruse.groovysh" version "1.0.8"
-  id "com.marklogic.ml-gradle" version "2.3.0"
+  id "com.marklogic.ml-gradle" version "2.3.3"
 }
 
 repositories {

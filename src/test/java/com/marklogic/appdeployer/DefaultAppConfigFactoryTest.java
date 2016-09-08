@@ -54,7 +54,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
         p.setProperty("mlContentForestsPerHost", "17");
         p.setProperty("mlModulePermissions", "some-perm,read,some-perm,update");
         p.setProperty("mlAdditionalBinaryExtensions", ".gradle,.properties");
-        p.setProperty("mlConfigDir", "src/test/resources/sample-app/empty-ml-config");
+        p.setProperty("mlConfigPath", "src/test/resources/sample-app/empty-ml-config");
         p.setProperty("mlSimpleSsl", "anyvalue");
         p.setProperty("mlModulesDatabaseName", "my-modules");
         p.setProperty("mlGroupName", "other-group");
@@ -91,6 +91,19 @@ public class DefaultAppConfigFactoryTest extends Assert {
         assertEquals("path2", paths.get(1));
         assertEquals("path3", paths.get(2));
     }
+
+	/**
+	 * Verifies that mlConfigDir is still supported, though mlConfigPath is preferred.
+	 */
+	@Test
+	public void mlConfigDir() {
+		Properties p = new Properties();
+		p.setProperty("mlConfigDir", "src/test/resources/sample-app/empty-ml-config");
+
+		sut = new DefaultAppConfigFactory(new SimplePropertySource(p));
+		AppConfig config = sut.newAppConfig();
+		assertTrue(config.getConfigDir().getBaseDir().getAbsolutePath().contains("empty-ml-config"));
+	}
 
     @Test
     public void mlUsernameAndPassword() {

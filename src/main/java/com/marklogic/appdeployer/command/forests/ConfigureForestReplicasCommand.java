@@ -169,7 +169,7 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 			return;
 		}
 
-		Map<String, String> replicaNamesAndHostIds = determineReplicaNamesAndHostIds(forestIdOrName, replicaCount, hostIds, forestMgr);
+		Map<String, String> replicaNamesAndHostIds = createReplicaForests(forestIdOrName, replicaCount, hostIds, forestMgr);
 		logger.info(format("Configuring forest replicas for primary forest %s", forestIdOrName));
 		if (!replicaNamesAndHostIds.isEmpty()) {
 			forestMgr.setReplicas(forestIdOrName, replicaNamesAndHostIds);
@@ -185,10 +185,11 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 	 * @param replicaCount
 	 * @param hostIds
 	 * @param forestMgr
-	 * @return
+	 * @return a map where the keys are replica forest names, and the value of each key is the ID of the host that
+	 * the replica was created on
 	 */
-	protected Map<String, String> determineReplicaNamesAndHostIds(String forestIdOrName, int replicaCount, List<String> hostIds,
-																  ForestManager forestMgr) {
+	protected Map<String, String> createReplicaForests(String forestIdOrName, int replicaCount, List<String> hostIds,
+													   ForestManager forestMgr) {
 		String primaryForestHostId = forestMgr.getHostId(forestIdOrName);
 		Map<String, String> replicaNamesAndHostIds = new HashMap<>();
 		int size = hostIds.size();

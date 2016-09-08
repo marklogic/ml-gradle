@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.HttpClientErrorException;
@@ -18,8 +19,14 @@ public class MgmtResponseErrorHandler extends DefaultResponseErrorHandler {
         try {
             super.handleError(response);
         } catch (HttpClientErrorException | HttpServerErrorException ex) {
-            if (logger.isErrorEnabled()) {
-                logger.error("Logging HTTP response body to assist with debugging: " + ex.getResponseBodyAsString());
+			String message = "Logging HTTP response body to assist with debugging: " + ex.getResponseBodyAsString();
+			if (HttpStatus.SERVICE_UNAVAILABLE.equals(ex.getStatusCode())) {
+				if (logger.isDebugEnabled()) {
+					logger.debug(message);
+				}
+			}
+            else if (logger.isErrorEnabled()) {
+                logger.error(message);
             }
             throw ex;
         }

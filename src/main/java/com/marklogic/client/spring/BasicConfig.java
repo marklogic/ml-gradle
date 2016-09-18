@@ -20,7 +20,7 @@ import com.marklogic.xcc.template.XccTemplate;
  * XccTemplate, it needs to know the application name.
  */
 @Configuration
-@PropertySource({ "file:gradle.properties" })
+@PropertySource(value = { "file:gradle.properties" }, ignoreResourceNotFound = true)
 public class BasicConfig {
 
     @Value("${mlAppName}")

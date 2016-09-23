@@ -4,7 +4,11 @@ import javax.net.ssl.SSLContext;
 
 import com.marklogic.client.DatabaseClientFactory.Authentication;
 import com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+@Component
 public class DatabaseClientConfig {
 
     private String host;
@@ -16,7 +20,12 @@ public class DatabaseClientConfig {
     private SSLContext sslContext;
     private SSLHostnameVerifier sslHostnameVerifier;
 
-    public DatabaseClientConfig(String host, int port, String username, String password) {
+    @Autowired
+    public DatabaseClientConfig(
+         @Value("${marklogic.host}") String host,
+         @Value("${marklogic.port}") int port,
+         @Value("${marklogic.username}") String username,
+         @Value("${marklogic.password}") String password) {
         this.host = host;
         this.port = port;
         this.username = username;

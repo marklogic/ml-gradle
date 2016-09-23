@@ -19,7 +19,8 @@ public class SpringConfigurationTest implements ApplicationContextAware {
     @Test
     public void getDatabaseClient() {
         Assert.assertTrue(ctx.containsBeanDefinition("databaseClientConfig"));
-        Assert.assertTrue(ctx.containsBeanDefinition("databaseClient"));
+        Assert.assertTrue(ctx.containsBeanDefinition("databaseClientProvider"));
+        Assert.assertTrue(ctx.containsBeanDefinition("xccTemplate"));
         DatabaseClientConfig config = (DatabaseClientConfig) ctx.getBean("databaseClientConfig");
         Assert.assertEquals("localhost", config.getHost());
         Assert.assertEquals(8000, config.getPort());

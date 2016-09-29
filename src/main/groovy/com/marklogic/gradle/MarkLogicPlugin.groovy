@@ -3,6 +3,8 @@ package com.marklogic.gradle
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand
 import com.marklogic.appdeployer.command.forests.DeployCustomForestsCommand
 import com.marklogic.gradle.task.forests.DeployCustomForestsTask
+import com.marklogic.gradle.task.qconsole.ExportWorkspacesTask
+import com.marklogic.gradle.task.qconsole.ImportWorkspacesTask
 import com.sun.jersey.core.spi.component.ProviderServices
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -205,6 +207,10 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlReloadModules", group: modulesGroup, dependsOn: ["mlClearModulesDatabase", "mlLoadModules"], description: "Reloads modules by first clearing the modules database and then loading modules")
         project.task("mlWatch", type: WatchTask, group: modulesGroup, description: "Run a loop that checks for new/modified modules every second and loads any that it finds")
         project.task("mlDeleteModuleTimestampsFile", type: DeleteModuleTimestampsFileTask, group: modulesGroup, description: "Delete the properties file in the build directory that keeps track of when each module was last loaded")
+
+		String qconsoleGroup = "ml-gradle qconsole"
+		project.task("mlImportWorkspaces", type: ImportWorkspacesTask, group: qconsoleGroup, description: "Import workspaces into qconsole")
+		project.task("mlExportWorkspaces", type: ExportWorkspacesTask, group: qconsoleGroup, description: "Export workspaces from qconsole")
 
         String schemasGroup = "ml-gradle Schemas"
         project.task("mlLoadSchemas", type: LoadSchemasTask, group: schemasGroup, description: "Loads special-purpose data into the schemas database (XSD schemas, Inference rules, and [MarkLogic 9] Extraction Templates)").mustRunAfter("mlClearSchemasDatabase")

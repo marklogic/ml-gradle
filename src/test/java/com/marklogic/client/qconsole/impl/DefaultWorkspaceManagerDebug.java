@@ -20,8 +20,8 @@ public class DefaultWorkspaceManagerDebug {
         DefaultWorkspaceManager dwm = new DefaultWorkspaceManager(client);
         String user = "admin";
         try {
-            System.out.println(dwm.exportWorkspaces(user));
-            System.out.println(dwm.importWorkspaces(user));
+            System.out.println(dwm.exportWorkspaces(user, "Workspace", "Workspace 1"));
+            //System.out.println(dwm.importWorkspaces(user));
         } finally {
             client.release();
         }

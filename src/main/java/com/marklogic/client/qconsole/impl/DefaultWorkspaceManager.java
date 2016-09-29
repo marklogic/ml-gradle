@@ -16,7 +16,8 @@ import java.util.List;
 
 /**
  * Default implementation that uses the ML Java Client API to manage workspaces. By default, workspaces
- * will be exported and imported to/from ~/.qconsole/workspaces/(ML username).
+ * will be exported and imported to/from ~/.qconsole/workspaces/(ML username). This can be overridden by
+ * calling setBaseDir.
  */
 public class DefaultWorkspaceManager extends LoggingObject implements WorkspaceManager {
 
@@ -76,17 +77,13 @@ public class DefaultWorkspaceManager extends LoggingObject implements WorkspaceM
 			return files;
 		}
 
-		String xquery = "import module namespace amped-qconsole = 'http://marklogic.com/appservices/qconsole/util-amped' at '/MarkLogic/appservices/qconsole/qconsole-amped.xqy'; " +
-			"declare variable $workspace external; " +
-			"declare variable $uri external; " +
-			"amped-qconsole:qconsole-document-insert($uri, $workspace)";
-
-		for (File f : userDir.listFiles()) {
-			if (f.isFile() && f.getName().endsWith(".xml")) {
+		for (String workspace : workspaceNames) {
+			File f = new File(userDir, workspace + ".xml");
+			if (f.isFile() && f.exists()) {
 				client.newServerEval()
-					.addVariable("uri", "/workspaces/" + f.getName())
-					.addVariable("workspace", new FileHandle(f).withFormat(Format.XML))
-					.xquery(xquery).eval();
+					.addVariable("user", user)
+					.addVariable("exported-workspace", new FileHandle(f).withFormat(Format.XML))
+					.xquery(QconsoleScripts.IMPORT).eval();
 
 				if (logger.isInfoEnabled()) {
 					logger.info(format("Imported workspace from %s", f.getAbsolutePath()));

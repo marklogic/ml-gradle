@@ -8,10 +8,9 @@ import java.io.IOException;
 /**
  * Debug-style program for manually verifying how DefaultWorkspaceManager works.
  * <p>
- * If the content source ID (an appserver ID) is not valid, that's fine - the content source just defaults
- * to the first app server.
- * <p>
- * If the user doesn't exist, that's fine - it just won't be accessible.
+ * To try this out locally, manually create a new workspace in qconsole and add some queries to it. Then
+ * export it with this program. Then delete it and its queries from the App-Services database. Then run this
+ * program to import it back in.
  */
 public class DefaultWorkspaceManagerDebug {
 
@@ -19,9 +18,10 @@ public class DefaultWorkspaceManagerDebug {
         DatabaseClient client = DatabaseClientFactory.newClient("localhost", 8000, "App-Services", "admin", "admin", DatabaseClientFactory.Authentication.DIGEST);
         DefaultWorkspaceManager dwm = new DefaultWorkspaceManager(client);
         String user = "admin";
+        final String workspaceName = "Workspace 1";
         try {
-            System.out.println(dwm.exportWorkspaces(user, "Workspace", "Workspace 1"));
-            //System.out.println(dwm.importWorkspaces(user));
+            //System.out.println(dwm.exportWorkspaces(user, workspaceName));
+            System.out.println(dwm.importWorkspaces(user, workspaceName));
         } finally {
             client.release();
         }

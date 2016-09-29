@@ -1,5 +1,9 @@
 package com.marklogic.client.qconsole.impl;
 
+/**
+ * This scripts are defined as strings so that it's easy to reuse this in an environment like Gradle without
+ * having to read files from the classpath.
+ */
 public class QconsoleScripts {
 
 	public static final String IMPORT = "xquery version \"1.0-ml\";\n" +
@@ -12,7 +16,7 @@ public class QconsoleScripts {
 		"\n" +
 		"declare namespace eval = \"xdmp:eval\";\n" +
 		"\n" +
-		"declare variable $exported-workspace as xs:string external;\n" +
+		"declare variable $exported-workspace as node() external;\n" +
 		"declare variable $user as xs:string external;\n" +
 		"\n" +
 		"declare function local:qconsole-eval(\n" +
@@ -28,7 +32,7 @@ public class QconsoleScripts {
 		"};\n" +
 		"\n" +
 		"declare function local:import-workspace(\n" +
-		"    $workspace as xs:string,\n" +
+		"    $workspace as element(),\n" +
 		"    $user as xs:string \n" +
 		") as xs:string*\n" +
 		"{\n" +
@@ -91,7 +95,6 @@ public class QconsoleScripts {
 		"        let $set-active := qconsole-model:set-only-one-workspace-active($wsid)\n" +
 		"        return $wsid'\n" +
 		"            \n" +
-		"    let $workspace := xdmp:unquote($workspace)/node()        \n" +
 		"    let $new-wsid := \n" +
 		"        local:qconsole-eval($eval-query, \n" +
 		"            (xs:QName(\"workspace\"), $workspace, \n" +
@@ -101,7 +104,7 @@ public class QconsoleScripts {
 		"    return $ws-uri\n" +
 		"};\n" +
 		"\n" +
-		"local:import-workspace($exported-workspace, $user)";
+		"local:import-workspace($exported-workspace/element(), $user)";
 
 	public final static String EXPORT = "xquery version \"1.0-ml\";\n" +
 		"\n" +

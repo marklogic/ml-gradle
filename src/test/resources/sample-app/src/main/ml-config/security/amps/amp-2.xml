@@ -1,5 +1,5 @@
 <amp-properties xmlns="http://marklogic.com/manage">
-  <local-name>sample-app-amp-2</local-name>
+  <local-name>ml-app-deployer-test-2</local-name>
   <document-uri>/module/path/name2</document-uri>
   <namespace>http://example.com/uri</namespace>
   <roles>

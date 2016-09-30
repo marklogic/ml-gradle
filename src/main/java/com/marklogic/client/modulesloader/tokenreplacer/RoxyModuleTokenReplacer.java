@@ -10,6 +10,7 @@ public class RoxyModuleTokenReplacer extends DefaultModuleTokenReplacer {
 
     public RoxyModuleTokenReplacer() {
         super();
+        setPropertyPrefix("@ml.");
         addPropertiesSource(new FilePropertiesSource(new File("deploy/default.properties")));
         addPropertiesSource(new FilePropertiesSource(new File("deploy/build.properties")));
         addPropertiesSource(new FilePropertiesSource(new File("deploy/local.properties")));

@@ -20,7 +20,7 @@ public class DefaultModuleTokenReplacer extends LoggingObject implements ModuleT
     private Properties properties;
     private PropertyPlaceholderHelper helper;
     private List<PropertiesSource> propertiesSources = new ArrayList<>();
-    private String propertyPrefix = "@ml.";
+    private String propertyPrefix;
 
     public void addPropertiesSource(PropertiesSource source) {
         this.propertiesSources.add(source);

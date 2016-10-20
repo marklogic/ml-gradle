@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.marklogic.mgmt.AbstractResourceManager;
 import com.marklogic.mgmt.ManageClient;
+import com.marklogic.mgmt.requests.RequestManager;
 import com.marklogic.rest.util.Fragment;
 
 /**
@@ -106,6 +107,33 @@ public class TaskManager extends AbstractResourceManager {
             deleteAtPath(getResourcesPath() + "/" + id + "?group-id=" + groupName);
         }
     }
+
+	public void waitForTasksToComplete(String group, int retryInSeconds) {
+		Fragment servers = getManageClient().getXml("/manage/v2/task-servers");
+		String taskServerId = servers.getElementValue(format("//ts:list-item[ts:groupnameref = '%s']/ts:idref", group));
+		if (taskServerId == null) {
+			logger.warn(format("Could not find task server ID for group %s, so not waiting for tasks to complete", group));
+			return;
+		}
+		RequestManager mgr = new RequestManager(getManageClient());
+		if (logger.isInfoEnabled()) {
+			logger.info("Waiting for tasks to complete on task server");
+		}
+		int count = mgr.getRequestCountForRelationId(taskServerId);
+		while (count > 0) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Waiting for tasks to complete on task server, count: " + count);
+			}
+			try {
+				Thread.sleep(retryInSeconds * 1000);
+			} catch (InterruptedException e) {
+			}
+			count = mgr.getRequestCountForRelationId(taskServerId);
+		}
+		if (logger.isInfoEnabled()) {
+			logger.info("Finished waiting for tasks to complete on task server");
+		}
+	}
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;

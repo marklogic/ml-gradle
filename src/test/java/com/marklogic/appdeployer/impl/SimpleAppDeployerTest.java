@@ -34,4 +34,12 @@ public class SimpleAppDeployerTest extends Assert {
         assertEquals(dbCommand, deployer.getCommand("DeployContentDatabasesCommand"));
         assertNull(deployer.getCommand("SomeOtherCommand"));
     }
+
+	@Test
+	public void removeCommand() {
+		assertEquals(restApiCommand, deployer.removeCommand("DeployRestApiServersCommand"));
+		assertEquals(1, deployer.getCommands().size());
+		assertEquals(dbCommand, deployer.removeCommand("DeployContentDatabasesCommand"));
+		assertTrue(deployer.getCommands().isEmpty());
+	}
 }

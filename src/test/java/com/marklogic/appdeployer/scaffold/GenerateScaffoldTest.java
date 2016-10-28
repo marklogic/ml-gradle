@@ -44,8 +44,14 @@ public class GenerateScaffoldTest extends AbstractAppDeployerTest {
             assertTrue(dbMgr.exists(appConfig.getContentDatabaseName()));
             assertTrue(dbMgr.exists(appConfig.getTriggersDatabaseName()));
 
-            assertTrue(new UserManager(manageClient).exists("sample-app-user"));
-            assertTrue(new RoleManager(manageClient).exists("sample-app-role"));
+            assertTrue(new UserManager(manageClient).exists("sample-app-reader"));
+			assertTrue(new UserManager(manageClient).exists("sample-app-writer"));
+			assertTrue(new UserManager(manageClient).exists("sample-app-admin"));
+            assertTrue(new RoleManager(manageClient).exists("sample-app-nobody"));
+			assertTrue(new RoleManager(manageClient).exists("sample-app-reader"));
+			assertTrue(new RoleManager(manageClient).exists("sample-app-writer"));
+			assertTrue(new RoleManager(manageClient).exists("sample-app-internal"));
+			assertTrue(new RoleManager(manageClient).exists("sample-app-admin"));
         } finally {
             undeploySampleApp();
         }
@@ -56,8 +62,6 @@ public class GenerateScaffoldTest extends AbstractAppDeployerTest {
         assertTrue(configDir.exists());
         assertTrue(new File(configDir, "rest-api.json").exists());
         assertTrue(new File(configDir, "databases/content-database.json").exists());
-        assertTrue(new File(configDir, "security/roles/sample-app-role.json").exists());
-        assertTrue(new File(configDir, "security/users/sample-app-user.json").exists());
     }
 
     private void assertModulesFilesAreCreated(File dir) {

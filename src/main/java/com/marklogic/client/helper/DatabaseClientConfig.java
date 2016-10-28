@@ -15,7 +15,7 @@ public class DatabaseClientConfig {
     private Authentication authentication = Authentication.DIGEST;
     private SSLContext sslContext;
     private SSLHostnameVerifier sslHostnameVerifier;
-
+    
     public DatabaseClientConfig(String host, int port, String username, String password) {
         this.host = host;
         this.port = port;

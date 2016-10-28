@@ -20,6 +20,7 @@ dependencies {
   compile 'org.springframework:spring-context:4.1.5.RELEASE'
   
   testCompile 'junit:junit:4+'
+  testCompile 'org.springframework:spring-test:4.1.5.RELEASE'
   
   // Used for testing loading modules from the classpath
   testRuntime files("lib/modules.jar")

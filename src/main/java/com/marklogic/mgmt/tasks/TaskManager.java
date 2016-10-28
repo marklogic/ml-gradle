@@ -121,8 +121,8 @@ public class TaskManager extends AbstractResourceManager {
 		}
 		int count = mgr.getRequestCountForRelationId(taskServerId);
 		while (count > 0) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("Waiting for tasks to complete on task server, count: " + count);
+			if (logger.isInfoEnabled()) {
+				logger.info("Waiting for tasks to complete on task server, count: " + count);
 			}
 			try {
 				Thread.sleep(retryInSeconds * 1000);

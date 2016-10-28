@@ -5,6 +5,7 @@ import com.marklogic.appdeployer.command.forests.DeployCustomForestsCommand
 import com.marklogic.gradle.task.forests.DeployCustomForestsTask
 import com.marklogic.gradle.task.qconsole.ExportWorkspacesTask
 import com.marklogic.gradle.task.qconsole.ImportWorkspacesTask
+import com.marklogic.gradle.task.tasks.WaitForTaskServerTask
 import com.sun.jersey.core.spi.component.ProviderServices
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -246,7 +247,8 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlDeleteAllTasks", type: DeleteAllTasksTask, group: taskGroup, description: "Delete all scheduled tasks in the cluster")
         project.task("mlDeployTasks", type: DeployTasksTask, group: taskGroup, description: "Deploy each scheduled task, updating it if it exists, in the configuration directory")
         project.task("mlUndeployTasks", type: UndeployTasksTask, group: taskGroup, description: "Undeploy (delete) each scheduled task in the configuration directory")
-
+		project.task("mlWaitForTaskServer", type: WaitForTaskServerTask, group: taskGroup, description: "Wait for the task server to not have any requests in progress")
+		
         String triggerGroup = "ml-gradle Trigger"
         project.task("mlDeployTriggers", type: DeployTriggersTask, group: triggerGroup, description: "Deploy each trigger, updating it if it exists, in the configuration directory")
 

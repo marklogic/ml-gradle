@@ -32,7 +32,6 @@ dependencies {
   compile localGroovy()
   compile mlAppDeployerDependency
   compile mlcpUtilDependency
-	compile "com.marklogic:ml-javaclient-util:2.10.0-alpha"
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {

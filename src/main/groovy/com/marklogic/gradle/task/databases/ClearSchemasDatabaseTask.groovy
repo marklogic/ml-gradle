@@ -8,7 +8,7 @@ import com.marklogic.mgmt.databases.DatabaseManager
 class ClearSchemasDatabaseTask extends MarkLogicTask {
 
     @TaskAction
-    void clearModules() {
+    void clearSchemasDatabase() {
         println "Clearing all documents in schemas database"
         DatabaseManager mgr = new DatabaseManager(getManageClient())
         mgr.clearDatabase(getAppConfig().getSchemasDatabaseName())

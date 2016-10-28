@@ -2,6 +2,7 @@ package com.marklogic.gradle
 
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand
 import com.marklogic.appdeployer.command.forests.DeployCustomForestsCommand
+import com.marklogic.gradle.task.databases.DeleteCollectionTask
 import com.marklogic.gradle.task.forests.DeployCustomForestsTask
 import com.marklogic.gradle.task.qconsole.ExportWorkspacesTask
 import com.marklogic.gradle.task.qconsole.ImportWorkspacesTask
@@ -171,6 +172,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlClearModulesDatabase", type: ClearModulesDatabaseTask, group: dbGroup, dependsOn: "mlDeleteModuleTimestampsFile", description: "Deletes potentially all of the documents in the modules database; has a property for excluding documents from deletion")
         project.task("mlClearSchemasDatabase", type: ClearSchemasDatabaseTask, group: dbGroup, description: "Deletes all documents in the schemas database")
         project.task("mlClearTriggersDatabase", type: ClearTriggersDatabaseTask, group: dbGroup, description: "Deletes all documents in the triggers database")
+		project.task("mlDeleteCollection", type: DeleteCollectionTask, group: dbGroup, description: "Delete the collection of documents in the content database; use -Pcollection=name to specify the collection name on the command line")
         project.task("mlDeployDatabases", type: DeployDatabasesTask, group: dbGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Deploy each database, updating it if it exists, in the configuration directory")
         project.task("mlMergeContentDatabase", type: MergeContentDatabaseTask, group: dbGroup, description: "Merge the database named by mlAppConfig.contentDatabaseName")
         project.task("mlMergeDatabase", type: MergeDatabaseTask, group: dbGroup, description: "Merge the database named by the project property dbName; e.g. gradle mlMergeDatabase -PdbName=my-database")
@@ -248,7 +250,7 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlDeployTasks", type: DeployTasksTask, group: taskGroup, description: "Deploy each scheduled task, updating it if it exists, in the configuration directory")
         project.task("mlUndeployTasks", type: UndeployTasksTask, group: taskGroup, description: "Undeploy (delete) each scheduled task in the configuration directory")
 		project.task("mlWaitForTaskServer", type: WaitForTaskServerTask, group: taskGroup, description: "Wait for the task server to not have any requests in progress")
-		
+
         String triggerGroup = "ml-gradle Trigger"
         project.task("mlDeployTriggers", type: DeployTriggersTask, group: triggerGroup, description: "Deploy each trigger, updating it if it exists, in the configuration directory")
 

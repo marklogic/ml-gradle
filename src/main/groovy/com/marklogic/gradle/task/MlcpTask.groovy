@@ -80,6 +80,9 @@ class MlcpTask extends JavaExec {
         newArgs.add("-password")
         newArgs.add(password ? password : config.getRestAdminPassword())
 
+		// Include any args that a user has configured via the args parameter of the Gradle task
+		newArgs.addAll(getArgs())
+
         setArgs(newArgs)
 
         super.exec()

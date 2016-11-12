@@ -47,12 +47,12 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
     private ExtensionMetadataProvider extensionMetadataProvider;
     private ModulesManager modulesManager;
 
-    /**
-     * When set to true, exceptions thrown while loading transforms and resources will be caught and logged, and the
-     * module will be updated as having been loaded. This is useful when running a program like ModulesWatcher, as it
-     * prevents the program from crashing and also from trying to load the module over and over.
-     */
-    private boolean catchExceptions = false;
+	/**
+	 * When set to true, exceptions thrown while loading transforms and resources will be caught and logged, and the
+	 * module will be updated as having been loaded. This is useful when running a program that watches modules for changes, as it
+	 * prevents the program from crashing and also from trying to load the module over and over.
+	 */
+	private boolean catchExceptions = false;
 
     /**
      * Use this when you don't need to load asset modules.
@@ -66,7 +66,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
      * Use this when you want to load asset modules via the REST API. The DatabaseClient used by RestApiAssetLoader
      * should point to the modules database you're targeting; otherwise, the modules will end up in the content
      * database.
-     * 
+     *
      * @param restApiAssetLoader
      */
     public DefaultModulesLoader(RestApiAssetLoader restApiAssetLoader) {
@@ -76,7 +76,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 
     /**
      * Use this when you want to load modules via XCC. XCC is generally faster than the REST API.
-     * 
+     *
      * @param xccAssetLoader
      */
     public DefaultModulesLoader(XccAssetLoader xccAssetLoader) {
@@ -119,7 +119,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 
     /**
      * Specialized method for loading modules from the classpath. Currently does not support loading asset modules.
-     * 
+     *
      * @param rootPath
      * @param client
      */
@@ -273,11 +273,12 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 
         Set<File> files = null;
 
-        if (restApiAssetLoader != null) {
-            files = restApiAssetLoader.loadAssets(paths);
-        } else if (xccAssetLoader != null) {
-            files = xccAssetLoader.loadAssetsViaXcc(paths);
-        }
+		if (restApiAssetLoader != null) {
+			files = restApiAssetLoader.loadAssets(paths);
+		} else if (xccAssetLoader != null) {
+			xccAssetLoader.setCatchExceptions(catchExceptions);
+			files = xccAssetLoader.loadAssetsViaXcc(paths);
+		}
 
         if (files != null) {
             loadedModules.addAll(files);
@@ -313,9 +314,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
                 }
             } catch (RuntimeException e) {
                 if (catchExceptions) {
-                    logger.warn(
-                            "Unable to load module from file: " + f.getAbsolutePath() + "; cause: " + e.getMessage(),
-                            e);
+                    logger.warn("Unable to load module from file: " + f.getAbsolutePath() + "; cause: " + e.getMessage(), e);
                     loadedModules.add(f);
                     if (modulesManager != null) {
                         modulesManager.saveLastInstalledTimestamp(f, new Date());
@@ -339,9 +338,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
                 f = installService(f, emap.metadata, emap.methods.toArray(new MethodParameters[] {}));
             } catch (RuntimeException e) {
                 if (catchExceptions) {
-                    logger.warn(
-                            "Unable to load module from file: " + f.getAbsolutePath() + "; cause: " + e.getMessage(),
-                            e);
+                    logger.warn("Unable to load module from file: " + f.getAbsolutePath() + "; cause: " + e.getMessage(), e);
                     loadedModules.add(f);
                     if (modulesManager != null) {
                         modulesManager.saveLastInstalledTimestamp(f, new Date());

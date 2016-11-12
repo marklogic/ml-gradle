@@ -4,7 +4,6 @@ plugins {
   id "eclipse"
   id "idea"
   id "com.jfrog.bintray" version "1.5"
-	id "com.marklogic.ml-gradle" version "2.4.0"
 }
 
 sourceCompatibility = "1.7"

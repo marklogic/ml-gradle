@@ -11,6 +11,12 @@ class InstallAdminTask extends MarkLogicTask {
 
     @TaskAction
     void installAdmin() {
+		if (project.hasProperty("adminUsername")) {
+			adminUsername = project.property("adminUsername")
+		}
+		if (project.hasProperty("adminPassword")) {
+			adminPassword = project.property("adminPassword")
+		}
         getAdminManager().installAdmin(adminUsername, adminPassword)
     }
 }

@@ -4,6 +4,7 @@ import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand
 import com.marklogic.appdeployer.command.forests.DeployCustomForestsCommand
 import com.marklogic.gradle.task.databases.DeleteCollectionTask
 import com.marklogic.gradle.task.forests.DeployCustomForestsTask
+import com.marklogic.gradle.task.groups.SetTraceEventsTask
 import com.marklogic.gradle.task.qconsole.ExportWorkspacesTask
 import com.marklogic.gradle.task.qconsole.ImportWorkspacesTask
 import com.marklogic.gradle.task.tasks.WaitForTaskServerTask
@@ -201,6 +202,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 
         String groupsGroup = "ml-gradle Group"
         project.task("mlDeployGroups", type: DeployGroupsTask, group: groupsGroup, description: "Deploy each group, updating it if it exists, in the configuration directory")
+		project.task("mlSetTraceEvents", type: SetTraceEventsTask, group: groupsGroup, description: "Set trace events via a comma-delimited string - e.g. -Pevents=event1,event2")
 
         String mimetypesGroup = "ml-gradle Mimetypes"
         project.task("mlDeployMimetypes", type: DeployMimetypesTask, group: mimetypesGroup, description: "Deploy each mimetype, updating it if it exists, in the configuration directory")

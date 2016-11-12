@@ -5,6 +5,7 @@ sudo: true
 before_install:
   - echo 'America/Los_Angeles' | sudo tee /etc/timezone
   - sudo dpkg-reconfigure --frontend noninteractive tzdata
+  - chmod 755 ./shared/dev-tasks/*.sh
 install:
   - ./shared/dev-tasks/install-dependencies.sh
 script:

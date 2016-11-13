@@ -27,6 +27,7 @@ if [[ $arg1 = 'release' ]]; then
   url="https://developer.marklogic.com${dl_link}"
 
   echo "********* Downloading MarkLogic $ver"
+	echo "Download URL: $url"
 
   successOrExit curl -k -o ./$fname $url
 

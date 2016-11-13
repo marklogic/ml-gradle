@@ -12,8 +12,14 @@ import java.io.File;
  * each directory under ml-config/forests (the name of the directory does not matter, but it makes sense to name
  * it after the database that the forests belong to), and each file in a directory can have a single forest object
  * or an array of forest objects.
+ *
+ * You can also set customForestsPath to specify a directory other than "forest" as the path that contains
+ * directories of custom forests. This allows you to easily support different custom forests in different
+ * environments.
  */
 public class DeployCustomForestsCommand extends AbstractCommand {
+
+	private String customForestsPath = "forests";
 
 	public DeployCustomForestsCommand() {
 		setExecuteSortOrder(SortOrderConstants.DEPLOY_FORESTS);
@@ -21,7 +27,7 @@ public class DeployCustomForestsCommand extends AbstractCommand {
 
 	@Override
 	public void execute(CommandContext context) {
-		File dir = new File(context.getAppConfig().getConfigDir().getBaseDir(), "forests");
+		File dir = new File(context.getAppConfig().getConfigDir().getBaseDir(), customForestsPath);
 		if (dir != null && dir.exists()) {
 			for (File f : dir.listFiles()) {
 				if (f.isDirectory()) {
@@ -37,5 +43,9 @@ public class DeployCustomForestsCommand extends AbstractCommand {
 			String payload = copyFileToString(f, context);
 			mgr.saveJsonForests(payload);
 		}
+	}
+
+	public void setCustomForestsPath(String customForestsPath) {
+		this.customForestsPath = customForestsPath;
 	}
 }

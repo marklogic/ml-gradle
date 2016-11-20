@@ -25,7 +25,7 @@ public class LoadModulesTest extends Assert {
 	private XccStaticChecker staticChecker;
 
 	private String host = "localhost";
-	private int port = 8123;
+	private int port = 8000;
 	private String username = "admin";
 	private String password = "admin";
 	private String database = "Modules";
@@ -76,6 +76,7 @@ public class LoadModulesTest extends Assert {
 			modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
 			fail("The load should have failed because of the bad library module");
 		} catch (RuntimeException ex) {
+			System.out.println(ex.getMessage());
 			assertTrue(ex.getMessage().contains("Static check failed for module at URI: /ext/bad-lib.xqy"));
 			assertTrue(ex.getMessage().contains("in /ext/bad-lib.xqy, on line 7"));
 		}

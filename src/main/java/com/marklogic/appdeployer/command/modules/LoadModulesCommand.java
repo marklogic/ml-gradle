@@ -26,12 +26,14 @@ public class LoadModulesCommand extends AbstractCommand {
     /**
      * Public so that a client can initialize the ModulesLoader and then access it via the getter; this is useful for a
      * tool like ml-gradle, where the ModulesLoader can be reused by multiple tasks.
-     * 
+     *
      * @param context
      */
     public void initializeDefaultModulesLoader(CommandContext context) {
         logger.info("Initializing instance of DefaultModulesLoader");
-        this.modulesLoader = new DefaultModulesLoader(context.getAppConfig().newXccAssetLoader());
+		DefaultModulesLoader l = new DefaultModulesLoader(context.getAppConfig().newXccAssetLoader());
+		l.setStaticChecker(context.getAppConfig().newStaticChecker());
+        this.modulesLoader = l;
     }
 
     @Override
@@ -47,7 +49,7 @@ public class LoadModulesCommand extends AbstractCommand {
      * If we have multiple module paths, we want to load via XCC the assets for each first, and then iterate over the
      * paths again and load all the REST API resources. This ensures that if the REST server for loading REST API
      * resources has a custom rewriter, it's guaranteed to be loaded before we try to load any REST API resources.
-     * 
+     *
      * @param context
      */
     protected void loadModulesIntoMainServer(CommandContext context) {
@@ -76,7 +78,7 @@ public class LoadModulesCommand extends AbstractCommand {
     /**
      * We use a customized impl of DefaultModulesLoader here so we can ensure that options are always loaded again into
      * the test server.
-     * 
+     *
      * @param context
      */
     protected void loadModulesIntoTestServer(CommandContext context) {

@@ -28,6 +28,30 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
         undeploySampleApp();
     }
 
+	@Test
+	public void loadModulesWithStaticCheck() {
+		appConfig.getModulePaths().clear();
+		appConfig.getModulePaths().add("src/test/resources/sample-app/static-check-modules");
+		appConfig.setStaticCheckAssetModules(false);
+		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
+
+		// This should succeed because modules aren't statically checked
+		appDeployer.deploy(appConfig);
+
+		// Now load modules with static check enabled
+		appConfig.setStaticCheckAssetModules(true);
+		initializeAppDeployer(buildLoadModulesCommand());
+		try {
+			appDeployer.deploy(appConfig);
+			fail("An error should have been thrown because /ext/bad.xqy failed static check");
+		} catch (Exception ex) {
+			String message = ex.getMessage();
+			assertTrue("Loading modules with 2.11.0 of ml-javaclient-util defaults to bulk loading, so static checking should as well",
+				message.contains("Bulk static check failure"));
+			assertTrue(message.contains("in /ext/bad.xqy, on line 2"));
+		}
+	}
+
     @Test
     public void loadModulesFromMultiplePaths() {
         appConfig.getModulePaths().add("src/test/resources/sample-app/build/mlRestApi/some-library/ml-modules");

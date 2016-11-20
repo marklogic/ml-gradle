@@ -1,20 +1,15 @@
 package com.marklogic.appdeployer;
 
-import java.io.File;
-
-import org.junit.After;
-import org.junit.Before;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ConfigurableApplicationContext;
-
 import com.marklogic.appdeployer.command.Command;
 import com.marklogic.appdeployer.command.modules.LoadModulesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.appdeployer.impl.SimpleAppDeployer;
 import com.marklogic.client.modulesloader.impl.DefaultModulesLoader;
 import com.marklogic.mgmt.AbstractMgmtTest;
-import com.marklogic.mgmt.ManageConfig;
 import com.marklogic.xcc.template.XccTemplate;
+import org.junit.Before;
+
+import java.io.File;
 
 /**
  * Base class for tests that depend on an AppDeployer instance. You can extend this directly to write a test for a
@@ -86,6 +81,7 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
     protected LoadModulesCommand buildLoadModulesCommand() {
         LoadModulesCommand command = new LoadModulesCommand();
         DefaultModulesLoader loader = new DefaultModulesLoader(appConfig.newXccAssetLoader());
+		loader.setStaticChecker(appConfig.newStaticChecker());
         loader.setModulesManager(null);
         command.setModulesLoader(loader);
         return command;

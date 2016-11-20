@@ -14,8 +14,6 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		super();
 	}
 
-	;
-
 	public DefaultAppConfigFactory(PropertySource propertySource) {
 		super(propertySource);
 	}
@@ -236,6 +234,35 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 				list.add(s);
 			}
 			c.setModulePaths(list);
+		}
+
+		/**
+		 * Whether or not to load asset modules in bulk - i.e. in one transaction. Defaults to true.
+		 */
+		prop = getProperty("mlBulkLoadAssets");
+		if (prop != null) {
+			logger.info("Bulk load modules: " + prop);
+			c.setBulkLoadAssetModules(Boolean.parseBoolean(prop));
+		}
+
+		/**
+		 * Whether or not to statically check asset modules after they're loaded - defaults to false.
+		 */
+		prop = getProperty("mlStaticCheckAssets");
+		if (prop != null) {
+			logger.info("Statically check asset modules: " + prop);
+			c.setStaticCheckAssetModules(Boolean.parseBoolean(prop));
+		}
+
+		/**
+		 * Whether or not to attempt to statically check asset library modules after they're loaded - defaults to false.
+		 * If mlStaticCheckAssets is true and this is false, and no errors will be thrown for library modules.
+		 * See XccAssetLoader in ml-javaclient-util for information on how this tries to check a library module.
+		 */
+		prop = getProperty("mlStaticCheckLibraryAssets");
+		if (prop != null) {
+			logger.info("Statically check asset library modules: " + prop);
+			c.setStaticCheckAssetLibraryModules(Boolean.parseBoolean(prop));
 		}
 
 		return c;

@@ -4,13 +4,16 @@ import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.DatabaseClientFactory.Authentication;
 import com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier;
+import com.marklogic.client.modulesloader.impl.StaticChecker;
 import com.marklogic.client.modulesloader.impl.XccAssetLoader;
+import com.marklogic.client.modulesloader.impl.XccStaticChecker;
 import com.marklogic.client.modulesloader.ssl.SimpleX509TrustManager;
 import com.marklogic.client.modulesloader.tokenreplacer.DefaultModuleTokenReplacer;
 import com.marklogic.client.modulesloader.tokenreplacer.ModuleTokenReplacer;
 import com.marklogic.client.modulesloader.tokenreplacer.PropertiesSource;
 import com.marklogic.client.modulesloader.tokenreplacer.RoxyModuleTokenReplacer;
 import com.marklogic.client.modulesloader.xcc.DefaultDocumentFormatGetter;
+import com.marklogic.xcc.template.XccTemplate;
 
 import javax.net.ssl.SSLContext;
 import java.io.FileFilter;
@@ -80,6 +83,11 @@ public class AppConfig {
     private String schemasDatabaseName;
 
     private List<String> modulePaths;
+	private boolean staticCheckAssetModules = false;
+	private boolean staticCheckAssetLibraryModules = false;
+	private boolean bulkLoadAssetModules = true;
+	private boolean catchExceptionsForAssetModules = false;
+
     private String schemasPath;
     private ConfigDir configDir;
 
@@ -167,7 +175,19 @@ public class AppConfig {
                 getRestSslHostnameVerifier());
     }
 
-    /**
+	public StaticChecker newStaticChecker() {
+		if (isStaticCheckAssetModules()) {
+			String xccUri = "xcc://%s:%s@%s:%d";
+			xccUri = String.format(xccUri, getRestAdminUsername(), getRestAdminPassword(), getHost(), getRestPort());
+			XccStaticChecker checker = new XccStaticChecker(new XccTemplate(xccUri));
+			checker.setBulkCheck(isBulkLoadAssetModules());
+			checker.setCheckLibraryModules(isStaticCheckAssetLibraryModules());
+			return checker;
+		}
+		return null;
+	}
+
+	/**
      * @return an XccAssetLoader based on the configuration properties in this class
      */
     public XccAssetLoader newXccAssetLoader() {
@@ -202,6 +222,7 @@ public class AppConfig {
             l.setModuleTokenReplacer(buildModuleTokenReplacer());
         }
 
+		l.setBulkLoad(isBulkLoadAssetModules());
         return l;
     }
 
@@ -576,4 +597,36 @@ public class AppConfig {
     public void setModuleTokensPropertiesSources(List<PropertiesSource> moduleTokensPropertiesSources) {
         this.moduleTokensPropertiesSources = moduleTokensPropertiesSources;
     }
+
+	public boolean isStaticCheckAssetModules() {
+		return staticCheckAssetModules;
+	}
+
+	public void setStaticCheckAssetModules(boolean staticCheckAssetModules) {
+		this.staticCheckAssetModules = staticCheckAssetModules;
+	}
+
+	public boolean isStaticCheckAssetLibraryModules() {
+		return staticCheckAssetLibraryModules;
+	}
+
+	public void setStaticCheckAssetLibraryModules(boolean staticCheckAssetLibraryModules) {
+		this.staticCheckAssetLibraryModules = staticCheckAssetLibraryModules;
+	}
+
+	public boolean isBulkLoadAssetModules() {
+		return bulkLoadAssetModules;
+	}
+
+	public void setBulkLoadAssetModules(boolean bulkLoadAssetModules) {
+		this.bulkLoadAssetModules = bulkLoadAssetModules;
+	}
+
+	public boolean isCatchExceptionsForAssetModules() {
+		return catchExceptionsForAssetModules;
+	}
+
+	public void setCatchExceptionsForAssetModules(boolean catchExceptionsForAssetModules) {
+		this.catchExceptionsForAssetModules = catchExceptionsForAssetModules;
+	}
 }

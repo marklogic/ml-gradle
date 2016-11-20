@@ -38,7 +38,8 @@ public class ModulesWatcher extends LoggingObject implements Runnable {
     @Override
     public void run() {
         XccAssetLoader xal = appConfig.newXccAssetLoader();
-        ModulesLoader loader = new DefaultModulesLoader(xal);
+        DefaultModulesLoader loader = new DefaultModulesLoader(xal);
+		loader.setStaticChecker(appConfig.newStaticChecker());
         DatabaseClient client = appConfig.newDatabaseClient();
         List<String> paths = appConfig.getModulePaths();
         ModulesFinder finder = new DefaultModulesFinder();

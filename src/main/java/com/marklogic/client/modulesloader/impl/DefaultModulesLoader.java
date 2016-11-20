@@ -46,6 +46,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
     private RestApiAssetLoader restApiAssetLoader;
     private ExtensionMetadataProvider extensionMetadataProvider;
     private ModulesManager modulesManager;
+	private StaticChecker staticChecker;
 
 	/**
 	 * When set to true, exceptions thrown while loading transforms and resources will be caught and logged, and the
@@ -276,8 +277,22 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		if (restApiAssetLoader != null) {
 			files = restApiAssetLoader.loadAssets(paths);
 		} else if (xccAssetLoader != null) {
-			xccAssetLoader.setCatchExceptions(catchExceptions);
-			files = xccAssetLoader.loadAssetsViaXcc(paths);
+			List<LoadedAsset> list = xccAssetLoader.loadAssetsViaXcc(paths);
+			if (staticChecker != null) {
+				try {
+					staticChecker.checkLoadedAssets(list);
+				} catch (RuntimeException ex) {
+					if (catchExceptions) {
+						logger.warn("Static check failure: " + ex.getMessage(), ex);
+					} else {
+						throw ex;
+					}
+				}
+			}
+			files = new HashSet<>();
+			for (LoadedAsset asset : list) {
+				files.add(asset.getFile());
+			}
 		}
 
         if (files != null) {
@@ -534,4 +549,8 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
     public void setRestApiAssetLoader(RestApiAssetLoader restApiAssetLoader) {
         this.restApiAssetLoader = restApiAssetLoader;
     }
+
+	public void setStaticChecker(StaticChecker staticChecker) {
+		this.staticChecker = staticChecker;
+	}
 }

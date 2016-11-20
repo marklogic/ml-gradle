@@ -36,9 +36,6 @@ public class LoadModulesDebug {
 		xal.setPassword("admin");
 		xal.setUsername("admin");
 		xal.setPort(8000);
-		xal.setBulkLoad(false);
-		xal.setStaticCheck(true);
-		xal.setStaticCheckLibraryModules(true);
 
 		DefaultModulesLoader l = new DefaultModulesLoader();
 		l.setModulesManager(null);

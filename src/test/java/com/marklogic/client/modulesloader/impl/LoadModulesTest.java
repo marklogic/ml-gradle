@@ -2,6 +2,7 @@ package com.marklogic.client.modulesloader.impl;
 
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
+import com.marklogic.xcc.template.XccTemplate;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -12,16 +13,19 @@ import java.util.Set;
 
 /**
  * This uses the default Modules database, and it clears it out before the test starts.
- *
+ * <p>
  * TODO Move config to a properties file
  */
 public class LoadModulesTest extends Assert {
 
 	private DatabaseClient client;
+	private XccTemplate xccTemplate;
 	private DefaultModulesLoader modulesLoader;
 	private XccAssetLoader xccAssetLoader;
+	private XccStaticChecker staticChecker;
 
 	private String host = "localhost";
+	private int port = 8123;
 	private String username = "admin";
 	private String password = "admin";
 	private String database = "Modules";
@@ -29,18 +33,23 @@ public class LoadModulesTest extends Assert {
 
 	@Before
 	public void setup() {
-		client = DatabaseClientFactory.newClient(host, 8000, database, username, password, DatabaseClientFactory.Authentication.DIGEST);
-		client.newServerEval().xquery("cts:uri-match('*.*') ! xdmp:document-delete(.)").eval();
+		client = DatabaseClientFactory.newClient(host, port, database, username, password, DatabaseClientFactory.Authentication.DIGEST);
+
+		xccTemplate = new XccTemplate("xcc://" + username + ":" + password + "@" + host + ":" + port);
+		xccTemplate.executeAdhocQuery("cts:uri-match('*.*') ! xdmp:document-delete(.)");
+
+		staticChecker = new XccStaticChecker(xccTemplate);
 
 		xccAssetLoader = new XccAssetLoader();
 		xccAssetLoader.setUsername(username);
 		xccAssetLoader.setHost(host);
 		xccAssetLoader.setPassword(password);
 		xccAssetLoader.setDatabaseName(database);
-		xccAssetLoader.setPort(8000);
+		xccAssetLoader.setPort(port);
 
 		modulesLoader = new DefaultModulesLoader(xccAssetLoader);
 		modulesLoader.setModulesManager(null);
+		modulesLoader.setStaticChecker(staticChecker);
 	}
 
 	@After
@@ -50,9 +59,8 @@ public class LoadModulesTest extends Assert {
 
 	@Test
 	public void staticCheckAndDontCheckLibraryModules() {
-		xccAssetLoader.setStaticCheck(true);
-		xccAssetLoader.setBulkLoad(false);
-		xccAssetLoader.setStaticCheckLibraryModules(false);
+		staticChecker.setBulkCheck(false);
+		staticChecker.setCheckLibraryModules(false);
 
 		Set<File> files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
 		assertEquals("All 3 modules should have been loaded because we didn't static check the bad libary module",
@@ -61,21 +69,22 @@ public class LoadModulesTest extends Assert {
 
 	@Test
 	public void staticCheckAndCheckLibraryModules() {
-		xccAssetLoader.setStaticCheck(true);
-		xccAssetLoader.setBulkLoad(false);
+		staticChecker.setBulkCheck(false);
+		staticChecker.setCheckLibraryModules(true);
 
 		try {
 			modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
 			fail("The load should have failed because of the bad library module");
-		} catch (Exception ex) {
-			assertTrue(ex.getMessage().contains("/ext/bad-lib.xqy; cause: Unexpected token"));
+		} catch (RuntimeException ex) {
+			assertTrue(ex.getMessage().contains("Static check failed for module at URI: /ext/bad-lib.xqy"));
+			assertTrue(ex.getMessage().contains("in /ext/bad-lib.xqy, on line 7"));
 		}
 	}
 
 	@Test
 	public void staticCheckAndCheckLibraryModulesAndCatchExceptions() {
-		xccAssetLoader.setStaticCheck(true);
-		xccAssetLoader.setBulkLoad(false);
+		staticChecker.setBulkCheck(false);
+		staticChecker.setCheckLibraryModules(true);
 		modulesLoader.setCatchExceptions(true);
 
 		Set<File> files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
@@ -84,9 +93,8 @@ public class LoadModulesTest extends Assert {
 
 	@Test
 	public void bulkLoadAndStaticCheck() {
-		xccAssetLoader.setBulkLoad(true);
-		xccAssetLoader.setStaticCheck(true);
-		xccAssetLoader.setStaticCheckLibraryModules(false);
+		staticChecker.setBulkCheck(true);
+		staticChecker.setCheckLibraryModules(false);
 
 		Set<File> files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
 		assertEquals("The load should have succeeded because we didn't check library modules", 3, files.size());
@@ -94,20 +102,22 @@ public class LoadModulesTest extends Assert {
 
 	@Test
 	public void bulkLoadAndStaticCheckAndCheckLibraryModules() {
-		xccAssetLoader.setBulkLoad(true);
-		xccAssetLoader.setStaticCheck(true);
+		staticChecker.setBulkCheck(true);
+		staticChecker.setCheckLibraryModules(true);
+
 		try {
 			modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
 			fail("The load should have failed because of the bad library module");
 		} catch (Exception ex) {
-			assertTrue(ex.getMessage().contains("Bulk static check failure, cause: Unexpected token"));
+			assertTrue(ex.getMessage().contains("Bulk static check failure"));
+			assertTrue(ex.getMessage().contains("in /ext/bad-lib.xqy, on line 7"));
 		}
 	}
 
 	@Test
 	public void bulkLoadAndStaticCheckAndCheckLibraryModulesAndCatchExceptions() {
-		xccAssetLoader.setBulkLoad(true);
-		xccAssetLoader.setStaticCheck(true);
+		staticChecker.setBulkCheck(true);
+		staticChecker.setCheckLibraryModules(true);
 		modulesLoader.setCatchExceptions(true);
 
 		Set<File> files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);

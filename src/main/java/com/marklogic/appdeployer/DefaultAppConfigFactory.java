@@ -242,7 +242,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		prop = getProperty("mlBulkLoadAssets");
 		if (prop != null) {
 			logger.info("Bulk load modules: " + prop);
-			c.setBulkLoadAssetModules(Boolean.parseBoolean(prop));
+			c.setBulkLoadAssets(Boolean.parseBoolean(prop));
 		}
 
 		/**
@@ -251,7 +251,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		prop = getProperty("mlStaticCheckAssets");
 		if (prop != null) {
 			logger.info("Statically check asset modules: " + prop);
-			c.setStaticCheckAssetModules(Boolean.parseBoolean(prop));
+			c.setStaticCheckAssets(Boolean.parseBoolean(prop));
 		}
 
 		/**
@@ -262,7 +262,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		prop = getProperty("mlStaticCheckLibraryAssets");
 		if (prop != null) {
 			logger.info("Statically check asset library modules: " + prop);
-			c.setStaticCheckAssetLibraryModules(Boolean.parseBoolean(prop));
+			c.setStaticCheckLibraryAssets(Boolean.parseBoolean(prop));
 		}
 
 		return c;

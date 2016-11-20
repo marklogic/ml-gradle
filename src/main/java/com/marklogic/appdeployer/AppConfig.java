@@ -83,10 +83,9 @@ public class AppConfig {
     private String schemasDatabaseName;
 
     private List<String> modulePaths;
-	private boolean staticCheckAssetModules = false;
-	private boolean staticCheckAssetLibraryModules = false;
-	private boolean bulkLoadAssetModules = true;
-	private boolean catchExceptionsForAssetModules = false;
+	private boolean staticCheckAssets = false;
+	private boolean staticCheckLibraryAssets = false;
+	private boolean bulkLoadAssets = true;
 
     private String schemasPath;
     private ConfigDir configDir;
@@ -176,12 +175,12 @@ public class AppConfig {
     }
 
 	public StaticChecker newStaticChecker() {
-		if (isStaticCheckAssetModules()) {
+		if (isStaticCheckAssets()) {
 			String xccUri = "xcc://%s:%s@%s:%d";
 			xccUri = String.format(xccUri, getRestAdminUsername(), getRestAdminPassword(), getHost(), getRestPort());
 			XccStaticChecker checker = new XccStaticChecker(new XccTemplate(xccUri));
-			checker.setBulkCheck(isBulkLoadAssetModules());
-			checker.setCheckLibraryModules(isStaticCheckAssetLibraryModules());
+			checker.setBulkCheck(isBulkLoadAssets());
+			checker.setCheckLibraryModules(isStaticCheckLibraryAssets());
 			return checker;
 		}
 		return null;
@@ -222,7 +221,7 @@ public class AppConfig {
             l.setModuleTokenReplacer(buildModuleTokenReplacer());
         }
 
-		l.setBulkLoad(isBulkLoadAssetModules());
+		l.setBulkLoad(isBulkLoadAssets());
         return l;
     }
 
@@ -598,35 +597,27 @@ public class AppConfig {
         this.moduleTokensPropertiesSources = moduleTokensPropertiesSources;
     }
 
-	public boolean isStaticCheckAssetModules() {
-		return staticCheckAssetModules;
+	public boolean isStaticCheckAssets() {
+		return staticCheckAssets;
 	}
 
-	public void setStaticCheckAssetModules(boolean staticCheckAssetModules) {
-		this.staticCheckAssetModules = staticCheckAssetModules;
+	public void setStaticCheckAssets(boolean staticCheckAssets) {
+		this.staticCheckAssets = staticCheckAssets;
 	}
 
-	public boolean isStaticCheckAssetLibraryModules() {
-		return staticCheckAssetLibraryModules;
+	public boolean isStaticCheckLibraryAssets() {
+		return staticCheckLibraryAssets;
 	}
 
-	public void setStaticCheckAssetLibraryModules(boolean staticCheckAssetLibraryModules) {
-		this.staticCheckAssetLibraryModules = staticCheckAssetLibraryModules;
+	public void setStaticCheckLibraryAssets(boolean staticCheckLibraryAssets) {
+		this.staticCheckLibraryAssets = staticCheckLibraryAssets;
 	}
 
-	public boolean isBulkLoadAssetModules() {
-		return bulkLoadAssetModules;
+	public boolean isBulkLoadAssets() {
+		return bulkLoadAssets;
 	}
 
-	public void setBulkLoadAssetModules(boolean bulkLoadAssetModules) {
-		this.bulkLoadAssetModules = bulkLoadAssetModules;
-	}
-
-	public boolean isCatchExceptionsForAssetModules() {
-		return catchExceptionsForAssetModules;
-	}
-
-	public void setCatchExceptionsForAssetModules(boolean catchExceptionsForAssetModules) {
-		this.catchExceptionsForAssetModules = catchExceptionsForAssetModules;
+	public void setBulkLoadAssets(boolean bulkLoadAssets) {
+		this.bulkLoadAssets = bulkLoadAssets;
 	}
 }

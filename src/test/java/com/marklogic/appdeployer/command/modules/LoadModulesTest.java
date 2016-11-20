@@ -32,14 +32,14 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 	public void loadModulesWithStaticCheck() {
 		appConfig.getModulePaths().clear();
 		appConfig.getModulePaths().add("src/test/resources/sample-app/static-check-modules");
-		appConfig.setStaticCheckAssetModules(false);
+		appConfig.setStaticCheckAssets(false);
 		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
 
 		// This should succeed because modules aren't statically checked
 		appDeployer.deploy(appConfig);
 
 		// Now load modules with static check enabled
-		appConfig.setStaticCheckAssetModules(true);
+		appConfig.setStaticCheckAssets(true);
 		initializeAppDeployer(buildLoadModulesCommand());
 		try {
 			appDeployer.deploy(appConfig);

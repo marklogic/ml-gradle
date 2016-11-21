@@ -7,6 +7,7 @@ import com.marklogic.gradle.task.forests.DeployCustomForestsTask
 import com.marklogic.gradle.task.groups.SetTraceEventsTask
 import com.marklogic.gradle.task.qconsole.ExportWorkspacesTask
 import com.marklogic.gradle.task.qconsole.ImportWorkspacesTask
+import com.marklogic.gradle.task.shell.ShellTask
 import com.marklogic.gradle.task.tasks.WaitForTaskServerTask
 import com.sun.jersey.core.spi.component.ProviderServices
 import org.gradle.api.Plugin
@@ -133,8 +134,6 @@ class MarkLogicPlugin implements Plugin<Project> {
 
 		quietDownJerseyLogging()
 
-        // Initialize groovysh support first so it doesn't pick up all the properties added when the AppDeployer is initialized
-        initializeGroovyShellSupport(project)
         initializeAppDeployerObjects(project)
 
         project.getConfigurations().create("mlRestApi")
@@ -259,6 +258,9 @@ class MarkLogicPlugin implements Plugin<Project> {
         String generalGroup = "ml-gradle General"
         project.task("mlPrintCommands", type: PrintCommandsTask, group: generalGroup, description: "Print information about each command used by mlDeploy and mlUndeploy")
 
+		String shellGroup = "ml-gradle Shell"
+		project.task("mlShell", type: ShellTask, group: shellGroup, description: "Run groovysh with MarkLogic-specific support built in")
+
         logger.info("Finished initializing ml-gradle\n")
     }
 
@@ -286,41 +288,6 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.extensions.add("mlCommandContext", context)
 
         project.extensions.add("mlAppDeployer", newAppDeployer(project, context))
-    }
-
-    void initializeGroovyShellSupport(Project project) {
-        def mlShellJvmArgs = []
-        for (String key : project.getProperties().keySet()) {
-            if (key.startsWith("ml")) {
-                mlShellJvmArgs.push("-D" + key + "=" + project.property(key))
-            }
-        }
-        project.extensions.add("mlShellJvmArgs", mlShellJvmArgs)
-
-        def script = "ml = com.marklogic.mgmt.api.APIUtil.newAPIFromSystemProps()"
-        if (project.hasProperty("mlShellWatchModules") && project.property("mlShellWatchModules").equals("true")) {
-            script += "\ncom.marklogic.appdeployer.util.ModulesWatcher.startFromSystemProps()"
-        }
-
-        // Allow project to add to the shell initialization script; mlShellScript will need to be in gradle.properties
-        if (project.hasProperty("mlShellScript")) {
-            script += "\n" + project.property("mlShellScript")
-        }
-
-        def mlShellArgs = ["-e", script]
-        project.extensions.add("mlShellArgs", mlShellArgs)
-
-        /**
-         * If the groovysh plugin has already been applied, then we can jvmArgs and args on the shell task automatically.
-         * Otherwise, the shell task needs to be configured in the Gradle file.
-         */
-        if (project.getExtensions().findByName("groovysh")) {
-            project.afterEvaluate {
-                def task = project.tasks.shell
-                task.jvmArgs = mlShellJvmArgs
-                task.args = mlShellArgs
-            }
-        }
     }
 
     /**

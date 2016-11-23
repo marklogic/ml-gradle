@@ -553,4 +553,8 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	public void setStaticChecker(StaticChecker staticChecker) {
 		this.staticChecker = staticChecker;
 	}
+
+	public StaticChecker getStaticChecker() {
+		return staticChecker;
+	}
 }

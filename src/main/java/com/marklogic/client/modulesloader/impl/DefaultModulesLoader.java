@@ -278,7 +278,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 			files = restApiAssetLoader.loadAssets(paths);
 		} else if (xccAssetLoader != null) {
 			List<LoadedAsset> list = xccAssetLoader.loadAssetsViaXcc(paths);
-			if (staticChecker != null) {
+			if (staticChecker != null && !list.isEmpty()) {
 				try {
 					staticChecker.checkLoadedAssets(list);
 				} catch (RuntimeException ex) {

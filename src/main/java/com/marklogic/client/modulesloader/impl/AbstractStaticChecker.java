@@ -14,6 +14,9 @@ public abstract class AbstractStaticChecker extends LoggingObject implements Sta
 
 	@Override
 	public void checkLoadedAssets(List<LoadedAsset> assets) {
+		if (assets == null || assets.isEmpty()) {
+			return;
+		}
 		if (bulkCheck) {
 			performBulkStaticCheck(assets);
 		} else {
@@ -89,7 +92,7 @@ public abstract class AbstractStaticChecker extends LoggingObject implements Sta
 	protected String buildXqueryForStaticallyCheckingModule() {
 		String xquery =
 			"try { xdmp:invoke($uri, (), <options xmlns='xdmp:eval'><static-check>true</static-check></options>) } " +
-				"catch ($e) { " +
+				"catch ($e) { xdmp:log($e), " +
 				"if ($e/*:code = 'XDMP-NOEXECUTE') then () " +
 				"else if ($e/*:code = 'XDMP-EVALLIBMOD') then ";
 		if (checkLibraryModules) {

@@ -1,20 +1,5 @@
 package com.marklogic.client.modulesloader.impl;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.FileVisitor;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.springframework.util.FileCopyUtils;
-
 import com.marklogic.client.helper.LoggingObject;
 import com.marklogic.client.modulesloader.ModulesManager;
 import com.marklogic.client.modulesloader.tokenreplacer.ModuleTokenReplacer;
@@ -22,20 +7,27 @@ import com.marklogic.client.modulesloader.xcc.CommaDelimitedPermissionsParser;
 import com.marklogic.client.modulesloader.xcc.DefaultDocumentFormatGetter;
 import com.marklogic.client.modulesloader.xcc.DocumentFormatGetter;
 import com.marklogic.client.modulesloader.xcc.PermissionsParser;
-import com.marklogic.xcc.Content;
-import com.marklogic.xcc.ContentCreateOptions;
-import com.marklogic.xcc.ContentFactory;
-import com.marklogic.xcc.ContentSource;
-import com.marklogic.xcc.ContentSourceFactory;
-import com.marklogic.xcc.DocumentFormat;
-import com.marklogic.xcc.SecurityOptions;
-import com.marklogic.xcc.Session;
+import com.marklogic.xcc.*;
 import com.marklogic.xcc.exceptions.RequestException;
+import org.springframework.util.FileCopyUtils;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.*;
 
 /**
- * Handles loading assets - as defined by the REST API, which are typically under the /ext directory - via XCC.
- * Currently not a threadsafe class - in order to make it threadsafe, would need to move the impl of FileVisitor to a
- * separate class.
+ * <p>
+ *     Handles loading assets - as defined by the REST API, which are typically under the /ext directory - via XCC.
+ *     Currently not a threadsafe class - in order to make it threadsafe, would need to move the impl of FileVisitor to
+ *     a separate class.
+ * </p>
+ * <p>
+ *     Version 2.11.0 introduced the ability to bulk load modules by loading all modules in one XCC
+ *     request. This is usually more efficient, so it's set to true by default.
+ * </p>
  */
 public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
 
@@ -57,12 +49,18 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
     private PermissionsParser permissionsParser = new CommaDelimitedPermissionsParser();
     private DocumentFormatGetter documentFormatGetter = new DefaultDocumentFormatGetter();
 
+    // Whether to load modules in a single request or not
+    private boolean bulkLoad = true;
+
+    // If bulkLoad is set to true, keeps track of all the modules to be loaded
+    private List<Content> bulkContents;
+
     // State that is maintained while visiting each asset path. Would need to move this to another class if this
     // class ever needs to be thread-safe.
     private Session activeSession;
     private Path currentAssetPath;
     private Path currentRootPath;
-    private Set<File> filesLoaded;
+	private List<LoadedAsset> loadedAssets;
 
     // Manages when modules were last loaded
     private ModulesManager modulesManager;
@@ -72,9 +70,9 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
     /**
      * For walking one or many paths and loading modules in each of them.
      */
-    public Set<File> loadAssetsViaXcc(String... paths) {
+    public List<LoadedAsset> loadAssetsViaXcc(String... paths) {
         initializeActiveSession();
-        filesLoaded = new HashSet<>();
+		loadedAssets = new ArrayList<>();
         try {
             for (String path : paths) {
                 if (logger.isDebugEnabled()) {
@@ -82,13 +80,23 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
                 }
                 this.currentAssetPath = Paths.get(path);
                 this.currentRootPath = this.currentAssetPath;
+                if (bulkLoad) {
+                    bulkContents = new ArrayList<>();
+                }
                 try {
                     Files.walkFileTree(this.currentAssetPath, this);
                 } catch (IOException ie) {
-                    throw new RuntimeException(format("Error while walking assets file tree: %s", ie.getMessage()), ie);
+                    throw new RuntimeException(format("IO error while walking assets file tree: %s", ie.getMessage()), ie);
                 }
+				if (bulkLoad) {
+					try {
+						activeSession.insertContent(bulkContents.toArray(new Content[]{}));
+					} catch (RequestException ex) {
+						throw new RuntimeException("Unable to complete bulk load, cause: " + ex.getMessage(), ex);
+					}
+				}
             }
-            return filesLoaded;
+            return loadedAssets;
         } finally {
             closeActiveSession();
         }
@@ -157,32 +165,25 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
                     uri = "/" + name + uri;
                 }
             }
-            loadFile(uri, path.toFile());
-            filesLoaded.add(path.toFile());
+			File f = path.toFile();
+            Content c = loadFile(uri, f);
+			if (c != null) {
+				loadedAssets.add(new LoadedAsset(c.getUri(), f, moduleCanBeReadAsString(c.getCreateOptions().getFormat())));
+			}
         }
 
         return FileVisitResult.CONTINUE;
     }
 
     /**
-     * A bit of a hack so that any modules in the samplestack-inspired "ext" directory have "/ext" prepended to their
-     * URI.
-     * 
-     * @return
-     */
-    // protected boolean isNotRootAssetsPath() {
-    // return this.currentRootPath != null && this.currentRootPath.toFile().getName().equals("root");
-    // }
-
-    /**
      * Does the actual work of loading a file into the modules database via XCC.
-     * 
+     *
      * @param uri
      * @param f
      */
-    protected void loadFile(String uri, File f) {
+    protected Content loadFile(String uri, File f) {
         if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(f)) {
-            return;
+            return null;
         }
 
         ContentCreateOptions options = new ContentCreateOptions();
@@ -193,15 +194,20 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
         }
 
         if (logger.isInfoEnabled()) {
-            logger.info(format("Inserting module with URI: %s", uri));
+            logger.info(format("Inserting module at URI: %s", uri));
         }
 
         Content content = buildContent(uri, f, options);
         try {
-            activeSession.insertContent(content);
+            if (bulkLoad) {
+                bulkContents.add(content);
+            } else {
+                activeSession.insertContent(content);
+            }
             if (modulesManager != null) {
                 modulesManager.saveLastInstalledTimestamp(f, new Date());
             }
+			return content;
         } catch (RequestException re) {
             throw new RuntimeException("Unable to insert content at URI: " + uri + "; cause: " + re.getMessage(), re);
         }
@@ -210,7 +216,7 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
     /**
      * If we have a ModuleTokenReplacer, we try to use it. But if we can't load the file as a string, we just assume we
      * can't replace any tokens in it.
-     * 
+     *
      * @param uri
      * @param f
      * @param options
@@ -298,4 +304,10 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
     public ModuleTokenReplacer getModuleTokenReplacer() {
         return moduleTokenReplacer;
     }
+
+	public void setBulkLoad(boolean bulkLoad) {
+		this.bulkLoad = bulkLoad;
+	}
+
+
 }

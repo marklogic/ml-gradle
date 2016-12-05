@@ -77,7 +77,6 @@ public class LoadModulesTest extends Assert {
 			fail("The load should have failed because of the bad library module");
 		} catch (RuntimeException ex) {
 			System.out.println(ex.getMessage());
-			assertTrue(ex.getMessage().contains("Static check failed for module at URI: /ext/bad-lib.xqy"));
 			assertTrue(ex.getMessage().contains("in /ext/bad-lib.xqy, on line 7"));
 		}
 	}
@@ -110,7 +109,6 @@ public class LoadModulesTest extends Assert {
 			modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
 			fail("The load should have failed because of the bad library module");
 		} catch (Exception ex) {
-			assertTrue(ex.getMessage().contains("Bulk static check failure"));
 			assertTrue(ex.getMessage().contains("in /ext/bad-lib.xqy, on line 7"));
 		}
 	}

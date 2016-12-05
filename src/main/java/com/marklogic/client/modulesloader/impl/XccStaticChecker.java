@@ -17,6 +17,9 @@ public class XccStaticChecker extends AbstractStaticChecker {
 
 	@Override
 	protected void executeQuery(String xquery) {
+		if (logger.isDebugEnabled()) {
+			logger.debug(xquery);
+		}
 		xccTemplate.executeAdhocQuery(xquery);
 	}
 }

@@ -38,18 +38,13 @@ public abstract class AbstractStaticChecker extends LoggingObject implements Sta
 	 * @param uri
 	 */
 	protected void staticallyCheckModule(String uri) {
-		try {
-			if (logger.isInfoEnabled()) {
-				logger.info("Performing static check on module at URI: " + uri);
-			}
-			String xquery = "let $uri := '" + uri + "' return " + buildXqueryForStaticallyCheckingModule();
-			executeQuery(xquery);
-			if (logger.isInfoEnabled()) {
-				logger.info("Finished static check on module at URI: " + uri);
-			}
-		} catch (Exception re) {
-			String message = "Static check failed for module at URI: " + uri + "; cause: " + re.getMessage();
-			throw new RuntimeException(message, re);
+		if (logger.isInfoEnabled()) {
+			logger.info("Performing static check on module at URI: " + uri);
+		}
+		String xquery = "let $uri := '" + uri + "' return " + buildXqueryForStaticallyCheckingModule();
+		executeQuery(xquery);
+		if (logger.isInfoEnabled()) {
+			logger.info("Finished static check on module at URI: " + uri);
 		}
 	}
 
@@ -66,17 +61,12 @@ public abstract class AbstractStaticChecker extends LoggingObject implements Sta
 		}
 		xquery += ") for $uri in $uris return " + buildXqueryForStaticallyCheckingModule();
 
-		try {
-			if (logger.isInfoEnabled()) {
-				logger.info("Static checking all loaded modules");
-			}
-			executeQuery(xquery);
-			if (logger.isInfoEnabled()) {
-				logger.info("Finished static checking all loaded modules");
-			}
-		} catch (Exception re) {
-			String message = "Bulk static check failure, cause: " + re.getMessage();
-			throw new RuntimeException(message, re);
+		if (logger.isInfoEnabled()) {
+			logger.info("Static checking all loaded modules");
+		}
+		executeQuery(xquery);
+		if (logger.isInfoEnabled()) {
+			logger.info("Finished static checking all loaded modules");
 		}
 	}
 

@@ -56,6 +56,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
         p.setProperty("mlAdditionalBinaryExtensions", ".gradle,.properties");
         p.setProperty("mlConfigPath", "src/test/resources/sample-app/empty-ml-config");
         p.setProperty("mlSimpleSsl", "anyvalue");
+        p.setProperty("mlContentDatabaseName", "my-content-db");
         p.setProperty("mlModulesDatabaseName", "my-modules");
         p.setProperty("mlGroupName", "other-group");
         p.setProperty("mlAppServicesPort", "8123");
@@ -80,6 +81,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
         assertTrue(config.getConfigDir().getBaseDir().getAbsolutePath().contains("empty-ml-config"));
         assertNotNull(config.getRestSslContext());
         assertNotNull(config.getRestSslHostnameVerifier());
+        assertEquals("my-content-db", config.getContentDatabaseName());
         assertEquals("my-modules", config.getModulesDatabaseName());
         assertEquals("other-group", config.getGroupName());
         assertEquals((Integer) 8123, config.getAppServicesPort());

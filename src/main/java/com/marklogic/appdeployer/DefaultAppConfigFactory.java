@@ -143,8 +143,18 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		}
 
 		/**
-		 * When a REST API server is created, the name will default to mlAppName-modules. This property can be used to
-		 * override that name.
+		 * When a REST API server is created, the content database name will default to mlAppName-content. This property
+		 * can be used to override that name.
+		 */
+		prop = getProperty("mlContentDatabaseName");
+		if (prop != null) {
+			logger.info("Content database name: " + prop);
+			c.setContentDatabaseName(prop);
+		}
+
+		/**
+		 * When a REST API server is created, the modules database name will default to mlAppName-modules. This property
+		 * can be used to override that name.
 		 */
 		prop = getProperty("mlModulesDatabaseName");
 		if (prop != null) {

@@ -29,6 +29,7 @@ public class Fragment {
         try {
             internalDoc = new SAXBuilder().build(new StringReader(xml));
             List<Namespace> list = new ArrayList<Namespace>();
+            list.add(Namespace.getNamespace("c", "http://marklogic.com/manage/clusters"));
             list.add(Namespace.getNamespace("db", "http://marklogic.com/manage/databases"));
             list.add(Namespace.getNamespace("f", "http://marklogic.com/manage/forests"));
             list.add(Namespace.getNamespace("h", "http://marklogic.com/manage/hosts"));

@@ -1,5 +1,6 @@
 package com.marklogic.appdeployer.command.viewschemas;
 
+import com.marklogic.mgmt.clusters.ClusterManager;
 import org.jdom2.Namespace;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -67,9 +68,13 @@ public class ManageViewSchemasTest extends AbstractManageResourceTest {
         String body = response.getBody();
         body = body.substring(body.indexOf("<json:array"));
 
+        String version = new ClusterManager(manageClient).getVersion();
+        // This changed between ML8 and ML9
+        String expectedAmount = version != null && version.startsWith("8") ? "amount": "main.ordertable.amount";
+
         Fragment xml = new Fragment("<results>" + body + "</results>",
                 Namespace.getNamespace("json", "http://marklogic.com/xdmp/json"));
-        xml.assertElementValue("/results/json:array[1]/json:value", "amount");
+        xml.assertElementValue("/results/json:array[1]/json:value", expectedAmount);
         xml.assertElementValue("/results/json:array[2]/json:value", "111");
         xml.assertElementValue("/results/json:array[3]/json:value", "222");
     }

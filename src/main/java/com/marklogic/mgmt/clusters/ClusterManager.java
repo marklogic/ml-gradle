@@ -4,6 +4,7 @@ import com.marklogic.mgmt.AbstractManager;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.admin.ActionRequiringRestart;
 import com.marklogic.mgmt.admin.AdminManager;
+import com.marklogic.rest.util.Fragment;
 
 public class ClusterManager extends AbstractManager {
 
@@ -28,5 +29,10 @@ public class ClusterManager extends AbstractManager {
                 return true;
             }
         });
+    }
+
+    public String getVersion() {
+    	Fragment f = manageClient.getXml("/manage/v2");
+	    return f.getElementValue("/c:local-cluster-default/c:version");
     }
 }

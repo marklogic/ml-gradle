@@ -1,10 +1,7 @@
 package com.marklogic.client.modulesloader.impl;
 
-import com.marklogic.client.DatabaseClient;
-import com.marklogic.client.DatabaseClientFactory;
+import com.marklogic.client.AbstractIntegrationTest;
 import com.marklogic.xcc.template.XccTemplate;
-import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,48 +10,38 @@ import java.util.Set;
 
 /**
  * This uses the default Modules database, and it clears it out before the test starts.
- * <p>
- * TODO Move config to a properties file
  */
-public class LoadModulesTest extends Assert {
+public class LoadModulesTest extends AbstractIntegrationTest {
 
-	private DatabaseClient client;
 	private XccTemplate xccTemplate;
 	private DefaultModulesLoader modulesLoader;
 	private XccAssetLoader xccAssetLoader;
 	private XccStaticChecker staticChecker;
 
-	private String host = "localhost";
-	private int port = 8000;
-	private String username = "admin";
-	private String password = "admin";
 	private String database = "Modules";
 	private File dir = new File("src/test/resources/static-check");
 
 	@Before
 	public void setup() {
-		client = DatabaseClientFactory.newClient(host, port, database, username, password, DatabaseClientFactory.Authentication.DIGEST);
+		client = newClient(database);
 
-		xccTemplate = new XccTemplate("xcc://" + username + ":" + password + "@" + host + ":" + port);
+		xccTemplate = new XccTemplate("xcc://" + clientConfig.getUsername() + ":" + clientConfig.getPassword()
+			+ "@" + clientConfig.getHost() + ":" + clientConfig.getPort());
+
 		xccTemplate.executeAdhocQuery("cts:uri-match('*.*') ! xdmp:document-delete(.)");
 
 		staticChecker = new XccStaticChecker(xccTemplate);
 
 		xccAssetLoader = new XccAssetLoader();
-		xccAssetLoader.setUsername(username);
-		xccAssetLoader.setHost(host);
-		xccAssetLoader.setPassword(password);
+		xccAssetLoader.setUsername(clientConfig.getUsername());
+		xccAssetLoader.setHost(clientConfig.getHost());
+		xccAssetLoader.setPassword(clientConfig.getPassword());
 		xccAssetLoader.setDatabaseName(database);
-		xccAssetLoader.setPort(port);
+		xccAssetLoader.setPort(clientConfig.getPort());
 
 		modulesLoader = new DefaultModulesLoader(xccAssetLoader);
 		modulesLoader.setModulesManager(null);
 		modulesLoader.setStaticChecker(staticChecker);
-	}
-
-	@After
-	public void tearDown() {
-		client.release();
 	}
 
 	@Test

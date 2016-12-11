@@ -122,7 +122,17 @@ public class AppConfig {
 
     private Map<String, Integer> forestCounts = new HashMap<>();
 
-    public AppConfig() {
+    // Entity Services properties
+    private String modelsPath = "data/entity-services";
+    private String instanceConverterPath = "ext/entity-services";
+
+	private boolean generateInstanceConverter = true;
+	private boolean generateSchema = true;
+	private boolean generateDatabaseProperties = true;
+	private boolean generateExtractionTemplate = true;
+	private boolean generateSearchOptions = true;
+
+	public AppConfig() {
         this(DEFAULT_MODULES_PATH, DEFAULT_SCHEMAS_PATH);
     }
 
@@ -620,4 +630,62 @@ public class AppConfig {
 	public void setBulkLoadAssets(boolean bulkLoadAssets) {
 		this.bulkLoadAssets = bulkLoadAssets;
 	}
+
+	public String getModelsPath() {
+		return modelsPath;
+	}
+
+	public void setModelsPath(String modelsPath) {
+		this.modelsPath = modelsPath;
+	}
+
+	public String getInstanceConverterPath() {
+		return instanceConverterPath;
+	}
+
+	public void setInstanceConverterPath(String instanceConverterPath) {
+		this.instanceConverterPath = instanceConverterPath;
+	}
+
+
+	public void setGenerateInstanceConverter(boolean generateInstanceConverter) {
+		this.generateInstanceConverter = generateInstanceConverter;
+	}
+
+	public void setGenerateSchema(boolean generateSchema) {
+		this.generateSchema = generateSchema;
+	}
+
+	public void setGenerateDatabaseProperties(boolean generateDatabaseProperties) {
+		this.generateDatabaseProperties = generateDatabaseProperties;
+	}
+
+	public void setGenerateExtractionTemplate(boolean generateExtractionTemplate) {
+		this.generateExtractionTemplate = generateExtractionTemplate;
+	}
+
+	public void setGenerateSearchOptions(boolean generateSearchOptions) {
+		this.generateSearchOptions = generateSearchOptions;
+	}
+
+	public boolean isGenerateInstanceConverter() {
+		return generateInstanceConverter;
+	}
+
+	public boolean isGenerateSchema() {
+		return generateSchema;
+	}
+
+	public boolean isGenerateDatabaseProperties() {
+		return generateDatabaseProperties;
+	}
+
+	public boolean isGenerateExtractionTemplate() {
+		return generateExtractionTemplate;
+	}
+
+	public boolean isGenerateSearchOptions() {
+		return generateSearchOptions;
+	}
+
 }

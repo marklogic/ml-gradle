@@ -275,6 +275,48 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			c.setStaticCheckLibraryAssets(Boolean.parseBoolean(prop));
 		}
 
+		prop = getProperty("mlModelsPath");
+		if (prop != null) {
+			logger.info("Entity Services models path: " + prop);
+			c.setModelsPath(prop);
+		}
+
+		prop = getProperty("mlInstanceConverterPath");
+		if (prop != null) {
+			logger.info("Entity Services instance converter path: " + prop);
+			c.setInstanceConverterPath(prop);
+		}
+
+		prop = getProperty("mlGenerateInstanceConverter");
+		if (prop != null) {
+			logger.info("Entity Services generate instance converter: " + prop);
+			c.setGenerateInstanceConverter(Boolean.parseBoolean(prop));
+		}
+
+		prop = getProperty("mlGenerateSchema");
+		if (prop != null) {
+			logger.info("Entity Services generate schema: " + prop);
+			c.setGenerateSchema(Boolean.parseBoolean(prop));
+		}
+
+		prop = getProperty("mlGenerateSearchOptions");
+		if (prop != null) {
+			logger.info("Entity Services generate search options: " + prop);
+			c.setGenerateSearchOptions(Boolean.parseBoolean(prop));
+		}
+
+		prop = getProperty("mlGenerateDatabaseProperties");
+		if (prop != null) {
+			logger.info("Entity Services generate database properties: " + prop);
+			c.setGenerateDatabaseProperties(Boolean.parseBoolean(prop));
+		}
+
+		prop = getProperty("mlGenerateExtractionTemplate");
+		if (prop != null) {
+			logger.info("Entity Services generate extraction template: " + prop);
+			c.setGenerateExtractionTemplate(Boolean.parseBoolean(prop));
+		}
+
 		return c;
 	}
 

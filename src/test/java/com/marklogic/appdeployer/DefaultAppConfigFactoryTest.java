@@ -64,7 +64,15 @@ public class DefaultAppConfigFactoryTest extends Assert {
         p.setProperty("mlUseRoxyTokenPrefix", "false");
         p.setProperty("mlModulePaths", "path1,path2,path3");
 
-        sut = new DefaultAppConfigFactory(new SimplePropertySource(p));
+        p.setProperty("mlModelsPath", "ml/models");
+        p.setProperty("mlInstanceConverterPath", "ext/my/path");
+        p.setProperty("mlGenerateInstanceConverter", "false");
+	    p.setProperty("mlGenerateDatabaseProperties", "false");
+	    p.setProperty("mlGenerateSchema", "false");
+	    p.setProperty("mlGenerateSearchOptions", "false");
+	    p.setProperty("mlGenerateExtractionTemplate", "false");
+
+	    sut = new DefaultAppConfigFactory(new SimplePropertySource(p));
         AppConfig config = sut.newAppConfig();
 
         assertEquals("prophost", config.getHost());
@@ -88,7 +96,15 @@ public class DefaultAppConfigFactoryTest extends Assert {
         assertFalse(config.isReplaceTokensInModules());
         assertFalse(config.isUseRoxyTokenPrefix());
 
-        List<String> paths = config.getModulePaths();
+        assertEquals("ml/models", config.getModelsPath());
+        assertEquals("ext/my/path", config.getInstanceConverterPath());
+        assertFalse(config.isGenerateDatabaseProperties());
+	    assertFalse(config.isGenerateExtractionTemplate());
+	    assertFalse(config.isGenerateInstanceConverter());
+	    assertFalse(config.isGenerateSchema());
+	    assertFalse(config.isGenerateSearchOptions());
+
+	    List<String> paths = config.getModulePaths();
         assertEquals("path1", paths.get(0));
         assertEquals("path2", paths.get(1));
         assertEquals("path3", paths.get(2));

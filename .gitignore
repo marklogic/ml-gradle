@@ -2,6 +2,7 @@
 .gradle
 .settings
 /build/
+/out/
 .project
 .classpath
 .idea
@@ -9,3 +10,7 @@ src/test/resources/user.properties
 setenv.bat
 src/test/resources/scaffold-test/
 .DS_Store
+src/test/resources/entity-services-project/src/main/ml-modules
+src/test/resources/entity-services-project/src/main/ml-schemas
+src/test/resources/entity-services-project/src/main/ml-config/databases/content-database-GENERATED.json
+

@@ -7,18 +7,19 @@ import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.FailedRequestException;
 import com.marklogic.client.schemasloader.SchemasLoader;
 import com.marklogic.client.schemasloader.impl.DefaultSchemasFinder;
 import com.marklogic.client.schemasloader.impl.DefaultSchemasLoader;
 
-public class LoadSchemasCommand extends AbstractCommand  {
+public class LoadSchemasCommand extends AbstractCommand {
 
 	private SchemasLoader schemasLoader;
-	
+
 	public LoadSchemasCommand() {
-        setExecuteSortOrder(SortOrderConstants.LOAD_SCHEMAS);
+		setExecuteSortOrder(SortOrderConstants.LOAD_SCHEMAS);
 	}
-	
+
 	@Override
 	public void execute(CommandContext context) {
 		loadSchemasIntoSchemasDatabase(context);
@@ -28,24 +29,28 @@ public class LoadSchemasCommand extends AbstractCommand  {
 		if (schemasLoader == null) {
 			initializeDefaultSchemasLoader(context);
 		}
-		
-		
+
 		AppConfig config = context.getAppConfig();
-        DatabaseClient client = config.newSchemasDatabaseClient();
-        try {
-        	String schemasPath = config.getSchemasPath();
-            
-        	logger.info("Loading schemas database data from path: " + schemasPath);
-        	schemasLoader.loadSchemas(new File(schemasPath), new DefaultSchemasFinder(), client);
-            
-        } finally {
-            client.release();
-        }
+		DatabaseClient client = config.newSchemasDatabaseClient();
+		try {
+			String schemasPath = config.getSchemasPath();
+			logger.info("Loading schemas database data from path: " + schemasPath);
+			schemasLoader.loadSchemas(new File(schemasPath), new DefaultSchemasFinder(), client);
+		} catch (FailedRequestException fre) {
+			if (fre.getMessage().contains("NOSUCHDB")) {
+				logger.warn("Unable to load schemas because no schemas database exists; cause: " + fre.getMessage());
+			}
+			else {
+				throw fre;
+			}
+		} finally {
+			client.release();
+		}
 	}
 
 	private void initializeDefaultSchemasLoader(CommandContext context) {
-	     logger.info("Initializing instance of DefaultSchemasLoader");
-	     this.schemasLoader = new DefaultSchemasLoader();
+		logger.info("Initializing instance of DefaultSchemasLoader");
+		this.schemasLoader = new DefaultSchemasLoader();
 	}
 
 }

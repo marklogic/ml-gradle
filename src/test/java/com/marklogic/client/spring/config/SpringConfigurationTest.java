@@ -1,26 +1,21 @@
 package com.marklogic.client.spring.config;
 
+import com.marklogic.client.AbstractIntegrationTest;
 import com.marklogic.client.helper.DatabaseClientConfig;
-import com.marklogic.client.helper.LoggingObject;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration( classes = {MarkLogicApplicationContext.class} )
-public class SpringConfigurationTest extends LoggingObject implements ApplicationContextAware {
+public class SpringConfigurationTest extends AbstractIntegrationTest implements ApplicationContextAware {
 
     private ApplicationContext ctx;
-    
+
     @Test
     public void getDatabaseClient() {
         for (String beanName : ctx.getBeanDefinitionNames()) {
-            logger.info(beanName);
+	        System.out.println(beanName);
         }
         Assert.assertTrue(ctx.containsBeanDefinition("com.marklogic.client.spring.SpringDatabaseClientConfig"));
         Assert.assertTrue(ctx.containsBeanDefinition("databaseClientProvider"));
@@ -29,8 +24,8 @@ public class SpringConfigurationTest extends LoggingObject implements Applicatio
         Assert.assertEquals("localhost", config.getHost());
         Assert.assertEquals(8000, config.getPort());
     }
-    
-    
+
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.ctx = applicationContext;

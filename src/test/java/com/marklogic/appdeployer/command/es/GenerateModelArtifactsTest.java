@@ -24,6 +24,10 @@ public class GenerateModelArtifactsTest extends AbstractAppDeployerTest {
 	@Test
 	public void test() {
 		String projectPath = "src/test/resources/entity-services-project";
+		File srcDir = new File(projectPath, "src");
+		if (srcDir.exists()) {
+			srcDir.delete();
+		}
 		appConfig.setConfigDir(new ConfigDir(new File(projectPath + "/src/main/ml-config")));
 		appConfig.setModelsPath(projectPath + "/data/entity-services");
 		appConfig.getModulePaths().clear();
@@ -38,8 +42,9 @@ public class GenerateModelArtifactsTest extends AbstractAppDeployerTest {
 		assertTrue(new File(projectPath, "src/main/ml-modules/options/Race.xml").exists());
 		assertTrue(new File(projectPath, "src/main/ml-schemas/Race-0.0.1.xsd").exists());
 		assertTrue(new File(projectPath, "src/main/ml-schemas/Race-0.0.1.tdex").exists());
-		// We already have a content-database.json file
-		assertTrue(new File(projectPath, "src/main/ml-config/databases/content-database-GENERATED.json").exists());
+		assertTrue(new File(projectPath, "src/main/ml-config/databases/content-database.json").exists());
+		assertTrue("A schemas db file needs to be created since the ES content-database.json file refers to one",
+			new File(projectPath, "src/main/ml-config/databases/schemas-database.json").exists());
 
 		deploySampleApp();
 
@@ -50,7 +55,8 @@ public class GenerateModelArtifactsTest extends AbstractAppDeployerTest {
 		assertTrue(new File(projectPath, "src/main/ml-schemas/Race-0.0.1-GENERATED.tdex").exists());
 
 		// Make sure none of these files break when they're deployed
-		initializeAppDeployer(new DeployContentDatabasesCommand(), new LoadSchemasCommand(), new LoadModulesCommand());
+		initializeAppDeployer(new DeployContentDatabasesCommand(), new DeploySchemasDatabaseCommand(),
+			new LoadSchemasCommand(), new LoadModulesCommand());
 		deploySampleApp();
 	}
 }

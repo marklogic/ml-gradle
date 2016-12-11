@@ -1,4 +1,0 @@
-{
-  "database-name": "%%DATABASE%%",
-  "schema-database": "%%SCHEMAS_DATABASE%%"
-}

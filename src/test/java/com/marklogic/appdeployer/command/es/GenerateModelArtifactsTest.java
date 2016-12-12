@@ -18,7 +18,7 @@ public class GenerateModelArtifactsTest extends AbstractAppDeployerTest {
 	public void tearDown() {
 		initializeAppDeployer(new DeployContentDatabasesCommand(), new DeploySchemasDatabaseCommand(),
 			new DeployRestApiServersCommand());
-		undeploySampleApp();
+		//undeploySampleApp();
 	}
 
 	@Test
@@ -48,15 +48,16 @@ public class GenerateModelArtifactsTest extends AbstractAppDeployerTest {
 
 		deploySampleApp();
 
-		assertTrue(new File(projectPath, "src/main/ml-modules/ext/entity-services/Race-0.0.1-GENERATED.xqy").exists());
-		assertTrue(new File(projectPath, "src/main/ml-modules/options/Race-GENERATED.xml").exists());
-		assertTrue(new File(projectPath, "src/main/ml-config/databases/content-database-GENERATED.json").exists());
-		assertTrue(new File(projectPath, "src/main/ml-schemas/Race-0.0.1-GENERATED.xsd").exists());
-		assertTrue(new File(projectPath, "src/main/ml-schemas/Race-0.0.1-GENERATED.tdex").exists());
+		// These shouldn't exist because the content is the same
+		assertFalse(new File(projectPath, "src/main/ml-modules/ext/entity-services/Race-0.0.1-GENERATED.xqy").exists());
+		assertFalse(new File(projectPath, "src/main/ml-modules/options/Race-GENERATED.xml").exists());
+		assertFalse(new File(projectPath, "src/main/ml-config/databases/content-database-GENERATED.json").exists());
+		assertFalse(new File(projectPath, "src/main/ml-schemas/Race-0.0.1-GENERATED.xsd").exists());
+		assertFalse(new File(projectPath, "src/main/ml-schemas/Race-0.0.1-GENERATED.tdex").exists());
 
 		// Make sure none of these files break when they're deployed
 		initializeAppDeployer(new DeployContentDatabasesCommand(), new DeploySchemasDatabaseCommand(),
 			new LoadSchemasCommand(), new LoadModulesCommand());
-		deploySampleApp();
+		//deploySampleApp();
 	}
 }

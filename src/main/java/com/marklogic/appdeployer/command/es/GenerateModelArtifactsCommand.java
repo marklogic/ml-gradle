@@ -99,8 +99,14 @@ public class GenerateModelArtifactsCommand extends AbstractCommand {
 			File out = new File(esDir, code.getTitle() + "-" + code.getVersion() + ".xqy");
 			String logMessage = "Wrote instance converter to: ";
 			if (out.exists()) {
+				if (!fileHasDifferentContent(out, instanceConverter)) {
+					if (logger.isInfoEnabled()) {
+						logger.info("Instance converter matches file, so not modifying: " + out.getAbsolutePath());
+					}
+					return;
+				}
 				out = new File(esDir, code.getTitle() + "-" + code.getVersion() + "-GENERATED.xqy");
-				logMessage = "Instance converter file already exists; writing new generated copy to: ";
+				logMessage = "Instance converter does not match existing file, so writing to: ";
 			}
 			try {
 				FileCopyUtils.copy(instanceConverter.getBytes(), out);
@@ -121,8 +127,14 @@ public class GenerateModelArtifactsCommand extends AbstractCommand {
 			File out = new File(optionsDir, code.getTitle() + ".xml");
 			String logMessage = "Wrote search options to: ";
 			if (out.exists()) {
+				if (!fileHasDifferentContent(out, searchOptions)) {
+					if (logger.isInfoEnabled()) {
+						logger.info("Search options matches file, so not modifying: " + out.getAbsolutePath());
+					}
+					return;
+				}
 				out = new File(optionsDir, code.getTitle() + "-GENERATED.xml");
-				logMessage = "Search options file already exists; writing new generated copy to: ";
+				logMessage = "Search options does not match existing file, so writing to: ";
 			}
 			try {
 				FileCopyUtils.copy(searchOptions.getBytes(), out);
@@ -150,8 +162,14 @@ public class GenerateModelArtifactsCommand extends AbstractCommand {
 			File out = new File(dbDir, "content-database.json");
 			String logMessage = "Wrote database properties to: ";
 			if (out.exists()) {
+				if (!fileHasDifferentContent(out, props)) {
+					if (logger.isInfoEnabled()) {
+						logger.info("Database properties matches file, so not modifying: " + out.getAbsolutePath());
+					}
+					return;
+				}
 				out = new File(dbDir, "content-database-GENERATED.json");
-				logMessage = "Database properties file already exists; writing new generated copy to: ";
+				logMessage = "Database properties does not match existing file, so writing to: ";
 			}
 			try {
 				FileCopyUtils.copy(props.getBytes(), out);
@@ -183,8 +201,14 @@ public class GenerateModelArtifactsCommand extends AbstractCommand {
 			File out = new File(dir, code.getTitle() + "-" + code.getVersion() + ".xsd");
 			String logMessage = "Wrote schema to: ";
 			if (out.exists()) {
+				if (!fileHasDifferentContent(out, schema)) {
+					if (logger.isInfoEnabled()) {
+						logger.info("Schema matches file, so not modifying: " + out.getAbsolutePath());
+					}
+					return;
+				}
 				out = new File(dir, code.getTitle() + "-" + code.getVersion() + "-GENERATED.xsd");
-				logMessage = "Schema file already exists; writing new generated copy to: ";
+				logMessage = "Schema does not match existing file, so writing to: ";
 			}
 			try {
 				FileCopyUtils.copy(schema.getBytes(), out);
@@ -205,8 +229,14 @@ public class GenerateModelArtifactsCommand extends AbstractCommand {
 			File out = new File(dir, code.getTitle() + "-" + code.getVersion() + ".tdex");
 			String logMessage = "Wrote extraction template to: ";
 			if (out.exists()) {
+				if (!fileHasDifferentContent(out, template)) {
+					if (logger.isInfoEnabled()) {
+						logger.info("Extraction template matches file, so not modifying: " + out.getAbsolutePath());
+					}
+					return;
+				}
 				out = new File(dir, code.getTitle() + "-" + code.getVersion() + "-GENERATED.tdex");
-				logMessage = "Extraction template already exists; writing new generated copy to: ";
+				logMessage = "Extraction template does not match existing file, so writing to: ";
 			}
 			try {
 				FileCopyUtils.copy(template.getBytes(), out);
@@ -217,6 +247,42 @@ public class GenerateModelArtifactsCommand extends AbstractCommand {
 				throw new RuntimeException("Unable to write extraction template to file: " + out.getAbsolutePath(), e);
 			}
 		}
+	}
+
+	/**
+	 * Determines if a file matches generated code, in which case we don't need to do anything further with the
+	 * generated code.
+	 *
+	 * @param existingFile
+	 * @param content
+	 * @return
+	 */
+	protected boolean fileHasDifferentContent(File existingFile, String content) {
+		try {
+			String fileContent = new String(FileCopyUtils.copyToByteArray(existingFile));
+			fileContent = removeGeneratedAtTimestamp(fileContent);
+			content = removeGeneratedAtTimestamp(content);
+			return !fileContent.equals(content);
+		} catch (IOException e) {
+			// Shouldn't occur, but if it does, treat it as the file having different content
+			return true;
+		}
+	}
+
+	/**
+	 * The instance converter module has a timestamp in it that has to be removed in order to tell if its contents match
+	 * that of an existing instance converter; the timestamp will of course nearly always be different.
+	 *
+	 * @param content
+	 * @return
+	 */
+	protected String removeGeneratedAtTimestamp(String content) {
+		int pos = content.indexOf("Generated at timestamp");
+		if (pos > -1) {
+			int end = content.indexOf(":)", pos);
+			return content.substring(0, pos) + content.substring(end + 2);
+		}
+		return content;
 	}
 
 	public void setOptionsPath(String optionsPath) {

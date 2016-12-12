@@ -1,7 +1,7 @@
 buildscript {
   repositories {
+	  mavenLocal()
     jcenter()
-    mavenLocal()
   }
   dependencies {
     classpath "com.marklogic:ml-gradle:${mlGradleVersion}"
@@ -12,8 +12,8 @@ apply plugin: "java"
 apply plugin: "com.marklogic.ml-gradle"
 
 repositories {
-	jcenter()
 	mavenLocal()
+	jcenter()
 }
 
 ext {

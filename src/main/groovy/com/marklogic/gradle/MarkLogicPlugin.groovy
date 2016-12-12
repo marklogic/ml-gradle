@@ -3,6 +3,7 @@ package com.marklogic.gradle
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand
 import com.marklogic.appdeployer.command.forests.DeployCustomForestsCommand
 import com.marklogic.gradle.task.databases.DeleteCollectionTask
+import com.marklogic.gradle.task.es.GenerateModelArtifactsTask
 import com.marklogic.gradle.task.forests.DeployCustomForestsTask
 import com.marklogic.gradle.task.groups.SetTraceEventsTask
 import com.marklogic.gradle.task.qconsole.ExportWorkspacesTask
@@ -185,6 +186,9 @@ class MarkLogicPlugin implements Plugin<Project> {
         project.task("mlCreateResource", type: CreateResourceTask, group: devGroup, description: "Create a new resource extension in the modules services directory")
         project.task("mlCreateTransform", type: CreateTransformTask, group: devGroup, description: "Create a new transform in the modules transforms directory")
         project.task("mlPrepareRestApiDependencies", type: PrepareRestApiDependenciesTask, group: devGroup, dependsOn: project.configurations["mlRestApi"], description: "Downloads (if necessary) and unzips in the build directory all mlRestApi dependencies")
+
+	    String esGroup = "ml-gradle Entity Services"
+	    project.task("mlGenerateModelArtifacts", type: GenerateModelArtifactsTask, group: esGroup, description: "Generate model artifacts for the Entity Services models in the default directory of ./data/entity-services")
 
         String flexrepGroup = "ml-gradle Flexible Replication"
         project.task("mlDeleteAllFlexrepConfigs", type: DeleteAllFlexrepConfigsTask, group: flexrepGroup, description: "Delete all Flexrep configs and their associated targets")

@@ -15,16 +15,3 @@ repositories {
 	mavenLocal()
 	jcenter()
 }
-
-ext {
-	mlAppConfig {
-		customTokens.put("CUSTOM_TOKEN", "testing")
-	}
-}
-
-dependencies {
-	runtime "com.marklogic:ml-groovysh:0.1.0"
-}
-
-
-mlShell.classpath = sourceSets.main.runtimeClasspath

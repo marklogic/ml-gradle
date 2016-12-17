@@ -44,6 +44,7 @@ public class ModulesWatcher extends LoggingObject implements Runnable {
         	loader.setModulesManager(new PropertiesModuleManager(new File(path)));
         }
 		loader.setStaticChecker(appConfig.newStaticChecker());
+        loader.setCatchExceptions(true);
         DatabaseClient client = appConfig.newDatabaseClient();
         List<String> paths = appConfig.getModulePaths();
         ModulesFinder finder = new DefaultModulesFinder();

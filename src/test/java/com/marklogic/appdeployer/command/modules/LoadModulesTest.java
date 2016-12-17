@@ -2,6 +2,8 @@ package com.marklogic.appdeployer.command.modules;
 
 import java.io.File;
 
+import com.marklogic.appdeployer.command.CommandContext;
+import com.marklogic.client.modulesloader.impl.DefaultModulesLoader;
 import com.marklogic.junit.Fragment;
 import org.junit.After;
 import org.junit.Before;
@@ -50,6 +52,21 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 				message.contains("Bulk static check failure"));
 			assertTrue(message.contains("in /ext/bad.xqy, on line 2"));
 		}
+	}
+
+	@Test
+	public void customModuleTimestampsPath() {
+    	String path = "build/custom-path.properties";
+    	File customFile = new File(path);
+    	customFile.mkdirs();
+    	if (customFile.exists()) {
+    		customFile.delete();
+	    }
+
+    	appConfig.setModuleTimestampsPath("build/custom-path.properties");
+		initializeAppDeployer(new DeployRestApiServersCommand(true), new LoadModulesCommand());
+		appDeployer.deploy(appConfig);
+		assertTrue("The custom file should have been created when the modules were loaded", customFile.exists());
 	}
 
     @Test

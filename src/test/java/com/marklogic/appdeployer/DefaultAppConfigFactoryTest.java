@@ -63,6 +63,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
         p.setProperty("mlReplaceTokensInModules", "false");
         p.setProperty("mlUseRoxyTokenPrefix", "false");
         p.setProperty("mlModulePaths", "path1,path2,path3");
+        p.setProperty("mlModuleTimestampsPath", "custom/timestamps/path.properties");
 
         p.setProperty("mlModelsPath", "ml/models");
         p.setProperty("mlInstanceConverterPath", "ext/my/path");
@@ -108,6 +109,8 @@ public class DefaultAppConfigFactoryTest extends Assert {
         assertEquals("path1", paths.get(0));
         assertEquals("path2", paths.get(1));
         assertEquals("path3", paths.get(2));
+
+        assertEquals("custom/timestamps/path.properties", config.getModuleTimestampsPath());
     }
 
 	/**

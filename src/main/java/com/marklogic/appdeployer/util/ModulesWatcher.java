@@ -6,9 +6,9 @@ import java.util.List;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.helper.LoggingObject;
 import com.marklogic.client.modulesloader.ModulesFinder;
-import com.marklogic.client.modulesloader.ModulesLoader;
 import com.marklogic.client.modulesloader.impl.DefaultModulesFinder;
 import com.marklogic.client.modulesloader.impl.DefaultModulesLoader;
+import com.marklogic.client.modulesloader.impl.PropertiesModuleManager;
 import com.marklogic.client.modulesloader.impl.XccAssetLoader;
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.DefaultAppConfigFactory;
@@ -39,13 +39,17 @@ public class ModulesWatcher extends LoggingObject implements Runnable {
     public void run() {
         XccAssetLoader xal = appConfig.newXccAssetLoader();
         DefaultModulesLoader loader = new DefaultModulesLoader(xal);
+        String path = appConfig.getModuleTimestampsPath();
+        if (path != null) {
+        	loader.setModulesManager(new PropertiesModuleManager(new File(path)));
+        }
 		loader.setStaticChecker(appConfig.newStaticChecker());
         DatabaseClient client = appConfig.newDatabaseClient();
         List<String> paths = appConfig.getModulePaths();
         ModulesFinder finder = new DefaultModulesFinder();
         while (true) {
-            for (String path : paths) {
-                loader.loadModules(new File(path), finder, client);
+            for (String modulesPath : paths) {
+                loader.loadModules(new File(modulesPath), finder, client);
             }
             try {
                 Thread.sleep(sleepTime);

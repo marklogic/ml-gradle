@@ -5,6 +5,7 @@ import java.io.File;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.modulesloader.ModulesLoader;
 import com.marklogic.client.modulesloader.impl.DefaultModulesLoader;
+import com.marklogic.client.modulesloader.impl.PropertiesModuleManager;
 import com.marklogic.client.modulesloader.impl.TestServerModulesFinder;
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.command.AbstractCommand;
@@ -32,6 +33,10 @@ public class LoadModulesCommand extends AbstractCommand {
     public void initializeDefaultModulesLoader(CommandContext context) {
         logger.info("Initializing instance of DefaultModulesLoader");
 		DefaultModulesLoader l = new DefaultModulesLoader(context.getAppConfig().newXccAssetLoader());
+		String path = context.getAppConfig().getModuleTimestampsPath();
+		if (path != null) {
+			l.setModulesManager(new PropertiesModuleManager(new File(path)));
+		}
 		l.setStaticChecker(context.getAppConfig().newStaticChecker());
         this.modulesLoader = l;
     }

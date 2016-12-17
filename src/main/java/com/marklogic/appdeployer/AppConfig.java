@@ -86,6 +86,7 @@ public class AppConfig {
 	private boolean staticCheckAssets = false;
 	private boolean staticCheckLibraryAssets = false;
 	private boolean bulkLoadAssets = true;
+	private String moduleTimestampsPath;
 
     private String schemasPath;
     private ConfigDir configDir;
@@ -688,4 +689,11 @@ public class AppConfig {
 		return generateSearchOptions;
 	}
 
+	public String getModuleTimestampsPath() {
+		return moduleTimestampsPath;
+	}
+
+	public void setModuleTimestampsPath(String moduleTimestampsPath) {
+		this.moduleTimestampsPath = moduleTimestampsPath;
+	}
 }

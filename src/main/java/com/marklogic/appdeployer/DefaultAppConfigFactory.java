@@ -246,6 +246,12 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			c.setModulePaths(list);
 		}
 
+		prop = getProperty("mlModuleTimestampsPath");
+		if (prop != null) {
+			logger.info("Module timestamps path: " + prop);
+			c.setModuleTimestampsPath(prop);
+		}
+
 		/**
 		 * Whether or not to load asset modules in bulk - i.e. in one transaction. Defaults to true.
 		 */

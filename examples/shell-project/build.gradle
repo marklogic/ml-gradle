@@ -1,6 +1,6 @@
 plugins {
   id "java"
-  id "com.marklogic.ml-gradle" version "2.4.0"
+  id "com.marklogic.ml-gradle" version "2.5.0"
 }
 
 repositories {
@@ -8,7 +8,12 @@ repositories {
 }
 
 dependencies {
+	// Brings in a tiny Main program that ShellTask uses
 	runtime "com.marklogic:ml-groovysh:0.1.1"
+
+	// Provides the "guts" needed by ShellTask; can pick any version you want, as ml-groovysh does not
+	// specify a dependency on ml-app-deployer
+	runtime "com.marklogic:ml-app-deployer:2.5.0"
 }
 
 mlShell.classpath = sourceSets.main.runtimeClasspath

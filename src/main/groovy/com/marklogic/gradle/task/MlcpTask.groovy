@@ -20,71 +20,77 @@ import com.marklogic.appdeployer.AppConfig
  */
 class MlcpTask extends JavaExec {
 
-    @Delegate MlcpBean mlcpBean = new MlcpBean();
+	@Delegate
+	MlcpBean mlcpBean = new MlcpBean();
 
-    public Logger getLogger() {
-        return Logging.getLogger(MlcpTask.class)
-    }
+	public Logger getLogger() {
+		return Logging.getLogger(MlcpTask.class)
+	}
 
-    @TaskAction
-    @Override
-    public void exec() {
-        setMain("com.marklogic.contentpump.ContentPump")
-        AppConfig config = getProject().property("mlAppConfig")
+	@TaskAction
+	@Override
+	public void exec() {
+		setMain("com.marklogic.contentpump.ContentPump")
+		AppConfig config = getProject().property("mlAppConfig")
 
-        List<String> newArgs = new ArrayList<>()
-        newArgs.add(command)
+		List<String> newArgs = new ArrayList<>()
+		newArgs.add(command)
 
-        mlcpBean.properties.each { prop, val ->
-            def propVal
-            if (val) {
-                switch (prop) {
-                    case "host":
-                        propVal = (val ? val : config.getHost())
-                        break
-                    case "port":
-                        propVal = (val ? val : 8000)
-                        break
-                    case "username":
-                        propVal = (val ? val : config.getRestAdminUsername())
-                        break
-                    case ["class", "logger", "command", "password"]:
-                        // skip for now
-                        return
-                    default:
-                        propVal = val
-                        break
-                }
+		mlcpBean.properties.each { prop, val ->
+			def propVal
+			if (val) {
+				switch (prop) {
+					case "host":
+						propVal = (val ? val : config.getHost())
+						break
+					case "port":
+						propVal = (val ? val : 8000)
+						break
+					case "username":
+						propVal = (val ? val : config.getRestAdminUsername())
+						break
+					case ["class", "logger", "command", "password"]:
+						// skip for now
+						return
+					default:
+						propVal = val
+						break
+				}
 
-                newArgs.add("-" + prop);
-                newArgs.add(String.valueOf(propVal));
-            }
-        }
-
-		// Ensure connection arguments are present
-		if (!newArgs.contains("-host")) {
-			newArgs.add("-host")
-			newArgs.add(config.getHost())
+				newArgs.add("-" + prop);
+				newArgs.add(String.valueOf(propVal));
+			}
 		}
-		if (!newArgs.contains("-port")) {
-			newArgs.add("-port")
-			newArgs.add("8000")
-		}
-		if (!newArgs.contains("-username")) {
-			newArgs.add("-username")
-			newArgs.add(config.getRestAdminUsername())
+
+		// Ensure connection arguments are present, but not if a COPY
+		boolean isCopy = "COPY".equals(command)
+		if (!isCopy) {
+			if (!newArgs.contains("-host")) {
+				newArgs.add("-host")
+				newArgs.add(config.getHost())
+			}
+			if (!newArgs.contains("-port")) {
+				newArgs.add("-port")
+				newArgs.add("8000")
+			}
+			if (!newArgs.contains("-username")) {
+				newArgs.add("-username")
+				newArgs.add(config.getRestAdminUsername())
+			}
 		}
 
 		println "mlcp arguments, excluding password: " + newArgs
 
-        newArgs.add("-password")
-        newArgs.add(password ? password : config.getRestAdminPassword())
+		if (!isCopy) {
+			newArgs.add("-password")
+			newArgs.add(password ? password : config.getRestAdminPassword())
+		}
 
 		// Include any args that a user has configured via the args parameter of the Gradle task
 		newArgs.addAll(getArgs())
 
-        setArgs(newArgs)
+		setArgs(newArgs)
 
-        super.exec()
-    }
+		super.exec()
+	}
 }

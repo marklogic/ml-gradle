@@ -10,7 +10,7 @@ buildscript {
 		mavenLocal()
 	}
 	dependencies {
-		classpath "com.marklogic:ml-gradle:2.4.0"
+		classpath "com.marklogic:ml-gradle:2.5.0"
 	}
 }
 
@@ -118,4 +118,22 @@ task exportSampleData(type: com.marklogic.gradle.task.MlcpTask) {
 	database = mlAppConfig.contentDatabaseName
 	output_file_path = "data/export"
 	collection_filter = "sample-import"
+}
+
+/**
+ * Example of a COPY task. In this case, MlcpTask won't populate host/port/username/password, since the arguments have
+ * different names for a COPY, and it's not clear what their values should default to.
+ */
+task copySampleData(type: com.marklogic.gradle.task.MlcpTask) {
+	description = "Copy the sample data from the app-specific database to Documents"
+	classpath = configurations.mlcp
+	command = "COPY"
+	input_host = mlHost
+	input_port = Integer.parseInt(mlRestPort)
+	input_username = mlUsername
+	input_password = mlPassword
+	output_host = mlHost
+	output_port = 8000
+	output_username = mlUsername
+	output_password = mlPassword
 }

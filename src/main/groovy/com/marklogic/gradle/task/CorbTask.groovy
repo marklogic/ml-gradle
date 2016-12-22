@@ -32,16 +32,16 @@ XML-FILE,XML-NODE\
 XQUERY-MODULE".tokenize(',')
 
   CorbTask() {
-    String[] optionNames = DEFAULT_CORB_OPTIONS  
+    String[] optionNames = DEFAULT_CORB_OPTIONS
     try {
         optionNames = Class.forName("com.marklogic.developer.corb.Options", true, Thread.currentThread().contextClassLoader)
         .declaredFields
         .findAll { !it.synthetic }.collect { it.get(null) }
     } catch (ClassNotFoundException ex) {}
-    
-    //Augment with member variables and a mapping of CoRB2 Options    
+
+    //Augment with member variables and a mapping of CoRB2 Options
     CorbTask.metaClass.corbOptions = optionNames.collectEntries { option ->
-        
+
         String camelOption = option.toLowerCase().split('_|-').collect { it.capitalize() }.join('')
         // create Map entry gradle property and original values, for easy lookup/translation
         String lowerCamelOption = new StringBuffer(camelOption.length())
@@ -77,7 +77,7 @@ XQUERY-MODULE".tokenize(',')
   @TaskAction
   @Override
   public void exec() {
-    //By convention, if there is a corb configuration, use it to set the classpath  
+    //By convention, if there is a corb configuration, use it to set the classpath
     if (getProject().configurations.findByName('corb')) {
       setClasspath(getProject().configurations.corb)
     }
@@ -162,11 +162,13 @@ XQUERY-MODULE".tokenize(',')
   }
 
   /**
-  * Find all CoRB2 System.properties
-  * @return Map of CoRB2 options
+  * Collect all System.properties. This allows for any CoRB option to be set, including those not statically known such
+  * as CoRB custom inputs (e.g. URIS-MODULE.foo, PROCESS-MODULE.bar, etc) as well as settings for other libraries, such
+  * as xcc.httpCompliant to enable XCCS compatability for XCC.
+  * @return all System.properties
   */
   public Map collectSystemProperties() {
-    System.properties.findAll { corbOptions.containsValue(it.key) }
+    System.properties
   }
 
   /**
@@ -179,5 +181,5 @@ XQUERY-MODULE".tokenize(',')
       [(corbOptions[it]): project[it]]
     }
   }
-  
+
 }

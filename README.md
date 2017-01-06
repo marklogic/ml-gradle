@@ -21,7 +21,7 @@ If you're currently using Ant or Maven and are wondering about Gradle, there are
 What are the main features of ml-gradle?
 =========
 1. Utilizes the new [Management REST API](http://docs.marklogic.com/REST/management) in MarkLogic 8 to configure and deploy all aspects of an application.
-1. Can watch for new/modified modules and automatically load them for you, thus speeding up the code/build/test cycle
+1. Can [watch for new/modified modules](https://github.com/rjrudin/ml-gradle/wiki/Watching-for-module-changes) and automatically load them for you, thus speeding up the code/build/test cycle
 1. Can run Content Pump, Corb, and other Java-based MarkLogic tools without having to copy jars around and worry about a classpath
 1. Can treat packages of MarkLogic code as [true third-party dependencies](https://github.com/rjrudin/ml-gradle/wiki/Preparing-REST-API-dependencies), resolving them just like you would a dependency on a jar, as well as automatically loading such code into your modules database
 1. Can take advantage of [all the features of Gradle](https://docs.gradle.org/current/userguide/overview.html)

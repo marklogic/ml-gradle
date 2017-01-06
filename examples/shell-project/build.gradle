@@ -9,7 +9,7 @@ repositories {
 
 dependencies {
 	// Brings in a tiny Main program that ShellTask uses
-	runtime "com.marklogic:ml-groovysh:0.1.1"
+	runtime "com.marklogic:ml-groovysh:0.1.4"
 
 	// Provides the "guts" needed by ShellTask; can pick any version you want, as ml-groovysh does not
 	// specify a dependency on ml-app-deployer

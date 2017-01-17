@@ -6,6 +6,10 @@ import com.marklogic.mgmt.admin.ActionRequiringRestart;
 import com.marklogic.mgmt.admin.AdminConfig;
 import com.marklogic.mgmt.admin.AdminManager;
 import com.marklogic.rest.util.Fragment;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestTemplate;
 
 public class ClusterManager extends AbstractManager {
 
@@ -31,6 +35,32 @@ public class ClusterManager extends AbstractManager {
             }
         });
     }
+
+	public void modifyLocalCluster(final String payload, AdminManager adminManager) {
+    	adminManager.invokeActionRequiringRestart(new ActionRequiringRestart() {
+		    @Override
+		    public boolean execute() {
+		    	try {
+				    putPayload(manageClient, "/manage/v2/properties", payload);
+			    } catch (ResourceAccessException rae) {
+				    /**
+				     * This is odd. Plenty of other Manage endpoints cause ML to restart, but this one seems to trigger
+				     * the restart before the PUT finishes. But - the PUT still seems to update the cluster properties
+				     * correctly. So we catch this error and figure that we can wait for ML to restart like it normally
+				     * would.
+				     */
+		    		if (logger.isInfoEnabled()) {
+		    			logger.info("Ignoring somewhat expected error while updating local cluster properties: " + rae.getMessage());
+				    }
+			    }
+			    return true;
+		    }
+	    });
+	}
+
+	public Fragment getLocalClusterProperties() {
+    	return manageClient.getXml("/manage/v2/properties");
+	}
 
     public String getVersion() {
     	Fragment f = manageClient.getXml("/manage/v2");

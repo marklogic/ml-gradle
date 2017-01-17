@@ -21,6 +21,7 @@ examples/flexrep-project/.gradle/
 examples/sample-project/local.gradle
 examples/failover-project/.gradle/
 examples/mlcp-project/.gradle/
+examples/mlcp-project/build/
 examples/mlcp-project/data/export/
 examples/shell-project/.gradle/
 examples/shell-project/build/

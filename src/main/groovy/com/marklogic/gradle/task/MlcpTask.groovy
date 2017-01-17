@@ -1,5 +1,7 @@
 package com.marklogic.gradle.task
 
+import com.marklogic.client.DatabaseClient
+import com.marklogic.client.io.FileHandle
 import com.marklogic.contentpump.bean.MlcpBean
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
@@ -23,13 +25,16 @@ class MlcpTask extends JavaExec {
 	@Delegate
 	MlcpBean mlcpBean = new MlcpBean();
 
-	public Logger getLogger() {
+	// Set this to define a URI in your content database for mlcp output to be written to as a text document
+	String logOutputUri
+
+	Logger getLogger() {
 		return Logging.getLogger(MlcpTask.class)
 	}
 
 	@TaskAction
 	@Override
-	public void exec() {
+	void exec() {
 		setMain("com.marklogic.contentpump.ContentPump")
 		AppConfig config = getProject().property("mlAppConfig")
 
@@ -91,6 +96,20 @@ class MlcpTask extends JavaExec {
 
 		setArgs(newArgs)
 
+		File logOutputFile = null
+		if (logOutputUri) {
+			println "Will write mlcp log output to URI: " + logOutputUri
+			logOutputFile = new File(getProject().getBuildDir(), "mlcp-log-output-" + System.currentTimeMillis() + ".txt")
+			setStandardOutput(logOutputFile.newOutputStream())
+		}
+
 		super.exec()
+
+		if (logOutputFile != null) {
+			AppConfig appConfig = project.property("mlAppConfig")
+			DatabaseClient client = appConfig.newDatabaseClient()
+			client.newDocumentManager().write(logOutputUri, new FileHandle(logOutputFile))
+			println "Wrote mlcp log output to URI: " + logOutputUri
+		}
 	}
 }

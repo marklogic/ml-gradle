@@ -10,7 +10,7 @@ buildscript {
 		mavenLocal()
 	}
 	dependencies {
-		classpath "com.marklogic:ml-gradle:2.5.0"
+		classpath "com.marklogic:ml-gradle:2.6.0"
 	}
 }
 
@@ -71,6 +71,11 @@ task importSampleData(type: com.marklogic.gradle.task.MlcpTask) {
 	output_collections = "sample-import"
 	output_permissions = "rest-reader,read,rest-writer,update"
 	output_uri_replace = ".*import,'/import'"
+	/**
+	 * New in ml-gradle 2.6.0 - set this to define a URI in your content database for mlcp's log output to be written to
+	 * as a text document. This can also be a variable, Gradle property, etc.
+	 */
+	logOutputUri = "/slappy.txt"
 }
 
 /**

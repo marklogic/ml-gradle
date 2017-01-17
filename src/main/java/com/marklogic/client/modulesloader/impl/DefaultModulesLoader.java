@@ -283,7 +283,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 					staticChecker.checkLoadedAssets(list);
 				} catch (RuntimeException ex) {
 					if (catchExceptions) {
-						logger.warn("Static check failure: " + ex.getMessage(), ex);
+						logger.error("Static check failure: " + ex.getMessage());
 					} else {
 						throw ex;
 					}

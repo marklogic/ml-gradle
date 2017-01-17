@@ -11,11 +11,11 @@ class InitTask extends MarkLogicTask {
 
     @TaskAction
     void initializeMarkLogic() {
-		if (project.hasProperty("licenseKey")) {
-			licenseKey = project.property("licenseKey")
+		if (project.hasProperty("mlLicenseKey")) {
+			licenseKey = project.property("mlLicenseKey")
 		}
-		if (project.hasProperty("licensee")) {
-			licensee = project.property("licensee")
+		if (project.hasProperty("mlLicensee")) {
+			licensee = project.property("mlLicensee")
 		}
         getAdminManager().init(licenseKey, licensee)
     }

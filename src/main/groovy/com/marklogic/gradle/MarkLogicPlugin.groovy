@@ -3,7 +3,9 @@ package com.marklogic.gradle
 import com.marklogic.appdeployer.command.clusters.ModifyLocalClusterCommand
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand
 import com.marklogic.appdeployer.command.forests.DeployCustomForestsCommand
+import com.marklogic.gradle.task.cluster.AddHostTask
 import com.marklogic.gradle.task.cluster.ModifyClusterTask
+import com.marklogic.gradle.task.cluster.RemoveHostTask
 import com.marklogic.gradle.task.databases.DeleteCollectionTask
 import com.marklogic.gradle.task.es.GenerateModelArtifactsTask
 import com.marklogic.gradle.task.forests.DeployCustomForestsTask
@@ -153,8 +155,8 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlRedeploy", group: deployGroup, dependsOn: ["mlClearModulesDatabase", "mlDeploy"], description: "Clears the modules database and then deploys the application")
 
 		String adminGroup = "ml-gradle Admin"
-		project.task("mlInit", type: InitTask, group: adminGroup, description: "Perform a one-time initialization of a MarkLogic server")
-		project.task("mlInstallAdmin", type: InstallAdminTask, group: adminGroup, description: "Perform a one-time installation of an admin user")
+		project.task("mlInit", type: InitTask, group: adminGroup, description: "Perform a one-time initialization of a MarkLogic server; uses the properties 'mlLicenseKey' and 'mlLicensee'")
+		project.task("mlInstallAdmin", type: InstallAdminTask, group: adminGroup, description: "Perform a one-time installation of an admin user; uses the properties 'mlAdminUsername'/'mlUsername' and 'mlAdminPassword'/'mlPassword'")
 
 		String alertGroup = "ml-gradle Alert"
 		project.task("mlDeleteAllAlertConfigs", type: DeleteAllAlertConfigsTask, group: alertGroup, description: "Delete all alert configs, which also deletes all of the actions rules associated with them")
@@ -166,9 +168,11 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlLoadDefaultPipelines", type: LoadDefaultPipelinesTask, group: cpfGroup, description: "Load default pipelines into a triggers database")
 
 		String clusterGroup = "ml-gradle Cluster"
+		project.task("mlAddHost", type: AddHostTask, group: clusterGroup, description: "Add host to the cluster; must define 'host', 'hostGroup' (optional), and 'hostZone' (optional) properties")
 		project.task("mlModifyCluster", type: ModifyClusterTask, group: clusterGroup, description: "Modify the properties of the local cluster based on the ml-config/clusters/local-cluster.json file")
 		project.task("mlDisableSslFips", type: DisableSslFipsTask, group: clusterGroup, description: "Disable SSL FIPS across the cluster")
 		project.task("mlEnableSslFips", type: EnableSslFipsTask, group: clusterGroup, description: "Enable SSL FIPS across the cluster")
+		project.task("mlRemoveHost", type: RemoveHostTask, group: clusterGroup, description: "Remove a host from the cluster; must define 'host' property")
 		project.task("mlRestartCluster", type: RestartClusterTask, group: clusterGroup, description: "Restart the local cluster")
 
 		String dbGroup = "ml-gradle Database"

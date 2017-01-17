@@ -21,8 +21,6 @@ public class AddAndRemoveHostDebug {
 		String existingHostPassword = args[1];
 		String joiningHost = args[2];
 		String joiningHostPassword = args[3];
-		String group = "Default";
-		String zone = "Don't let me get in my zone";
 
 		ManageConfig manageConfig = new ManageConfig(existingHost, 8002, "admin", existingHostPassword);
 		ManageClient manageClient = new ManageClient(manageConfig);

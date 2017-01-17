@@ -11,7 +11,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration( classes = {MarkLogicApplicationContext.class} )
-public class AbstractIntegrationTest extends Assert {
+public abstract class AbstractIntegrationTest extends Assert {
 
 	@Autowired
 	protected DatabaseClientConfig clientConfig;

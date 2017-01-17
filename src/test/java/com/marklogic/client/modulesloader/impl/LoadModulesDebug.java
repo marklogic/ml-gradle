@@ -13,16 +13,6 @@ import java.io.File;
 public class LoadModulesDebug {
 
 	public static void main(String[] args) throws Exception {
-		if (false) {
-			File dir = new File("c:/temp/modules");
-			dir.mkdirs();
-			for (int i = 0; i < 500; i++) {
-				FileCopyUtils.copy(new String("Hello " + System.currentTimeMillis()).getBytes(),
-					new File(dir, i + ".xqy"));
-			}
-			return;
-		}
-
 		DatabaseClient client = DatabaseClientFactory.newClient("localhost", 8000, "admin", "admin",
 			Authentication.DIGEST);
 
@@ -43,7 +33,7 @@ public class LoadModulesDebug {
 		//l.setRestApiAssetLoader(raal);
 		l.setXccAssetLoader(xal);
 
-		String path = "c:/temp/modules";
+		String path = "src/test/resources/sample-base-dir";
 		try {
 			long start = System.currentTimeMillis();
 			l.loadModules(new File(path), new DefaultModulesFinder(), client);

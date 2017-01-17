@@ -16,11 +16,10 @@ import org.junit.Assert;
  */
 public class AddAndRemoveHostDebug {
 
-	public static void main(String[] args) throws Exception{
+	public static void main(String[] args) throws Exception {
 		String existingHost = args[0];
 		String existingHostPassword = args[1];
 		String joiningHost = args[2];
-		String joiningHostPassword = args[3];
 
 		ManageConfig manageConfig = new ManageConfig(existingHost, 8002, "admin", existingHostPassword);
 		ManageClient manageClient = new ManageClient(manageConfig);
@@ -33,7 +32,7 @@ public class AddAndRemoveHostDebug {
 		ClusterManager clusterManager = new ClusterManager(manageClient);
 		AdminConfig adminConfig = new AdminConfig(existingHost, 8001, "admin", existingHostPassword);
 		AdminManager adminManager = new AdminManager(adminConfig);
-		clusterManager.addHost(adminManager, joiningHost, "admin", joiningHostPassword, "Default");
+		clusterManager.addHost(adminManager, joiningHost);
 
 		Assert.assertEquals("Expecting two hosts after the add", 2, hostManager.getHostIds().size());
 		System.out.println("After adding a host, the cluster now has two hosts");

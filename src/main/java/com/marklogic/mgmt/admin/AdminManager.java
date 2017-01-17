@@ -274,9 +274,16 @@ public class AdminManager extends AbstractManager {
 	 */
 	public void leaveCluster() {
 		ResponseEntity<String> response = restTemplate.exchange(adminConfig.buildUri("/admin/v1/host-config"), HttpMethod.DELETE, null, String.class);
-		if(response.getStatusCode().value() == 202){
+		if (response.getStatusCode().value() == 202) {
 			waitForRestart();
 		}
 	}
 
+	public AdminConfig getAdminConfig() {
+		return adminConfig;
+	}
+
+	public RestTemplate getRestTemplate() {
+		return restTemplate;
+	}
 }

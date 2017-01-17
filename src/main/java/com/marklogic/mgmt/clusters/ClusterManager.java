@@ -71,52 +71,45 @@ public class ClusterManager extends AbstractManager {
 	 * Adds a host to the cluster represented by adminManager
 	 * @param adminManager AdminManager for a host already in the cluster
 	 * @param hostname hostname of the joining host
-	 * @param username admin username of the joining host
-	 * @param password admin password of the joining host
-	 * @param group name of the group within the cluster to add the joining host to
 	 * @throws Exception
 	 */
-    public void addHost(AdminManager adminManager, String hostname, String username, String password, String group) throws Exception {
-		addHost(adminManager, hostname, username, password, group, null);
+    public void addHost(AdminManager adminManager, String hostname) throws Exception {
+		addHost(adminManager, hostname, "Default", null);
 	}
 
 	/**
 	 * Adds a host to the cluster represented by adminManager
 	 * @param adminManager AdminManager for a host already in the cluster
 	 * @param hostname hostname of the joining host
-	 * @param username admin username of the joining host
-	 * @param password admin password of the joining host
 	 * @param group name of the group within the cluster to add the joining host to
 	 * @param zone zone information for the joining host (optional)
 	 * @throws Exception
 	 */
-    public void addHost(AdminManager adminManager, String hostname, String username, String password, String group, String zone) throws Exception{
-		AdminConfig joiningHostAdminConfig = new AdminConfig(hostname, 8001, username, password);
+    public void addHost(AdminManager adminManager, String hostname, String group, String zone) throws Exception{
+    	AdminConfig adminConfig = adminManager.getAdminConfig();
+
+		AdminConfig joiningHostAdminConfig = new AdminConfig(hostname, 8001, adminConfig.getUsername(), adminConfig.getPassword());
 		AdminManager joiningHostAdminManager = new AdminManager(joiningHostAdminConfig);
 
 		// get the joining host's configuration
 		Fragment fragment = joiningHostAdminManager.getServerConfig();
 
-		// Make sure host has previously been initialized. If it hasn't, the host-id from the getServerConfig will
-		// be empty
+		// Make sure host has previously been initialized. If it hasn't, the host-id from the getServerConfig will be empty
 		String hostId = fragment.getElementValue("node()/m:host-id");
-		if(hostId.isEmpty()){
-			logger.error("New host [" + hostname + "] has not been initialized. Please initialize the host first.");
-			return;
+		if (hostId.isEmpty()){
+			throw new IllegalStateException("New host [" + hostname + "] has not been initialized. Please initialize the host first.");
 		}
 
 		// Send the joining host's config to the bootstrap host and receive
 		// the cluster config data needed to complete the join.
 		byte[] clusterConfigZipBytes = adminManager.postJoiningHostConfig(fragment, group, zone);
-		if(clusterConfigZipBytes == null){
-			logger.error("Error sending new host's config to cluster and receiving updated cluster configuration");
-			return;
+		if (clusterConfigZipBytes == null){
+			throw new RuntimeException("Error sending new host's config to cluster and receiving updated cluster configuration");
 		}
 
 		// Final step of adding a host to the cluster. Post the zipped cluster config to the
 		// joining host
 		joiningHostAdminManager.postClustConfigToJoiningHost(clusterConfigZipBytes);
-
 	}
 
 	/**

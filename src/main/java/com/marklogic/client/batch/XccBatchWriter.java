@@ -35,7 +35,7 @@ public class XccBatchWriter extends BatchWriterSupport {
 		final ContentSource contentSource = contentSources.get(contentSourceIndex);
 		contentSourceIndex++;
 
-		execute(new Runnable() {
+		getTaskExecutor().execute(new Runnable() {
 			@Override
 			public void run() {
 				Session session = contentSource.newSession();

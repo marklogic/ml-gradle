@@ -7,10 +7,16 @@ import com.marklogic.client.document.GenericDocumentManager;
 
 import java.util.List;
 
+/**
+ * REST API-based implementation, using the Java Client API. By default, this will call release() on each of the
+ * DatabaseClient objects that are passed in. Be sure to disable this if you want to keep using those DatabaseClient
+ * objects.
+ */
 public class RestBatchWriter extends BatchWriterSupport {
 
 	private List<DatabaseClient> databaseClients;
 	private int clientIndex = 0;
+	private boolean releaseDatabaseClients = true;
 
 	public RestBatchWriter(List<DatabaseClient> databaseClients) {
 		this.databaseClients = databaseClients;
@@ -24,7 +30,7 @@ public class RestBatchWriter extends BatchWriterSupport {
 		final DatabaseClient client = databaseClients.get(clientIndex);
 		clientIndex++;
 
-		execute(new Runnable() {
+		getTaskExecutor().execute(new Runnable() {
 			@Override
 			public void run() {
 				GenericDocumentManager mgr = client.newDocumentManager();
@@ -42,5 +48,22 @@ public class RestBatchWriter extends BatchWriterSupport {
 				}
 			}
 		});
+	}
+
+	@Override
+	public void waitForCompletion() {
+		super.waitForCompletion();
+
+		if (databaseClients != null && releaseDatabaseClients) {
+			logger.info("Releasing DatabaseClient instances...");
+			for (DatabaseClient client : databaseClients) {
+				client.release();
+			}
+			logger.info("Finished releasing DatabaseClient instances");
+		}
+	}
+
+	public void setReleaseDatabaseClients(boolean releaseDatabaseClients) {
+		this.releaseDatabaseClients = releaseDatabaseClients;
 	}
 }

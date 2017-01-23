@@ -4,6 +4,7 @@ import com.marklogic.client.helper.LoggingObject;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.concurrent.ExecutorConfigurationSupport;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.ArrayList;
@@ -13,27 +14,44 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Support class for BatchWriter implementations that uses Spring's TaskExecutor interface for parallelizing writes to
- * MarkLogic.
+ * MarkLogic. Allows for setting a TaskExecutor instance, and if one is not set, a default one will be created based
+ * on the threadCount attribute. That attribute is ignored if a TaskExecutor is set.
  */
 public abstract class BatchWriterSupport extends LoggingObject implements BatchWriter {
 
 	private TaskExecutor taskExecutor;
 	private int threadCount = 16;
 
-	/**
-	 * Seems necessary to keep track of each Future instance so that we can properly wait for each one to finish.
-	 * Spring's TaskExecutor library doesn't seem to provide a better way of doing this.
-	 */
-	private List<Future<?>> futures = new ArrayList<>();
-
 	@Override
 	public void initialize() {
+		if (taskExecutor == null) {
+			initializeDefaultTaskExecutor();
+		}
+	}
+
+	@Override
+	public void waitForCompletion() {
+		if (taskExecutor instanceof ExecutorConfigurationSupport) {
+			if (logger.isInfoEnabled()) {
+				logger.info("Calling shutdown on thread pool");
+			}
+			((ExecutorConfigurationSupport) taskExecutor).shutdown();
+			if (logger.isInfoEnabled()) {
+				logger.info("Thread pool finished shutdown");
+			}
+		}
+	}
+
+	protected void initializeDefaultTaskExecutor() {
 		if (threadCount > 1) {
 			if (logger.isInfoEnabled()) {
 				logger.info("Initializing thread pool with a count of " + threadCount);
 			}
 			ThreadPoolTaskExecutor tpte = new ThreadPoolTaskExecutor();
 			tpte.setCorePoolSize(threadCount);
+			// By default, wait for tasks to finish, and wait up to an hour
+			tpte.setWaitForTasksToCompleteOnShutdown(true);
+			tpte.setAwaitTerminationSeconds(60 * 60);
 			tpte.afterPropertiesSet();
 			this.taskExecutor = tpte;
 		} else {
@@ -44,33 +62,8 @@ public abstract class BatchWriterSupport extends LoggingObject implements BatchW
 		}
 	}
 
-	@Override
-	public void waitForCompletion() {
-		int size = futures.size();
-		if (logger.isDebugEnabled()) {
-			logger.debug("Waiting for threads to finish document processing; futures count: " + size);
-		}
-
-		for (int i = 0; i < size; i++) {
-			Future<?> f = futures.get(i);
-			if (f.isDone()) {
-				continue;
-			}
-			try {
-				// Wait up to 1 hour for a write to ML to finish (should never happen)
-				f.get(1, TimeUnit.HOURS);
-			} catch (Exception ex) {
-				logger.warn("Unable to wait for last set of documents to be processed: " + ex.getMessage(), ex);
-			}
-		}
-	}
-
-	protected void execute(Runnable runnable) {
-		if (taskExecutor instanceof AsyncTaskExecutor) {
-			futures.add(((AsyncTaskExecutor) taskExecutor).submit(runnable));
-		} else {
-			taskExecutor.execute(runnable);
-		}
+	protected TaskExecutor getTaskExecutor() {
+		return taskExecutor;
 	}
 
 	public void setTaskExecutor(TaskExecutor taskExecutor) {

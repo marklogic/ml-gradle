@@ -66,8 +66,7 @@ public abstract class SortOrderConstants {
     public static Integer DELETE_CERTIFICATE_AUTHORITIES = 9020;
     public static Integer DELETE_EXTERNAL_SECURITY = 9030;
     public static Integer DELETE_PROTECTED_COLLECTIONS = 9040;
-    // Amps can reference roles, so must delete amps first
-    public static Integer DELETE_AMPS = 9050;
+
     // Roles can reference privileges, so must delete roles first
     public static Integer DELETE_ROLES = 9060;
     public static Integer DELETE_PRIVILEGES = 9070;
@@ -86,5 +85,9 @@ public abstract class SortOrderConstants {
     public static Integer DELETE_REST_API_SERVERS = 7000;
     public static Integer DELETE_OTHER_SERVERS = 7010;
 
-    public static Integer DELETE_SCHEDULED_TASKS = 1000;
+	// Amps can reference roles and databases, so must delete amps before both (and before deleting REST API servers
+	// too, which may delete databases)
+	public static Integer DELETE_AMPS = 2000;
+
+	public static Integer DELETE_SCHEDULED_TASKS = 1000;
 }

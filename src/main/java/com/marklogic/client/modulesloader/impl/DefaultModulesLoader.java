@@ -23,8 +23,6 @@ import org.springframework.util.FileCopyUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Default implementation of ModulesLoader. Loads everything except assets via the REST API. Assets are either loaded
@@ -43,7 +41,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	// For parallelizing writes of modules
 	private TaskExecutor taskExecutor;
 	private int taskThreadCount = 16;
-	private List<Future> taskFutures;
+	private boolean shutdownTaskExecutorAfterLoadingModules = true;
 
 	/**
 	 * When set to true, exceptions thrown while loading transforms and resources will be caught and logged, and the
@@ -119,7 +117,6 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
         if (taskExecutor == null) {
         	initializeDefaultTaskExecutor();
         }
-        taskFutures = new ArrayList<>();
 
 	    Set<File> loadedModules = new HashSet<>();
         loadProperties(modules, loadedModules);
@@ -130,8 +127,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
         loadTransforms(modules, loadedModules);
         loadResources(modules, loadedModules);
 
-        // Wait for thread pool to complete
-	    waitForTaskFuturesToComplete();
+	    waitForTaskExecutorToFinish();
 
         if (logger.isDebugEnabled()) {
             logger.debug("Finished loading modules from base directory: " + baseDir.getAbsolutePath());
@@ -143,33 +139,20 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	 * If an AsyncTaskExecutor is used for loading options/services/transforms, we need to wait for the tasks to complete
 	 * before we e.g. release the DatabaseClient.
 	 */
-	protected void waitForTaskFuturesToComplete() {
-    	int size = taskFutures.size();
-	    for (int i = 0; i < size; i++) {
-		    Future<?> f = taskFutures.get(i);
-		    if (f.isDone() || f.isCancelled()) {
-			    continue;
-		    }
-		    try {
-			    // Wait up to 1 hour for a write to ML to finish (should never happen)
-			    f.get(1, TimeUnit.HOURS);
-		    } catch (Exception ex) {
-			    logger.warn("Unable to wait for last task future to finish: " + ex.getMessage(), ex);
-		    }
-	    }
-
-	    if (taskExecutor instanceof ExecutorConfigurationSupport) {
-		    ((ExecutorConfigurationSupport)taskExecutor).shutdown();
-	    } else if (taskExecutor instanceof DisposableBean) {
-	    	try {
-			    ((DisposableBean) taskExecutor).destroy();
-		    } catch (Exception ex) {
-	    		logger.warn("Unexpected exception while calling destroy() on taskExecutor: " + ex.getMessage(), ex);
-		    }
-	    }
-
-	    // Null this out so a new thread pool is created if loadModules is called again on this object
-	    this.taskExecutor = null;
+	protected void waitForTaskExecutorToFinish() {
+		if (shutdownTaskExecutorAfterLoadingModules) {
+			if (taskExecutor instanceof ExecutorConfigurationSupport) {
+				((ExecutorConfigurationSupport) taskExecutor).shutdown();
+			} else if (taskExecutor instanceof DisposableBean) {
+				try {
+					((DisposableBean) taskExecutor).destroy();
+				} catch (Exception ex) {
+					logger.warn("Unexpected exception while calling destroy() on taskExecutor: " + ex.getMessage(), ex);
+				}
+			}
+		} else if (logger.isDebugEnabled()) {
+			logger.debug("shutdownTaskExecutorAfterLoadingModules is set to false, so not shutting down taskExecutor");
+		}
     }
 
     /**
@@ -642,5 +625,9 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 
 	public void setTaskThreadCount(int taskThreadCount) {
 		this.taskThreadCount = taskThreadCount;
+	}
+
+	public void setShutdownTaskExecutorAfterLoadingModules(boolean shutdownTaskExecutorAfterLoadingModules) {
+		this.shutdownTaskExecutorAfterLoadingModules = shutdownTaskExecutorAfterLoadingModules;
 	}
 }

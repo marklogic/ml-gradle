@@ -33,5 +33,23 @@ it can be used in any environment. It provides the following features:
 1. Uses Spring's [TaskExecutor library](https://docs.spring.io/spring/docs/current/spring-framework-reference/html/scheduling.html) for parallelizing writes
 1. Supports writes via the REST API or XCC
 
+Via Spring's TaskExecutor library, you can essentially throw an infinite number of documents at this interface. The library
+will default to a sensible implementation of [ThreadPoolTaskExecutor](http://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/scheduling/concurrent/ThreadPoolTaskExecutor.html),
+but you can override that with any TaskExecutor implementation you like.
+
 Once MarkLogic 9 is available, an implementation will be used that depends on the new Data Movement SDK, which is being
 added to the MarkLogic Java Client API. 
+
+Here's a sample using two DatabaseClient instances:
+
+		// This is all basic Java Client API stuff
+    DatabaseClient client1 = DatabaseClientFactory.newClient("host1", ...);
+    DatabaseClient client2 = DatabaseClientFactory.newClient("host2", ...);
+    DocumentWriteOperation doc1 = new DocumentWriteOperationImpl("test1.xml", ...);
+    DocumentWriteOperation doc2 = new DocumentWriteOperationImpl("test2.xml", ...);
+    
+    // Here's how BatchWriter works
+    BatchWriter writer = new RestBatchWriter(Arrays.asList(client1, client2));
+    writer.initialize();
+    writer.write(Arrays.asList(doc1, doc2));
+    writer.waitForCompletion();

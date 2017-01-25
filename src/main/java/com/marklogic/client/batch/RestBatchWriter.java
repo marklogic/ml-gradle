@@ -4,6 +4,7 @@ import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.document.DocumentWriteOperation;
 import com.marklogic.client.document.DocumentWriteSet;
 import com.marklogic.client.document.GenericDocumentManager;
+import com.marklogic.client.document.ServerTransform;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ public class RestBatchWriter extends BatchWriterSupport {
 	private List<DatabaseClient> databaseClients;
 	private int clientIndex = 0;
 	private boolean releaseDatabaseClients = true;
+	private ServerTransform serverTransform;
 
 	public RestBatchWriter(List<DatabaseClient> databaseClients) {
 		this.databaseClients = databaseClients;
@@ -42,7 +44,11 @@ public class RestBatchWriter extends BatchWriterSupport {
 				if (logger.isDebugEnabled()) {
 					logger.debug("Writing " + count + " documents to MarkLogic");
 				}
-				mgr.write(set);
+				if (serverTransform != null) {
+					mgr.write(set, serverTransform);
+				} else {
+					mgr.write(set);
+				}
 				if (logger.isInfoEnabled()) {
 					logger.info("Wrote " + count + " documents to MarkLogic");
 				}
@@ -65,5 +71,9 @@ public class RestBatchWriter extends BatchWriterSupport {
 
 	public void setReleaseDatabaseClients(boolean releaseDatabaseClients) {
 		this.releaseDatabaseClients = releaseDatabaseClients;
+	}
+
+	public void setServerTransform(ServerTransform serverTransform) {
+		this.serverTransform = serverTransform;
 	}
 }

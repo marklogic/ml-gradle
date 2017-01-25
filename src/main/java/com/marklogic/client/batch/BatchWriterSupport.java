@@ -49,9 +49,11 @@ public abstract class BatchWriterSupport extends LoggingObject implements BatchW
 			}
 			ThreadPoolTaskExecutor tpte = new ThreadPoolTaskExecutor();
 			tpte.setCorePoolSize(threadCount);
+
 			// By default, wait for tasks to finish, and wait up to an hour
 			tpte.setWaitForTasksToCompleteOnShutdown(true);
 			tpte.setAwaitTerminationSeconds(60 * 60);
+
 			tpte.afterPropertiesSet();
 			this.taskExecutor = tpte;
 		} else {

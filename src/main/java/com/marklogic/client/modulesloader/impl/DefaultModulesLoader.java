@@ -1,45 +1,30 @@
 package com.marklogic.client.modulesloader.impl;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
-import com.marklogic.client.io.marker.QueryOptionsWriteHandle;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.admin.*;
+import com.marklogic.client.admin.ResourceExtensionsManager.MethodParameters;
+import com.marklogic.client.admin.ServerConfigurationManager.UpdatePolicy;
+import com.marklogic.client.helper.FilenameUtil;
+import com.marklogic.client.helper.LoggingObject;
+import com.marklogic.client.io.Format;
+import com.marklogic.client.io.InputStreamHandle;
+import com.marklogic.client.modulesloader.*;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.task.AsyncTaskExecutor;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ExecutorConfigurationSupport;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.FileCopyUtils;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.marklogic.client.DatabaseClient;
-import com.marklogic.client.admin.ExtensionLibrariesManager;
-import com.marklogic.client.admin.ExtensionMetadata;
-import com.marklogic.client.admin.NamespacesManager;
-import com.marklogic.client.admin.QueryOptionsManager;
-import com.marklogic.client.admin.ResourceExtensionsManager;
-import com.marklogic.client.admin.ResourceExtensionsManager.MethodParameters;
-import com.marklogic.client.admin.ServerConfigurationManager;
-import com.marklogic.client.admin.ServerConfigurationManager.UpdatePolicy;
-import com.marklogic.client.admin.TransformExtensionsManager;
-import com.marklogic.client.helper.FilenameUtil;
-import com.marklogic.client.helper.LoggingObject;
-import com.marklogic.client.io.Format;
-import com.marklogic.client.io.InputStreamHandle;
-import com.marklogic.client.modulesloader.ExtensionMetadataAndParams;
-import com.marklogic.client.modulesloader.ExtensionMetadataProvider;
-import com.marklogic.client.modulesloader.Modules;
-import com.marklogic.client.modulesloader.ModulesFinder;
-import com.marklogic.client.modulesloader.ModulesLoader;
-import com.marklogic.client.modulesloader.ModulesManager;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Default implementation of ModulesLoader. Loads everything except assets via the REST API. Assets are either loaded
@@ -101,6 +86,11 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
     	if (taskThreadCount > 1) {
 		    ThreadPoolTaskExecutor tpte = new ThreadPoolTaskExecutor();
 		    tpte.setCorePoolSize(taskThreadCount);
+
+		    // 10 minutes should be plenty of time to wait for REST API modules to be loaded
+		    tpte.setAwaitTerminationSeconds(60 * 10);
+		    tpte.setWaitForTasksToCompleteOnShutdown(true);
+
 		    tpte.afterPropertiesSet();
 		    this.taskExecutor = tpte;
 	    } else {
@@ -551,17 +541,13 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
     }
 
 	/**
-	 * Ensures that if we're using an AsyncTaskExecutor, we capture the Future and add it to our list so we can ensure
-	 * we wait for it to finish.
+	 * Protected in case a subclass wants to execute the Runnable in a different way - e.g. capturing the Future
+	 * that could be returned.
 	 *
 	 * @param r
 	 */
 	protected void executeTask(Runnable r) {
-    	if (taskExecutor instanceof AsyncTaskExecutor) {
-		    taskFutures.add(((AsyncTaskExecutor)taskExecutor).submit(r));
-	    } else {
-    		taskExecutor.execute(r);
-	    }
+		taskExecutor.execute(r);
     }
 
     public File installNamespace(File f) {

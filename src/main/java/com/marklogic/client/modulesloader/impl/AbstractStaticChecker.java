@@ -82,7 +82,7 @@ public abstract class AbstractStaticChecker extends LoggingObject implements Sta
 	protected String buildXqueryForStaticallyCheckingModule() {
 		String xquery =
 			"try { xdmp:invoke($uri, (), <options xmlns='xdmp:eval'><static-check>true</static-check></options>) } " +
-				"catch ($e) { xdmp:log($e), " +
+				"catch ($e) { " +
 				"if ($e/*:code = 'XDMP-NOEXECUTE') then () " +
 				"else if ($e/*:code = 'XDMP-EVALLIBMOD') then ";
 		if (checkLibraryModules) {

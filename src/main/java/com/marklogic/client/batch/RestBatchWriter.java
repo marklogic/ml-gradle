@@ -1,9 +1,9 @@
 package com.marklogic.client.batch;
 
 import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.document.DocumentManager;
 import com.marklogic.client.document.DocumentWriteOperation;
 import com.marklogic.client.document.DocumentWriteSet;
-import com.marklogic.client.document.GenericDocumentManager;
 import com.marklogic.client.document.ServerTransform;
 
 import java.util.List;
@@ -35,7 +35,7 @@ public class RestBatchWriter extends BatchWriterSupport {
 		getTaskExecutor().execute(new Runnable() {
 			@Override
 			public void run() {
-				GenericDocumentManager mgr = client.newDocumentManager();
+				DocumentManager<?, ?> mgr = buildDocumentManager(client);
 				DocumentWriteSet set = mgr.newWriteSet();
 				for (DocumentWriteOperation item : items) {
 					set.add(item);
@@ -54,6 +54,17 @@ public class RestBatchWriter extends BatchWriterSupport {
 				}
 			}
 		});
+	}
+
+	/**
+	 * Factored out so it can be overridden for e.g. those already using MarkLogic 9, who may need to set the content
+	 * format on the manager.
+	 *
+	 * @param client
+	 * @return
+	 */
+	protected DocumentManager<?, ?> buildDocumentManager(DatabaseClient client) {
+		return client.newDocumentManager();
 	}
 
 	@Override

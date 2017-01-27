@@ -1,0 +1,17 @@
+plugins {
+	id "com.marklogic.ml-gradle" version "2.6.0"
+}
+
+ext {
+	println mlAppDeployer.getCommand("DeployRolesCommand")
+
+	/**
+	 * Each command that extends the com.marklogic.appdeployer.command.AbstractCommand class has a setFilenamesToIgnore
+	 * method. You can pass in an array of strings to configure the resources to ignore for a particular command. This
+	 * is an alternative to using mlResourceFilenamesToIgnore.
+	 */
+	//mlAppDeployer.getCommand("DeployRolesCommand").setFilenamesToIgnore("role-2.json")
+
+	// Disabling creating of a REST API server, which isn't needed for this sample project
+	// mlAppDeployer.getCommands().remove(mlAppDeployer.getCommand("DeployRestApiServersCommand"))
+}

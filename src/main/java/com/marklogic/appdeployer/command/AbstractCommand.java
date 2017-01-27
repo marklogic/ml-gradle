@@ -52,6 +52,7 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
             for (String f : filenames) {
                 set.add(f);
             }
+            rff.setFilenamesToIgnore(set);
         } else {
             this.resourceFilenameFilter = new ResourceFilenameFilter(filenames);
         }

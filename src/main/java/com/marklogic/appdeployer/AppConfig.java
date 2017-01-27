@@ -133,6 +133,8 @@ public class AppConfig {
 	private boolean generateExtractionTemplate = true;
 	private boolean generateSearchOptions = true;
 
+	private String[] resourceFilenamesToIgnore;
+
 	public AppConfig() {
         this(DEFAULT_MODULES_PATH, DEFAULT_SCHEMAS_PATH);
     }
@@ -695,5 +697,13 @@ public class AppConfig {
 
 	public void setModuleTimestampsPath(String moduleTimestampsPath) {
 		this.moduleTimestampsPath = moduleTimestampsPath;
+	}
+
+	public String[] getResourceFilenamesToIgnore() {
+		return resourceFilenamesToIgnore;
+	}
+
+	public void setResourceFilenamesToIgnore(String... resourceFilenamesToIgnore) {
+		this.resourceFilenamesToIgnore = resourceFilenamesToIgnore;
 	}
 }

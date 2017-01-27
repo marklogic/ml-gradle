@@ -8,9 +8,8 @@ public class IgnoreRoleTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void test() {
-		DeployRolesCommand command = new DeployRolesCommand();
-		command.setFilenamesToIgnore("sample-app-role2.xml");
-		initializeAppDeployer(command);
+		appConfig.setResourceFilenamesToIgnore("sample-app-role2.xml");
+		initializeAppDeployer(new DeployRolesCommand());
 		appDeployer.deploy(appConfig);
 
 		try {

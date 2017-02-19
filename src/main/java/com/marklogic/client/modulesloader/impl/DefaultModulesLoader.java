@@ -80,7 +80,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
         this.xccAssetLoader = xccAssetLoader;
     }
 
-    protected void initializeDefaultTaskExecutor() {
+    public void initializeDefaultTaskExecutor() {
     	if (taskThreadCount > 1) {
 		    ThreadPoolTaskExecutor tpte = new ThreadPoolTaskExecutor();
 		    tpte.setCorePoolSize(taskThreadCount);
@@ -530,6 +530,9 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	 * @param r
 	 */
 	protected void executeTask(Runnable r) {
+		if (taskExecutor == null) {
+			initializeDefaultTaskExecutor();
+		}
 		taskExecutor.execute(r);
     }
 

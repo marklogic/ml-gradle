@@ -8,7 +8,6 @@ import com.marklogic.xcc.ContentSource;
 import com.marklogic.xcc.Session;
 import com.marklogic.xcc.exceptions.RequestException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,14 +27,22 @@ public class XccBatchWriter extends BatchWriterSupport {
 
 	@Override
 	public void write(final List<? extends DocumentWriteOperation> items) {
+		ContentSource contentSource = determineContentSourceToUse();
+		Runnable runnable = buildRunnable(contentSource, items);
+		executeRunnable(runnable, items);
+	}
+
+	protected ContentSource determineContentSourceToUse() {
 		if (contentSourceIndex >= contentSources.size()) {
 			contentSourceIndex = 0;
 		}
-
-		final ContentSource contentSource = contentSources.get(contentSourceIndex);
+		ContentSource contentSource = contentSources.get(contentSourceIndex);
 		contentSourceIndex++;
+		return contentSource;
+	}
 
-		getTaskExecutor().execute(new Runnable() {
+	protected Runnable buildRunnable(final ContentSource contentSource, final List<? extends DocumentWriteOperation> items) {
+		return new Runnable() {
 			@Override
 			public void run() {
 				Session session = contentSource.newSession();
@@ -58,7 +65,7 @@ public class XccBatchWriter extends BatchWriterSupport {
 					session.close();
 				}
 			}
-		});
+		};
 	}
 
 	public void setDocumentWriteOperationAdapter(DocumentWriteOperationAdapter documentWriteOperationAdapter) {

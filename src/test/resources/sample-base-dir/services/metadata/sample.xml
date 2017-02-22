@@ -1,4 +1,4 @@
-<documentMetadata>
+<metadata>
   <title>Sample Service</title>
   <description>Would be nice to support HTML in this.</description>
   <method name="GET">
@@ -13,4 +13,4 @@
     <param name="id" />
     <param name="sourceId" />
   </method>
-</documentMetadata>
+</metadata>

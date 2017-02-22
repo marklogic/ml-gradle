@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.document.GenericDocumentManager;
 import com.marklogic.client.document.XMLDocumentManager;
 import com.marklogic.client.io.DocumentMetadataHandle;
 import com.marklogic.client.io.DocumentMetadataHandle.DocumentCollections;
@@ -29,11 +30,12 @@ public class ClientHelper extends LoggingObject {
         return this.client;
     }
 
+    public DocumentMetadataHandle getMetadata(String uri) {
+        return client.newDocumentManager().readMetadata(uri, new DocumentMetadataHandle());
+    }
+
     public List<String> getCollections(String uri) {
-        XMLDocumentManager mgr = client.newXMLDocumentManager();
-        DocumentMetadataHandle h = new DocumentMetadataHandle();
-        mgr.readMetadata(uri, h);
-        DocumentCollections colls = h.getCollections();
+        DocumentCollections colls = getMetadata(uri).getCollections();
         return Arrays.asList(colls.toArray(new String[] {}));
     }
 

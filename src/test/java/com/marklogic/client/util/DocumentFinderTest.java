@@ -1,8 +1,8 @@
 package com.marklogic.client.util;
 
-import com.marklogic.client.file.DefaultDocumentFileFinder;
+import com.marklogic.client.file.DefaultDocumentFileReader;
 import com.marklogic.client.file.DocumentFile;
-import com.marklogic.client.file.DocumentFileFinder;
+import com.marklogic.client.file.DocumentFileReader;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -11,12 +11,12 @@ import java.util.List;
 
 public class DocumentFinderTest extends Assert {
 
-	private DocumentFileFinder sut = new DefaultDocumentFileFinder();
+	private DocumentFileReader sut = new DefaultDocumentFileReader();
 
 	@Test
 	public void noFileFilter() {
 		String path = "src/test/resources/schemas";
-		List<DocumentFile> list = sut.findDocumentFiles(path);
+		List<DocumentFile> list = sut.readDocumentFiles(path);
 		assertEquals(3, list.size());
 
 		List<String> uris = new ArrayList<>();

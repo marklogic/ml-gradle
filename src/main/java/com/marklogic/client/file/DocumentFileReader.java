@@ -6,7 +6,7 @@ import java.util.List;
  * Strategy interface for determining which files to load into MarkLogic, with those files being captured as a List of
  * DocumentFile objects.
  */
-public interface DocumentFileFinder {
+public interface DocumentFileReader {
 
-	List<DocumentFile> findDocumentFiles(String... paths);
+	List<DocumentFile> readDocumentFiles(String... paths);
 }

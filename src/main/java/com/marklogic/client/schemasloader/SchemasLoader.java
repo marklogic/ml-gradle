@@ -16,7 +16,7 @@ public interface SchemasLoader {
 	 * @param schemasDataFinder 
 	 * @param client
 	 * @return a set of files that were loaded.
-	 * @deprecated Prefer loadSchemas instead, which is assumed to use the new FileLoader library
+	 * @deprecated Prefer loadSchemas instead, which is assumed to use DocumentFileReader and BatchWriter
 	 */
 	@Deprecated
     Set<File> loadSchemas(File directory, SchemasFinder schemasDataFinder, DatabaseClient client);

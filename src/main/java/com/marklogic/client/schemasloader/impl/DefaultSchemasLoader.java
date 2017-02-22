@@ -1,60 +1,94 @@
 package com.marklogic.client.schemasloader.impl;
 
-import java.io.File;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.batch.BatchWriter;
 import com.marklogic.client.batch.RestBatchWriter;
 import com.marklogic.client.document.JSONDocumentManager;
 import com.marklogic.client.document.TextDocumentManager;
 import com.marklogic.client.document.XMLDocumentManager;
-import com.marklogic.client.file.DefaultFileLoader;
+import com.marklogic.client.file.DefaultDocumentFileReader;
+import com.marklogic.client.file.DocumentFile;
+import com.marklogic.client.file.DocumentFileReader;
 import com.marklogic.client.helper.LoggingObject;
 import com.marklogic.client.io.DocumentMetadataHandle;
 import com.marklogic.client.io.FileHandle;
 import com.marklogic.client.io.Format;
 import com.marklogic.client.schemasloader.SchemasFinder;
 import com.marklogic.client.schemasloader.SchemasLoader;
-import com.marklogic.client.file.DefaultDocumentFileFinder;
-import com.marklogic.client.file.DocumentFile;
-import com.marklogic.client.file.DocumentFileFinder;
+
+import java.io.File;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class DefaultSchemasLoader extends LoggingObject implements SchemasLoader {
 
-	private DocumentFileFinder documentFileFinder = new DefaultDocumentFileFinder();
-	private DatabaseClient databaseClient;
+	private DocumentFileReader documentFileReader;
+	private BatchWriter batchWriter;
+	private boolean waitForCompletion = true;
 
+	/**
+	 * @deprecated This constructor is only for the deprecated way of loading schemas
+	 */
 	public DefaultSchemasLoader() {
 	}
 
+	/**
+	 * Simplest constructor for using this class. Just provide a DatabaseClient, and this will use sensible defaults
+	 * for how documents are read and written. Note that the DatabaseClient will not be released after this class is
+	 * done with it, as this class wasn't the one that created it.
+	 *
+	 * @param databaseClient
+	 */
 	public DefaultSchemasLoader(DatabaseClient databaseClient) {
-		this.databaseClient = databaseClient;
+		RestBatchWriter restBatchWriter = new RestBatchWriter(databaseClient);
+		restBatchWriter.setReleaseDatabaseClients(false);
+		restBatchWriter.initialize();
+		this.batchWriter = restBatchWriter;
+
+		DefaultDocumentFileReader reader = new DefaultDocumentFileReader();
+		reader.addDocumentFileProcessor(new TdeDocumentFileProcessor());
+		this.documentFileReader = reader;
 	}
 
 	/**
-	 * A RestBatchWriter is used for loading documents. The DatabaseClient is not released by this BatchWriter, as it's
-	 * expected that it will be reused by the client that constructed this object.
+	 * Assumes that the BatchWriter has already been initialized.
+	 *
+	 * @param documentFileReader
+	 * @param batchWriter
+	 */
+	public DefaultSchemasLoader(DocumentFileReader documentFileReader, BatchWriter batchWriter) {
+		this.documentFileReader = documentFileReader;
+		this.batchWriter = batchWriter;
+	}
+
+	/**
+	 * Run the given paths through the DocumentFileReader, and then send the result to the BatchWriter, and then
+	 * return the result.
 	 *
 	 * @param paths
 	 * @return
 	 */
 	@Override
 	public List<DocumentFile> loadSchemas(String... paths) {
-		RestBatchWriter batchWriter = new RestBatchWriter(databaseClient);
-		batchWriter.setReleaseDatabaseClients(false);
-		batchWriter.initialize();
 		try {
-			DefaultFileLoader fileLoader = new DefaultFileLoader(batchWriter);
-			fileLoader.addDocumentFileProcessor(new TdeDocumentFileProcessor());
-			return fileLoader.loadFiles(paths);
+			List<DocumentFile> documentFiles = documentFileReader.readDocumentFiles(paths);
+			batchWriter.write(documentFiles);
+			return documentFiles;
 		} finally {
-			batchWriter.waitForCompletion();
+			if (waitForCompletion) {
+				batchWriter.waitForCompletion();
+			}
 		}
 	}
 
+	/**
+	 * @deprecated
+	 * @param baseDir
+	 * @param schemasDataFinder
+	 * @param client
+	 * @return
+	 */
 	@Override
 	public Set<File> loadSchemas(File baseDir, SchemasFinder schemasDataFinder, DatabaseClient client) {
 		XMLDocumentManager xmlDocMgr = client.newXMLDocumentManager();
@@ -90,7 +124,15 @@ public class DefaultSchemasLoader extends LoggingObject implements SchemasLoader
 		return pos < 0 ? name : name.substring(pos + 1);
 	}
 
-	public void setDocumentFileFinder(DocumentFileFinder documentFileFinder) {
-		this.documentFileFinder = documentFileFinder;
+	public void setWaitForCompletion(boolean waitForCompletion) {
+		this.waitForCompletion = waitForCompletion;
+	}
+
+	public DocumentFileReader getDocumentFileReader() {
+		return documentFileReader;
+	}
+
+	public BatchWriter getBatchWriter() {
+		return batchWriter;
 	}
 }

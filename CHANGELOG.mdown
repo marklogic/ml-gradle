@@ -8,7 +8,7 @@ Releases past 2.7.0 now tracked in Github
 
 ## 2.6.1
 
-* [#17](https://github.com/rjrudin/ml-javaclient-util/issues/17) Extension metadata can now be loaded from the classpath
+* [#17](https://github.com/rjrudin/ml-javaclient-util/issues/17) Extension documentMetadata can now be loaded from the classpath
 
 ## 2.6
 

@@ -1,6 +1,8 @@
 <metadata>
   <title>Sample Service</title>
-  <description>Would be nice to support HTML in this.</description>
+  <description>
+    <p>You can use <b>HTML</b> in this or any other XML that you like.</p>
+  </description>
   <method name="GET">
     <param name="id" />
     <param name="format" />

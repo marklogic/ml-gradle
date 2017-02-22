@@ -21,7 +21,7 @@ public class XmlExtensionMetadataProviderTest extends Assert {
         ExtensionMetadataAndParams emap = p.provideExtensionMetadataAndParams(resource);
 
         assertEquals("Sample Service", emap.metadata.getTitle());
-        assertEquals("Would be nice to support HTML in this.", emap.metadata.getDescription());
+        assertEquals("<p>You can use <b>HTML</b> in this or any other XML that you like.</p>", emap.metadata.getDescription());
         List<MethodParameters> methods = emap.methods;
         assertEquals(3, methods.size());
 

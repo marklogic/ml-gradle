@@ -1,12 +1,14 @@
 package com.marklogic.client.file;
 
 /**
- * Callback-style interface for processing - i.e. do whatever you want with - a DocumentFile instance before it's
- * written to MarkLogic.
+ * Interface for processing - i.e. do whatever you want with - a DocumentFile instance before it's written to MarkLogic.
  */
 public interface DocumentFileProcessor {
 
-	boolean supportsDocumentFile(DocumentFile documentFile);
+	/**
+	 * @param documentFile
+	 * @return the same or a new DocumentFile instance
+	 */
+	DocumentFile processDocumentFile(DocumentFile documentFile);
 
-	void processDocumentFile(DocumentFile documentFile);
 }

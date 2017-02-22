@@ -30,26 +30,32 @@ public class DefaultFileLoader extends LoggingObject implements FileLoader {
 
 	protected void initializeDocumentFileProcessors() {
 		documentFileProcessors = new ArrayList<>();
+		documentFileProcessors.add(new CollectionsDocumentFileProcessor());
 		documentFileProcessors.add(new FormatDocumentFileProcessor());
 	}
 
 	@Override
 	public List<DocumentFile> loadFiles(String... paths) {
 		List<DocumentFile> documentFiles = documentFileFinder.findDocumentFiles(paths);
-		processDocumentFiles(documentFiles);
+		documentFiles = processDocumentFiles(documentFiles);
 		batchWriter.write(documentFiles);
 		return documentFiles;
 	}
 
 	protected List<DocumentFile> processDocumentFiles(List<DocumentFile> documentFiles) {
+		List<DocumentFile> newFiles = new ArrayList<>();
 		for (DocumentFile file : documentFiles) {
 			for (DocumentFileProcessor processor : documentFileProcessors) {
-				if (processor.supportsDocumentFile(file)) {
-					processor.processDocumentFile(file);
+				file = processor.processDocumentFile(file);
+				if (file == null) {
+					break;
 				}
 			}
+			if (file != null) {
+				newFiles.add(file);
+			}
 		}
-		return documentFiles;
+		return newFiles;
 	}
 	public DocumentFileProcessor getDocumentFileProcessor(String classShortName) {
 		for (DocumentFileProcessor processor : documentFileProcessors) {

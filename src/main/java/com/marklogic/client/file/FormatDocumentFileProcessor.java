@@ -21,16 +21,12 @@ public class FormatDocumentFileProcessor implements DocumentFileProcessor {
 	}
 
 	@Override
-	public boolean supportsDocumentFile(DocumentFile documentFile) {
-		return true;
-	}
-
-	@Override
-	public void processDocumentFile(DocumentFile documentFile) {
+	public DocumentFile processDocumentFile(DocumentFile documentFile) {
 		Format format = formatGetter.getFormat(documentFile.getFile());
 		if (format != null) {
 			documentFile.setFormat(format);
 		}
+		return documentFile;
 	}
 
 	public FormatGetter getFormatGetter() {

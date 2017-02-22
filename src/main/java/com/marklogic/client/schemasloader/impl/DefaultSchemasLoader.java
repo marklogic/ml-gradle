@@ -71,23 +71,25 @@ public class DefaultSchemasLoader extends LoggingObject implements SchemasLoader
 	 */
 	@Override
 	public List<DocumentFile> loadSchemas(String... paths) {
-		try {
-			List<DocumentFile> documentFiles = documentFileReader.readDocumentFiles(paths);
+		List<DocumentFile> documentFiles = documentFileReader.readDocumentFiles(paths);
+		if (documentFiles != null && !documentFiles.isEmpty()) {
+			if (logger.isInfoEnabled()) {
+				logger.info(format("Writing %d files into the schemas database", documentFiles.size()));
+			}
 			batchWriter.write(documentFiles);
-			return documentFiles;
-		} finally {
 			if (waitForCompletion) {
 				batchWriter.waitForCompletion();
 			}
 		}
+		return documentFiles;
 	}
 
 	/**
-	 * @deprecated
 	 * @param baseDir
 	 * @param schemasDataFinder
 	 * @param client
 	 * @return
+	 * @deprecated
 	 */
 	@Override
 	public Set<File> loadSchemas(File baseDir, SchemasFinder schemasDataFinder, DatabaseClient client) {

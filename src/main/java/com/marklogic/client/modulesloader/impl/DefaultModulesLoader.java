@@ -143,12 +143,14 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		if (shutdownTaskExecutorAfterLoadingModules) {
 			if (taskExecutor instanceof ExecutorConfigurationSupport) {
 				((ExecutorConfigurationSupport) taskExecutor).shutdown();
+				taskExecutor = null;
 			} else if (taskExecutor instanceof DisposableBean) {
 				try {
 					((DisposableBean) taskExecutor).destroy();
 				} catch (Exception ex) {
 					logger.warn("Unexpected exception while calling destroy() on taskExecutor: " + ex.getMessage(), ex);
 				}
+				taskExecutor = null;
 			}
 		} else if (logger.isDebugEnabled()) {
 			logger.debug("shutdownTaskExecutorAfterLoadingModules is set to false, so not shutting down taskExecutor");

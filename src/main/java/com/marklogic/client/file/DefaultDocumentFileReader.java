@@ -20,6 +20,7 @@ public class DefaultDocumentFileReader extends LoggingObject implements FileVisi
 	private List<FileFilter> fileFilters;
 	private List<DocumentFile> documentFiles;
 	private List<DocumentFileProcessor> documentFileProcessors;
+	private String uriPrefix = "/";
 
 	public DefaultDocumentFileReader() {
 		initialize();
@@ -107,7 +108,10 @@ public class DefaultDocumentFileReader extends LoggingObject implements FileVisi
 
 	protected DocumentFile buildDocumentFile(Path path, Path currentRootPath) {
 		Path relPath = currentRootPath.relativize(path);
-		String uri = "/" + relPath.toString().replace("\\", "/");
+		String uri = relPath.toString().replace("\\", "/");
+		if (uriPrefix != null) {
+			uri = uriPrefix + uri;
+		}
 		File f = path.toFile();
 		return new DocumentFile(uri, f);
 	}
@@ -171,5 +175,9 @@ public class DefaultDocumentFileReader extends LoggingObject implements FileVisi
 
 	public void setFileFilters(List<FileFilter> fileFilters) {
 		this.fileFilters = fileFilters;
+	}
+
+	public void setUriPrefix(String uriPrefix) {
+		this.uriPrefix = uriPrefix;
 	}
 }

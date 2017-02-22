@@ -26,8 +26,8 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
         GenericDocumentManager docMgr = client.newDocumentManager();
 
         assertNull("Rules document loaded", docMgr.exists("notExists"));
-        assertNotNull("Rules document loaded", docMgr.exists("my.rules").getUri());
-        assertNotNull("XSD document loaded", docMgr.exists("x.xsd").getUri());
+        assertNotNull("Rules document loaded", docMgr.exists("/my.rules").getUri());
+        assertNotNull("XSD document loaded", docMgr.exists("/x.xsd").getUri());
     }
 
     @Test
@@ -41,10 +41,10 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 
         GenericDocumentManager docMgr = client.newDocumentManager();
 
-        assertNotNull("TDEXML document loaded", docMgr.exists("x.tdex").getUri());
-        assertNotNull("TDEJSON document loaded", docMgr.exists("x.tdej").getUri());
+        assertNotNull("TDEXML document loaded", docMgr.exists("/x.tdex").getUri());
+        assertNotNull("TDEJSON document loaded", docMgr.exists("/x.tdej").getUri());
 
-        for (String uri : new String[] { "x.tdex", "x.tdej" }) {
+        for (String uri : new String[] { "/x.tdex", "/x.tdej" }) {
             DocumentMetadataHandle h = docMgr.readMetadata(uri, new DocumentMetadataHandle());
             assertEquals("Files ending in tdex and tdej go into a special collection", "http://marklogic.com/xdmp/tde",
                     h.getCollections().iterator().next());

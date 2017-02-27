@@ -1,5 +1,7 @@
 package com.marklogic.gradle.task.client
 
+import com.marklogic.appdeployer.AppDeployer
+import com.marklogic.appdeployer.impl.SimpleAppDeployer
 import org.gradle.api.tasks.TaskAction
 
 import com.marklogic.appdeployer.command.modules.LoadModulesCommand
@@ -22,7 +24,14 @@ class WatchTask extends MarkLogicTask {
 
 	@TaskAction
 	void watchModules() {
-		LoadModulesCommand command = getProject().property("mlLoadModulesCommand")
+		LoadModulesCommand command = null
+		AppDeployer d = getAppDeployer()
+		if (d instanceof SimpleAppDeployer) {
+			command = d.getCommand("LoadModulesCommand")
+		}
+		if (command == null) {
+			command = new LoadModulesCommand()
+		}
 
 		ModulesLoader loader = command.getModulesLoader()
 		if (loader == null) {

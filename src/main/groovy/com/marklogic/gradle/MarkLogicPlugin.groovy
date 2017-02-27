@@ -1,60 +1,11 @@
 package com.marklogic.gradle
 
-import com.marklogic.appdeployer.command.clusters.ModifyLocalClusterCommand
-import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand
-import com.marklogic.appdeployer.command.forests.DeployCustomForestsCommand
-import com.marklogic.gradle.task.cluster.AddHostTask
-import com.marklogic.gradle.task.cluster.ModifyClusterTask
-import com.marklogic.gradle.task.cluster.RemoveHostTask
-import com.marklogic.gradle.task.databases.DeleteCollectionTask
-import com.marklogic.gradle.task.es.GenerateModelArtifactsTask
-import com.marklogic.gradle.task.forests.DeployCustomForestsTask
-import com.marklogic.gradle.task.groups.SetTraceEventsTask
-import com.marklogic.gradle.task.qconsole.ExportWorkspacesTask
-import com.marklogic.gradle.task.qconsole.ImportWorkspacesTask
-import com.marklogic.gradle.task.shell.ShellTask
-import com.marklogic.gradle.task.tasks.WaitForTaskServerTask
-import com.sun.jersey.core.spi.component.ProviderServices
-import org.gradle.api.Plugin
-import org.gradle.api.Project
-import org.slf4j.LoggerFactory
-
 import com.marklogic.appdeployer.AppConfig
 import com.marklogic.appdeployer.AppDeployer
 import com.marklogic.appdeployer.DefaultAppConfigFactory
 import com.marklogic.appdeployer.command.Command
 import com.marklogic.appdeployer.command.CommandContext
-import com.marklogic.appdeployer.command.alert.DeployAlertActionsCommand
-import com.marklogic.appdeployer.command.alert.DeployAlertConfigsCommand
-import com.marklogic.appdeployer.command.alert.DeployAlertRulesCommand
-import com.marklogic.appdeployer.command.appservers.DeployOtherServersCommand
-import com.marklogic.appdeployer.command.appservers.UpdateRestApiServersCommand
-import com.marklogic.appdeployer.command.cpf.DeployCpfConfigsCommand
-import com.marklogic.appdeployer.command.cpf.DeployDomainsCommand
-import com.marklogic.appdeployer.command.cpf.DeployPipelinesCommand
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand
-import com.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand
-import com.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand
-import com.marklogic.appdeployer.command.flexrep.DeployConfigsCommand
-import com.marklogic.appdeployer.command.flexrep.DeployFlexrepCommand
-import com.marklogic.appdeployer.command.flexrep.DeployTargetsCommand
-import com.marklogic.appdeployer.command.forests.ConfigureForestReplicasCommand
-import com.marklogic.appdeployer.command.groups.DeployGroupsCommand
-import com.marklogic.appdeployer.command.mimetypes.DeployMimetypesCommand
-import com.marklogic.appdeployer.command.modules.LoadModulesCommand
-import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand
-import com.marklogic.appdeployer.command.schemas.LoadSchemasCommand
-import com.marklogic.appdeployer.command.security.DeployAmpsCommand
-import com.marklogic.appdeployer.command.security.DeployCertificateAuthoritiesCommand
-import com.marklogic.appdeployer.command.security.DeployCertificateTemplatesCommand
-import com.marklogic.appdeployer.command.security.DeployExternalSecurityCommand
-import com.marklogic.appdeployer.command.security.DeployPrivilegesCommand
-import com.marklogic.appdeployer.command.security.DeployProtectedCollectionsCommand
-import com.marklogic.appdeployer.command.security.DeployRolesCommand
-import com.marklogic.appdeployer.command.security.DeployUsersCommand
-import com.marklogic.appdeployer.command.tasks.DeployScheduledTasksCommand
-import com.marklogic.appdeployer.command.triggers.DeployTriggersCommand
-import com.marklogic.appdeployer.command.viewschemas.DeployViewSchemasCommand
+import com.marklogic.appdeployer.command.CommandMapBuilder
 import com.marklogic.appdeployer.impl.SimpleAppDeployer
 import com.marklogic.gradle.task.DeleteModuleTimestampsFileTask
 import com.marklogic.gradle.task.DeployAppTask
@@ -64,60 +15,32 @@ import com.marklogic.gradle.task.admin.InitTask
 import com.marklogic.gradle.task.admin.InstallAdminTask
 import com.marklogic.gradle.task.alert.DeleteAllAlertConfigsTask
 import com.marklogic.gradle.task.alert.DeployAlertingTask
-import com.marklogic.gradle.task.client.CreateResourceTask
-import com.marklogic.gradle.task.client.CreateTransformTask
-import com.marklogic.gradle.task.client.LoadModulesTask
-import com.marklogic.gradle.task.client.PrepareRestApiDependenciesTask
-import com.marklogic.gradle.task.client.WatchTask
-import com.marklogic.gradle.task.cluster.DisableSslFipsTask
-import com.marklogic.gradle.task.cluster.EnableSslFipsTask
-import com.marklogic.gradle.task.cluster.RestartClusterTask
+import com.marklogic.gradle.task.client.*
+import com.marklogic.gradle.task.cluster.*
 import com.marklogic.gradle.task.cpf.DeployCpfTask
 import com.marklogic.gradle.task.cpf.LoadDefaultPipelinesTask
-import com.marklogic.gradle.task.databases.ClearContentDatabaseTask
-import com.marklogic.gradle.task.databases.ClearModulesDatabaseTask
-import com.marklogic.gradle.task.databases.ClearSchemasDatabaseTask
-import com.marklogic.gradle.task.databases.ClearTriggersDatabaseTask
-import com.marklogic.gradle.task.databases.DeployDatabasesTask
-import com.marklogic.gradle.task.databases.MergeContentDatabaseTask
-import com.marklogic.gradle.task.databases.MergeDatabaseTask
-import com.marklogic.gradle.task.databases.ReindexContentDatabaseTask
-import com.marklogic.gradle.task.databases.ReindexDatabaseTask
-import com.marklogic.gradle.task.databases.SetContentUpdatesAllowedTask
-import com.marklogic.gradle.task.flexrep.DeleteAllFlexrepConfigsTask
-import com.marklogic.gradle.task.flexrep.DeployFlexrepAtPathTask
-import com.marklogic.gradle.task.flexrep.DeployFlexrepTask
-import com.marklogic.gradle.task.flexrep.DisableAllFlexrepTargetsTask
-import com.marklogic.gradle.task.flexrep.EnableAllFlexrepTargetsTask
+import com.marklogic.gradle.task.databases.*
+import com.marklogic.gradle.task.es.GenerateModelArtifactsTask
+import com.marklogic.gradle.task.flexrep.*
 import com.marklogic.gradle.task.forests.ConfigureForestReplicasTask
 import com.marklogic.gradle.task.forests.DeleteForestReplicasTask
+import com.marklogic.gradle.task.forests.DeployCustomForestsTask
 import com.marklogic.gradle.task.forests.DeployForestReplicasTask
 import com.marklogic.gradle.task.groups.DeployGroupsTask
+import com.marklogic.gradle.task.groups.SetTraceEventsTask
 import com.marklogic.gradle.task.mimetypes.DeployMimetypesTask
+import com.marklogic.gradle.task.qconsole.ExportWorkspacesTask
+import com.marklogic.gradle.task.qconsole.ImportWorkspacesTask
 import com.marklogic.gradle.task.scaffold.GenerateScaffoldTask
 import com.marklogic.gradle.task.schemas.LoadSchemasTask
-import com.marklogic.gradle.task.security.DeployAmpsTask
-import com.marklogic.gradle.task.security.DeployCertificateAuthoritiesTask
-import com.marklogic.gradle.task.security.DeployCertificateTemplatesTask
-import com.marklogic.gradle.task.security.DeployExternalSecurityTask
-import com.marklogic.gradle.task.security.DeployPrivilegesTask
-import com.marklogic.gradle.task.security.DeployProtectedCollectionsTask
-import com.marklogic.gradle.task.security.DeployRolesTask
-import com.marklogic.gradle.task.security.DeploySecurityTask
-import com.marklogic.gradle.task.security.DeployUsersTask
-import com.marklogic.gradle.task.security.UndeployAmpsTask
-import com.marklogic.gradle.task.security.UndeployCertificateTemplatesTask
-import com.marklogic.gradle.task.security.UndeployExternalSecurityTask
-import com.marklogic.gradle.task.security.UndeployPrivilegesTask
-import com.marklogic.gradle.task.security.UndeployProtectedCollectionsTask
-import com.marklogic.gradle.task.security.UndeployRolesTask
-import com.marklogic.gradle.task.security.UndeploySecurityTask
-import com.marklogic.gradle.task.security.UndeployUsersTask
+import com.marklogic.gradle.task.security.*
 import com.marklogic.gradle.task.servers.DeployServersTask
 import com.marklogic.gradle.task.servers.UndeployOtherServersTask
+import com.marklogic.gradle.task.shell.ShellTask
 import com.marklogic.gradle.task.tasks.DeleteAllTasksTask
 import com.marklogic.gradle.task.tasks.DeployTasksTask
 import com.marklogic.gradle.task.tasks.UndeployTasksTask
+import com.marklogic.gradle.task.tasks.WaitForTaskServerTask
 import com.marklogic.gradle.task.trigger.DeployTriggersTask
 import com.marklogic.gradle.task.viewschemas.DeployViewSchemasTask
 import com.marklogic.mgmt.DefaultManageConfigFactory
@@ -126,6 +49,10 @@ import com.marklogic.mgmt.ManageConfig
 import com.marklogic.mgmt.admin.AdminConfig
 import com.marklogic.mgmt.admin.AdminManager
 import com.marklogic.mgmt.admin.DefaultAdminConfigFactory
+import com.sun.jersey.core.spi.component.ProviderServices
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+import org.slf4j.LoggerFactory
 
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -306,121 +233,12 @@ class MarkLogicPlugin implements Plugin<Project> {
 	 * ext block.
 	 */
 	AppDeployer newAppDeployer(Project project, CommandContext context) {
-		List<Command> commands = new ArrayList<Command>()
-
-		// Security
-		List<Command> securityCommands = new ArrayList<Command>()
-		securityCommands.add(new DeployRolesCommand())
-		securityCommands.add(new DeployUsersCommand())
-		securityCommands.add(new DeployAmpsCommand())
-		securityCommands.add(new DeployCertificateTemplatesCommand())
-		securityCommands.add(new DeployCertificateAuthoritiesCommand())
-		securityCommands.add(new DeployExternalSecurityCommand())
-		securityCommands.add(new DeployPrivilegesCommand())
-		securityCommands.add(new DeployProtectedCollectionsCommand())
-		project.extensions.add("mlSecurityCommands", securityCommands)
-		commands.addAll(securityCommands)
-
-		// Cluster
-		List<Command> clusterCommands = new ArrayList<Command>()
-		clusterCommands.add(new ModifyLocalClusterCommand())
-		project.extensions.add("mlClusterCommands", clusterCommands)
-		commands.addAll(clusterCommands)
-
-		// Databases
-		List<Command> dbCommands = new ArrayList<Command>()
-		dbCommands.add(new DeployContentDatabasesCommand())
-		dbCommands.add(new DeployTriggersDatabaseCommand())
-		dbCommands.add(new DeploySchemasDatabaseCommand())
-		dbCommands.add(new DeployOtherDatabasesCommand())
-		project.extensions.add("mlDatabaseCommands", dbCommands)
-		commands.addAll(dbCommands)
-
-		// Schemas
-		LoadSchemasCommand lsc = new LoadSchemasCommand()
-		project.extensions.add("mlLoadSchemasCommand", lsc)
-		commands.add(lsc)
-
-		// REST API instance creation
-		commands.add(new DeployRestApiServersCommand())
-
-		// App servers
-		List<Command> serverCommands = new ArrayList<Command>()
-		serverCommands.add(new DeployOtherServersCommand())
-		serverCommands.add(new UpdateRestApiServersCommand())
-		project.extensions.add("mlServerCommands", serverCommands)
-		commands.addAll(serverCommands)
-
-		// Modules
-		LoadModulesCommand lmc = new LoadModulesCommand()
-		project.extensions.add("mlLoadModulesCommand", lmc)
-		commands.add(lmc)
-
-		// Alerting
-		List<Command> alertCommands = new ArrayList<Command>()
-		alertCommands.add(new DeployAlertConfigsCommand())
-		alertCommands.add(new DeployAlertActionsCommand())
-		alertCommands.add(new DeployAlertRulesCommand())
-		project.extensions.add("mlAlertCommands", alertCommands)
-		commands.addAll(alertCommands)
-
-		// CPF
-		List<Command> cpfCommands = new ArrayList<Command>()
-		cpfCommands.add(new DeployCpfConfigsCommand())
-		cpfCommands.add(new DeployDomainsCommand())
-		cpfCommands.add(new DeployPipelinesCommand())
-		project.extensions.add("mlCpfCommands", cpfCommands)
-		commands.addAll(cpfCommands)
-
-		// Flexrep
-		List<Command> flexrepCommands = new ArrayList<Command>()
-		flexrepCommands.add(new DeployConfigsCommand())
-		flexrepCommands.add(new DeployTargetsCommand())
-		flexrepCommands.add(new DeployFlexrepCommand())
-		project.extensions.add("mlFlexrepCommands", flexrepCommands)
-		commands.addAll(flexrepCommands)
-
-		// Groups
-		List<Command> groupCommands = new ArrayList<Command>()
-		groupCommands.add(new DeployGroupsCommand())
-		project.extensions.add("mlGroupCommands", groupCommands)
-		commands.addAll(groupCommands)
-
-		List<Command> mimetypeCommands = new ArrayList<Command>()
-		mimetypeCommands.add(new DeployMimetypesCommand())
-		project.extensions.add("mlMimetypeCommands", mimetypeCommands)
-		commands.addAll(mimetypeCommands)
-
-		// Forests
-		List<Command> forestCommands = new ArrayList<Command>()
-		forestCommands.add(new DeployCustomForestsCommand())
-		project.extensions.add("mlForestCommands", forestCommands)
-		commands.addAll(forestCommands)
-
-		// Forest replicas
-		List<Command> replicaCommands = new ArrayList<Command>()
-		replicaCommands.add(new ConfigureForestReplicasCommand())
-		project.extensions.add("mlForestReplicaCommands", replicaCommands)
-		commands.addAll(replicaCommands)
-
-		// Tasks
-		List<Command> taskCommands = new ArrayList<Command>()
-		taskCommands.add(new DeployScheduledTasksCommand())
-		project.extensions.add("mlTaskCommands", taskCommands)
-		commands.addAll(taskCommands)
-
-		// Triggers
-		List<Command> triggerCommands = new ArrayList<Command>()
-		triggerCommands.add(new DeployTriggersCommand())
-		project.extensions.add("mlTriggerCommands", triggerCommands)
-		commands.addAll(triggerCommands)
-
-		// SQL Views
-		List<Command> viewCommands = new ArrayList<Command>()
-		viewCommands.add(new DeployViewSchemasCommand())
-		project.extensions.add("mlViewCommands", viewCommands)
-		commands.addAll(viewCommands)
-
+		Map<String, List<Command>> commandMap = new CommandMapBuilder().buildCommandMap();
+		List<Command> commands = new ArrayList<>();
+		for (String name : commandMap.keySet()) {
+			project.extensions.add(name, commandMap.get(name));
+			commands.addAll(commandMap.get(name));
+		}
 		SimpleAppDeployer deployer = new SimpleAppDeployer(context.getManageClient(), context.getAdminManager())
 		deployer.setCommands(commands)
 		return deployer

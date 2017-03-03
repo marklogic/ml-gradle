@@ -21,6 +21,14 @@ declare function transform(
 };
 '''
 
+	final static String SJS_TEMPLATE =
+'''function transform(context, params, content)
+{
+  // Must return the result of the transform 
+};
+exports.transform = transform;
+'''
+
     final static String XSL_TEMPLATE = '''<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:map="http://marklogic.com/xdmp/map">
   <xsl:param name="context" as="map:map"/>
   <xsl:param name="params"  as="map:map"/>
@@ -50,19 +58,26 @@ declare function transform(
 
             String name = getProject().getProperties().get(propName)
 
-            String defaultType = "xqy"
             String type = "xqy"
             String propType = "transformType"
             if (getProject().hasProperty(propType)) {
                 type = getProject().getProperties().get(propType)
             }
 
-            String template = type == "xqy" ? XQUERY_TEMPLATE : XSL_TEMPLATE
-            String suffix = type == "xqy" ? ".xqy" : ".xsl"
+            String template = XQUERY_TEMPLATE
+	        String fileExtension = ".xqy"
+	        if ("xsl".equals(type)) {
+		        template = XSL_TEMPLATE
+		        fileExtension = ".xsl"
+	        } else if ("sjs".equals(type)) {
+		        template = SJS_TEMPLATE
+		        fileExtension  = ".sjs"
+	        }
+
             String transform = template.replace("%%TRANSFORM_NAME%%", name)
 
             new File(transformsDir).mkdirs()
-            def transformFile = new File(transformsDir, name + suffix)
+            def transformFile = new File(transformsDir, name + fileExtension)
             println "Creating new transform at " + transformFile.getAbsolutePath()
             transformFile.write(transform)
 
@@ -73,7 +88,7 @@ declare function transform(
 			println "Creating new transform metadata file at " + metadataFile.getAbsolutePath()
 			metadataFile.write(metadata)
         } else {
-            println "Use -PtransformName=your-transform-name [-PtransformType=(xqy|xslt)] when invoking Gradle to specify a transform name"
+            println "Use -PtransformName=your-transform-name [-PtransformType=(xqy|xsl|sjs)] when invoking Gradle to specify a transform name"
         }
     }
 }

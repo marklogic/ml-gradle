@@ -6,6 +6,29 @@ import com.marklogic.gradle.task.MarkLogicTask
 
 class CreateResourceTask extends MarkLogicTask {
 
+    final static String SJS_RESOURCE_TEMPLATE =
+'''function get(context, params) {
+  // return zero or more document nodes
+};
+
+function post(context, params, input) {
+  // return zero or more document nodes
+};
+
+function put(context, params, input) {
+  // return at most one document node
+};
+
+function deleteFunction(context, params) {
+  // return at most one document node
+};
+
+exports.GET = get;
+exports.POST = post;
+exports.PUT = put;
+exports.DELETE = deleteFunction;
+'''
+
     final static String RESOURCE_TEMPLATE = '''xquery version "1.0-ml";
 
 module namespace resource = "http://marklogic.com/rest-api/resource/%%RESOURCE_NAME%%";
@@ -65,15 +88,22 @@ declare function delete(
 
     @TaskAction
     void createResource() {
-        String propName = "resourceName"        
+        String propName = "resourceName"
         if (getProject().hasProperty(propName)) {
             servicesDir = servicesDir ? servicesDir : getAppConfig().getModulePaths().get(0) + "/services"
             
             String name = getProject().getProperties().get(propName)
 
-            String resource = RESOURCE_TEMPLATE.replace("%%RESOURCE_NAME%%", name)
+            String template = RESOURCE_TEMPLATE
+            String fileExtension = ".xqy"
+            if (getProject().hasProperty("resourceType") && "sjs".equals(getProject().getProperties().get("resourceType"))) {
+                template = SJS_RESOURCE_TEMPLATE
+                fileExtension = ".sjs"
+            }
+
+            String resource = template.replace("%%RESOURCE_NAME%%", name)
             new File(servicesDir).mkdirs()
-            def resourceFile = new File(servicesDir, name + ".xqy")
+            def resourceFile = new File(servicesDir, name + fileExtension)
             println "Creating new resource at " + resourceFile.getAbsolutePath()
             resourceFile.write(resource)
 
@@ -84,7 +114,7 @@ declare function delete(
             println "Creating new resource metadata file at " + metadataFile.getAbsolutePath()
             metadataFile.write(metadata)
         } else {
-            println "Use -PresourceName=your-resource-name when invoking Gradle to specify a resource name"
+            println "Use -PresourceName=your-resource-name -PresourceType=(xqy|sjs) when invoking Gradle to specify a resource name"
         }
     }
 }

@@ -72,6 +72,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    p.setProperty("mlGenerateSchema", "false");
 	    p.setProperty("mlGenerateSearchOptions", "false");
 	    p.setProperty("mlGenerateExtractionTemplate", "false");
+	    p.setProperty("mlResourceFilenamesToIgnore", "role1.json,role2.xml");
 
 	    sut = new DefaultAppConfigFactory(new SimplePropertySource(p));
         AppConfig config = sut.newAppConfig();
@@ -111,6 +112,9 @@ public class DefaultAppConfigFactoryTest extends Assert {
         assertEquals("path3", paths.get(2));
 
         assertEquals("custom/timestamps/path.properties", config.getModuleTimestampsPath());
+
+        assertEquals("role1.json", config.getResourceFilenamesToIgnore()[0]);
+	    assertEquals("role2.xml", config.getResourceFilenamesToIgnore()[1]);
     }
 
 	/**

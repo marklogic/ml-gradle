@@ -60,6 +60,10 @@ public class ConfigDir {
         return new File(baseDir, "cpf");
     }
 
+    public File getClustersDir() {
+        return new File(baseDir, "clusters");
+    }
+
     public File getAlertDir() {
         return new File(baseDir, "alert");
     }

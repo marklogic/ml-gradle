@@ -41,6 +41,9 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
      * @param filenames
      */
     public void setFilenamesToIgnore(String... filenames) {
+        if (filenames == null || filenames.length == 0) {
+            return;
+        }
         if (resourceFilenameFilter != null && resourceFilenameFilter instanceof ResourceFilenameFilter) {
             ResourceFilenameFilter rff = (ResourceFilenameFilter) resourceFilenameFilter;
             Set<String> set = null;
@@ -52,6 +55,7 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
             for (String f : filenames) {
                 set.add(f);
             }
+            rff.setFilenamesToIgnore(set);
         } else {
             this.resourceFilenameFilter = new ResourceFilenameFilter(filenames);
         }

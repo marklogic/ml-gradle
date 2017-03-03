@@ -1,7 +1,10 @@
 package com.marklogic.mgmt.admin;
 
+import java.io.FileOutputStream;
 import java.net.URI;
 
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -126,7 +129,7 @@ public class AdminManager extends AbstractManager {
      * This used to be much more complex - the code first got the latest restart timestamp and then waited for a new
      * value. But based on the "delay()" method implementation in marklogic-samplestack, we can just keep catching
      * exceptions until the call to get the restart timestamp works.
-     * 
+     *
      * @param action
      */
     public void invokeActionRequiringRestart(ActionRequiringRestart action) {
@@ -215,4 +218,72 @@ public class AdminManager extends AbstractManager {
     public void setWaitForRestartLimit(int waitForRestartLimit) {
         this.waitForRestartLimit = waitForRestartLimit;
     }
+
+
+	/**
+	 * Part of the steps required to join a cluster. This posts the host config of the host that wants to
+	 * join the cluster, to one of the cluster hosts. The cluster host returns a zip of the cluster config
+	 * for the joining host to use
+	 * @param joiningHostConfig - Output of getServerConfig of the joining host
+	 * @param group - The group in the cluster to join
+	 * @param zone - String that will get stored as the zone (optional)
+	 * @return An array of bytes that represent a zip file of the cluster config
+	 * @throws Exception
+	 */
+	public byte[] postJoiningHostConfig(Fragment joiningHostConfig, String group, String zone) throws Exception {
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+		map.add("group", group);
+		if(zone != null && !zone.isEmpty()){
+			map.add("zone", zone);
+		}
+		map.add("server-config", joiningHostConfig.getPrettyXml());
+
+		HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+
+		URI url = adminConfig.buildUri("/admin/v1/cluster-config");
+		ResponseEntity<byte[]> bytes = restTemplate.exchange(url, HttpMethod.POST, entity, byte[].class);
+		return bytes.getBody();
+	}
+
+	/**
+	 * Final step of adding a host to a cluster
+	 * Takes the zip file created from calling postJoiningHostConfig, which is the cluster config,
+	 * and posts it to the joining host
+	 * @param clusterConfigZipBytes Array of bytes that represent a zip file of the cluster config
+	 */
+	public void postClustConfigToJoiningHost(byte[] clusterConfigZipBytes) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Content-type", "application/zip");
+
+		URI clusterConfigUri = adminConfig.buildUri("/admin/v1/cluster-config");
+
+		HttpEntity<Resource> resourceEntity = new HttpEntity<Resource>(new ByteArrayResource(clusterConfigZipBytes), headers);
+		ResponseEntity<String> response = restTemplate.exchange(clusterConfigUri, HttpMethod.POST, resourceEntity, String.class);
+		if(response.getStatusCode().value() == 202){
+			waitForRestart();
+		}
+	}
+
+	/**
+	 * Instructs the server referred to by this AdminManager to leave the cluster it belongs to.
+	 * Note that once it does so, the server will need to be initialized again
+	 */
+	public void leaveCluster() {
+		ResponseEntity<String> response = restTemplate.exchange(adminConfig.buildUri("/admin/v1/host-config"), HttpMethod.DELETE, null, String.class);
+		if (response.getStatusCode().value() == 202) {
+			waitForRestart();
+		}
+	}
+
+	public AdminConfig getAdminConfig() {
+		return adminConfig;
+	}
+
+	public RestTemplate getRestTemplate() {
+		return restTemplate;
+	}
 }

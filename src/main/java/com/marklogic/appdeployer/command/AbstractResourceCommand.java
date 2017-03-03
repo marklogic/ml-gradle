@@ -23,18 +23,22 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
     @Override
     public void execute(CommandContext context) {
         for (File resourceDir : getResourceDirs(context)) {
-            if (resourceDir.exists()) {
-                ResourceManager mgr = getResourceManager(context);
+            processExecuteOnResourceDir(context, resourceDir);
+        }
+    }
+
+    protected void processExecuteOnResourceDir(CommandContext context, File resourceDir) {
+        if (resourceDir.exists()) {
+            ResourceManager mgr = getResourceManager(context);
+            if (logger.isInfoEnabled()) {
+                logger.info("Processing files in directory: " + resourceDir.getAbsolutePath());
+            }
+            for (File f : listFilesInDirectory(resourceDir)) {
                 if (logger.isInfoEnabled()) {
-                    logger.info("Processing files in directory: " + resourceDir.getAbsolutePath());
+                    logger.info("Processing file: " + f.getAbsolutePath());
                 }
-                for (File f : listFilesInDirectory(resourceDir)) {
-                    if (logger.isInfoEnabled()) {
-                        logger.info("Processing file: " + f.getAbsolutePath());
-                    }
-                    SaveReceipt receipt = saveResource(mgr, context, f);
-                    afterResourceSaved(mgr, context, f, receipt);
-                }
+                SaveReceipt receipt = saveResource(mgr, context, f);
+                afterResourceSaved(mgr, context, f, receipt);
             }
         }
     }
@@ -56,18 +60,22 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
     public void undo(CommandContext context) {
         if (deleteResourcesOnUndo) {
             for (File resourceDir : getResourceDirs(context)) {
-                if (resourceDir.exists()) {
-                    if (logger.isInfoEnabled()) {
-                        logger.info("Processing files in directory: " + resourceDir.getAbsolutePath());
-                    }
-                    final ResourceManager mgr = getResourceManager(context);
-                    for (File f : listFilesInDirectory(resourceDir)) {
-                        if (logger.isInfoEnabled()) {
-                            logger.info("Processing file: " + f.getAbsolutePath());
-                        }
-                        deleteResource(mgr, context, f);
-                    }
+                processUndoOnResourceDir(context, resourceDir);
+            }
+        }
+    }
+
+    protected void processUndoOnResourceDir(CommandContext context, File resourceDir) {
+        if (resourceDir.exists()) {
+            if (logger.isInfoEnabled()) {
+                logger.info("Processing files in directory: " + resourceDir.getAbsolutePath());
+            }
+            final ResourceManager mgr = getResourceManager(context);
+            for (File f : listFilesInDirectory(resourceDir)) {
+                if (logger.isInfoEnabled()) {
+                    logger.info("Processing file: " + f.getAbsolutePath());
                 }
+                deleteResource(mgr, context, f);
             }
         }
     }

@@ -281,46 +281,59 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			c.setStaticCheckLibraryAssets(Boolean.parseBoolean(prop));
 		}
 
+		/**
+		 * The following properties are all for generating Entity Services artifacts.
+		 */
 		prop = getProperty("mlModelsPath");
 		if (prop != null) {
 			logger.info("Entity Services models path: " + prop);
 			c.setModelsPath(prop);
 		}
-
 		prop = getProperty("mlInstanceConverterPath");
 		if (prop != null) {
 			logger.info("Entity Services instance converter path: " + prop);
 			c.setInstanceConverterPath(prop);
 		}
-
 		prop = getProperty("mlGenerateInstanceConverter");
 		if (prop != null) {
 			logger.info("Entity Services generate instance converter: " + prop);
 			c.setGenerateInstanceConverter(Boolean.parseBoolean(prop));
 		}
-
 		prop = getProperty("mlGenerateSchema");
 		if (prop != null) {
 			logger.info("Entity Services generate schema: " + prop);
 			c.setGenerateSchema(Boolean.parseBoolean(prop));
 		}
-
 		prop = getProperty("mlGenerateSearchOptions");
 		if (prop != null) {
 			logger.info("Entity Services generate search options: " + prop);
 			c.setGenerateSearchOptions(Boolean.parseBoolean(prop));
 		}
-
 		prop = getProperty("mlGenerateDatabaseProperties");
 		if (prop != null) {
 			logger.info("Entity Services generate database properties: " + prop);
 			c.setGenerateDatabaseProperties(Boolean.parseBoolean(prop));
 		}
-
 		prop = getProperty("mlGenerateExtractionTemplate");
 		if (prop != null) {
 			logger.info("Entity Services generate extraction template: " + prop);
 			c.setGenerateExtractionTemplate(Boolean.parseBoolean(prop));
+		}
+		// End Entity Services properties
+
+		/**
+		 * Sets resource filenames to ignore on ALL commands. Be careful here, in case you have files for different kinds
+		 * of resources, but with the same filename (this should be very rare and easily avoided).
+		 *
+		 * Also that as of version 2.6.0 of ml-app-deployer, this property is processed by AbstractAppDeployer, NOT by
+		 * the Command itself. So in order for this property to be applied, you must execute a Command via a subclass of
+		 * AbstractAppDeployer (most commonly SimpleAppDeployer).
+		 */
+		prop = getProperty("mlResourceFilenamesToIgnore");
+		if (prop != null) {
+			String[] values = prop.split(",");
+			logger.info("Ignoring resource filenames: " + Arrays.asList(values));
+			c.setResourceFilenamesToIgnore(values);
 		}
 
 		return c;

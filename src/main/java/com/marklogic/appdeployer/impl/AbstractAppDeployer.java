@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.client.helper.LoggingObject;
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.AppDeployer;
@@ -52,9 +53,13 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
 
         CommandContext context = new CommandContext(appConfig, manageClient, adminManager);
 
+        String[] filenamesToIgnore = appConfig.getResourceFilenamesToIgnore();
         for (Command command : commands) {
             String name = command.getClass().getName();
             logger.info(format("Executing command [%s] with sort order [%d]", name, command.getExecuteSortOrder()));
+            if (command instanceof AbstractCommand) {
+	            ((AbstractCommand)command).setFilenamesToIgnore(filenamesToIgnore);
+            }
             command.execute(context);
             logger.info(format("Finished executing command [%s]\n", name));
         }

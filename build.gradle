@@ -15,10 +15,10 @@ repositories {
 }
 
 dependencies {
-  compile 'com.marklogic:ml-javaclient-util:2.11.0'
+  compile 'com.marklogic:ml-javaclient-util:2.13.0'
   compile 'jaxen:jaxen:1.1.6'
   compile 'org.apache.httpcomponents:httpclient:4.3.5'
-  compile 'org.springframework:spring-web:4.1.5.RELEASE'
+  compile 'org.springframework:spring-web:4.3.5.RELEASE'
   testCompile ('com.marklogic:ml-junit:2.6.0') {
     exclude module: "ml-javaclient-util"
   }

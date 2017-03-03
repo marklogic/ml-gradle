@@ -140,17 +140,18 @@ public class CommandMapBuilder {
 		taskCommands.add(new DeployScheduledTasksCommand());
 		map.put("mlTaskCommands", taskCommands);
 
-		// Triggers
-		List<Command> triggerCommands = new ArrayList<Command>();
-		triggerCommands.add(new DeployTriggersCommand());
-		map.put("mlTriggerCommands", triggerCommands);
-
 		// Temporal
 		List<Command> temporalCommands = new ArrayList<>();
 		temporalCommands.add(new DeployTemporalAxesCommand());
 		temporalCommands.add(new DeployTemporalCollectionsCommand()) ;
 		temporalCommands.add(new DeployTemporalCollectionsLSQTCommand()) ;
 		map.put("mlTemporalCommands", temporalCommands);
+
+		// Triggers
+		List<Command> triggerCommands = new ArrayList<Command>();
+		triggerCommands.add(new DeployTriggersCommand());
+		map.put("mlTriggerCommands", triggerCommands);
+
 
 		// SQL Views
 		List<Command> viewCommands = new ArrayList<Command>();

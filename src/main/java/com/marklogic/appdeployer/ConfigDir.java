@@ -8,7 +8,7 @@ import java.util.List;
  * Defines all of the directories where configuration files can be found. This is decoupled from the NounManager
  * classes, who don't need to care where to look for configuration files, they just need to care about how to load the
  * data in those files.
- * 
+ *
  * Every directory path referenced in this should have a setter so that it can be modified in e.g. a Gradle build file.
  */
 public class ConfigDir {
@@ -63,12 +63,14 @@ public class ConfigDir {
     public File getAlertDir() {
         return new File(baseDir, "alert");
     }
-    
+
     public File getFlexrepDir() {
         return new File(baseDir, "flexrep");
     }
 
-    public void setDatabasesPath(String databasesPath) {
+	public File getTemporalDir() { return new File(baseDir, "temporal"); }
+
+	public void setDatabasesPath(String databasesPath) {
         this.databasesPath = databasesPath;
     }
 

@@ -13,7 +13,7 @@ public abstract class SortOrderConstants {
     public static Integer DEPLOY_EXTERNAL_SECURITY = 70;
     public static Integer DEPLOY_PROTECTED_COLLECTIONS = 80;
     public static Integer DEPLOY_MIMETYPES = 90;
-    
+
     public static Integer DEPLOY_TRIGGERS_DATABASE = 100;
     public static Integer DEPLOY_SCHEMAS_DATABASE = 100;
     public static Integer DEPLOY_CONTENT_DATABASES = 120;
@@ -26,7 +26,7 @@ public abstract class SortOrderConstants {
 
     // Module code may depend on schemas, but not vice-versa.
     public static Integer LOAD_SCHEMAS = 350;
-    
+
     // Modules have to be loaded after the REST API server has been updated, for if the deployer is expecting to load
     // modules via SSL, then the REST API server must already be configured with a certificate template
     public static Integer LOAD_MODULES = 400;
@@ -35,7 +35,11 @@ public abstract class SortOrderConstants {
     public static Integer DEPLOY_AMPS = 450;
 
     public static Integer DEPLOY_TRIGGERS = 700;
-    
+
+	public static Integer DEPLOY_TEMPORAL_AXIS = 750;
+	public static Integer DEPLOY_TEMPORAL_COLLECTIONS = 751;
+	public static Integer DEPLOY_TEMPORAL_COLLECTIONS_LSQT = 752;
+
     public static Integer DEPLOY_SCHEDULED_TASKS = 800;
 
     public static Integer DEPLOY_DEFAULT_PIPELINES = 900;
@@ -49,16 +53,16 @@ public abstract class SortOrderConstants {
 
     public static Integer DEPLOY_FLEXREP_CONFIGS = 1000;
     public static Integer DEPLOY_FLEXREP_TARGETS = 1010;
-    
+
     public static Integer DEPLOY_SQL_VIEWS = 1100;
 
     public static Integer DEPLOY_FOREST_REPLICAS = 1200;
-    
+
     // Undo constants
     public static Integer DELETE_GROUPS = 10000;
 
     public static Integer DELETE_MIMETYPES = 9500;
-    
+
     public static Integer DELETE_USERS = 9000;
     public static Integer DELETE_CERTIFICATE_TEMPLATES = 9010;
     public static Integer DELETE_CERTIFICATE_AUTHORITIES = 9020;
@@ -75,7 +79,7 @@ public abstract class SortOrderConstants {
      * need to make sure the replicas are deleted first.
      */
     public static Integer DELETE_FOREST_REPLICAS = 8000;
-    
+
     public static Integer DELETE_CONTENT_DATABASES = 8100;
     public static Integer DELETE_OTHER_DATABASES = 8120;
     public static Integer DELETE_TRIGGERS_DATABASE = 8140;
@@ -84,5 +88,5 @@ public abstract class SortOrderConstants {
     public static Integer DELETE_REST_API_SERVERS = 7000;
     public static Integer DELETE_OTHER_SERVERS = 7010;
 
-    public static Integer DELETE_SCHEDULED_TASKS = 1000;
+	public static Integer DELETE_SCHEDULED_TASKS = 1000;
 }

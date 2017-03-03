@@ -143,8 +143,8 @@ public class CommandMapBuilder {
 		// Temporal
 		List<Command> temporalCommands = new ArrayList<>();
 		temporalCommands.add(new DeployTemporalAxesCommand());
-		temporalCommands.add(new DeployTemporalCollectionsCommand()) ;
-		temporalCommands.add(new DeployTemporalCollectionsLSQTCommand()) ;
+		temporalCommands.add(new DeployTemporalCollectionsCommand());
+		temporalCommands.add(new DeployTemporalCollectionsLSQTCommand());
 		map.put("mlTemporalCommands", temporalCommands);
 
 		// Triggers

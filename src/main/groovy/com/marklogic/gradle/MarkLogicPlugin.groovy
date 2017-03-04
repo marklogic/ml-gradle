@@ -41,6 +41,7 @@ import com.marklogic.gradle.task.tasks.DeleteAllTasksTask
 import com.marklogic.gradle.task.tasks.DeployTasksTask
 import com.marklogic.gradle.task.tasks.UndeployTasksTask
 import com.marklogic.gradle.task.tasks.WaitForTaskServerTask
+import com.marklogic.gradle.task.temporal.DeployTemporalTask
 import com.marklogic.gradle.task.trigger.DeployTriggersTask
 import com.marklogic.gradle.task.viewschemas.DeployViewSchemasTask
 import com.marklogic.mgmt.DefaultManageConfigFactory
@@ -189,6 +190,9 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlDeployTasks", type: DeployTasksTask, group: taskGroup, description: "Deploy each scheduled task, updating it if it exists, in the configuration directory")
 		project.task("mlUndeployTasks", type: UndeployTasksTask, group: taskGroup, description: "Undeploy (delete) each scheduled task in the configuration directory")
 		project.task("mlWaitForTaskServer", type: WaitForTaskServerTask, group: taskGroup, description: "Wait for the task server to not have any requests in progress")
+
+		String temporalGroup = "ml-gradle Temporal"
+		project.task("mlDeployTemporal", type: DeployTemporalTask, group: temporalGroup, description: "Deploy temporal configuration. Note that (currently) you can't update the temporal configuration (collection properties and LSQT properties excepted)")
 
 		String triggerGroup = "ml-gradle Trigger"
 		project.task("mlDeployTriggers", type: DeployTriggersTask, group: triggerGroup, description: "Deploy each trigger, updating it if it exists, in the configuration directory")

@@ -58,6 +58,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
         p.setProperty("mlSimpleSsl", "anyvalue");
         p.setProperty("mlContentDatabaseName", "my-content-db");
         p.setProperty("mlModulesDatabaseName", "my-modules");
+        p.setProperty("mlDeleteReplicas", "false");
         p.setProperty("mlGroupName", "other-group");
         p.setProperty("mlAppServicesPort", "8123");
         p.setProperty("mlReplaceTokensInModules", "false");
@@ -93,6 +94,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
         assertNotNull(config.getRestSslHostnameVerifier());
         assertEquals("my-content-db", config.getContentDatabaseName());
         assertEquals("my-modules", config.getModulesDatabaseName());
+        assertFalse(config.isDeleteReplicas());
         assertEquals("other-group", config.getGroupName());
         assertEquals((Integer) 8123, config.getAppServicesPort());
         assertFalse(config.isReplaceTokensInModules());

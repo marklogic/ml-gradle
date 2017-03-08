@@ -57,6 +57,8 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
      */
     private String forestDelete = "data";
 
+    private boolean deleteReplicas = true;
+
     private int undoSortOrder;
 
     public DeployDatabaseCommand() {
@@ -95,6 +97,7 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
         if (payload != null) {
             DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
             dbMgr.setForestDelete(forestDelete);
+            dbMgr.setDeleteReplicas(deleteReplicas);
             dbMgr.delete(payload);
         }
     }
@@ -243,5 +246,13 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 
     public void setCreateForestsOnEachHost(boolean createForestsOnEachHost) {
         this.createForestsOnEachHost = createForestsOnEachHost;
+    }
+
+    public boolean isDeleteReplicas() {
+        return deleteReplicas;
+    }
+
+    public void setDeleteReplicas(boolean deleteReplicas) {
+        this.deleteReplicas = deleteReplicas;
     }
 }

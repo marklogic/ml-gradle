@@ -135,9 +135,17 @@ public abstract class AbstractResourceManager extends AbstractManager implements
         } else {
             String path = getResourcePath(resourceId, resourceUrlParams);
             path = appendParamsAndValuesToPath(path, getDeleteResourceParams(payload));
+            beforeDelete(resourceId, path, resourceUrlParams);
             deleteAtPath(path);
             return new DeleteReceipt(resourceId, path, true);
         }
+    }
+
+    /**
+     * Can be overridden by subclass to perform processing before deleteAtPath is invoked.
+     */
+    protected void beforeDelete(String resourceId, String path, String... resourceUrlParams) {
+
     }
 
     /**

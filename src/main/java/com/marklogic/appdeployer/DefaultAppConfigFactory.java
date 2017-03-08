@@ -143,6 +143,17 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		}
 
 		/**
+		 * When undo is invoked on DeployDatabaseCommand (such as via mlUndeploy in ml-gradle), this controls whether
+		 * or not replicas are deleted first. Most of the time, you want this set to true (the default) as otherwise,
+		 * the database can't be deleted and the Management REST API will throw an error.
+		 */
+		prop = getProperty("mlDeleteReplicas");
+		if (prop != null) {
+			logger.info("Delete replicas when a database is deleted: " + prop);
+			c.setDeleteReplicas(Boolean.parseBoolean(prop));
+		}
+
+		/**
 		 * When a REST API server is created, the content database name will default to mlAppName-content. This property
 		 * can be used to override that name.
 		 */

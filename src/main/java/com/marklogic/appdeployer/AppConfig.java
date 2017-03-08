@@ -97,6 +97,9 @@ public class AppConfig {
     // Allows for creating a triggers database without a config file for one
     private boolean createTriggersDatabase = true;
 
+    // Controls whether replicas are deleted or not when undeploying a database
+    private boolean deleteReplicas = true;
+
     // As defined by the REST API
     private String modulePermissions = "rest-admin,read,rest-admin,update,rest-extension-user,execute";
 
@@ -706,4 +709,12 @@ public class AppConfig {
 	public void setResourceFilenamesToIgnore(String... resourceFilenamesToIgnore) {
 		this.resourceFilenamesToIgnore = resourceFilenamesToIgnore;
 	}
+
+    public boolean isDeleteReplicas() {
+        return deleteReplicas;
+    }
+
+    public void setDeleteReplicas(boolean deleteReplicas) {
+        this.deleteReplicas = deleteReplicas;
+    }
 }

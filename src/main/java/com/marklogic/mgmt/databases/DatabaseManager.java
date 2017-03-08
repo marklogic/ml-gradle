@@ -4,12 +4,15 @@ import java.util.List;
 
 import com.marklogic.mgmt.AbstractResourceManager;
 import com.marklogic.mgmt.ManageClient;
+import com.marklogic.mgmt.ManageConfig;
 import com.marklogic.mgmt.forests.ForestManager;
+import com.marklogic.mgmt.forests.ForestStatus;
 import com.marklogic.rest.util.Fragment;
 
 public class DatabaseManager extends AbstractResourceManager {
 
     private String forestDelete = "data";
+    private boolean deleteReplicas = true;
 
     public DatabaseManager(ManageClient manageClient) {
         super(manageClient);
@@ -55,6 +58,20 @@ public class DatabaseManager extends AbstractResourceManager {
     public void deleteByName(String databaseName) {
         String json = format("{\"database-name\":\"%s\"}", databaseName);
         delete(json);
+    }
+
+    @Override
+    protected void beforeDelete(String resourceId, String path, String... resourceUrlParams) {
+        if (deleteReplicas) {
+            logger.info("Deleting any replicas that exist for database: " + resourceId);
+            ForestManager forestManager = new ForestManager(getManageClient());
+            for (String forestId : getPrimaryForestIds(resourceId)) {
+                ForestStatus status = forestManager.getForestStatus(forestId);
+                if (status.isPrimary() && status.hasReplicas()) {
+                    forestManager.deleteReplicas(forestId);
+                }
+            }
+        }
     }
 
     /**
@@ -114,5 +131,13 @@ public class DatabaseManager extends AbstractResourceManager {
 
     public void setForestDelete(String forestDelete) {
         this.forestDelete = forestDelete;
+    }
+
+    public boolean isDeleteReplicas() {
+        return deleteReplicas;
+    }
+
+    public void setDeleteReplicas(boolean deleteReplicas) {
+        this.deleteReplicas = deleteReplicas;
     }
 }

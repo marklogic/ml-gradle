@@ -1,8 +1,5 @@
 package com.marklogic.appdeployer.command.databases;
 
-import java.io.File;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.command.CommandContext;
@@ -10,6 +7,9 @@ import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.databases.DatabaseManager;
 import com.marklogic.rest.util.JsonNodeUtil;
+
+import java.io.File;
+import java.util.List;
 
 /**
  * For ease of use, this command handles creating forests the the content database, either based on a file in the
@@ -70,18 +70,15 @@ public class DeployContentDatabasesCommand extends DeployDatabaseCommand {
             String payload = node.toString();
             String json = tokenReplacer.replaceTokens(payload, appConfig, false);
 
-            DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
-            dbMgr.setForestDelete(getForestDelete());
+            DatabaseManager dbMgr = newDatabaseManageForDeleting(context);
             dbMgr.delete(json);
-
             if (appConfig.isTestPortSet()) {
                 json = tokenReplacer.replaceTokens(payload, appConfig, true);
                 dbMgr.delete(json);
             }
         } else {
             // Try to delete the content database if it exists
-            DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
-            dbMgr.setForestDelete(getForestDelete());
+            DatabaseManager dbMgr = newDatabaseManageForDeleting(context);
             dbMgr.deleteByName(appConfig.getContentDatabaseName());
 
             if (appConfig.isTestPortSet()) {

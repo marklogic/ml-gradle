@@ -48,8 +48,8 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 			fail("An error should have been thrown because /ext/bad.xqy failed static check");
 		} catch (Exception ex) {
 			String message = ex.getMessage();
-			assertTrue("Loading modules with 2.11.0 of ml-javaclient-util defaults to bulk loading, so static checking should as well",
-				message.contains("Bulk static check failure"));
+			assertTrue("Loading modules with 2.11.0 of ml-javaclient-util defaults to bulk loading, so static checking should as well; message: " + message,
+				message.contains("Unexpected token syntax error"));
 			assertTrue(message.contains("in /ext/bad.xqy, on line 2"));
 		}
 	}

@@ -1,17 +1,18 @@
 package com.marklogic.mgmt.databases;
 
-import java.util.List;
-
 import com.marklogic.mgmt.AbstractResourceManager;
 import com.marklogic.mgmt.ManageClient;
-import com.marklogic.mgmt.ManageConfig;
 import com.marklogic.mgmt.forests.ForestManager;
-import com.marklogic.mgmt.forests.ForestStatus;
 import com.marklogic.rest.util.Fragment;
+
+import java.util.List;
 
 public class DatabaseManager extends AbstractResourceManager {
 
-    private String forestDelete = "data";
+	public final static String DELETE_FOREST_DATA = "data";
+	public final static String DELETE_FOREST_CONFIGURATION = "configuration";
+
+    private String forestDelete = DELETE_FOREST_DATA;
     private boolean deleteReplicas = true;
 
     public DatabaseManager(ManageClient manageClient) {
@@ -60,17 +61,33 @@ public class DatabaseManager extends AbstractResourceManager {
         delete(json);
     }
 
+    /**
+     * Use this to delete all of a database's forests and their replicas, but leave the database in place. This seems
+     * to be the safest way to ensure a database can be deleted.
+     *
+     * @param databaseIdOrName
+     */
+    public void deleteForestsAndReplicas(String databaseIdOrName) {
+        List<String> primaryForestIds = getPrimaryForestIds(databaseIdOrName);
+        detachForests(databaseIdOrName);
+        ForestManager forestManager = new ForestManager(getManageClient());
+        for (String forestId : primaryForestIds) {
+            forestManager.delete(forestId, ForestManager.DELETE_LEVEL_FULL, ForestManager.REPLICAS_DELETE);
+        }
+    }
+
+    public void detachForests(String databaseIdOrName) {
+    	logger.info("Detaching forests from database: " + databaseIdOrName);
+        save(format("{\"database-name\":\"%s\", \"forest\":[]}", databaseIdOrName));
+        logger.info("Finished detaching forests from database: " + databaseIdOrName);
+    }
+
     @Override
     protected void beforeDelete(String resourceId, String path, String... resourceUrlParams) {
         if (deleteReplicas) {
-            logger.info("Deleting any replicas that exist for database: " + resourceId);
-            ForestManager forestManager = new ForestManager(getManageClient());
-            for (String forestId : getPrimaryForestIds(resourceId)) {
-                ForestStatus status = forestManager.getForestStatus(forestId);
-                if (status.isPrimary() && status.hasReplicas()) {
-                    forestManager.deleteReplicas(forestId);
-                }
-            }
+        	logger.info("Deleting forests and replicas for database: " + resourceId);
+        	deleteForestsAndReplicas(resourceId);
+        	logger.info("Finished deleting forests and replicas for database: " + resourceId);
         }
     }
 
@@ -102,7 +119,13 @@ public class DatabaseManager extends AbstractResourceManager {
         return getPropertiesAsXml(databaseNameOrId).getElementValues("/node()/m:forests/m:forest");
     }
 
-    public void deleteReplicaForests(String databaseNameOrId) {
+	/**
+	 * Delete all replicas for the primary forests for the given database, but don't delete the database or the
+	 * primary forests.
+	 *
+	 * @param databaseNameOrId
+	 */
+	public void deleteReplicaForests(String databaseNameOrId) {
         logger.info(format("Deleting replica forests (if any exist) for database %s", databaseNameOrId));
         ForestManager mgr = new ForestManager(getManageClient());
         for (String forestId : getPrimaryForestIds(databaseNameOrId)) {
@@ -133,7 +156,11 @@ public class DatabaseManager extends AbstractResourceManager {
         this.forestDelete = forestDelete;
     }
 
-    public boolean isDeleteReplicas() {
+	public String getForestDelete() {
+		return forestDelete;
+	}
+
+	public boolean isDeleteReplicas() {
         return deleteReplicas;
     }
 

@@ -97,6 +97,9 @@ public class AppConfig {
     // Allows for creating a triggers database without a config file for one
     private boolean createTriggersDatabase = true;
 
+    // Controls whether forests are deleted when a database is deleted
+    private boolean deleteForests = true;
+
     // Controls whether replicas are deleted or not when undeploying a database
     private boolean deleteReplicas = true;
 
@@ -716,5 +719,13 @@ public class AppConfig {
 
     public void setDeleteReplicas(boolean deleteReplicas) {
         this.deleteReplicas = deleteReplicas;
+    }
+
+    public boolean isDeleteForests() {
+        return deleteForests;
+    }
+
+    public void setDeleteForests(boolean deleteForests) {
+        this.deleteForests = deleteForests;
     }
 }

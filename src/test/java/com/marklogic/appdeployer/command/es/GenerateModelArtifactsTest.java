@@ -8,10 +8,12 @@ import com.marklogic.appdeployer.command.modules.LoadModulesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.appdeployer.command.schemas.LoadSchemasCommand;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
 
+@Ignore("Ignoring until ML9 is released")
 public class GenerateModelArtifactsTest extends AbstractAppDeployerTest {
 
 	@After

@@ -1,9 +1,8 @@
 package com.marklogic.mgmt;
 
-import org.springframework.http.ResponseEntity;
-
 import com.marklogic.rest.util.Fragment;
 import com.marklogic.rest.util.ResourcesFragment;
+import org.springframework.http.ResponseEntity;
 
 /**
  * This class makes a number of assumptions in order to simplify the implementation of common operations for a MarkLogic

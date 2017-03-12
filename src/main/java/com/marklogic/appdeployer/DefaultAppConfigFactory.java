@@ -144,8 +144,20 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 
 		/**
 		 * When undo is invoked on DeployDatabaseCommand (such as via mlUndeploy in ml-gradle), this controls whether
-		 * or not replicas are deleted first. Most of the time, you want this set to true (the default) as otherwise,
-		 * the database can't be deleted and the Management REST API will throw an error.
+		 * or not forests are deleted, or just their configuration is deleted. If mlDeleteReplicas is set to true, this
+		 * has no impact - currently, the forests and their replicas will be deleted for efficiency reasons (results in
+		 * fewer calls to the Management REST API.
+		 */
+		prop = getProperty("mlDeleteForests");
+		if (prop != null) {
+			logger.info("Delete forests when a database is deleted: " + prop);
+			c.setDeleteForests(Boolean.parseBoolean(prop));
+		}
+
+		/**
+		 * When undo is invoked on DeployDatabaseCommand (such as via mlUndeploy in ml-gradle), this controls whether
+		 * primary forests and their replicas are deleted first. Most of the time, you want this set to true
+		 * (the default) as otherwise, the database can't be deleted and the Management REST API will throw an error.
 		 */
 		prop = getProperty("mlDeleteReplicas");
 		if (prop != null) {

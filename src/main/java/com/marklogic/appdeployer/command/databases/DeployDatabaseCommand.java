@@ -1,8 +1,6 @@
 package com.marklogic.appdeployer.command.databases;
 
-import java.io.File;
-import java.util.Map;
-
+import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
@@ -11,6 +9,10 @@ import com.marklogic.appdeployer.command.forests.DeployForestsCommand;
 import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.databases.DatabaseManager;
+import com.marklogic.mgmt.forests.ForestManager;
+
+import java.io.File;
+import java.util.Map;
 
 /**
  * Can be used for creating any kind of database with any sorts of forests. Specifying a config file for the database or
@@ -51,14 +53,6 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
      */
     private boolean createForestsOnEachHost = true;
 
-    /**
-     * Applied when the database is deleted - see
-     * http://docs.marklogic.com/REST/DELETE/manage/v2/databases/[id-or-name].
-     */
-    private String forestDelete = "data";
-
-    private boolean deleteReplicas = true;
-
     private int undoSortOrder;
 
     public DeployDatabaseCommand() {
@@ -95,11 +89,26 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
     public void undo(CommandContext context) {
         String payload = buildPayload(context);
         if (payload != null) {
-            DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
-            dbMgr.setForestDelete(forestDelete);
-            dbMgr.setDeleteReplicas(deleteReplicas);
-            dbMgr.delete(payload);
+            newDatabaseManageForDeleting(context).delete(payload);
         }
+    }
+
+    /**
+     * Configures the DatabaseManager in terms of how it deletes forests based on properties in the AppConfig instance
+     * in the CommandContext.
+     *
+     * @param context
+     * @return
+     */
+    protected DatabaseManager newDatabaseManageForDeleting(CommandContext context) {
+        DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
+        dbMgr.setForestDelete(getForestDeleteLevel(context.getAppConfig()));
+        dbMgr.setDeleteReplicas(context.getAppConfig().isDeleteReplicas());
+        return dbMgr;
+    }
+
+    protected String getForestDeleteLevel(AppConfig appConfig) {
+        return appConfig.isDeleteForests() ? DatabaseManager.DELETE_FOREST_DATA : DatabaseManager.DELETE_FOREST_CONFIGURATION;
     }
 
     /**
@@ -188,14 +197,6 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
         return format("{\"database-name\": \"%s\"}", databaseName);
     }
 
-    public String getForestDelete() {
-        return forestDelete;
-    }
-
-    public void setForestDelete(String forestDelete) {
-        this.forestDelete = forestDelete;
-    }
-
     public int getForestsPerHost() {
         return forestsPerHost;
     }
@@ -246,13 +247,5 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 
     public void setCreateForestsOnEachHost(boolean createForestsOnEachHost) {
         this.createForestsOnEachHost = createForestsOnEachHost;
-    }
-
-    public boolean isDeleteReplicas() {
-        return deleteReplicas;
-    }
-
-    public void setDeleteReplicas(boolean deleteReplicas) {
-        this.deleteReplicas = deleteReplicas;
     }
 }

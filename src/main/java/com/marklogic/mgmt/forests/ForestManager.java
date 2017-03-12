@@ -1,14 +1,14 @@
 package com.marklogic.mgmt.forests;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.marklogic.mgmt.AbstractResourceManager;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.rest.util.Fragment;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Provides methods wrapping /manage/v2/forests endpoints.
@@ -19,10 +19,15 @@ import com.marklogic.rest.util.Fragment;
  */
 public class ForestManager extends AbstractResourceManager {
 
-    public final static String DELETE_FULL = "full";
-    public final static String DELETE_CONFIG = "config-only";
+    // Parameter values for the "level" parameter when deleting a forest
+    public final static String DELETE_LEVEL_FULL = "full";
+    public final static String DELETE_LEVEL_CONFIG_ONLY = "config-only";
 
-    private String deleteLevel = DELETE_FULL;
+    // Parameter values for the "replicas" parameter when deleting a forest
+    public final static String REPLICAS_DETACH = "detach";
+    public final static String REPLICAS_DELETE = "delete";
+
+    private String deleteLevel = DELETE_LEVEL_FULL;
 
     public ForestManager(ManageClient client) {
         super(client);
@@ -40,11 +45,20 @@ public class ForestManager extends AbstractResourceManager {
     }
 
     public void delete(String nameOrId, String level) {
+        delete(nameOrId, level, REPLICAS_DELETE);
+    }
+
+    /**
+     * @param nameOrId Name or ID of forest to delete
+     * @param level either "full" or "config-only"
+     * @param replicas either "detach" or "delete"
+     */
+    public void delete(String nameOrId, String level, String replicas) {
         if (!forestExists(nameOrId)) {
             logger.info(format("Could not find forest with name or ID: %s, so not deleting", nameOrId));
         } else {
             logger.info(format("Deleting forest %s", nameOrId));
-            getManageClient().delete(format("/manage/v2/forests/%s?level=%s", nameOrId, level));
+            getManageClient().delete(format("/manage/v2/forests/%s?level=%s&replicas=%s", nameOrId, level, replicas));
             logger.info(format("Deleted forest %s", nameOrId));
         }
     }
@@ -158,7 +172,7 @@ public class ForestManager extends AbstractResourceManager {
         }
         setReplicasToNone(forestIdOrName);
         for (String id : replicaIds) {
-            delete(id, DELETE_FULL);
+            delete(id, DELETE_LEVEL_FULL);
         }
     }
 

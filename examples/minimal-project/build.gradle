@@ -7,5 +7,5 @@
  */
 
 plugins {
-  id "com.marklogic.ml-gradle" version "2.5.0"
+  id "com.marklogic.ml-gradle" version "2.6.0"
 }

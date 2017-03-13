@@ -1,7 +1,7 @@
 The Gradle build file in this project shows the things you need in order to run groovysh with 
 some MarkLogic support built in:
 
-1. The latest ml-gradle plugin (at the time of this writing, most likely 2.5.0+)
+1. The latest ml-gradle plugin (at the time of this writing, most likely 2.6.0+)
 1. The java plugin, so that mlShell can have a classpath set on it
 1. The jcenter repository, which hosts ml-groovysh
 1. The latest ml-groovysh dependency

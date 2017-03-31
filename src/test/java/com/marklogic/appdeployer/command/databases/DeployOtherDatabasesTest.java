@@ -19,6 +19,7 @@ public class DeployOtherDatabasesTest extends AbstractAppDeployerTest {
 
         appConfig.getForestCounts().put("other-sample-app-content", 2);
         appConfig.getForestCounts().put("other-sample-app-schemas", 3);
+        appConfig.setResourceFilenamesToIgnore("ignored-database.json");
 
         initializeAppDeployer(new DeployRestApiServersCommand(), new DeployContentDatabasesCommand(2),
                 new DeployTriggersDatabaseCommand(), new DeploySchemasDatabaseCommand(),
@@ -34,6 +35,7 @@ public class DeployOtherDatabasesTest extends AbstractAppDeployerTest {
             for (String name : dbNames) {
                 assertTrue("Expected to find database: " + name, dbMgr.exists(name));
             }
+            assertFalse("ignored-database.json should have been ignored", dbMgr.exists("ignored-content"));
 
             assertEquals("The main content database should have 2 forests, as set in the command", 2,
                     dbMgr.getForestIds("sample-app-content").size());

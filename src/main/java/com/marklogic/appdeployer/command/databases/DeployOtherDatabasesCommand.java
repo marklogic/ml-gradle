@@ -61,20 +61,10 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 
     protected List<DeployDatabaseCommand> buildDatabaseCommands(CommandContext context) {
         List<DeployDatabaseCommand> dbCommands = new ArrayList<>();
-
         ConfigDir configDir = context.getAppConfig().getConfigDir();
         File dir = configDir.getDatabasesDir();
         if (dir != null && dir.exists()) {
-            Set<String> ignore = new HashSet<>();
-            for (File f : configDir.getContentDatabaseFiles()) {
-                ignore.add(f.getName());
-            }
-            ignore.add(DeploySchemasDatabaseCommand.DATABASE_FILENAME);
-            ignore.add(DeployTriggersDatabaseCommand.DATABASE_FILENAME);
-
-            ResourceFilenameFilter filter = new ResourceFilenameFilter(ignore);
-            setResourceFilenameFilter(filter);
-
+            ignoreKnownDatabaseFilenames(context);
             for (File f : listFilesInDirectory(dir)) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Will process other database in file: " + f.getName());
@@ -85,5 +75,20 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
             }
         }
         return dbCommands;
+    }
+
+    /**
+     * Adds to the list of resource filenames to ignore. Some may already have been set via the superclass method.
+     *
+     * @param context
+     */
+    protected void ignoreKnownDatabaseFilenames(CommandContext context) {
+        Set<String> ignore = new HashSet<>();
+        for (File f : context.getAppConfig().getConfigDir().getContentDatabaseFiles()) {
+            ignore.add(f.getName());
+        }
+        ignore.add(DeploySchemasDatabaseCommand.DATABASE_FILENAME);
+        ignore.add(DeployTriggersDatabaseCommand.DATABASE_FILENAME);
+        setFilenamesToIgnore(ignore.toArray(new String[]{}));
     }
 }

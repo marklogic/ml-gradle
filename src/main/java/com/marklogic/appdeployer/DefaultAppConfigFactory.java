@@ -76,6 +76,15 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		}
 
 		/**
+		 * Set this to true to prevent creating a REST API server by default.
+		 */
+		prop = getProperty("mlNoRestServer");
+		if (prop != null && Boolean.parseBoolean(prop) == true) {
+			logger.info("Not creating REST server if no REST config file is found");
+			c.setNoRestServer(true);
+
+		}
+		/**
 		 * If a REST API server is created, it will use the following port. Modules will also be loaded via this port.
 		 */
 		prop = getProperty("mlRestPort");

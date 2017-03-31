@@ -74,6 +74,7 @@ public class AppConfig {
 
     // These can all be set to override the default names that are generated off of the "name" attribute.
     private String groupName = DEFAULT_GROUP;
+    private boolean noRestServer = false;
     private String restServerName;
     private String testRestServerName;
     private String contentDatabaseName;
@@ -727,5 +728,13 @@ public class AppConfig {
 
     public void setDeleteForests(boolean deleteForests) {
         this.deleteForests = deleteForests;
+    }
+
+    public boolean isNoRestServer() {
+        return noRestServer;
+    }
+
+    public void setNoRestServer(boolean noRestServer) {
+        this.noRestServer = noRestServer;
     }
 }

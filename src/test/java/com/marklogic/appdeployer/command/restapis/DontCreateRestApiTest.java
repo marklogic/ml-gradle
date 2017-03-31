@@ -1,0 +1,28 @@
+package com.marklogic.appdeployer.command.restapis;
+
+import com.marklogic.appdeployer.AbstractAppDeployerTest;
+import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
+import com.marklogic.mgmt.restapis.RestApiManager;
+import org.junit.Test;
+
+import java.io.File;
+
+public class DontCreateRestApiTest extends AbstractAppDeployerTest {
+
+	@Test
+	public void test() {
+		appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/db-only-config"));
+		appConfig.setNoRestServer(true);
+
+		initializeAppDeployer(new DeployRestApiServersCommand(), new DeployContentDatabasesCommand(1));
+
+		try {
+			appDeployer.deploy(appConfig);
+			RestApiManager mgr = new RestApiManager(manageClient);
+			assertFalse("A REST API server should not have been created",
+				mgr.restApiServerExists(appConfig.getRestServerName()));
+		} finally {
+			undeploySampleApp();
+		}
+	}
+}

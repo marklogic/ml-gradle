@@ -46,6 +46,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
         p.setProperty("mlHost", "prophost");
         p.setProperty("mlAppName", "propname");
         p.setProperty("mlRestPort", "4321");
+        p.setProperty("mlNoRestServer", "true");
         p.setProperty("mlTestRestPort", "8765");
         p.setProperty("mlUsername", "propuser1");
         p.setProperty("mlPassword", "proppassword");
@@ -82,6 +83,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
         assertEquals("prophost", config.getHost());
         assertEquals("propname", config.getName());
         assertEquals((Integer) 4321, config.getRestPort());
+        assertTrue(config.isNoRestServer());
         assertEquals((Integer) 8765, config.getTestRestPort());
         assertEquals("propuser2", config.getRestAdminUsername());
         assertEquals("proppassword2", config.getRestAdminPassword());

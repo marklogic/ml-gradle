@@ -69,6 +69,9 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
 		File f = findRestApiConfigFile(context);
 		if (f.exists()) {
 			return copyFileToString(f);
+		} else if (context.getAppConfig().isNoRestServer()) {
+			logger.info(format("Could not find REST API file at %s, will not deploy/undeploy a REST API server", f.getAbsolutePath()));
+			return null;
 		} else {
 			logger.info(format("Could not find REST API file at %s, will use default payload", f.getAbsolutePath()));
 			return getDefaultRestApiPayload();
@@ -119,17 +122,19 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
 		ServerManager mgr = new ServerManager(manageClient, appConfig.getGroupName());
 
 		String payload = getRestApiPayload(context);
-		payload = tokenReplacer.replaceTokens(payload, appConfig, false);
-		final String serverName = new RestApiManager(manageClient).extractNameFromJson(payload);
+		if (payload != null) {
+			payload = tokenReplacer.replaceTokens(payload, appConfig, false);
+			final String serverName = new RestApiManager(manageClient).extractNameFromJson(payload);
 
-		if (mgr.exists(serverName)) {
-			context.getAdminManager().invokeActionRequiringRestart(new ActionRequiringRestart() {
-				@Override
-				public boolean execute() {
-					return deleteRestApi(serverName, appConfig.getGroupName(), manageClient, deleteModulesDatabase,
-						deleteContentDatabase);
-				}
-			});
+			if (mgr.exists(serverName)) {
+				context.getAdminManager().invokeActionRequiringRestart(new ActionRequiringRestart() {
+					@Override
+					public boolean execute() {
+						return deleteRestApi(serverName, appConfig.getGroupName(), manageClient, deleteModulesDatabase,
+							deleteContentDatabase);
+					}
+				});
+			}
 		}
 	}
 
@@ -165,5 +170,4 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
 	public void setRestApiFilename(String restApiFilename) {
 		this.restApiFilename = restApiFilename;
 	}
-
 }

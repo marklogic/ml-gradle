@@ -144,6 +144,14 @@ public class ManageClient extends LoggingObject {
         return getRestTemplate().exchange(uri, HttpMethod.GET, new HttpEntity<>(headers), String.class).getBody();
     }
 
+    public String getJsonAsAdmin(String path) {
+        logAdminRequest(path, "JSON", "GET");
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
+        return getAdminRestTemplate().exchange(buildUri(path), HttpMethod.GET, new HttpEntity<>(headers), String.class)
+                .getBody();
+    }
+
     public void delete(String path) {
         logRequest(path, "", "DELETE");
         restTemplate.delete(buildUri(path));

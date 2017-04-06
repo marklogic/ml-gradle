@@ -1,0 +1,26 @@
+package com.marklogic.appdeployer.export.security;
+
+import com.marklogic.appdeployer.ConfigDir;
+import com.marklogic.appdeployer.export.AbstractNamedResourceExporter;
+import com.marklogic.mgmt.ManageClient;
+import com.marklogic.mgmt.ResourceManager;
+import com.marklogic.mgmt.security.RoleManager;
+
+import java.io.File;
+
+public class RoleExporter extends AbstractNamedResourceExporter {
+
+	public RoleExporter(ManageClient manageClient, String... usernames) {
+		super(manageClient, usernames);
+	}
+
+	@Override
+	protected ResourceManager newResourceManager(ManageClient manageClient) {
+		return new RoleManager(manageClient);
+	}
+
+	@Override
+	protected File getResourceDirectory(File baseDir) {
+		return new File(new ConfigDir(baseDir).getSecurityDir(), "roles");
+	}
+}

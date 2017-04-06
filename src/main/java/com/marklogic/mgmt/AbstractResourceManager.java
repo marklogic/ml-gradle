@@ -60,6 +60,11 @@ public abstract class AbstractResourceManager extends AbstractManager implements
         return manageClient.getJson(path);
     }
 
+    public String getPropertiesAsJson(String resourceNameOrId, String... resourceUrlParams) {
+        String path = appendParamsAndValuesToPath(getPropertiesPath(resourceNameOrId, resourceUrlParams));
+        return useAdminUser() ? manageClient.getJsonAsAdmin(path) : manageClient.getJson(path);
+    }
+
     /**
      * Determines whether to create a new resource or update an existing one based on the contents of the payload.
      */

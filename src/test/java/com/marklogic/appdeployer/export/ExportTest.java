@@ -22,7 +22,6 @@ public class ExportTest extends AbstractAppDeployerTest {
 			.format("xml")
 			.export(baseDir);
 
-		// Export!
 		System.out.println(exportedFiles);
 	}
 }

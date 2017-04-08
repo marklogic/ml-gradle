@@ -38,8 +38,14 @@ public class DeployCustomForestsCommand extends AbstractCommand {
 	}
 
 	protected void processDirectory(File dir, CommandContext context) {
+		if (logger.isInfoEnabled()) {
+			logger.info("Processing custom forest files in directory: " + dir.getAbsolutePath());
+		}
 		ForestManager mgr = new ForestManager(context.getManageClient());
 		for (File f : listFilesInDirectory(dir)) {
+			if (logger.isInfoEnabled()) {
+				logger.info("Processing forests in file: " + f.getAbsolutePath());
+			}
 			String payload = copyFileToString(f, context);
 			mgr.saveJsonForests(payload);
 		}

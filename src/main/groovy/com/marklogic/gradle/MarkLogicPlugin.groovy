@@ -10,6 +10,7 @@ import com.marklogic.appdeployer.impl.SimpleAppDeployer
 import com.marklogic.gradle.task.DeleteModuleTimestampsFileTask
 import com.marklogic.gradle.task.DeployAppTask
 import com.marklogic.gradle.task.PrintCommandsTask
+import com.marklogic.gradle.task.ExportConfigTask
 import com.marklogic.gradle.task.UndeployAppTask
 import com.marklogic.gradle.task.admin.InitTask
 import com.marklogic.gradle.task.admin.InstallAdminTask
@@ -199,6 +200,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 
 		String generalGroup = "ml-gradle General"
 		project.task("mlPrintCommands", type: PrintCommandsTask, group: generalGroup, description: "Print information about each command used by mlDeploy and mlUndeploy")
+		project.task("mlExportConfig", type: ExportConfigTask, group: generalGroup, description: "Export cluster configuration to ml-config directory")
 
 		String shellGroup = "ml-gradle Shell"
 		project.task("mlShell", type: ShellTask, group: shellGroup, description: "Run groovysh with MarkLogic-specific support built in")

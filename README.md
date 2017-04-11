@@ -34,36 +34,7 @@ How can I start using ml-gradle?
 =========
 First, please note the [Wiki and FAQ](https://github.com/rjrudin/ml-gradle/wiki) which have answers to many of the questions you'll have or run into soon.
 
-To use ml-gradle right away, you'll need Gradle installed first. And of course you'll need Marklogic installed somewhere - it doesn't have to be the same computer as the one you're running Gradle on. Then create a directory for your project and add a build.gradle file and a gradle.properties file (a Gradle best practice is to put properties in this file so they can be easily overridden). Here's the simplest build.gradle file possible:
-
-    plugins {
-      id "com.marklogic.ml-gradle" version "2.6.0"
-    }
-
-And here's a basic gradle.properties file (you can of course customize these properties as needed, particularly the port - make sure that it's open on the host you're deploying to; you can also omit all of these, and ml-gradle will assume some sensible defaults, but it's expected you'll want to customize these):
-
-    mlHost=localhost
-    mlUsername=admin
-    mlPassword=admin
-    mlAppName=quick-start
-    mlRestPort=8200
-
-Then just run "gradle mlDeploy" in the directory containing these two files (note that the first time you run this, Gradle
-may need to download a number of dependencies):
-
-    gradle mlDeploy
-    
-You'll end up with a new REST API server on port 8200 with a modules database and a content database with 3 forests by default. 
-
-To see exactly what mlDeploy is doing, just run Gradle with the "-i" or "--info" option (it's normally useful to do this in any case with Gradle):
-
-    gradle -i mlDeploy
-
-And to see all the tasks available to you, just run:
-
-    gradle tasks
-    
-You can also get a preview of those tasks at [the Wiki page on all tasks](https://github.com/rjrudin/ml-gradle/wiki/All-tasks).
+Then, check out the [new Getting Started Wiki page](https://github.com/rjrudin/ml-gradle/wiki/Getting-started). 
 
 Exploring the sample projects
 -----

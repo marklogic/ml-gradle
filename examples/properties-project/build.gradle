@@ -1,0 +1,10 @@
+plugins {
+	id "com.marklogic.ml-gradle" version "2.6.0"
+	id "net.saliman.properties" version "1.4.6"
+}
+
+task printHost {
+	doLast {
+		println "mlHost: ${mlHost}"
+	}
+}

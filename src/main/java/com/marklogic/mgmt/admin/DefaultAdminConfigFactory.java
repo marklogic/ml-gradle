@@ -20,12 +20,12 @@ public class DefaultAdminConfigFactory extends PropertySourceFactory implements 
         String mlUsername = getProperty("mlUsername");
         String mlPassword = getProperty("mlPassword");
 
-        String prop = getProperty("mlHost");
+        String prop = getProperty("mlAdminHost");
         if (prop != null) {
             logger.info("Admin host: " + prop);
             c.setHost(prop);
         } else {
-            prop = getProperty("mlAdminHost");
+            prop = getProperty("mlHost");
             if (prop != null) {
                 logger.info("Admin host: " + prop);
                 c.setHost(prop);

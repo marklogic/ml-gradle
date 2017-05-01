@@ -20,12 +20,12 @@ public class DefaultManageConfigFactory extends PropertySourceFactory implements
         String mlUsername = getProperty("mlUsername");
         String mlPassword = getProperty("mlPassword");
 
-        String prop = getProperty("mlHost");
+        String prop = getProperty("mlManageHost");
         if (prop != null) {
             logger.info("Manage host: " + prop);
             c.setHost(prop);
         } else {
-            prop = getProperty("mlManageHost");
+            prop = getProperty("mlHost");
             if (prop != null) {
                 logger.info("Manage host: " + prop);
                 c.setHost(prop);

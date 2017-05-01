@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public abstract class RestApiUtil {
 
-    public static String buildDefaultRestApiJson() {
+	public static String buildDefaultRestApiJson() {
         ObjectMapper m = new ObjectMapper();
         ObjectNode node = m.createObjectNode();
         ObjectNode n = node.putObject("rest-api");
@@ -17,7 +17,7 @@ public abstract class RestApiUtil {
         n.put("modules-database", "%%MODULES_DATABASE%%");
         n.put("port", "%%PORT%%");
         n.put("xdbc-enabled", true);
-        n.put("forests-per-host", 3);
+		// n.put("forests-per-host", 3);
         n.put("error-format", "json");
 
         try {

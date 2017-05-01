@@ -9,6 +9,7 @@ import com.marklogic.appdeployer.command.CommandMapBuilder
 import com.marklogic.appdeployer.impl.SimpleAppDeployer
 import com.marklogic.gradle.task.DeleteModuleTimestampsFileTask
 import com.marklogic.gradle.task.DeployAppTask
+import com.marklogic.gradle.task.NewProjectTask
 import com.marklogic.gradle.task.PrintCommandsTask
 import com.marklogic.gradle.task.UndeployAppTask
 import com.marklogic.gradle.task.admin.InitTask
@@ -117,6 +118,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlSetContentUpdatesAllowed", type: SetContentUpdatesAllowedTask, group: dbGroup, description: "Sets updated-allowed on each primary forest for the content database; must set the mode via e.g. -Pmode=flash-backup")
 
 		String devGroup = "ml-gradle Development"
+		project.task("mlNewProject", type: NewProjectTask, group: devGroup, description: "Run a wizard for creating a new project, which includes running mlScaffold")
 		project.task("mlScaffold", type: GenerateScaffoldTask, group: devGroup, description: "Generate project scaffold for a new project")
 		project.task("mlCreateResource", type: CreateResourceTask, group: devGroup, description: "Create a new resource extension in the modules services directory; use -PresourceName and -PresourceType to set the resource name and type (either xqy or sjs)")
 		project.task("mlCreateTransform", type: CreateTransformTask, group: devGroup, description: "Create a new transform in the modules transforms directory; use -PtranssformName and -PtransformType to set the transform name and type (xqy, xsl, or sjs)")

@@ -36,11 +36,13 @@ public class DefaultDocumentFileReader extends LoggingObject implements FileVisi
 	public List<DocumentFile> readDocumentFiles(String... paths) {
 		documentFiles = new ArrayList<>();
 		for (String path : paths) {
-			if (logger.isDebugEnabled()) {
-				logger.debug(format("Finding documents at path: %s", path));
+			if (logger.isInfoEnabled()) {
+				logger.info(format("Finding documents at path: %s", path));
 			}
 			this.currentRootPath = Paths.get(path);
+			this.currentRootPath.toFile().mkdirs();
 			try {
+				logger.info("CRP: " + currentRootPath.toFile().getAbsolutePath());
 				Files.walkFileTree(this.currentRootPath, this);
 			} catch (IOException ie) {
 				throw new RuntimeException(format("IO error while walking file tree at path: %s", path), ie);
@@ -51,15 +53,16 @@ public class DefaultDocumentFileReader extends LoggingObject implements FileVisi
 
 	@Override
 	public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+		logger.info("visit dir: " + dir.toFile().getAbsolutePath());
 		boolean accept = acceptPath(dir, attrs);
 		if (accept) {
-			if (logger.isTraceEnabled()) {
-				logger.trace("Visiting directory: " + dir);
+			if (logger.isInfoEnabled()) {
+				logger.info("Visiting directory: " + dir);
 			}
 			return FileVisitResult.CONTINUE;
 		} else {
-			if (logger.isTraceEnabled()) {
-				logger.trace("Skipping directory: " + dir);
+			if (logger.isInfoEnabled()) {
+				logger.info("Skipping directory: " + dir);
 			}
 			return FileVisitResult.SKIP_SUBTREE;
 		}
@@ -67,16 +70,20 @@ public class DefaultDocumentFileReader extends LoggingObject implements FileVisi
 
 	@Override
 	public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+		logger.info("vff: " + exc.getMessage());
+		exc.printStackTrace();
 		return FileVisitResult.CONTINUE;
 	}
 
 	@Override
 	public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+		logger.info("pvd: " + exc.getMessage());
 		return FileVisitResult.CONTINUE;
 	}
 
 	@Override
 	public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
+		logger.info("visit file: " + path.toFile().getAbsolutePath());
 		if (acceptPath(path, attrs)) {
 			DocumentFile documentFile = buildDocumentFile(path, currentRootPath);
 			documentFile = processDocumentFile(documentFile);
@@ -95,6 +102,7 @@ public class DefaultDocumentFileReader extends LoggingObject implements FileVisi
 	 * @return
 	 */
 	protected boolean acceptPath(Path path, BasicFileAttributes attrs) {
+		logger.info("acceptPath: " + path.toFile().getAbsolutePath());
 		if (fileFilters != null) {
 			File file = path.toFile();
 			for (FileFilter filter : fileFilters) {

@@ -39,13 +39,9 @@ public class DefaultDocumentFileReader extends LoggingObject implements FileVisi
 			if (logger.isInfoEnabled()) {
 				logger.info(format("Finding documents at path: %s", path));
 			}
-			this.currentRootPath = Paths.get(path);
+			this.currentRootPath = constructPath(path);
 			this.currentRootPath.toFile().mkdirs();
 			try {
-				File rob = currentRootPath.toFile();
-				logger.info("CRP: " + currentRootPath.toFile().getAbsolutePath());
-				logger.info("exists: " + rob.exists());
-				logger.info("dir: " + rob.isDirectory());
 				Files.walkFileTree(this.currentRootPath, this);
 			} catch (IOException ie) {
 				throw new RuntimeException(format("IO error while walking file tree at path: %s", path), ie);
@@ -54,18 +50,28 @@ public class DefaultDocumentFileReader extends LoggingObject implements FileVisi
 		return documentFiles;
 	}
 
+	/**
+	 * The path is first wrapped in a File; this prevents a bug in Gradle when Gradle is run in daemon mode, where it
+	 * will try to resolve the path from its daemon directory.
+	 *
+	 * @param path
+	 * @return
+	 */
+	protected Path constructPath(String path) {
+		return Paths.get(new File(path).getAbsolutePath());
+	}
+
 	@Override
 	public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-		logger.info("visit dir: " + dir.toFile().getAbsolutePath());
 		boolean accept = acceptPath(dir, attrs);
 		if (accept) {
-			if (logger.isInfoEnabled()) {
-				logger.info("Visiting directory: " + dir);
+			if (logger.isDebugEnabled()) {
+				logger.debug("Visiting directory: " + dir);
 			}
 			return FileVisitResult.CONTINUE;
 		} else {
-			if (logger.isInfoEnabled()) {
-				logger.info("Skipping directory: " + dir);
+			if (logger.isDebugEnabled()) {
+				logger.debug("Skipping directory: " + dir);
 			}
 			return FileVisitResult.SKIP_SUBTREE;
 		}
@@ -74,8 +80,7 @@ public class DefaultDocumentFileReader extends LoggingObject implements FileVisi
 	@Override
 	public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
 		if (exc != null) {
-			logger.info("vff: " + exc.getMessage());
-			exc.printStackTrace();
+			logger.warn("Failed visiting file: " + exc.getMessage(), exc);
 		}
 		return FileVisitResult.CONTINUE;
 	}
@@ -83,14 +88,13 @@ public class DefaultDocumentFileReader extends LoggingObject implements FileVisi
 	@Override
 	public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
 		if (exc != null) {
-			logger.info("pvd: " + exc.getMessage());
+			logger.warn("Error in postVisitDirectory: " + exc.getMessage(), exc);
 		}
 		return FileVisitResult.CONTINUE;
 	}
 
 	@Override
 	public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
-		logger.info("visit file: " + path.toFile().getAbsolutePath());
 		if (acceptPath(path, attrs)) {
 			DocumentFile documentFile = buildDocumentFile(path, currentRootPath);
 			documentFile = processDocumentFile(documentFile);
@@ -109,7 +113,6 @@ public class DefaultDocumentFileReader extends LoggingObject implements FileVisi
 	 * @return
 	 */
 	protected boolean acceptPath(Path path, BasicFileAttributes attrs) {
-		logger.info("acceptPath: " + path.toFile().getAbsolutePath());
 		if (fileFilters != null) {
 			File file = path.toFile();
 			for (FileFilter filter : fileFilters) {

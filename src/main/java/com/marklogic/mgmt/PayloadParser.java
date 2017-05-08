@@ -42,6 +42,15 @@ public class PayloadParser {
     }
 
     public boolean isJsonPayload(String payload) {
-        return payload.trim().startsWith("{");
+        String s = payload.trim();
+        return s.startsWith("{") || s.startsWith("[");
     }
+
+	public ObjectMapper getObjectMapper() {
+		return objectMapper;
+	}
+
+	public void setObjectMapper(ObjectMapper objectMapper) {
+		this.objectMapper = objectMapper;
+	}
 }

@@ -28,9 +28,19 @@ import com.marklogic.appdeployer.command.SortOrderConstants;
  */
 public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 
+	// Each of these is copied to the instances of DeployDatabaseCommand that are created
+    private int forestsPerHost = 1;
+	private boolean checkForCustomForests = true;
+	private String forestFilename;
+	private boolean createForestsOnEachHost = true;
+
     public DeployOtherDatabasesCommand() {
-        setExecuteSortOrder(SortOrderConstants.DEPLOY_OTHER_DATABASES);
-        setUndoSortOrder(SortOrderConstants.DELETE_OTHER_DATABASES);
+        this(1);
+    }
+
+    public DeployOtherDatabasesCommand(int forestsPerHost) {
+	    setExecuteSortOrder(SortOrderConstants.DEPLOY_OTHER_DATABASES);
+	    setUndoSortOrder(SortOrderConstants.DELETE_OTHER_DATABASES);
     }
 
     @Override
@@ -69,12 +79,20 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Will process other database in file: " + f.getName());
                 }
-                DeployDatabaseCommand c = new DeployDatabaseCommand();
-                c.setDatabaseFilename(f.getName());
-                dbCommands.add(c);
+                dbCommands.add(buildDeployDatabaseCommand(f));
             }
         }
         return dbCommands;
+    }
+
+    protected DeployDatabaseCommand buildDeployDatabaseCommand(File file) {
+	    DeployDatabaseCommand c = new DeployDatabaseCommand();
+	    c.setForestsPerHost(getForestsPerHost());
+	    c.setDatabaseFilename(file.getName());
+	    c.setCheckForCustomForests(isCheckForCustomForests());
+	    c.setForestFilename(getForestFilename());
+	    c.setCreateForestsOnEachHost(isCreateForestsOnEachHost());
+	    return c;
     }
 
     /**
@@ -91,4 +109,36 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
         ignore.add(DeployTriggersDatabaseCommand.DATABASE_FILENAME);
         setFilenamesToIgnore(ignore.toArray(new String[]{}));
     }
+
+	public int getForestsPerHost() {
+		return forestsPerHost;
+	}
+
+	public void setForestsPerHost(int forestsPerHost) {
+		this.forestsPerHost = forestsPerHost;
+	}
+
+	public boolean isCheckForCustomForests() {
+		return checkForCustomForests;
+	}
+
+	public void setCheckForCustomForests(boolean checkForCustomForests) {
+		this.checkForCustomForests = checkForCustomForests;
+	}
+
+	public String getForestFilename() {
+		return forestFilename;
+	}
+
+	public void setForestFilename(String forestFilename) {
+		this.forestFilename = forestFilename;
+	}
+
+	public boolean isCreateForestsOnEachHost() {
+		return createForestsOnEachHost;
+	}
+
+	public void setCreateForestsOnEachHost(boolean createForestsOnEachHost) {
+		this.createForestsOnEachHost = createForestsOnEachHost;
+	}
 }

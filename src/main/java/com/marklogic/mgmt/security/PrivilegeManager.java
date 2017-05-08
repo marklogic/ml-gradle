@@ -14,6 +14,7 @@ public class PrivilegeManager extends AbstractResourceManager {
         return true;
     }
 
+
     @Override
     protected String[] getUpdateResourceParams(String payload) {
         return new String[] { "kind", payloadParser.getPayloadFieldValue(payload, "kind") };

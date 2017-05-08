@@ -81,6 +81,10 @@ public class TaskManager extends AbstractResourceManager {
 			resourceNameOrId));
 	}
 
+	public List<String> getTaskPaths() {
+		return getAsXml().getListItemValues("task-path");
+	}
+
 	public void disableAllTasks() {
 		for (String id : getAsXml().getListItemIdRefs()) {
 			disableTask(id);
@@ -107,6 +111,17 @@ public class TaskManager extends AbstractResourceManager {
 
 	public void deleteAllTasks() {
 		deleteAllScheduledTasks();
+	}
+
+	public void deleteTaskWithPath(String taskPath) {
+		String json = format("{\"task-path\":\"%s\"}", taskPath);
+		delete(json, "group-id", groupName);
+	}
+
+	public String getTaskId(String taskPath) {
+		return getAsXml().getElementValue(format(
+			"/t:tasks-default-list/t:list-items/t:list-item[t:task-path = '%s']/t:idref", taskPath)
+		);
 	}
 
 	public void deleteAllScheduledTasks() {

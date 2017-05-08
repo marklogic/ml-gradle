@@ -109,9 +109,13 @@ public class ManageClient extends LoggingObject {
         return restTemplate.exchange(buildUri(path), HttpMethod.POST, entity, String.class);
     }
 
-    public Fragment getXml(String path, String... namespacePrefixesAndUris) {
+    public String getXmlString(String path) {
         logRequest(path, "XML", "GET");
-        String xml = getRestTemplate().getForObject(buildUri(path), String.class);
+        return getRestTemplate().getForObject(buildUri(path), String.class);
+    }
+
+    public Fragment getXml(String path, String... namespacePrefixesAndUris) {
+        String xml = getXmlString(path);
         List<Namespace> list = new ArrayList<Namespace>();
         for (int i = 0; i < namespacePrefixesAndUris.length; i += 2) {
             list.add(Namespace.getNamespace(namespacePrefixesAndUris[i], namespacePrefixesAndUris[i + 1]));
@@ -119,9 +123,13 @@ public class ManageClient extends LoggingObject {
         return new Fragment(xml, list.toArray(new Namespace[] {}));
     }
 
+	public String getXmlStringAsAdmin(String path) {
+		logAdminRequest(path, "XML", "GET");
+		return getAdminRestTemplate().getForObject(buildUri(path), String.class);
+	}
+
     public Fragment getXmlAsAdmin(String path, String... namespacePrefixesAndUris) {
-        logAdminRequest(path, "XML", "GET");
-        String xml = getAdminRestTemplate().getForObject(buildUri(path), String.class);
+        String xml = getXmlStringAsAdmin(path);
         List<Namespace> list = new ArrayList<Namespace>();
         for (int i = 0; i < namespacePrefixesAndUris.length; i += 2) {
             list.add(Namespace.getNamespace(namespacePrefixesAndUris[i], namespacePrefixesAndUris[i + 1]));

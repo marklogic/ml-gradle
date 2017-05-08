@@ -23,4 +23,9 @@ public class RoleExporter extends AbstractNamedResourceExporter {
 	protected File getResourceDirectory(File baseDir) {
 		return new File(new ConfigDir(baseDir).getSecurityDir(), "roles");
 	}
+
+	@Override
+	protected String[] getExportMessages() {
+		return new String[] {"The exported role files may need to be renamed to guarantee they are deployed in an order that respects the dependencies between them."};
+	}
 }

@@ -36,6 +36,8 @@ dependencies {
   testCompile ('com.marklogic:ml-junit:2.6.0') {
     exclude module: "ml-javaclient-util"
   }
+
+  testCompile('commons-io:commons-io:2.5')
 }
 
 // This ensures that Gradle includes in the published jar any non-java files under src/main/java

@@ -3,6 +3,7 @@ package com.marklogic.appdeployer.command.forests;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
+import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.forests.ForestManager;
 
 import java.io.File;
@@ -20,6 +21,7 @@ import java.io.File;
 public class DeployCustomForestsCommand extends AbstractCommand {
 
 	private String customForestsPath = "forests";
+	private PayloadParser payloadParser;
 
 	public DeployCustomForestsCommand() {
 		setExecuteSortOrder(SortOrderConstants.DEPLOY_FORESTS);
@@ -29,6 +31,7 @@ public class DeployCustomForestsCommand extends AbstractCommand {
 	public void execute(CommandContext context) {
 		File dir = new File(context.getAppConfig().getConfigDir().getBaseDir(), customForestsPath);
 		if (dir != null && dir.exists()) {
+			payloadParser = new PayloadParser();
 			for (File f : dir.listFiles()) {
 				if (f.isDirectory()) {
 					processDirectory(f, context);
@@ -37,6 +40,12 @@ public class DeployCustomForestsCommand extends AbstractCommand {
 		}
 	}
 
+	/**
+	 * Supports JSON files with a single payload or an array of payloads, or an XML file with a single payload.
+	 *
+	 * @param dir
+	 * @param context
+	 */
 	protected void processDirectory(File dir, CommandContext context) {
 		if (logger.isInfoEnabled()) {
 			logger.info("Processing custom forest files in directory: " + dir.getAbsolutePath());
@@ -47,7 +56,11 @@ public class DeployCustomForestsCommand extends AbstractCommand {
 				logger.info("Processing forests in file: " + f.getAbsolutePath());
 			}
 			String payload = copyFileToString(f, context);
-			mgr.saveJsonForests(payload);
+			if (payloadParser.isJsonPayload(payload)) {
+				mgr.saveJsonForests(payload);
+			} else {
+				mgr.save(payload);
+			}
 		}
 	}
 

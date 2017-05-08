@@ -23,4 +23,9 @@ public class UserExporter extends AbstractNamedResourceExporter {
 	protected File getResourceDirectory(File baseDir) {
 		return new File(new ConfigDir(baseDir).getSecurityDir(), "users");
 	}
+
+	@Override
+	protected String[] getExportMessages() {
+		return new String[]{"The exported user files do not have a password in them, as passwords cannot be retrieved. Each user file needs a password added before it can be deployed."};
+	}
 }

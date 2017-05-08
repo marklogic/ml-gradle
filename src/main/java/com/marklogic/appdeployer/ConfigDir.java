@@ -49,11 +49,17 @@ public class ConfigDir {
     }
 
     public File getRestApiServerFile() {
-        return new File(new File(baseDir, "servers"), "rest-api-server.json");
+        return new File(getServersDir(), "rest-api-server.json");
     }
 
     public File getSecurityDir() {
         return new File(baseDir, "security");
+    }
+
+    public File getServersDir() { return new File(baseDir, "servers"); }
+
+    public File getForestsDir() {
+        return new File(baseDir, "forests");
     }
 
     public File getCpfDir() {
@@ -73,6 +79,10 @@ public class ConfigDir {
     }
 
 	public File getTemporalDir() { return new File(baseDir, "temporal"); }
+
+	public File getTasksDir() {
+    	return new File(baseDir, "tasks");
+	}
 
 	public void setDatabasesPath(String databasesPath) {
         this.databasesPath = databasesPath;

@@ -29,15 +29,20 @@ public class CompositeResourceExporter extends AbstractResourceExporter {
 	}
 
 	@Override
-	public List<File> exportResources(File baseDir) {
-		List<File> files = new ArrayList<>();
+	public ExportedResources exportResources(File baseDir) {
+		ExportedResources resources = null;
 		for (ResourceExporter exporter : resourceExporters) {
 			if (overrideFormatOnExporters && exporter instanceof AbstractResourceExporter) {
 				((AbstractResourceExporter) exporter).setFormat(getFormat());
 			}
-			files.addAll(exporter.exportResources(baseDir));
+			ExportedResources er = exporter.exportResources(baseDir);
+			if (resources == null) {
+				resources = er;
+			} else {
+				resources.add(er);
+			}
 		}
-		return files;
+		return resources;
 	}
 
 	public boolean isOverrideFormatOnExporters() {

@@ -46,7 +46,7 @@ public class DeployForestsCommand extends AbstractCommand {
     public void execute(CommandContext context) {
         String payload = null;
         if (forestFilename != null) {
-            File dir = new File(context.getAppConfig().getConfigDir().getBaseDir(), "forests");
+            File dir = context.getAppConfig().getConfigDir().getForestsDir();
             if (dir.exists()) {
                 File f = new File(dir, forestFilename);
                 if (f.exists()) {

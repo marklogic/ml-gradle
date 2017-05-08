@@ -79,6 +79,15 @@ public interface ResourceManager {
     public Fragment getPropertiesAsXml(String resourceNameOrId, String... resourceUrlParams);
 
 	/**
+	 *
+	 * @param resourceNameOrId
+	 * @param resourceUrlParams
+	 *            Some resources require URL parameters to uniquely identify them
+	 * @return
+	 */
+	public String getPropertiesAsXmlString(String resourceNameOrId, String... resourceUrlParams);
+
+	/**
 	 * @param resourceNameOrId
 	 * @param resourceUrlParams
 	 * @return

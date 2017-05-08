@@ -55,6 +55,11 @@ public abstract class AbstractResourceManager extends AbstractManager implements
         return useAdminUser() ? manageClient.getXmlAsAdmin(path) : manageClient.getXml(path);
     }
 
+    public String getPropertiesAsXmlString(String resourceNameOrId, String... resourceUrlParams) {
+        String path = appendParamsAndValuesToPath(getPropertiesPath(resourceNameOrId, resourceUrlParams));
+        return useAdminUser() ? manageClient.getXmlStringAsAdmin(path) : manageClient.getXmlString(path);
+    }
+
     public String getAsJson(String resourceNameOrId, String... resourceUrlParams) {
         String path = appendParamsAndValuesToPath(getPropertiesPath(resourceNameOrId, resourceUrlParams));
         return manageClient.getJson(path);

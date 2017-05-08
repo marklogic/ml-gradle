@@ -9,7 +9,6 @@ import com.marklogic.appdeployer.command.forests.DeployForestsCommand;
 import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.databases.DatabaseManager;
-import com.marklogic.mgmt.forests.ForestManager;
 
 import java.io.File;
 import java.util.Map;
@@ -38,13 +37,22 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
     private String databaseName;
 
     /**
+     * If true, this will look for a ./forests/(name of database) directory that defines custom forests for this
+     * database. If such a directory exists, this command will not create any forests for the database. If the
+     * directory does not exist, then this command will create forests for the database as defined by forestsPerHost.
+     */
+    private boolean checkForCustomForests = true;
+
+    /**
      * Optional name of the file in the forests directory that will be used to create each forest. If not provided, a
-     * "vanilla" forest is created on each host with a name based on the databaseName attribute.
+     * "vanilla" forest is created on each host with a name based on the databaseName attribute. This is ignored if
+     * custom forests are found in ./forests/(name of forest).
      */
     private String forestFilename;
 
     /**
-     * Number of forests to create per host for this database.
+     * Number of forests to create per host for this database. This is ignored if custom forests are found in
+     * ./forests/(name of forest).
      */
     private int forestsPerHost = 1;
 
@@ -81,7 +89,13 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
         if (payload != null) {
             DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
             SaveReceipt receipt = dbMgr.save(payload);
-            buildDeployForestsCommand(payload, receipt, context).execute(context);
+            if (shouldCreateForests(context, payload)) {
+	            buildDeployForestsCommand(payload, receipt, context).execute(context);
+            } else {
+            	if (logger.isInfoEnabled()) {
+            		logger.info("Found custom forests for database, so not creating default forests");
+	            }
+            }
         }
     }
 
@@ -144,6 +158,40 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
             }
             return null;
         }
+    }
+
+	/**
+	 * This is where we check to see if a custom forests directory exists at ./forests/(database name). The database
+	 * name is extracted from the payload via a PayloadParser. This check can be disabled by setting
+	 * checkForCustomForests to false.
+	 *
+	 * @param context
+	 * @param payload
+	 * @return
+	 */
+	protected boolean shouldCreateForests(CommandContext context, String payload) {
+		if (isCheckForCustomForests()) {
+			PayloadParser parser = new PayloadParser();
+			String dbName = parser.getPayloadFieldValue(payload, "database-name");
+			return !customForestsExist(context, dbName);
+		}
+		return true;
+	}
+
+	/**
+	 * @param context
+	 * @param dbName
+	 * @return true if any file exists in ./forests/(name of database)
+	 */
+	protected boolean customForestsExist(CommandContext context, String dbName) {
+    	File dir = context.getAppConfig().getConfigDir().getForestsDir();
+    	if (dir.exists()) {
+    		File dbDir = new File(dir, dbName);
+    		if (dbDir.exists()) {
+    			return dbDir.listFiles().length > 0;
+		    }
+	    }
+	    return false;
     }
 
     /**
@@ -247,5 +295,13 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 
     public void setCreateForestsOnEachHost(boolean createForestsOnEachHost) {
         this.createForestsOnEachHost = createForestsOnEachHost;
+    }
+
+    public boolean isCheckForCustomForests() {
+        return checkForCustomForests;
+    }
+
+    public void setCheckForCustomForests(boolean checkForCustomForests) {
+        this.checkForCustomForests = checkForCustomForests;
     }
 }

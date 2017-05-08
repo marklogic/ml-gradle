@@ -1,5 +1,7 @@
 package com.marklogic.appdeployer.export;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.ResourceManager;
 import org.springframework.util.FileCopyUtils;
@@ -16,10 +18,12 @@ import java.util.List;
 public abstract class AbstractNamedResourceExporter extends AbstractResourceExporter {
 
 	private String[] resourceNames;
+	private ObjectMapper objectMapper;
 
 	protected AbstractNamedResourceExporter(ManageClient manageClient, String... resourceNames) {
 		super(manageClient);
 		this.resourceNames = resourceNames;
+		this.objectMapper = new ObjectMapper();
 	}
 
 	protected abstract ResourceManager newResourceManager(ManageClient manageClient);
@@ -27,7 +31,7 @@ public abstract class AbstractNamedResourceExporter extends AbstractResourceExpo
 	protected abstract File getResourceDirectory(File baseDir);
 
 	@Override
-	public List<File> exportResources(File baseDir) {
+	public ExportedResources exportResources(File baseDir) {
 		ResourceManager mgr = newResourceManager(getManageClient());
 		File resourceDir = getResourceDirectory(baseDir);
 		resourceDir.mkdirs();
@@ -38,7 +42,11 @@ public abstract class AbstractNamedResourceExporter extends AbstractResourceExpo
 				files.add(f);
 			}
 		}
-		return files;
+		return new ExportedResources(files, getExportMessages());
+	}
+
+	protected String[] getExportMessages() {
+		return null;
 	}
 
 	protected File exportToFile(ResourceManager mgr, String resourceName, File resourceDir) {
@@ -57,19 +65,46 @@ public abstract class AbstractNamedResourceExporter extends AbstractResourceExpo
 	}
 
 	protected File exportToXml(ResourceManager mgr, String resourceName, File resourceDir) throws IOException {
-		String xml = mgr.getPropertiesAsXml(resourceName).getPrettyXml();
-		File f = new File(resourceDir, resourceName + ".xml");
+		String xml = mgr.getPropertiesAsXmlString(resourceName, getResourceUrlParams(resourceName));
+		xml = beforeResourceWrittenToFile(resourceName, xml);
+		File f = new File(resourceDir, buildFilename(resourceName, "xml"));
 		logWritingFile(resourceName, f);
 		FileCopyUtils.copy(xml.getBytes(), f);
 		return f;
 	}
 
+	protected String buildFilename(String resourceName, String suffix) {
+		return resourceName + "." + suffix;
+	}
+
+	/**
+	 * Subclasses that need to provide URL params for getting the properties of a resource can override this.
+	 *
+	 * @param resourceName
+	 * @return
+	 */
+	protected String[] getResourceUrlParams(String resourceName) {
+		return null;
+	}
+
 	protected File exportToJson(ResourceManager mgr, String resourceName, File resourceDir) throws IOException {
-		String json = mgr.getPropertiesAsJson(resourceName);
-		File f = new File(resourceDir, resourceName + ".json");
+		String json = mgr.getPropertiesAsJson(resourceName, getResourceUrlParams(resourceName));
+		json = beforeResourceWrittenToFile(resourceName, json);
+		json = prettyPrintJson(json);
+
+		File f = new File(resourceDir, buildFilename(resourceName, "json"));
 		logWritingFile(resourceName, f);
 		FileCopyUtils.copy(json.getBytes(), f);
 		return f;
+	}
+
+	protected String prettyPrintJson(String json) throws IOException {
+		JsonNode node = objectMapper.readTree(json);
+		return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
+	}
+
+	protected String beforeResourceWrittenToFile(String resourceName, String payload) {
+		return payload;
 	}
 
 	protected void logWritingFile(String resourceName, File file) {
@@ -78,4 +113,7 @@ public abstract class AbstractNamedResourceExporter extends AbstractResourceExpo
 		}
 	}
 
+	public String[] getResourceNames() {
+		return resourceNames;
+	}
 }

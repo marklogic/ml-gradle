@@ -20,7 +20,7 @@ public class DeployScheduledTasksCommand extends AbstractResourceCommand {
 
     @Override
     protected File[] getResourceDirs(CommandContext context) {
-        return new File[] { new File(context.getAppConfig().getConfigDir().getBaseDir(), "tasks") };
+        return new File[] { context.getAppConfig().getConfigDir().getTasksDir() };
     }
 
     @Override

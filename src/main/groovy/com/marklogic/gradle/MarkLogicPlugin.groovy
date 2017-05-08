@@ -22,6 +22,7 @@ import com.marklogic.gradle.task.cpf.DeployCpfTask
 import com.marklogic.gradle.task.cpf.LoadDefaultPipelinesTask
 import com.marklogic.gradle.task.databases.*
 import com.marklogic.gradle.task.es.GenerateModelArtifactsTask
+import com.marklogic.gradle.task.export.ExportResourcesTask
 import com.marklogic.gradle.task.flexrep.*
 import com.marklogic.gradle.task.forests.ConfigureForestReplicasTask
 import com.marklogic.gradle.task.forests.DeleteForestReplicasTask
@@ -118,11 +119,12 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlSetContentUpdatesAllowed", type: SetContentUpdatesAllowedTask, group: dbGroup, description: "Sets updated-allowed on each primary forest for the content database; must set the mode via e.g. -Pmode=flash-backup")
 
 		String devGroup = "ml-gradle Development"
-		project.task("mlNewProject", type: NewProjectTask, group: devGroup, description: "Run a wizard for creating a new project, which includes running mlScaffold")
-		project.task("mlScaffold", type: GenerateScaffoldTask, group: devGroup, description: "Generate project scaffold for a new project")
 		project.task("mlCreateResource", type: CreateResourceTask, group: devGroup, description: "Create a new resource extension in the modules services directory; use -PresourceName and -PresourceType to set the resource name and type (either xqy or sjs)")
 		project.task("mlCreateTransform", type: CreateTransformTask, group: devGroup, description: "Create a new transform in the modules transforms directory; use -PtranssformName and -PtransformType to set the transform name and type (xqy, xsl, or sjs)")
+		project.task("mlExportResources", type: ExportResourcesTask, group: devGroup, description: "Export resources based on a properties file specified via -PpropertiesFile, -Pprefix, or -Pregex")
 		project.task("mlPrepareRestApiDependencies", type: PrepareRestApiDependenciesTask, group: devGroup, dependsOn: project.configurations["mlRestApi"], description: "Downloads (if necessary) and unzips in the build directory all mlRestApi dependencies")
+		project.task("mlNewProject", type: NewProjectTask, group: devGroup, description: "Run a wizard for creating a new project, which includes running mlScaffold")
+		project.task("mlScaffold", type: GenerateScaffoldTask, group: devGroup, description: "Generate project scaffold for a new project")
 
 		String esGroup = "ml-gradle Entity Services"
 		project.task("mlGenerateModelArtifacts", type: GenerateModelArtifactsTask, group: esGroup, description: "Generate model artifacts for the Entity Services models in the default directory of ./data/entity-services")

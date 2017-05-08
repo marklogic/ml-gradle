@@ -42,7 +42,10 @@ public class DefaultDocumentFileReader extends LoggingObject implements FileVisi
 			this.currentRootPath = Paths.get(path);
 			this.currentRootPath.toFile().mkdirs();
 			try {
+				File rob = currentRootPath.toFile();
 				logger.info("CRP: " + currentRootPath.toFile().getAbsolutePath());
+				logger.info("exists: " + rob.exists());
+				logger.info("dir: " + rob.isDirectory());
 				Files.walkFileTree(this.currentRootPath, this);
 			} catch (IOException ie) {
 				throw new RuntimeException(format("IO error while walking file tree at path: %s", path), ie);
@@ -70,14 +73,18 @@ public class DefaultDocumentFileReader extends LoggingObject implements FileVisi
 
 	@Override
 	public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-		logger.info("vff: " + exc.getMessage());
-		exc.printStackTrace();
+		if (exc != null) {
+			logger.info("vff: " + exc.getMessage());
+			exc.printStackTrace();
+		}
 		return FileVisitResult.CONTINUE;
 	}
 
 	@Override
 	public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-		logger.info("pvd: " + exc.getMessage());
+		if (exc != null) {
+			logger.info("pvd: " + exc.getMessage());
+		}
 		return FileVisitResult.CONTINUE;
 	}
 

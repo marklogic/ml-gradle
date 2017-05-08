@@ -15,13 +15,13 @@ import java.util.List;
 public class LoadRulesetsTest extends AbstractIntegrationTest {
 
 	/**
-	 * Wipes out documents matching the ones we intend to load - it's assumed you're not using the Schemas database for
+	 * Wipes out the Schemas database - it's assumed you're not using the Schemas database for
 	 * anything besides ad hoc testing like this.
 	 */
 	@Before
 	public void setup() {
 		client = newClient("Schemas");
-		client.newServerEval().xquery("cts:uri-match('/ruleset*.*') ! xdmp:document-delete(.)").eval();
+		client.newServerEval().xquery("cts:uris((), (), cts:true-query()) ! xdmp:document-delete(.)").eval();
 	}
 
 	@Test

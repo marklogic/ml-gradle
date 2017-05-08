@@ -1,5 +1,6 @@
 package com.marklogic.appdeployer;
 
+import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.mgmt.util.PropertySource;
 import com.marklogic.mgmt.util.PropertySourceFactory;
 
@@ -91,6 +92,12 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		if (prop != null) {
 			logger.info("App REST port: " + prop);
 			c.setRestPort(Integer.parseInt(prop));
+		}
+
+		prop = getProperty("mlRestAuthentication");
+		if (prop != null) {
+			logger.info("App REST authentication: " + prop);
+			c.setRestAuthentication(DatabaseClientFactory.Authentication.valueOfUncased(prop));
 		}
 
 		/**

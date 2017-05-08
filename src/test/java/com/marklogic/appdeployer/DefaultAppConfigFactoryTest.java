@@ -3,6 +3,7 @@ package com.marklogic.appdeployer;
 import java.util.List;
 import java.util.Properties;
 
+import com.marklogic.client.DatabaseClientFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -52,6 +53,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
         p.setProperty("mlPassword", "proppassword");
         p.setProperty("mlRestAdminUsername", "propuser2");
         p.setProperty("mlRestAdminPassword", "proppassword2");
+        p.setProperty("mlRestAuthentication", "basic");
         p.setProperty("mlContentForestsPerHost", "17");
         p.setProperty("mlModulePermissions", "some-perm,read,some-perm,update");
         p.setProperty("mlAdditionalBinaryExtensions", ".gradle,.properties");
@@ -87,6 +89,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
         assertEquals((Integer) 8765, config.getTestRestPort());
         assertEquals("propuser2", config.getRestAdminUsername());
         assertEquals("proppassword2", config.getRestAdminPassword());
+        assertEquals(DatabaseClientFactory.Authentication.BASIC, config.getRestAuthentication());
         assertEquals((Integer) 17, config.getContentForestsPerHost());
         assertEquals("some-perm,read,some-perm,update", config.getModulePermissions());
         String[] extensions = config.getAdditionalBinaryExtensions();

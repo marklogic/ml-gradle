@@ -7,14 +7,6 @@ import java.util.Map;
 
 public class MapResourceSelection implements ResourceSelection {
 
-	public final static String DATABASES = "databases";
-	public final static String PRIVILEGES_EXECUTE = "privilegesExecute";
-	public final static String PRIVILEGES_URI = "privilegesUri";
-	public final static String ROLES = "roles";
-	public final static String SERVERS = "servers";
-	public final static String TASKS = "tasks";
-	public final static String USERS = "users";
-
 	private Map<String, List<String>> selections = new HashMap<>();
 
 	public void select(String type, String name) {

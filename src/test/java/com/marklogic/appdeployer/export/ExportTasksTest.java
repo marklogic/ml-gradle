@@ -1,7 +1,9 @@
 package com.marklogic.appdeployer.export;
 
 import com.marklogic.appdeployer.command.tasks.DeployScheduledTasksCommand;
+import com.marklogic.mgmt.selector.MapResourceSelection;
 import com.marklogic.mgmt.selector.PrefixResourceSelector;
+import com.marklogic.mgmt.selector.ResourceSelection;
 import com.marklogic.mgmt.tasks.TaskManager;
 import org.junit.After;
 import org.junit.Test;
@@ -19,7 +21,12 @@ public class ExportTasksTest extends AbstractExportTest {
 		deploySampleApp();
 
 		String taskPath = "/path/to/query.xqy";
-		ExportedResources resources = new Exporter(manageClient).select(new PrefixResourceSelector("/path")).export(exportDir);
+
+		// Get some test coverage of selectors, even though we don't care about users here
+		PrefixResourceSelector selector = new PrefixResourceSelector("/path");
+		selector.setIncludeTypesAsString(ResourceSelection.TASKS + "," + ResourceSelection.USERS);
+
+		ExportedResources resources = new Exporter(manageClient).select(selector).export(exportDir);
 		assertEquals(1, resources.getFiles().size());
 		assertEquals("query.xqy.json", resources.getFiles().get(0).getName());
 

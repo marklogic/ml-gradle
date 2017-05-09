@@ -11,6 +11,7 @@ import com.marklogic.mgmt.tasks.TaskManager;
 import com.marklogic.rest.util.ResourcesFragment;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class AbstractNameMatchingResourceSelector implements ResourceSelector {
@@ -72,9 +73,15 @@ public abstract class AbstractNameMatchingResourceSelector implements ResourceSe
 		}
 	}
 
-	public void setIncludeTypes(String... includeTypes) {
+	public void setIncludeTypesAsString(String commaDelimitedTypes) {
+		if (commaDelimitedTypes != null) {
+			setIncludeTypes(commaDelimitedTypes.split(","));
+		}
+	}
+
+	public void setIncludeTypes(String... types) {
 		this.includeTypes = new ArrayList<>();
-		for (String type : includeTypes) {
+		for (String type : types) {
 			// Make it easy to specify the two types of privileges
 			if ("privileges".equals(type)) {
 				this.includeTypes.add(MapResourceSelection.PRIVILEGES_EXECUTE);

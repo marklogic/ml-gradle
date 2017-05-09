@@ -2,6 +2,7 @@ package com.marklogic.appdeployer.scaffold;
 
 import java.io.File;
 
+import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import org.junit.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
@@ -35,7 +36,7 @@ public class GenerateScaffoldTest extends AbstractAppDeployerTest {
         appConfig.getModulePaths().clear();
         appConfig.getModulePaths().add(path + "/src/main/ml-modules");
 
-        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployTriggersDatabaseCommand(),
+        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployContentDatabasesCommand(), new DeployTriggersDatabaseCommand(),
                 new DeployUsersCommand(), new DeployRolesCommand(), buildLoadModulesCommand());
         appDeployer.deploy(appConfig);
 

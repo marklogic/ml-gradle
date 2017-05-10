@@ -9,6 +9,7 @@ import com.marklogic.appdeployer.command.CommandMapBuilder
 import com.marklogic.appdeployer.impl.SimpleAppDeployer
 import com.marklogic.gradle.task.DeleteModuleTimestampsFileTask
 import com.marklogic.gradle.task.DeployAppTask
+import com.marklogic.gradle.task.NewProjectTask
 import com.marklogic.gradle.task.PrintCommandsTask
 import com.marklogic.gradle.task.UndeployAppTask
 import com.marklogic.gradle.task.admin.InitTask
@@ -21,6 +22,7 @@ import com.marklogic.gradle.task.cpf.DeployCpfTask
 import com.marklogic.gradle.task.cpf.LoadDefaultPipelinesTask
 import com.marklogic.gradle.task.databases.*
 import com.marklogic.gradle.task.es.GenerateModelArtifactsTask
+import com.marklogic.gradle.task.export.ExportResourcesTask
 import com.marklogic.gradle.task.flexrep.*
 import com.marklogic.gradle.task.forests.ConfigureForestReplicasTask
 import com.marklogic.gradle.task.forests.DeleteForestReplicasTask
@@ -41,6 +43,7 @@ import com.marklogic.gradle.task.tasks.DeleteAllTasksTask
 import com.marklogic.gradle.task.tasks.DeployTasksTask
 import com.marklogic.gradle.task.tasks.UndeployTasksTask
 import com.marklogic.gradle.task.tasks.WaitForTaskServerTask
+import com.marklogic.gradle.task.temporal.DeployTemporalTask
 import com.marklogic.gradle.task.trigger.DeployTriggersTask
 import com.marklogic.gradle.task.viewschemas.DeployViewSchemasTask
 import com.marklogic.mgmt.DefaultManageConfigFactory
@@ -116,10 +119,12 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlSetContentUpdatesAllowed", type: SetContentUpdatesAllowedTask, group: dbGroup, description: "Sets updated-allowed on each primary forest for the content database; must set the mode via e.g. -Pmode=flash-backup")
 
 		String devGroup = "ml-gradle Development"
-		project.task("mlScaffold", type: GenerateScaffoldTask, group: devGroup, description: "Generate project scaffold for a new project")
 		project.task("mlCreateResource", type: CreateResourceTask, group: devGroup, description: "Create a new resource extension in the modules services directory; use -PresourceName and -PresourceType to set the resource name and type (either xqy or sjs)")
 		project.task("mlCreateTransform", type: CreateTransformTask, group: devGroup, description: "Create a new transform in the modules transforms directory; use -PtranssformName and -PtransformType to set the transform name and type (xqy, xsl, or sjs)")
+		project.task("mlExportResources", type: ExportResourcesTask, group: devGroup, description: "Export resources based on a properties file specified via -PpropertiesFile, -Pprefix, or -Pregex; use -PincludeTypes to select resource types to export via a comma-delimited string; use -PexportPath to specify where to export resources to")
 		project.task("mlPrepareRestApiDependencies", type: PrepareRestApiDependenciesTask, group: devGroup, dependsOn: project.configurations["mlRestApi"], description: "Downloads (if necessary) and unzips in the build directory all mlRestApi dependencies")
+		project.task("mlNewProject", type: NewProjectTask, group: devGroup, description: "Run a wizard for creating a new project, which includes running mlScaffold")
+		project.task("mlScaffold", type: GenerateScaffoldTask, group: devGroup, description: "Generate project scaffold for a new project")
 
 		String esGroup = "ml-gradle Entity Services"
 		project.task("mlGenerateModelArtifacts", type: GenerateModelArtifactsTask, group: esGroup, description: "Generate model artifacts for the Entity Services models in the default directory of ./data/entity-services")
@@ -189,6 +194,9 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlDeployTasks", type: DeployTasksTask, group: taskGroup, description: "Deploy each scheduled task, updating it if it exists, in the configuration directory")
 		project.task("mlUndeployTasks", type: UndeployTasksTask, group: taskGroup, description: "Undeploy (delete) each scheduled task in the configuration directory")
 		project.task("mlWaitForTaskServer", type: WaitForTaskServerTask, group: taskGroup, description: "Wait for the task server to not have any requests in progress")
+
+		String temporalGroup = "ml-gradle Temporal"
+		project.task("mlDeployTemporal", type: DeployTemporalTask, group: temporalGroup, description: "Deploy temporal configuration. Note that (currently) you can't update the temporal configuration (collection properties and LSQT properties excepted)")
 
 		String triggerGroup = "ml-gradle Trigger"
 		project.task("mlDeployTriggers", type: DeployTriggersTask, group: triggerGroup, description: "Deploy each trigger, updating it if it exists, in the configuration directory")

@@ -57,6 +57,28 @@ public class ManageClient extends LoggingObject {
         }
     }
 
+	/**
+	 * Use this when you want to provide your own RestTemplate as opposed to using the one that's constructed via a
+	 * ManageConfig instance.
+	 *
+	 * @param restTemplate
+	 */
+	public ManageClient(RestTemplate restTemplate) {
+    	this(restTemplate, restTemplate);
+    }
+
+	/**
+	 * Use this when you want to provide your own RestTemplate as opposed to using the one that's constructed via a
+	 * ManageConfig instance.
+	 *
+	 * @param restTemplate
+	 * @param adminRestTemplate
+	 */
+	public ManageClient(RestTemplate restTemplate, RestTemplate adminRestTemplate) {
+    	this.restTemplate = restTemplate;
+    	this.adminRestTemplate = adminRestTemplate;
+    }
+
     public ResponseEntity<String> putJson(String path, String json) {
         logRequest(path, "JSON", "PUT");
         return restTemplate.exchange(buildUri(path), HttpMethod.PUT, buildJsonEntity(json), String.class);
@@ -211,4 +233,12 @@ public class ManageClient extends LoggingObject {
     public ManageConfig getManageConfig() {
         return manageConfig;
     }
+
+	public void setRestTemplate(RestTemplate restTemplate) {
+		this.restTemplate = restTemplate;
+	}
+
+	public void setAdminRestTemplate(RestTemplate adminRestTemplate) {
+		this.adminRestTemplate = adminRestTemplate;
+	}
 }

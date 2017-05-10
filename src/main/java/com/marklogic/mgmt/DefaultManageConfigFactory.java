@@ -54,7 +54,13 @@ public class DefaultManageConfigFactory extends PropertySourceFactory implements
             c.setPassword(mlPassword);
         }
 
-        prop = getProperty("mlAdminUsername");
+	    prop = getProperty("mlManageScheme");
+	    if (prop != null) {
+		    logger.info("Manage scheme: " + prop);
+		    c.setScheme(prop);
+	    }
+
+	    prop = getProperty("mlAdminUsername");
         if (prop != null) {
             logger.info("Manage admin username: " + prop);
             c.setAdminUsername(prop);

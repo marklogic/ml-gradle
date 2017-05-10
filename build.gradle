@@ -28,7 +28,7 @@ repositories {
 }
 
 dependencies {
-  compile 'com.marklogic:ml-javaclient-util:DEV'
+  compile 'com.marklogic:ml-javaclient-util:' + mlJavaclientUtilVersion
   compile 'jaxen:jaxen:1.1.6'
   compile 'org.apache.httpcomponents:httpclient:4.3.5'
   compile 'org.springframework:spring-web:4.3.5.RELEASE'

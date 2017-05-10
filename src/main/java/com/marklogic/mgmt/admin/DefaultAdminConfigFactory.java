@@ -54,6 +54,12 @@ public class DefaultAdminConfigFactory extends PropertySourceFactory implements 
             c.setPassword(mlPassword);
         }
 
+	    prop = getProperty("mlAdminScheme");
+	    if (prop != null) {
+		    logger.info("Admin scheme: " + prop);
+		    c.setScheme(prop);
+	    }
+
         return c;
     }
 

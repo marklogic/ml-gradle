@@ -41,7 +41,7 @@ public class DeployContentDatabasesCommand extends DeployDatabaseCommand {
         if (count != null) {
             this.setForestsPerHost(count);
         }
-        
+
         super.execute(context);
 
         AppConfig appConfig = context.getAppConfig();
@@ -51,7 +51,13 @@ public class DeployContentDatabasesCommand extends DeployDatabaseCommand {
                 DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
                 String json = tokenReplacer.replaceTokens(payload, appConfig, true);
                 SaveReceipt receipt = dbMgr.save(json);
-                buildDeployForestsCommand(payload, receipt, context).execute(context);
+	            if (shouldCreateForests(context, payload)) {
+		            buildDeployForestsCommand(payload, receipt, context).execute(context);
+	            } else {
+		            if (logger.isInfoEnabled()) {
+			            logger.info("Found custom forests for database, so not creating default forests");
+		            }
+	            }
             }
         }
     }

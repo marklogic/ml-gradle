@@ -1,6 +1,5 @@
 {
 	"forest-name": "sample-app-content-custom-3",
 	"enabled": true,
-	"host": "%%CUSTOM_HOST%%",
 	"database": "%%DATABASE%%"
 }

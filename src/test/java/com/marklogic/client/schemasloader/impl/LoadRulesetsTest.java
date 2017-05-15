@@ -9,9 +9,6 @@ import org.junit.Test;
 
 import java.util.List;
 
-/**
- * Created by rrudin on 2/21/2017.
- */
 public class LoadRulesetsTest extends AbstractIntegrationTest {
 
 	/**

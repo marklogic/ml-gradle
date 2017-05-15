@@ -5,6 +5,7 @@ import com.marklogic.client.document.DocumentManager;
 import com.marklogic.client.document.DocumentWriteOperation;
 import com.marklogic.client.document.DocumentWriteSet;
 import com.marklogic.client.document.ServerTransform;
+import com.marklogic.client.io.Format;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,8 +22,16 @@ public class RestBatchWriter extends BatchWriterSupport {
 	private boolean releaseDatabaseClients = true;
 	private ServerTransform serverTransform;
 
+	// Specific to Client API 4.0.+
+	private Format contentFormat;
+
 	public RestBatchWriter(DatabaseClient databaseClient) {
+		this(databaseClient, true);
+	}
+
+	public RestBatchWriter(DatabaseClient databaseClient, boolean releaseDatabaseClients) {
 		this(Arrays.asList(databaseClient));
+		this.releaseDatabaseClients = releaseDatabaseClients;
 	}
 
 	public RestBatchWriter(List<DatabaseClient> databaseClients) {
@@ -30,10 +39,12 @@ public class RestBatchWriter extends BatchWriterSupport {
 	}
 
 	@Override
-	public void write(List<? extends DocumentWriteOperation> items) {
+	public RestBatchWriter write(List<? extends DocumentWriteOperation> items) {
+		initialize();
 		DatabaseClient client = determineDatabaseClientToUse();
 		Runnable runnable = buildRunnable(client, items);
 		executeRunnable(runnable, items);
+		return this;
 	}
 
 	protected DatabaseClient determineDatabaseClientToUse() {
@@ -50,6 +61,10 @@ public class RestBatchWriter extends BatchWriterSupport {
 			@Override
 			public void run() {
 				DocumentManager<?, ?> mgr = buildDocumentManager(client);
+				if (contentFormat != null) {
+					mgr.setContentFormat(contentFormat);
+				}
+
 				DocumentWriteSet set = mgr.newWriteSet();
 				for (DocumentWriteOperation item : items) {
 					set.add(item);
@@ -116,5 +131,9 @@ public class RestBatchWriter extends BatchWriterSupport {
 
 	protected ServerTransform getServerTransform() {
 		return serverTransform;
+	}
+
+	public void setContentFormat(Format contentFormat) {
+		this.contentFormat = contentFormat;
 	}
 }

@@ -42,7 +42,7 @@ public class XccAssetLoader extends LoggingObject implements FileVisitor<Path> {
     // Controls what files/directories are processed
     private FileFilter fileFilter = new AssetFileFilter();
 
-    // Default permissions and collections for each module
+    // Default permissions and queryCollections for each module
     private String permissions = "rest-admin,read,rest-admin,update,rest-extension-user,execute";
     private String[] collections;
 

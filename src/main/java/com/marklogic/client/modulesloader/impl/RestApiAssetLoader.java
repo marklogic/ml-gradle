@@ -37,7 +37,7 @@ public class RestApiAssetLoader extends LoggingObject implements FileVisitor<Pat
     // Controls what files/directories are processed
     private FileFilter fileFilter = new AssetFileFilter();
 
-    // Default permissions and collections for each module
+    // Default permissions and queryCollections for each module
     private String permissions = "rest-admin,read,rest-admin,update,rest-extension-user,execute";
     private String[] collections;
 
@@ -95,7 +95,7 @@ public class RestApiAssetLoader extends LoggingObject implements FileVisitor<Pat
     /**
      * Loads a file into the internally held DocumentWriteSet. If the writeCount is the batchSize or greater, than the
      * writeSet is written.
-     * 
+     *
      * @param uri
      * @param f
      */
@@ -181,7 +181,7 @@ public class RestApiAssetLoader extends LoggingObject implements FileVisitor<Pat
     /**
      * A bit of a hack so that any modules in the samplestack-inspired "ext" directory have "/ext" prepended to their
      * URI.
-     * 
+     *
      * @return
      */
     // protected boolean isNotRootAssetsPath() {

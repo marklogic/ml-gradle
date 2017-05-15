@@ -18,8 +18,9 @@ public interface BatchWriter {
 	 * Write the given list of documents, as defined by the Java Client DocumentWriteOperation interface.
 	 *
 	 * @param items
+	 * @return the instance of this class, typically so waitFroCompletion can be called next
 	 */
-	void write(List<? extends DocumentWriteOperation> items);
+	BatchWriter write(List<? extends DocumentWriteOperation> items);
 
 	/**
 	 * Assuming that the writer is using a multi-threaded approach, call this to wait for the writer to finish

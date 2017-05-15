@@ -26,10 +26,11 @@ public class XccBatchWriter extends BatchWriterSupport {
 	}
 
 	@Override
-	public void write(final List<? extends DocumentWriteOperation> items) {
+	public XccBatchWriter write(final List<? extends DocumentWriteOperation> items) {
 		ContentSource contentSource = determineContentSourceToUse();
 		Runnable runnable = buildRunnable(contentSource, items);
 		executeRunnable(runnable, items);
+		return this;
 	}
 
 	protected ContentSource determineContentSourceToUse() {

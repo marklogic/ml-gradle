@@ -1,3 +1,12 @@
+buildscript {
+	repositories {
+		jcenter()
+	}
+	dependencies {
+		classpath "com.smokejumperit.gradle.license:Gradle-License-Report:0.0.2"
+	}
+}
+
 plugins {
   id "java"
   id "maven-publish"
@@ -6,24 +15,34 @@ plugins {
   id "com.jfrog.bintray" version "1.5"
 }
 
+// gradle dependencyLicenseReport to generate your report in build/reports/dependency-license
+apply plugin:'license-report'
+
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
 
 repositories {
   jcenter()
+	mavenCentral()
+	maven { url "http://developer.marklogic.com/maven2/" }
 }
 
 dependencies {
-  compile 'com.marklogic:java-client-api:3.0.5'
-  compile 'com.marklogic:marklogic-xcc:8.0.5'
-  compile 'org.jdom:jdom2:2.0.5'
-  compile 'org.springframework:spring-context:4.3.5.RELEASE'
+  compile 'com.marklogic:marklogic-client-api:4.0.1'
+  compile 'com.marklogic:marklogic-xcc:9.0.1'
+  compile 'org.jdom:jdom2:2.0.6'
+  compile 'org.springframework:spring-context:4.3.7.RELEASE'
 
   testCompile 'junit:junit:4+'
-  testCompile 'org.springframework:spring-test:4.3.5.RELEASE'
+  testCompile 'org.springframework:spring-test:4.3.7.RELEASE'
 
   // Used for testing loading modules from the classpath
   testRuntime files("lib/modules.jar")
+
+	// Forcing Spring to use logback instead of commons-logging
+	testRuntime "ch.qos.logback:logback-classic:1.1.8"
+	testRuntime group: "org.slf4j", name: "jcl-over-slf4j", version: "1.7.22"
+	testRuntime group: "org.slf4j", name: "slf4j-api", version: "1.7.22"
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {

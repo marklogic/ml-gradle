@@ -19,6 +19,7 @@ public class DocumentFile implements DocumentWriteOperation {
 	private File file;
 	private Format format;
 	private DocumentMetadataHandle documentMetadata;
+	private String temporalDocumentURI;
 
 	public DocumentFile(String uri, File file) {
 		this.uri = uri;
@@ -56,6 +57,11 @@ public class DocumentFile implements DocumentWriteOperation {
 		return format != null ? h.withFormat(format) : h;
 	}
 
+	@Override
+	public String getTemporalDocumentURI() {
+		return temporalDocumentURI;
+	}
+
 	public void setFormat(Format format) {
 		this.format = format;
 	}
@@ -78,5 +84,9 @@ public class DocumentFile implements DocumentWriteOperation {
 
 	public Format getFormat() {
 		return format;
+	}
+
+	public void setTemporalDocumentURI(String temporalDocumentURI) {
+		this.temporalDocumentURI = temporalDocumentURI;
 	}
 }

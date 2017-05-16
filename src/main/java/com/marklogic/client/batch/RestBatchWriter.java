@@ -39,12 +39,11 @@ public class RestBatchWriter extends BatchWriterSupport {
 	}
 
 	@Override
-	public RestBatchWriter write(List<? extends DocumentWriteOperation> items) {
+	public void write(List<? extends DocumentWriteOperation> items) {
 		initialize();
 		DatabaseClient client = determineDatabaseClientToUse();
 		Runnable runnable = buildRunnable(client, items);
 		executeRunnable(runnable, items);
-		return this;
 	}
 
 	protected DatabaseClient determineDatabaseClientToUse() {

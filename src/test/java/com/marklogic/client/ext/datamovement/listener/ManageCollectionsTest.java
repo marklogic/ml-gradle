@@ -23,10 +23,12 @@ public class ManageCollectionsTest extends AbstractIntegrationTest {
 		qbt.applyOnDocuments(new DeleteListener(), "1.xml", "2.xml");
 
 		// Insert documents
-		new RestBatchWriter(client, false).write(Arrays.asList(
+		RestBatchWriter writer = new RestBatchWriter(client, false);
+		writer.write(Arrays.asList(
 			new SimpleDocumentWriteOperation("1.xml", "<one/>", COLLECTION),
 			new SimpleDocumentWriteOperation("2.xml", "<two/>", COLLECTION)
-		)).waitForCompletion();
+		));
+		writer.waitForCompletion();
 
 		// Set collections
 		qbt.applyOnCollections(new SetCollectionsListener(COLLECTION, "red"), COLLECTION);

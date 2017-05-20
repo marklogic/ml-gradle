@@ -1,6 +1,6 @@
 plugins {
-	id "com.marklogic.ml-gradle" version "2.7.0"
 	id "net.saliman.properties" version "1.4.6"
+	id "com.marklogic.ml-gradle" version "2.7.0"
 }
 
 task printHost {

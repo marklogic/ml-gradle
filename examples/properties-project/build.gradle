@@ -1,5 +1,8 @@
 plugins {
+	// The properties plugin must be applied BEFORE ml-gradle so that ml-gradle sees the results of the properties plugin
+	// processing the gradle-(environmentName).properties files.
 	id "net.saliman.properties" version "1.4.6"
+	
 	id "com.marklogic.ml-gradle" version "2.7.0"
 }
 

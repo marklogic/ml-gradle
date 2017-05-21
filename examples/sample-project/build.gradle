@@ -3,7 +3,7 @@
  * that those blocks can override properties before ml-gradle initializes itself.
  */
 plugins {
-  id "com.marklogic.ml-gradle" version "2.7.0"
+  id "com.marklogic.ml-gradle" version "2.7.1"
 
   // The following plugins are optional
 

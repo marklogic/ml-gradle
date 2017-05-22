@@ -2,7 +2,10 @@ package com.marklogic.client.modulesloader;
 
 import java.io.File;
 
+/**
+ * Given a directory, return a Modules instance capturing all of the REST API modules to load.
+ */
 public interface ModulesFinder {
 
-    public Modules findModules(File dir);
+    Modules findModules(File dir);
 }

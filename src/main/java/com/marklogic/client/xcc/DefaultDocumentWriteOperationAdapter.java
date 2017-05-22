@@ -39,7 +39,7 @@ public class DefaultDocumentWriteOperationAdapter implements DocumentWriteOperat
 	}
 
 	/**
-	 * TODO Only adapts queryCollections, quality, format, and permissions so far.
+	 * TODO Only adapts collections, quality, format, and permissions so far.
 	 *
 	 * @param handle
 	 * @return

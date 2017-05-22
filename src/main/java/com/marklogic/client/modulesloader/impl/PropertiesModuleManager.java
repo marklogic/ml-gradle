@@ -11,7 +11,7 @@ import com.marklogic.client.modulesloader.ModulesManager;
 
 public class PropertiesModuleManager extends LoggingObject implements ModulesManager {
 
-    public static final String DEFAULT_FILE_PATH = "build/ml-last-configured-timestamps.properties";
+    public static final String DEFAULT_FILE_PATH = "build/ml-javaclient-util/module-timestamps.properties";
 
     private Properties props;
     private File propertiesFile;
@@ -87,7 +87,7 @@ public class PropertiesModuleManager extends LoggingObject implements ModulesMan
      * Lower-casing avoids some annoying issues on Windows where sometimes you get "C:" at the start, and other times
      * you get "c:". This of course will be a problem if you for some reason have modules with the same names but
      * differing in some cases, but I'm not sure why anyone would do that.
-     * 
+     *
      * @param file
      * @return
      */

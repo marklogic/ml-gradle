@@ -1,7 +1,7 @@
 package com.marklogic.client.schemasloader.impl;
 
-import com.marklogic.client.file.DocumentFile;
-import com.marklogic.client.file.DocumentFileProcessor;
+import com.marklogic.client.ext.file.DocumentFile;
+import com.marklogic.client.ext.file.DocumentFileProcessor;
 import com.marklogic.client.helper.LoggingObject;
 import com.marklogic.client.io.Format;
 

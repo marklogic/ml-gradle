@@ -11,9 +11,9 @@ public interface ModulesManager {
     /**
      * Give the implementor a chance to initialize itself - e.g. loading data from a properties file or other resource.
      */
-    public void initialize();
+    void initialize();
 
-    public boolean hasFileBeenModifiedSinceLastInstalled(File file);
+    boolean hasFileBeenModifiedSinceLastInstalled(File file);
 
-    public void saveLastInstalledTimestamp(File file, Date date);
+    void saveLastInstalledTimestamp(File file, Date date);
 }

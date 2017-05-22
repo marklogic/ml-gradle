@@ -1,7 +1,7 @@
 package com.marklogic.client.schemasloader.impl;
 
 import com.marklogic.client.AbstractIntegrationTest;
-import com.marklogic.client.file.DocumentFile;
+import com.marklogic.client.ext.file.DocumentFile;
 import com.marklogic.client.helper.ClientHelper;
 import org.junit.Before;
 import org.junit.Test;

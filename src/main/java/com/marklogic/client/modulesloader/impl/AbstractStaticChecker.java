@@ -1,6 +1,8 @@
 package com.marklogic.client.modulesloader.impl;
 
+import com.marklogic.client.ext.file.DocumentFile;
 import com.marklogic.client.helper.LoggingObject;
+import com.marklogic.client.io.Format;
 
 import java.util.List;
 
@@ -13,15 +15,15 @@ public abstract class AbstractStaticChecker extends LoggingObject implements Sta
 	private boolean bulkCheck = false;
 
 	@Override
-	public void checkLoadedAssets(List<LoadedAsset> assets) {
+	public void checkLoadedAssets(List<DocumentFile> assets) {
 		if (assets == null || assets.isEmpty()) {
 			return;
 		}
 		if (bulkCheck) {
 			performBulkStaticCheck(assets);
 		} else {
-			for (LoadedAsset asset : assets) {
-				if (asset.isCanBeStaticallyChecked()) {
+			for (DocumentFile asset : assets) {
+				if (canBeStaticallyChecked(asset)) {
 					staticallyCheckModule(asset.getUri());
 				}
 			}
@@ -48,10 +50,16 @@ public abstract class AbstractStaticChecker extends LoggingObject implements Sta
 		}
 	}
 
-	protected void performBulkStaticCheck(List<LoadedAsset> assets) {
+	protected boolean canBeStaticallyChecked(DocumentFile asset) {
+		Format format = asset.getFormat();
+		return format != null && (format.equals(Format.JSON) || format.equals(Format.TEXT)
+			|| format.equals(Format.XML));
+	}
+
+	protected void performBulkStaticCheck(List<DocumentFile> assets) {
 		String xquery = "let $uris := (";
-		for (LoadedAsset asset : assets) {
-			if (asset.isCanBeStaticallyChecked()) {
+		for (DocumentFile asset : assets) {
+			if (canBeStaticallyChecked(asset)) {
 				String uri = asset.getUri();
 				if (!xquery.endsWith("(")) {
 					xquery += ",";

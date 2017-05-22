@@ -1,8 +1,13 @@
 package com.marklogic.client.modulesloader.impl;
 
+import com.marklogic.client.ext.file.DocumentFile;
+
 import java.util.List;
 
+/**
+ * Interface for performing static checks on a list of modules that have been loaded into MarkLogic already.
+ */
 public interface StaticChecker {
 
-	public void checkLoadedAssets(List<LoadedAsset> assets);
+	void checkLoadedAssets(List<DocumentFile> documentFiles);
 }

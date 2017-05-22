@@ -44,6 +44,7 @@ public abstract class BatchWriterSupport extends LoggingObject implements BatchW
 			if (logger.isInfoEnabled()) {
 				logger.info("Thread pool finished shutdown");
 			}
+			taskExecutor = null;
 		}
 	}
 

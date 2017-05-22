@@ -17,6 +17,12 @@ public abstract class AbstractIntegrationTest extends Assert {
 	protected DatabaseClientConfig clientConfig;
 	protected DatabaseClient client;
 
+	protected DatabaseClient newClient() {
+		client = DatabaseClientFactory.newClient(clientConfig.getHost(), clientConfig.getPort(), clientConfig.getUsername(),
+			clientConfig.getPassword(), DatabaseClientFactory.Authentication.DIGEST);
+		return client;
+	}
+
 	protected DatabaseClient newClient(String database) {
 		client = DatabaseClientFactory.newClient(clientConfig.getHost(), clientConfig.getPort(), database, clientConfig.getUsername(),
 			clientConfig.getPassword(), DatabaseClientFactory.Authentication.DIGEST);

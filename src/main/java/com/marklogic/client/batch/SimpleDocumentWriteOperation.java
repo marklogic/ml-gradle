@@ -8,7 +8,7 @@ import com.marklogic.client.io.marker.DocumentMetadataWriteHandle;
 
 /**
  * Implementation of DocumentWriteOperation for a simple use case of inserting a document with a URI, a String
- * body, and zero or more queryCollections.
+ * body, and zero or more collections.
  */
 public class SimpleDocumentWriteOperation implements DocumentWriteOperation {
 

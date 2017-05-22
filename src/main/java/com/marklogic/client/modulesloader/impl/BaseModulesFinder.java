@@ -39,7 +39,7 @@ public abstract class BaseModulesFinder implements ModulesFinder {
 
     /**
      * Only supports JSON for now.
-     * 
+     *
      * @param modules
      * @param baseDir
      */
@@ -65,11 +65,11 @@ public abstract class BaseModulesFinder implements ModulesFinder {
 
     protected void addAssetDirectories(Modules modules, File baseDir) {
         List<Resource> dirs = new ArrayList<>();
-        File dir = new File(baseDir, "ext");
+        File dir = new File(baseDir, extPath);
         if (dir.exists()) {
             dirs.add(new FileSystemResource(dir));
         }
-        dir = new File(baseDir, "root");
+        dir = new File(baseDir, rootPath);
         if (dir.exists()) {
             dirs.add(new FileSystemResource(dir));
         }
@@ -174,15 +174,6 @@ public abstract class BaseModulesFinder implements ModulesFinder {
     public void setRootPath(String rootPath) {
         this.rootPath = rootPath;
     }
-}
-
-class AssetFilenameFilter implements FilenameFilter {
-
-    @Override
-    public boolean accept(File dir, String name) {
-        return !name.startsWith(".");
-    }
-
 }
 
 class TransformFilenameFilter implements FilenameFilter {

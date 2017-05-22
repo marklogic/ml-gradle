@@ -40,7 +40,7 @@ public class ManageCollectionsTest extends AbstractIntegrationTest {
 		assertUriInCollections("1.xml", COLLECTION, "red", "blue", "green");
 		assertUriInCollections("2.xml", COLLECTION, "red", "blue", "green");
 
-		// Remove queryCollections
+		// Remove collections
 		qbt.applyOnCollections(new RemoveCollectionsListener("red", "blue", "green"), COLLECTION);
 		assertUriInCollections("1.xml", COLLECTION);
 		assertUriInCollections("2.xml", COLLECTION);

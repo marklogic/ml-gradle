@@ -63,7 +63,18 @@ class NewProjectTask extends MarkLogicTask {
 
 		if (ant.mlScaffold == "y") {
 			println "Writing project scaffolding files"
-			new ScaffoldGenerator().generateScaffold(".", getAppConfig())
+			def appConfig = getAppConfig()
+			appConfig.setName(ant.mlAppName)
+			appConfig.setHost(ant.mlHost)
+			appConfig.setRestAdminUsername(ant.mlUsername)
+			appConfig.setRestAdminPassword(ant.mlPassword)
+			if (ant.mlRestPort) {
+				appConfig.setRestPort(Integer.parseInt(ant.mlRestPort))
+			}
+			if (ant.mlTestRestPort) {
+				appConfig.setTestRestPort(Integer.parseInt(ant.mlTestRestPort))
+			}
+			new ScaffoldGenerator().generateScaffold(".", appConfig)
 		}
 	}
 

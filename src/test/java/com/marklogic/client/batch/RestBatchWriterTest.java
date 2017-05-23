@@ -42,7 +42,7 @@ public class RestBatchWriterTest extends AbstractIntegrationTest {
 	}
 
 	@Test
-	public void writeDocumentWithTransfer() throws IOException {
+	public void writeDocumentWithTransform() throws IOException {
 		DatabaseClient client = newClient("Documents");
 		Resource transform = new FileSystemResource("./src/test/resources/transform/simple.xqy");
 		TransformExtensionsManager transMgr = client.newServerConfigManager().newTransformExtensionsManager();
@@ -58,6 +58,7 @@ public class RestBatchWriterTest extends AbstractIntegrationTest {
 		client = newClient("Documents");
 		RestBatchWriter writer = new RestBatchWriter(client);
 		writer.setServerTransform(new ServerTransform("simple"));
+		writer.setContentFormat(Format.XML);
 		writer.initialize();
 		writer.write(Arrays.asList(op));
 		writer.waitForCompletion();
@@ -65,9 +66,9 @@ public class RestBatchWriterTest extends AbstractIntegrationTest {
 
 		client = newClient("Documents");
 		XMLDocumentManager docMgr = client.newXMLDocumentManager();
-		DocumentPage page = docMgr.read("./test.xml");
+		DocumentPage page = docMgr.read("/test.xml");
 		StringHandle handle = page.nextContent(new StringHandle());
-		assertTrue(handle.toString().startsWith("<hello>"));
+		assertTrue(handle.toString().contains("<transform/>"));
 
 	}
 }

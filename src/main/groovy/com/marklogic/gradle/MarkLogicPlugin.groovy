@@ -33,6 +33,7 @@ import com.marklogic.gradle.task.groups.SetTraceEventsTask
 import com.marklogic.gradle.task.mimetypes.DeployMimetypesTask
 import com.marklogic.gradle.task.qconsole.ExportWorkspacesTask
 import com.marklogic.gradle.task.qconsole.ImportWorkspacesTask
+import com.marklogic.gradle.task.roxy.MLRoxyCopyProperties
 import com.marklogic.gradle.task.scaffold.GenerateScaffoldTask
 import com.marklogic.gradle.task.schemas.LoadSchemasTask
 import com.marklogic.gradle.task.security.*
@@ -206,6 +207,9 @@ class MarkLogicPlugin implements Plugin<Project> {
 
 		String shellGroup = "ml-gradle Shell"
 		project.task("mlShell", type: ShellTask, group: shellGroup, description: "Run groovysh with MarkLogic-specific support built in")
+
+		String roxyGroup = "ml-gradle Roxy";
+		project.task("mlRoxyCopyProperties", type: MLRoxyCopyProperties, group: roxyGroup, description: "Copy Roxy properties to gradle.properties file")
 
 		logger.info("Finished initializing ml-gradle\n")
 	}

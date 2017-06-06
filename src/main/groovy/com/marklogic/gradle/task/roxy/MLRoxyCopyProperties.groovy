@@ -28,7 +28,7 @@ class MLRoxyCopyProperties extends MarkLogicTask {
 					if (!line.startsWith("#") && !line.isEmpty()) {
 						def keyValue = line.split("=")
 						if(keyValue.length == 2)
-						roxyProperties.put(keyValue[0], keyValue[1])
+							roxyProperties.put(keyValue[0], keyValue[1])
 						allRoxyProperties.add(keyValue[0])
 					}
 				}

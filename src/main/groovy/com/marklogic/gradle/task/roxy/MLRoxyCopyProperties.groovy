@@ -56,4 +56,8 @@ class MLRoxyCopyProperties extends MarkLogicTask {
 			}
 		}
 	}
+
+	String getRoxyHome(){
+		project.hasProperty("mlRoxyHome") ? project.property("mlRoxyHome") : null
+	}
 }

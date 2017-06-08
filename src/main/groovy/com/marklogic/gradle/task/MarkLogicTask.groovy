@@ -44,10 +44,6 @@ class MarkLogicTask extends DefaultTask {
 		project.hasProperty("mlAdminPassword") ? project.property("mlAdminPassword") : project.property("mlPassword")
 	}
 
-	String getRoxyHome(){
-		project.hasProperty("mlRoxyHome") ? project.property("mlRoxyHome") : null
-	}
-
     DatabaseClient newClient() {
         getAppConfig().newDatabaseClient()
     }

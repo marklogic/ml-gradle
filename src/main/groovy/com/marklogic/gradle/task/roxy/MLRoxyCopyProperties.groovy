@@ -21,7 +21,7 @@ class MLRoxyCopyProperties extends MarkLogicTask {
 
 	@TaskAction
 	void copyProperties() {
-		if (null != getRoxyHome()) {
+		if (getRoxyHome()) {
 			Map roxyProperties = new LinkedHashMap()
 			roxyPropertyFiles.each { propertyFile ->
 				new File(getRoxyHome() + "/deploy/", propertyFile).eachLine { line ->
@@ -47,8 +47,7 @@ class MLRoxyCopyProperties extends MarkLogicTask {
 		file.withWriter { writer ->
 			roxyGradleMapping.each { k, v ->
 				def val = roxyProperties.get(k)
-				if (null != val)
-					writer.append(v).append("=").append(val).append("\n")
+				if (val) writer.append(v).append("=").append(val).append("\n")
 			}
 			allRoxyProperties.removeAll(roxyGradleMapping.keySet())
 			allRoxyProperties.each{ prop ->
@@ -58,6 +57,6 @@ class MLRoxyCopyProperties extends MarkLogicTask {
 	}
 
 	String getRoxyHome(){
-		project.hasProperty("mlRoxyHome") ? project.property("mlRoxyHome") : null
+		project.hasProperty("mlRoxyHome") ? project.property("mlRoxyHome") : ""
 	}
 }

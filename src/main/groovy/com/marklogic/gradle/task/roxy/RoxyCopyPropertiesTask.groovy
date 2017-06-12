@@ -3,7 +3,7 @@ package com.marklogic.gradle.task.roxy
 import com.marklogic.gradle.task.MarkLogicTask
 import org.gradle.api.tasks.TaskAction
 
-class MLRoxyCopyProperties extends MarkLogicTask {
+class RoxyCopyPropertiesTask extends MarkLogicTask {
 
 	Set<String> allRoxyProperties = new LinkedHashSet<>()
 	def roxyPropertyFiles = ["default.properties", "build.properties"]

@@ -11,3 +11,4 @@ setenv.bat
 src/test/resources/scaffold-test/
 .DS_Store
 src/test/resources/entity-services-project/src
+*.iml

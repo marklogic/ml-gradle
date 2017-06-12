@@ -1,22 +1,11 @@
-buildscript {
-	repositories {
-		jcenter()
-	}
-	dependencies {
-		classpath "com.smokejumperit.gradle.license:Gradle-License-Report:0.0.2"
-	}
-}
-
 plugins {
   id "java"
   id "maven-publish"
   id "eclipse"
   id "idea"
   id "com.jfrog.bintray" version "1.5"
+	id "com.github.jk1.dependency-license-report" version "0.3.11"
 }
-
-// gradle dependencyLicenseReport to generate your report in build/reports/dependency-license
-apply plugin:'license-report'
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"

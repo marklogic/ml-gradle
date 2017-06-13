@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.marklogic.appdeployer.AppConfig;
 
-public class DefaultTokenReplacer implements TokenReplacer {
+public class DefaultPayloadTokenReplacer implements PayloadTokenReplacer {
 
     public String replaceTokens(String payload, AppConfig appConfig, boolean isTestResource) {
         payload = replaceDefaultTokens(payload, appConfig, isTestResource);

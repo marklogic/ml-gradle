@@ -1,6 +1,7 @@
 package com.marklogic.appdeployer;
 
 import com.marklogic.appdeployer.command.Command;
+import com.marklogic.appdeployer.command.modules.DefaultModulesLoaderFactory;
 import com.marklogic.appdeployer.command.modules.LoadModulesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.appdeployer.impl.SimpleAppDeployer;
@@ -80,8 +81,8 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
      */
     protected LoadModulesCommand buildLoadModulesCommand() {
         LoadModulesCommand command = new LoadModulesCommand();
-        DefaultModulesLoader loader = new DefaultModulesLoader(appConfig.newXccAssetLoader());
-		loader.setStaticChecker(appConfig.newStaticChecker());
+        appConfig.setModuleTimestampsPath(null);
+        DefaultModulesLoader loader = (DefaultModulesLoader)(new DefaultModulesLoaderFactory().newModulesLoader(appConfig));
         loader.setModulesManager(null);
         command.setModulesLoader(loader);
         return command;

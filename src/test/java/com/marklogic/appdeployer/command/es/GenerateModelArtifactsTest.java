@@ -20,7 +20,7 @@ public class GenerateModelArtifactsTest extends AbstractAppDeployerTest {
 	public void tearDown() {
 		initializeAppDeployer(new DeployContentDatabasesCommand(), new DeploySchemasDatabaseCommand(),
 			new DeployRestApiServersCommand());
-		//undeploySampleApp();
+		undeploySampleApp();
 	}
 
 	@Test

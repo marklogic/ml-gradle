@@ -25,7 +25,7 @@ public class ModifyLocalClusterCommand extends AbstractCommand {
 			for (File f : configDir.listFiles()) {
 				if (f.isFile() && f.getName().startsWith("local-cluster")) {
 					String payload = copyFileToString(f);
-					payload = tokenReplacer.replaceTokens(payload, context.getAppConfig(), false);
+					payload = payloadTokenReplacer.replaceTokens(payload, context.getAppConfig(), false);
 					new ClusterManager(context.getManageClient()).modifyLocalCluster(payload, context.getAdminManager());
 				}
 			}

@@ -127,19 +127,19 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 
     /**
      * Builds the XML or JSON payload for this command, based on the given CommandContext.
-     * 
+     *
      * @param context
      * @return
      */
     public String buildPayload(CommandContext context) {
         String payload = getPayload(context);
-        return payload != null ? tokenReplacer.replaceTokens(payload, context.getAppConfig(), false) : null;
+        return payload != null ? payloadTokenReplacer.replaceTokens(payload, context.getAppConfig(), false) : null;
     }
 
     /**
      * Get the payload based on the given CommandContext. Only loads the payload, does not replace any tokens in it.
      * Call buildPayload to construct a payload with all tokens replaced.
-     * 
+     *
      * @param context
      * @return
      */
@@ -196,7 +196,7 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 
     /**
      * Allows for how an instance of DeployForestsCommand is built to be overridden by a subclass.
-     * 
+     *
      * @param dbPayload
      *            Needed so we can look up forest counts based on the database name
      * @param receipt
@@ -217,7 +217,7 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
     /**
      * Checks the forestCounts map in AppConfig to see if the client has specified a number of forests per host for this
      * database.
-     * 
+     *
      * @param dbPayload
      * @param context
      * @return

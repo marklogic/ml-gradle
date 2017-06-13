@@ -1,18 +1,19 @@
 package com.marklogic.appdeployer.util;
 
-import java.io.File;
-import java.util.List;
-
+import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.DefaultAppConfigFactory;
+import com.marklogic.appdeployer.command.modules.DefaultModulesLoaderFactory;
+import com.marklogic.appdeployer.command.modules.ModulesLoaderFactory;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.helper.LoggingObject;
 import com.marklogic.client.modulesloader.ModulesFinder;
+import com.marklogic.client.modulesloader.ModulesLoader;
 import com.marklogic.client.modulesloader.impl.DefaultModulesFinder;
 import com.marklogic.client.modulesloader.impl.DefaultModulesLoader;
-import com.marklogic.client.modulesloader.impl.PropertiesModuleManager;
-import com.marklogic.client.modulesloader.impl.XccAssetLoader;
-import com.marklogic.appdeployer.AppConfig;
-import com.marklogic.appdeployer.DefaultAppConfigFactory;
 import com.marklogic.mgmt.util.SystemPropertySource;
+
+import java.io.File;
+import java.util.List;
 
 /**
  * This is a hacked together prototype of loading modules from within groovysh. The idea is that all the necessary
@@ -22,46 +23,51 @@ import com.marklogic.mgmt.util.SystemPropertySource;
  */
 public class ModulesWatcher extends LoggingObject implements Runnable {
 
-    private long sleepTime = 1000;
+	private long sleepTime = 1000;
+	private AppConfig appConfig;
+	private ModulesLoaderFactory modulesLoaderFactory;
 
-    private AppConfig appConfig;
+	public ModulesWatcher(AppConfig appConfig) {
+		this.appConfig = appConfig;
+		this.modulesLoaderFactory = new DefaultModulesLoaderFactory();
+	}
 
-    public ModulesWatcher(AppConfig appConfig) {
-        this.appConfig = appConfig;
-    }
+	public static void startFromSystemProps() {
+		ModulesWatcher mw = new ModulesWatcher(new DefaultAppConfigFactory(new SystemPropertySource()).newAppConfig());
+		new Thread(mw).start();
+	}
 
-    public static void startFromSystemProps() {
-        ModulesWatcher mw = new ModulesWatcher(new DefaultAppConfigFactory(new SystemPropertySource()).newAppConfig());
-        new Thread(mw).start();
-    }
+	@Override
+	public void run() {
+		ModulesLoader loader = modulesLoaderFactory.newModulesLoader(appConfig);
+		if (loader instanceof DefaultModulesLoader) {
+			((DefaultModulesLoader) loader).setCatchExceptions(true);
+		}
 
-    @Override
-    public void run() {
-        XccAssetLoader xal = appConfig.newXccAssetLoader();
-        DefaultModulesLoader loader = new DefaultModulesLoader(xal);
-        String path = appConfig.getModuleTimestampsPath();
-        if (path != null) {
-        	loader.setModulesManager(new PropertiesModuleManager(new File(path)));
-        }
-		loader.setStaticChecker(appConfig.newStaticChecker());
-        loader.setCatchExceptions(true);
-        DatabaseClient client = appConfig.newDatabaseClient();
-        List<String> paths = appConfig.getModulePaths();
-        ModulesFinder finder = new DefaultModulesFinder();
-        while (true) {
-            for (String modulesPath : paths) {
-                loader.loadModules(new File(modulesPath), finder, client);
-            }
-            try {
-                Thread.sleep(sleepTime);
-            } catch (InterruptedException ie) {
-                // Ignore
-            }
-        }
-    }
+		DatabaseClient client = appConfig.newDatabaseClient();
+		List<String> paths = appConfig.getModulePaths();
+		ModulesFinder finder = new DefaultModulesFinder();
+		while (true) {
+			for (String modulesPath : paths) {
+				loader.loadModules(new File(modulesPath), finder, client);
+			}
+			try {
+				Thread.sleep(sleepTime);
+			} catch (InterruptedException ie) {
+				// Ignore
+			}
+		}
+	}
 
-    public void setSleepTime(long sleepTime) {
-        this.sleepTime = sleepTime;
-    }
+	public void setSleepTime(long sleepTime) {
+		this.sleepTime = sleepTime;
+	}
 
+	public ModulesLoaderFactory getModulesLoaderFactory() {
+		return modulesLoaderFactory;
+	}
+
+	public void setModulesLoaderFactory(ModulesLoaderFactory modulesLoaderFactory) {
+		this.modulesLoaderFactory = modulesLoaderFactory;
+	}
 }

@@ -4,20 +4,16 @@ import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.DatabaseClientFactory.Authentication;
 import com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier;
-import com.marklogic.client.modulesloader.impl.StaticChecker;
-import com.marklogic.client.modulesloader.impl.XccAssetLoader;
-import com.marklogic.client.modulesloader.impl.XccStaticChecker;
+import com.marklogic.client.ext.tokenreplacer.PropertiesSource;
+import com.marklogic.client.modulesloader.impl.PropertiesModuleManager;
 import com.marklogic.client.modulesloader.ssl.SimpleX509TrustManager;
-import com.marklogic.client.modulesloader.tokenreplacer.DefaultModuleTokenReplacer;
-import com.marklogic.client.modulesloader.tokenreplacer.ModuleTokenReplacer;
-import com.marklogic.client.modulesloader.tokenreplacer.PropertiesSource;
-import com.marklogic.client.modulesloader.tokenreplacer.RoxyModuleTokenReplacer;
-import com.marklogic.client.modulesloader.xcc.DefaultDocumentFormatGetter;
-import com.marklogic.xcc.template.XccTemplate;
 
 import javax.net.ssl.SSLContext;
 import java.io.FileFilter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Encapsulates common configuration properties for an application deployed to MarkLogic. These properties include not
@@ -68,6 +64,10 @@ public class AppConfig {
     private SSLHostnameVerifier restSslHostnameVerifier;
     private Authentication restAuthentication = Authentication.DIGEST;
 
+    private SSLContext appServicesSslContext;
+    private SSLHostnameVerifier appServicesSslHostnameVerifier;
+    private Authentication appServicesAuthentication = Authentication.DIGEST;
+
     private Integer restPort = DEFAULT_PORT;
     private Integer testRestPort;
     private Integer appServicesPort = 8000;
@@ -87,12 +87,12 @@ public class AppConfig {
 	private boolean staticCheckAssets = false;
 	private boolean staticCheckLibraryAssets = false;
 	private boolean bulkLoadAssets = true;
-	private String moduleTimestampsPath;
+	private String moduleTimestampsPath = PropertiesModuleManager.DEFAULT_FILE_PATH;
 
     private String schemasPath;
     private ConfigDir configDir;
 
-    // Passed into the TokenReplacer that subclasses of AbstractCommand use
+    // Passed into the PayloadTokenReplacer that subclasses of AbstractCommand use
     private Map<String, String> customTokens = new HashMap<>();
 
     // Allows for creating a triggers database without a config file for one
@@ -183,88 +183,21 @@ public class AppConfig {
                 getRestAdminPassword(), getRestAuthentication(), getRestSslContext(), getRestSslHostnameVerifier());
     }
 
+    public DatabaseClient newModulesDatabaseClient() {
+	    return DatabaseClientFactory.newClient(getHost(), getAppServicesPort(), getModulesDatabaseName(),
+		    getRestAdminUsername(), getRestAdminPassword(), getAppServicesAuthentication(), getAppServicesSslContext(),
+		    getAppServicesSslHostnameVerifier());
+    }
+
     /**
      * Like newDatabaseClient, but connects to schemas database.
      *
      * @return
      */
     public DatabaseClient newSchemasDatabaseClient() {
-        return DatabaseClientFactory.newClient(getHost(), getRestPort(), getSchemasDatabaseName(),
-                getRestAdminUsername(), getRestAdminPassword(), getRestAuthentication(), getRestSslContext(),
-                getRestSslHostnameVerifier());
-    }
-
-	public StaticChecker newStaticChecker() {
-		if (isStaticCheckAssets()) {
-			String xccUri = "xcc://%s:%s@%s:%d";
-			xccUri = String.format(xccUri, getRestAdminUsername(), getRestAdminPassword(), getHost(), getRestPort());
-			XccStaticChecker checker = new XccStaticChecker(new XccTemplate(xccUri));
-			checker.setBulkCheck(isBulkLoadAssets());
-			checker.setCheckLibraryModules(isStaticCheckLibraryAssets());
-			return checker;
-		}
-		return null;
-	}
-
-	/**
-     * @return an XccAssetLoader based on the configuration properties in this class
-     */
-    public XccAssetLoader newXccAssetLoader() {
-        XccAssetLoader l = new XccAssetLoader();
-        l.setHost(getHost());
-        l.setUsername(getRestAdminUsername());
-        l.setPassword(getRestAdminPassword());
-        l.setDatabaseName(getModulesDatabaseName());
-        if (getAppServicesPort() != null) {
-            l.setPort(getAppServicesPort());
-        }
-
-        String permissions = getModulePermissions();
-        if (permissions != null) {
-            l.setPermissions(permissions);
-        }
-
-        String[] extensions = getAdditionalBinaryExtensions();
-        if (extensions != null) {
-            DefaultDocumentFormatGetter getter = new DefaultDocumentFormatGetter();
-            for (String ext : extensions) {
-                getter.getBinaryExtensions().add(ext);
-            }
-            l.setDocumentFormatGetter(getter);
-        }
-
-        if (assetFileFilter != null) {
-            l.setFileFilter(assetFileFilter);
-        }
-
-        if (isReplaceTokensInModules()) {
-            l.setModuleTokenReplacer(buildModuleTokenReplacer());
-        }
-
-		l.setBulkLoad(isBulkLoadAssets());
-        return l;
-    }
-
-    protected ModuleTokenReplacer buildModuleTokenReplacer() {
-        DefaultModuleTokenReplacer r = isUseRoxyTokenPrefix() ? new RoxyModuleTokenReplacer() : new DefaultModuleTokenReplacer();
-        if (customTokens != null && !customTokens.isEmpty()) {
-            r.addPropertiesSource(new PropertiesSource() {
-                @Override
-                public Properties getProperties() {
-                    Properties p = new Properties();
-                    p.putAll(customTokens);
-                    return p;
-                }
-            });
-        }
-
-        if (getModuleTokensPropertiesSources() != null) {
-            for (PropertiesSource ps : getModuleTokensPropertiesSources()) {
-                r.addPropertiesSource(ps);
-            }
-        }
-
-        return r;
+        return DatabaseClientFactory.newClient(getHost(), getAppServicesPort(), getSchemasDatabaseName(),
+                getRestAdminUsername(), getRestAdminPassword(), getAppServicesAuthentication(), getAppServicesSslContext(),
+                getAppServicesSslHostnameVerifier());
     }
 
     /**
@@ -737,4 +670,28 @@ public class AppConfig {
     public void setNoRestServer(boolean noRestServer) {
         this.noRestServer = noRestServer;
     }
+
+	public SSLContext getAppServicesSslContext() {
+		return appServicesSslContext;
+	}
+
+	public void setAppServicesSslContext(SSLContext appServicesSslContext) {
+		this.appServicesSslContext = appServicesSslContext;
+	}
+
+	public SSLHostnameVerifier getAppServicesSslHostnameVerifier() {
+		return appServicesSslHostnameVerifier;
+	}
+
+	public void setAppServicesSslHostnameVerifier(SSLHostnameVerifier appServicesSslHostnameVerifier) {
+		this.appServicesSslHostnameVerifier = appServicesSslHostnameVerifier;
+	}
+
+	public Authentication getAppServicesAuthentication() {
+		return appServicesAuthentication;
+	}
+
+	public void setAppServicesAuthentication(Authentication appServicesAuthentication) {
+		this.appServicesAuthentication = appServicesAuthentication;
+	}
 }

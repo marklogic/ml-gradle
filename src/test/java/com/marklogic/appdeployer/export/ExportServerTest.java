@@ -13,7 +13,7 @@ public class ExportServerTest extends AbstractExportTest {
 
 	@After
 	public void teardown() {
-		//undeploySampleApp();
+		undeploySampleApp();
 	}
 
 	@Test

@@ -26,6 +26,11 @@ dependencies {
   }
 
   testCompile('commons-io:commons-io:2.5')
+
+	// Forcing Spring to use logback instead of commons-logging
+	runtime "ch.qos.logback:logback-classic:1.1.8"
+	runtime group: "org.slf4j", name: "jcl-over-slf4j", version: "1.7.22"
+	runtime group: "org.slf4j", name: "slf4j-api", version: "1.7.22"
 }
 
 // This ensures that Gradle includes in the published jar any non-java files under src/main/java

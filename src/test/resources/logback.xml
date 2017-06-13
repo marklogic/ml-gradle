@@ -16,7 +16,7 @@
     <appender-ref ref="STDOUT" />
   </logger>
 
-	<logger name="com.marklogic.client.batch" level="INFO" additivity="false">
+	<logger name="com.marklogic.client.ext.batch" level="INFO" additivity="false">
 		<appender-ref ref="STDOUT" />
 	</logger>
 

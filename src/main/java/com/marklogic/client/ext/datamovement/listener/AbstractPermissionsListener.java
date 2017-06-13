@@ -3,7 +3,7 @@ package com.marklogic.client.ext.datamovement.listener;
 import com.marklogic.client.datamovement.QueryBatch;
 import com.marklogic.client.datamovement.QueryBatchListener;
 import com.marklogic.client.ext.util.SequenceUtil;
-import com.marklogic.client.helper.LoggingObject;
+import com.marklogic.client.ext.helper.LoggingObject;
 
 public abstract class AbstractPermissionsListener extends LoggingObject implements QueryBatchListener {
 

@@ -1,11 +1,11 @@
 package com.marklogic.client.ext.datamovement.listener;
 
-import com.marklogic.client.AbstractIntegrationTest;
-import com.marklogic.client.batch.RestBatchWriter;
-import com.marklogic.client.batch.SimpleDocumentWriteOperation;
+import com.marklogic.client.ext.AbstractIntegrationTest;
+import com.marklogic.client.ext.batch.RestBatchWriter;
+import com.marklogic.client.ext.batch.SimpleDocumentWriteOperation;
 import com.marklogic.client.datamovement.DeleteListener;
 import com.marklogic.client.ext.datamovement.QueryBatcherTemplate;
-import com.marklogic.client.helper.ClientHelper;
+import com.marklogic.client.ext.helper.ClientHelper;
 import org.junit.Test;
 
 import java.util.Arrays;

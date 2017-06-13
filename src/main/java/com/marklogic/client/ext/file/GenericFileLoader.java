@@ -1,11 +1,10 @@
 package com.marklogic.client.ext.file;
 
 import com.marklogic.client.DatabaseClient;
-import com.marklogic.client.batch.BatchWriter;
-import com.marklogic.client.batch.RestBatchWriter;
+import com.marklogic.client.ext.batch.BatchWriter;
+import com.marklogic.client.ext.batch.RestBatchWriter;
 import com.marklogic.client.ext.tokenreplacer.TokenReplacer;
-import com.marklogic.client.helper.LoggingObject;
-import com.marklogic.client.io.Format;
+import com.marklogic.client.ext.helper.LoggingObject;
 
 import java.io.FileFilter;
 import java.util.ArrayList;

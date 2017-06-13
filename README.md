@@ -3,12 +3,12 @@
 ml-javaclient-util is a library of Java classes that provide some useful functionality on top of 
 the [MarkLogic Java Client API](http://docs.marklogic.com/guide/java). Those features include:
 
-- Support for [loading modules via the REST API](https://github.com/rjrudin/ml-javaclient-util/tree/master/src/main/java/com/marklogic/client/modulesloader)
-- Basic integration with [Spring via a Spring FactoryBean](https://github.com/rjrudin/ml-javaclient-util/tree/master/src/main/java/com/marklogic/client/spring)
-- Library for [parallelizing batched writes](https://github.com/rjrudin/ml-javaclient-util/tree/master/src/main/java/com/marklogic/client/batch)
+- Support for [loading modules via the REST API](https://github.com/rjrudin/ml-javaclient-util/tree/master/src/main/java/com/marklogic/client/ext/modulesloader)
+- Basic integration with [Spring via a Spring FactoryBean](https://github.com/rjrudin/ml-javaclient-util/tree/master/src/main/java/com/marklogic/client/ext/spring)
+- Library for [parallelizing batched writes](https://github.com/rjrudin/ml-javaclient-util/tree/master/src/main/java/com/marklogic/client/ext/batch)
 - Spring-style [template/callback library for XCC](https://github.com/rjrudin/ml-javaclient-util/tree/master/src/main/java/com/marklogic/xcc/template)
-- Support for generating MarkLogic 9 [Entity Services modules](https://github.com/rjrudin/ml-javaclient-util/tree/master/src/main/java/com/marklogic/client/es)
-- Support for [importing/exporting qconsole workspaces] (https://github.com/rjrudin/ml-javaclient-util/tree/master/src/main/java/com/marklogic/client/qconsole)
+- Support for generating MarkLogic 9 [Entity Services modules](https://github.com/rjrudin/ml-javaclient-util/tree/master/src/main/java/com/marklogic/client/ext/es)
+- Support for [importing/exporting qconsole workspaces](https://github.com/rjrudin/ml-javaclient-util/tree/master/src/main/java/com/marklogic/client/ext/qconsole)
  
 This is a lower-level library that is primarily used via [ml-app-deployer](https://github.com/rjrudin/ml-app-deployer) 
 and [ml-gradle](https://github.com/rjrudin/ml-gradle) and [ml-junit](https://github.com/rjrudin/ml-junit). But you can use it by itself too.
@@ -18,7 +18,7 @@ and [ml-gradle](https://github.com/rjrudin/ml-gradle) and [ml-junit](https://git
 Here's a sample of loading modules - though it's best to look at the aforementioned projects to see all the ways this can be done:
 
     DatabaseClient client = DatabaseClientFactory.newClient(...); // Use the ML Java Client API
-    XccAssetLoader assetLoader = new XccAssetLoader(client); // Can use XCC or the REST API to load asset modules
+    AssetFileLoader assetFileLoader = new AssetFileLoader(client); // Uses the REST API to load asset modules
     DefaultModulesLoader modulesLoader = new DefaultModulesLoader(assetLoader);
     File modulesDir = new File("src/main/ml-modules");
     ModulesFinder modulesFinder = new DefaultModulesFinder(); // Allows for adjusting where modules are stored on a filesystem

@@ -1,6 +1,6 @@
 package com.marklogic.client.ext.file;
 
-import com.marklogic.client.helper.LoggingObject;
+import com.marklogic.client.ext.helper.LoggingObject;
 import org.springframework.util.ClassUtils;
 
 import java.io.File;

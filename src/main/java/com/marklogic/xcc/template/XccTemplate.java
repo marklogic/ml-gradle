@@ -48,7 +48,7 @@ public class XccTemplate {
 
     /**
      * Convenience method for executing any adhoc query.
-     * 
+     *
      * @param xquery the XQuery statement to execute
      * @return the response from MarkLogic as a String
      */

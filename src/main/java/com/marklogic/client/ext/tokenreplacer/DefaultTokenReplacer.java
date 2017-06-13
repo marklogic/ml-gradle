@@ -1,6 +1,6 @@
 package com.marklogic.client.ext.tokenreplacer;
 
-import com.marklogic.client.helper.LoggingObject;
+import com.marklogic.client.ext.helper.LoggingObject;
 import org.springframework.beans.factory.config.PlaceholderConfigurerSupport;
 import org.springframework.util.PropertyPlaceholderHelper;
 

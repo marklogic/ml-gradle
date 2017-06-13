@@ -1,6 +1,6 @@
 package com.marklogic.client.ext.file;
 
-import com.marklogic.client.helper.LoggingObject;
+import com.marklogic.client.ext.helper.LoggingObject;
 
 import java.io.File;
 import java.io.FileFilter;

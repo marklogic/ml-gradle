@@ -23,7 +23,11 @@ public class DefaultDocumentPermissionsParser implements DocumentPermissionsPars
                 } else if (capability.equals("read")) {
                     c = Capability.READ;
                 }
-                permissions.add(role, c);
+                if (permissions.containsKey(role)) {
+                	permissions.get(role).add(c);
+                } else {
+	                permissions.add(role, c);
+                }
             }
         }
     }

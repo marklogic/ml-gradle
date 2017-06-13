@@ -1,4 +1,4 @@
-package com.marklogic.client.es;
+package com.marklogic.client.ext.es;
 
 public class CodeGenerationRequest {
 

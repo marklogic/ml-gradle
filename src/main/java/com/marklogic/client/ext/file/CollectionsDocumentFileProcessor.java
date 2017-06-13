@@ -1,5 +1,8 @@
 package com.marklogic.client.ext.file;
 
+/**
+ * Adds the given collections to each DocumentFile that it processes.
+ */
 public class CollectionsDocumentFileProcessor implements DocumentFileProcessor {
 
 	private String[] collections;

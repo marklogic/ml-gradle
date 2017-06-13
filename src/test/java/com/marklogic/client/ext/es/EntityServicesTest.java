@@ -1,4 +1,4 @@
-package com.marklogic.client.es;
+package com.marklogic.client.ext.es;
 
 import com.marklogic.client.AbstractIntegrationTest;
 import org.junit.Before;

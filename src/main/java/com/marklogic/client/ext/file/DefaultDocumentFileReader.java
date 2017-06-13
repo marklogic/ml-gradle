@@ -22,6 +22,14 @@ public class DefaultDocumentFileReader extends LoggingObject implements FileVisi
 	private List<DocumentFileProcessor> documentFileProcessors;
 	private String uriPrefix = "/";
 
+	// Each of these are eagerly instantiated, and we retain a reference in case a client wants to modify them
+	private CollectionsFileDocumentFileProcessor collectionsFileDocumentFileProcessor;
+	private PermissionsFileDocumentFileProcessor permissionsFileDocumentFileProcessor;
+	private FormatDocumentFileProcessor formatDocumentFileProcessor;
+
+	/**
+	 * Calls initialize to instantiate some default DocumentFileProcessor objects.
+	 */
 	public DefaultDocumentFileReader() {
 		initialize();
 	}
@@ -154,15 +162,16 @@ public class DefaultDocumentFileReader extends LoggingObject implements FileVisi
 	}
 
 	protected void initialize() {
-		CollectionsFileDocumentFileProcessor cfdfp = new CollectionsFileDocumentFileProcessor();
-		PermissionsFileDocumentFileProcessor pfdfp = new PermissionsFileDocumentFileProcessor();
+		collectionsFileDocumentFileProcessor = new CollectionsFileDocumentFileProcessor();
+		permissionsFileDocumentFileProcessor = new PermissionsFileDocumentFileProcessor();
+		formatDocumentFileProcessor = new FormatDocumentFileProcessor();
 
-		addFileFilter(cfdfp);
-		addFileFilter(pfdfp);
+		addFileFilter(collectionsFileDocumentFileProcessor);
+		addFileFilter(permissionsFileDocumentFileProcessor);
 
-		addDocumentFileProcessor(cfdfp);
-		addDocumentFileProcessor(pfdfp);
-		addDocumentFileProcessor(new FormatDocumentFileProcessor());
+		addDocumentFileProcessor(collectionsFileDocumentFileProcessor);
+		addDocumentFileProcessor(permissionsFileDocumentFileProcessor);
+		addDocumentFileProcessor(formatDocumentFileProcessor);
 	}
 
 	public DocumentFileProcessor getDocumentFileProcessor(String classShortName) {
@@ -206,5 +215,17 @@ public class DefaultDocumentFileReader extends LoggingObject implements FileVisi
 
 	public void setUriPrefix(String uriPrefix) {
 		this.uriPrefix = uriPrefix;
+	}
+
+	public CollectionsFileDocumentFileProcessor getCollectionsFileDocumentFileProcessor() {
+		return collectionsFileDocumentFileProcessor;
+	}
+
+	public PermissionsFileDocumentFileProcessor getPermissionsFileDocumentFileProcessor() {
+		return permissionsFileDocumentFileProcessor;
+	}
+
+	public FormatDocumentFileProcessor getFormatDocumentFileProcessor() {
+		return formatDocumentFileProcessor;
 	}
 }

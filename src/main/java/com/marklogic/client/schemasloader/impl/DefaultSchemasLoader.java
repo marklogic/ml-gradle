@@ -21,20 +21,26 @@ public class DefaultSchemasLoader extends GenericFileLoader implements SchemasLo
 	 */
 	public DefaultSchemasLoader(DatabaseClient databaseClient) {
 		super(databaseClient);
-
-		DefaultDocumentFileReader reader = new DefaultDocumentFileReader();
-		reader.addDocumentFileProcessor(new TdeDocumentFileProcessor());
-		setDocumentFileReader(reader);
+		initializeDocumentFileReader();
 	}
 
 	/**
 	 * Assumes that the BatchWriter has already been initialized.
 	 *
 	 * @param batchWriter
-	 * @param documentFileReader
 	 */
-	public DefaultSchemasLoader(BatchWriter batchWriter, DocumentFileReader documentFileReader) {
-		super(batchWriter, documentFileReader);
+	public DefaultSchemasLoader(BatchWriter batchWriter) {
+		super(batchWriter);
+		initializeDocumentFileReader();
+	}
+
+	/**
+	 * Configures and sets a DefaultDocumentFileReader with a TDE-specific file processor.
+	 */
+	protected void initializeDocumentFileReader() {
+		DefaultDocumentFileReader reader = new DefaultDocumentFileReader();
+		reader.addDocumentFileProcessor(new TdeDocumentFileProcessor());
+		setDocumentFileReader(reader);
 	}
 
 	/**

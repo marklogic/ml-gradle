@@ -12,9 +12,9 @@ import java.util.Properties;
  * Default implementation of TokenReplacer that relies on a list of PropertiesSource implementations for
  * finding tokens to replace in text.
  *
- * <p>Based on Roxy conventions of referencing properties in module text with "@ml." as a prefix, this class also by
- * default will attempt to find property names in the text with "@ml." as a prefix. This can be adjusted via the
- * propertyPrefix property.</p>
+ * The propertyPrefix property allows for adhering to the Roxy convention of referencing properties in module text
+ * with "@ml." as a prefix. This class does not look for that prefix; rather, the RoxyTokenReplacer subclass does. This
+ * class allows for that prefix to be set to anything.
  */
 public class DefaultTokenReplacer extends LoggingObject implements TokenReplacer {
 

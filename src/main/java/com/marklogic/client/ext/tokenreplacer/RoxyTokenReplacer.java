@@ -4,7 +4,8 @@ import java.io.File;
 
 /**
  * Loads properties from typical Roxy locations of "deploy/default.properties", "deploy/build.properties", and
- * "deploy/local.properties", if any of those exist.
+ * "deploy/local.properties", if any of those exist. Also adopts the Roxy convention of properties being prefixed
+ * with "@ml.".
  */
 public class RoxyTokenReplacer extends DefaultTokenReplacer {
 

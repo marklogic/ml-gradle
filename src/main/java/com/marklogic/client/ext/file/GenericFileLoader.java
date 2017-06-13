@@ -5,12 +5,19 @@ import com.marklogic.client.batch.BatchWriter;
 import com.marklogic.client.batch.RestBatchWriter;
 import com.marklogic.client.ext.tokenreplacer.TokenReplacer;
 import com.marklogic.client.helper.LoggingObject;
+import com.marklogic.client.io.Format;
 
 import java.io.FileFilter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class GenericFileLoader extends LoggingObject {
+/**
+ * Generic implementation of FileLoader. Delegates to a DocumentFileReader for reading from a set of file paths, and
+ * delegates to a BatchWriter for writing to MarkLogic (where that BatchWriter could use XCC, the REST API, or the
+ * Data Movement SDK in ML9).
+ */
+public class GenericFileLoader extends LoggingObject implements FileLoader {
 
 	private DocumentFileReader documentFileReader;
 	private BatchWriter batchWriter;
@@ -24,16 +31,28 @@ public class GenericFileLoader extends LoggingObject {
 	private String permissions;
 	private String[] collections;
 	private TokenReplacer tokenReplacer;
+	private String[] additionalBinaryExtensions;
 
+	/**
+	 * The given DatabaseClient is used to construct a BatchWriter that writes to MarkLogic via the REST API. The
+	 * expectation is that the client will then either call setDocumentFileReader or will rely on the default one
+	 * that's created by this class if one has not yet been set.
+	 *
+	 * @param client
+	 */
 	public GenericFileLoader(DatabaseClient client) {
 		RestBatchWriter restBatchWriter = new RestBatchWriter(client);
 		restBatchWriter.setReleaseDatabaseClients(false);
 		this.batchWriter = restBatchWriter;
 	}
 
-	public GenericFileLoader(BatchWriter batchWriter, DocumentFileReader documentFileReader) {
+	/**
+	 * Clients should use this when they already have a BatchWriter ready to go.
+	 *
+	 * @param batchWriter
+	 */
+	public GenericFileLoader(BatchWriter batchWriter) {
 		this.batchWriter = batchWriter;
-		this.documentFileReader = documentFileReader;
 	}
 
 	/**
@@ -64,8 +83,8 @@ public class GenericFileLoader extends LoggingObject {
 	}
 
 	/**
-	 * If no DocumentFileReader is set, this will construct a DefaultDocumentFileReader using several of the properties
-	 * of this class.
+	 * If no DocumentFileReader is set, this will construct a DefaultDocumentFileReader, which is then configured based
+	 * on several properties of this class.
 	 *
 	 * @return
 	 */
@@ -82,9 +101,28 @@ public class GenericFileLoader extends LoggingObject {
 			}
 		}
 
+		if (additionalBinaryExtensions != null) {
+			FormatDocumentFileProcessor processor = reader.getFormatDocumentFileProcessor();
+			FormatGetter formatGetter = processor.getFormatGetter();
+			if (formatGetter instanceof DefaultDocumentFormatGetter) {
+				DefaultDocumentFormatGetter ddfg = (DefaultDocumentFormatGetter)formatGetter;
+				for (String ext : additionalBinaryExtensions) {
+					ddfg.getBinaryExtensions().add(ext);
+				}
+			} else {
+				logger.warn("FormatGetter is not an instanceof DefaultDocumentFormatGetter, " +
+					"so unable to add additionalBinaryExtensions: " + Arrays.asList(additionalBinaryExtensions));
+			}
+		}
+
 		return reader;
 	}
 
+	/**
+	 * Builds a set of DocumentFileProcessor objects based on how this class has been configured.
+	 *
+	 * @return
+	 */
 	protected List<DocumentFileProcessor> buildDocumentFileProcessors() {
 		List<DocumentFileProcessor> processors = new ArrayList<>();
 		if (permissions != null) {
@@ -96,14 +134,26 @@ public class GenericFileLoader extends LoggingObject {
 		if (tokenReplacer != null) {
 			processors.add(new TokenReplacerDocumentFileProcessor(tokenReplacer));
 		}
-
 		if (documentFileProcessors != null) {
 			for (DocumentFileProcessor dfp : documentFileProcessors) {
 				processors.add(dfp);
 			}
 		}
-
 		return processors;
+	}
+
+	public void addFileFilter(FileFilter fileFilter) {
+		if (fileFilters == null) {
+			fileFilters = new ArrayList<>();
+		}
+		fileFilters.add(fileFilter);
+	}
+
+	public void addDocumentFileProcessor(DocumentFileProcessor processor) {
+		if (documentFileProcessors == null) {
+			documentFileProcessors = new ArrayList<>();
+		}
+		documentFileProcessors.add(processor);
 	}
 
 	public void setWaitForCompletion(boolean waitForCompletion) {
@@ -126,25 +176,15 @@ public class GenericFileLoader extends LoggingObject {
 		this.tokenReplacer = tokenReplacer;
 	}
 
-	public void addFileFilter(FileFilter fileFilter) {
-		if (fileFilters == null) {
-			fileFilters = new ArrayList<>();
-		}
-		fileFilters.add(fileFilter);
-	}
-
 	public void setFileFilters(List<FileFilter> fileFilters) {
 		this.fileFilters = fileFilters;
 	}
 
-	public void addDocumentFileProcessor(DocumentFileProcessor processor) {
-		if (documentFileProcessors == null) {
-			documentFileProcessors = new ArrayList<>();
-		}
-		documentFileProcessors.add(processor);
-	}
-
 	public void setDocumentFileProcessors(List<DocumentFileProcessor> documentFileProcessors) {
 		this.documentFileProcessors = documentFileProcessors;
+	}
+
+	public void setAdditionalBinaryExtensions(String... additionalBinaryExtensions) {
+		this.additionalBinaryExtensions = additionalBinaryExtensions;
 	}
 }

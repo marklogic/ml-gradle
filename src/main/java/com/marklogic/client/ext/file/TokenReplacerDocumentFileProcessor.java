@@ -8,6 +8,11 @@ import org.springframework.util.FileCopyUtils;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Processor that delegates to a TokenReplacer for replacing tokens in the content of a DocumentFile. In order to
+ * replace tokens, the File must first be read in as a String. After tokens are replaced, the String is set back on
+ * the DocumentFile via setModifiedContent.
+ */
 public class TokenReplacerDocumentFileProcessor extends LoggingObject implements DocumentFileProcessor {
 
 	private TokenReplacer tokenReplacer;

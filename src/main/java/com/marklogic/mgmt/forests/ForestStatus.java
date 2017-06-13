@@ -1,8 +1,7 @@
 package com.marklogic.mgmt.forests;
 
-import org.jdom2.Namespace;
-
 import com.marklogic.rest.util.Fragment;
+import org.jdom2.Namespace;
 
 public class ForestStatus extends Fragment {
 

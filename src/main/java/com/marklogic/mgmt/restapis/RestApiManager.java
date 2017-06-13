@@ -1,7 +1,7 @@
 package com.marklogic.mgmt.restapis;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.marklogic.client.helper.LoggingObject;
+import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.appservers.ServerManager;

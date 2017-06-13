@@ -6,7 +6,7 @@ import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.FailedRequestException;
-import com.marklogic.client.schemasloader.impl.DefaultSchemasLoader;
+import com.marklogic.client.ext.schemasloader.impl.DefaultSchemasLoader;
 
 public class LoadSchemasCommand extends AbstractCommand {
 

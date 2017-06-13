@@ -1,11 +1,11 @@
 package com.marklogic.appdeployer.command.cpf;
 
-import java.io.File;
-
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.mgmt.cpf.AbstractCpfResourceManager;
+
+import java.io.File;
 
 public abstract class AbstractCpfResourceCommand extends AbstractCommand {
 

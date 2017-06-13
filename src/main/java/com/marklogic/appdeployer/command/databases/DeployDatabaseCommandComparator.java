@@ -1,9 +1,9 @@
 package com.marklogic.appdeployer.command.databases;
 
-import java.util.Comparator;
-
 import com.marklogic.appdeployer.command.CommandContext;
-import com.marklogic.client.helper.LoggingObject;
+import com.marklogic.client.ext.helper.LoggingObject;
+
+import java.util.Comparator;
 
 /**
  * Used for sorting instances of DeployDatabaseCommand so that databases are created in a correct order - i.e. an order
@@ -41,7 +41,7 @@ public class DeployDatabaseCommandComparator extends LoggingObject implements Co
     /**
      * If the payload has a triggers-database or schemas-database, we consider it to depend on some other database. We
      * don't check for a security database yet, as it's very rare to use a custom security database.
-     * 
+     *
      * @param payload
      * @return
      */

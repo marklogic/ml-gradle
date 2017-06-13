@@ -1,7 +1,6 @@
 package com.marklogic.mgmt.requests;
 
 import com.marklogic.mgmt.AbstractManager;
-import com.marklogic.mgmt.AbstractResourceManager;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.rest.util.Fragment;
 import org.jdom2.Element;

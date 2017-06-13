@@ -6,10 +6,7 @@ import com.marklogic.mgmt.admin.ActionRequiringRestart;
 import com.marklogic.mgmt.admin.AdminConfig;
 import com.marklogic.mgmt.admin.AdminManager;
 import com.marklogic.rest.util.Fragment;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestTemplate;
 
 public class ClusterManager extends AbstractManager {
 

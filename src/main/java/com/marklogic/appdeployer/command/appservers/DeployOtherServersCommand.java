@@ -1,13 +1,13 @@
 package com.marklogic.appdeployer.command.appservers;
 
-import java.io.File;
-
 import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.ResourceFilenameFilter;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.ResourceManager;
 import com.marklogic.mgmt.appservers.ServerManager;
+
+import java.io.File;
 
 /**
  * "Other" = non-REST-API servers. This will process every JSON/XML file that's not named "rest-api-server.*" in the

@@ -1,22 +1,17 @@
 package com.marklogic.mgmt;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.marklogic.client.ext.helper.LoggingObject;
+import com.marklogic.rest.util.Fragment;
+import com.marklogic.rest.util.RestTemplateUtil;
 import org.jdom2.Namespace;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import com.marklogic.client.helper.LoggingObject;
-import com.marklogic.rest.util.Fragment;
-import com.marklogic.rest.util.RestTemplateUtil;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Wraps a RestTemplate with methods that should simplify accessing the Manage API with RestTemplate. Each NounManager

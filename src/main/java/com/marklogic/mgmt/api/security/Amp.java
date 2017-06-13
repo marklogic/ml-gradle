@@ -1,12 +1,12 @@
 package com.marklogic.mgmt.api.security;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.marklogic.mgmt.ResourceManager;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.Resource;
 import com.marklogic.mgmt.security.AmpManager;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Amp extends Resource {
 

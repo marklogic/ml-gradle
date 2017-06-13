@@ -1,11 +1,11 @@
 package com.marklogic.appdeployer.command.alert;
 
-import java.io.File;
-
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.alert.AlertActionManager;
+
+import java.io.File;
 
 /**
  * This is similar to how DeployTargetsCommand works for Flexrep. Since action belong to a certain alert config, this

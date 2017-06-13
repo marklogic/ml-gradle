@@ -1,7 +1,7 @@
 package com.marklogic.appdeployer.command.modules;
 
 import com.marklogic.appdeployer.AppConfig;
-import com.marklogic.client.modulesloader.ModulesLoader;
+import com.marklogic.client.ext.modulesloader.ModulesLoader;
 
 /**
  * Interface for objects that can construct a ModulesLoader based on the configuration information in the given

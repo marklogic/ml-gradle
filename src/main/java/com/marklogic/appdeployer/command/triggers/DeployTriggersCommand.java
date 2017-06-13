@@ -1,12 +1,12 @@
 package com.marklogic.appdeployer.command.triggers;
 
-import java.io.File;
-
 import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.ResourceManager;
 import com.marklogic.mgmt.triggers.TriggerManager;
+
+import java.io.File;
 
 /**
  * Defaults to the triggers database name in the AppConfig instance. Can be overridden via the databaseNameOrId

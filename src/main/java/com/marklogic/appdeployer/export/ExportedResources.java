@@ -2,7 +2,6 @@ package com.marklogic.appdeployer.export;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ExportedResources {

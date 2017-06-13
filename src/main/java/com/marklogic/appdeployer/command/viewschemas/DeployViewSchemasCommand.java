@@ -1,7 +1,5 @@
 package com.marklogic.appdeployer.command.viewschemas;
 
-import java.io.File;
-
 import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
@@ -10,6 +8,8 @@ import com.marklogic.mgmt.ResourceManager;
 import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.viewschemas.ViewManager;
 import com.marklogic.mgmt.viewschemas.ViewSchemaManager;
+
+import java.io.File;
 
 /**
  * Processes each file in the view-schemas directory. For each one, then checks for a (view schema name)-views

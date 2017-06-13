@@ -1,8 +1,8 @@
 package com.marklogic.appdeployer.command;
 
-import java.util.Map;
-
 import com.marklogic.appdeployer.AppConfig;
+
+import java.util.Map;
 
 public class DefaultPayloadTokenReplacer implements PayloadTokenReplacer {
 

@@ -1,11 +1,11 @@
 package com.marklogic.appdeployer.command;
 
+import com.marklogic.client.ext.helper.LoggingObject;
+
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.HashSet;
 import java.util.Set;
-
-import com.marklogic.client.helper.LoggingObject;
 
 /**
  * Simple filter implementation that returns true for .json and .xml files.

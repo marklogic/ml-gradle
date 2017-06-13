@@ -1,13 +1,13 @@
 package com.marklogic.appdeployer.command.tasks;
 
-import java.io.File;
-import java.io.FileFilter;
-
 import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.ResourceManager;
 import com.marklogic.mgmt.tasks.TaskManager;
+
+import java.io.File;
+import java.io.FileFilter;
 
 public class DeployScheduledTasksCommand extends AbstractResourceCommand {
 

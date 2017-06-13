@@ -1,9 +1,9 @@
 package com.marklogic.appdeployer.command.modules;
 
-import java.io.File;
+import com.marklogic.client.ext.modulesloader.Modules;
+import com.marklogic.client.ext.modulesloader.impl.BaseModulesFinder;
 
-import com.marklogic.client.modulesloader.Modules;
-import com.marklogic.client.modulesloader.impl.BaseModulesFinder;
+import java.io.File;
 
 public class AssetModulesFinder extends BaseModulesFinder {
 

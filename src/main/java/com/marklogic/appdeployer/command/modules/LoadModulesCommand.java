@@ -5,9 +5,9 @@ import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.client.DatabaseClient;
-import com.marklogic.client.modulesloader.ModulesLoader;
-import com.marklogic.client.modulesloader.impl.DefaultModulesLoader;
-import com.marklogic.client.modulesloader.impl.TestServerModulesFinder;
+import com.marklogic.client.ext.modulesloader.ModulesLoader;
+import com.marklogic.client.ext.modulesloader.impl.DefaultModulesLoader;
+import com.marklogic.client.ext.modulesloader.impl.TestServerModulesFinder;
 
 import java.io.File;
 

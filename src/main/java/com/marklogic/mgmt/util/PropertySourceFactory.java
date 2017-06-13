@@ -1,6 +1,6 @@
 package com.marklogic.mgmt.util;
 
-import com.marklogic.client.helper.LoggingObject;
+import com.marklogic.client.ext.helper.LoggingObject;
 
 /**
  * Helper class for factories that depend on a PropertySource for configuring the objects they produce.
@@ -22,7 +22,7 @@ public abstract class PropertySourceFactory extends LoggingObject {
      * If checkWithMarklogicPrefix is set to true, and a property with the given name is not found, this method will
      * check for a property with "marklogic." + the property name. This allows for Spring Boot-style properties, where
      * it's usually helpful to be able to prefix everything with "marklogic.".
-     * 
+     *
      * @param name
      * @return
      */

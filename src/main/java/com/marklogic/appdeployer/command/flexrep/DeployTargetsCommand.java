@@ -1,11 +1,11 @@
 package com.marklogic.appdeployer.command.flexrep;
 
-import java.io.File;
-
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.flexrep.TargetManager;
+
+import java.io.File;
 
 /**
  * The directory structure for this is a bit different from most command. Since targets belong to a certain flexrep

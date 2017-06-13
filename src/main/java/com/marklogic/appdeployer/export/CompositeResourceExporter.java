@@ -4,7 +4,6 @@ import com.marklogic.mgmt.ManageClient;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**

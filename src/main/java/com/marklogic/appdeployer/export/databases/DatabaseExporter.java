@@ -9,7 +9,6 @@ import com.marklogic.mgmt.ResourceManager;
 import com.marklogic.mgmt.databases.DatabaseManager;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 /**

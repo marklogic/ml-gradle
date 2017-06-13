@@ -1,16 +1,15 @@
 package com.marklogic.mgmt.api;
 
-import java.util.Collections;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.marklogic.mgmt.DeleteReceipt;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.ResourceManager;
 import com.marklogic.mgmt.SaveReceipt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Base class for any class that we both want to read/write from/to JSON and make calls to the Management REST API.
@@ -68,7 +67,7 @@ public abstract class Resource extends ApiObject {
      * TODO Not totally convinced about putting this method here, as it means that an instance of this is needed to get
      * a list of names. The other choices would be a method on the API class, but then that means the API class needs a
      * method per resource for getting a list of names, whereas with this approach, we have a single method.
-     * 
+     *
      * @return a list of names of all resources of this type.
      */
     public List<String> list() {
@@ -87,7 +86,7 @@ public abstract class Resource extends ApiObject {
     /**
      * Some resources, such as amps, require additional parameters in the URL to uniquely identify the resource. A
      * subclass can override this to provide those parameters.
-     * 
+     *
      * @return
      */
     public String[] getResourceUrlParams() {

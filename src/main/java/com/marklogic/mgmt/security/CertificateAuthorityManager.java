@@ -1,15 +1,10 @@
 package com.marklogic.mgmt.security;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
-
 import com.marklogic.mgmt.AbstractManager;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.rest.util.ResourcesFragment;
+import org.springframework.http.*;
+import org.springframework.web.client.RestTemplate;
 
 public class CertificateAuthorityManager extends AbstractManager {
 

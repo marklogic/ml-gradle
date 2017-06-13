@@ -1,16 +1,15 @@
 package com.marklogic.mgmt.api;
 
-import java.beans.PropertyDescriptor;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
+
+import java.beans.PropertyDescriptor;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Base class for any object used for ferrying JSON around with Jackson.
@@ -23,7 +22,7 @@ public abstract class ApiObject {
     /**
      * Intended as a convenience method for a user to find out all the property names of an API object from within the
      * context of e.g. Groovy Shell.
-     * 
+     *
      * @return
      */
     @JsonIgnore
@@ -53,7 +52,7 @@ public abstract class ApiObject {
 
     /**
      * Syntactic sugar - it's very quick to type e.g. "db.props" in Groovy shell vs "db.propertyNames".
-     * 
+     *
      * @return
      */
     @JsonIgnore

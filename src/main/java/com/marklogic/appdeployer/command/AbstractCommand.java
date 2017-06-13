@@ -1,5 +1,10 @@
 package com.marklogic.appdeployer.command;
 
+import com.marklogic.client.ext.helper.LoggingObject;
+import com.marklogic.mgmt.ResourceManager;
+import com.marklogic.mgmt.SaveReceipt;
+import org.springframework.util.FileCopyUtils;
+
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -7,12 +12,6 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.springframework.util.FileCopyUtils;
-
-import com.marklogic.client.helper.LoggingObject;
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.SaveReceipt;
 
 /**
  * Abstract base class that provides some convenience methods for implementing a command. Subclasses will typically

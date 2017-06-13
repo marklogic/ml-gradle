@@ -1,12 +1,12 @@
 package com.marklogic.appdeployer.command.alert;
 
-import java.io.File;
-
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.alert.AlertRuleManager;
+
+import java.io.File;
 
 public class DeployAlertRulesCommand extends AbstractCommand {
 

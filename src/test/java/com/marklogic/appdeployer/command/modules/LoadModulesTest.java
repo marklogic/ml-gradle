@@ -2,7 +2,7 @@ package com.marklogic.appdeployer.command.modules;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
-import com.marklogic.client.modulesloader.impl.AssetFileFilter;
+import com.marklogic.client.ext.modulesloader.impl.AssetFileFilter;
 import com.marklogic.junit.Fragment;
 import com.marklogic.junit.PermissionsFragment;
 import com.marklogic.xcc.template.XccTemplate;

@@ -1,12 +1,12 @@
 package com.marklogic.appdeployer.command.flexrep;
 
-import java.io.File;
-
 import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.ResourceManager;
 import com.marklogic.mgmt.flexrep.ConfigManager;
+
+import java.io.File;
 
 /**
  * Defaults to the content database name in the AppConfig instance. Can be overridden via the databaseNameOrId property.
@@ -20,7 +20,7 @@ public class DeployConfigsCommand extends AbstractResourceCommand {
         // Flexrep config is stored in a database, so we don't need to delete it as the database will be deleted
         setDeleteResourcesOnUndo(false);
     }
-    
+
     @Override
     protected File[] getResourceDirs(CommandContext context) {
         return new File[] { new File(context.getAppConfig().getConfigDir().getFlexrepDir(), "configs") };

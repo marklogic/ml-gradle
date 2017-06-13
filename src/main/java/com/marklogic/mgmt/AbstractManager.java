@@ -1,9 +1,8 @@
 package com.marklogic.mgmt;
 
+import com.marklogic.client.ext.helper.LoggingObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ClassUtils;
-
-import com.marklogic.client.helper.LoggingObject;
 
 public class AbstractManager extends LoggingObject {
 
@@ -11,7 +10,7 @@ public class AbstractManager extends LoggingObject {
 
     /**
      * Manager classes that need to connect to ML as a user with the admin role should override this to return true.
-     * 
+     *
      * @return
      */
     protected boolean useAdminUser() {
@@ -20,7 +19,7 @@ public class AbstractManager extends LoggingObject {
 
     /**
      * Assumes the resource name is based on the class name - e.g. RoleManager would have a resource name of "role".
-     * 
+     *
      * @return
      */
     protected String getResourceName() {
@@ -32,7 +31,7 @@ public class AbstractManager extends LoggingObject {
     /**
      * Assumes the field name of the resource ID - which is used to determine existence - is the resource name plus
      * "-name". So RoleManager would have an ID field name of "role-name".
-     * 
+     *
      * @return
      */
     protected String getIdFieldName() {

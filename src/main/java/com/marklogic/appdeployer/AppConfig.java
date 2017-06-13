@@ -5,8 +5,8 @@ import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.DatabaseClientFactory.Authentication;
 import com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier;
 import com.marklogic.client.ext.tokenreplacer.PropertiesSource;
-import com.marklogic.client.modulesloader.impl.PropertiesModuleManager;
-import com.marklogic.client.modulesloader.ssl.SimpleX509TrustManager;
+import com.marklogic.client.ext.modulesloader.impl.PropertiesModuleManager;
+import com.marklogic.client.ext.modulesloader.ssl.SimpleX509TrustManager;
 
 import javax.net.ssl.SSLContext;
 import java.io.FileFilter;

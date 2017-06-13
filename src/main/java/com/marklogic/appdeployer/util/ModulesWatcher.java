@@ -5,11 +5,11 @@ import com.marklogic.appdeployer.DefaultAppConfigFactory;
 import com.marklogic.appdeployer.command.modules.DefaultModulesLoaderFactory;
 import com.marklogic.appdeployer.command.modules.ModulesLoaderFactory;
 import com.marklogic.client.DatabaseClient;
-import com.marklogic.client.helper.LoggingObject;
-import com.marklogic.client.modulesloader.ModulesFinder;
-import com.marklogic.client.modulesloader.ModulesLoader;
-import com.marklogic.client.modulesloader.impl.DefaultModulesFinder;
-import com.marklogic.client.modulesloader.impl.DefaultModulesLoader;
+import com.marklogic.client.ext.helper.LoggingObject;
+import com.marklogic.client.ext.modulesloader.ModulesFinder;
+import com.marklogic.client.ext.modulesloader.ModulesLoader;
+import com.marklogic.client.ext.modulesloader.impl.DefaultModulesFinder;
+import com.marklogic.client.ext.modulesloader.impl.DefaultModulesLoader;
 import com.marklogic.mgmt.util.SystemPropertySource;
 
 import java.io.File;

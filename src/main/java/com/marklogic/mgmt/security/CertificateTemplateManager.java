@@ -1,12 +1,11 @@
 package com.marklogic.mgmt.security;
 
-import org.springframework.http.ResponseEntity;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.mgmt.AbstractResourceManager;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.rest.util.Fragment;
+import org.springframework.http.ResponseEntity;
 
 /**
  * For 8.0-2, the docs suggest that either ID or name can be used for accessing a certificate template, but only ID

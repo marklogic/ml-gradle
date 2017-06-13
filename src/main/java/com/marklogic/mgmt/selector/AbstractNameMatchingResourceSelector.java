@@ -11,7 +11,6 @@ import com.marklogic.mgmt.tasks.TaskManager;
 import com.marklogic.rest.util.ResourcesFragment;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public abstract class AbstractNameMatchingResourceSelector implements ResourceSelector {

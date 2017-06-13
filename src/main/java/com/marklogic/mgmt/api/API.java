@@ -1,17 +1,15 @@
 package com.marklogic.mgmt.api;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.marklogic.appdeployer.DefaultAppConfigFactory;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.DatabaseClientFactory.Authentication;
-import com.marklogic.client.helper.ClientHelper;
-import com.marklogic.client.helper.LoggingObject;
-import com.marklogic.appdeployer.DefaultAppConfigFactory;
+import com.marklogic.client.ext.helper.ClientHelper;
+import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.mgmt.DefaultManageConfigFactory;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.ManageConfig;
@@ -23,27 +21,19 @@ import com.marklogic.mgmt.api.database.Database;
 import com.marklogic.mgmt.api.forest.Forest;
 import com.marklogic.mgmt.api.group.Group;
 import com.marklogic.mgmt.api.restapi.RestApi;
-import com.marklogic.mgmt.api.security.Amp;
-import com.marklogic.mgmt.api.security.ExternalSecurity;
-import com.marklogic.mgmt.api.security.Privilege;
-import com.marklogic.mgmt.api.security.ProtectedCollection;
-import com.marklogic.mgmt.api.security.Role;
-import com.marklogic.mgmt.api.security.User;
+import com.marklogic.mgmt.api.security.*;
 import com.marklogic.mgmt.api.server.Server;
 import com.marklogic.mgmt.api.task.Task;
 import com.marklogic.mgmt.appservers.ServerManager;
 import com.marklogic.mgmt.databases.DatabaseManager;
 import com.marklogic.mgmt.forests.ForestManager;
 import com.marklogic.mgmt.groups.GroupManager;
-import com.marklogic.mgmt.security.AmpManager;
-import com.marklogic.mgmt.security.ExternalSecurityManager;
-import com.marklogic.mgmt.security.PrivilegeManager;
-import com.marklogic.mgmt.security.ProtectedCollectionsManager;
-import com.marklogic.mgmt.security.RoleManager;
-import com.marklogic.mgmt.security.UserManager;
+import com.marklogic.mgmt.security.*;
 import com.marklogic.mgmt.tasks.TaskManager;
 import com.marklogic.mgmt.util.SimplePropertySource;
 import com.marklogic.mgmt.util.SystemPropertySource;
+
+import java.io.IOException;
 
 /**
  * Big facade-style class for the MarkLogic Management API. Use this to instantiate or access any resource, as it will
@@ -96,7 +86,7 @@ public class API extends LoggingObject {
      * Connect to a (presumably) different host, using the same username/password combos that were used for the same
      * connection. Useful in a development environment where you may have multiple clusters with the same admin
      * username/password combo, and you want to switch quickly from one to another.
-     * 
+     *
      * @param host
      */
     public void connect(String host) {
@@ -107,7 +97,7 @@ public class API extends LoggingObject {
     /**
      * Connect to a (presumably) different MarkLogic Management API. The username/password are assumed to work for both
      * the Management API and the Admin API on port 8001.
-     * 
+     *
      * @param host
      * @param username
      * @param password
@@ -118,7 +108,7 @@ public class API extends LoggingObject {
 
     /**
      * Connect to a (presumably) different MarkLogic Management API.
-     * 
+     *
      * @param host
      * @param username
      * @param password
@@ -140,7 +130,7 @@ public class API extends LoggingObject {
 
     /**
      * Constructs a new ClientHelper, using newClient().
-     * 
+     *
      * @return
      */
     public ClientHelper clientHelper() {
@@ -150,7 +140,7 @@ public class API extends LoggingObject {
     /**
      * Constructs a new DatabaseClient, using system properties to create an AppConfig instance which is used to create
      * a DatabaseClient.
-     * 
+     *
      * @return
      */
     public DatabaseClient newClient() {
@@ -159,7 +149,7 @@ public class API extends LoggingObject {
 
     /**
      * Construct a new DatabaseClient, assuming DIGEST authentication.
-     * 
+     *
      * @param host
      * @param port
      * @param user
@@ -203,7 +193,7 @@ public class API extends LoggingObject {
     /**
      * Convenience method since the "Default" group is usually the group that's wanted (and often the only one that
      * exists).
-     * 
+     *
      * @return
      */
     public Group group() {
@@ -222,7 +212,7 @@ public class API extends LoggingObject {
     /**
      * The vast majority of the time, configuring trace events will be on the default group, so a convenience method is
      * exposed for this use case.
-     * 
+     *
      * @param events
      */
     public void trace(String... events) {
@@ -232,7 +222,7 @@ public class API extends LoggingObject {
     /**
      * The vast majority of the time, configuring trace events will be on the default group, so a convenience method is
      * exposed for this use case.
-     * 
+     *
      * @param events
      */
     public void untrace(String... events) {
@@ -276,7 +266,7 @@ public class API extends LoggingObject {
      * In order to get an amp, we need up to 4 things to uniquely identify based on
      * http://docs.marklogic.com/REST/GET/manage/v2/amps/[id-or-name] . TODO Could make this nicer, where a call is made
      * to the amps endpoint to find an amp with the given local name, and if only one exists, just use that.
-     * 
+     *
      * @param localName
      * @return
      */

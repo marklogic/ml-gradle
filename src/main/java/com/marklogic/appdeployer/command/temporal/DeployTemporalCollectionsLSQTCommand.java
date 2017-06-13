@@ -1,6 +1,9 @@
 package com.marklogic.appdeployer.command.temporal;
 
-import com.marklogic.appdeployer.command.*;
+import com.marklogic.appdeployer.command.AbstractCommand;
+import com.marklogic.appdeployer.command.CommandContext;
+import com.marklogic.appdeployer.command.ResourceFilenameFilter;
+import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.temporal.TemporalCollectionLSQTManager;
 
 import java.io.File;

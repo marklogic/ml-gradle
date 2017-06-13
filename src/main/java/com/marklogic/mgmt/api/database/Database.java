@@ -1,13 +1,13 @@
 package com.marklogic.mgmt.api.database;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.marklogic.mgmt.ResourceManager;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.Resource;
 import com.marklogic.mgmt.api.forest.Forest;
 import com.marklogic.mgmt.databases.DatabaseManager;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Database extends Resource {
 
@@ -116,7 +116,7 @@ public class Database extends Resource {
     public void addForest(Forest f) {
         addForest(f.getForestName());
     }
-    
+
     public void addForest(String forestName) {
         if (forest == null) {
             forest = new ArrayList<>();
@@ -135,7 +135,7 @@ public class Database extends Resource {
     /**
      * TODO In the event this is a new forest with no host set, add a parameter to specify an index of the set of hosts
      * returned by /manage/v2/hosts (I think the order is guaranteed).
-     * 
+     *
      * @param f
      */
     public void attach(String forestName) {

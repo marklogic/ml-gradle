@@ -1,10 +1,10 @@
 package com.marklogic.appdeployer.command;
 
-import java.io.File;
-
 import com.marklogic.mgmt.ResourceManager;
 import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.admin.ActionRequiringRestart;
+
+import java.io.File;
 
 /**
  * Provides a basic implementation for creating/updating a resource while an app is being deployed and then deleting it

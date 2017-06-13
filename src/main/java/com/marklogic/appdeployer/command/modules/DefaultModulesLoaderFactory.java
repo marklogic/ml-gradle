@@ -6,10 +6,10 @@ import com.marklogic.client.ext.tokenreplacer.DefaultTokenReplacer;
 import com.marklogic.client.ext.tokenreplacer.PropertiesSource;
 import com.marklogic.client.ext.tokenreplacer.RoxyTokenReplacer;
 import com.marklogic.client.ext.tokenreplacer.TokenReplacer;
-import com.marklogic.client.helper.LoggingObject;
-import com.marklogic.client.modulesloader.ModulesLoader;
-import com.marklogic.client.modulesloader.ModulesManager;
-import com.marklogic.client.modulesloader.impl.*;
+import com.marklogic.client.ext.helper.LoggingObject;
+import com.marklogic.client.ext.modulesloader.ModulesLoader;
+import com.marklogic.client.ext.modulesloader.ModulesManager;
+import com.marklogic.client.ext.modulesloader.impl.*;
 import com.marklogic.xcc.template.XccTemplate;
 
 import java.io.File;

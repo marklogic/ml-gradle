@@ -1,8 +1,8 @@
 package com.marklogic.rest.util;
 
-import java.util.List;
-
 import org.jdom2.Namespace;
+
+import java.util.List;
 
 /**
  * Provides some convenience methods for the XML response from resources endpoints

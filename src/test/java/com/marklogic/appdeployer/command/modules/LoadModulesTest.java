@@ -1,19 +1,16 @@
 package com.marklogic.appdeployer.command.modules;
 
-import java.io.File;
-
-import com.marklogic.appdeployer.command.CommandContext;
-import com.marklogic.client.modulesloader.impl.DefaultModulesLoader;
+import com.marklogic.appdeployer.AbstractAppDeployerTest;
+import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
+import com.marklogic.client.modulesloader.impl.AssetFileFilter;
 import com.marklogic.junit.Fragment;
+import com.marklogic.junit.PermissionsFragment;
+import com.marklogic.xcc.template.XccTemplate;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
-import com.marklogic.client.modulesloader.impl.AssetFileFilter;
-import com.marklogic.junit.PermissionsFragment;
-import com.marklogic.xcc.template.XccTemplate;
+import java.io.File;
 
 public class LoadModulesTest extends AbstractAppDeployerTest {
 
@@ -83,8 +80,8 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
                 "/ext/some-lib.xqy");
     }
 
-    @Test
-    public void loadModulesWithCustomPermissions() {
+	@Test
+	public void loadModulesWithCustomPermissions() {
         appConfig.setModulePermissions(appConfig.getModulePermissions() + ",app-user,execute");
 
         initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
@@ -92,12 +89,19 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
         appDeployer.deploy(appConfig);
 
         PermissionsFragment perms = getDocumentPermissions("/ext/sample-lib.xqy", xccTemplate);
-        perms.prettyPrint();
-        perms.assertPermissionCount(4);
+	    perms.assertPermissionCount(6);
+
+	    // Default permissions set by AppConfig
         perms.assertPermissionExists("rest-admin", "read");
         perms.assertPermissionExists("rest-admin", "update");
         perms.assertPermissionExists("rest-extension-user", "execute");
+
+        // Custom permission
         perms.assertPermissionExists("app-user", "execute");
+
+        // Permissions that the REST API still applies, which seems like a bug
+		perms.assertPermissionExists("rest-reader", "read");
+		perms.assertPermissionExists("rest-writer", "update");
     }
 
     @Test
@@ -148,13 +152,20 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 
     /**
      * Apparently, the REST API won't let you remove these 3 default permissions, they're always present.
+     *
+     * And, now that we're loading modules via the REST API by default, rest-reader/read and rest-writer/update are
+     * always present, at least on 8.0-6.3 and 9.0-1.1, which seems like a bug.
      */
     private void assertDefaultPermissionsExists(String uri) {
         PermissionsFragment perms = getDocumentPermissions(uri, xccTemplate);
-        perms.assertPermissionCount(3);
+        perms.assertPermissionCount(5);
         perms.assertPermissionExists("rest-admin", "read");
         perms.assertPermissionExists("rest-admin", "update");
         perms.assertPermissionExists("rest-extension-user", "execute");
+
+        // Not really expected!
+	    perms.assertPermissionExists("rest-reader", "read");
+	    perms.assertPermissionExists("rest-writer", "update");
     }
 }
 

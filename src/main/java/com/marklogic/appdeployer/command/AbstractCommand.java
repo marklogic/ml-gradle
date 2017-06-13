@@ -23,7 +23,7 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
     private int executeSortOrder = Integer.MAX_VALUE;
     private boolean storeResourceIdsAsCustomTokens = false;
 
-    protected TokenReplacer tokenReplacer = new DefaultTokenReplacer();
+    protected PayloadTokenReplacer payloadTokenReplacer = new DefaultPayloadTokenReplacer();
     private FilenameFilter resourceFilenameFilter = new ResourceFilenameFilter();
 
     /**
@@ -87,7 +87,7 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 	 */
 	protected String copyFileToString(File f, CommandContext context) {
 		String str = copyFileToString(f);
-		return str != null ? tokenReplacer.replaceTokens(str, context.getAppConfig(), false) : str;
+		return str != null ? payloadTokenReplacer.replaceTokens(str, context.getAppConfig(), false) : str;
 	}
 
     /**
@@ -146,8 +146,8 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
         return files;
     }
 
-    public void setTokenReplacer(TokenReplacer tokenReplacer) {
-        this.tokenReplacer = tokenReplacer;
+    public void setPayloadTokenReplacer(PayloadTokenReplacer payloadTokenReplacer) {
+        this.payloadTokenReplacer = payloadTokenReplacer;
     }
 
     public void setExecuteSortOrder(int executeSortOrder) {

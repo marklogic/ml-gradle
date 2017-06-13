@@ -92,7 +92,7 @@ public class DeployForestsCommand extends AbstractCommand {
         for (int i = countOfExistingForests + 1; i <= desiredNumberOfForests;) {
             for (String hostName : hostNames) {
                 if (i <= desiredNumberOfForests) {
-                    String payload = tokenReplacer.replaceTokens(originalPayload, appConfig, false);
+                    String payload = payloadTokenReplacer.replaceTokens(originalPayload, appConfig, false);
                     payload = payload.replace("%%FOREST_HOST%%", hostName);
                     String forestName = getForestName(appConfig, i);
                     payload = payload.replace("%%FOREST_NAME%%", forestName);

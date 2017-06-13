@@ -58,9 +58,13 @@ public class CreateRestApiAsNonAdminUserTest extends AbstractAppDeployerTest {
 
         // And now ensure that the module was loaded correctly
         PermissionsFragment perms = getDocumentPermissions("/ext/hello-lib.xqy", xccTemplate);
-        perms.assertPermissionCount(3);
+        perms.assertPermissionCount(5);
         perms.assertPermissionExists("rest-admin", "read");
         perms.assertPermissionExists("rest-admin", "update");
         perms.assertPermissionExists("rest-extension-user", "execute");
+
+        // Non-expected permissions that ML, as of 9.0-1.1, still adds by default
+	    perms.assertPermissionExists("rest-reader", "read");
+	    perms.assertPermissionExists("rest-writer", "update");
     }
 }

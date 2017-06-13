@@ -7,7 +7,7 @@ import com.marklogic.appdeployer.AppConfig;
  * Typically, the tokens are replaced by values in the AppConfig instance. This allows for configuration files to be
  * reused across applications with different names.
  */
-public interface TokenReplacer {
+public interface PayloadTokenReplacer {
 
-    public String replaceTokens(String payload, AppConfig appConfig, boolean isTestResource);
+    String replaceTokens(String payload, AppConfig appConfig, boolean isTestResource);
 }

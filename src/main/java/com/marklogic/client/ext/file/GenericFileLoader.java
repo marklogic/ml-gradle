@@ -21,6 +21,7 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 	private DocumentFileReader documentFileReader;
 	private BatchWriter batchWriter;
 	private boolean waitForCompletion = true;
+	private boolean logFileUris = true;
 
 	// These are passed on to the DefaultDocumentFileReader that is created if one isn't set
 	private List<FileFilter> fileFilters;
@@ -72,6 +73,11 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 		if (documentFiles != null && !documentFiles.isEmpty()) {
 			if (logger.isInfoEnabled()) {
 				logger.info(format("Writing %d files", documentFiles.size()));
+				if (logFileUris ) {
+					for (DocumentFile df : documentFiles) {
+						logger.info("Writing: " + df.getUri());
+					}
+				}
 			}
 			batchWriter.write(documentFiles);
 			if (waitForCompletion) {
@@ -185,5 +191,13 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 
 	public void setAdditionalBinaryExtensions(String... additionalBinaryExtensions) {
 		this.additionalBinaryExtensions = additionalBinaryExtensions;
+	}
+
+	public boolean isLogFileUris() {
+		return logFileUris;
+	}
+
+	public void setLogFileUris(boolean logFileUris) {
+		this.logFileUris = logFileUris;
 	}
 }

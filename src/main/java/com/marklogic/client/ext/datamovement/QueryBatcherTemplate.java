@@ -51,7 +51,7 @@ public class QueryBatcherTemplate extends LoggingObject {
 	 * @return
 	 */
 	public QueryBatcherJobTicket applyOnDocuments(QueryBatchListener listener, String... documentUris) {
-		return applyOnStructuredQuery(listener, databaseClient.newQueryManager().newStructuredQueryBuilder().collection(documentUris));
+		return applyOnStructuredQuery(listener, databaseClient.newQueryManager().newStructuredQueryBuilder().document(documentUris));
 	}
 
 	/**

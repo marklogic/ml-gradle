@@ -44,8 +44,8 @@ public class DefaultDocumentFileReader extends LoggingObject implements FileVisi
 	public List<DocumentFile> readDocumentFiles(String... paths) {
 		documentFiles = new ArrayList<>();
 		for (String path : paths) {
-			if (logger.isInfoEnabled()) {
-				logger.info(format("Finding documents at path: %s", path));
+			if (logger.isDebugEnabled()) {
+				logger.debug(format("Finding documents at path: %s", path));
 			}
 			Path p = constructPath(path);
 			if (p != null) {

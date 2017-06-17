@@ -33,12 +33,12 @@ public abstract class BatchWriterSupport extends LoggingObject implements BatchW
 	@Override
 	public void waitForCompletion() {
 		if (taskExecutor instanceof ExecutorConfigurationSupport) {
-			if (logger.isInfoEnabled()) {
-				logger.info("Calling shutdown on thread pool");
+			if (logger.isDebugEnabled()) {
+				logger.debug("Calling shutdown on thread pool");
 			}
 			((ExecutorConfigurationSupport) taskExecutor).shutdown();
-			if (logger.isInfoEnabled()) {
-				logger.info("Thread pool finished shutdown");
+			if (logger.isDebugEnabled()) {
+				logger.debug("Thread pool finished shutdown");
 			}
 			taskExecutor = null;
 		}
@@ -46,8 +46,8 @@ public abstract class BatchWriterSupport extends LoggingObject implements BatchW
 
 	protected void initializeDefaultTaskExecutor() {
 		if (threadCount > 1) {
-			if (logger.isInfoEnabled()) {
-				logger.info("Initializing thread pool with a count of " + threadCount);
+			if (logger.isDebugEnabled()) {
+				logger.debug("Initializing thread pool with a count of " + threadCount);
 			}
 			ThreadPoolTaskExecutor tpte = new ThreadPoolTaskExecutor();
 			tpte.setCorePoolSize(threadCount);
@@ -59,8 +59,8 @@ public abstract class BatchWriterSupport extends LoggingObject implements BatchW
 			tpte.afterPropertiesSet();
 			this.taskExecutor = tpte;
 		} else {
-			if (logger.isInfoEnabled()) {
-				logger.info("Thread count is 1, so using a synchronous TaskExecutor");
+			if (logger.isDebugEnabled()) {
+				logger.debug("Thread count is 1, so using a synchronous TaskExecutor");
 			}
 			this.taskExecutor = new SyncTaskExecutor();
 		}

@@ -6,6 +6,9 @@ import com.marklogic.client.io.StringHandle;
 import com.marklogic.client.io.marker.AbstractWriteHandle;
 import com.marklogic.client.io.marker.DocumentMetadataWriteHandle;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Implementation of DocumentWriteOperation for a simple use case of inserting a document with a URI, a String
  * body, and zero or more collections.
@@ -15,11 +18,20 @@ public class SimpleDocumentWriteOperation implements DocumentWriteOperation {
 	private String uri;
 	private String[] collections;
 	private String content;
+	private Map<String, DocumentMetadataHandle.Capability[]> permissions;
 
 	public SimpleDocumentWriteOperation(String uri, String content, String... collections) {
 		this.uri = uri;
 		this.content = content;
 		this.collections = collections;
+	}
+
+	public SimpleDocumentWriteOperation addPermissions(String role, DocumentMetadataHandle.Capability... capabilities) {
+		if (permissions == null) {
+			permissions = new HashMap<>();
+		}
+		permissions.put(role, capabilities);
+		return this;
 	}
 
 	@Override
@@ -38,6 +50,11 @@ public class SimpleDocumentWriteOperation implements DocumentWriteOperation {
 		if (collections != null) {
 			h.withCollections(collections);
 		}
+		if (permissions != null) {
+			for (String role : permissions.keySet()) {
+				h.withPermission(role, permissions.get(role));
+			}
+		}
 		return h;
 	}
 
@@ -49,5 +66,13 @@ public class SimpleDocumentWriteOperation implements DocumentWriteOperation {
 	@Override
 	public String getTemporalDocumentURI() {
 		return null;
+	}
+
+	public void setCollections(String[] collections) {
+		this.collections = collections;
+	}
+
+	public void setPermissions(Map<String, DocumentMetadataHandle.Capability[]> permissions) {
+		this.permissions = permissions;
 	}
 }

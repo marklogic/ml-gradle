@@ -130,7 +130,7 @@ public class TaskManager extends AbstractResourceManager {
 		}
 	}
 
-	public void waitForTasksToComplete(String group, int retryInSeconds) {
+	public void waitForTasksToComplete(String group, int retryInMilliseconds) {
 		Fragment servers = getManageClient().getXml("/manage/v2/task-servers");
 		String taskServerId = servers.getElementValue(format("//ts:list-item[ts:groupnameref = '%s']/ts:idref", group));
 		if (taskServerId == null) {
@@ -147,7 +147,7 @@ public class TaskManager extends AbstractResourceManager {
 				logger.info("Waiting for tasks to complete on task server, count: " + count);
 			}
 			try {
-				Thread.sleep(retryInSeconds * 1000);
+				Thread.sleep(retryInMilliseconds);
 			} catch (InterruptedException e) {
 			}
 			count = mgr.getRequestCountForRelationId(taskServerId);

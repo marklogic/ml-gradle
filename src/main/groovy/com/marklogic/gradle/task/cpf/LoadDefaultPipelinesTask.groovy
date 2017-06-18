@@ -3,7 +3,7 @@ package com.marklogic.gradle.task.cpf
 import org.gradle.api.tasks.TaskAction
 
 import com.marklogic.gradle.task.MarkLogicTask
-import com.marklogic.mgmt.cpf.PipelineManager
+import com.marklogic.mgmt.resource.cpf.PipelineManager
 
 class LoadDefaultPipelinesTask extends MarkLogicTask {
 

@@ -3,7 +3,7 @@ package com.marklogic.gradle.task.databases
 import org.gradle.api.tasks.TaskAction
 
 import com.marklogic.gradle.task.MarkLogicTask
-import com.marklogic.mgmt.databases.DatabaseManager
+import com.marklogic.mgmt.resource.databases.DatabaseManager
 
 class ClearContentDatabaseTask extends MarkLogicTask {
 

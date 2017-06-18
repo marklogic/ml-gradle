@@ -1,15 +1,14 @@
 package com.marklogic.gradle.task.client
 
 import com.marklogic.appdeployer.AppDeployer
-import com.marklogic.appdeployer.impl.SimpleAppDeployer
-import org.gradle.api.tasks.TaskAction
-
 import com.marklogic.appdeployer.command.modules.LoadModulesCommand
+import com.marklogic.appdeployer.impl.SimpleAppDeployer
 import com.marklogic.client.DatabaseClient
-import com.marklogic.client.modulesloader.ModulesLoader
-import com.marklogic.client.modulesloader.impl.DefaultModulesFinder
-import com.marklogic.client.modulesloader.impl.DefaultModulesLoader
+import com.marklogic.client.ext.modulesloader.ModulesLoader
+import com.marklogic.client.ext.modulesloader.impl.DefaultModulesFinder
+import com.marklogic.client.ext.modulesloader.impl.DefaultModulesLoader
 import com.marklogic.gradle.task.MarkLogicTask
+import org.gradle.api.tasks.TaskAction
 
 /**
  * Runs an infinite loop, and each second, it loads any new/modified modules. Often useful to run with the Gradle "-i" flag

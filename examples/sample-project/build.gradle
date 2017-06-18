@@ -2,19 +2,28 @@
  * In order to use ml-gradle, it must be applied. This occurs after the two above blocks for overriding properties so
  * that those blocks can override properties before ml-gradle initializes itself.
  */
-plugins {
-  id "com.marklogic.ml-gradle" version "2.7.1"
-
-  // The following plugins are optional
-
-  // The Java plugin is used to compile and run JUnit tests
-  id "java"
-
-  // These plugins are used to generate IDE files
-  id "eclipse"
-  id "idea"
+buildscript {
+	repositories {
+		mavenLocal()
+		jcenter()
+	}
+	dependencies {
+		classpath "com.marklogic:ml-gradle:3.0-alpha1"
+	}
 }
 
+plugins {
+	// The following plugins are optional
+
+	// The Java plugin is used to compile and run JUnit tests
+	id "java"
+
+	// These plugins are used to generate IDE files
+	id "eclipse"
+	id "idea"
+}
+
+apply plugin: "com.marklogic.ml-gradle"
 
 /*
  * Everything below this line is optional and is intended to show different features provided by ml-gradle.
@@ -26,16 +35,16 @@ plugins {
  * dependencies expressed below.
  */
 repositories {
-    jcenter()
+	jcenter()
+	mavenLocal()
 }
 
 
 configurations {
-    // This custom Gradle configuration allows us to specify the classpath for running Corb jobs. This is only needed if
-    // you want to run Corb jobs via Gradle tasks. More info on Corb can be found at - http://developer.marklogic.com/code/corb.
-    corb
+	// This custom Gradle configuration allows us to specify the classpath for running Corb jobs. This is only needed if
+	// you want to run Corb jobs via Gradle tasks. More info on Corb can be found at - http://developer.marklogic.com/code/corb.
+	corb
 }
-
 
 /*
  * This expresses dependencies on the ml-java and ml-junit libraries. The former is typically used for application
@@ -43,55 +52,52 @@ configurations {
  * using that library in tests that must invoke MarkLogic HTTP endpoints.
  */
 dependencies {
-    // Needed to compile and run the JUnit tests
-    testCompile "com.marklogic:ml-junit:2.6.0"
-    testCompile "com.jayway.restassured:rest-assured:2.4.1"
+	// Needed to compile and run the JUnit tests
+	testCompile "com.marklogic:ml-junit:3.0-alpha1"
+	testCompile "com.jayway.restassured:rest-assured:2.4.1"
 
-    // corb jar available from jcenter
-    corb "com.marklogic:marklogic-corb:2.3.2"
+	// corb jar available from jcenter
+	corb "com.marklogic:marklogic-corb:2.3.2"
 }
-
 
 /*
  * ml-gradle adds an instance of com.marklogic.appdeployer.AppConfig to the Gradle project under the key "mlAppConfig".
  * This instance can be modified to affect the behavior of ml-gradle.
  */
 ext {
-    // mlAppConfig is an instance of com.marklogic.appdeployer.AppConfig
-    mlAppConfig {
-        // Example of adding custom tokens; these will then be replaced in any JSON/XML config files
-        customTokens.put("sample-key", "sample-value")
-        customTokens.put("%%ODBC_PORT%%", "8102")
-        customTokens.put("%%XDBC_PORT%%", "8103")
+	// mlAppConfig is an instance of com.marklogic.appdeployer.AppConfig
+	mlAppConfig {
+		// Example of adding custom tokens; these will then be replaced in any JSON/XML config files
+		customTokens.put("sample-key", "sample-value")
+		customTokens.put("%%ODBC_PORT%%", "8102")
+		customTokens.put("%%XDBC_PORT%%", "8103")
 
-        // By default, the createTriggersDatabase attribute is set to true, which results in a triggers database being
-        // created, even if a databases/triggers-database.json file isn't present. Un-commenting the line will below
-        // will prevent one from being created (assuming the triggers-database.json file isn't present).
-        //createTriggersDatabase = false
+		// By default, the createTriggersDatabase attribute is set to true, which results in a triggers database being
+		// created, even if a databases/triggers-database.json file isn't present. Un-commenting the line will below
+		// will prevent one from being created (assuming the triggers-database.json file isn't present).
+		//createTriggersDatabase = false
 
-        // Example of adding a path for modules to the list of module paths, which defaults to src/main/ml-modules
-        // modulePaths.add("src/another-modules-dir")
-        // You can also override the list of module paths
-        // modulePaths = ["src/another-modules-dir"]
+		// Example of adding a path for modules to the list of module paths, which defaults to src/main/ml-modules
+		// modulePaths.add("src/another-modules-dir")
+		// You can also override the list of module paths
+		// modulePaths = ["src/another-modules-dir"]
 
-        // You can have multiple config files for your content database. This is useful when you have a dependency on
-        // a package of MarkLogic modules that requires some content database config, and you don't want to duplicate
-        // that in your own content-database.json file. Instead, just add the file from your
-        // build/mlRestApi/(name of dependency)/ml-config/databases directory.
-        configDir.contentDatabaseFiles.add(new File("src/main/ml-config/databases/more-content-database-config.json"))
+		// You can have multiple config files for your content database. This is useful when you have a dependency on
+		// a package of MarkLogic modules that requires some content database config, and you don't want to duplicate
+		// that in your own content-database.json file. Instead, just add the file from your
+		// build/mlRestApi/(name of dependency)/ml-config/databases directory.
+		configDir.contentDatabaseFiles.add(new File("src/main/ml-config/databases/more-content-database-config.json"))
 
-        // XCC URL for running corb task below and for creating triggers on pre-8.0-4 builds of MarkLogic
-        contentXccUrl = "xcc://${mlRestAdminUsername}:${mlRestAdminPassword}@${mlHost}:${mlRestPort}"
-    }
+		// XCC URL for running corb task below and for creating triggers on pre-8.0-4 builds of MarkLogic
+		contentXccUrl = "xcc://${mlRestAdminUsername}:${mlRestAdminPassword}@${mlHost}:${mlRestPort}"
+	}
 }
-
 
 /*
  * For tests that reference test files in the test source tree, we need to tell Gradle to copy these to src/test/resources
  * so that they can be found when running "gradle test".
  */
 sourceSets.test.resources.srcDir 'src/test/java'
-
 
 /*
  * This is an example of both a custom Gradle task and an easy way of invoking Corb. This depends on "mlLoadModules" to
@@ -102,11 +108,10 @@ sourceSets.test.resources.srcDir 'src/test/java'
  * to invoke corb from Gradle.
  */
 task runCorb(dependsOn: ['mlLoadModules'], type: JavaExec) {
-    main = 'com.marklogic.developer.corb.Manager'
-    classpath = configurations.corb
-    args = [contentXccUrl, '""', 'transform.xqy', '4', 'uris.xqy', '/ext/sample-project/corb/', 'sample-project-modules', 'false']
+	main = 'com.marklogic.developer.corb.Manager'
+	classpath = configurations.corb
+	args = [contentXccUrl, '""', 'transform.xqy', '4', 'uris.xqy', '/ext/sample-project/corb/', 'sample-project-modules', 'false']
 }
-
 
 /*
  * The management API has an operation for loading the default CPF pipelines -
@@ -115,7 +120,7 @@ task runCorb(dependsOn: ['mlLoadModules'], type: JavaExec) {
  * domains, which means you can safely reference them in your domain configuration files.
  */
 ext {
-    //mlAppDeployer.commands.add(new com.marklogic.appdeployer.command.cpf.DeployDefaultPipelinesCommand())
+	//mlAppDeployer.commands.add(new com.marklogic.appdeployer.command.cpf.DeployDefaultPipelinesCommand())
 }
 
 /*
@@ -130,7 +135,6 @@ ext {
 //	mlDatabaseCommands.add(otherDbCommand)
 //}
 
-
 /*
  * Example of a custom command, which in this case performs a merge on a database. The benefit of doing this in a
  * command (as opposed to a task) is that a command can be included in the mlDeploy and mlUndeploy tasks by adding it to
@@ -140,30 +144,29 @@ ext {
  * Management REST API. Note that this class could also be defined in the Gradle buildSrc directory, which is really a
  * better option for keeping your build.gradle file slim.
  */
-import com.marklogic.appdeployer.command.AbstractCommand;
-import com.marklogic.appdeployer.command.CommandContext;
+import com.marklogic.appdeployer.command.AbstractCommand
+import com.marklogic.appdeployer.command.CommandContext
 
 class MergeContentDatabaseCommand extends AbstractCommand {
-    public Integer getExecuteSortOrder() {
-        return Integer.MAX_VALUE;
-    }
-    public void execute(CommandContext context) {
-        String dbName = context.getAppConfig().getContentDatabaseName();
-        logger.info("Merging database: " + dbName);
-        context.getManageClient().postJson("/manage/v2/databases/" + dbName, '{"operation":"merge-database"}');
-        logger.info("Merged database: " + dbName)
-    }
-}
+	public Integer getExecuteSortOrder() {
+		return Integer.MAX_VALUE;
+	}
 
+	public void execute(CommandContext context) {
+		String dbName = context.getAppConfig().getContentDatabaseName();
+		logger.info("Merging database: " + dbName);
+		context.getManageClient().postJson("/manage/v2/databases/" + dbName, '{"operation":"merge-database"}');
+		logger.info("Merged database: " + dbName)
+	}
+}
 
 /*
  * Example of including our custom command in the deployment process. The order in which it's invoked is determined by
  * the command's "getExecuteSortOrder" method.
  */
 ext {
-    //mlAppDeployer.commands.add(new MergeContentDatabaseCommand())
+	//mlAppDeployer.commands.add(new MergeContentDatabaseCommand())
 }
-
 
 /*
  * Below is an example of a custom task that merges a database - just like the command above. The benefit of creating a
@@ -171,10 +174,10 @@ ext {
  * access to a number of helpful objects via methods like getAppConfig() and getManageClient().
  */
 task mergeContentDatabase(type: com.marklogic.gradle.task.MarkLogicTask) {
-    description = "Call this task to initiate a merge on the content database"
-    doLast {
-        getManageClient().postJson("/manage/v2/databases/" + getAppConfig().getContentDatabaseName(), '{"operation":"merge-database"}')
-    }
+	description = "Call this task to initiate a merge on the content database"
+	doLast {
+		getManageClient().postJson("/manage/v2/databases/" + getAppConfig().getContentDatabaseName(), '{"operation":"merge-database"}')
+	}
 }
 
 /*

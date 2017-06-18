@@ -3,7 +3,7 @@ package com.marklogic.gradle.task.flexrep
 import org.gradle.api.tasks.TaskAction
 
 import com.marklogic.gradle.task.MarkLogicTask
-import com.marklogic.mgmt.flexrep.ConfigManager
+import com.marklogic.mgmt.resource.flexrep.ConfigManager
 
 class DisableAllFlexrepTargetsTask extends MarkLogicTask {
 

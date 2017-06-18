@@ -3,8 +3,8 @@ package com.marklogic.appdeployer.command.security;
 import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.security.CertificateTemplateManager;
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.security.CertificateTemplateManager;
 
 import java.io.File;
 

@@ -2,7 +2,7 @@ package com.marklogic.appdeployer.command.restapis;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
-import com.marklogic.mgmt.restapis.RestApiManager;
+import com.marklogic.mgmt.resource.restapis.RestApiManager;
 import org.junit.Test;
 
 import java.io.File;

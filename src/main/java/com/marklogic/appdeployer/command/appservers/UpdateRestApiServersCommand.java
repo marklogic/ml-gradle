@@ -4,7 +4,7 @@ import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
-import com.marklogic.mgmt.appservers.ServerManager;
+import com.marklogic.mgmt.resource.appservers.ServerManager;
 
 import java.io.File;
 

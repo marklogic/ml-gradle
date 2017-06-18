@@ -3,7 +3,7 @@ package com.marklogic.mgmt.api;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.marklogic.mgmt.DeleteReceipt;
 import com.marklogic.mgmt.ManageClient;
-import com.marklogic.mgmt.ResourceManager;
+import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.SaveReceipt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

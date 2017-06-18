@@ -5,8 +5,8 @@ import com.marklogic.appdeployer.command.Command;
 import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import com.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand;
 import com.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.triggers.TriggerManager;
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.triggers.TriggerManager;
 
 public class ManageTriggersTest extends AbstractManageResourceTest {
 

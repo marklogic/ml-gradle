@@ -1,11 +1,11 @@
 package com.marklogic.mgmt.api.forest;
 
-import com.marklogic.mgmt.ResourceManager;
+import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.Resource;
 import com.marklogic.mgmt.api.database.DatabaseReplication;
-import com.marklogic.mgmt.forests.ForestManager;
-import com.marklogic.mgmt.hosts.HostManager;
+import com.marklogic.mgmt.resource.forests.ForestManager;
+import com.marklogic.mgmt.resource.hosts.HostManager;
 
 import java.util.List;
 

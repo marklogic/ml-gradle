@@ -4,7 +4,7 @@ import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.ResourceFilenameFilter;
 import com.marklogic.appdeployer.command.SortOrderConstants;
-import com.marklogic.mgmt.temporal.TemporalCollectionLSQTManager;
+import com.marklogic.mgmt.resource.temporal.TemporalCollectionLSQTManager;
 
 import java.io.File;
 

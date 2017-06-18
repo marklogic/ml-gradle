@@ -3,8 +3,8 @@ package com.marklogic.appdeployer.export.security;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.export.AbstractNamedResourceExporter;
 import com.marklogic.mgmt.ManageClient;
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.security.PrivilegeManager;
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.security.PrivilegeManager;
 
 import java.io.File;
 import java.util.Arrays;

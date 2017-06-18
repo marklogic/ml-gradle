@@ -1,10 +1,10 @@
 package com.marklogic.mgmt.api.group;
 
-import com.marklogic.mgmt.ResourceManager;
+import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.Resource;
-import com.marklogic.mgmt.groups.GroupManager;
-import com.marklogic.mgmt.tasks.TaskManager;
+import com.marklogic.mgmt.resource.groups.GroupManager;
+import com.marklogic.mgmt.resource.tasks.TaskManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;

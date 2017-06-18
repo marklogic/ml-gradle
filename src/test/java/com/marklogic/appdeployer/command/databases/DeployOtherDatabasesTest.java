@@ -7,7 +7,7 @@ import org.junit.Test;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
-import com.marklogic.mgmt.databases.DatabaseManager;
+import com.marklogic.mgmt.resource.databases.DatabaseManager;
 
 public class DeployOtherDatabasesTest extends AbstractAppDeployerTest {
 

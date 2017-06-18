@@ -4,9 +4,9 @@ import org.junit.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
-import com.marklogic.mgmt.appservers.ServerManager;
-import com.marklogic.mgmt.databases.DatabaseManager;
-import com.marklogic.mgmt.forests.ForestManager;
+import com.marklogic.mgmt.resource.appservers.ServerManager;
+import com.marklogic.mgmt.resource.databases.DatabaseManager;
+import com.marklogic.mgmt.resource.forests.ForestManager;
 
 /**
  * Verifies that all the default names in AppConfig can be overridden successfully.

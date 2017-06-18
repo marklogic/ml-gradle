@@ -3,9 +3,9 @@ package com.marklogic.appdeployer.command.groups;
 import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
-import com.marklogic.mgmt.ResourceManager;
+import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.SaveReceipt;
-import com.marklogic.mgmt.groups.GroupManager;
+import com.marklogic.mgmt.resource.groups.GroupManager;
 
 import java.io.File;
 

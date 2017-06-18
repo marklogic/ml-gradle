@@ -8,7 +8,7 @@ import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand
 import com.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand;
 import com.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
-import com.marklogic.mgmt.cpf.PipelineManager;
+import com.marklogic.mgmt.resource.cpf.PipelineManager;
 import com.marklogic.rest.util.ResourcesFragment;
 
 public class LoadDefaultCpfPipelinesTest extends AbstractAppDeployerTest {

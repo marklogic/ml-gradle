@@ -5,8 +5,8 @@ import org.junit.Test;
 
 import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.tasks.TaskManager;
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.tasks.TaskManager;
 import com.marklogic.rest.util.ResourcesFragment;
 
 import java.io.File;

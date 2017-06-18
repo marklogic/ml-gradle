@@ -4,9 +4,9 @@ import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
-import com.marklogic.mgmt.databases.DatabaseManager;
-import com.marklogic.mgmt.forests.ForestManager;
-import com.marklogic.mgmt.hosts.HostManager;
+import com.marklogic.mgmt.resource.databases.DatabaseManager;
+import com.marklogic.mgmt.resource.forests.ForestManager;
+import com.marklogic.mgmt.resource.hosts.HostManager;
 import org.springframework.util.StringUtils;
 
 import java.io.File;

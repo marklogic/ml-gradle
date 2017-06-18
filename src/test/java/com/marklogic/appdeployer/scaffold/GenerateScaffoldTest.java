@@ -11,9 +11,9 @@ import com.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.appdeployer.command.security.DeployRolesCommand;
 import com.marklogic.appdeployer.command.security.DeployUsersCommand;
-import com.marklogic.mgmt.databases.DatabaseManager;
-import com.marklogic.mgmt.security.RoleManager;
-import com.marklogic.mgmt.security.UserManager;
+import com.marklogic.mgmt.resource.databases.DatabaseManager;
+import com.marklogic.mgmt.resource.security.RoleManager;
+import com.marklogic.mgmt.resource.security.UserManager;
 
 public class GenerateScaffoldTest extends AbstractAppDeployerTest {
 

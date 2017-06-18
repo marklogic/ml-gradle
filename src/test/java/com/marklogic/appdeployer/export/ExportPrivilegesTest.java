@@ -1,15 +1,10 @@
 package com.marklogic.appdeployer.export;
 
-import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
-import com.marklogic.appdeployer.command.forests.DeployCustomForestsCommand;
 import com.marklogic.appdeployer.command.security.DeployPrivilegesCommand;
-import com.marklogic.mgmt.security.PrivilegeManager;
+import com.marklogic.mgmt.resource.security.PrivilegeManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.File;
-import java.util.List;
 
 public class ExportPrivilegesTest extends AbstractExportTest {
 

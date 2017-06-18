@@ -1,6 +1,8 @@
 package com.marklogic.mgmt;
 
 import com.marklogic.client.ext.helper.LoggingObject;
+import com.marklogic.mgmt.ManageClient;
+import com.marklogic.mgmt.PayloadParser;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ClassUtils;
 

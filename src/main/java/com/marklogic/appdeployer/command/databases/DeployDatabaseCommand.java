@@ -8,7 +8,7 @@ import com.marklogic.appdeployer.command.UndoableCommand;
 import com.marklogic.appdeployer.command.forests.DeployForestsCommand;
 import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.SaveReceipt;
-import com.marklogic.mgmt.databases.DatabaseManager;
+import com.marklogic.mgmt.resource.databases.DatabaseManager;
 
 import java.io.File;
 import java.util.Map;

@@ -3,7 +3,7 @@ package com.marklogic.appdeployer.command.alert;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
-import com.marklogic.mgmt.alert.AlertActionManager;
+import com.marklogic.mgmt.resource.alert.AlertActionManager;
 
 import java.io.File;
 

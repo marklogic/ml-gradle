@@ -8,7 +8,7 @@ import org.junit.Test;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
-import com.marklogic.mgmt.appservers.ServerManager;
+import com.marklogic.mgmt.resource.appservers.ServerManager;
 import com.marklogic.rest.util.Fragment;
 
 public class CreateRestApiUsingDefaultModulesDatabaseTest extends AbstractAppDeployerTest {

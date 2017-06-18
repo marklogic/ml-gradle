@@ -4,7 +4,7 @@ import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.PayloadParser;
-import com.marklogic.mgmt.forests.ForestManager;
+import com.marklogic.mgmt.resource.forests.ForestManager;
 
 import java.io.File;
 

@@ -3,10 +3,10 @@ package com.marklogic.appdeployer.command.forests;
 import com.marklogic.appdeployer.command.AbstractUndoableCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
-import com.marklogic.mgmt.databases.DatabaseManager;
-import com.marklogic.mgmt.forests.ForestManager;
-import com.marklogic.mgmt.forests.ForestStatus;
-import com.marklogic.mgmt.hosts.HostManager;
+import com.marklogic.mgmt.resource.databases.DatabaseManager;
+import com.marklogic.mgmt.resource.forests.ForestManager;
+import com.marklogic.mgmt.resource.forests.ForestStatus;
+import com.marklogic.mgmt.resource.hosts.HostManager;
 
 import java.util.HashMap;
 import java.util.List;

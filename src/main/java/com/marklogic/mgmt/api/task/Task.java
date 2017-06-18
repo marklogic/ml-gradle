@@ -1,11 +1,11 @@
 package com.marklogic.mgmt.api.task;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.marklogic.mgmt.ResourceManager;
+import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.Resource;
 import com.marklogic.mgmt.api.group.Group;
-import com.marklogic.mgmt.tasks.TaskManager;
+import com.marklogic.mgmt.resource.tasks.TaskManager;
 
 import java.util.List;
 

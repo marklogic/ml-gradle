@@ -5,8 +5,8 @@ import java.io.File;
 import org.junit.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.mgmt.databases.DatabaseManager;
-import com.marklogic.mgmt.forests.ForestManager;
+import com.marklogic.mgmt.resource.databases.DatabaseManager;
+import com.marklogic.mgmt.resource.forests.ForestManager;
 import com.marklogic.rest.util.Fragment;
 
 /**

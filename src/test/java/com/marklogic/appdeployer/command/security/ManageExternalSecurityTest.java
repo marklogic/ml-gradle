@@ -2,8 +2,8 @@ package com.marklogic.appdeployer.command.security;
 
 import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.security.ExternalSecurityManager;
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.security.ExternalSecurityManager;
 
 public class ManageExternalSecurityTest extends AbstractManageResourceTest {
 

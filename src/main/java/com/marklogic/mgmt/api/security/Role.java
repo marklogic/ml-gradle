@@ -1,9 +1,9 @@
 package com.marklogic.mgmt.api.security;
 
-import com.marklogic.mgmt.ResourceManager;
+import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.Resource;
-import com.marklogic.mgmt.security.RoleManager;
+import com.marklogic.mgmt.resource.security.RoleManager;
 
 import java.util.ArrayList;
 import java.util.List;

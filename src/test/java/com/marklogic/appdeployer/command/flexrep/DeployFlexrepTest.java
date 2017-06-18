@@ -2,10 +2,10 @@ package com.marklogic.appdeployer.command.flexrep;
 
 import java.io.File;
 
-import com.marklogic.mgmt.appservers.ServerManager;
-import com.marklogic.mgmt.cpf.CpfConfigManager;
-import com.marklogic.mgmt.cpf.DomainManager;
-import com.marklogic.mgmt.cpf.PipelineManager;
+import com.marklogic.mgmt.resource.appservers.ServerManager;
+import com.marklogic.mgmt.resource.cpf.CpfConfigManager;
+import com.marklogic.mgmt.resource.cpf.DomainManager;
+import com.marklogic.mgmt.resource.cpf.PipelineManager;
 import org.junit.After;
 import org.junit.Test;
 
@@ -15,8 +15,8 @@ import com.marklogic.appdeployer.command.cpf.DeployDomainsCommand;
 import com.marklogic.appdeployer.command.cpf.DeployPipelinesCommand;
 import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import com.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
-import com.marklogic.mgmt.flexrep.ConfigManager;
-import com.marklogic.mgmt.flexrep.TargetManager;
+import com.marklogic.mgmt.resource.flexrep.ConfigManager;
+import com.marklogic.mgmt.resource.flexrep.TargetManager;
 
 public class DeployFlexrepTest extends AbstractAppDeployerTest {
 

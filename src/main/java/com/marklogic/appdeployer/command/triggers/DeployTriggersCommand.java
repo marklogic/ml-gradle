@@ -3,8 +3,8 @@ package com.marklogic.appdeployer.command.triggers;
 import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.triggers.TriggerManager;
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.triggers.TriggerManager;
 
 import java.io.File;
 

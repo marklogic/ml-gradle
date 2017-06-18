@@ -2,8 +2,8 @@ package com.marklogic.appdeployer.command.groups;
 
 import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.groups.GroupManager;
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.groups.GroupManager;
 import com.marklogic.rest.util.Fragment;
 
 public class ManageGroupsTest extends AbstractManageResourceTest {

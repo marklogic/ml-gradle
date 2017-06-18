@@ -21,10 +21,7 @@ dependencies {
   compile 'org.apache.httpcomponents:httpclient:4.3.5'
   compile 'org.springframework:spring-web:4.3.5.RELEASE'
 
-  testCompile ('com.marklogic:ml-junit:3.0-alpha1') {
-    exclude module: "ml-javaclient-util"
-  }
-
+  testCompile ('com.marklogic:ml-junit:3.0-alpha1')
   testCompile('commons-io:commons-io:2.5')
 
 	// Forcing Spring to use logback instead of commons-logging

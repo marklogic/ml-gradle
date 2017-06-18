@@ -8,8 +8,8 @@ import com.marklogic.appdeployer.command.UndoableCommand;
 import com.marklogic.appdeployer.util.RestApiUtil;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.admin.ActionRequiringRestart;
-import com.marklogic.mgmt.appservers.ServerManager;
-import com.marklogic.mgmt.restapis.RestApiManager;
+import com.marklogic.mgmt.resource.appservers.ServerManager;
+import com.marklogic.mgmt.resource.restapis.RestApiManager;
 
 import java.io.File;
 

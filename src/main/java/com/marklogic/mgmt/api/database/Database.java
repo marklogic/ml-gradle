@@ -1,10 +1,10 @@
 package com.marklogic.mgmt.api.database;
 
-import com.marklogic.mgmt.ResourceManager;
+import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.Resource;
 import com.marklogic.mgmt.api.forest.Forest;
-import com.marklogic.mgmt.databases.DatabaseManager;
+import com.marklogic.mgmt.resource.databases.DatabaseManager;
 
 import java.util.ArrayList;
 import java.util.List;

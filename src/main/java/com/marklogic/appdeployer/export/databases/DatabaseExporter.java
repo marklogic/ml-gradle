@@ -5,8 +5,8 @@ import com.marklogic.appdeployer.export.AbstractNamedResourceExporter;
 import com.marklogic.appdeployer.export.ExportedResources;
 import com.marklogic.appdeployer.export.forests.ForestExporter;
 import com.marklogic.mgmt.ManageClient;
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.databases.DatabaseManager;
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.databases.DatabaseManager;
 
 import java.io.File;
 import java.util.List;

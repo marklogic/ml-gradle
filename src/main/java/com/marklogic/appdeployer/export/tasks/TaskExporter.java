@@ -3,8 +3,8 @@ package com.marklogic.appdeployer.export.tasks;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.export.AbstractNamedResourceExporter;
 import com.marklogic.mgmt.ManageClient;
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.tasks.TaskManager;
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.tasks.TaskManager;
 
 import java.io.File;
 

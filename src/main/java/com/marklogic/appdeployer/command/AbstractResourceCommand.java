@@ -1,6 +1,6 @@
 package com.marklogic.appdeployer.command;
 
-import com.marklogic.mgmt.ResourceManager;
+import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.admin.ActionRequiringRestart;
 

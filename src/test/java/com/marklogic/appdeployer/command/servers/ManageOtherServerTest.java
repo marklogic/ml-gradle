@@ -10,7 +10,7 @@ import com.marklogic.appdeployer.command.appservers.DeployOtherServersCommand;
 import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import com.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand;
 import com.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
-import com.marklogic.mgmt.appservers.ServerManager;
+import com.marklogic.mgmt.resource.appservers.ServerManager;
 
 /**
  * Main purpose of these tests is to ensure that we wait properly after deleting a server.

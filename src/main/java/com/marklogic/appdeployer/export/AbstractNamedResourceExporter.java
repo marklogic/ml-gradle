@@ -3,7 +3,7 @@ package com.marklogic.appdeployer.export;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marklogic.mgmt.ManageClient;
-import com.marklogic.mgmt.ResourceManager;
+import com.marklogic.mgmt.resource.ResourceManager;
 import org.springframework.util.FileCopyUtils;
 
 import java.io.File;

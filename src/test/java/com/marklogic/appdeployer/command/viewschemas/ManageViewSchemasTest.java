@@ -1,6 +1,6 @@
 package com.marklogic.appdeployer.command.viewschemas;
 
-import com.marklogic.mgmt.clusters.ClusterManager;
+import com.marklogic.mgmt.resource.clusters.ClusterManager;
 import org.jdom2.Namespace;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -12,8 +12,8 @@ import com.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand;
 import com.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.junit.Fragment;
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.viewschemas.ViewSchemaManager;
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.viewschemas.ViewSchemaManager;
 import com.marklogic.rest.util.RestTemplateUtil;
 
 public class ManageViewSchemasTest extends AbstractManageResourceTest {

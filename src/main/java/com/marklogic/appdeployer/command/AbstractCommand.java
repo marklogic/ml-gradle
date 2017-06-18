@@ -1,7 +1,7 @@
 package com.marklogic.appdeployer.command;
 
 import com.marklogic.client.ext.helper.LoggingObject;
-import com.marklogic.mgmt.ResourceManager;
+import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.SaveReceipt;
 import org.springframework.util.FileCopyUtils;
 

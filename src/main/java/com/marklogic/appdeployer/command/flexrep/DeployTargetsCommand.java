@@ -3,7 +3,7 @@ package com.marklogic.appdeployer.command.flexrep;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
-import com.marklogic.mgmt.flexrep.TargetManager;
+import com.marklogic.mgmt.resource.flexrep.TargetManager;
 
 import java.io.File;
 

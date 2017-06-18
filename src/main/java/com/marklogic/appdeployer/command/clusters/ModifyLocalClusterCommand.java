@@ -3,7 +3,7 @@ package com.marklogic.appdeployer.command.clusters;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
-import com.marklogic.mgmt.clusters.ClusterManager;
+import com.marklogic.mgmt.resource.clusters.ClusterManager;
 
 import java.io.File;
 

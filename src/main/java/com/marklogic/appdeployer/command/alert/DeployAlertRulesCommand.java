@@ -4,7 +4,7 @@ import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.PayloadParser;
-import com.marklogic.mgmt.alert.AlertRuleManager;
+import com.marklogic.mgmt.resource.alert.AlertRuleManager;
 
 import java.io.File;
 

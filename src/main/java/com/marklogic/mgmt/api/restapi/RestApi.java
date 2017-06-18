@@ -2,7 +2,7 @@ package com.marklogic.mgmt.api.restapi;
 
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.ApiObject;
-import com.marklogic.mgmt.restapis.RestApiManager;
+import com.marklogic.mgmt.resource.restapis.RestApiManager;
 import org.springframework.http.ResponseEntity;
 
 public class RestApi extends ApiObject {

@@ -3,7 +3,7 @@ package com.marklogic.appdeployer.command.cpf;
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
-import com.marklogic.mgmt.cpf.AbstractCpfResourceManager;
+import com.marklogic.mgmt.resource.cpf.AbstractCpfResourceManager;
 
 import java.io.File;
 

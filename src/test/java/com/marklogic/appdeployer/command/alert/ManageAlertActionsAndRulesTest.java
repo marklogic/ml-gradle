@@ -6,10 +6,10 @@ import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
 import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import com.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.alert.AlertActionManager;
-import com.marklogic.mgmt.alert.AlertConfigManager;
-import com.marklogic.mgmt.alert.AlertRuleManager;
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.alert.AlertActionManager;
+import com.marklogic.mgmt.resource.alert.AlertConfigManager;
+import com.marklogic.mgmt.resource.alert.AlertRuleManager;
 import com.marklogic.rest.util.Fragment;
 import com.marklogic.rest.util.ResourcesFragment;
 
@@ -83,8 +83,8 @@ public class ManageAlertActionsAndRulesTest extends AbstractManageResourceTest {
      */
     @Override
     protected void verifyResourcesWereDeleted(ResourceManager mgr) {
-        
+
     }
-    
-    
+
+
 }

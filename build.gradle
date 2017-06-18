@@ -21,7 +21,7 @@ dependencies {
   compile 'org.apache.httpcomponents:httpclient:4.3.5'
   compile 'org.springframework:spring-web:4.3.5.RELEASE'
 
-  testCompile ('com.marklogic:ml-junit:2.6.0') {
+  testCompile ('com.marklogic:ml-junit:3.0-alpha1') {
     exclude module: "ml-javaclient-util"
   }
 

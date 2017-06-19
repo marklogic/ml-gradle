@@ -5,6 +5,11 @@ import java.io.File;
 import com.marklogic.mgmt.ResourceManager;
 import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.admin.ActionRequiringRestart;
+import com.marklogic.mgmt.admin.AdminManager;
+import org.springframework.http.ResponseEntity;
+
+import java.io.File;
+import java.net.URI;
 
 /**
  * Provides a basic implementation for creating/updating a resource while an app is being deployed and then deleting it
@@ -46,6 +51,9 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
     /**
      * Subclasses can override this to add functionality after a resource has been saved.
      *
+     * Starting in version 3.0 of ml-app-deployer, this will always check if the Location header is
+     * /admin/v1/timestamp, and if so, it will wait for ML to restart.
+     *
      * @param mgr
      * @param context
      * @param resourceFile
@@ -53,7 +61,16 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
      */
     protected void afterResourceSaved(ResourceManager mgr, CommandContext context, File resourceFile,
             SaveReceipt receipt) {
-
+    	ResponseEntity<String> response = receipt.getResponse();
+    	URI uri = response.getHeaders().getLocation();
+    	if (uri != null && "/admin/v1/timestamp".equals(uri.getPath())) {
+		    AdminManager adminManager = context.getAdminManager();
+		    if (adminManager != null) {
+		    	adminManager.waitForRestart();
+		    } else {
+		    	logger.warn("Location header indicates ML is restarting, but no AdminManager available to support waiting for a restart");
+		    }
+	    }
     }
 
     @Override

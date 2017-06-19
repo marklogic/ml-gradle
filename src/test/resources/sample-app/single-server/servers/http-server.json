@@ -1,0 +1,9 @@
+{
+  "server-name": "%%NAME%%-http",
+  "server-type": "http",
+  "root": "/",
+  "group-name": "%%GROUP%%",
+  "port": %%HTTP_PORT%%,
+  "modules-database": "Modules",
+  "content-database": "Documents"
+}

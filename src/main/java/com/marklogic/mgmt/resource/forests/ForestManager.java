@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.marklogic.mgmt.resource.AbstractResourceManager;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.rest.util.Fragment;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -28,6 +29,8 @@ public class ForestManager extends AbstractResourceManager {
     public final static String REPLICAS_DELETE = "delete";
 
     private String deleteLevel = DELETE_LEVEL_FULL;
+    private int deleteRetryAttempts = 3;
+    private long deleteSleepPeriod = 500;
 
     public ForestManager(ManageClient client) {
         super(client);
@@ -58,9 +61,30 @@ public class ForestManager extends AbstractResourceManager {
             logger.info(format("Could not find forest with name or ID: %s, so not deleting", nameOrId));
         } else {
             logger.info(format("Deleting forest %s", nameOrId));
-            getManageClient().delete(format("/manage/v2/forests/%s?level=%s&replicas=%s", nameOrId, level, replicas));
+            String path = format("/manage/v2/forests/%s?level=%s&replicas=%s", nameOrId, level, replicas);
+            deleteWithRetry(path, deleteRetryAttempts);
             logger.info(format("Deleted forest %s", nameOrId));
         }
+    }
+
+    public void deleteWithRetry(String path, int attemptsLeft) {
+	    try {
+		    getManageClient().delete(path);
+	    } catch (Exception e) {
+	    	// Error will be logged automatically by MgmtResponseErrorHandler
+		    if (attemptsLeft > 0) {
+		    	try {
+		    		logger.warn("Unable to delete forest; will wait " + deleteSleepPeriod + "ms, then retry at path: " + path);
+				    Thread.sleep(deleteSleepPeriod);
+				    attemptsLeft--;
+				    deleteWithRetry(path, attemptsLeft);
+			    } catch (InterruptedException ex) {
+		    		// Ignore
+			    }
+		    } else {
+		    	throw e;
+		    }
+	    }
     }
 
 	/**
@@ -199,4 +223,12 @@ public class ForestManager extends AbstractResourceManager {
     public void setDeleteLevel(String deleteLevel) {
         this.deleteLevel = deleteLevel;
     }
+
+	public void setDeleteRetryAttempts(int deleteRetryAttempts) {
+		this.deleteRetryAttempts = deleteRetryAttempts;
+	}
+
+	public void setDeleteSleepPeriod(long deleteSleepPeriod) {
+		this.deleteSleepPeriod = deleteSleepPeriod;
+	}
 }

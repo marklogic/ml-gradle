@@ -79,6 +79,11 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    p.setProperty("mlGenerateExtractionTemplate", "false");
 	    p.setProperty("mlResourceFilenamesToIgnore", "role1.json,role2.xml");
 
+	    p.setProperty("mlDatabaseNamesAndReplicaCounts", "Documents,1,Security,2");
+	    p.setProperty("mlReplicaForestDataDirectory", "/var/data");
+	    p.setProperty("mlReplicaForestFastDataDirectory", "/var/fast");
+	    p.setProperty("mlReplicaForestLargeDataDirectory", "/var/large");
+
 	    sut = new DefaultAppConfigFactory(new SimplePropertySource(p));
         AppConfig config = sut.newAppConfig();
 
@@ -124,6 +129,11 @@ public class DefaultAppConfigFactoryTest extends Assert {
 
         assertEquals("role1.json", config.getResourceFilenamesToIgnore()[0]);
 	    assertEquals("role2.xml", config.getResourceFilenamesToIgnore()[1]);
+
+	    assertEquals("Documents,1,Security,2", config.getDatabaseNamesAndReplicaCounts());
+	    assertEquals("/var/data", config.getReplicaForestDataDirectory());
+	    assertEquals("/var/fast", config.getReplicaForestFastDataDirectory());
+	    assertEquals("/var/large", config.getReplicaForestLargeDataDirectory());
     }
 
 	/**

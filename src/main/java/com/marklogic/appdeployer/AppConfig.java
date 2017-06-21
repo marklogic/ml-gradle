@@ -19,10 +19,13 @@ import java.util.Map;
  * Encapsulates common configuration properties for an application deployed to MarkLogic. These properties include not
  * just names of application resources - such as app servers and databases - but also connection information for loading
  * modules into an application as well as paths for modules and configuration files.
- * <p>
+ *
  * An instance of this class is passed in as the main argument to the methods in the {@code AppDeployer} interface,
  * meaning that you're free to not just configure this as needed but also subclass it and add anything that you would
  * like.
+ *
+ * Additionally, the additionalProperties Map can used for storing any additional properties that a client of this class
+ * may use, without having to define them as attributes of this class.
  */
 public class AppConfig {
 
@@ -118,6 +121,11 @@ public class AppConfig {
     // Comma-delimited string used for configuring forest replicas
     private String databaseNamesAndReplicaCounts;
 
+    // Configures the data-directory for replica forests built dynamically
+    private String replicaForestDataDirectory;
+    private String replicaForestLargeDataDirectory;
+    private String replicaForestFastDataDirectory;
+
     // Path to use for DeployFlexrepCommand
     private String flexrepPath;
 
@@ -141,6 +149,8 @@ public class AppConfig {
 	private boolean generateSearchOptions = true;
 
 	private String[] resourceFilenamesToIgnore;
+
+	private Map<String, Object> additionalProperties = new HashMap<>();
 
 	public AppConfig() {
         this(DEFAULT_MODULES_PATH, DEFAULT_SCHEMAS_PATH);
@@ -693,5 +703,37 @@ public class AppConfig {
 
 	public void setAppServicesAuthentication(Authentication appServicesAuthentication) {
 		this.appServicesAuthentication = appServicesAuthentication;
+	}
+
+	public String getReplicaForestDataDirectory() {
+		return replicaForestDataDirectory;
+	}
+
+	public void setReplicaForestDataDirectory(String replicaForestDataDirectory) {
+		this.replicaForestDataDirectory = replicaForestDataDirectory;
+	}
+
+	public String getReplicaForestLargeDataDirectory() {
+		return replicaForestLargeDataDirectory;
+	}
+
+	public void setReplicaForestLargeDataDirectory(String replicaForestLargeDataDirectory) {
+		this.replicaForestLargeDataDirectory = replicaForestLargeDataDirectory;
+	}
+
+	public String getReplicaForestFastDataDirectory() {
+		return replicaForestFastDataDirectory;
+	}
+
+	public void setReplicaForestFastDataDirectory(String replicaForestFastDataDirectory) {
+		this.replicaForestFastDataDirectory = replicaForestFastDataDirectory;
+	}
+
+	public Map<String, Object> getAdditionalProperties() {
+		return additionalProperties;
+	}
+
+	public void setAdditionalProperties(Map<String, Object> additionalProperties) {
+		this.additionalProperties = additionalProperties;
 	}
 }

@@ -25,6 +25,7 @@ public class Forest extends Resource {
     private List<String> failoverHost;
     private List<ForestBackup> forestBackup;
     private List<DatabaseReplication> databaseReplication;
+    private List<ForestReplica> forestReplica;
 
     public Forest() {
     }
@@ -191,4 +192,12 @@ public class Forest extends Resource {
     public Boolean getFailoverEnable() {
         return failoverEnable;
     }
+
+	public List<ForestReplica> getForestReplica() {
+		return forestReplica;
+	}
+
+	public void setForestReplica(List<ForestReplica> forestReplica) {
+		this.forestReplica = forestReplica;
+	}
 }

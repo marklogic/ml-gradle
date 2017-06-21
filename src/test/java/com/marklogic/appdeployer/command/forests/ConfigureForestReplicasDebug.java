@@ -13,13 +13,16 @@ import com.marklogic.mgmt.ManageConfig;
 public class ConfigureForestReplicasDebug {
 
     public static void main(String[] args) {
-        final String host = args[0];
-        final String password = args[1];
+        final String host = "localhost"; //args[0];
+        final String password = "admin"; //args[1];
 
         ManageConfig config = new ManageConfig(host, 8002, "admin", password);
         ManageClient manageClient = new ManageClient(config);
         AppConfig appConfig = new AppConfig();
         appConfig.setDatabaseNamesAndReplicaCounts("testdb,1");
+        appConfig.setReplicaForestDataDirectory("/var/opt/MarkLogic/Replica");
+        appConfig.setReplicaForestLargeDataDirectory("/var/opt/MarkLogic/Large");
+        appConfig.setReplicaForestFastDataDirectory("/var/opt/MarkLogic/Fast");
         CommandContext context = new CommandContext(appConfig, manageClient, null);
 
         DeployDatabaseCommand ddc = new DeployDatabaseCommand();
@@ -33,7 +36,10 @@ public class ConfigureForestReplicasDebug {
         ddc.execute(context);
         cfrc.execute(context);
 
-        // Then delete the replicas, and then undeploy the database
+        // Deploy again to make sure there are no errors
+	    cfrc.execute(context);
+
+	    // Then delete the replicas, and then undeploy the database
         cfrc.undo(context);
         ddc.undo(context);
     }

@@ -1,13 +1,18 @@
 package com.marklogic.appdeployer.command.forests;
 
+import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.command.AbstractUndoableCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
+import com.marklogic.mgmt.api.API;
+import com.marklogic.mgmt.api.forest.Forest;
+import com.marklogic.mgmt.api.forest.ForestReplica;
 import com.marklogic.mgmt.databases.DatabaseManager;
 import com.marklogic.mgmt.forests.ForestManager;
 import com.marklogic.mgmt.forests.ForestStatus;
 import com.marklogic.mgmt.hosts.HostManager;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,7 +89,7 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 		for (String forestName : forestNamesAndReplicaCounts.keySet()) {
 			int replicaCount = forestNamesAndReplicaCounts.get(forestName);
 			if (replicaCount > 0) {
-				configureReplicaForests(forestName, replicaCount, hostIds, forestMgr);
+				configureReplicaForests(forestName, replicaCount, hostIds, context, forestMgr);
 			}
 		}
 	}
@@ -130,7 +135,7 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 
 	/**
 	 * For the given database, find all of its primary forests. Then for each primary forest, just call
-	 * configureReplicaForests? And that should be smart enough to say - if the primary forest already has replicas,
+	 * configureReplicaForests. And that should be smart enough to say - if the primary forest already has replicas,
 	 * then don't do anything.
 	 *
 	 * @param databaseName
@@ -138,13 +143,12 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 	 * @param hostIds
 	 */
 	protected void configureDatabaseReplicaForests(String databaseName, int replicaCount, List<String> hostIds,
-												   CommandContext context) {
+	                                               CommandContext context) {
 		ForestManager forestMgr = new ForestManager(context.getManageClient());
 		DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
 		List<String> forestNames = dbMgr.getForestNames(databaseName);
-		logger.info("Forests: " + forestNames);
 		for (String name : forestNames) {
-			configureReplicaForests(name, replicaCount, hostIds, forestMgr);
+			configureReplicaForests(name, replicaCount, hostIds, context, forestMgr);
 		}
 	}
 
@@ -155,10 +159,11 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 	 * @param forestIdOrName
 	 * @param replicaCount
 	 * @param hostIds
+	 * @param context
 	 * @param forestMgr
 	 */
 	protected void configureReplicaForests(String forestIdOrName, int replicaCount, List<String> hostIds,
-										   ForestManager forestMgr) {
+	                                       CommandContext context, ForestManager forestMgr) {
 		ForestStatus status = forestMgr.getForestStatus(forestIdOrName);
 		if (!status.isPrimary()) {
 			logger.info(format("Forest %s is not a primary forest, so not configuring replica forests", forestIdOrName));
@@ -169,12 +174,9 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 			return;
 		}
 
-		Map<String, String> replicaNamesAndHostIds = createReplicaForests(forestIdOrName, replicaCount, hostIds, forestMgr);
-		logger.info(format("Configuring forest replicas for primary forest %s", forestIdOrName));
-		if (!replicaNamesAndHostIds.isEmpty()) {
-			forestMgr.setReplicas(forestIdOrName, replicaNamesAndHostIds);
-		}
-		logger.info(format("Finished configuring forest replicas for primary forest %s", forestIdOrName));
+		logger.info(format("Creating forest replicas for primary forest %s", forestIdOrName));
+		createReplicaForests(forestIdOrName, replicaCount, hostIds, context, forestMgr);
+		logger.info(format("Finished creating forest replicas for primary forest %s", forestIdOrName));
 	}
 
 	/**
@@ -184,12 +186,20 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 	 * @param forestIdOrName
 	 * @param replicaCount
 	 * @param hostIds
+	 * @param context
 	 * @param forestMgr
 	 * @return a map where the keys are replica forest names, and the value of each key is the ID of the host that
 	 * the replica was created on
 	 */
 	protected Map<String, String> createReplicaForests(String forestIdOrName, int replicaCount, List<String> hostIds,
-													   ForestManager forestMgr) {
+	                                                   CommandContext context, ForestManager forestMgr) {
+
+		// Using the Forest class to generate JSON
+		API api = new API(context.getManageClient());
+		Forest forest = new Forest(api, null);
+		List<ForestReplica> replicas = new ArrayList<>();
+		forest.setForestReplica(replicas);
+
 		String primaryForestHostId = forestMgr.getHostId(forestIdOrName);
 		Map<String, String> replicaNamesAndHostIds = new HashMap<>();
 		int size = hostIds.size();
@@ -203,13 +213,26 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 					}
 					String replicaHostId = hostIds.get(nextReplicaHostIndex);
 					String name = forestIdOrName + "-replica-" + j;
-					forestMgr.createJsonForestWithName(name, replicaHostId);
+					replicas.add(buildForestReplica(name, replicaHostId, context.getAppConfig()));
 					replicaNamesAndHostIds.put(name, replicaHostId);
 					nextReplicaHostIndex++;
 				}
 			}
 		}
+
+		String json = forest.getJson();
+		context.getManageClient().putJson(forestMgr.getPropertiesPath(forestIdOrName), json);
 		return replicaNamesAndHostIds;
+	}
+
+	protected ForestReplica buildForestReplica(String name, String replicaHostId, AppConfig appConfig) {
+		ForestReplica replica = new ForestReplica();
+		replica.setHost(replicaHostId);
+		replica.setReplicaName(name);
+		replica.setDataDirectory(appConfig.getReplicaForestDataDirectory());
+		replica.setLargeDataDirectory(appConfig.getReplicaForestLargeDataDirectory());
+		replica.setFastDataDirectory(appConfig.getReplicaForestFastDataDirectory());
+		return replica;
 	}
 
 	public Map<String, Integer> getForestNamesAndReplicaCounts() {

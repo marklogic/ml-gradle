@@ -158,6 +158,24 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			c.setDatabaseNamesAndReplicaCounts(prop);
 		}
 
+		prop = getProperty("mlReplicaForestDataDirectory");
+		if (prop != null) {
+			logger.info("Replica forest data directory " + prop);
+			c.setReplicaForestDataDirectory(prop);
+		}
+
+		prop = getProperty("mlReplicaForestLargeDataDirectory");
+		if (prop != null) {
+			logger.info("Replica forest large data directory " + prop);
+			c.setReplicaForestLargeDataDirectory(prop);
+		}
+
+		prop = getProperty("mlReplicaForestFastDataDirectory");
+		if (prop != null) {
+			logger.info("Replica forest fast data directory " + prop);
+			c.setReplicaForestFastDataDirectory(prop);
+		}
+
 		/**
 		 * When undo is invoked on DeployDatabaseCommand (such as via mlUndeploy in ml-gradle), this controls whether
 		 * or not forests are deleted, or just their configuration is deleted. If mlDeleteReplicas is set to true, this

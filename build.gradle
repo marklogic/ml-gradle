@@ -4,8 +4,8 @@ plugins {
   id "eclipse"
   id "idea"
   id "com.jfrog.bintray" version "1.6"
-	id "com.github.jk1.dependency-license-report" version "0.3.11"
-	id "com.gradle.plugin-publish" version "0.9.7"
+  id "com.github.jk1.dependency-license-report" version "0.3.11"
+  id "com.gradle.plugin-publish" version "0.9.7"
 }
 
 sourceCompatibility = "1.7"
@@ -21,6 +21,7 @@ dependencies {
   compile localGroovy()
   compile mlAppDeployerDependency
   compile mlcpUtilDependency
+  compile group: 'commons-io', name: 'commons-io', version: '2.5'
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {

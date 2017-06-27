@@ -33,6 +33,7 @@ import com.marklogic.gradle.task.groups.SetTraceEventsTask
 import com.marklogic.gradle.task.mimetypes.DeployMimetypesTask
 import com.marklogic.gradle.task.qconsole.ExportWorkspacesTask
 import com.marklogic.gradle.task.qconsole.ImportWorkspacesTask
+import com.marklogic.gradle.task.roxy.CopyRoxyFilesTask
 import com.marklogic.gradle.task.roxy.RoxyCopyPropertiesTask
 import com.marklogic.gradle.task.scaffold.GenerateScaffoldTask
 import com.marklogic.gradle.task.schemas.LoadSchemasTask
@@ -210,6 +211,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 
 		String roxyGroup = "ml-gradle Roxy";
 		project.task("mlRoxyCopyProperties", type: RoxyCopyPropertiesTask, group: roxyGroup, description: "Copy Roxy properties to gradle.properties file")
+		project.task("mlCopyRoxyFiles", type: CopyRoxyFilesTask, group: roxyGroup, description: "Copy roxy files")
 
 		logger.info("Finished initializing ml-gradle\n")
 	}

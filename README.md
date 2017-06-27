@@ -15,7 +15,7 @@ Why use ml-gradle?
 =========
 ml-gradle is a good fit for you and your team if:
 
-1. You're using MarkLogic 8
+1. You're using MarkLogic 8 or 9
 2. You're using Gradle, or you're considering moving away from Ant/Maven/etc to Gradle to manage all of your build processes
 3. You'd like to use a build tool that can manage the dependencies and execution of MarkLogic tools such as the Java Client API, mlcp, corb, recordloader, xqsync
 4. You'd like to have a single all-purpose tool that allows you to define tasks to do anything you need to on your MarkLogic project, 

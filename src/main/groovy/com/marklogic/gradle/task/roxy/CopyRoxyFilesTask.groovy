@@ -19,9 +19,9 @@ class CopyRoxyFilesTask extends MarkLogicTask {
 
 	@TaskAction
 	void copyRoxyFiles() {
+		backupProperties()
 		if (getRoxyHome()) {
 			copyFolders()
-			copyProperties()
 		} else {
 			println "mlRoxyHome parameter is not provided. Please run using -P mlRoxyHome=/your/roxy/project/home"
 		}
@@ -41,17 +41,11 @@ class CopyRoxyFilesTask extends MarkLogicTask {
 		}
 	}
 
-	void copyProperties() {
-		def deployFolder = new File(getRoxyHome() + "/deploy")
-		if (deployFolder.exists() && deployFolder.isDirectory()) {
-			deployFolder.eachFileMatch FILES, ~/.*\.properties$/, {
-				File file ->
-					def backup = file.getName() + ".backup"
-					println "Copy file '" + file.getAbsoluteFile() + "' to '" + backup + "' ... "
-					FileUtils.copyFile(file, new File(backup))
-			}
-		} else {
-			println "Missing deploy folder"
+	void backupProperties() {
+		def gradleProp = new File("gradle.properties")
+		if (gradleProp.exists()) {
+			println "Copying 'gradle.properties' to 'gradle.properties.backup' ... "
+			FileUtils.copyFile(gradleProp, new File("gradle.properties.backup"))
 		}
 	}
 

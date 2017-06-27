@@ -8,8 +8,6 @@ import static groovy.io.FileType.FILES
 
 class CopyRoxyFilesTask extends MarkLogicTask {
 
-	Set<String> allRoxyProperties = new LinkedHashSet<>()
-
 	def roxyFolderMapping = [
 								"src" : "src/main/ml-modules/root",
 								"rest-api/config" : "src/main/ml-modules/options",
@@ -23,7 +21,7 @@ class CopyRoxyFilesTask extends MarkLogicTask {
 		if (getRoxyHome()) {
 			copyFolders()
 		} else {
-			println "mlRoxyHome parameter is not provided. Please run using -P mlRoxyHome=/your/roxy/project/home"
+			println "mlRoxyHome parameter is not provided. Please run using -PmlRoxyHome=/your/roxy/project/home"
 		}
 	}
 

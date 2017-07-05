@@ -73,6 +73,10 @@ public class AppConfig {
 
     private Integer restPort = DEFAULT_PORT;
     private Integer testRestPort;
+
+    // Username/password combo for using the App Services client REST API - e.g. to load non-REST API modules
+	private String appServicesUsername = DEFAULT_USERNAME;
+	private String appServicesPassword = DEFAULT_PASSWORD;
     private Integer appServicesPort = 8000;
 
     // These can all be set to override the default names that are generated off of the "name" attribute.
@@ -195,7 +199,7 @@ public class AppConfig {
 
     public DatabaseClient newModulesDatabaseClient() {
 	    return DatabaseClientFactory.newClient(getHost(), getAppServicesPort(), getModulesDatabaseName(),
-		    getRestAdminUsername(), getRestAdminPassword(), getAppServicesAuthentication(), getAppServicesSslContext(),
+		    getAppServicesUsername(), getAppServicesPassword(), getAppServicesAuthentication(), getAppServicesSslContext(),
 		    getAppServicesSslHostnameVerifier());
     }
 
@@ -206,7 +210,7 @@ public class AppConfig {
      */
     public DatabaseClient newSchemasDatabaseClient() {
         return DatabaseClientFactory.newClient(getHost(), getAppServicesPort(), getSchemasDatabaseName(),
-                getRestAdminUsername(), getRestAdminPassword(), getAppServicesAuthentication(), getAppServicesSslContext(),
+                getAppServicesUsername(), getAppServicesPassword(), getAppServicesAuthentication(), getAppServicesSslContext(),
                 getAppServicesSslHostnameVerifier());
     }
 
@@ -735,5 +739,21 @@ public class AppConfig {
 
 	public void setAdditionalProperties(Map<String, Object> additionalProperties) {
 		this.additionalProperties = additionalProperties;
+	}
+
+	public String getAppServicesUsername() {
+		return appServicesUsername;
+	}
+
+	public void setAppServicesUsername(String appServicesUsername) {
+		this.appServicesUsername = appServicesUsername;
+	}
+
+	public String getAppServicesPassword() {
+		return appServicesPassword;
+	}
+
+	public void setAppServicesPassword(String appServicesPassword) {
+		this.appServicesPassword = appServicesPassword;
 	}
 }

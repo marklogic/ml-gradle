@@ -73,6 +73,10 @@ public class AppConfig {
 
     private Integer restPort = DEFAULT_PORT;
     private Integer testRestPort;
+
+    // Username/password combo for using the App Services client REST API - e.g. to load non-REST API modules
+	private String appServicesUsername = DEFAULT_USERNAME;
+	private String appServicesPassword = DEFAULT_PASSWORD;
     private Integer appServicesPort = 8000;
 
     // These can all be set to override the default names that are generated off of the "name" attribute.
@@ -217,13 +221,15 @@ public class AppConfig {
 	}
 
 	/**
+	 * In versions 2.8.0 and prior, this used restAdminUsername/Password. instead of appServicesUsername/Password.
+	 *
      * @return an XccAssetLoader based on the configuration properties in this class
      */
     public XccAssetLoader newXccAssetLoader() {
         XccAssetLoader l = new XccAssetLoader();
         l.setHost(getHost());
-        l.setUsername(getRestAdminUsername());
-        l.setPassword(getRestAdminPassword());
+        l.setUsername(getAppServicesUsername());
+        l.setPassword(getAppServicesPassword());
         l.setDatabaseName(getModulesDatabaseName());
         if (getAppServicesPort() != null) {
             l.setPort(getAppServicesPort());
@@ -778,5 +784,21 @@ public class AppConfig {
 
 	public void setAdditionalProperties(Map<String, Object> additionalProperties) {
 		this.additionalProperties = additionalProperties;
+	}
+
+	public String getAppServicesUsername() {
+		return appServicesUsername;
+	}
+
+	public void setAppServicesUsername(String appServicesUsername) {
+		this.appServicesUsername = appServicesUsername;
+	}
+
+	public String getAppServicesPassword() {
+		return appServicesPassword;
+	}
+
+	public void setAppServicesPassword(String appServicesPassword) {
+		this.appServicesPassword = appServicesPassword;
 	}
 }

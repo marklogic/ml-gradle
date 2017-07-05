@@ -38,7 +38,39 @@ public class DefaultAppConfigFactoryTest extends Assert {
         assertEquals("Should use default", "admin", config.getRestAdminUsername());
     }
 
-    /**
+    @Test
+    public void appServicesDefaultsToDefaultUsernamePassword() {
+	    sut = new DefaultAppConfigFactory(new SimplePropertySource("mlUsername", "someuser", "mlPassword", "somepassword"));
+	    AppConfig config = sut.newAppConfig();
+	    assertEquals("someuser", config.getRestAdminUsername());
+	    assertEquals("somepassword", config.getRestAdminPassword());
+	    assertEquals("someuser", config.getAppServicesUsername());
+	    assertEquals("somepassword", config.getAppServicesPassword());
+    }
+
+	@Test
+	public void appServicesDefaultsToRestAdminUsernamePassword() {
+		sut = new DefaultAppConfigFactory(new SimplePropertySource("mlRestAdminUsername", "someuser", "mlRestAdminPassword", "somepassword"));
+		AppConfig config = sut.newAppConfig();
+		assertEquals("someuser", config.getRestAdminUsername());
+		assertEquals("somepassword", config.getRestAdminPassword());
+		assertEquals("someuser", config.getAppServicesUsername());
+		assertEquals("somepassword", config.getAppServicesPassword());
+	}
+
+	@Test
+	public void appServicesDiffersFromRestAdmin() {
+		sut = new DefaultAppConfigFactory(new SimplePropertySource(
+			"mlRestAdminUsername", "someuser", "mlRestAdminPassword", "somepassword",
+			"mlAppServicesUsername", "appuser", "mlAppServicesPassword", "appword"));
+		AppConfig config = sut.newAppConfig();
+		assertEquals("someuser", config.getRestAdminUsername());
+		assertEquals("somepassword", config.getRestAdminPassword());
+		assertEquals("appuser", config.getAppServicesUsername());
+		assertEquals("appword", config.getAppServicesPassword());
+	}
+
+	/**
      * As of 2.2.0.
      */
     @Test
@@ -64,6 +96,8 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    p.setProperty("mlDeleteForests", "false");
         p.setProperty("mlDeleteReplicas", "false");
         p.setProperty("mlGroupName", "other-group");
+        p.setProperty("mlAppServicesUsername", "appServicesUsername");
+        p.setProperty("mlAppServicesPassword", "appServicesPassword");
         p.setProperty("mlAppServicesPort", "8123");
         p.setProperty("mlReplaceTokensInModules", "false");
         p.setProperty("mlUseRoxyTokenPrefix", "false");
@@ -108,6 +142,8 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    assertFalse(config.isDeleteForests());
         assertFalse(config.isDeleteReplicas());
         assertEquals("other-group", config.getGroupName());
+        assertEquals("appServicesUsername", config.getAppServicesUsername());
+        assertEquals("appServicesPassword", config.getAppServicesPassword());
         assertEquals((Integer) 8123, config.getAppServicesPort());
         assertFalse(config.isReplaceTokensInModules());
         assertFalse(config.isUseRoxyTokenPrefix());

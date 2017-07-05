@@ -121,7 +121,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 
 		/**
 		 * The username and password for a ML user with the rest-admin role. This user is used for operations against the
-		 * Client REST API - namely, loading modules.
+		 * Client REST API - namely, loading REST API modules such as options, services, and transforms.
 		 */
 		prop = getProperty("mlRestAdminUsername");
 		if (prop != null) {
@@ -136,6 +136,33 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			c.setRestAdminPassword(prop);
 		} else if (mlPassword != null) {
 			c.setRestAdminPassword(mlPassword);
+		}
+
+		/**
+		 * The username and password for a ML user with the rest-admin role that is used for e.g. loading
+		 * non-REST API modules via the App Services client REST API, which is defined by the appServicesPort.
+		 *
+		 * Note that this will first default to restAdminUsername and restAdminPassword if those have been set, and if
+		 * not, then username and password.
+		 */
+		prop = getProperty("mlAppServicesUsername");
+		if (prop != null) {
+			logger.info("App Services username: " + prop);
+			c.setAppServicesUsername(prop);
+		} else if (c.getRestAdminUsername() != null) {
+			logger.info("App Services username: " + c.getRestAdminUsername());
+			c.setAppServicesUsername(c.getRestAdminUsername());
+		} else if (mlUsername != null) {
+			logger.info("App Services username: " + mlUsername);
+			c.setAppServicesUsername(mlUsername);
+		}
+		prop = getProperty("mlAppServicesPassword");
+		if (prop != null) {
+			c.setAppServicesPassword(prop);
+		} else if (c.getRestAdminPassword() != null) {
+			c.setAppServicesPassword(c.getRestAdminPassword());
+		} else if (mlPassword != null) {
+			c.setAppServicesPassword(mlPassword);
 		}
 
 		/**

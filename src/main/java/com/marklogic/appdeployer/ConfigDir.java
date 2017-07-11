@@ -1,114 +1,162 @@
 package com.marklogic.appdeployer;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * Defines all of the directories where configuration files can be found. This is decoupled from the NounManager
  * classes, who don't need to care where to look for configuration files, they just need to care about how to load the
  * data in those files.
- *
- * Every directory path referenced in this should have a setter so that it can be modified in e.g. a Gradle build file.
  */
 public class ConfigDir {
 
-    private File baseDir;
+	private File baseDir;
 
-    private String databasesPath = "databases";
-    private String defaultContentDatabaseFilename = "content-database.json";
+	private String databasesPath = "databases";
+	private String defaultContentDatabaseFilename = "content-database.json";
 
-    private String restApiPath = "rest-api.json";
+	private String restApiPath = "rest-api.json";
 
-    private List<File> contentDatabaseFiles;
+	private List<File> contentDatabaseFiles;
 
-    public ConfigDir() {
-        this(new File("src/main/ml-config"));
-    }
+	public ConfigDir() {
+		this(new File("src/main/ml-config"));
+	}
 
-    public ConfigDir(File baseDir) {
-        setBaseDir(baseDir);
-    }
+	public ConfigDir(File baseDir) {
+		setBaseDir(baseDir);
+	}
 
-    public void setBaseDir(File baseDir) {
-        this.baseDir = baseDir;
-        initializeContentDatabaseFiles();
-    }
+	public void setBaseDir(File baseDir) {
+		this.baseDir = baseDir;
+		initializeContentDatabaseFiles();
+	}
 
-    public File getDatabasesDir() {
-        return new File(baseDir, databasesPath);
-    }
+	public File getDatabasesDir() {
+		return new File(baseDir, databasesPath);
+	}
 
-    protected void initializeContentDatabaseFiles() {
-        contentDatabaseFiles = new ArrayList<>();
-        contentDatabaseFiles.add(new File(getDatabasesDir(), defaultContentDatabaseFilename));
-    }
+	/**
+	 * Return a list of every directory under the databases directory. Each such directory is considered to contain
+	 * resources for the database with a name matching that of the directory.
+	 *
+	 * @return
+	 */
+	public List<File> getDatabaseResourceDirectories() {
+		File dbDir = getDatabasesDir();
+		if (dbDir != null && dbDir.exists()) {
+			File[] dirs = dbDir.listFiles(new FileFilter() {
+				@Override
+				public boolean accept(File pathname) {
+					return pathname.isDirectory();
+				}
+			});
+			return Arrays.asList(dirs);
+		}
+		return new ArrayList<File>();
+	}
 
-    public File getRestApiFile() {
-        return new File(baseDir, restApiPath);
-    }
+	protected void initializeContentDatabaseFiles() {
+		contentDatabaseFiles = new ArrayList<>();
+		contentDatabaseFiles.add(new File(getDatabasesDir(), defaultContentDatabaseFilename));
+	}
 
-    public File getRestApiServerFile() {
-        return new File(getServersDir(), "rest-api-server.json");
-    }
+	public File getRestApiFile() {
+		return new File(baseDir, restApiPath);
+	}
 
-    public File getSecurityDir() {
-        return new File(baseDir, "security");
-    }
+	public File getRestApiServerFile() {
+		return new File(getServersDir(), "rest-api-server.json");
+	}
 
-    public File getServersDir() { return new File(baseDir, "servers"); }
+	public File getSecurityDir() {
+		return new File(baseDir, "security");
+	}
 
-    public File getForestsDir() {
-        return new File(baseDir, "forests");
-    }
+	public File getServersDir() {
+		return new File(baseDir, "servers");
+	}
 
-    public File getCpfDir() {
-        return new File(baseDir, "cpf");
-    }
+	public File getForestsDir() {
+		return new File(baseDir, "forests");
+	}
 
-    public File getClustersDir() {
-        return new File(baseDir, "clusters");
-    }
+	public File getCpfDir() {
+		return new File(baseDir, "cpf");
+	}
 
-    public File getAlertDir() {
-        return new File(baseDir, "alert");
-    }
+	public File getClustersDir() {
+		return new File(baseDir, "clusters");
+	}
 
-    public File getFlexrepDir() {
-        return new File(baseDir, "flexrep");
-    }
+	public File getAlertDir() {
+		return new File(baseDir, "alert");
+	}
 
-	public File getTemporalDir() { return new File(baseDir, "temporal"); }
+	public File getAlertConfigsDir() {
+		return new File(getAlertDir(), "configs");
+	}
+
+	public File getFlexrepDir() {
+		return new File(baseDir, "flexrep");
+	}
+
+	public File getFlexrepConfigsDir() {
+		return new File(getFlexrepDir(), "configs");
+	}
+
+	public File getViewSchemasDir() {
+		return new File(baseDir, "view-schemas");
+	}
+
+	public File getTemporalDir() {
+		return new File(baseDir, "temporal");
+	}
+
+	public File getTemporalAxesDir() {
+		return new File(getTemporalDir(), "axes");
+	}
+
+	public File getTemporalCollectionsDir() {
+		return new File(getTemporalDir(), "collections");
+	}
+
+	public File getTemporalCollectionsLsqtDir() {
+		return new File(getTemporalCollectionsDir(), "lqst");
+	}
 
 	public File getTasksDir() {
-    	return new File(baseDir, "tasks");
+		return new File(baseDir, "tasks");
 	}
 
 	public void setDatabasesPath(String databasesPath) {
-        this.databasesPath = databasesPath;
-    }
+		this.databasesPath = databasesPath;
+	}
 
-    public void setRestApiPath(String restApiPath) {
-        this.restApiPath = restApiPath;
-    }
+	public void setRestApiPath(String restApiPath) {
+		this.restApiPath = restApiPath;
+	}
 
-    public File getBaseDir() {
-        return baseDir;
-    }
+	public File getBaseDir() {
+		return baseDir;
+	}
 
-    public List<File> getContentDatabaseFiles() {
-        return contentDatabaseFiles;
-    }
+	public List<File> getContentDatabaseFiles() {
+		return contentDatabaseFiles;
+	}
 
-    public void setContentDatabaseFiles(List<File> contentDatabaseFiles) {
-        this.contentDatabaseFiles = contentDatabaseFiles;
-    }
+	public void setContentDatabaseFiles(List<File> contentDatabaseFiles) {
+		this.contentDatabaseFiles = contentDatabaseFiles;
+	}
 
-    public String getDefaultContentDatabaseFilename() {
-        return defaultContentDatabaseFilename;
-    }
+	public String getDefaultContentDatabaseFilename() {
+		return defaultContentDatabaseFilename;
+	}
 
-    public void setDefaultContentDatabaseFilename(String contentDatabaseFilename) {
-        this.defaultContentDatabaseFilename = contentDatabaseFilename;
-    }
+	public void setDefaultContentDatabaseFilename(String contentDatabaseFilename) {
+		this.defaultContentDatabaseFilename = contentDatabaseFilename;
+	}
 }

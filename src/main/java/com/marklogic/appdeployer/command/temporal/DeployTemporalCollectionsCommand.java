@@ -1,16 +1,19 @@
 package com.marklogic.appdeployer.command.temporal;
 
+import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.ResourceManager;
+import com.marklogic.mgmt.temporal.TemporalAxesManager;
 import com.marklogic.mgmt.temporal.TemporalCollectionManager;
 
 import java.io.File;
 
 public class DeployTemporalCollectionsCommand extends AbstractResourceCommand {
 
-	private String databaseIdOrName;
+	private TemporalCollectionManager currentTemporalCollectionManager;
 
 	public DeployTemporalCollectionsCommand() {
 		setExecuteSortOrder(SortOrderConstants.DEPLOY_TEMPORAL_COLLECTIONS);
@@ -20,17 +23,33 @@ public class DeployTemporalCollectionsCommand extends AbstractResourceCommand {
 	}
 
 	@Override
+	public void execute(CommandContext context) {
+		AppConfig appConfig = context.getAppConfig();
+		deployTemporalCollections(context, appConfig.getConfigDir(), appConfig.getContentDatabaseName());
+
+		for (File dir : appConfig.getConfigDir().getDatabaseResourceDirectories()) {
+			deployTemporalCollections(context, new ConfigDir(dir), dir.getName());
+		}
+	}
+
+	protected void deployTemporalCollections(CommandContext context, ConfigDir configDir, String databaseIdOrName) {
+		currentTemporalCollectionManager = new TemporalCollectionManager(context.getManageClient(), databaseIdOrName);
+		processExecuteOnResourceDir(context, configDir.getTemporalCollectionsDir());
+	}
+
+	/**
+	 * Not used since we override execute in the parent class.
+	 *
+	 * @param context
+	 * @return
+	 */
+	@Override
 	protected File[] getResourceDirs(CommandContext context) {
-		return new File[] { new File(context.getAppConfig().getConfigDir().getTemporalDir(),"collections") };
+		return null;
 	}
 
 	@Override
 	protected ResourceManager getResourceManager(CommandContext context) {
-		String db = databaseIdOrName != null ? databaseIdOrName : context.getAppConfig().getContentDatabaseName();
-		return new TemporalCollectionManager(context.getManageClient(), db);
-	}
-
-	public void setDatabaseIdOrName(String databaseIdOrName) {
-		this.databaseIdOrName = databaseIdOrName;
+		return currentTemporalCollectionManager;
 	}
 }

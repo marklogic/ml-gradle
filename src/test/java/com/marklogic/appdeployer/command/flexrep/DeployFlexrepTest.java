@@ -2,6 +2,7 @@ package com.marklogic.appdeployer.command.flexrep;
 
 import java.io.File;
 
+import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.mgmt.appservers.ServerManager;
 import com.marklogic.mgmt.cpf.CpfConfigManager;
 import com.marklogic.mgmt.cpf.DomainManager;
@@ -31,7 +32,7 @@ public class DeployFlexrepTest extends AbstractAppDeployerTest {
 
         initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployTriggersDatabaseCommand(),
                 new DeployCpfConfigsCommand(), new DeployDomainsCommand(), new DeployPipelinesCommand(),
-                new DeployConfigsCommand(), new DeployTargetsCommand());
+                new DeployConfigsCommand(), new DeployTargetsCommand(), new DeployOtherDatabasesCommand());
 
         appDeployer.deploy(appConfig);
         assertConfigAndTargetAreDeployed();

@@ -1,0 +1,4 @@
+{
+	"database-name": "other-%%DATABASE%%",
+	"schema-database": "%%SCHEMAS_DATABASE%%"
+}

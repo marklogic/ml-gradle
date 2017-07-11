@@ -1,5 +1,7 @@
 package com.marklogic.appdeployer.command.temporal;
 
+import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
@@ -10,7 +12,7 @@ import java.io.File;
 
 public class DeployTemporalAxesCommand extends AbstractResourceCommand {
 
-	private String databaseIdOrName;
+	private TemporalAxesManager currentTemporalAxesManager;
 
 	public DeployTemporalAxesCommand() {
 		// TODO - verify that range element indexes exist before creation of temporal axes?
@@ -20,18 +22,34 @@ public class DeployTemporalAxesCommand extends AbstractResourceCommand {
 	}
 
 	@Override
+	public void execute(CommandContext context) {
+		AppConfig appConfig = context.getAppConfig();
+		deployTemporalAxes(context, appConfig.getConfigDir(), appConfig.getContentDatabaseName());
+
+		for (File dir : appConfig.getConfigDir().getDatabaseResourceDirectories()) {
+			deployTemporalAxes(context, new ConfigDir(dir), dir.getName());
+		}
+	}
+
+	protected void deployTemporalAxes(CommandContext context, ConfigDir configDir, String databaseIdOrName) {
+		currentTemporalAxesManager = new TemporalAxesManager(context.getManageClient(), databaseIdOrName);
+		processExecuteOnResourceDir(context, configDir.getTemporalAxesDir());
+	}
+
+	/**
+	 * Not used since we override execute in the parent class.
+	 *
+	 * @param context
+	 * @return
+	 */
+	@Override
 	protected File[] getResourceDirs(CommandContext context) {
-		return new File[] { new File(context.getAppConfig().getConfigDir().getTemporalDir(),"axes") };
+		return null;
 	}
 
 	@Override
 	protected ResourceManager getResourceManager(CommandContext context) {
-		String db = databaseIdOrName != null ? databaseIdOrName : context.getAppConfig().getContentDatabaseName();
-		return new TemporalAxesManager(context.getManageClient(), db);
-	}
-
-	public void setDatabaseIdOrName(String databaseIdOrName) {
-		this.databaseIdOrName = databaseIdOrName;
+		return currentTemporalAxesManager;
 	}
 
 }

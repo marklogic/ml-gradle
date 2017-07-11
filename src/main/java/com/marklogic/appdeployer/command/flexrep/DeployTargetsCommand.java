@@ -2,6 +2,8 @@ package com.marklogic.appdeployer.command.flexrep;
 
 import java.io.File;
 
+import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
@@ -15,51 +17,54 @@ import com.marklogic.mgmt.flexrep.TargetManager;
  */
 public class DeployTargetsCommand extends AbstractCommand {
 
-    private String databaseIdOrName;
-    private String targetDirectorySuffix = "-targets";
+	private String targetDirectorySuffix = "-targets";
 
-    public DeployTargetsCommand() {
-        setExecuteSortOrder(SortOrderConstants.DEPLOY_FLEXREP_TARGETS);
-    }
+	public DeployTargetsCommand() {
+		setExecuteSortOrder(SortOrderConstants.DEPLOY_FLEXREP_TARGETS);
+	}
 
-    @Override
-    public void execute(CommandContext context) {
-        File configDir = new File(context.getAppConfig().getConfigDir().getFlexrepDir(), "configs");
-        if (configDir != null && configDir.exists()) {
-            for (File f : configDir.listFiles()) {
-                if (f.isDirectory() && f.getName().endsWith(targetDirectorySuffix)) {
-                    deployTargets(f, context);
-                }
-            }
-        }
-    }
+	@Override
+	public void execute(CommandContext context) {
+		AppConfig appConfig = context.getAppConfig();
+		deployTargets(context, appConfig.getConfigDir(), appConfig.getContentDatabaseName());
 
-    protected void deployTargets(File dir, CommandContext context) {
-        String dbName = databaseIdOrName != null ? databaseIdOrName : context.getAppConfig().getContentDatabaseName();
-        String configName = extractConfigNameFromDirectory(dir);
+		for (File dir : appConfig.getConfigDir().getDatabaseResourceDirectories()) {
+			deployTargets(context, new ConfigDir(dir), dir.getName());
+		}
+	}
 
-        if (logger.isInfoEnabled()) {
-            logger.info(format("Deploying flexrep targets with config name '%s' in directory: %s", configName,
-                    dir.getAbsolutePath()));
-        }
+	protected void deployTargets(CommandContext context, ConfigDir configDir, String databaseIdOrName) {
+		File configsDir = configDir.getFlexrepConfigsDir();
+		if (configsDir != null && configsDir.exists()) {
+			for (File f : configsDir.listFiles()) {
+				if (f.isDirectory() && f.getName().endsWith(targetDirectorySuffix)) {
+					deployTargetsInDirectory(f, context, databaseIdOrName);
+				}
+			}
+		}
+	}
 
-        TargetManager mgr = new TargetManager(context.getManageClient(), dbName, configName);
-        for (File f : listFilesInDirectory(dir)) {
-            saveResource(mgr, context, f);
-        }
-    }
+	protected void deployTargetsInDirectory(File dir, CommandContext context, String databaseIdOrName) {
+		String configName = extractConfigNameFromDirectory(dir);
 
-    protected String extractConfigNameFromDirectory(File dir) {
-        String name = dir.getName();
-        return name.substring(0, name.length() - targetDirectorySuffix.length());
-    }
+		if (logger.isInfoEnabled()) {
+			logger.info(format("Deploying flexrep targets with config name '%s' in directory: %s", configName,
+				dir.getAbsolutePath()));
+		}
 
-    public void setDatabaseIdOrName(String databaseIdOrName) {
-        this.databaseIdOrName = databaseIdOrName;
-    }
+		TargetManager mgr = new TargetManager(context.getManageClient(), databaseIdOrName, configName);
+		for (File f : listFilesInDirectory(dir)) {
+			saveResource(mgr, context, f);
+		}
+	}
 
-    public void setTargetDirectorySuffix(String targetDirectorySuffix) {
-        this.targetDirectorySuffix = targetDirectorySuffix;
-    }
+	protected String extractConfigNameFromDirectory(File dir) {
+		String name = dir.getName();
+		return name.substring(0, name.length() - targetDirectorySuffix.length());
+	}
+
+	public void setTargetDirectorySuffix(String targetDirectorySuffix) {
+		this.targetDirectorySuffix = targetDirectorySuffix;
+	}
 
 }

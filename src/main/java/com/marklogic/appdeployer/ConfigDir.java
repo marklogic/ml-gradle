@@ -76,6 +76,10 @@ public class ConfigDir {
 		return new File(baseDir, "security");
 	}
 
+	public File getRolesDir() {
+		return new File(getSecurityDir(), "roles");
+	}
+
 	public File getServersDir() {
 		return new File(baseDir, "servers");
 	}

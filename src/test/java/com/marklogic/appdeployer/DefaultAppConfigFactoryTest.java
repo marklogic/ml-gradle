@@ -118,6 +118,8 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    p.setProperty("mlReplicaForestFastDataDirectory", "/var/fast");
 	    p.setProperty("mlReplicaForestLargeDataDirectory", "/var/large");
 
+	    p.setProperty("mlSortRolesByDependencies", "false");
+
 	    sut = new DefaultAppConfigFactory(new SimplePropertySource(p));
         AppConfig config = sut.newAppConfig();
 
@@ -170,6 +172,8 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    assertEquals("/var/data", config.getReplicaForestDataDirectory());
 	    assertEquals("/var/fast", config.getReplicaForestFastDataDirectory());
 	    assertEquals("/var/large", config.getReplicaForestLargeDataDirectory());
+
+	    assertFalse(config.isSortRolesByDependencies());
     }
 
 	/**

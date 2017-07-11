@@ -38,7 +38,7 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
             if (logger.isInfoEnabled()) {
                 logger.info("Processing files in directory: " + resourceDir.getAbsolutePath());
             }
-            for (File f : listFilesInDirectory(resourceDir)) {
+            for (File f : listFilesInDirectory(resourceDir, context)) {
                 if (logger.isInfoEnabled()) {
                     logger.info("Processing file: " + f.getAbsolutePath());
                 }
@@ -46,6 +46,19 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
                 afterResourceSaved(mgr, context, f, receipt);
             }
         }
+    }
+
+	/**
+	 * Defaults to the parent method. This was extracted so that a subclass can override it and have access to the
+	 * CommandContext, which allows for reading in the contents of each file and replacing tokens, which may impact the
+	 * order in which the files are processed.
+	 *
+	 * @param resourceDir
+	 * @param context
+	 * @return
+	 */
+	protected File[] listFilesInDirectory(File resourceDir, CommandContext context) {
+    	return listFilesInDirectory(resourceDir);
     }
 
     /**

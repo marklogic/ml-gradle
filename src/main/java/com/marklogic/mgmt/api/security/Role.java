@@ -8,7 +8,7 @@ import com.marklogic.mgmt.resource.security.RoleManager;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Role extends Resource {
+public class Role extends Resource implements Comparable<Role> {
 
     private String roleName;
     private String description;
@@ -27,7 +27,27 @@ public class Role extends Resource {
         this.roleName = roleName;
     }
 
-    public void addExternalName(String name) {
+	@Override
+	public int compareTo(Role other) {
+    	if (other == null) {
+    		return 0;
+	    }
+    	if (this.role == null || this.role.isEmpty()) {
+    		return -1;
+	    }
+	    if (other.role == null || other.role.isEmpty()) {
+    		return 1;
+	    }
+		if (other.role.contains(this.roleName)) {
+    		return -1;
+		}
+		if (this.role.contains(other.roleName)) {
+    		return 1;
+		}
+		return -1;
+	}
+
+	public void addExternalName(String name) {
         if (externalName == null) {
             externalName = new ArrayList<>();
         }

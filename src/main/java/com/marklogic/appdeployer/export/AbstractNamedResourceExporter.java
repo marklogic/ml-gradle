@@ -18,7 +18,7 @@ import java.util.List;
 public abstract class AbstractNamedResourceExporter extends AbstractResourceExporter {
 
 	private String[] resourceNames;
-	private ObjectMapper objectMapper;
+	protected ObjectMapper objectMapper;
 
 	protected AbstractNamedResourceExporter(ManageClient manageClient, String... resourceNames) {
 		super(manageClient);

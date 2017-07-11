@@ -1,5 +1,7 @@
 package com.marklogic.appdeployer.command.flexrep;
 
+import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
@@ -13,27 +15,43 @@ import java.io.File;
  */
 public class DeployConfigsCommand extends AbstractResourceCommand {
 
-    private String databaseIdOrName;
+	private ConfigManager currentConfigManager;
 
-    public DeployConfigsCommand() {
-        setExecuteSortOrder(SortOrderConstants.DEPLOY_FLEXREP_CONFIGS);
-        // Flexrep config is stored in a database, so we don't need to delete it as the database will be deleted
-        setDeleteResourcesOnUndo(false);
-    }
+	public DeployConfigsCommand() {
+		setExecuteSortOrder(SortOrderConstants.DEPLOY_FLEXREP_CONFIGS);
+		// Flexrep config is stored in a database, so we don't need to delete it as the database will be deleted
+		setDeleteResourcesOnUndo(false);
+	}
 
-    @Override
-    protected File[] getResourceDirs(CommandContext context) {
-        return new File[] { new File(context.getAppConfig().getConfigDir().getFlexrepDir(), "configs") };
-    }
+	@Override
+	public void execute(CommandContext context) {
+		AppConfig appConfig = context.getAppConfig();
+		deployConfigs(context, appConfig.getConfigDir(), appConfig.getContentDatabaseName());
 
-    @Override
-    protected ResourceManager getResourceManager(CommandContext context) {
-        String db = databaseIdOrName != null ? databaseIdOrName : context.getAppConfig().getContentDatabaseName();
-        return new ConfigManager(context.getManageClient(), db);
-    }
+		for (File dir : appConfig.getConfigDir().getDatabaseResourceDirectories()) {
+			deployConfigs(context, new ConfigDir(dir), dir.getName());
+		}
+	}
 
-    public void setDatabaseIdOrName(String databaseIdOrName) {
-        this.databaseIdOrName = databaseIdOrName;
-    }
+	protected void deployConfigs(CommandContext context, ConfigDir configDir, String databaseIdOrName) {
+		currentConfigManager = new ConfigManager(context.getManageClient(), databaseIdOrName);
+		processExecuteOnResourceDir(context, configDir.getFlexrepConfigsDir());
+	}
+
+	/**
+	 * Not used as we override execute in this command.
+	 *
+	 * @param context
+	 * @return
+	 */
+	@Override
+	protected File[] getResourceDirs(CommandContext context) {
+		return null;
+	}
+
+	@Override
+	protected ResourceManager getResourceManager(CommandContext context) {
+		return currentConfigManager;
+	}
 
 }

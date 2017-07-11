@@ -1,41 +1,42 @@
 package com.marklogic.appdeployer.command.temporal;
 
-import com.marklogic.appdeployer.command.AbstractCommand;
-import com.marklogic.appdeployer.command.CommandContext;
-import com.marklogic.appdeployer.command.ResourceFilenameFilter;
-import com.marklogic.appdeployer.command.SortOrderConstants;
+import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.ConfigDir;
+import com.marklogic.appdeployer.command.*;
 import com.marklogic.mgmt.resource.temporal.TemporalCollectionLSQTManager;
 
 import java.io.File;
 
-/**
- * Created by dsmyth on 28/02/2017.
- */
-public class DeployTemporalCollectionsLSQTCommand  extends AbstractCommand {
-
-	private String databaseIdOrName;
+public class DeployTemporalCollectionsLSQTCommand extends AbstractCommand {
 
 	public DeployTemporalCollectionsLSQTCommand() {
 		setExecuteSortOrder(SortOrderConstants.DEPLOY_TEMPORAL_COLLECTIONS_LSQT);
 	}
 
-	public void setDatabaseIdOrName(String databaseIdOrName) {
-		this.databaseIdOrName = databaseIdOrName;
-	}
-
 	@Override
 	public void execute(CommandContext context) {
-		File configDir = new File(new File(context.getAppConfig().getConfigDir().getTemporalDir(), "collections"), "lsqt");
-		String db = databaseIdOrName != null ? databaseIdOrName : context.getAppConfig().getContentDatabaseName();
-		if (configDir != null && configDir.exists()) {
-			for (File f : configDir.listFiles(new ResourceFilenameFilter())) {
+		AppConfig appConfig = context.getAppConfig();
+		deployTemporalCollectionsLsqt(context, appConfig.getConfigDir(), appConfig.getContentDatabaseName());
+
+		for (File dir : appConfig.getConfigDir().getDatabaseResourceDirectories()) {
+			deployTemporalCollectionsLsqt(context, new ConfigDir(dir), dir.getName());
+		}
+	}
+
+	protected void deployTemporalCollectionsLsqt(CommandContext context, ConfigDir configDir, String databaseIdOrName) {
+		File dir = configDir.getTemporalCollectionsLsqtDir();
+		if (dir != null && dir.exists()) {
+			for (File f : dir.listFiles(new ResourceFilenameFilter())) {
 				String name = f.getName();
 				// use filename without suffix as temporal collection
-				String temporalCollectionName = name.replaceAll(".xml|.json","");
+				String temporalCollectionName = name.replaceAll(".xml|.json", "");
 				String payload = copyFileToString(f, context);
-				logger.info(format("Extracted temporal collection name '%s' from filename '%s'", temporalCollectionName, name));
-				new TemporalCollectionLSQTManager(context.getManageClient(),db, temporalCollectionName).save(payload);
+				if (logger.isInfoEnabled()) {
+					logger.info(format("Extracted temporal collection name '%s' from filename '%s'", temporalCollectionName, name));
+				}
+				new TemporalCollectionLSQTManager(context.getManageClient(), databaseIdOrName, temporalCollectionName).save(payload);
 			}
 		}
+
 	}
 }

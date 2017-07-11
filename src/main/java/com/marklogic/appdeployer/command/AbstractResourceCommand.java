@@ -4,6 +4,8 @@ import com.marklogic.mgmt.admin.AdminManager;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.admin.ActionRequiringRestart;
+import com.marklogic.mgmt.admin.AdminManager;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 
 import java.io.File;
@@ -60,13 +62,18 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
     protected void afterResourceSaved(ResourceManager mgr, CommandContext context, File resourceFile,
             SaveReceipt receipt) {
     	ResponseEntity<String> response = receipt.getResponse();
-    	URI uri = response.getHeaders().getLocation();
-    	if (uri != null && "/admin/v1/timestamp".equals(uri.getPath())) {
-		    AdminManager adminManager = context.getAdminManager();
-		    if (adminManager != null) {
-		    	adminManager.waitForRestart();
-		    } else {
-		    	logger.warn("Location header indicates ML is restarting, but no AdminManager available to support waiting for a restart");
+    	if (response != null) {
+    		HttpHeaders headers = response.getHeaders();
+    		if (headers != null) {
+			    URI uri = headers.getLocation();
+			    if (uri != null && "/admin/v1/timestamp".equals(uri.getPath())) {
+				    AdminManager adminManager = context.getAdminManager();
+				    if (adminManager != null) {
+					    adminManager.waitForRestart();
+				    } else {
+					    logger.warn("Location header indicates ML is restarting, but no AdminManager available to support waiting for a restart");
+				    }
+			    }
 		    }
 	    }
     }

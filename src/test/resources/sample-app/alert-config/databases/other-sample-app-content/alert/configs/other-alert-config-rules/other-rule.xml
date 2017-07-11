@@ -1,0 +1,11 @@
+<alert-rule-properties xmlns="http://marklogic.com/manage/alert-rule/properties">
+	<name>other-rule</name>
+	<description>other log to ErrorLog.txt</description>
+	<user-name>admin</user-name>
+	<query>
+		<cts:word-query xmlns:cts="http://marklogic.com/cts">
+			<cts:text>Yorick</cts:text>
+		</cts:word-query>
+	</query>
+	<action-name>xdmp:log3</action-name>
+</alert-rule-properties>

@@ -26,6 +26,6 @@ public class RoleExporter extends AbstractNamedResourceExporter {
 
 	@Override
 	protected String[] getExportMessages() {
-		return new String[] {"The exported role files may need to be renamed to guarantee they are deployed in an order that respects the dependencies between them."};
+		return new String[] {"The exported role files may have circular dependencies between them that must be resolved before they can be deployed."};
 	}
 }

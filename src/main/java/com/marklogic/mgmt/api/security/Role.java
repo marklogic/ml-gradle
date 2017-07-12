@@ -1,14 +1,14 @@
 package com.marklogic.mgmt.api.security;
 
-import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.Resource;
+import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.security.RoleManager;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Role extends Resource implements Comparable<Role> {
+public class Role extends Resource {
 
     private String roleName;
     private String description;
@@ -26,26 +26,6 @@ public class Role extends Resource implements Comparable<Role> {
         super(api);
         this.roleName = roleName;
     }
-
-	@Override
-	public int compareTo(Role other) {
-    	if (other == null) {
-    		return 0;
-	    }
-    	if (this.role == null || this.role.isEmpty()) {
-    		return -1;
-	    }
-	    if (other.role == null || other.role.isEmpty()) {
-    		return 1;
-	    }
-		if (other.role.contains(this.roleName)) {
-    		return -1;
-		}
-		if (this.role.contains(other.roleName)) {
-    		return 1;
-		}
-		return -1;
-	}
 
 	public void addExternalName(String name) {
         if (externalName == null) {

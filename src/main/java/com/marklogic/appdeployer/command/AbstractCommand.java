@@ -141,7 +141,9 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 
     protected File[] listFilesInDirectory(File dir) {
         File[] files = dir.listFiles(resourceFilenameFilter);
-        Arrays.sort(files);
+        if (files != null && files.length > 1) {
+	        Arrays.sort(files);
+        }
         return files;
     }
 

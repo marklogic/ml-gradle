@@ -32,14 +32,16 @@ public abstract class AbstractNamedResourceExporter extends AbstractResourceExpo
 
 	@Override
 	public ExportedResources exportResources(File baseDir) {
-		ResourceManager mgr = newResourceManager(getManageClient());
-		File resourceDir = getResourceDirectory(baseDir);
-		resourceDir.mkdirs();
 		List<File> files = new ArrayList<>();
-		for (String resourceName : resourceNames) {
-			File f = exportToFile(mgr, resourceName, resourceDir);
-			if (f != null) {
-				files.add(f);
+		if (resourceNames != null && resourceNames.length > 0) {
+			ResourceManager mgr = newResourceManager(getManageClient());
+			File resourceDir = getResourceDirectory(baseDir);
+			resourceDir.mkdirs();
+			for (String resourceName : resourceNames) {
+				File f = exportToFile(mgr, resourceName, resourceDir);
+				if (f != null) {
+					files.add(f);
+				}
 			}
 		}
 		return new ExportedResources(files, getExportMessages());

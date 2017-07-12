@@ -31,7 +31,7 @@ public class DeployRolesCommand extends AbstractResourceCommand {
 	protected File[] listFilesInDirectory(File dir, CommandContext context) {
 		File[] files = super.listFilesInDirectory(dir);
 
-		if (context.getAppConfig().isSortRolesByDependencies()) {
+		if (context.getAppConfig().isSortRolesByDependencies() && files != null && files.length > 0) {
 			if (logger.isInfoEnabled()) {
 				logger.info("Sorting role files by role dependencies");
 			}
@@ -47,6 +47,9 @@ public class DeployRolesCommand extends AbstractResourceCommand {
 
 	protected List<RoleFile> sortFilesBasedOnRoleDependencies(File[] files, CommandContext context) {
 		List<RoleFile> roleFiles = new ArrayList<>();
+		if (files == null || files.length < 1) {
+			return roleFiles;
+		}
 		PayloadParser parser = new PayloadParser();
 		for (File f : files) {
 			RoleFile rf = new RoleFile(f);
@@ -69,7 +72,12 @@ public class DeployRolesCommand extends AbstractResourceCommand {
 			roleFiles.add(rf);
 		}
 
-		Collections.sort(roleFiles);
+		return sortRoleFiles(roleFiles);
+	}
+
+	protected List<RoleFile> sortRoleFiles(List<RoleFile> roleFiles) {
+		RoleFileComparator comparator = new RoleFileComparator(roleFiles);
+		Collections.sort(roleFiles, comparator);
 		return roleFiles;
 	}
 
@@ -84,7 +92,7 @@ public class DeployRolesCommand extends AbstractResourceCommand {
 
 }
 
-class RoleFile implements Comparable<RoleFile> {
+class RoleFile {
 
 	File file;
 	Role role;
@@ -95,8 +103,77 @@ class RoleFile implements Comparable<RoleFile> {
 		this.role.setRole(new ArrayList<String>());
 	}
 
+}
+
+/**
+ * This comparator is designed to handle a scenario where two roles are next to each other, but they don't have any
+ * dependencies in common, nor does one depend on the other. In this scenario, we need to know which role has a
+ * dependency on a role furthest to the end of the list of roles. In order to know that, we first build up a data
+ * structure that tracks the highest position of a dependency in the list of roles for each role.
+ */
+class RoleFileComparator implements Comparator<RoleFile> {
+
+	private Map<String, Integer> highestDependencyPositionMap;
+
+	public RoleFileComparator(List<RoleFile> roleFiles) {
+		Map<String, Integer> rolePositions = new HashMap<>();
+		for (int i = 0; i < roleFiles.size(); i++) {
+			rolePositions.put(roleFiles.get(i).role.getRoleName(), i);
+		}
+
+		highestDependencyPositionMap = new HashMap<>();
+		for (RoleFile rf : roleFiles) {
+			String roleName = rf.role.getRoleName();
+			int highest = -1;
+			for (String role : rf.role.getRole()) {
+				if (rolePositions.containsKey(role)) {
+					int pos = rolePositions.get(role);
+					if (pos > highest) {
+						highest = pos;
+					}
+				}
+			}
+			highestDependencyPositionMap.put(roleName, highest);
+		}
+	}
+
 	@Override
-	public int compareTo(RoleFile o) {
-		return this.role.compareTo(o.role);
+	public int compare(RoleFile o1, RoleFile o2) {
+		if (o1 == null && o2 != null) {
+			return 1;
+		}
+		if (o2 == null) {
+			return -1;
+		}
+		if (o1.role.getRole() == null || o1.role.getRole().isEmpty()) {
+			return -1;
+		}
+		if (o2.role.getRole() == null || o2.role.getRole().isEmpty()) {
+			return 1;
+		}
+		if (o2.role.getRole().contains(o1.role.getRoleName())) {
+			return -1;
+		}
+		if (o1.role.getRole().contains(o2.role.getRoleName())) {
+			return 1;
+		}
+
+		/**
+		 * If the roles aren't dependent on each other, then we want to base this on which role has a dependency further
+		 * to the right.
+		 */
+		int o1Pos = highestDependencyPositionMap.get(o1.role.getRoleName());
+		int o2Pos = highestDependencyPositionMap.get(o2.role.getRoleName());
+		if (o1Pos > o2Pos) {
+			return 1;
+		}
+		if (o2Pos > o1Pos) {
+			return -1;
+		}
+
+		/**
+		 * This would be for two roles that depend on the same other role.
+		 */
+		return 0;
 	}
 }

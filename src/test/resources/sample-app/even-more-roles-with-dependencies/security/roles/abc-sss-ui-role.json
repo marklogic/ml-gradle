@@ -1,0 +1,4 @@
+{
+  "role-name" : "abc-sss-ui-role",
+  "role" : [ "xyz-reader", "xyz-writer" ]
+}

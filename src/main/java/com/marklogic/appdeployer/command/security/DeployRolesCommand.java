@@ -16,6 +16,8 @@ import java.util.*;
 
 public class DeployRolesCommand extends AbstractResourceCommand {
 
+	private int maxSortAttempts = 100;
+
 	public DeployRolesCommand() {
 		setExecuteSortOrder(SortOrderConstants.DEPLOY_ROLES);
 		setUndoSortOrder(SortOrderConstants.DELETE_ROLES);
@@ -72,7 +74,27 @@ public class DeployRolesCommand extends AbstractResourceCommand {
 			roleFiles.add(rf);
 		}
 
-		return sortRoleFiles(roleFiles);
+		return keepSortingRoleFilesUntilOrderDoesntChange(roleFiles);
+	}
+
+	/**
+	 * Some sets of role files require multiple sorts until the order no longer changes. The maxSortAttempts class
+	 * attribute controls how many times this command will try to sort the roles.
+	 *
+	 * @param roleFiles
+	 * @return
+	 */
+	protected List<RoleFile> keepSortingRoleFilesUntilOrderDoesntChange(List<RoleFile> roleFiles) {
+		List<RoleFile> previousRoleFiles;
+		int counter = 0;
+		do {
+			previousRoleFiles = roleFiles;
+			roleFiles = new ArrayList<>();
+			roleFiles.addAll(previousRoleFiles);
+			roleFiles = sortRoleFiles(roleFiles);
+			counter++;
+		} while (!previousRoleFiles.equals(roleFiles) && counter < maxSortAttempts);
+		return roleFiles;
 	}
 
 	protected List<RoleFile> sortRoleFiles(List<RoleFile> roleFiles) {
@@ -90,8 +112,15 @@ public class DeployRolesCommand extends AbstractResourceCommand {
 		return new RoleManager(context.getManageClient());
 	}
 
+	public void setMaxSortAttempts(int maxSortAttempts) {
+		this.maxSortAttempts = maxSortAttempts;
+	}
 }
 
+/**
+ * Simple data structure for associating a File that defines a role, and the parsed Role that is used for
+ * sorting the role files.
+ */
 class RoleFile {
 
 	File file;
@@ -103,6 +132,15 @@ class RoleFile {
 		this.role.setRole(new ArrayList<String>());
 	}
 
+	@Override
+	public int hashCode() {
+		return role.getRoleName().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return role.getRoleName().equals(((RoleFile)obj).role.getRoleName());
+	}
 }
 
 /**
@@ -139,16 +177,13 @@ class RoleFileComparator implements Comparator<RoleFile> {
 
 	@Override
 	public int compare(RoleFile o1, RoleFile o2) {
-		if (o1 == null && o2 != null) {
-			return 1;
+		if (o1.role.getRole().isEmpty() && o2.role.getRole().isEmpty()) {
+			return 0;
 		}
-		if (o2 == null) {
+		if (o1.role.getRole().isEmpty()) {
 			return -1;
 		}
-		if (o1.role.getRole() == null || o1.role.getRole().isEmpty()) {
-			return -1;
-		}
-		if (o2.role.getRole() == null || o2.role.getRole().isEmpty()) {
+		if (o2.role.getRole().isEmpty()) {
 			return 1;
 		}
 		if (o2.role.getRole().contains(o1.role.getRoleName())) {

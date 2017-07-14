@@ -3,7 +3,6 @@ package com.marklogic.appdeployer.command.security;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.mgmt.security.RoleManager;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -27,6 +26,29 @@ public class DeployRolesWithDependenciesTest extends AbstractAppDeployerTest {
 		assertEquals("role4.xml", files[3].getName());
 		assertEquals("role5.json", files[4].getName());
 		assertEquals("role0.json", files[5].getName());
+	}
+
+	/**
+	 * This scenario features role files that must be sorted multiple times in order for them to be in the correct
+	 * order.
+	 */
+	@Test
+	public void testEvenMoreRoles() {
+		appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/even-more-roles-with-dependencies"));
+
+		DeployRolesCommand command = new DeployRolesCommand();
+		File[] files = command.listFilesInDirectory(appConfig.getConfigDir().getRolesDir(),
+			new CommandContext(appConfig, manageClient, null));
+
+		assertEquals("abc-login-role.json", files[0].getName());
+		assertEquals("abc-ui-developer.json", files[1].getName());
+		assertEquals("xyz-reader.json", files[2].getName());
+		assertEquals("xyz-writer.json", files[3].getName());
+		assertEquals("xyz-admin.json", files[4].getName());
+		assertEquals("abc-sss-ui-role.json", files[5].getName());
+		assertEquals("abc-ui-offline-user.json", files[6].getName());
+		assertEquals("abc-ui-offline-admin.json", files[7].getName());
+		assertEquals("abc-ui-admin.json", files[8].getName());
 	}
 
 	/**

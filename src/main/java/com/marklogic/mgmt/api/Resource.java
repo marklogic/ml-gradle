@@ -42,7 +42,7 @@ public abstract class Resource extends ApiObject {
             logger.info(format("Saved %s %s", name, label));
         }
         return format("[Path: %s; Resource ID: %s; HTTP status: %s]", receipt.getPath(), receipt.getResourceId(),
-                receipt.getResponse().getStatusCode());
+                receipt.getResponse() != null ? receipt.getResponse().getStatusCode() : "(none)");
     }
 
     /**

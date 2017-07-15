@@ -64,11 +64,13 @@ public class API extends LoggingObject {
     }
 
     protected void initializeAdminManager() {
-        ManageConfig mc = manageClient.getManageConfig();
-        if (mc.getAdminUsername() != null && mc.getAdminPassword() != null) {
-            AdminConfig ac = new AdminConfig(mc.getHost(), 8001, mc.getAdminUsername(), mc.getAdminPassword());
-            this.adminManager = new AdminManager(ac);
-        }
+    	if (manageClient != null) {
+		    ManageConfig mc = manageClient.getManageConfig();
+		    if (mc.getAdminUsername() != null && mc.getAdminPassword() != null) {
+			    AdminConfig ac = new AdminConfig(mc.getHost(), 8001, mc.getAdminUsername(), mc.getAdminPassword());
+			    this.adminManager = new AdminManager(ac);
+		    }
+	    }
     }
 
     protected ObjectMapper buildDefaultObjectMapper() {

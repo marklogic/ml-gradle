@@ -1,7 +1,13 @@
 package com.marklogic.mgmt.api.security;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+
+@XmlAccessorType(XmlAccessType.FIELD)
 public class RolePrivilege {
 
+	@XmlElement(name = "privilege-name")
     private String privilegeName;
     private String action;
     private String kind;

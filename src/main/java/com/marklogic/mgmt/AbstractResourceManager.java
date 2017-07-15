@@ -4,6 +4,8 @@ import com.marklogic.rest.util.Fragment;
 import com.marklogic.rest.util.ResourcesFragment;
 import org.springframework.http.ResponseEntity;
 
+import javax.xml.ws.Response;
+
 /**
  * This class makes a number of assumptions in order to simplify the implementation of common operations for a MarkLogic
  * management resource. Feel free to override the methods in here in a subclass when those assumptions don't work for a
@@ -75,22 +77,33 @@ public abstract class AbstractResourceManager extends AbstractManager implements
      */
     public SaveReceipt save(String payload) {
         String resourceId = getResourceId(payload);
-        String label = getResourceName();
-        String path = null;
-        ResponseEntity<String> response = null;
         if (exists(resourceId)) {
             if (updateAllowed) {
                 return updateResource(payload, resourceId);
             } else {
                 logger.info("Resource already exists and updates are not supported, so not updating: " + resourceId);
+	            /**
+	             * Prior to version 2.9.0, this was always returning a non-null SaveReceipt with a null path and null
+	             * response. Not sure of the consequences of returning null instead, so keeping this behavior for now.
+	             */
+	            return new SaveReceipt(resourceId, payload, null, null);
             }
         } else {
-            logger.info(format("Creating %s: %s", label, resourceId));
-            path = getCreateResourcePath(payload);
-            response = postPayload(manageClient, path, payload);
-            logger.info(format("Created %s: %s", label, resourceId));
+        	return createNewResource(payload, resourceId);
         }
-        return new SaveReceipt(resourceId, payload, path, response);
+    }
+
+    protected SaveReceipt createNewResource(String payload, String resourceId) {
+    	String label = getResourceName();
+    	if (logger.isInfoEnabled()) {
+		    logger.info(format("Creating %s: %s", label, resourceId));
+	    }
+	    String path = getCreateResourcePath(payload);
+	    ResponseEntity<String> response = postPayload(manageClient, path, payload);
+	    if (logger.isInfoEnabled()) {
+		    logger.info(format("Created %s: %s", label, resourceId));
+	    }
+	    return new SaveReceipt(resourceId, payload, path, response);
     }
 
     /**
@@ -98,7 +111,7 @@ public abstract class AbstractResourceManager extends AbstractManager implements
      * be encoded. Other resources could have a "+" in their ID value as well. However, doing a full encoding doesn't
      * seem to be a great idea, as that will e.g. encode a forward slash in a mimetype as well, which will result in a
      * 404.
-     * 
+     *
      * @param idValue
      * @return
      */
@@ -109,7 +122,7 @@ public abstract class AbstractResourceManager extends AbstractManager implements
     /**
      * Most clients should just use the save method, but this is public for scenarios where a client knows an update
      * should be performed.
-     * 
+     *
      * @param payload
      * @param resourceId
      * @return
@@ -159,7 +172,7 @@ public abstract class AbstractResourceManager extends AbstractManager implements
 
     /**
      * Convenience method for performing a delete once the correct path for the resource has been constructed.
-     * 
+     *
      * @param path
      */
     public void deleteAtPath(String path) {
@@ -175,7 +188,7 @@ public abstract class AbstractResourceManager extends AbstractManager implements
 
     /**
      * TODO Could use something nicer here, particularly to properly encode the parameter values.
-     * 
+     *
      * @param path
      * @param paramsAndValues
      * @return
@@ -203,7 +216,7 @@ public abstract class AbstractResourceManager extends AbstractManager implements
 
     /**
      * Can be overridden by subclass to provide custom querystring parameters.
-     * 
+     *
      * @param payload
      *            XML or JSON payload
      * @return
@@ -214,7 +227,7 @@ public abstract class AbstractResourceManager extends AbstractManager implements
 
     /**
      * Defaults to the "update" resource parameters.
-     * 
+     *
      * @param payload
      *            XML or JSON payload
      * @return

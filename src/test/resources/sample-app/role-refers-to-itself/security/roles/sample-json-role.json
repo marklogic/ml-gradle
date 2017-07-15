@@ -1,0 +1,9 @@
+{
+	"role-name": "sample-app-json-role",
+	"permission": [
+		{
+			"role-name": "sample-app-json-role",
+			"capability": "read"
+		}
+	]
+}

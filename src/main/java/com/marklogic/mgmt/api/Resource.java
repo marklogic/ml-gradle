@@ -43,7 +43,7 @@ public abstract class Resource extends ApiObject {
             logger.info(format("Saved %s %s", name, label));
         }
         return format("[Path: %s; Resource ID: %s; HTTP status: %s]", receipt.getPath(), receipt.getResourceId(),
-                receipt.getResponse().getStatusCode());
+                receipt.getResponse() != null ? receipt.getResponse().getStatusCode() : "(none)");
     }
 
     /**
@@ -68,7 +68,7 @@ public abstract class Resource extends ApiObject {
      * TODO Not totally convinced about putting this method here, as it means that an instance of this is needed to get
      * a list of names. The other choices would be a method on the API class, but then that means the API class needs a
      * method per resource for getting a list of names, whereas with this approach, we have a single method.
-     * 
+     *
      * @return a list of names of all resources of this type.
      */
     public List<String> list() {
@@ -87,7 +87,7 @@ public abstract class Resource extends ApiObject {
     /**
      * Some resources, such as amps, require additional parameters in the URL to uniquely identify the resource. A
      * subclass can override this to provide those parameters.
-     * 
+     *
      * @return
      */
     public String[] getResourceUrlParams() {

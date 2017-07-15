@@ -74,11 +74,13 @@ public class API extends LoggingObject {
     }
 
     protected void initializeAdminManager() {
-        ManageConfig mc = manageClient.getManageConfig();
-        if (mc.getAdminUsername() != null && mc.getAdminPassword() != null) {
-            AdminConfig ac = new AdminConfig(mc.getHost(), 8001, mc.getAdminUsername(), mc.getAdminPassword());
-            this.adminManager = new AdminManager(ac);
-        }
+    	if (manageClient != null) {
+		    ManageConfig mc = manageClient.getManageConfig();
+		    if (mc.getAdminUsername() != null && mc.getAdminPassword() != null) {
+			    AdminConfig ac = new AdminConfig(mc.getHost(), 8001, mc.getAdminUsername(), mc.getAdminPassword());
+			    this.adminManager = new AdminManager(ac);
+		    }
+	    }
     }
 
     protected ObjectMapper buildDefaultObjectMapper() {
@@ -96,7 +98,7 @@ public class API extends LoggingObject {
      * Connect to a (presumably) different host, using the same username/password combos that were used for the same
      * connection. Useful in a development environment where you may have multiple clusters with the same admin
      * username/password combo, and you want to switch quickly from one to another.
-     * 
+     *
      * @param host
      */
     public void connect(String host) {
@@ -107,7 +109,7 @@ public class API extends LoggingObject {
     /**
      * Connect to a (presumably) different MarkLogic Management API. The username/password are assumed to work for both
      * the Management API and the Admin API on port 8001.
-     * 
+     *
      * @param host
      * @param username
      * @param password
@@ -118,7 +120,7 @@ public class API extends LoggingObject {
 
     /**
      * Connect to a (presumably) different MarkLogic Management API.
-     * 
+     *
      * @param host
      * @param username
      * @param password
@@ -140,7 +142,7 @@ public class API extends LoggingObject {
 
     /**
      * Constructs a new ClientHelper, using newClient().
-     * 
+     *
      * @return
      */
     public ClientHelper clientHelper() {
@@ -150,7 +152,7 @@ public class API extends LoggingObject {
     /**
      * Constructs a new DatabaseClient, using system properties to create an AppConfig instance which is used to create
      * a DatabaseClient.
-     * 
+     *
      * @return
      */
     public DatabaseClient newClient() {
@@ -159,7 +161,7 @@ public class API extends LoggingObject {
 
     /**
      * Construct a new DatabaseClient, assuming DIGEST authentication.
-     * 
+     *
      * @param host
      * @param port
      * @param user
@@ -203,7 +205,7 @@ public class API extends LoggingObject {
     /**
      * Convenience method since the "Default" group is usually the group that's wanted (and often the only one that
      * exists).
-     * 
+     *
      * @return
      */
     public Group group() {
@@ -222,7 +224,7 @@ public class API extends LoggingObject {
     /**
      * The vast majority of the time, configuring trace events will be on the default group, so a convenience method is
      * exposed for this use case.
-     * 
+     *
      * @param events
      */
     public void trace(String... events) {
@@ -232,7 +234,7 @@ public class API extends LoggingObject {
     /**
      * The vast majority of the time, configuring trace events will be on the default group, so a convenience method is
      * exposed for this use case.
-     * 
+     *
      * @param events
      */
     public void untrace(String... events) {
@@ -276,7 +278,7 @@ public class API extends LoggingObject {
      * In order to get an amp, we need up to 4 things to uniquely identify based on
      * http://docs.marklogic.com/REST/GET/manage/v2/amps/[id-or-name] . TODO Could make this nicer, where a call is made
      * to the amps endpoint to find an amp with the given local name, and if only one exists, just use that.
-     * 
+     *
      * @param localName
      * @return
      */

@@ -1,10 +1,9 @@
 package com.marklogic.gradle.task.roxy
 
-import com.marklogic.gradle.task.MarkLogicTask
 import org.apache.commons.io.FileUtils
 import org.gradle.api.tasks.TaskAction
 
-class RoxyCopyFilesTask extends MarkLogicTask {
+class RoxyMigrateFilesTask extends RoxyTask {
 
 	def roxyFolderMapping = [
 								"src" : "/root",
@@ -15,27 +14,25 @@ class RoxyCopyFilesTask extends MarkLogicTask {
 
 	@TaskAction
 	void copyRoxyFiles() {
-		if (getRoxyHome()) {
+		if (getRoxyProjectPath()) {
 			def baseDir = getAppConfig().getModulePaths().get(0)
 			roxyFolderMapping.each { k, v ->
-				def source = getRoxyHome() + "/" + k
-				println "Source folder '" + source + "' ... "
-				def sourceFolder = new File(source)
+				def sourcePath = getRoxyProjectPath() + "/" + k
+				def sourceFolder = new File(sourcePath)
 				if (sourceFolder.exists() && sourceFolder.isDirectory()) {
 					def targetDir = baseDir + v
-					println "Creating folder '" + targetDir + "' ... "
+					println "Creating directory: " + targetDir
 					def targetFolder = new File(targetDir)
 					FileUtils.forceMkdir(targetFolder)
-					println "Copying contents of '" + source + "' to '" + targetDir + "' ... "
+					println "Copying contents of '" + sourcePath + "' to '" + targetDir + "'"
 					FileUtils.copyDirectory(sourceFolder, targetFolder)
+				} else {
+					println "Did not find Roxy source directory: " + sourcePath
 				}
 			}
 		} else {
-			println "mlRoxyHome parameter is not provided. Please run using -PmlRoxyHome=/your/roxy/project/home"
+			printMissingPathMessage()
 		}
 	}
 
-	String getRoxyHome(){
-		project.hasProperty("mlRoxyHome") ? project.property("mlRoxyHome") : ""
-	}
 }

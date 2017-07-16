@@ -33,8 +33,9 @@ import com.marklogic.gradle.task.groups.SetTraceEventsTask
 import com.marklogic.gradle.task.mimetypes.DeployMimetypesTask
 import com.marklogic.gradle.task.qconsole.ExportWorkspacesTask
 import com.marklogic.gradle.task.qconsole.ImportWorkspacesTask
-import com.marklogic.gradle.task.roxy.RoxyCopyFilesTask
-import com.marklogic.gradle.task.roxy.RoxyCopyPropertiesTask
+import com.marklogic.gradle.task.roxy.RoxyMigrateBuildStepsTask
+import com.marklogic.gradle.task.roxy.RoxyMigrateFilesTask
+import com.marklogic.gradle.task.roxy.RoxyMigratePropertiesTask
 import com.marklogic.gradle.task.scaffold.GenerateScaffoldTask
 import com.marklogic.gradle.task.schemas.LoadSchemasTask
 import com.marklogic.gradle.task.security.*
@@ -210,9 +211,14 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlShell", type: ShellTask, group: shellGroup, description: "Run groovysh with MarkLogic-specific support built in")
 
 		String roxyGroup = "ml-gradle Roxy";
-		project.task("mlRoxyCopyProperties", type: RoxyCopyPropertiesTask, group: roxyGroup, description: "Copy Roxy properties to gradle.properties file")
-		project.task("mlRoxyCopyFiles", type: RoxyCopyFilesTask, group: roxyGroup, description: "Copy roxy files")
-
+		project.task("mlRoxyMigrateBuildSteps", type: RoxyMigrateBuildStepsTask, group: roxyGroup, description: "Migrate build steps from deploy/app_specific.rb into custom Gradle tasks. " +
+			"Use -ProxyProjectPath to define the location of your Roxy project, and -PappSpecificPath to define a path other than deploy/app_specific.rb")
+		project.task("mlRoxyMigrateFiles", type: RoxyMigrateFilesTask, group: roxyGroup, description: "Migrate Roxy source files into this Gradle project. " +
+			"Use -ProxyProjectPath to define the location of your Roxy project.")
+		project.task("mlRoxyMigrateProperties", type: RoxyMigratePropertiesTask, group: roxyGroup, description: "Migrate Roxy properties into the gradle.properties file in this project. " +
+			"Use -ProxyProjectPath to define the location of your Roxy project.")
+		project.task("mlRoxyMigrateProject", group: roxyGroup, description: "Run all tasks for migrating a Roxy project into this Gradle project. " +
+			"Use -ProxyProjectPath to define the location of your Roxy project.", dependsOn: ["mlRoxyMigrateBuildSteps", "mlRoxyMigrateFiles", "mlRoxyMigrateProperties"])
 		logger.info("Finished initializing ml-gradle\n")
 	}
 

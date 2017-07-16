@@ -44,7 +44,7 @@ class MarkLogicTask extends DefaultTask {
 		project.hasProperty("mlAdminPassword") ? project.property("mlAdminPassword") : project.property("mlPassword")
 	}
 
-    DatabaseClient newClient() {
+	DatabaseClient newClient() {
         getAppConfig().newDatabaseClient()
     }
 

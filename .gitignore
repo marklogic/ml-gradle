@@ -33,3 +33,4 @@ examples/minimal-project/.gradle
 examples/ignore-resources-project/.gradle/
 .idea
 *.iml
+out

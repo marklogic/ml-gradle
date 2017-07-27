@@ -103,7 +103,7 @@ public class AppConfig {
     private Map<String, String> customTokens = new HashMap<>();
 
     // Allows for creating a triggers database without a config file for one
-    private boolean createTriggersDatabase = true;
+    private boolean createTriggersDatabase = false;
 
     // Controls whether forests are deleted when a database is deleted
     private boolean deleteForests = true;
@@ -512,8 +512,8 @@ public class AppConfig {
     }
 
     /**
-     * @return whether a triggers database should be created by default; defaults to true, as it's very common to need a
-     * triggers database, such as for CPF, Alerting, custom triggers, etc.
+     * @return whether a triggers database should be created by default; as of version 2.9.0, this defaults to false;
+     * defaulted to true prior to that.
      */
     public boolean isCreateTriggersDatabase() {
         return createTriggersDatabase;

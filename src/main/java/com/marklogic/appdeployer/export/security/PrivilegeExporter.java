@@ -1,7 +1,9 @@
 package com.marklogic.appdeployer.export.security;
 
 import com.marklogic.appdeployer.ConfigDir;
-import com.marklogic.appdeployer.export.AbstractNamedResourceExporter;
+import com.marklogic.appdeployer.export.impl.AbstractNamedResourceExporter;
+import com.marklogic.appdeployer.export.impl.ExportInputs;
+import com.marklogic.appdeployer.export.impl.SimpleExportInputs;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.ResourceManager;
 import com.marklogic.mgmt.security.PrivilegeManager;
@@ -30,7 +32,14 @@ public class PrivilegeExporter extends AbstractNamedResourceExporter {
 	}
 
 	@Override
-	protected String beforeResourceWrittenToFile(String resourceName, String payload) {
+	protected File exportToFile(ResourceManager mgr, String resourceName, File resourceDir) {
+		SimpleExportInputs inputs = new SimpleExportInputs(resourceName, "kind",
+			uriPrivilegeNames != null && uriPrivilegeNames.contains(resourceName) ? "uri" : "execute");
+		return super.exportToFile(mgr, inputs, resourceDir);
+	}
+
+	@Override
+	protected String beforeResourceWrittenToFile(ExportInputs exportInputs, String payload) {
 		return isRemoveRoles() ? removeJsonKeyFromPayload(payload, "role") : payload;
 	}
 
@@ -40,21 +49,13 @@ public class PrivilegeExporter extends AbstractNamedResourceExporter {
 	}
 
 	@Override
-	protected String[] getResourceUrlParams(String resourceName) {
-		String[] params = new String[2];
-		params[0] = "kind";
-		params[1] = uriPrivilegeNames != null && uriPrivilegeNames.contains(resourceName) ? "uri" : "execute";
-		return params;
-	}
-
-	@Override
 	protected ResourceManager newResourceManager(ManageClient manageClient) {
 		return new PrivilegeManager(manageClient);
 	}
 
 	@Override
 	protected File getResourceDirectory(File baseDir) {
-		return new File(new ConfigDir(baseDir).getSecurityDir(), "privileges");
+		return new ConfigDir(baseDir).getPrivilegesDir();
 	}
 
 	public boolean isRemoveRoles() {

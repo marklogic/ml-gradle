@@ -5,10 +5,12 @@ import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.security.Role;
+import com.marklogic.mgmt.mapper.DefaultResourceMapper;
+import com.marklogic.mgmt.mapper.ResourceMapper;
 
 public class RoleManager extends AbstractResourceManager {
 
-	private API api;
+	private ResourceMapper resourceMapper;
 
 	public RoleManager(ManageClient client) {
 		super(client);
@@ -31,21 +33,12 @@ public class RoleManager extends AbstractResourceManager {
 	 */
 	@Override
 	protected SaveReceipt createNewResource(String payload, String resourceId) {
-		if (api == null) {
-			api = new API(getManageClient());
+		if (resourceMapper == null) {
+			API api = new API(getManageClient());
+			resourceMapper = new DefaultResourceMapper(api);
 		}
 
-		/**
-		 * TODO In version 3.x, this will be handled via a separate class.
-		 */
-		Role role = null;
-		if (payloadParser.isJsonPayload(payload)) {
-			role = Role.parseJson(api, payload);
-		} else {
-			role = Role.parseXml(payload);
-			role.setApi(api);
-			role.setObjectMapper(api.getObjectMapper());
-		}
+		Role role = resourceMapper.readResource(payload, Role.class);
 
 		if (role.hasPermissionWithOwnRoleName()) {
 			role.getPermission().clear();

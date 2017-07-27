@@ -116,7 +116,7 @@ public class Database extends Resource {
     public void addForest(Forest f) {
         addForest(f.getForestName());
     }
-    
+
     public void addForest(String forestName) {
         if (forest == null) {
             forest = new ArrayList<>();
@@ -135,7 +135,7 @@ public class Database extends Resource {
     /**
      * TODO In the event this is a new forest with no host set, add a parameter to specify an index of the set of hosts
      * returned by /manage/v2/hosts (I think the order is guaranteed).
-     * 
+     *
      * @param f
      */
     public void attach(String forestName) {
@@ -159,7 +159,7 @@ public class Database extends Resource {
 
     public void detach(String forestName) {
         if (forest == null || !forest.contains(forestName)) {
-            logger.warn(format("Forest %s not in list of known forests for database, so not detaching"));
+            getLogger().warn(format("Forest %s not in list of known forests for database, so not detaching"));
         } else {
             forest.remove(forestName);
             save();

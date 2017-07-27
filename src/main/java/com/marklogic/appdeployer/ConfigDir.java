@@ -7,9 +7,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Defines all of the directories where configuration files can be found. This is decoupled from the NounManager
- * classes, who don't need to care where to look for configuration files, they just need to care about how to load the
- * data in those files.
+ * Defines all of the directories where configuration files can be found.
+ *
+ * TODO Eventually turn this into an interface. 
  */
 public class ConfigDir {
 
@@ -76,8 +76,20 @@ public class ConfigDir {
 		return new File(baseDir, "security");
 	}
 
+	public File getAmpsDir() {
+		return new File(getSecurityDir(), "amps");
+	}
+
+	public File getPrivilegesDir() {
+		return new File(getSecurityDir(), "privileges");
+	}
+
 	public File getRolesDir() {
 		return new File(getSecurityDir(), "roles");
+	}
+
+	public File getUsersDir() {
+		return new File(getSecurityDir(), "users");
 	}
 
 	public File getServersDir() {

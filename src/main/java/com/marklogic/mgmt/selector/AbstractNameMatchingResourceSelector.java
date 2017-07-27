@@ -4,11 +4,14 @@ import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.ResourceManager;
 import com.marklogic.mgmt.appservers.ServerManager;
 import com.marklogic.mgmt.databases.DatabaseManager;
+import com.marklogic.mgmt.security.AmpManager;
 import com.marklogic.mgmt.security.PrivilegeManager;
 import com.marklogic.mgmt.security.RoleManager;
 import com.marklogic.mgmt.security.UserManager;
 import com.marklogic.mgmt.tasks.TaskManager;
 import com.marklogic.rest.util.ResourcesFragment;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,8 +33,24 @@ public abstract class AbstractNameMatchingResourceSelector implements ResourceSe
 		select(selection, new UserManager(manageClient), MapResourceSelection.USERS);
 		selectPrivileges(selection, manageClient);
 		selectTasks(selection, manageClient);
+		selectAmps(selection, manageClient);
 
 		return selection;
+	}
+
+	protected void selectAmps(MapResourceSelection selection, ManageClient manageClient) {
+		if (includeTypes == null || includeTypes.contains(MapResourceSelection.AMPS)) {
+			AmpManager mgr = new AmpManager(manageClient);
+			ResourcesFragment amps = mgr.getAsXml();
+			Namespace ns = Namespace.getNamespace("http://marklogic.com/manage/security");
+			for (Element amp : amps.getListItems()) {
+				String nameref = amp.getChildText("nameref", ns);
+				if (nameMatches(nameref)) {
+					String uriref = amp.getChildText("uriref", ns);
+					selection.select(MapResourceSelection.AMPS, uriref);
+				}
+			}
+		}
 	}
 
 	protected void selectTasks(MapResourceSelection selection, ManageClient manageClient) {

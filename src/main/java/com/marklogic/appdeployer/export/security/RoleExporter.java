@@ -1,7 +1,7 @@
 package com.marklogic.appdeployer.export.security;
 
 import com.marklogic.appdeployer.ConfigDir;
-import com.marklogic.appdeployer.export.AbstractNamedResourceExporter;
+import com.marklogic.appdeployer.export.impl.AbstractNamedResourceExporter;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.ResourceManager;
 import com.marklogic.mgmt.security.RoleManager;
@@ -21,7 +21,7 @@ public class RoleExporter extends AbstractNamedResourceExporter {
 
 	@Override
 	protected File getResourceDirectory(File baseDir) {
-		return new File(new ConfigDir(baseDir).getSecurityDir(), "roles");
+		return new ConfigDir(baseDir).getRolesDir();
 	}
 
 	@Override

@@ -1,7 +1,8 @@
 package com.marklogic.appdeployer.export.databases;
 
 import com.marklogic.appdeployer.ConfigDir;
-import com.marklogic.appdeployer.export.AbstractNamedResourceExporter;
+import com.marklogic.appdeployer.export.impl.AbstractNamedResourceExporter;
+import com.marklogic.appdeployer.export.impl.ExportInputs;
 import com.marklogic.appdeployer.export.ExportedResources;
 import com.marklogic.appdeployer.export.forests.ForestExporter;
 import com.marklogic.mgmt.ManageClient;
@@ -9,7 +10,6 @@ import com.marklogic.mgmt.ResourceManager;
 import com.marklogic.mgmt.databases.DatabaseManager;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,7 +39,7 @@ public class DatabaseExporter extends AbstractNamedResourceExporter {
 	}
 
 	@Override
-	protected String beforeResourceWrittenToFile(String resourceName, String payload) {
+	protected String beforeResourceWrittenToFile(ExportInputs exportInputs, String payload) {
 		return removeForestsSoDatabaseCanBeCreatedBeforeForestsAre(payload);
 	}
 

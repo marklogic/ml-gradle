@@ -53,7 +53,7 @@ public class Forest extends Resource {
     /**
      * save is tricky for forests, because many of the properties are read-only, and thus ForestManager does not yet
      * support updates.
-     * 
+     *
      * Another tricky part is that "localhost" won't work as a hostname - it has to be the real hostname. So if it's not
      * set, we have to fetch it from the cluster.
      */
@@ -61,8 +61,8 @@ public class Forest extends Resource {
     public String save() {
         if (host == null) {
             String host = new HostManager(getClient()).getHostNames().get(0);
-            if (logger.isInfoEnabled()) {
-                logger.info(format("Setting forest host to %s", host));
+            if (getLogger().isInfoEnabled()) {
+                getLogger().info(format("Setting forest host to %s", host));
             }
             this.host = host;
         }

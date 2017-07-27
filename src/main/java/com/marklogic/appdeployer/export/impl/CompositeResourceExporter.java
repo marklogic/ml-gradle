@@ -1,23 +1,25 @@
-package com.marklogic.appdeployer.export;
+package com.marklogic.appdeployer.export.impl;
 
-import com.marklogic.mgmt.ManageClient;
+import com.marklogic.appdeployer.export.ExportedResources;
+import com.marklogic.appdeployer.export.ResourceExporter;
+import com.marklogic.appdeployer.export.impl.AbstractResourceExporter;
+import com.marklogic.client.helper.LoggingObject;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
  * Lets you combine many instances of ResourceExporter and invoke them all at once (could parallelize this in the
  * future).
  */
-public class CompositeResourceExporter extends AbstractResourceExporter {
+public class CompositeResourceExporter extends LoggingObject implements ResourceExporter {
 
 	private List<ResourceExporter> resourceExporters;
 	private boolean overrideFormatOnExporters = true;
+	private String format = FORMAT_JSON;
 
-	public CompositeResourceExporter(ManageClient manageClient, ResourceExporter... resourceExporters) {
-		super(manageClient);
+	public CompositeResourceExporter(ResourceExporter... resourceExporters) {
 		this.resourceExporters = new ArrayList<>();
 		for (ResourceExporter exporter : resourceExporters) {
 			this.resourceExporters.add(exporter);
@@ -59,5 +61,13 @@ public class CompositeResourceExporter extends AbstractResourceExporter {
 
 	public void setResourceExporters(List<ResourceExporter> resourceExporters) {
 		this.resourceExporters = resourceExporters;
+	}
+
+	public String getFormat() {
+		return format;
+	}
+
+	public void setFormat(String format) {
+		this.format = format;
 	}
 }

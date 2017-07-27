@@ -2,7 +2,7 @@ package com.marklogic.appdeployer.export.appservers;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.appdeployer.ConfigDir;
-import com.marklogic.appdeployer.export.AbstractNamedResourceExporter;
+import com.marklogic.appdeployer.export.impl.AbstractNamedResourceExporter;
 import com.marklogic.appdeployer.export.ExportedResources;
 import com.marklogic.appdeployer.export.databases.DatabaseExporter;
 import com.marklogic.mgmt.ManageClient;

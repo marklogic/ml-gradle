@@ -1,7 +1,10 @@
 package com.marklogic.mgmt.selector;
 
+import com.marklogic.mgmt.api.security.Amp;
+
 public interface ResourceSelection {
 
+	String AMPS = "amps";
 	String DATABASES = "databases";
 	String PRIVILEGES_EXECUTE = "privilegesExecute";
 	String PRIVILEGES_URI = "privilegesUri";
@@ -23,4 +26,12 @@ public interface ResourceSelection {
 	String[] getTaskNames();
 
 	String[] getUserNames();
+
+	/**
+	 * Because an amp cannot be uniquely identified solely by its name, the implementation is expected to return the
+	 * full "uriref" that the Manage API defines for an amp, as a uriref uniquely identifies the amp.
+	 *
+	 * @return
+	 */
+	String[] getAmpUriRefs();
 }

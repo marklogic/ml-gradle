@@ -1,5 +1,7 @@
 package com.marklogic.mgmt.selector;
 
+import com.marklogic.mgmt.api.security.Amp;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,13 +11,22 @@ public class MapResourceSelection implements ResourceSelection {
 
 	private Map<String, List<String>> selections = new HashMap<>();
 
-	public void select(String type, String name) {
+	/**
+	 * Clients use this method to select a resource of a particular type. The "value" parameter can differ in its
+	 * nature based on the resource type. For example, for a database, the value can be a name, which is sufficient
+	 * for uniquely identifying a database. But for an amp, the value should be the uriref for the amp resource, as
+	 * a name is not sufficient for uniquely identifying an amp.
+	 *
+	 * @param type
+	 * @param value
+	 */
+	public void select(String type, String value) {
 		List<String> names = selections.get(type);
 		if (names == null) {
 			names = new ArrayList<>();
 			selections.put(type, names);
 		}
-		names.add(name);
+		names.add(value);
 	}
 
 	protected String[] getSelectedResourceNames(String type) {
@@ -56,5 +67,10 @@ public class MapResourceSelection implements ResourceSelection {
 	@Override
 	public String[] getUserNames() {
 		return getSelectedResourceNames(USERS);
+	}
+
+	@Override
+	public String[] getAmpUriRefs() {
+		return getSelectedResourceNames(AMPS);
 	}
 }

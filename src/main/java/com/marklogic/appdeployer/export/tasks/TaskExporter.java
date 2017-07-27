@@ -1,13 +1,18 @@
 package com.marklogic.appdeployer.export.tasks;
 
 import com.marklogic.appdeployer.ConfigDir;
-import com.marklogic.appdeployer.export.AbstractNamedResourceExporter;
+import com.marklogic.appdeployer.export.impl.AbstractNamedResourceExporter;
+import com.marklogic.appdeployer.export.impl.ExportInputs;
+import com.marklogic.appdeployer.export.impl.SimpleExportInputs;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.tasks.TaskManager;
 
 import java.io.File;
 
+/**
+ * This is currently limited to exporting tasks from a single group.
+ */
 public class TaskExporter extends AbstractNamedResourceExporter {
 
 	private String groupName = "Default";
@@ -22,6 +27,11 @@ public class TaskExporter extends AbstractNamedResourceExporter {
 	}
 
 	@Override
+	protected File exportToFile(ResourceManager mgr, String resourceName, File resourceDir) {
+		return super.exportToFile(mgr, new TaskExportInputs(resourceName, "group-id", groupName), resourceDir);
+	}
+
+	@Override
 	protected ResourceManager newResourceManager(ManageClient manageClient) {
 		return groupName != null ? new TaskManager(manageClient, groupName) : new TaskManager(manageClient);
 	}
@@ -32,19 +42,22 @@ public class TaskExporter extends AbstractNamedResourceExporter {
 	}
 
 	@Override
-	protected String[] getResourceUrlParams(String resourceName) {
-		return new String[]{"group-id", groupName};
+	protected String beforeResourceWrittenToFile(ExportInputs exportInputs, String payload) {
+		return removeJsonKeyFromPayload(payload, "task-id");
+	}
+}
+
+class TaskExportInputs extends SimpleExportInputs {
+
+	public TaskExportInputs(String resourceName, String... resourceUrlParams) {
+		super(resourceName, resourceUrlParams);
 	}
 
 	@Override
-	protected String buildFilename(String resourceName, String suffix) {
+	public String buildFilename(String suffix) {
+		String resourceName = getResourceName();
 		int pos = resourceName.lastIndexOf("/");
 		String prefix = pos > -1 ? resourceName.substring(pos + 1) : resourceName;
 		return prefix + "." + suffix;
-	}
-
-	@Override
-	protected String beforeResourceWrittenToFile(String resourceName, String payload) {
-		return removeJsonKeyFromPayload(payload, "task-id");
 	}
 }

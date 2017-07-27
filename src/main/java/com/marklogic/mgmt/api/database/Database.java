@@ -159,7 +159,7 @@ public class Database extends Resource {
 
     public void detach(String forestName) {
         if (forest == null || !forest.contains(forestName)) {
-            logger.warn(format("Forest %s not in list of known forests for database, so not detaching"));
+            getLogger().warn(format("Forest %s not in list of known forests for database, so not detaching"));
         } else {
             forest.remove(forestName);
             save();

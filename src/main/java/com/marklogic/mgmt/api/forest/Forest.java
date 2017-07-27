@@ -61,8 +61,8 @@ public class Forest extends Resource {
     public String save() {
         if (host == null) {
             String host = new HostManager(getClient()).getHostNames().get(0);
-            if (logger.isInfoEnabled()) {
-                logger.info(format("Setting forest host to %s", host));
+            if (getLogger().isInfoEnabled()) {
+                getLogger().info(format("Setting forest host to %s", host));
             }
             this.host = host;
         }

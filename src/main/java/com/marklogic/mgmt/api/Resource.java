@@ -16,16 +16,27 @@ import java.util.List;
  */
 public abstract class Resource extends ApiObject {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    private Logger logger;
 
     private API api;
 
-    protected Resource() {
+	/**
+	 * This constructor can be used when a client doesn't to perform any operations with the Manage API, but rather
+	 * just wants to use the subclass instance like a regular Java bean class.
+	 */
+	protected Resource() {
     }
 
     protected Resource(API api) {
         this.api = api;
         setObjectMapper(api.getObjectMapper());
+    }
+
+    protected Logger getLogger() {
+    	if (logger == null) {
+    		logger = LoggerFactory.getLogger(getClass());
+	    }
+	    return logger;
     }
 
     /**
@@ -34,12 +45,12 @@ public abstract class Resource extends ApiObject {
     public String save() {
         String name = getResourceType();
         String label = getResourceLabel();
-        if (logger.isInfoEnabled()) {
-            logger.info(format("Saving %s %s", name, label));
+        if (getLogger().isInfoEnabled()) {
+            getLogger().info(format("Saving %s %s", name, label));
         }
         SaveReceipt receipt = getResourceManager().save(getJson());
-        if (logger.isInfoEnabled()) {
-            logger.info(format("Saved %s %s", name, label));
+        if (getLogger().isInfoEnabled()) {
+            getLogger().info(format("Saved %s %s", name, label));
         }
         return format("[Path: %s; Resource ID: %s; HTTP status: %s]", receipt.getPath(), receipt.getResourceId(),
                 receipt.getResponse() != null ? receipt.getResponse().getStatusCode() : "(none)");
@@ -52,12 +63,12 @@ public abstract class Resource extends ApiObject {
     public String delete() {
         String name = getResourceType();
         String label = getResourceLabel();
-        if (logger.isInfoEnabled()) {
-            logger.info(format("Deleting %s %s", name, label));
+        if (getLogger().isInfoEnabled()) {
+            getLogger().info(format("Deleting %s %s", name, label));
         }
         DeleteReceipt receipt = getResourceManager().deleteByIdField(getResourceId(), getResourceUrlParams());
-        if (logger.isInfoEnabled()) {
-            logger.info(format("Deleted %s %s", name, label));
+        if (getLogger().isInfoEnabled()) {
+            getLogger().info(format("Deleted %s %s", name, label));
         }
         return receipt.isDeleted() ? format("[Path: %s; Resource ID: %s; deleted: true]", receipt.getPath(),
                 receipt.getResourceId()) : format("[Resource ID: %s; deleted: false]", receipt.getResourceId());

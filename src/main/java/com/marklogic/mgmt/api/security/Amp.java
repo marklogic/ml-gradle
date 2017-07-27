@@ -1,19 +1,35 @@
 package com.marklogic.mgmt.api.security;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.Resource;
 import com.marklogic.mgmt.resource.security.AmpManager;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.xml.bind.annotation.*;
 
+@XmlRootElement(name = "role-properties")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Amp extends Resource {
 
+	@JsonProperty("local-name")
+	@XmlElement(name = "local-name")
     private String localName;
+
     private String namespace;
-    private String documentUri;
-    private String modulesDatabase;
+
+	@JsonProperty("document-uri")
+	@XmlElement(name = "document-uri")
+	private String documentUri;
+
+	@JsonProperty("modules-database")
+	@XmlElement(name = "modules-database")
+	private String modulesDatabase;
+
+	@XmlElementWrapper(name = "roles")
     private List<String> role;
 
     public Amp() {

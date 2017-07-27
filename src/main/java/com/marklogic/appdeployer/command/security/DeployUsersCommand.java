@@ -8,6 +8,8 @@ import com.marklogic.mgmt.resource.security.UserManager;
 
 import java.io.File;
 
+import java.io.File;
+
 public class DeployUsersCommand extends AbstractResourceCommand {
 
     public DeployUsersCommand() {
@@ -16,7 +18,7 @@ public class DeployUsersCommand extends AbstractResourceCommand {
     }
 
     protected File[] getResourceDirs(CommandContext context) {
-        return new File[] { new File(context.getAppConfig().getConfigDir().getSecurityDir(), "users") };
+        return new File[] { context.getAppConfig().getConfigDir().getUsersDir() };
     }
 
     @Override

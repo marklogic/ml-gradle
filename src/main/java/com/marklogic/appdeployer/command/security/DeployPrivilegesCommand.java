@@ -8,6 +8,8 @@ import com.marklogic.mgmt.resource.security.PrivilegeManager;
 
 import java.io.File;
 
+import java.io.File;
+
 public class DeployPrivilegesCommand extends AbstractResourceCommand {
 
     public DeployPrivilegesCommand() {
@@ -17,7 +19,7 @@ public class DeployPrivilegesCommand extends AbstractResourceCommand {
 
     @Override
     protected File[] getResourceDirs(CommandContext context) {
-        return new File[] { new File(context.getAppConfig().getConfigDir().getSecurityDir(), "privileges") };
+        return new File[] { context.getAppConfig().getConfigDir().getPrivilegesDir() };
     }
 
     @Override

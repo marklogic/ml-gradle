@@ -2,6 +2,8 @@ package com.marklogic.appdeployer.export;
 
 import com.marklogic.appdeployer.export.appservers.ServerExporter;
 import com.marklogic.appdeployer.export.databases.DatabaseExporter;
+import com.marklogic.appdeployer.export.impl.CompositeResourceExporter;
+import com.marklogic.appdeployer.export.security.AmpExporter;
 import com.marklogic.appdeployer.export.security.PrivilegeExporter;
 import com.marklogic.appdeployer.export.security.RoleExporter;
 import com.marklogic.appdeployer.export.security.UserExporter;
@@ -27,11 +29,12 @@ public class Exporter extends LoggingObject {
 
 	public Exporter(ManageClient manageClient) {
 		this.manageClient = manageClient;
-		compositeExporter = new CompositeResourceExporter(manageClient);
+		compositeExporter = new CompositeResourceExporter();
 	}
 
 	public Exporter select(ResourceSelector selector) {
 		ResourceSelection selection = selector.selectResources(manageClient);
+		amps(selection.getAmpUriRefs());
 		databases(selection.getDatabaseNames());
 		privilegesExecute(selection.getPrivilegeExecuteNames());
 		privilegesUri(selection.getPrivilegeUriNames());
@@ -54,6 +57,10 @@ public class Exporter extends LoggingObject {
 	public Exporter add(ResourceExporter resourceExporter) {
 		compositeExporter.add(resourceExporter);
 		return this;
+	}
+
+	public Exporter amps(String... ampUriRefs) {
+		return add(new AmpExporter(manageClient, ampUriRefs));
 	}
 
 	public Exporter databases(String... databaseNames) {

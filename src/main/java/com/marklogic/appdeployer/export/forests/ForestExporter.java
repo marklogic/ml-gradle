@@ -1,7 +1,8 @@
 package com.marklogic.appdeployer.export.forests;
 
 import com.marklogic.appdeployer.ConfigDir;
-import com.marklogic.appdeployer.export.AbstractNamedResourceExporter;
+import com.marklogic.appdeployer.export.impl.AbstractNamedResourceExporter;
+import com.marklogic.appdeployer.export.impl.ExportInputs;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.forests.ForestManager;
@@ -19,7 +20,7 @@ public class ForestExporter extends AbstractNamedResourceExporter {
 	}
 
 	@Override
-	protected String beforeResourceWrittenToFile(String resourceName, String payload) {
+	protected String beforeResourceWrittenToFile(ExportInputs exportInputs, String payload) {
 		return isRemoveRange() ? removeJsonKeyFromPayload(payload, "range") : payload;
 	}
 

@@ -1,5 +1,8 @@
 package com.marklogic.rest.util;
 
+import java.util.List;
+
+import org.jdom2.Element;
 import org.jdom2.Namespace;
 
 import java.util.List;
@@ -33,6 +36,17 @@ public class ResourcesFragment extends Fragment {
         return getListItemValue(resourceIdOrName, "idref");
     }
 
+    public String getUriRefForNameRef(String nameref) {
+    	return getListItemValue(nameref, "uriref");
+    }
+
+    public String getNameRefForUriRef(String uriRef) {
+	    String xpath = "/node()/*[local-name(.) = 'list-items']/node()"
+		    + "[*[local-name(.) = 'uriref'] = '%s']/*[local-name(.) = 'nameref']";
+	    xpath = String.format(xpath, uriRef);
+	    return getElementValue(xpath);
+    }
+
     public String getListItemValue(String resourceIdOrName, String elementLocalName) {
         String xpath = "/node()/*[local-name(.) = 'list-items']/node()"
                 + "[*[local-name(.) = 'nameref'] = '%s' or *[local-name(.) = 'idref'] = '%s']/*[local-name(.) = '%s']";
@@ -52,4 +66,9 @@ public class ResourcesFragment extends Fragment {
         String xpath = "/node()/*[local-name(.) = 'list-items']/node()/*[local-name(.) = '%s']";
         return getElementValues(String.format(xpath, elementName));
     }
+
+    public List<Element> getListItems() {
+    	return evaluateForElements("/node()/*[local-name(.) = 'list-items']/node()[local-name(.) = 'list-item']");
+    }
+
 }

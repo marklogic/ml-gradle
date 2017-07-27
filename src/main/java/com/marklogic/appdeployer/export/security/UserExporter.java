@@ -2,7 +2,8 @@ package com.marklogic.appdeployer.export.security;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.appdeployer.ConfigDir;
-import com.marklogic.appdeployer.export.AbstractNamedResourceExporter;
+import com.marklogic.appdeployer.export.impl.AbstractNamedResourceExporter;
+import com.marklogic.appdeployer.export.impl.ExportInputs;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.resource.ResourceManager;
@@ -31,7 +32,7 @@ public class UserExporter extends AbstractNamedResourceExporter {
 
 	@Override
 	protected File getResourceDirectory(File baseDir) {
-		return new File(new ConfigDir(baseDir).getSecurityDir(), "users");
+		return new ConfigDir(baseDir).getUsersDir();
 	}
 
 	@Override
@@ -49,7 +50,7 @@ public class UserExporter extends AbstractNamedResourceExporter {
 	 * @return
 	 */
 	@Override
-	protected String beforeResourceWrittenToFile(String resourceName, String payload) {
+	protected String beforeResourceWrittenToFile(ExportInputs exportInputs, String payload) {
 		try {
 			if (payloadParser.isJsonPayload(payload)) {
 				ObjectNode json = (ObjectNode) payloadParser.parseJson(payload);
@@ -66,7 +67,8 @@ public class UserExporter extends AbstractNamedResourceExporter {
 				}
 			}
 		} catch (Exception ex) {
-			logger.warn("Unable to add a default password to exported user: " + resourceName + "; still exporting user but without a password; exception message: " + ex.getMessage());
+			logger.warn("Unable to add a default password to exported user: " + exportInputs.getResourceName() +
+				"; still exporting user but without a password; exception message: " + ex.getMessage());
 		}
 		return payload;
 	}

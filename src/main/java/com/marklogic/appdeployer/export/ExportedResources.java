@@ -4,6 +4,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Captures the results of exporting one or more resources.
+ *
+ * The list of messages contains messages pertaining to the resources that were exported. These messages are
+ * typically used to provide warnings or an explanation of how a particular resource or resource type was exported.
+ */
 public class ExportedResources {
 
 	private List<File> files;

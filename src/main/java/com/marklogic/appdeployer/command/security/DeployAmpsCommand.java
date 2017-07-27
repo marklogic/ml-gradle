@@ -8,6 +8,8 @@ import com.marklogic.mgmt.resource.security.AmpManager;
 
 import java.io.File;
 
+import java.io.File;
+
 public class DeployAmpsCommand extends AbstractResourceCommand {
 
     public DeployAmpsCommand() {
@@ -17,7 +19,7 @@ public class DeployAmpsCommand extends AbstractResourceCommand {
 
     @Override
     protected File[] getResourceDirs(CommandContext context) {
-        return new File[] { new File(context.getAppConfig().getConfigDir().getSecurityDir(), "amps") };
+        return new File[] { context.getAppConfig().getConfigDir().getAmpsDir() };
     }
 
     @Override

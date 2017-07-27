@@ -7,17 +7,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
-public class PropertiesFileResourceSelector implements ResourceSelector {
+public class PropertiesResourceSelector implements ResourceSelector {
 
-	private File file;
+	private Properties props;
 
-	public PropertiesFileResourceSelector(File file) {
-		this.file = file;
-	}
-
-	@Override
-	public ResourceSelection selectResources(ManageClient manageClient) {
-		Properties props = new Properties();
+	public PropertiesResourceSelector(File file) {
+		props = new Properties();
 		try {
 			FileReader reader = new FileReader(file);
 			props.load(reader);
@@ -25,13 +20,20 @@ public class PropertiesFileResourceSelector implements ResourceSelector {
 		} catch (IOException ie) {
 			throw new RuntimeException(ie);
 		}
+	}
 
+	public PropertiesResourceSelector(Properties props) {
+		this.props = props;
+	}
+
+	@Override
+	public ResourceSelection selectResources(ManageClient manageClient) {
 		MapResourceSelection selection = new MapResourceSelection();
 
 		for (String prop : props.stringPropertyNames()) {
-			String[] names = props.getProperty(prop).split(",");
-			for (String name : names) {
-				selection.select(prop, name);
+			String[] values = props.getProperty(prop).split(",");
+			for (String value : values) {
+				selection.select(prop, value);
 			}
 		}
 

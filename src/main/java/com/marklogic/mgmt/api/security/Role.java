@@ -9,7 +9,6 @@ import com.marklogic.mgmt.resource.security.RoleManager;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.*;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,39 +47,6 @@ public class Role extends Resource {
 	public Role(API api, String roleName) {
 		super(api);
 		this.roleName = roleName;
-	}
-
-	/**
-	 * This is a temporary home for this method; it will be moved to something more reusable in version 3.x.
-	 *
-	 * @param xml
-	 * @return
-	 */
-	public static Role parseXml(String xml) {
-		try {
-			if (roleJaxbContext == null) {
-				roleJaxbContext = JAXBContext.newInstance(Role.class);
-			}
-			return (Role) roleJaxbContext.createUnmarshaller().unmarshal(new StringReader(xml));
-		} catch (Exception ex) {
-			throw new RuntimeException("Unable to parse XML for role, cause: " + ex.getMessage(), ex);
-		}
-	}
-
-	/**
-	 * This is a temporary home for this method; it will be moved to something more reusable in version 3.x.
-	 *
-	 * @param xml
-	 * @return
-	 */
-	public static Role parseJson(API api, String json) {
-		try {
-			Role role = api.getObjectMapper().readerFor(Role.class).readValue(json);
-			role.setObjectMapper(api.getObjectMapper());
-			return role;
-		} catch (Exception ex) {
-			throw new RuntimeException("Unable to parse JSON for role, cause: " + ex.getMessage(), ex);
-		}
 	}
 
 	public boolean hasPermissionWithOwnRoleName() {

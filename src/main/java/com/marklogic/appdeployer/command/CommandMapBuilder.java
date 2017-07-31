@@ -20,6 +20,7 @@ import com.marklogic.appdeployer.command.forests.ConfigureForestReplicasCommand;
 import com.marklogic.appdeployer.command.forests.DeployCustomForestsCommand;
 import com.marklogic.appdeployer.command.groups.DeployGroupsCommand;
 import com.marklogic.appdeployer.command.mimetypes.DeployMimetypesCommand;
+import com.marklogic.appdeployer.command.modules.DeleteTestModulesCommand;
 import com.marklogic.appdeployer.command.modules.LoadModulesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.appdeployer.command.schemas.LoadSchemasCommand;
@@ -93,6 +94,7 @@ public class CommandMapBuilder {
 		// Modules
 		List<Command> moduleCommands = new ArrayList<>();
 		moduleCommands.add(new LoadModulesCommand());
+		moduleCommands.add(new DeleteTestModulesCommand());
 		map.put("mlModuleCommands", moduleCommands);
 
 		// Alerting

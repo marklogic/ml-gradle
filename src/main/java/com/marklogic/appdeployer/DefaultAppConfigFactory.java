@@ -365,6 +365,18 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			c.setStaticCheckLibraryAssets(Boolean.parseBoolean(prop));
 		}
 
+		prop = getProperty("mlDeleteTestModules");
+		if (prop != null) {
+			logger.info("Delete test modules: " + prop);
+			c.setDeleteTestModules(Boolean.parseBoolean(prop));
+		}
+
+		prop = getProperty("mlDeleteTestModulesPattern");
+		if (prop != null) {
+			logger.info("Delete test modules pattern: " + prop);
+			c.setDeleteTestModulesPattern(prop);
+		}
+
 		/**
 		 * The following properties are all for generating Entity Services artifacts.
 		 */

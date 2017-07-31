@@ -32,6 +32,7 @@ public abstract class SortOrderConstants {
     // Modules have to be loaded after the REST API server has been updated, for if the deployer is expecting to load
     // modules via SSL, then the REST API server must already be configured with a certificate template
     public static Integer LOAD_MODULES = 400;
+    public static Integer DELETE_TEST_MODULES = 410;
 
     // The modules database must exist before we deploy amps
     public static Integer DEPLOY_AMPS = 450;

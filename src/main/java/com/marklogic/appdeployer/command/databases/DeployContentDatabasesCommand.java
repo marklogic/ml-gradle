@@ -77,6 +77,10 @@ public class DeployContentDatabasesCommand extends DeployDatabaseCommand {
             String json = payloadTokenReplacer.replaceTokens(payload, appConfig, false);
 
             DatabaseManager dbMgr = newDatabaseManageForDeleting(context);
+            
+            // remove subdatabases if they exist
+            removeSubDatabases(dbMgr, context, dbMgr.getResourceId(json));
+            
             dbMgr.delete(json);
             if (appConfig.isTestPortSet()) {
                 json = payloadTokenReplacer.replaceTokens(payload, appConfig, true);

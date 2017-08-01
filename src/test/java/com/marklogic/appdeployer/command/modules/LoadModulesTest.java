@@ -14,18 +14,18 @@ import java.io.File;
 
 public class LoadModulesTest extends AbstractAppDeployerTest {
 
-    private XccTemplate xccTemplate;
+	private XccTemplate xccTemplate;
 
-    @Before
-    public void setup() {
-        xccTemplate = new XccTemplate(format("xcc://%s:%s@%s:8000/%s", "admin", "admin", appConfig.getHost(),
-                appConfig.getModulesDatabaseName()));
-    }
+	@Before
+	public void setup() {
+		xccTemplate = new XccTemplate(format("xcc://%s:%s@%s:8000/%s", appConfig.getRestAdminUsername(),
+			appConfig.getRestAdminPassword(), appConfig.getHost(), appConfig.getModulesDatabaseName()));
+	}
 
-    @After
-    public void teardown() {
-        undeploySampleApp();
-    }
+	@After
+	public void teardown() {
+		undeploySampleApp();
+	}
 
 	@Test
 	public void loadModulesWithStaticCheck() {
@@ -48,19 +48,21 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 			assertTrue("Loading modules with 2.11.0 of ml-javaclient-util defaults to bulk loading, so static checking should as well; message: " + message,
 				message.contains("Unexpected token syntax error"));
 			assertTrue(message.contains("in /ext/bad.xqy, on line 2"));
+		} finally {
+			initializeAppDeployer(new DeployRestApiServersCommand(true));
 		}
 	}
 
 	@Test
 	public void customModuleTimestampsPath() {
-    	String path = "build/custom-path.properties";
-    	File customFile = new File(path);
-    	customFile.mkdirs();
-    	if (customFile.exists()) {
-    		customFile.delete();
-	    }
+		String path = "build/custom-path.properties";
+		File customFile = new File(path);
+		customFile.mkdirs();
+		if (customFile.exists()) {
+			customFile.delete();
+		}
 
-    	appConfig.setModuleTimestampsPath("build/custom-path.properties");
+		appConfig.setModuleTimestampsPath("build/custom-path.properties");
 		initializeAppDeployer(new DeployRestApiServersCommand(true), new LoadModulesCommand());
 		appDeployer.deploy(appConfig);
 		assertTrue("The custom file should have been created when the modules were loaded", customFile.exists());
@@ -127,7 +129,6 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
         Fragment f = parse(xml);
         f.assertElementValue("/test/color", "red");
         f.assertElementValue("/test/description", "red description");
-
     }
 
     @Test
@@ -145,35 +146,49 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
         }
     }
 
-    private void assertModuleExistsWithDefaultPermissions(String message, String uri) {
-        assertEquals(message, "true", xccTemplate.executeAdhocQuery(format("fn:doc-available('%s')", uri)));
-        assertDefaultPermissionsExists(uri);
-    }
+	@Test
+	public void deleteTestModules() {
+		appConfig.setDeleteTestModules(true);
+		appConfig.setDeleteTestModulesPattern("/ext/lib/*.xqy");
 
-    /**
-     * Apparently, the REST API won't let you remove these 3 default permissions, they're always present.
-     *
-     * And, now that we're loading modules via the REST API by default, rest-reader/read and rest-writer/update are
-     * always present, at least on 8.0-6.3 and 9.0-1.1, which seems like a bug.
-     */
-    private void assertDefaultPermissionsExists(String uri) {
-        PermissionsFragment perms = getDocumentPermissions(uri, xccTemplate);
-        perms.assertPermissionCount(5);
-        perms.assertPermissionExists("rest-admin", "read");
-        perms.assertPermissionExists("rest-admin", "update");
-        perms.assertPermissionExists("rest-extension-user", "execute");
+		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand(),
+			new DeleteTestModulesCommand());
+		appDeployer.deploy(appConfig);
 
-        // Not really expected!
-	    perms.assertPermissionExists("rest-reader", "read");
-	    perms.assertPermissionExists("rest-writer", "update");
-    }
+		String xquery = "fn:count(cts:uri-match('/ext/**.xqy'))";
+		assertEquals(1, Integer.parseInt(xccTemplate.executeAdhocQuery(xquery)));
+	}
+
+	private void assertModuleExistsWithDefaultPermissions(String message, String uri) {
+		assertEquals(message, "true", xccTemplate.executeAdhocQuery(format("fn:doc-available('%s')", uri)));
+		assertDefaultPermissionsExists(uri);
+	}
+
+	/**
+	 * Apparently, the REST API won't let you remove these 3 default permissions, they're always present.
+	 *
+	 * And, now that we're loading modules via the REST API by default, rest-reader/read and rest-writer/update are
+	 * always present, at least on 8.0-6.3 and 9.0-1.1, which seems like a bug.
+	 */
+	private void assertDefaultPermissionsExists(String uri) {
+		PermissionsFragment perms = getDocumentPermissions(uri, xccTemplate);
+		perms.assertPermissionCount(5);
+		perms.assertPermissionExists("rest-admin", "read");
+		perms.assertPermissionExists("rest-admin", "update");
+		perms.assertPermissionExists("rest-extension-user", "execute");
+
+		// Not really expected!
+		perms.assertPermissionExists("rest-reader", "read");
+		perms.assertPermissionExists("rest-writer", "update");
+	}
+
 }
 
 class TestFileFilter extends AssetFileFilter {
 
-    @Override
-    public boolean accept(File f) {
-        return !f.getName().equals("test2.xqy") && super.accept(f);
-    }
+	@Override
+	public boolean accept(File f) {
+		return !f.getName().equals("test2.xqy") && super.accept(f);
+	}
 
 }

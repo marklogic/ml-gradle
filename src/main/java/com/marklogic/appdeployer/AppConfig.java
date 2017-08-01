@@ -95,6 +95,8 @@ public class AppConfig {
 	private boolean staticCheckLibraryAssets = false;
 	private boolean bulkLoadAssets = true;
 	private String moduleTimestampsPath = PropertiesModuleManager.DEFAULT_FILE_PATH;
+	private boolean deleteTestModules = false;
+	private String deleteTestModulesPattern = "/test/**";
 
     private String schemasPath;
     private ConfigDir configDir;
@@ -765,5 +767,21 @@ public class AppConfig {
 
 	public void setSortRolesByDependencies(boolean sortRolesByDependencies) {
 		this.sortRolesByDependencies = sortRolesByDependencies;
+	}
+
+	public boolean isDeleteTestModules() {
+		return deleteTestModules;
+	}
+
+	public void setDeleteTestModules(boolean deleteTestModules) {
+		this.deleteTestModules = deleteTestModules;
+	}
+
+	public String getDeleteTestModulesPattern() {
+		return deleteTestModulesPattern;
+	}
+
+	public void setDeleteTestModulesPattern(String deleteTestModulesPattern) {
+		this.deleteTestModulesPattern = deleteTestModulesPattern;
 	}
 }

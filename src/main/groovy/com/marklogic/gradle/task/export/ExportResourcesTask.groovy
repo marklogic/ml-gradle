@@ -4,7 +4,7 @@ import com.marklogic.appdeployer.export.ExportedResources
 import com.marklogic.appdeployer.export.Exporter
 import com.marklogic.gradle.task.MarkLogicTask
 import com.marklogic.mgmt.selector.PrefixResourceSelector
-import com.marklogic.mgmt.selector.PropertiesFileResourceSelector
+import com.marklogic.mgmt.selector.PropertiesResourceSelector
 import com.marklogic.mgmt.selector.RegexResourceSelector
 import com.marklogic.mgmt.selector.ResourceSelector
 import org.gradle.api.tasks.TaskAction
@@ -27,7 +27,7 @@ class ExportResourcesTask extends MarkLogicTask {
 			String filename = getProject().property(filePropName)
 			File file = new File(filename)
 			if (file.exists()) {
-				export(new PropertiesFileResourceSelector(file))
+				export(new PropertiesResourceSelector(file))
 			} else {
 				println "File " + filename + " does not exist"
 			}

@@ -35,7 +35,8 @@ public class GenerateScaffoldTest extends AbstractAppDeployerTest {
         appConfig.setConfigDir(new ConfigDir(new File(path, "src/main/ml-config")));
         appConfig.getModulePaths().clear();
         appConfig.getModulePaths().add(path + "/src/main/ml-modules");
-
+        appConfig.setCreateTriggersDatabase(true);
+        
         initializeAppDeployer(new DeployRestApiServersCommand(), new DeployContentDatabasesCommand(), new DeployTriggersDatabaseCommand(),
                 new DeployUsersCommand(), new DeployRolesCommand(), buildLoadModulesCommand());
         appDeployer.deploy(appConfig);

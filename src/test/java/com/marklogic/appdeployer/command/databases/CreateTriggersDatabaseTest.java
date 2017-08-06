@@ -38,6 +38,7 @@ public class CreateTriggersDatabaseTest extends AbstractAppDeployerTest {
     @Test
     public void createViaAppConfigProperty() {
         appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/empty-ml-config")));
+        appConfig.setCreateTriggersDatabase(true);
 
         initializeAppDeployer(new DeployTriggersDatabaseCommand());
         appDeployer.deploy(appConfig);

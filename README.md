@@ -45,9 +45,3 @@ how different resources can be configured.
 
 Finally, if you run into trouble, you can either submit an issue to this project or try asking a question 
 [on stackoverflow with marklogic as a tag](http://stackoverflow.com/questions/tagged/marklogic).
-
-Can I use ml-gradle with Roxy?
-=========
-You bet! Starting with version 2.2.0, you can use "gradle mlWatch" to automatically load new/modified modules into the 
-modules database of your Roxy application, and ml-gradle will substitute tokens based on Roxy properties as well. 
-See [Loading modules in a Roxy project](https://github.com/rjrudin/ml-gradle/wiki/Loading-modules-on-a-Roxy-project) for more information.

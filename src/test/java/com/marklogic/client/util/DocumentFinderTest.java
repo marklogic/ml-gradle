@@ -17,7 +17,7 @@ public class DocumentFinderTest extends Assert {
 	public void noFileFilter() {
 		String path = "src/test/resources/schemas";
 		List<DocumentFile> list = sut.readDocumentFiles(path);
-		assertEquals(3, list.size());
+		assertEquals(5, list.size());
 
 		List<String> uris = new ArrayList<>();
 		for (DocumentFile file : list) {
@@ -26,5 +26,7 @@ public class DocumentFinderTest extends Assert {
 		assertTrue(uris.contains("/child/child.tdej"));
 		assertTrue(uris.contains("/child/grandchild/grandchild.tdex"));
 		assertTrue(uris.contains("/parent.tdex"));
+		assertTrue(uris.contains("/not-tde/ruleset.txt"));
+		assertTrue(uris.contains("/tde/ruleset.txt"));
 	}
 }

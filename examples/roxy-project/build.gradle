@@ -1,14 +1,16 @@
-plugins {
-  id "com.marklogic.ml-gradle" version "2.7.1"
+buildscript {
+	repositories {
+		mavenLocal()
+		jcenter()
+	}
+	dependencies {
+		classpath "com.marklogic:ml-gradle:2.9.0"
+	}
 }
 
-/**
- * ml-gradle defaults to a modules path of src/main/ml-modules. Roxy applications almost always store
- * asset modules under ./src, so we need to modify the module paths. Note that since Roxy stores REST API
- * extensions under ./ext, "gradle mlWatch" will not load these.
- */
-ext {
-	mlAppConfig {
-		modulePaths = ["src"]
-	}
+apply plugin: "com.marklogic.ml-gradle"
+
+repositories {
+	mavenLocal()
+	jcenter()
 }

@@ -44,10 +44,10 @@ class MarkLogicTask extends DefaultTask {
 		project.hasProperty("mlAdminPassword") ? project.property("mlAdminPassword") : project.property("mlPassword")
 	}
 
-    DatabaseClient newClient() {
+	DatabaseClient newClient() {
         getAppConfig().newDatabaseClient()
     }
-    
+
     void deployWithCommandListProperty(String propertyName) {
         deployWithCommands(getProject().property(propertyName))
     }
@@ -57,7 +57,7 @@ class MarkLogicTask extends DefaultTask {
         deployer.setCommands(commands)
         deployer.deploy(getAppConfig())
     }
-    
+
     void undeployWithCommandListProperty(String propertyName) {
         undeployWithCommands(getProject().property(propertyName))
     }
@@ -67,12 +67,12 @@ class MarkLogicTask extends DefaultTask {
         deployer.setCommands(commands)
         deployer.undeploy(getAppConfig())
     }
-    
+
     void invokeDeployerCommandWithClassName(String className) {
         SimpleAppDeployer d = (SimpleAppDeployer)getAppDeployer()
         new SimpleAppDeployer(getManageClient(), getAdminManager(), d.getCommand(className)).deploy(getAppConfig())
     }
-    
+
     void undeployWithCommandWithClassName(String className) {
         SimpleAppDeployer d = (SimpleAppDeployer)getAppDeployer()
         new SimpleAppDeployer(getManageClient(), getAdminManager(), d.getCommand(className)).undeploy(getAppConfig())

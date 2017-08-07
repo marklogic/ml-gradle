@@ -33,6 +33,9 @@ import com.marklogic.gradle.task.groups.SetTraceEventsTask
 import com.marklogic.gradle.task.mimetypes.DeployMimetypesTask
 import com.marklogic.gradle.task.qconsole.ExportWorkspacesTask
 import com.marklogic.gradle.task.qconsole.ImportWorkspacesTask
+import com.marklogic.gradle.task.roxy.RoxyMigrateBuildStepsTask
+import com.marklogic.gradle.task.roxy.RoxyMigrateFilesTask
+import com.marklogic.gradle.task.roxy.RoxyMigratePropertiesTask
 import com.marklogic.gradle.task.scaffold.GenerateScaffoldTask
 import com.marklogic.gradle.task.schemas.LoadSchemasTask
 import com.marklogic.gradle.task.security.*
@@ -80,7 +83,8 @@ class MarkLogicPlugin implements Plugin<Project> {
 		String deployGroup = "ml-gradle Deploy"
 		project.task("mlPostDeploy", group: deployGroup, description: "Add dependsOn to this task to add tasks at the end of mlDeploy").mustRunAfter(["mlDeployApp"])
 		project.task("mlPostUndeploy", group: deployGroup, description: "Add dependsOn to this task to add tasks at the end of mlUndeploy").mustRunAfter(["mlUndeployApp"])
-		project.task("mlDeploy", group: deployGroup, dependsOn: ["mlDeployApp", "mlPostDeploy"], description: "Deploys all application resources in the configuration directory and allows for additional steps via mlPostDeploy.dependsOn").mustRunAfter("mlClearModulesDatabase")
+		project.task("mlDeploy", group: deployGroup, dependsOn: ["mlDeployApp", "mlPostDeploy"],
+			description: "Deploys all application resources in the configuration directory and allows for additional steps via mlPostDeploy.dependsOn. Use -Pignore to specify a comma-delimited list of short class names of ml-app-deployer command classes to ignore while deploying.").mustRunAfter("mlClearModulesDatabase")
 		project.task("mlUndeploy", group: deployGroup, dependsOn: ["mlUndeployApp", "mlPostUndeploy"], description: "Undeploys all application resources in the configuration directory and allows for additional steps via mlPostUndeploy.dependsOn")
 		project.task("mlRedeploy", group: deployGroup, dependsOn: ["mlClearModulesDatabase", "mlDeploy"], description: "Clears the modules database and then deploys the application")
 
@@ -207,6 +211,15 @@ class MarkLogicPlugin implements Plugin<Project> {
 		String shellGroup = "ml-gradle Shell"
 		project.task("mlShell", type: ShellTask, group: shellGroup, description: "Run groovysh with MarkLogic-specific support built in")
 
+		String roxyGroup = "ml-gradle Roxy";
+		project.task("mlRoxyMigrateBuildSteps", type: RoxyMigrateBuildStepsTask, group: roxyGroup, description: "Migrate build steps from deploy/app_specific.rb into custom Gradle tasks. " +
+			"Use -ProxyProjectPath to define the location of your Roxy project, and -PappSpecificPath to define a path other than deploy/app_specific.rb")
+		project.task("mlRoxyMigrateFiles", type: RoxyMigrateFilesTask, group: roxyGroup, description: "Migrate Roxy source files into this Gradle project. " +
+			"Use -ProxyProjectPath to define the location of your Roxy project.")
+		project.task("mlRoxyMigrateProperties", type: RoxyMigratePropertiesTask, group: roxyGroup, description: "Migrate Roxy properties into the gradle.properties file in this project. " +
+			"Use -ProxyProjectPath to define the location of your Roxy project.")
+		project.task("mlRoxyMigrateProject", group: roxyGroup, description: "Run all tasks for migrating a Roxy project into this Gradle project. " +
+			"Use -ProxyProjectPath to define the location of your Roxy project.", dependsOn: ["mlRoxyMigrateBuildSteps", "mlRoxyMigrateFiles", "mlRoxyMigrateProperties"])
 		logger.info("Finished initializing ml-gradle\n")
 	}
 

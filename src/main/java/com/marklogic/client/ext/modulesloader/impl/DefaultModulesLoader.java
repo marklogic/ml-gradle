@@ -241,10 +241,10 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 					mgr.setUpdatePolicy(UpdatePolicy.valueOf(node.get("update-policy").asText()));
 				}
 				if (node.has("validate-options")) {
-					mgr.setQueryValidation(node.get("validate-options").asBoolean());
+					mgr.setQueryOptionValidation(node.get("validate-options").asBoolean());
 				}
 				if (node.has("validate-queries")) {
-					mgr.setQueryOptionValidation(node.get("validate-queries").asBoolean());
+					mgr.setQueryValidation(node.get("validate-queries").asBoolean());
 				}
 				if (node.has("debug")) {
 					mgr.setServerRequestLogging(node.get("debug").asBoolean());

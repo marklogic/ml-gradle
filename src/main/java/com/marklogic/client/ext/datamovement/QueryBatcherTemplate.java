@@ -40,7 +40,7 @@ public class QueryBatcherTemplate extends LoggingObject {
 	 * @return
 	 */
 	public QueryBatcherJobTicket applyOnCollections(QueryBatchListener listener, String... collectionUris) {
-		return applyOnStructuredQuery(listener, databaseClient.newQueryManager().newStructuredQueryBuilder().collection(collectionUris));
+		return apply(listener, new CollectionsQueryBatcherBuilder(collectionUris));
 	}
 
 	/**
@@ -51,7 +51,18 @@ public class QueryBatcherTemplate extends LoggingObject {
 	 * @return
 	 */
 	public QueryBatcherJobTicket applyOnDocuments(QueryBatchListener listener, String... documentUris) {
-		return applyOnStructuredQuery(listener, databaseClient.newQueryManager().newStructuredQueryBuilder().document(documentUris));
+		return apply(listener, new UrisQueryBatcherBuilder(documentUris));
+	}
+
+	/**
+	 * Apply the given listener on batches of documents with URIs matching the given URI pattern.
+	 *
+	 * @param listener
+	 * @param uriPattern
+	 * @return
+	 */
+	public QueryBatcherJobTicket applyOnUriPattern(QueryBatchListener listener, String uriPattern) {
+		return apply(listener, new UriPatternQueryBatcherBuilder(uriPattern));
 	}
 
 	/**
@@ -107,6 +118,18 @@ public class QueryBatcherTemplate extends LoggingObject {
 	 */
 	public QueryBatcherJobTicket applyOnIterator(QueryBatchListener listener, Iterator<String> uriIterator) {
 		return apply(listener, dataMovementManager.newQueryBatcher(uriIterator));
+	}
+
+	/**
+	 * Apply the given listener on batches of documents returning by the QueryBatcher that's constructed by the
+	 * given QueryBatcherBuilder.
+	 *
+	 * @param listener
+	 * @param queryBatcherBuilder
+	 * @return
+	 */
+	public QueryBatcherJobTicket apply(QueryBatchListener listener, QueryBatcherBuilder queryBatcherBuilder) {
+		return apply(listener, queryBatcherBuilder.buildQueryBatcher(databaseClient, dataMovementManager));
 	}
 
 	/**

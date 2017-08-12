@@ -7,8 +7,8 @@ plugins {
 	id "com.github.jk1.dependency-license-report" version "0.3.11"
 }
 
-sourceCompatibility = "1.7"
-targetCompatibility = "1.7"
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
 
 repositories {
   jcenter()

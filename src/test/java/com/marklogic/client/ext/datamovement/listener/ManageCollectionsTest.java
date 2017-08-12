@@ -17,33 +17,45 @@ public class ManageCollectionsTest extends AbstractIntegrationTest {
 
 	@Test
 	public void setThenAddThenRemove() {
+		String firstUri = "dmsdk-test-1.xml";
+		String secondUri = "dmsdk-test-2.xml";
+
 		QueryBatcherTemplate qbt = new QueryBatcherTemplate(newClient("Documents"));
 
 		// Clear out the test documents
-		qbt.applyOnDocuments(new DeleteListener(), "1.xml", "2.xml");
+		qbt.applyOnDocuments(new DeleteListener(), firstUri, secondUri);
 
 		// Insert documents
 		RestBatchWriter writer = new RestBatchWriter(client, false);
 		writer.write(Arrays.asList(
-			new SimpleDocumentWriteOperation("1.xml", "<one/>", COLLECTION),
-			new SimpleDocumentWriteOperation("2.xml", "<two/>", COLLECTION)
+			new SimpleDocumentWriteOperation(firstUri, "<one/>", COLLECTION),
+			new SimpleDocumentWriteOperation(secondUri, "<two/>", COLLECTION)
 		));
 		writer.waitForCompletion();
 
 		// Set collections
 		qbt.applyOnCollections(new SetCollectionsListener(COLLECTION, "red"), COLLECTION);
-		assertUriInCollections("1.xml", COLLECTION, "red");
-		assertUriInCollections("2.xml", COLLECTION, "red");
+		assertUriInCollections(firstUri, COLLECTION, "red");
+		assertUriInCollections(secondUri, COLLECTION, "red");
 
 		// Add collections
 		qbt.applyOnCollections(new AddCollectionsListener("blue", "green"), COLLECTION);
-		assertUriInCollections("1.xml", COLLECTION, "red", "blue", "green");
-		assertUriInCollections("2.xml", COLLECTION, "red", "blue", "green");
+		assertUriInCollections(firstUri, COLLECTION, "red", "blue", "green");
+		assertUriInCollections(secondUri, COLLECTION, "red", "blue", "green");
 
 		// Remove collections
 		qbt.applyOnCollections(new RemoveCollectionsListener("red", "blue", "green"), COLLECTION);
-		assertUriInCollections("1.xml", COLLECTION);
-		assertUriInCollections("2.xml", COLLECTION);
+		assertUriInCollections(firstUri, COLLECTION);
+		assertUriInCollections(secondUri, COLLECTION);
+
+		// Set via URI pattern!
+		qbt.applyOnUriPattern(new SetCollectionsListener(COLLECTION, "red"), "dmsdk-test-*.xml");
+		assertUriInCollections(firstUri, COLLECTION, "red");
+		assertUriInCollections(secondUri, COLLECTION, "red");
+
+		qbt.applyOnUriPattern(new RemoveCollectionsListener("red"), "dmsdk-test-2*");
+		assertUriInCollections(firstUri, COLLECTION, "red");
+		assertUriNotInCollections(secondUri, "red");
 	}
 
 	private void assertUriInCollections(String uri, String... collections) {
@@ -53,5 +65,13 @@ public class ManageCollectionsTest extends AbstractIntegrationTest {
 			assertTrue(list.contains(coll));
 		}
 		assertEquals(collections.length, list.size());
+	}
+
+	private void assertUriNotInCollections(String uri, String... collections) {
+		ClientHelper clientHelper = new ClientHelper(client);
+		List<String> list = clientHelper.getCollections(uri);
+		for (String coll : collections) {
+			assertFalse(list.contains(coll));
+		}
 	}
 }

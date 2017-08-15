@@ -1,10 +1,7 @@
 package com.marklogic.client.ext.datamovement;
 
 import com.marklogic.client.DatabaseClient;
-import com.marklogic.client.datamovement.DataMovementManager;
-import com.marklogic.client.datamovement.JobTicket;
-import com.marklogic.client.datamovement.QueryBatchListener;
-import com.marklogic.client.datamovement.QueryBatcher;
+import com.marklogic.client.datamovement.*;
 import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.client.query.RawCombinedQueryDefinition;
 import com.marklogic.client.query.RawStructuredQueryDefinition;
@@ -26,6 +23,10 @@ public class QueryBatcherTemplate extends LoggingObject {
 	private boolean applyConsistentSnapshot = true;
 	private boolean awaitCompletion = true;
 	private boolean stopJob = true;
+	private String jobName;
+	private ForestConfiguration forestConfig;
+	private QueryFailureListener[] queryFailureListeners;
+	private QueryBatchListener[] urisReadyListeners;
 
 	public QueryBatcherTemplate(DatabaseClient databaseClient) {
 		this.databaseClient = databaseClient;
@@ -35,106 +36,110 @@ public class QueryBatcherTemplate extends LoggingObject {
 	/**
 	 * Apply the given listener on batches of documents from the given set of collection URIs.
 	 *
-	 * @param listener
+	 * @param urisReadyListener
 	 * @param collectionUris
 	 * @return
 	 */
-	public QueryBatcherJobTicket applyOnCollections(QueryBatchListener listener, String... collectionUris) {
-		return apply(listener, new CollectionsQueryBatcherBuilder(collectionUris));
+	public QueryBatcherJobTicket applyOnCollections(QueryBatchListener urisReadyListener, String... collectionUris) {
+		return apply(urisReadyListener, new CollectionsQueryBatcherBuilder(collectionUris));
 	}
 
 	/**
 	 * Apply the given listener on batches of documents from the given set of document URIs.
 	 *
-	 * @param listener
+	 * @param urisReadyListener
 	 * @param documentUris
 	 * @return
 	 */
-	public QueryBatcherJobTicket applyOnDocuments(QueryBatchListener listener, String... documentUris) {
-		return apply(listener, new UrisQueryBatcherBuilder(documentUris));
+	public QueryBatcherJobTicket applyOnDocuments(QueryBatchListener urisReadyListener, String... documentUris) {
+		return apply(urisReadyListener, new UrisQueryBatcherBuilder(documentUris));
 	}
 
 	/**
 	 * Apply the given listener on batches of documents with URIs matching the given URI pattern.
 	 *
-	 * @param listener
+	 * @param urisReadyListener
 	 * @param uriPattern
 	 * @return
 	 */
-	public QueryBatcherJobTicket applyOnUriPattern(QueryBatchListener listener, String uriPattern) {
-		return apply(listener, new UriPatternQueryBatcherBuilder(uriPattern));
+	public QueryBatcherJobTicket applyOnUriPattern(QueryBatchListener urisReadyListener, String uriPattern) {
+		return apply(urisReadyListener, new UriPatternQueryBatcherBuilder(uriPattern));
 	}
 
 	/**
 	 * Apply the given listener on batches on documents matching the given structured query.
 	 *
-	 * @param listener
+	 * @param urisReadyListener
 	 * @param queryDefinition
 	 * @return
 	 */
-	public QueryBatcherJobTicket applyOnStructuredQuery(QueryBatchListener listener, StructuredQueryDefinition queryDefinition) {
-		return apply(listener, dataMovementManager.newQueryBatcher(queryDefinition));
+	public QueryBatcherJobTicket applyOnStructuredQuery(QueryBatchListener urisReadyListener, StructuredQueryDefinition queryDefinition) {
+		return apply(urisReadyListener, dataMovementManager.newQueryBatcher(queryDefinition));
 	}
 
 	/**
 	 * Apply the given listener on batches on documents matching the given raw structured query.
 	 *
-	 * @param listener
+	 * @param urisReadyListener
 	 * @param queryDefinition
 	 * @return
 	 */
-	public QueryBatcherJobTicket applyOnRawStructuredQuery(QueryBatchListener listener, RawStructuredQueryDefinition queryDefinition) {
-		return apply(listener, dataMovementManager.newQueryBatcher(queryDefinition));
+	public QueryBatcherJobTicket applyOnRawStructuredQuery(QueryBatchListener urisReadyListener, RawStructuredQueryDefinition queryDefinition) {
+		return apply(urisReadyListener, dataMovementManager.newQueryBatcher(queryDefinition));
 	}
 
 	/**
 	 * Apply the given listener on batches on documents matching the given string query.
 	 *
-	 * @param listener
+	 * @param urisReadyListener
 	 * @param queryDefinition
 	 * @return
 	 */
-	public QueryBatcherJobTicket applyOnStringQuery(QueryBatchListener listener, StringQueryDefinition queryDefinition) {
-		return apply(listener, dataMovementManager.newQueryBatcher(queryDefinition));
+	public QueryBatcherJobTicket applyOnStringQuery(QueryBatchListener urisReadyListener, StringQueryDefinition queryDefinition) {
+		return apply(urisReadyListener, dataMovementManager.newQueryBatcher(queryDefinition));
 	}
 
 	/**
 	 * Apply the given listener on batches on documents matching the given raw combined query.
 	 *
-	 * @param listener
+	 * @param urisReadyListener
 	 * @param queryDefinition
 	 * @return
 	 */
-	public QueryBatcherJobTicket applyOnRawCombinedQuery(QueryBatchListener listener, RawCombinedQueryDefinition queryDefinition) {
-		return apply(listener, dataMovementManager.newQueryBatcher(queryDefinition));
+	public QueryBatcherJobTicket applyOnRawCombinedQuery(QueryBatchListener urisReadyListener, RawCombinedQueryDefinition queryDefinition) {
+		return apply(urisReadyListener, dataMovementManager.newQueryBatcher(queryDefinition));
 	}
 
 	/**
 	 * Apply the given listener on batches on documents matching the URIs from the given iterator.
 	 *
-	 * @param listener
+	 * @param urisReadyListener
 	 * @param uriIterator
 	 * @return
 	 */
-	public QueryBatcherJobTicket applyOnIterator(QueryBatchListener listener, Iterator<String> uriIterator) {
-		return apply(listener, dataMovementManager.newQueryBatcher(uriIterator));
+	public QueryBatcherJobTicket applyOnIterator(QueryBatchListener urisReadyListener, Iterator<String> uriIterator) {
+		return apply(urisReadyListener, dataMovementManager.newQueryBatcher(uriIterator));
 	}
 
 	/**
 	 * Apply the given listener on batches of documents returning by the QueryBatcher that's constructed by the
 	 * given QueryBatcherBuilder.
 	 *
-	 * @param listener
+	 * @param urisReadyListener
 	 * @param queryBatcherBuilder
 	 * @return
 	 */
-	public QueryBatcherJobTicket apply(QueryBatchListener listener, QueryBatcherBuilder queryBatcherBuilder) {
-		return apply(listener, queryBatcherBuilder.buildQueryBatcher(databaseClient, dataMovementManager));
+	public QueryBatcherJobTicket apply(QueryBatchListener urisReadyListener, QueryBatcherBuilder queryBatcherBuilder) {
+		return apply(urisReadyListener, queryBatcherBuilder.buildQueryBatcher(databaseClient, dataMovementManager));
 	}
 
 	/**
 	 * Apply the given listener with the given QueryBatcher. The QueryBatcher should have been constructed via the
 	 * DatabaseClient that was used to instantiate this class.
+	 * <p>
+	 * The given listener can be null. In such a scenario, it's expected that listeners have been defined on this class
+	 * via the setQueryBatchListeners method.
+	 * </p>
 	 * <p>
 	 * Notes on how the job is run:
 	 * <ol>
@@ -147,11 +152,11 @@ public class QueryBatcherTemplate extends LoggingObject {
 	 * likely be stopped with URIs that have not be processed yet.</li>
 	 * </ol>
 	 *
-	 * @param listener
+	 * @param urisReadyListener
 	 * @param queryBatcher
 	 * @return
 	 */
-	public QueryBatcherJobTicket apply(QueryBatchListener listener, QueryBatcher queryBatcher) {
+	public QueryBatcherJobTicket apply(QueryBatchListener urisReadyListener, QueryBatcher queryBatcher) {
 		if (threadCount > 0) {
 			queryBatcher.withThreadCount(threadCount);
 		}
@@ -161,8 +166,23 @@ public class QueryBatcherTemplate extends LoggingObject {
 		if (applyConsistentSnapshot) {
 			queryBatcher.withConsistentSnapshot();
 		}
+		if (jobName != null) {
+			queryBatcher.withJobName(jobName);
+		}
+		if (forestConfig != null) {
+			queryBatcher.withForestConfig(forestConfig);
+		}
+		if (urisReadyListeners != null) {
+			queryBatcher.setUrisReadyListeners(urisReadyListeners);
+		}
+		if (queryFailureListeners != null) {
+			queryBatcher.setQueryFailureListeners(queryFailureListeners);
+		}
 
-		queryBatcher.onUrisReady(listener);
+		if (urisReadyListener != null) {
+			queryBatcher.onUrisReady(urisReadyListener);
+		}
+
 		JobTicket jobTicket = dataMovementManager.startJob(queryBatcher);
 
 		if (awaitCompletion) {
@@ -232,5 +252,21 @@ public class QueryBatcherTemplate extends LoggingObject {
 	 */
 	public DatabaseClient getDatabaseClient() {
 		return databaseClient;
+	}
+
+	public void setJobName(String jobName) {
+		this.jobName = jobName;
+	}
+
+	public void setForestConfig(ForestConfiguration forestConfig) {
+		this.forestConfig = forestConfig;
+	}
+
+	public void setQueryFailureListeners(QueryFailureListener... queryFailureListeners) {
+		this.queryFailureListeners = queryFailureListeners;
+	}
+
+	public void setUrisReadyListeners(QueryBatchListener... urisReadyListeners) {
+		this.urisReadyListeners = urisReadyListeners;
 	}
 }

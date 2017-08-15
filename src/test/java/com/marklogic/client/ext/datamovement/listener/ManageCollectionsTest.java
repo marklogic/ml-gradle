@@ -1,5 +1,7 @@
 package com.marklogic.client.ext.datamovement.listener;
 
+import com.marklogic.client.datamovement.QueryBatch;
+import com.marklogic.client.datamovement.QueryBatchListener;
 import com.marklogic.client.ext.AbstractIntegrationTest;
 import com.marklogic.client.ext.batch.RestBatchWriter;
 import com.marklogic.client.ext.batch.SimpleDocumentWriteOperation;
@@ -21,6 +23,16 @@ public class ManageCollectionsTest extends AbstractIntegrationTest {
 		String secondUri = "dmsdk-test-2.xml";
 
 		QueryBatcherTemplate qbt = new QueryBatcherTemplate(newClient("Documents"));
+		qbt.setJobName("manage-collections-test");
+		qbt.setBatchSize(1);
+		qbt.setThreadCount(2);
+
+		qbt.setUrisReadyListeners(new QueryBatchListener() {
+			@Override
+			public void processEvent(QueryBatch batch) {
+				System.out.println("Testing, job batch number: " + batch.getJobBatchNumber() + "; " + batch.getJobTicket().getJobId());
+			}
+		});
 
 		// Clear out the test documents
 		qbt.applyOnDocuments(new DeleteListener(), firstUri, secondUri);

@@ -8,7 +8,9 @@ import com.marklogic.client.query.RawStructuredQueryDefinition;
 import com.marklogic.client.query.StringQueryDefinition;
 import com.marklogic.client.query.StructuredQueryDefinition;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Spring-style Template class for simplifying common usages of QueryBatcher. Threadsafe, at least as long as
@@ -25,8 +27,8 @@ public class QueryBatcherTemplate extends LoggingObject {
 	private boolean stopJob = true;
 	private String jobName;
 	private ForestConfiguration forestConfig;
-	private QueryFailureListener[] queryFailureListeners;
-	private QueryBatchListener[] urisReadyListeners;
+	private List<QueryFailureListener> queryFailureListeners;
+	private List<QueryBatchListener> urisReadyListeners;
 
 	public QueryBatcherTemplate(DatabaseClient databaseClient) {
 		this.databaseClient = databaseClient;
@@ -51,8 +53,8 @@ public class QueryBatcherTemplate extends LoggingObject {
 	 * @param documentUris
 	 * @return
 	 */
-	public QueryBatcherJobTicket applyOnDocuments(QueryBatchListener urisReadyListener, String... documentUris) {
-		return apply(urisReadyListener, new UrisQueryBatcherBuilder(documentUris));
+	public QueryBatcherJobTicket applyOnDocumentUris(QueryBatchListener urisReadyListener, String... documentUris) {
+		return apply(urisReadyListener, new DocumentUrisQueryBatcherBuilder(documentUris));
 	}
 
 	/**
@@ -64,6 +66,17 @@ public class QueryBatcherTemplate extends LoggingObject {
 	 */
 	public QueryBatcherJobTicket applyOnUriPattern(QueryBatchListener urisReadyListener, String uriPattern) {
 		return apply(urisReadyListener, new UriPatternQueryBatcherBuilder(uriPattern));
+	}
+
+	/**
+	 * Apply the given listener on batches of documents with URIs matching the given XQuery or JavaScript query.
+	 *
+	 * @param urisReadyListener
+	 * @param xqueryOrJavascriptQuery
+	 * @return
+	 */
+	public QueryBatcherJobTicket applyOnUrisQuery(QueryBatchListener urisReadyListener, String xqueryOrJavascriptQuery) {
+		return apply(urisReadyListener, new UrisQueryQueryBatcherBuilder(xqueryOrJavascriptQuery));
 	}
 
 	/**
@@ -173,10 +186,10 @@ public class QueryBatcherTemplate extends LoggingObject {
 			queryBatcher.withForestConfig(forestConfig);
 		}
 		if (urisReadyListeners != null) {
-			queryBatcher.setUrisReadyListeners(urisReadyListeners);
+			queryBatcher.setUrisReadyListeners(urisReadyListeners.toArray(new QueryBatchListener[]{}));
 		}
 		if (queryFailureListeners != null) {
-			queryBatcher.setQueryFailureListeners(queryFailureListeners);
+			queryBatcher.setQueryFailureListeners(queryFailureListeners.toArray(new QueryFailureListener[]{}));
 		}
 
 		if (urisReadyListener != null) {
@@ -262,11 +275,35 @@ public class QueryBatcherTemplate extends LoggingObject {
 		this.forestConfig = forestConfig;
 	}
 
-	public void setQueryFailureListeners(QueryFailureListener... queryFailureListeners) {
-		this.queryFailureListeners = queryFailureListeners;
+	public void addQueryFailureListeners(QueryFailureListener... listeners) {
+		if (this.queryFailureListeners == null) {
+			this.queryFailureListeners = new ArrayList<>();
+		}
+		for (QueryFailureListener listener : listeners) {
+			this.queryFailureListeners.add(listener);
+		}
 	}
 
-	public void setUrisReadyListeners(QueryBatchListener... urisReadyListeners) {
-		this.urisReadyListeners = urisReadyListeners;
+	public void setQueryFailureListeners(QueryFailureListener... listeners) {
+		this.queryFailureListeners = new ArrayList<>();
+		for (QueryFailureListener listener : listeners) {
+			this.queryFailureListeners.add(listener);
+		}
+	}
+
+	public void addUrisReadyListeners(QueryBatchListener... listeners) {
+		if (this.urisReadyListeners == null) {
+			this.urisReadyListeners = new ArrayList<>();
+		}
+		for (QueryBatchListener listener : listeners) {
+			this.urisReadyListeners.add(listener);
+		}
+	}
+
+	public void setUrisReadyListeners(QueryBatchListener... listeners) {
+		this.urisReadyListeners = new ArrayList<>();
+		for (QueryBatchListener listener : listeners) {
+			this.urisReadyListeners.add(listener);
+		}
 	}
 }

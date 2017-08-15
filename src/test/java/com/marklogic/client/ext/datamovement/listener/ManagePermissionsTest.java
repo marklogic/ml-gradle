@@ -24,7 +24,7 @@ public class ManagePermissionsTest extends AbstractIntegrationTest {
 		QueryBatcherTemplate qbt = new QueryBatcherTemplate(newClient("Documents"));
 
 		// Clear out the test documents
-		qbt.applyOnDocuments(new DeleteListener(), uri);
+		qbt.applyOnDocumentUris(new DeleteListener(), uri);
 
 		// Insert documents
 		RestBatchWriter writer = new RestBatchWriter(client, false);
@@ -42,7 +42,7 @@ public class ManagePermissionsTest extends AbstractIntegrationTest {
 		assertTrue(perms.get("app-user").contains(DocumentMetadataHandle.Capability.UPDATE));
 
 		// Set permissions
-		qbt.applyOnDocuments(new SetPermissionsListener("alert-user", "read", "alert-user", "update"), uri);
+		qbt.applyOnDocumentUris(new SetPermissionsListener("alert-user", "read", "alert-user", "update"), uri);
 		perms = helper.getMetadata(uri).getPermissions();
 		assertEquals(1, perms.size());
 		assertEquals(2, perms.get("alert-user").size());
@@ -50,7 +50,7 @@ public class ManagePermissionsTest extends AbstractIntegrationTest {
 		assertTrue(perms.get("alert-user").contains(DocumentMetadataHandle.Capability.UPDATE));
 
 		// Add permissions
-		qbt.applyOnDocuments(new AddPermissionsListener("app-user", "read", "app-user", "update"), uri);
+		qbt.applyOnDocumentUris(new AddPermissionsListener("app-user", "read", "app-user", "update"), uri);
 		perms = helper.getMetadata(uri).getPermissions();
 		assertEquals(2, perms.size());
 		assertEquals(2, perms.get("alert-user").size());
@@ -61,7 +61,7 @@ public class ManagePermissionsTest extends AbstractIntegrationTest {
 		assertTrue(perms.get("app-user").contains(DocumentMetadataHandle.Capability.UPDATE));
 
 		// Remove permissions
-		qbt.applyOnDocuments(new RemovePermissionsListener("app-user", "read", "app-user", "update"), uri);
+		qbt.applyOnDocumentUris(new RemovePermissionsListener("app-user", "read", "app-user", "update"), uri);
 		perms = helper.getMetadata(uri).getPermissions();
 		assertEquals(1, perms.size());
 		assertEquals(2, perms.get("alert-user").size());

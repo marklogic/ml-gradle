@@ -4,11 +4,13 @@ import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.datamovement.DataMovementManager;
 import com.marklogic.client.datamovement.QueryBatcher;
 import com.marklogic.client.eval.EvalResult;
+import com.marklogic.client.ext.util.EvalResultIterator;
 
 import java.util.Iterator;
 
 /**
- * Builds a QueryBatcher based on a URI pattern that is fed into cts:uri-match via an eval call.
+ * Builds a QueryBatcher based on a URI pattern that is fed into cts:uri-match via an eval call. Note that cts:uri-match
+ * may not always scale as well as a cts:uris query will.
  */
 public class UriPatternQueryBatcherBuilder implements QueryBatcherBuilder {
 
@@ -21,17 +23,6 @@ public class UriPatternQueryBatcherBuilder implements QueryBatcherBuilder {
 	@Override
 	public QueryBatcher buildQueryBatcher(DatabaseClient databaseClient, DataMovementManager dataMovementManager) {
 		final Iterator<EvalResult> evalResults = databaseClient.newServerEval().xquery(String.format("cts:uri-match('%s')", uriPattern)).eval().iterator();
-		Iterator<String> stringIterator = new Iterator<String>() {
-			@Override
-			public boolean hasNext() {
-				return evalResults.hasNext();
-			}
-
-			@Override
-			public String next() {
-				return evalResults.next().getString();
-			}
-		};
-		return dataMovementManager.newQueryBatcher(stringIterator);
+		return dataMovementManager.newQueryBatcher(new EvalResultIterator(evalResults));
 	}
 }

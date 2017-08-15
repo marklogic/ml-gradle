@@ -8,11 +8,11 @@ import com.marklogic.client.query.StructuredQueryDefinition;
 /**
  * Builds a QueryBatcher based on an array of document URIs.
  */
-public class UrisQueryBatcherBuilder implements QueryBatcherBuilder {
+public class DocumentUrisQueryBatcherBuilder implements QueryBatcherBuilder {
 
 	private String[] documentUris;
 
-	public UrisQueryBatcherBuilder(String... documentUris) {
+	public DocumentUrisQueryBatcherBuilder(String... documentUris) {
 		this.documentUris = documentUris;
 	}
 

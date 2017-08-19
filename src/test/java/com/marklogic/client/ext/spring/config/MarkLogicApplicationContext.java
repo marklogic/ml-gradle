@@ -1,6 +1,6 @@
 package com.marklogic.client.ext.spring.config;
 
-import com.marklogic.client.ext.helper.DatabaseClientConfig;
+import com.marklogic.client.ext.DatabaseClientConfig;
 import com.marklogic.client.ext.helper.DatabaseClientProvider;
 import com.marklogic.client.ext.spring.SimpleDatabaseClientProvider;
 import com.marklogic.client.ext.spring.SpringDatabaseClientConfig;

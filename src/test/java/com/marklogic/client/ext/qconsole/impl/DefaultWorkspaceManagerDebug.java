@@ -15,7 +15,8 @@ import java.io.IOException;
 public class DefaultWorkspaceManagerDebug {
 
     public static void main(String[] args) throws IOException {
-        DatabaseClient client = DatabaseClientFactory.newClient("localhost", 8000, "App-Services", "admin", "admin", DatabaseClientFactory.Authentication.DIGEST);
+        DatabaseClient client = DatabaseClientFactory.newClient("localhost", 8000, "App-Services",
+	        new DatabaseClientFactory.DigestAuthContext("admin", "admin"));
         DefaultWorkspaceManager dwm = new DefaultWorkspaceManager(client);
         String user = "admin";
         final String workspaceName = "Workspace 1";

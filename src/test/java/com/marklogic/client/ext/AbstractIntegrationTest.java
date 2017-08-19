@@ -1,8 +1,6 @@
 package com.marklogic.client.ext;
 
 import com.marklogic.client.DatabaseClient;
-import com.marklogic.client.DatabaseClientFactory;
-import com.marklogic.client.ext.helper.DatabaseClientConfig;
 import com.marklogic.client.ext.spring.config.MarkLogicApplicationContext;
 import org.junit.After;
 import org.junit.Assert;
@@ -19,15 +17,18 @@ public abstract class AbstractIntegrationTest extends Assert {
 	protected DatabaseClientConfig clientConfig;
 	protected DatabaseClient client;
 
+	protected ConfiguredDatabaseClientFactory configuredDatabaseClientFactory = new DefaultConfiguredDatabaseClientFactory();
+
 	protected DatabaseClient newClient() {
-		client = DatabaseClientFactory.newClient(clientConfig.getHost(), clientConfig.getPort(), clientConfig.getUsername(),
-			clientConfig.getPassword(), DatabaseClientFactory.Authentication.DIGEST);
+		client = configuredDatabaseClientFactory.newDatabaseClient(clientConfig);
 		return client;
 	}
 
 	protected DatabaseClient newClient(String database) {
-		client = DatabaseClientFactory.newClient(clientConfig.getHost(), clientConfig.getPort(), database, clientConfig.getUsername(),
-			clientConfig.getPassword(), DatabaseClientFactory.Authentication.DIGEST);
+		String currentDatabase = clientConfig.getDatabase();
+		clientConfig.setDatabase(database);
+		client = configuredDatabaseClientFactory.newDatabaseClient(clientConfig);
+		clientConfig.setDatabase(currentDatabase);
 		return client;
 	}
 

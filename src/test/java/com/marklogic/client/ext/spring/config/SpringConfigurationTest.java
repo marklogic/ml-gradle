@@ -1,7 +1,7 @@
 package com.marklogic.client.ext.spring.config;
 
 import com.marklogic.client.ext.AbstractIntegrationTest;
-import com.marklogic.client.ext.helper.DatabaseClientConfig;
+import com.marklogic.client.ext.DatabaseClientConfig;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.BeansException;

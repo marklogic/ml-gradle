@@ -3,7 +3,7 @@ package com.marklogic.client.ext.spring;
 import org.springframework.beans.factory.DisposableBean;
 
 import com.marklogic.client.DatabaseClient;
-import com.marklogic.client.ext.helper.DatabaseClientConfig;
+import com.marklogic.client.ext.DatabaseClientConfig;
 import com.marklogic.client.ext.helper.DatabaseClientProvider;
 
 public class SimpleDatabaseClientProvider implements DatabaseClientProvider, DisposableBean {

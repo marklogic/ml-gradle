@@ -1,12 +1,11 @@
 package com.marklogic.client.ext.spring;
 
+import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.ext.DatabaseClientConfig;
+import com.marklogic.client.ext.DefaultConfiguredDatabaseClientFactory;
+import com.marklogic.client.ext.helper.LoggingObject;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
-
-import com.marklogic.client.DatabaseClient;
-import com.marklogic.client.DatabaseClientFactory;
-import com.marklogic.client.ext.helper.DatabaseClientConfig;
-import com.marklogic.client.ext.helper.LoggingObject;
 
 /**
  * Hooks into Spring container lifecycle so that the DatabaseClient is initialized when the container starts up and
@@ -17,52 +16,50 @@ import com.marklogic.client.ext.helper.LoggingObject;
  */
 public class DatabaseClientManager extends LoggingObject implements FactoryBean<DatabaseClient>, DisposableBean {
 
-    private DatabaseClientConfig config;
-    private DatabaseClient client;
+	private DatabaseClientConfig config;
+	private DatabaseClient client;
 
-    public DatabaseClientManager() {
-        super();
-    }
+	public DatabaseClientManager() {
+		super();
+	}
 
-    public DatabaseClientManager(DatabaseClientConfig config) {
-        this();
-        this.config = config;
-    }
+	public DatabaseClientManager(DatabaseClientConfig config) {
+		this();
+		this.config = config;
+	}
 
-    @Override
-    public DatabaseClient getObject() {
-        if (client == null) {
-            if (logger.isInfoEnabled()) {
-                logger.info("Connecting to REST server with: " + config);
-            }
-            client = DatabaseClientFactory.newClient(config.getHost(), config.getPort(), config.getDatabase(),
-                    config.getUsername(), config.getPassword(), config.getAuthentication(), config.getSslContext(),
-                    config.getSslHostnameVerifier());
-        }
-        return client;
-    }
+	@Override
+	public DatabaseClient getObject() {
+		if (client == null) {
+			if (logger.isInfoEnabled()) {
+				logger.info("Connecting to REST server with: " + config);
+			}
+			client = new DefaultConfiguredDatabaseClientFactory().newDatabaseClient(config);
+		}
+		return client;
+	}
 
-    @Override
-    public Class<?> getObjectType() {
-        return DatabaseClient.class;
-    }
+	@Override
+	public Class<?> getObjectType() {
+		return DatabaseClient.class;
+	}
 
-    @Override
-    public boolean isSingleton() {
-        return true;
-    }
+	@Override
+	public boolean isSingleton() {
+		return true;
+	}
 
-    @Override
-    public void destroy() {
-        if (client != null) {
-            if (logger.isInfoEnabled()) {
-                logger.info("Releasing client with username: " + config.getUsername());
-            }
-            client.release();
-        }
-    }
+	@Override
+	public void destroy() {
+		if (client != null) {
+			if (logger.isInfoEnabled()) {
+				logger.info("Releasing client with username: " + config.getUsername());
+			}
+			client.release();
+		}
+	}
 
-    public void setConfig(DatabaseClientConfig config) {
-        this.config = config;
-    }
+	public void setConfig(DatabaseClientConfig config) {
+		this.config = config;
+	}
 }

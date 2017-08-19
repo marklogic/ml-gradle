@@ -30,8 +30,11 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 		 * Odd - the Client REST API doesn't allow for loading namespaces when the DatabaseClient has a database
 		 * specified, so we construct a DatabaseClient without a database and assume we get "Documents".
 		 */
-		client = DatabaseClientFactory.newClient(clientConfig.getHost(), clientConfig.getPort(), clientConfig.getUsername(),
-			clientConfig.getPassword(), DatabaseClientFactory.Authentication.DIGEST);
+		String currentDatabase = clientConfig.getDatabase();
+		clientConfig.setDatabase(null);
+		client = configuredDatabaseClientFactory.newDatabaseClient(clientConfig);
+		clientConfig.setDatabase(currentDatabase);
+
 		DefaultModulesLoader modulesLoader = new DefaultModulesLoader(new AssetFileLoader(modulesClient));
 		modulesLoader.setModulesManager(null);
 

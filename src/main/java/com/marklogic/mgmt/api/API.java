@@ -6,14 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.marklogic.appdeployer.DefaultAppConfigFactory;
 import com.marklogic.client.DatabaseClient;
-import com.marklogic.client.DatabaseClientFactory;
-import com.marklogic.client.DatabaseClientFactory.Authentication;
 import com.marklogic.client.ext.helper.ClientHelper;
 import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.mgmt.DefaultManageConfigFactory;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.ManageConfig;
-import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.admin.AdminConfig;
 import com.marklogic.mgmt.admin.AdminManager;
 import com.marklogic.mgmt.api.cluster.Cluster;
@@ -24,6 +21,7 @@ import com.marklogic.mgmt.api.restapi.RestApi;
 import com.marklogic.mgmt.api.security.*;
 import com.marklogic.mgmt.api.server.Server;
 import com.marklogic.mgmt.api.task.Task;
+import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.forests.ForestManager;
@@ -147,19 +145,6 @@ public class API extends LoggingObject {
      */
     public DatabaseClient newClient() {
         return new DefaultAppConfigFactory(new SystemPropertySource()).newAppConfig().newDatabaseClient();
-    }
-
-    /**
-     * Construct a new DatabaseClient, assuming DIGEST authentication.
-     *
-     * @param host
-     * @param port
-     * @param user
-     * @param password
-     * @return
-     */
-    public DatabaseClient newClient(String host, Integer port, String user, String password) {
-        return DatabaseClientFactory.newClient(host, port, user, password, Authentication.DIGEST);
     }
 
     /**

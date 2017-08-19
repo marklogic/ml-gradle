@@ -33,9 +33,7 @@ public class DeleteModulesCommand extends AbstractCommand {
 			logger.info(format("Deleting modules in database '%s' with URIs matching pattern '%s'", dbName, pattern));
 		}
 
-		DatabaseClient client = DatabaseClientFactory.newClient(appConfig.getHost(), appConfig.getAppServicesPort(), dbName,
-			appConfig.getRestAdminUsername(), appConfig.getRestAdminPassword(), appConfig.getRestAuthentication(),
-			appConfig.getRestSslContext(), appConfig.getRestSslHostnameVerifier());
+		DatabaseClient client = appConfig.newAppServicesDatabaseClient(dbName);
 
 		String xquery = "for $uri in cts:uri-match('%s') where fn:doc-available($uri) return xdmp:document-delete($uri)";
 		try {

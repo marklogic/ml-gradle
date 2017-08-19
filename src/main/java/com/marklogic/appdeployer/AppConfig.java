@@ -4,9 +4,13 @@ import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.DatabaseClientFactory.Authentication;
 import com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier;
-import com.marklogic.client.ext.tokenreplacer.PropertiesSource;
+import com.marklogic.client.ext.ConfiguredDatabaseClientFactory;
+import com.marklogic.client.ext.DatabaseClientConfig;
+import com.marklogic.client.ext.DefaultConfiguredDatabaseClientFactory;
+import com.marklogic.client.ext.SecurityContextType;
 import com.marklogic.client.ext.modulesloader.impl.PropertiesModuleManager;
 import com.marklogic.client.ext.modulesloader.ssl.SimpleX509TrustManager;
+import com.marklogic.client.ext.tokenreplacer.PropertiesSource;
 
 import javax.net.ssl.SSLContext;
 import java.io.FileFilter;
@@ -29,7 +33,7 @@ import java.util.Map;
  */
 public class AppConfig {
 
-    /**
+	/**
      * This is set purely for development purposes so that an app can be created without specifying an app name.
      */
     public static final String DEFAULT_APP_NAME = "my-app";
@@ -60,24 +64,35 @@ public class AppConfig {
     private String name = DEFAULT_APP_NAME;
     private String host = DEFAULT_HOST;
 
+    // Used to construct DatabaseClient instances based on inputs defined in this class
+    private ConfiguredDatabaseClientFactory configuredDatabaseClientFactory = new DefaultConfiguredDatabaseClientFactory();
+
     // Username/password combo for using the client REST API - e.g. to load modules
+	private SecurityContextType restSecurityContextType = SecurityContextType.DIGEST;
     private String restAdminUsername = DEFAULT_USERNAME;
     private String restAdminPassword = DEFAULT_PASSWORD;
     private SSLContext restSslContext;
     private SSLHostnameVerifier restSslHostnameVerifier;
-    private Authentication restAuthentication = Authentication.DIGEST;
-
-    private SSLContext appServicesSslContext;
-    private SSLHostnameVerifier appServicesSslHostnameVerifier;
-    private Authentication appServicesAuthentication = Authentication.DIGEST;
-
+    private String restCertFile;
+    private String restCertPassword;
+    private String restExternalName;
+    @Deprecated
+    private Authentication restAuthentication;
     private Integer restPort = DEFAULT_PORT;
     private Integer testRestPort;
 
     // Username/password combo for using the App Services client REST API - e.g. to load non-REST API modules
+    private SecurityContextType appServicesSecurityContextType = SecurityContextType.DIGEST;
 	private String appServicesUsername = DEFAULT_USERNAME;
 	private String appServicesPassword = DEFAULT_PASSWORD;
     private Integer appServicesPort = 8000;
+	private SSLContext appServicesSslContext;
+	private SSLHostnameVerifier appServicesSslHostnameVerifier;
+	private String appServicesCertFile;
+	private String appServicesCertPassword;
+	private String appServicesExternalName;
+	@Deprecated
+	private Authentication appServicesAuthentication;
 
     // These can all be set to override the default names that are generated off of the "name" attribute.
     private String groupName = DEFAULT_GROUP;
@@ -176,19 +191,23 @@ public class AppConfig {
     }
 
     public void setSimpleSslConfig() {
-        setRestSslContext(SimpleX509TrustManager.newSSLContext());
-        setRestSslHostnameVerifier(DatabaseClientFactory.SSLHostnameVerifier.ANY);
+		setRestSslContext(SimpleX509TrustManager.newSSLContext());
+		setRestSslHostnameVerifier(DatabaseClientFactory.SSLHostnameVerifier.ANY);
+    }
+
+    public void setAppServicesSimpleSslConfig() {
+		setAppServicesSslContext(SimpleX509TrustManager.newSSLContext());
+		setAppServicesSslHostnameVerifier(DatabaseClientFactory.SSLHostnameVerifier.ANY);
     }
 
     /**
-     * Convenience method for constructing a MarkLogic Java API DatabaseClient based on the host, restPort,
-     * restAdminUsername, restAdminPassword, restAuthentication, restSslContext, and restSslHostnameVerifier properties.
+     * Convenience method for constructing a MarkLogic Java API DatabaseClient based on the the host and rest*
+     * properties defined on this class.
      *
      * @return
      */
     public DatabaseClient newDatabaseClient() {
-        return DatabaseClientFactory.newClient(getHost(), getRestPort(), getRestAdminUsername(), getRestAdminPassword(),
-                getRestAuthentication(), getRestSslContext(), getRestSslHostnameVerifier());
+	    return configuredDatabaseClientFactory.newDatabaseClient(newRestDatabaseClientConfig(getRestPort()));
     }
 
     /**
@@ -197,25 +216,49 @@ public class AppConfig {
      * @return
      */
     public DatabaseClient newTestDatabaseClient() {
-        return DatabaseClientFactory.newClient(getHost(), getTestRestPort(), getRestAdminUsername(),
-                getRestAdminPassword(), getRestAuthentication(), getRestSslContext(), getRestSslHostnameVerifier());
+	    return configuredDatabaseClientFactory.newDatabaseClient(newRestDatabaseClientConfig(getTestRestPort()));
     }
 
-    public DatabaseClient newModulesDatabaseClient() {
-	    return DatabaseClientFactory.newClient(getHost(), getAppServicesPort(), getModulesDatabaseName(),
-		    getAppServicesUsername(), getAppServicesPassword(), getAppServicesAuthentication(), getAppServicesSslContext(),
-		    getAppServicesSslHostnameVerifier());
+    public DatabaseClientConfig newRestDatabaseClientConfig(int port) {
+	    DatabaseClientConfig config = new DatabaseClientConfig(getHost(), port, getRestAdminUsername(), getRestAdminPassword());
+	    config.setAuthentication(getRestAuthentication());
+	    config.setSecurityContextType(restSecurityContextType);
+	    config.setSslHostnameVerifier(getRestSslHostnameVerifier());
+	    config.setSslContext(getRestSslContext());
+	    config.setCertFile(getRestCertFile());
+	    config.setCertPassword(getRestCertPassword());
+	    config.setExternalName(getRestExternalName());
+	    return config;
+    }
+
+	/**
+	 * Constructs a DatabaseClient based on host, the appServices* properties, and the modules database name.
+	 * @return
+	 */
+	public DatabaseClient newModulesDatabaseClient() {
+		return newAppServicesDatabaseClient(getModulesDatabaseName());
     }
 
     /**
-     * Like newDatabaseClient, but connects to schemas database.
+     * Like newModulesDatabaseClient, but connects to schemas database.
      *
      * @return
      */
     public DatabaseClient newSchemasDatabaseClient() {
-        return DatabaseClientFactory.newClient(getHost(), getAppServicesPort(), getSchemasDatabaseName(),
-                getAppServicesUsername(), getAppServicesPassword(), getAppServicesAuthentication(), getAppServicesSslContext(),
-                getAppServicesSslHostnameVerifier());
+	    return newAppServicesDatabaseClient(getSchemasDatabaseName());
+    }
+
+    public DatabaseClient newAppServicesDatabaseClient(String databaseName) {
+	    DatabaseClientConfig config = new DatabaseClientConfig(getHost(), getAppServicesPort(), getAppServicesUsername(), getAppServicesPassword());
+	    config.setDatabase(databaseName);
+	    config.setAuthentication(getAppServicesAuthentication());
+	    config.setSecurityContextType(appServicesSecurityContextType);
+	    config.setSslHostnameVerifier(getAppServicesSslHostnameVerifier());
+	    config.setSslContext(getAppServicesSslContext());
+	    config.setCertFile(getAppServicesCertFile());
+	    config.setCertPassword(getAppServicesCertPassword());
+	    config.setExternalName(getAppServicesExternalName());
+	    return configuredDatabaseClientFactory.newDatabaseClient(config);
     }
 
     /**
@@ -410,10 +453,12 @@ public class AppConfig {
      * @return the MarkLogic Java Client {@code Authentication} object that is used for authenticating with a REST API
      * server for loading modules
      */
+    @Deprecated
     public Authentication getRestAuthentication() {
         return restAuthentication;
     }
 
+    @Deprecated
     public void setRestAuthentication(Authentication authentication) {
         this.restAuthentication = authentication;
     }
@@ -705,10 +750,12 @@ public class AppConfig {
 		this.appServicesSslHostnameVerifier = appServicesSslHostnameVerifier;
 	}
 
+	@Deprecated
 	public Authentication getAppServicesAuthentication() {
 		return appServicesAuthentication;
 	}
 
+	@Deprecated
 	public void setAppServicesAuthentication(Authentication appServicesAuthentication) {
 		this.appServicesAuthentication = appServicesAuthentication;
 	}
@@ -783,5 +830,77 @@ public class AppConfig {
 
 	public void setDeleteTestModulesPattern(String deleteTestModulesPattern) {
 		this.deleteTestModulesPattern = deleteTestModulesPattern;
+	}
+
+	public SecurityContextType getRestSecurityContextType() {
+		return restSecurityContextType;
+	}
+
+	public void setRestSecurityContextType(SecurityContextType restSecurityContextType) {
+		this.restSecurityContextType = restSecurityContextType;
+	}
+
+	public SecurityContextType getAppServicesSecurityContextType() {
+		return appServicesSecurityContextType;
+	}
+
+	public void setAppServicesSecurityContextType(SecurityContextType appServicesSecurityContextType) {
+		this.appServicesSecurityContextType = appServicesSecurityContextType;
+	}
+
+	public String getRestCertFile() {
+		return restCertFile;
+	}
+
+	public void setRestCertFile(String restCertFile) {
+		this.restCertFile = restCertFile;
+	}
+
+	public String getRestCertPassword() {
+		return restCertPassword;
+	}
+
+	public void setRestCertPassword(String restCertPassword) {
+		this.restCertPassword = restCertPassword;
+	}
+
+	public String getAppServicesCertFile() {
+		return appServicesCertFile;
+	}
+
+	public void setAppServicesCertFile(String appServicesCertFile) {
+		this.appServicesCertFile = appServicesCertFile;
+	}
+
+	public String getAppServicesCertPassword() {
+		return appServicesCertPassword;
+	}
+
+	public void setAppServicesCertPassword(String appServicesCertPassword) {
+		this.appServicesCertPassword = appServicesCertPassword;
+	}
+
+	public String getRestExternalName() {
+		return restExternalName;
+	}
+
+	public void setRestExternalName(String restExternalName) {
+		this.restExternalName = restExternalName;
+	}
+
+	public String getAppServicesExternalName() {
+		return appServicesExternalName;
+	}
+
+	public void setAppServicesExternalName(String appServicesExternalName) {
+		this.appServicesExternalName = appServicesExternalName;
+	}
+
+	public ConfiguredDatabaseClientFactory getConfiguredDatabaseClientFactory() {
+		return configuredDatabaseClientFactory;
+	}
+
+	public void setConfiguredDatabaseClientFactory(ConfiguredDatabaseClientFactory configuredDatabaseClientFactory) {
+		this.configuredDatabaseClientFactory = configuredDatabaseClientFactory;
 	}
 }

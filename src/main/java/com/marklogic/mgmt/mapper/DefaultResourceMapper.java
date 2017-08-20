@@ -9,6 +9,10 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * This implementation assumes that the API object that it's given has a Jackson ObjectMapper that's configured to use
+ * a lower-case hyphenated naming strategy.
+ */
 public class DefaultResourceMapper implements ResourceMapper {
 
 	private API api;

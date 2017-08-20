@@ -1,25 +1,34 @@
 package com.marklogic.mgmt.api.database;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.List;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class DatabaseReplication {
 
-    private List<ForeignReplica> foreignReplica;
-    private ForeignReplica foreignMaster;
+	@XmlElementWrapper(name = "foreign-replicas")
+	@XmlElement(name = "foreign-replica")
+	private List<ForeignReplica> foreignReplica;
 
-    public List<ForeignReplica> getForeignReplica() {
-        return foreignReplica;
-    }
+	@XmlElement(name = "foreign-master")
+	private ForeignReplica foreignMaster;
 
-    public void setForeignReplica(List<ForeignReplica> foreignReplica) {
-        this.foreignReplica = foreignReplica;
-    }
+	public List<ForeignReplica> getForeignReplica() {
+		return foreignReplica;
+	}
 
-    public ForeignReplica getForeignMaster() {
-        return foreignMaster;
-    }
+	public void setForeignReplica(List<ForeignReplica> foreignReplica) {
+		this.foreignReplica = foreignReplica;
+	}
 
-    public void setForeignMaster(ForeignReplica foreignMaster) {
-        this.foreignMaster = foreignMaster;
-    }
+	public ForeignReplica getForeignMaster() {
+		return foreignMaster;
+	}
+
+	public void setForeignMaster(ForeignReplica foreignMaster) {
+		this.foreignMaster = foreignMaster;
+	}
 }

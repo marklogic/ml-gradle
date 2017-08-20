@@ -1,22 +1,20 @@
 package com.marklogic.mgmt.api.security;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.Resource;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.security.RoleManager;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @XmlRootElement(name = "role-properties")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Role extends Resource {
 
-	@JsonProperty("role-name")
 	@XmlElement(name = "role-name")
 	private String roleName;
 
@@ -39,7 +37,15 @@ public class Role extends Resource {
 	@XmlElementWrapper(name = "collections")
 	private List<String> collection;
 
-	private static JAXBContext roleJaxbContext;
+	public static void main(String[] args) {
+		API api = new API(new ManageClient());
+		Role r = new Role();
+		r.setRoleName("hi");
+		r.setObjectMapper(api.getObjectMapper());
+		r.setExternalName(Arrays.asList("name1", "name2"));
+		System.out.println(r.getJson());
+
+	}
 
 	public Role() {
 	}

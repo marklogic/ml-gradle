@@ -67,6 +67,10 @@ class RoxyMigratePropertiesTask extends RoxyTask {
 			}
 		}
 
+		properties.append("\n# Added automatically by ml-gradle under the assumption that a Roxy application defines all of the app servers that it needs ")
+		properties.append("\n# and thus doesn't need ml-gradle to automatically create a REST API server for it.")
+		properties.append("\nmlNoRestServer=true\n")
+
 		properties.append("\n# All other Roxy properties\n")
 		roxyProperties.each { entry ->
 			String key = entry.key

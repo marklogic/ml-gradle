@@ -46,7 +46,7 @@ public class ManageClient extends LoggingObject {
                 logger.info("Initializing ManageClient with admin config, admin user: " + config.getAdminUsername());
             }
             this.adminRestTemplate = RestTemplateUtil.newRestTemplate(config.getHost(), config.getPort(),
-                    config.getAdminUsername(), config.getAdminPassword());
+                    config.getAdminUsername(), config.getAdminPassword(), config.isAdminConfigureSimpleSsl());
         } else {
             this.adminRestTemplate = restTemplate;
         }

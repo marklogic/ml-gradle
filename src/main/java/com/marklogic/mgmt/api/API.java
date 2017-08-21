@@ -66,6 +66,7 @@ public class API extends LoggingObject {
 		    ManageConfig mc = manageClient.getManageConfig();
 		    if (mc.getAdminUsername() != null && mc.getAdminPassword() != null) {
 			    AdminConfig ac = new AdminConfig(mc.getHost(), 8001, mc.getAdminUsername(), mc.getAdminPassword());
+			    ac.setConfigureSimpleSsl(mc.isAdminConfigureSimpleSsl());
 			    this.adminManager = new AdminManager(ac);
 		    }
 	    }
@@ -90,8 +91,29 @@ public class API extends LoggingObject {
      * @param host
      */
     public void connect(String host) {
-        ManageConfig mc = this.manageClient.getManageConfig();
-        connect(host, mc.getUsername(), mc.getPassword(), mc.getAdminUsername(), mc.getAdminPassword());
+        connect(host, this.manageClient.getManageConfig());
+    }
+
+	/**
+	 * Connect to a (presumably) different MarkLogic Management API.
+	 *
+	 * @param host
+	 * @param mc
+	 */
+	public void connect(String host, ManageConfig mc) {
+	    if (logger.isInfoEnabled()) {
+		    logger.info("Connecting to host: " + host);
+	    }
+	    SimplePropertySource sps = new SimplePropertySource("mlHost", host, "mlManageUsername", mc.getUsername(),
+		    "mlManagePassword", mc.getPassword(), "mlAdminUsername", mc.getAdminUsername(), "mlAdminPassword", mc.getAdminPassword(),
+		    "mlManageSimpleSsl", mc.isConfigureSimpleSsl() + "", "mlAdminSimpleSsl", mc.isAdminConfigureSimpleSsl() + "",
+		    "mlManageScheme", mc.getScheme(), "mlAdminScheme", mc.getAdminScheme(), "mlAdminPort", mc.getAdminPort() + "",
+		    "mlManagePort", mc.getPort() + "");
+	    this.manageClient = new ManageClient(new DefaultManageConfigFactory(sps).newManageConfig());
+	    initializeAdminManager();
+	    if (logger.isInfoEnabled()) {
+		    logger.info("Connected to host: " + host);
+	    }
     }
 
     /**
@@ -116,16 +138,13 @@ public class API extends LoggingObject {
      * @param adminPassword
      */
     public void connect(String host, String username, String password, String adminUsername, String adminPassword) {
-        if (logger.isInfoEnabled()) {
-            logger.info("Connecting to host: " + host);
-        }
-        SimplePropertySource sps = new SimplePropertySource("mlHost", host, "mlManageUsername", username,
-                "mlManagePassword", password, "mlAdminUsername", adminUsername, "mlAdminPassword", adminPassword);
-        this.manageClient = new ManageClient(new DefaultManageConfigFactory(sps).newManageConfig());
-        initializeAdminManager();
-        if (logger.isInfoEnabled()) {
-            logger.info("Connected to host: " + host);
-        }
+    	ManageConfig mc = new ManageConfig();
+    	mc.setHost(host);
+    	mc.setUsername(username);
+    	mc.setPassword(password);
+    	mc.setAdminUsername(adminUsername);
+    	mc.setAdminPassword(adminPassword);
+    	connect(host, mc);
     }
 
     /**

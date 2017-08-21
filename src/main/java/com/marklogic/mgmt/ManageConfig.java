@@ -15,9 +15,12 @@ public class ManageConfig extends RestConfig {
      */
     public static final String DEFAULT_USERNAME = "admin";
     public static final String DEFAULT_PASSWORD = "admin";
-    
+
     private String adminUsername;
     private String adminPassword;
+    private boolean adminConfigureSimpleSsl;
+    private String adminScheme = "http";
+    private int adminPort = 8001;
 
     public ManageConfig() {
         this("localhost", DEFAULT_PASSWORD);
@@ -54,4 +57,28 @@ public class ManageConfig extends RestConfig {
     public void setAdminPassword(String adminPassword) {
         this.adminPassword = adminPassword;
     }
+
+	public boolean isAdminConfigureSimpleSsl() {
+		return adminConfigureSimpleSsl;
+	}
+
+	public void setAdminConfigureSimpleSsl(boolean adminConfigureSimpleSsl) {
+		this.adminConfigureSimpleSsl = adminConfigureSimpleSsl;
+	}
+
+	public int getAdminPort() {
+		return adminPort;
+	}
+
+	public void setAdminPort(int adminPort) {
+		this.adminPort = adminPort;
+	}
+
+	public String getAdminScheme() {
+		return adminScheme;
+	}
+
+	public void setAdminScheme(String adminScheme) {
+		this.adminScheme = adminScheme;
+	}
 }

@@ -10,6 +10,7 @@ public class RestConfig {
     private String username;
     private String password;
     private String scheme = "http";
+    private boolean configureSimpleSsl;
 
     public RestConfig() {
     }
@@ -46,7 +47,7 @@ public class RestConfig {
     public String getBaseUrl() {
         return String.format("%s://%s:%d", scheme, host, port);
     }
-    
+
     public String getHost() {
         return host;
     }
@@ -86,4 +87,12 @@ public class RestConfig {
     public void setScheme(String scheme) {
         this.scheme = scheme;
     }
+
+	public boolean isConfigureSimpleSsl() {
+		return configureSimpleSsl;
+	}
+
+	public void setConfigureSimpleSsl(boolean configureSimpleSsl) {
+		this.configureSimpleSsl = configureSimpleSsl;
+	}
 }

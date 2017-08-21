@@ -68,6 +68,12 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			c.setSchemasPath(prop);
 		}
 
+		prop = getProperty("mlSchemasDatabaseName");
+		if (prop != null) {
+			logger.info("Schemas database name: " + prop);
+			c.setSchemasDatabaseName(prop);
+		}
+
 		/**
 		 * Defines the MarkLogic host that requests should be sent to. Defaults to localhost.
 		 */

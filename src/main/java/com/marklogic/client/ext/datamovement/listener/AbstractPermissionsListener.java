@@ -22,6 +22,9 @@ public abstract class AbstractPermissionsListener extends LoggingObject implemen
 		sb.append(String.format(" ! %s(., ", getXqueryFunction()));
 		sb.append(buildPermissions(this.rolesAndCapabilities));
 		sb.append(")");
+		if (logger.isDebugEnabled()) {
+			logger.debug("Executing: " + sb);
+		}
 		queryBatch.getClient().newServerEval().xquery(sb.toString()).evalAs(String.class);
 	}
 

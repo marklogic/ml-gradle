@@ -128,26 +128,27 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlSetContentUpdatesAllowed", type: SetContentUpdatesAllowedTask, group: dbGroup, description: "Sets updated-allowed on each primary forest for the content database; must set the mode via e.g. -Pmode=flash-backup")
 
 		String dmGroup = "ml-Gradle Data Movement"
-
+		String dmGroupMessage = "; can also set the properties threadCount, batchSize, applyConsistentSnapshot, awaitCompletion, stopJob, " +
+			"jobName, and logBatches to configure how the Data Movement QueryBatcher operates.";
 		project.task("mlAddCollections", type: AddCollectionsTask, group: dmGroup, description: "Add all documents, either in a comma-separated list of " +
-			"collection names specified by the 'sourceCollections' property or matching a URI pattern specified by the 'uriPattern' property, " +
-			"to a comma-separated list of collection names specified by the 'collections' property")
+			"collection names specified by the 'whereCollections' property or matching a URI pattern specified by the 'whereUriPattern' property, " +
+			"to a comma-separated list of collection names specified by the 'collections' property" + dmGroupMessage)
 		project.task("mlDeleteCollections", type: DeleteCollectionsTask, group: dmGroup, description: "Delete all documents in a comma-separated list of " +
-			"collection names specified by the 'collections' property")
+			"collection names specified by the 'collections' property" + dmGroupMessage)
 		project.task("mlRemoveCollections", type: RemoveCollectionsTask, group: dmGroup, description: "Remove all documents, either in a comma-separated list of " +
-			"collection names specified by the 'sourceCollections' property or matching a URI pattern specified by the 'uriPattern' property, " +
+			"collection names specified by the 'whereCollections' property or matching a URI pattern specified by the 'whereUriPattern' property, " +
 			"from a comma-separated list of collection names specified by the 'collections' property; " +
-			"if the values of 'sourceCollections' and 'collections' are the same, you only need to specify the 'collections' property")
+			"if the values of 'whereCollections' and 'collections' are the same, you only need to specify the 'collections' property" + dmGroupMessage)
 		project.task("mlSetCollections", type: SetCollectionsTask, group: dmGroup, description: "Set collections on all documents, either in a comma-separated list of " +
-			"collection names specified by the 'sourceCollections' property or matching a URI pattern specified by the 'uriPattern' property, " +
-			"to a comma-separated list of collection names specified by the 'collections' property")
+			"collection names specified by the 'whereCollections' property or matching a URI pattern specified by the 'whereUriPattern' property, " +
+			"to a comma-separated list of collection names specified by the 'collections' property" + dmGroupMessage)
 
 		project.task("mlAddPermissions", type: AddPermissionsTask, group: dmGroup, description: "Add permissions, specified as a comma-separated list of roles and capabilities via the 'permissions' property, " +
-			"to all documents either in the set of collection names specified by the 'collections' property or with URIs matching the pattern specified by the 'uriPattern' property")
+			"to all documents either in the set of collection names specified by the 'collections' property or with URIs matching the pattern specified by the 'whereUriPattern' property" + dmGroupMessage)
 		project.task("mlRemovePermissions", type: RemovePermissionsTask, group: dmGroup, description: "Remove permissions, specified as a comma-separated list of roles and capabilities via the 'permissions' property, " +
-			"from all documents either in the set of collection names specified by the 'collections' property or with URIs matching the pattern specified by the 'uriPattern' property")
+			"from all documents either in the set of collection names specified by the 'collections' property or with URIs matching the pattern specified by the 'whereUriPattern' property" + dmGroupMessage)
 		project.task("mlSetPermissions", type: AddPermissionsTask, group: dmGroup, description: "Set permissions, specified as a comma-separated list of roles and capabilities via the 'permissions' property, " +
-			"on all documents in the set of collection names specified by the 'collections' property or with URIs matching the pattern specified by the 'uriPattern' property")
+			"on all documents in the set of collection names specified by the 'collections' property or with URIs matching the pattern specified by the 'whereUriPattern' property" + dmGroupMessage)
 
 		String devGroup = "ml-gradle Development"
 		project.task("mlCreateResource", type: CreateResourceTask, group: devGroup, description: "Create a new resource extension in the modules services directory; use -PresourceName and -PresourceType to set the resource name and type (either xqy or sjs)")

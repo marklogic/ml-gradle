@@ -1,9 +1,7 @@
 package com.marklogic.gradle.task.datamovement
 
 import com.marklogic.client.datamovement.QueryBatchListener
-import com.marklogic.client.ext.datamovement.CollectionsQueryBatcherBuilder
 import com.marklogic.client.ext.datamovement.QueryBatcherBuilder
-import com.marklogic.client.ext.datamovement.UriPatternQueryBatcherBuilder
 import com.marklogic.client.ext.datamovement.listener.SetCollectionsListener
 import org.gradle.api.tasks.TaskAction
 
@@ -12,7 +10,7 @@ class SetCollectionsTask extends DataMovementTask {
 	@TaskAction
 	void setCollections() {
 		if (
-		(!project.hasProperty("sourceCollections") && !project.hasProperty("pattern")) ||
+		(!project.hasProperty("whereCollections") && !project.hasProperty("pattern")) ||
 			!project.hasProperty("collections")
 		) {
 			println "Invalid inputs; " + getDescription()
@@ -24,14 +22,13 @@ class SetCollectionsTask extends DataMovementTask {
 		QueryBatcherBuilder builder = null
 
 		String message = " collections " + Arrays.asList(collections);
-		if (project.hasProperty("collections")) {
-			String[] sourceCollections = getProject().property("sourceCollections").split(",")
-			message += " on documents in collections " + Arrays.asList(sourceCollections)
-			builder = new CollectionsQueryBatcherBuilder(sourceCollections)
-		} else if (project.hasProperty("uriPattern")) {
-			String pattern = getProject().property("pattern")
-			message += " on documents matching URI pattern " + pattern
-			builder = new UriPatternQueryBatcherBuilder(pattern)
+
+		if (hasWhereCollectionsProperty()) {
+			builder = constructBuilderFromWhereCollections()
+			message += " on documents in collections " + Arrays.asList(this.whereCollections)
+		} else if (hasWhereUriPatternProperty()) {
+			builder = constructBuilderFromWhereUriPattern()
+			message += " on documents matching URI pattern " + this.whereUriPattern
 		}
 
 		println "Setting " + message

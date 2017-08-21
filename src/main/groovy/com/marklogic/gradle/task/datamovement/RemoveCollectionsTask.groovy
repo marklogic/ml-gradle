@@ -1,9 +1,7 @@
 package com.marklogic.gradle.task.datamovement
 
 import com.marklogic.client.datamovement.QueryBatchListener
-import com.marklogic.client.ext.datamovement.CollectionsQueryBatcherBuilder
 import com.marklogic.client.ext.datamovement.QueryBatcherBuilder
-import com.marklogic.client.ext.datamovement.UriPatternQueryBatcherBuilder
 import com.marklogic.client.ext.datamovement.listener.RemoveCollectionsListener
 import org.gradle.api.tasks.TaskAction
 
@@ -26,18 +24,16 @@ class RemoveCollectionsTask extends DataMovementTask {
 		QueryBatchListener listener = new RemoveCollectionsListener(collections)
 		QueryBatcherBuilder builder = null
 
-		if (project.hasProperty("uriPattern")) {
-			String pattern = project.property("uriPattern")
-			message = "documents matching URI pattern " + pattern + message
-			builder = new UriPatternQueryBatcherBuilder(pattern)
+		if (hasWhereUriPatternProperty()) {
+			builder = constructBuilderFromWhereUriPattern()
+			message = "documents matching URI pattern " + this.whereUriPattern + message
 		}
 		else {
-			String[] sourceCollections = collections
-			if (project.hasProperty("sourceCollections")) {
-				sourceCollections = getProject().property("sourceCollections").split(",")
+			this.whereCollections = collections
+			if (hasWhereCollectionsProperty()) {
+				builder = constructBuilderFromWhereCollections()
 			}
-			message = "documents in collections " + Arrays.asList(sourceCollections) + message
-			builder = new CollectionsQueryBatcherBuilder(sourceCollections)
+			message = "documents in collections " + Arrays.asList(this.whereCollections) + message
 		}
 
 		println "Removing " + message

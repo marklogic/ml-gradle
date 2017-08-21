@@ -21,14 +21,13 @@ class RemovePermissionsTask extends DataMovementTask {
 		QueryBatcherBuilder builder = null
 
 		String message = "permissions " + Arrays.asList(permissions) + " from documents "
-		if (project.hasProperty("collections")) {
-			String[] collections = getProject().property("collections").split(",")
-			message += "in collections " + Arrays.asList(collections)
-			builder = new CollectionsQueryBatcherBuilder(collections)
-		} else if (project.hasProperty("uriPattern")) {
-			String pattern = getProject().property("uriPattern")
-			message += "matching URI pattern " + pattern
-			builder = new UriPatternQueryBatcherBuilder(pattern)
+
+		if (hasWhereCollectionsProperty()) {
+			builder = constructBuilderFromWhereCollections()
+			message += "in collections " + Arrays.asList(this.whereCollections)
+		} else if (hasWhereUriPatternProperty()) {
+			builder = constructBuilderFromWhereUriPattern()
+			message += "matching URI pattern " + this.whereUriPattern
 		}
 
 		println "Removing " + message

@@ -27,6 +27,7 @@ import com.marklogic.gradle.task.datamovement.DeleteCollectionsTask
 import com.marklogic.gradle.task.datamovement.RemoveCollectionsTask
 import com.marklogic.gradle.task.datamovement.RemovePermissionsTask
 import com.marklogic.gradle.task.datamovement.SetCollectionsTask
+import com.marklogic.gradle.task.datamovement.SetPermissionsTask
 import com.marklogic.gradle.task.es.GenerateModelArtifactsTask
 import com.marklogic.gradle.task.export.ExportResourcesTask
 import com.marklogic.gradle.task.flexrep.*
@@ -128,7 +129,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlSetContentUpdatesAllowed", type: SetContentUpdatesAllowedTask, group: dbGroup, description: "Sets updated-allowed on each primary forest for the content database; must set the mode via e.g. -Pmode=flash-backup")
 
 		String dmGroup = "ml-Gradle Data Movement"
-		String dmGroupMessage = "; can also set the properties threadCount, batchSize, applyConsistentSnapshot, awaitCompletion, stopJob, " +
+		String dmGroupMessage = "; can also set the properties threadCount, batchSize, applyConsistentSnapshot, " +
 			"jobName, and logBatches to configure how the Data Movement QueryBatcher operates.";
 		project.task("mlAddCollections", type: AddCollectionsTask, group: dmGroup, description: "Add all documents, either in a comma-separated list of " +
 			"collection names specified by the 'whereCollections' property or matching a URI pattern specified by the 'whereUriPattern' property, " +
@@ -147,7 +148,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 			"to all documents either in the set of collection names specified by the 'collections' property or with URIs matching the pattern specified by the 'whereUriPattern' property" + dmGroupMessage)
 		project.task("mlRemovePermissions", type: RemovePermissionsTask, group: dmGroup, description: "Remove permissions, specified as a comma-separated list of roles and capabilities via the 'permissions' property, " +
 			"from all documents either in the set of collection names specified by the 'collections' property or with URIs matching the pattern specified by the 'whereUriPattern' property" + dmGroupMessage)
-		project.task("mlSetPermissions", type: AddPermissionsTask, group: dmGroup, description: "Set permissions, specified as a comma-separated list of roles and capabilities via the 'permissions' property, " +
+		project.task("mlSetPermissions", type: SetPermissionsTask, group: dmGroup, description: "Set permissions, specified as a comma-separated list of roles and capabilities via the 'permissions' property, " +
 			"on all documents in the set of collection names specified by the 'collections' property or with URIs matching the pattern specified by the 'whereUriPattern' property" + dmGroupMessage)
 
 		String devGroup = "ml-gradle Development"

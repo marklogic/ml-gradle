@@ -64,10 +64,9 @@ class DataMovementTask extends MarkLogicTask {
 	 * - threadCount
 	 * - batchSize
 	 * - applyConsistentSnapshot
-	 * - awaitCompletion
-	 * - stopJob
 	 * - jobName
-	 *
+	 * - logBatches
+	 * 
 	 * Can override this method in a subclass to further configure the QueryBatcherTemplate that's returned.
 	 *
 	 * @param client
@@ -84,12 +83,6 @@ class DataMovementTask extends MarkLogicTask {
 		if (project.hasProperty("applyConsistentSnapshot")) {
 			t.setApplyConsistentSnapshot(Boolean.parseBoolean(project.property("applyConsistentSnapshot")))
 		}
-		if (project.hasProperty("awaitCompletion")) {
-			t.setAwaitCompletion(Boolean.parseBoolean(project.property("awaitCompletion")))
-		}
-		if (project.hasProperty("stopJob")) {
-			t.setStopJob(Boolean.parseBoolean(project.property("stopJob")))
-		}
 		if (project.hasProperty("jobName")) {
 			t.setJobName(project.property("jobName"))
 		}
@@ -103,7 +96,7 @@ class DataMovementTask extends MarkLogicTask {
 				}
 			})
 		}
-		
+
 		return t
 	}
 }

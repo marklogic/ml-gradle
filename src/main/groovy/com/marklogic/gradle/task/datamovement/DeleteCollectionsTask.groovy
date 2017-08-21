@@ -8,7 +8,7 @@ class DeleteCollectionsTask extends DataMovementTask {
 	@TaskAction
 	void deleteCollections() {
 		if (!project.hasProperty("collections")) {
-			println "Invalid inputs; " + getDescription()
+			println "Invalid inputs; task description: " + getDescription()
 			return
 		}
 

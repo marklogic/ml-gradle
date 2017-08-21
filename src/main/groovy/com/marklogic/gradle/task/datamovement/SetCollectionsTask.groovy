@@ -13,7 +13,7 @@ class SetCollectionsTask extends DataMovementTask {
 		(!project.hasProperty("whereCollections") && !project.hasProperty("pattern")) ||
 			!project.hasProperty("collections")
 		) {
-			println "Invalid inputs; " + getDescription()
+			println "Invalid inputs; task description: " + getDescription()
 			return;
 		}
 

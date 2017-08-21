@@ -13,7 +13,7 @@ class AddCollectionsTask extends DataMovementTask {
 		(!project.hasProperty("whereCollections") && !project.hasProperty("whereUriPattern")) ||
 			!project.hasProperty("collections")
 		) {
-			println "Invalid inputs; " + getDescription()
+			println "Invalid inputs; task description: " + getDescription()
 			return;
 		}
 

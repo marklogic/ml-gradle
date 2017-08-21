@@ -11,8 +11,8 @@ class RemovePermissionsTask extends DataMovementTask {
 
 	@TaskAction
 	void removePermissions() {
-		if ((!project.hasProperty("collections") && !project.hasProperty("uriPattern")) || !project.hasProperty("permissions")) {
-			println "Invalid input; " + getDescription()
+		if ((!project.hasProperty("whereCollections") && !project.hasProperty("whereUriPattern")) || !project.hasProperty("permissions")) {
+			println "Invalid input; task description: " + getDescription()
 			return;
 		}
 

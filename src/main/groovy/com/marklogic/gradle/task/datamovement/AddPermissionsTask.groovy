@@ -10,7 +10,7 @@ class AddPermissionsTask extends DataMovementTask {
 	@TaskAction
 	void addPermissions() {
 		if ((!project.hasProperty("whereCollections") && !project.hasProperty("whereUriPattern")) || !project.hasProperty("permissions")) {
-			println "Invalid input; " + getDescription()
+			println "Invalid input; task description: " + getDescription()
 			return;
 		}
 

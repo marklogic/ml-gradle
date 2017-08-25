@@ -232,6 +232,18 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		}
 
 		/**
+		 * For any database besides the content database, configure the number of forests per host.
+		 */
+		prop = getProperty("mlForestsPerHost");
+		if (prop != null) {
+			logger.info("Forests per host: " + prop);
+			String[] tokens = prop.split(",");
+			for (int i = 0; i < tokens.length; i += 2) {
+				c.getForestCounts().put(tokens[i], Integer.parseInt(tokens[i + 1]));
+			}
+		}
+
+		/**
 		 * This property can specify a comma-delimited list of database names and replica counts as a simple way of
 		 * setting up forest replicas - e.g. Documents,1,Security,2.
 		 */

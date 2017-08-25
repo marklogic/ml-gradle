@@ -1,6 +1,7 @@
 package com.marklogic.appdeployer;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import com.marklogic.client.DatabaseClientFactory;
@@ -102,6 +103,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    p.setProperty("mlAppServicesSimpleSsl", "true");
 
 	    p.setProperty("mlContentForestsPerHost", "17");
+	    p.setProperty("mlForestsPerHost", "some-db,2,other-db,3");
         p.setProperty("mlModulePermissions", "some-perm,read,some-perm,update");
         p.setProperty("mlAdditionalBinaryExtensions", ".gradle,.properties");
         p.setProperty("mlConfigPath", "src/test/resources/sample-app/empty-ml-config");
@@ -167,6 +169,9 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    assertEquals(DatabaseClientFactory.SSLHostnameVerifier.ANY, config.getAppServicesSslHostnameVerifier());
 
 	    assertEquals((Integer) 17, config.getContentForestsPerHost());
+	    Map<String, Integer> forestCounts = config.getForestCounts();
+	    assertEquals(2, (int)forestCounts.get("some-db"));
+	    assertEquals(3, (int)forestCounts.get("other-db"));
         assertEquals("some-perm,read,some-perm,update", config.getModulePermissions());
         String[] extensions = config.getAdditionalBinaryExtensions();
         assertEquals(".gradle", extensions[0]);

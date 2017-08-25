@@ -7,12 +7,14 @@ import com.marklogic.client.ext.datamovement.CollectionsQueryBatcherBuilder
 import com.marklogic.client.ext.datamovement.QueryBatcherBuilder
 import com.marklogic.client.ext.datamovement.QueryBatcherTemplate
 import com.marklogic.client.ext.datamovement.UriPatternQueryBatcherBuilder
+import com.marklogic.client.ext.datamovement.UrisQueryQueryBatcherBuilder
 import com.marklogic.gradle.task.MarkLogicTask
 
 class DataMovementTask extends MarkLogicTask {
 
 	String whereUriPattern
 	String[] whereCollections
+	String whereUrisQuery
 
 	boolean hasWhereCollectionsProperty() {
 		return project.hasProperty("whereCollections")
@@ -20,6 +22,14 @@ class DataMovementTask extends MarkLogicTask {
 
 	boolean hasWhereUriPatternProperty() {
 		return project.hasProperty("whereUriPattern")
+	}
+
+	boolean hasWhereUrisQueryProperty() {
+		return project.hasProperty("whereUrisQuery")
+	}
+
+	boolean hasWhereSelectorProperty() {
+		return hasWhereCollectionsProperty() || hasWhereUriPatternProperty() || hasWhereUrisQueryProperty()
 	}
 
 	QueryBatcherBuilder constructBuilderFromWhereCollections() {
@@ -32,6 +42,10 @@ class DataMovementTask extends MarkLogicTask {
 		return new UriPatternQueryBatcherBuilder(this.whereUriPattern)
 	}
 
+	QueryBatcherBuilder constructBuilderFromWhereUrisQuery() {
+		this.whereUrisQuery = getProject().property("whereUrisQuery")
+		return new UrisQueryQueryBatcherBuilder(this.whereUrisQuery)
+	}
 	void applyOnCollections(QueryBatchListener listener, String... collections) {
 		DatabaseClient client = newClient()
 		try {
@@ -66,7 +80,7 @@ class DataMovementTask extends MarkLogicTask {
 	 * - applyConsistentSnapshot
 	 * - jobName
 	 * - logBatches
-	 * 
+	 *
 	 * Can override this method in a subclass to further configure the QueryBatcherTemplate that's returned.
 	 *
 	 * @param client

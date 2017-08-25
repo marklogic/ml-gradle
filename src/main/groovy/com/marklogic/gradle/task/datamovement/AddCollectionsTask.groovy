@@ -9,10 +9,7 @@ class AddCollectionsTask extends DataMovementTask {
 
 	@TaskAction
 	void addCollections() {
-		if (
-		(!project.hasProperty("whereCollections") && !project.hasProperty("whereUriPattern")) ||
-			!project.hasProperty("collections")
-		) {
+		if (!hasWhereSelectorProperty() || !project.hasProperty("collections")) {
 			println "Invalid inputs; task description: " + getDescription()
 			return;
 		}
@@ -25,14 +22,17 @@ class AddCollectionsTask extends DataMovementTask {
 
 		if (hasWhereCollectionsProperty()) {
 			builder = constructBuilderFromWhereCollections()
-			message = "documents in collections " + Arrays.asList(this.whereCollections) + message
+			message = "in collections " + Arrays.asList(this.whereCollections) + message
 		} else if (hasWhereUriPatternProperty()) {
 			builder = constructBuilderFromWhereUriPattern()
-			message = "documents matching URI pattern " + this.whereUriPattern + message
+			message = "matching URI pattern " + this.whereUriPattern + message
+		} else if (hasWhereUrisQueryProperty()) {
+			builder = constructBuilderFromWhereUrisQuery()
+			message = "matching URIs query " + this.whereUrisQuery + message
 		}
 
-		println "Adding " + message
+		println "Adding documents " + message
 		applyWithQueryBatcherBuilder(listener, builder)
-		println "Finished adding " + message
+		println "Finished adding documents " + message
 	}
 }

@@ -27,7 +27,11 @@ class RemoveCollectionsTask extends DataMovementTask {
 
 		if (hasWhereUriPatternProperty()) {
 			builder = constructBuilderFromWhereUriPattern()
-			message = "documents matching URI pattern " + this.whereUriPattern + message
+			message = "matching URI pattern " + this.whereUriPattern + message
+		}
+		else if (hasWhereUrisQueryProperty()) {
+			builder = constructBuilderFromWhereUrisQuery()
+			message = "matching URIs query " + this.whereUrisQuery + message
 		}
 		else {
 			if (hasWhereCollectionsProperty()) {
@@ -36,11 +40,11 @@ class RemoveCollectionsTask extends DataMovementTask {
 				this.whereCollections = collections
 				builder = new CollectionsQueryBatcherBuilder(this.whereCollections)
 			}
-			message = "documents in collections " + Arrays.asList(this.whereCollections) + message
+			message = "in collections " + Arrays.asList(this.whereCollections) + message
 		}
 
-		println "Removing " + message
+		println "Removing documents " + message
 		applyWithQueryBatcherBuilder(listener, builder)
-		println "Finished removing " + message
+		println "Finished removing documents " + message
 	}
 }

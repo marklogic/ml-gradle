@@ -11,7 +11,7 @@ class RemovePermissionsTask extends DataMovementTask {
 
 	@TaskAction
 	void removePermissions() {
-		if ((!project.hasProperty("whereCollections") && !project.hasProperty("whereUriPattern")) || !project.hasProperty("permissions")) {
+		if (!hasWhereSelectorProperty() || !project.hasProperty("permissions")) {
 			println "Invalid input; task description: " + getDescription()
 			return;
 		}
@@ -28,6 +28,9 @@ class RemovePermissionsTask extends DataMovementTask {
 		} else if (hasWhereUriPatternProperty()) {
 			builder = constructBuilderFromWhereUriPattern()
 			message += "matching URI pattern " + this.whereUriPattern
+		} else if (hasWhereUrisQueryProperty()) {
+			builder = constructBuilderFromWhereUrisQuery()
+			message += "matching URIs query " + this.whereUrisQuery
 		}
 
 		println "Removing " + message

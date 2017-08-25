@@ -9,10 +9,7 @@ class SetCollectionsTask extends DataMovementTask {
 
 	@TaskAction
 	void setCollections() {
-		if (
-		(!project.hasProperty("whereCollections") && !project.hasProperty("pattern")) ||
-			!project.hasProperty("collections")
-		) {
+		if (!hasWhereSelectorProperty() || !project.hasProperty("collections")) {
 			println "Invalid inputs; task description: " + getDescription()
 			return;
 		}
@@ -21,18 +18,21 @@ class SetCollectionsTask extends DataMovementTask {
 		QueryBatchListener listener = new SetCollectionsListener(collections)
 		QueryBatcherBuilder builder = null
 
-		String message = " collections " + Arrays.asList(collections);
+		String message = " collections " + Arrays.asList(collections) + " on documents ";
 
 		if (hasWhereCollectionsProperty()) {
 			builder = constructBuilderFromWhereCollections()
-			message += " on documents in collections " + Arrays.asList(this.whereCollections)
+			message += "in collections " + Arrays.asList(this.whereCollections)
 		} else if (hasWhereUriPatternProperty()) {
 			builder = constructBuilderFromWhereUriPattern()
-			message += " on documents matching URI pattern " + this.whereUriPattern
+			message += "matching URI pattern " + this.whereUriPattern
+		} else if (hasWhereUrisQueryProperty()) {
+			builder = constructBuilderFromWhereUrisQuery()
+			message += "matching URIs query " + this.whereUrisQuery
 		}
 
-		println "Setting " + message
+		println "Setting" + message
 		applyWithQueryBatcherBuilder(listener, builder)
-		println "Finished setting " + message
+		println "Finished setting" + message
 	}
 }

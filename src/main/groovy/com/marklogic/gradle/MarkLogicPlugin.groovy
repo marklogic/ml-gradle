@@ -132,24 +132,24 @@ class MarkLogicPlugin implements Plugin<Project> {
 		String dmGroupMessage = "; can also set the properties threadCount, batchSize, applyConsistentSnapshot, " +
 			"jobName, and logBatches to configure how the Data Movement QueryBatcher operates.";
 		project.task("mlAddCollections", type: AddCollectionsTask, group: dmGroup, description: "Add all documents, either in a comma-separated list of " +
-			"collection names specified by the 'whereCollections' property or matching a URI pattern specified by the 'whereUriPattern' property, " +
+			"collection names specified by the 'whereCollections' property or matching a URI pattern specified by the 'whereUriPattern' property or matching a URIs query specified by the 'whereUrisQuery' property, " +
 			"to a comma-separated list of collection names specified by the 'collections' property" + dmGroupMessage)
 		project.task("mlDeleteCollections", type: DeleteCollectionsTask, group: dmGroup, description: "Delete all documents in a comma-separated list of " +
 			"collection names specified by the 'collections' property" + dmGroupMessage)
 		project.task("mlRemoveCollections", type: RemoveCollectionsTask, group: dmGroup, description: "Remove all documents, either in a comma-separated list of " +
-			"collection names specified by the 'whereCollections' property or matching a URI pattern specified by the 'whereUriPattern' property, " +
+			"collection names specified by the 'whereCollections' property or matching a URI pattern specified by the 'whereUriPattern' property or matching a URIs query specified by the 'whereUrisQuery' property, " +
 			"from a comma-separated list of collection names specified by the 'collections' property; " +
 			"if the values of 'whereCollections' and 'collections' are the same, you only need to specify the 'collections' property" + dmGroupMessage)
 		project.task("mlSetCollections", type: SetCollectionsTask, group: dmGroup, description: "Set collections on all documents, either in a comma-separated list of " +
-			"collection names specified by the 'whereCollections' property or matching a URI pattern specified by the 'whereUriPattern' property, " +
+			"collection names specified by the 'whereCollections' property or matching a URI pattern specified by the 'whereUriPattern' property or matching a URIs query specified by the 'whereUrisQuery' property, " +
 			"to a comma-separated list of collection names specified by the 'collections' property" + dmGroupMessage)
 
 		project.task("mlAddPermissions", type: AddPermissionsTask, group: dmGroup, description: "Add permissions, specified as a comma-separated list of roles and capabilities via the 'permissions' property, " +
-			"to all documents either in the set of collection names specified by the 'collections' property or with URIs matching the pattern specified by the 'whereUriPattern' property" + dmGroupMessage)
+			"to all documents either in the set of collection names specified by the 'collections' property or with URIs matching the pattern specified by the 'whereUriPattern' property or matching a URIs query specified by the 'whereUrisQuery' property" + dmGroupMessage)
 		project.task("mlRemovePermissions", type: RemovePermissionsTask, group: dmGroup, description: "Remove permissions, specified as a comma-separated list of roles and capabilities via the 'permissions' property, " +
-			"from all documents either in the set of collection names specified by the 'collections' property or with URIs matching the pattern specified by the 'whereUriPattern' property" + dmGroupMessage)
+			"from all documents either in the set of collection names specified by the 'collections' property or with URIs matching the pattern specified by the 'whereUriPattern' property or matching a URIs query specified by the 'whereUrisQuery' property" + dmGroupMessage)
 		project.task("mlSetPermissions", type: SetPermissionsTask, group: dmGroup, description: "Set permissions, specified as a comma-separated list of roles and capabilities via the 'permissions' property, " +
-			"on all documents in the set of collection names specified by the 'collections' property or with URIs matching the pattern specified by the 'whereUriPattern' property" + dmGroupMessage)
+			"on all documents in the set of collection names specified by the 'collections' property or with URIs matching the pattern specified by the 'whereUriPattern' property or matching a URIs query specified by the 'whereUrisQuery' property" + dmGroupMessage)
 
 		String devGroup = "ml-gradle Development"
 		project.task("mlCreateResource", type: CreateResourceTask, group: devGroup, description: "Create a new resource extension in the modules services directory; use -PresourceName and -PresourceType to set the resource name and type (either xqy or sjs)")

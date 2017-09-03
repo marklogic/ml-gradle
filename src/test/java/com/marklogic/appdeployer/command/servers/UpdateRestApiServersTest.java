@@ -6,7 +6,7 @@ import org.junit.Test;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.appservers.UpdateRestApiServersCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
-import com.marklogic.mgmt.appservers.ServerManager;
+import com.marklogic.mgmt.resource.appservers.ServerManager;
 import com.marklogic.rest.util.Fragment;
 
 public class UpdateRestApiServersTest extends AbstractAppDeployerTest {

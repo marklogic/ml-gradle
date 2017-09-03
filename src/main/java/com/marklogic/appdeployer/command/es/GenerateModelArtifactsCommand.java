@@ -6,9 +6,9 @@ import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand;
 import com.marklogic.client.DatabaseClient;
-import com.marklogic.client.es.CodeGenerationRequest;
-import com.marklogic.client.es.EntityServicesManager;
-import com.marklogic.client.es.GeneratedCode;
+import com.marklogic.client.ext.es.CodeGenerationRequest;
+import com.marklogic.client.ext.es.EntityServicesManager;
+import com.marklogic.client.ext.es.GeneratedCode;
 import org.springframework.util.FileCopyUtils;
 
 import java.io.File;

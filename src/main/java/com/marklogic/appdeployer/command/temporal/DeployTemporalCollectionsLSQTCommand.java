@@ -3,7 +3,7 @@ package com.marklogic.appdeployer.command.temporal;
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.*;
-import com.marklogic.mgmt.temporal.TemporalCollectionLSQTManager;
+import com.marklogic.mgmt.resource.temporal.TemporalCollectionLSQTManager;
 
 import java.io.File;
 

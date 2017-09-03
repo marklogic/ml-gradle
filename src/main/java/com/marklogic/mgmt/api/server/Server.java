@@ -1,9 +1,9 @@
 package com.marklogic.mgmt.api.server;
 
-import com.marklogic.mgmt.ResourceManager;
+import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.Resource;
-import com.marklogic.mgmt.appservers.ServerManager;
+import com.marklogic.mgmt.resource.appservers.ServerManager;
 
 public class Server extends Resource {
 

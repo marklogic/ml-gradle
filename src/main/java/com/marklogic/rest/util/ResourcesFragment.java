@@ -5,6 +5,8 @@ import java.util.List;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 
+import java.util.List;
+
 /**
  * Provides some convenience methods for the XML response from resources endpoints
  */

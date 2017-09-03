@@ -1,6 +1,7 @@
 package com.marklogic.appdeployer;
 
 import com.marklogic.client.DatabaseClientFactory;
+import com.marklogic.client.ext.SecurityContextType;
 import com.marklogic.mgmt.util.PropertySource;
 import com.marklogic.mgmt.util.PropertySourceFactory;
 
@@ -8,6 +9,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class DefaultAppConfigFactory extends PropertySourceFactory implements AppConfigFactory {
 
@@ -67,6 +69,12 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			c.setSchemasPath(prop);
 		}
 
+		prop = getProperty("mlSchemasDatabaseName");
+		if (prop != null) {
+			logger.info("Schemas database name: " + prop);
+			c.setSchemasDatabaseName(prop);
+		}
+
 		/**
 		 * Defines the MarkLogic host that requests should be sent to. Defaults to localhost.
 		 */
@@ -98,6 +106,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		if (prop != null) {
 			logger.info("App REST authentication: " + prop);
 			c.setRestAuthentication(DatabaseClientFactory.Authentication.valueOfUncased(prop));
+			c.setRestSecurityContextType(SecurityContextType.valueOf(prop.toUpperCase()));
 		}
 
 		/**
@@ -138,6 +147,24 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			c.setRestAdminPassword(mlPassword);
 		}
 
+		prop = getProperty("mlRestCertFile");
+		if (prop != null) {
+			logger.info("REST cert file: " + prop);
+			c.setRestCertFile(prop);
+		}
+
+		prop = getProperty("mlRestCertPassword");
+		if (prop != null) {
+			logger.info("REST cert password: " + prop);
+			c.setRestCertPassword(prop);
+		}
+
+		prop = getProperty("mlRestExternalName");
+		if (prop != null) {
+			logger.info("REST external name: " + prop);
+			c.setRestExternalName(prop);
+		}
+
 		/**
 		 * The username and password for a ML user with the rest-admin role that is used for e.g. loading
 		 * non-REST API modules via the App Services client REST API, which is defined by the appServicesPort.
@@ -165,6 +192,36 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			c.setAppServicesPassword(mlPassword);
 		}
 
+		prop = getProperty("mlAppServicesAuthentication");
+		if (prop != null) {
+			logger.info("App Services authentication: " + prop);
+			c.setAppServicesSecurityContextType(SecurityContextType.valueOf(prop.toUpperCase()));
+			c.setAppServicesAuthentication(DatabaseClientFactory.Authentication.valueOfUncased(prop));
+		}
+
+		prop = getProperty("mlAppServicesCertFile");
+		if (prop != null) {
+			logger.info("App Services cert file: " + prop);
+			c.setAppServicesCertFile(prop);
+		}
+
+		prop = getProperty("mlAppServicesCertPassword");
+		if (prop != null) {
+			logger.info("App Services cert password: " + prop);
+			c.setAppServicesCertPassword(prop);
+		}
+
+		prop = getProperty("mlAppServicesExternalName");
+		if (prop != null) {
+			logger.info("App Services external name: " + prop);
+			c.setAppServicesExternalName(prop);
+		}
+
+		if (getProperty("mlAppServicesSimpleSsl") != null) {
+			logger.info("Using simple SSL context and 'ANY' hostname verifier for authenticating against the App-Services server");
+			c.setAppServicesSimpleSslConfig();
+		}
+
 		/**
 		 * When a content database is created, this property can be used to control the number of forests per host for
 		 * that database.
@@ -173,6 +230,18 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		if (prop != null) {
 			logger.info("Content forests per host: " + prop);
 			c.setContentForestsPerHost(Integer.parseInt(prop));
+		}
+
+		/**
+		 * For any database besides the content database, configure the number of forests per host.
+		 */
+		prop = getProperty("mlForestsPerHost");
+		if (prop != null) {
+			logger.info("Forests per host: " + prop);
+			String[] tokens = prop.split(",");
+			for (int i = 0; i < tokens.length; i += 2) {
+				c.getForestCounts().put(tokens[i], Integer.parseInt(tokens[i + 1]));
+			}
 		}
 
 		/**
@@ -430,6 +499,18 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			String[] values = prop.split(",");
 			logger.info("Ignoring resource filenames: " + Arrays.asList(values));
 			c.setResourceFilenamesToIgnore(values);
+		}
+
+		prop = getProperty("mlResourceFilenamesToExcludeRegex");
+		if (prop != null) {
+			logger.info("Excluding resource filenames matching regex: " + prop);
+			c.setResourceFilenamesExcludePattern(Pattern.compile(prop));
+		}
+
+		prop = getProperty("mlResourceFilenamesToIncludeRegex");
+		if (prop != null) {
+			logger.info("Including resource filenames matching regex: " + prop);
+			c.setResourceFilenamesIncludePattern(Pattern.compile(prop));
 		}
 
 		/**

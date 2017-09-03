@@ -2,7 +2,7 @@ package com.marklogic.appdeployer.command.tasks;
 
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
-import com.marklogic.mgmt.tasks.TaskManager;
+import com.marklogic.mgmt.resource.tasks.TaskManager;
 
 public class WaitForTaskServerCommand extends AbstractCommand {
 

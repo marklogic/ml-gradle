@@ -60,6 +60,12 @@ public class DefaultManageConfigFactory extends PropertySourceFactory implements
 		    c.setScheme(prop);
 	    }
 
+	    prop = getProperty("mlManageSimpleSsl");
+	    if (prop != null) {
+		    logger.info("Use simple SSL for Manage app server: " + prop);
+		    c.setConfigureSimpleSsl(Boolean.parseBoolean(prop));
+	    }
+
 	    prop = getProperty("mlAdminUsername");
         if (prop != null) {
             logger.info("Manage admin username: " + prop);
@@ -79,6 +85,24 @@ public class DefaultManageConfigFactory extends PropertySourceFactory implements
         } else {
             c.setAdminPassword(c.getPassword());
         }
+
+	    prop = getProperty("mlAdminPort");
+	    if (prop != null) {
+		    logger.info("Admin port: " + prop);
+		    c.setAdminPort(Integer.parseInt(prop));
+	    }
+
+	    prop = getProperty("mlAdminScheme");
+	    if (prop != null) {
+		    logger.info("Admin scheme: " + prop);
+		    c.setAdminScheme(prop);
+	    }
+
+	    prop = getProperty("mlAdminSimpleSsl");
+	    if (prop != null) {
+		    logger.info("Use simple SSL for Admin app server: " + prop);
+		    c.setAdminConfigureSimpleSsl(Boolean.parseBoolean(prop));
+	    }
 
         return c;
     }

@@ -5,8 +5,8 @@ import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.temporal.TemporalAxesManager;
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.temporal.TemporalAxesManager;
 
 import java.io.File;
 

@@ -1,13 +1,13 @@
 package com.marklogic.appdeployer.command.mimetypes;
 
-import java.io.File;
-
 import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
-import com.marklogic.mgmt.ResourceManager;
+import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.SaveReceipt;
-import com.marklogic.mgmt.mimetypes.MimetypeManager;
+import com.marklogic.mgmt.resource.mimetypes.MimetypeManager;
+
+import java.io.File;
 
 public class DeployMimetypesCommand extends AbstractResourceCommand {
 

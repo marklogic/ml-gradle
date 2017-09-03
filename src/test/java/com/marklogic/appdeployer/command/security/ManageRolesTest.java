@@ -7,9 +7,9 @@ import org.junit.Test;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.security.PrivilegeManager;
-import com.marklogic.mgmt.security.RoleManager;
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.security.PrivilegeManager;
+import com.marklogic.mgmt.resource.security.RoleManager;
 import com.marklogic.rest.util.Fragment;
 
 public class ManageRolesTest extends AbstractManageResourceTest {

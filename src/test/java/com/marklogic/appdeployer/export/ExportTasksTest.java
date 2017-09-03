@@ -1,10 +1,9 @@
 package com.marklogic.appdeployer.export;
 
 import com.marklogic.appdeployer.command.tasks.DeployScheduledTasksCommand;
-import com.marklogic.mgmt.selector.MapResourceSelection;
 import com.marklogic.mgmt.selector.PrefixResourceSelector;
 import com.marklogic.mgmt.selector.ResourceSelection;
-import com.marklogic.mgmt.tasks.TaskManager;
+import com.marklogic.mgmt.resource.tasks.TaskManager;
 import org.junit.After;
 import org.junit.Test;
 

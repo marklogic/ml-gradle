@@ -8,10 +8,10 @@ import com.marklogic.appdeployer.export.security.PrivilegeExporter;
 import com.marklogic.appdeployer.export.security.RoleExporter;
 import com.marklogic.appdeployer.export.security.UserExporter;
 import com.marklogic.appdeployer.export.tasks.TaskExporter;
+import com.marklogic.client.ext.helper.LoggingObject;
+import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.selector.ResourceSelection;
 import com.marklogic.mgmt.selector.ResourceSelector;
-import com.marklogic.client.helper.LoggingObject;
-import com.marklogic.mgmt.ManageClient;
 
 import java.io.File;
 

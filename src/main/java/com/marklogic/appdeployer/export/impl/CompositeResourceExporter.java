@@ -3,7 +3,7 @@ package com.marklogic.appdeployer.export.impl;
 import com.marklogic.appdeployer.export.ExportedResources;
 import com.marklogic.appdeployer.export.ResourceExporter;
 import com.marklogic.appdeployer.export.impl.AbstractResourceExporter;
-import com.marklogic.client.helper.LoggingObject;
+import com.marklogic.client.ext.helper.LoggingObject;
 
 import java.io.File;
 import java.util.ArrayList;

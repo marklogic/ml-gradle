@@ -7,8 +7,8 @@ import com.marklogic.appdeployer.command.Command;
 import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.alert.AlertConfigManager;
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.alert.AlertConfigManager;
 
 public class ManageAlertConfigsTest extends AbstractManageResourceTest {
 

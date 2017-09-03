@@ -5,8 +5,8 @@ import com.marklogic.appdeployer.export.impl.AbstractNamedResourceExporter;
 import com.marklogic.appdeployer.export.impl.ExportInputs;
 import com.marklogic.appdeployer.export.impl.SimpleExportInputs;
 import com.marklogic.mgmt.ManageClient;
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.security.PrivilegeManager;
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.security.PrivilegeManager;
 
 import java.io.File;
 import java.util.Arrays;

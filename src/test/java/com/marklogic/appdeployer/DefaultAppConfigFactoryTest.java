@@ -1,9 +1,11 @@
 package com.marklogic.appdeployer;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import com.marklogic.client.DatabaseClientFactory;
+import com.marklogic.client.ext.SecurityContextType;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -78,27 +80,41 @@ public class DefaultAppConfigFactoryTest extends Assert {
         Properties p = new Properties();
         p.setProperty("mlHost", "prophost");
         p.setProperty("mlAppName", "propname");
-        p.setProperty("mlRestPort", "4321");
         p.setProperty("mlNoRestServer", "true");
-        p.setProperty("mlTestRestPort", "8765");
         p.setProperty("mlUsername", "propuser1");
         p.setProperty("mlPassword", "proppassword");
+
+	    p.setProperty("mlRestPort", "4321");
+	    p.setProperty("mlTestRestPort", "8765");
         p.setProperty("mlRestAdminUsername", "propuser2");
         p.setProperty("mlRestAdminPassword", "proppassword2");
-        p.setProperty("mlRestAuthentication", "basic");
-        p.setProperty("mlContentForestsPerHost", "17");
+        p.setProperty("mlRestAuthentication", "certiFicate");
+        p.setProperty("mlRestCertFile", "restCertFile");
+        p.setProperty("mlRestCertPassword", "restCertPassword");
+        p.setProperty("mlRestExternalName", "restExternalName");
+
+	    p.setProperty("mlAppServicesUsername", "appServicesUsername");
+	    p.setProperty("mlAppServicesPassword", "appServicesPassword");
+	    p.setProperty("mlAppServicesPort", "8123");
+	    p.setProperty("mlAppServicesAuthentication", "kerBEROS");
+	    p.setProperty("mlAppServicesCertFile", "appServicesCertFile");
+	    p.setProperty("mlAppServicesCertPassword", "appServicesCertPassword");
+	    p.setProperty("mlAppServicesExternalName", "appServicesExternalName");
+	    p.setProperty("mlAppServicesSimpleSsl", "true");
+
+	    p.setProperty("mlContentForestsPerHost", "17");
+	    p.setProperty("mlForestsPerHost", "some-db,2,other-db,3");
         p.setProperty("mlModulePermissions", "some-perm,read,some-perm,update");
         p.setProperty("mlAdditionalBinaryExtensions", ".gradle,.properties");
         p.setProperty("mlConfigPath", "src/test/resources/sample-app/empty-ml-config");
         p.setProperty("mlSimpleSsl", "anyvalue");
         p.setProperty("mlContentDatabaseName", "my-content-db");
         p.setProperty("mlModulesDatabaseName", "my-modules");
+        p.setProperty("mlSchemasDatabaseName", "my-schemas-db");
+        p.setProperty("mlSchemasPath", "/my/schemas");
 	    p.setProperty("mlDeleteForests", "false");
         p.setProperty("mlDeleteReplicas", "false");
         p.setProperty("mlGroupName", "other-group");
-        p.setProperty("mlAppServicesUsername", "appServicesUsername");
-        p.setProperty("mlAppServicesPassword", "appServicesPassword");
-        p.setProperty("mlAppServicesPort", "8123");
         p.setProperty("mlReplaceTokensInModules", "false");
         p.setProperty("mlUseRoxyTokenPrefix", "false");
         p.setProperty("mlModulePaths", "path1,path2,path3");
@@ -113,7 +129,10 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    p.setProperty("mlGenerateSchema", "false");
 	    p.setProperty("mlGenerateSearchOptions", "false");
 	    p.setProperty("mlGenerateExtractionTemplate", "false");
+
 	    p.setProperty("mlResourceFilenamesToIgnore", "role1.json,role2.xml");
+	    p.setProperty("mlResourceFilenamesToExcludeRegex", "dev-.*");
+	    p.setProperty("mlResourceFilenamesToIncludeRegex", "qa-.*");
 
 	    p.setProperty("mlDatabaseNamesAndReplicaCounts", "Documents,1,Security,2");
 	    p.setProperty("mlReplicaForestDataDirectory", "/var/data");
@@ -127,13 +146,35 @@ public class DefaultAppConfigFactoryTest extends Assert {
 
         assertEquals("prophost", config.getHost());
         assertEquals("propname", config.getName());
-        assertEquals((Integer) 4321, config.getRestPort());
         assertTrue(config.isNoRestServer());
-        assertEquals((Integer) 8765, config.getTestRestPort());
+
+        // REST server connection properties
+	    assertEquals((Integer) 4321, config.getRestPort());
+	    assertEquals((Integer) 8765, config.getTestRestPort());
         assertEquals("propuser2", config.getRestAdminUsername());
         assertEquals("proppassword2", config.getRestAdminPassword());
-        assertEquals(DatabaseClientFactory.Authentication.BASIC, config.getRestAuthentication());
-        assertEquals((Integer) 17, config.getContentForestsPerHost());
+	    assertEquals(DatabaseClientFactory.Authentication.CERTIFICATE, config.getRestAuthentication());
+        assertEquals(SecurityContextType.CERTIFICATE, config.getRestSecurityContextType());
+        assertEquals("restCertFile", config.getRestCertFile());
+        assertEquals("restCertPassword", config.getRestCertPassword());
+        assertEquals("restExternalName", config.getRestExternalName());
+
+        // App-Services server connection properties
+	    assertEquals("appServicesUsername", config.getAppServicesUsername());
+	    assertEquals("appServicesPassword", config.getAppServicesPassword());
+	    assertEquals((Integer) 8123, config.getAppServicesPort());
+	    assertEquals(DatabaseClientFactory.Authentication.KERBEROS, config.getAppServicesAuthentication());
+	    assertEquals(SecurityContextType.KERBEROS, config.getAppServicesSecurityContextType());
+	    assertEquals("appServicesCertFile", config.getAppServicesCertFile());
+	    assertEquals("appServicesCertPassword", config.getAppServicesCertPassword());
+	    assertEquals("appServicesExternalName", config.getAppServicesExternalName());
+	    assertNotNull(config.getAppServicesSslContext());
+	    assertEquals(DatabaseClientFactory.SSLHostnameVerifier.ANY, config.getAppServicesSslHostnameVerifier());
+
+	    assertEquals((Integer) 17, config.getContentForestsPerHost());
+	    Map<String, Integer> forestCounts = config.getForestCounts();
+	    assertEquals(2, (int)forestCounts.get("some-db"));
+	    assertEquals(3, (int)forestCounts.get("other-db"));
         assertEquals("some-perm,read,some-perm,update", config.getModulePermissions());
         String[] extensions = config.getAdditionalBinaryExtensions();
         assertEquals(".gradle", extensions[0]);
@@ -143,12 +184,11 @@ public class DefaultAppConfigFactoryTest extends Assert {
         assertNotNull(config.getRestSslHostnameVerifier());
         assertEquals("my-content-db", config.getContentDatabaseName());
         assertEquals("my-modules", config.getModulesDatabaseName());
+        assertEquals("my-schemas-db", config.getSchemasDatabaseName());
+        assertEquals("/my/schemas", config.getSchemasPath());
 	    assertFalse(config.isDeleteForests());
         assertFalse(config.isDeleteReplicas());
         assertEquals("other-group", config.getGroupName());
-        assertEquals("appServicesUsername", config.getAppServicesUsername());
-        assertEquals("appServicesPassword", config.getAppServicesPassword());
-        assertEquals((Integer) 8123, config.getAppServicesPort());
         assertFalse(config.isReplaceTokensInModules());
         assertFalse(config.isUseRoxyTokenPrefix());
         assertTrue(config.isDeleteTestModules());
@@ -171,6 +211,8 @@ public class DefaultAppConfigFactoryTest extends Assert {
 
         assertEquals("role1.json", config.getResourceFilenamesToIgnore()[0]);
 	    assertEquals("role2.xml", config.getResourceFilenamesToIgnore()[1]);
+	    assertEquals("dev-.*", config.getResourceFilenamesExcludePattern().pattern());
+	    assertEquals("qa-.*", config.getResourceFilenamesIncludePattern().pattern());
 
 	    assertEquals("Documents,1,Security,2", config.getDatabaseNamesAndReplicaCounts());
 	    assertEquals("/var/data", config.getReplicaForestDataDirectory());

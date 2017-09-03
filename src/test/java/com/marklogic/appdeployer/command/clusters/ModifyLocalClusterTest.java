@@ -1,7 +1,7 @@
 package com.marklogic.appdeployer.command.clusters;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.mgmt.clusters.ClusterManager;
+import com.marklogic.mgmt.resource.clusters.ClusterManager;
 import org.junit.Test;
 
 import java.io.File;
@@ -13,7 +13,7 @@ public class ModifyLocalClusterTest extends AbstractAppDeployerTest {
 		final String sslFipsXpath = "/node()/node()[local-name(.) = 'ssl-fips-enabled']";
 
 		ClusterManager mgr = new ClusterManager(manageClient);
-	
+
 		String originalSslFipsEnabled = mgr.getLocalClusterProperties().getElementValue(sslFipsXpath);
 
 		/**

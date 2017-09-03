@@ -3,7 +3,7 @@ package com.marklogic.appdeployer.command.security;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
-import com.marklogic.mgmt.security.CertificateTemplateManager;
+import com.marklogic.mgmt.resource.security.CertificateTemplateManager;
 
 public class GenerateTemporaryCertificateCommand extends AbstractCommand {
 

@@ -1,23 +1,11 @@
-buildscript {
-	repositories {
-		jcenter()
-	}
-	dependencies {
-		// For dependency license report
-		classpath "com.smokejumperit.gradle.license:Gradle-License-Report:0.0.2"
-	}
-}
-
 plugins {
   id "java"
   id "maven-publish"
   id "eclipse"
   id "idea"
   id "com.jfrog.bintray" version "1.5"
+	id "com.github.jk1.dependency-license-report" version "0.3.11"
 }
-
-// gradle dependencyLicenseReport to generate your report in build/reports/dependency-license
-apply plugin:'license-report'
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
@@ -33,11 +21,13 @@ dependencies {
   compile 'org.apache.httpcomponents:httpclient:4.3.5'
   compile 'org.springframework:spring-web:4.3.5.RELEASE'
 
-  testCompile ('com.marklogic:ml-junit:2.6.0') {
-    exclude module: "ml-javaclient-util"
-  }
-
+  testCompile ('com.marklogic:ml-junit:3.0-alpha1')
   testCompile('commons-io:commons-io:2.5')
+
+	// Forcing Spring to use logback instead of commons-logging
+	runtime "ch.qos.logback:logback-classic:1.1.8"
+	runtime group: "org.slf4j", name: "jcl-over-slf4j", version: "1.7.22"
+	runtime group: "org.slf4j", name: "slf4j-api", version: "1.7.22"
 }
 
 // This ensures that Gradle includes in the published jar any non-java files under src/main/java

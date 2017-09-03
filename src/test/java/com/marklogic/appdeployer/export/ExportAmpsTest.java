@@ -5,7 +5,7 @@ import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.security.Amp;
 import com.marklogic.mgmt.mapper.DefaultResourceMapper;
 import com.marklogic.mgmt.mapper.ResourceMapper;
-import com.marklogic.mgmt.security.AmpManager;
+import com.marklogic.mgmt.resource.security.AmpManager;
 import com.marklogic.mgmt.selector.PropertiesResourceSelector;
 import com.marklogic.mgmt.selector.RegexResourceSelector;
 import com.marklogic.mgmt.selector.ResourceSelector;

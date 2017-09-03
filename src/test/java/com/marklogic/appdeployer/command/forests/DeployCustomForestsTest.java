@@ -3,7 +3,7 @@ package com.marklogic.appdeployer.command.forests;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
-import com.marklogic.mgmt.forests.ForestManager;
+import com.marklogic.mgmt.resource.forests.ForestManager;
 import org.junit.After;
 import org.junit.Test;
 

@@ -1,21 +1,16 @@
 package com.marklogic.mgmt.api;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.marklogic.client.DatabaseClient;
-import com.marklogic.client.DatabaseClientFactory;
-import com.marklogic.client.DatabaseClientFactory.Authentication;
-import com.marklogic.client.helper.ClientHelper;
-import com.marklogic.client.helper.LoggingObject;
 import com.marklogic.appdeployer.DefaultAppConfigFactory;
+import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.ext.helper.ClientHelper;
+import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.mgmt.DefaultManageConfigFactory;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.ManageConfig;
-import com.marklogic.mgmt.ResourceManager;
 import com.marklogic.mgmt.admin.AdminConfig;
 import com.marklogic.mgmt.admin.AdminManager;
 import com.marklogic.mgmt.api.cluster.Cluster;
@@ -23,27 +18,20 @@ import com.marklogic.mgmt.api.database.Database;
 import com.marklogic.mgmt.api.forest.Forest;
 import com.marklogic.mgmt.api.group.Group;
 import com.marklogic.mgmt.api.restapi.RestApi;
-import com.marklogic.mgmt.api.security.Amp;
-import com.marklogic.mgmt.api.security.ExternalSecurity;
-import com.marklogic.mgmt.api.security.Privilege;
-import com.marklogic.mgmt.api.security.ProtectedCollection;
-import com.marklogic.mgmt.api.security.Role;
-import com.marklogic.mgmt.api.security.User;
+import com.marklogic.mgmt.api.security.*;
 import com.marklogic.mgmt.api.server.Server;
 import com.marklogic.mgmt.api.task.Task;
-import com.marklogic.mgmt.appservers.ServerManager;
-import com.marklogic.mgmt.databases.DatabaseManager;
-import com.marklogic.mgmt.forests.ForestManager;
-import com.marklogic.mgmt.groups.GroupManager;
-import com.marklogic.mgmt.security.AmpManager;
-import com.marklogic.mgmt.security.ExternalSecurityManager;
-import com.marklogic.mgmt.security.PrivilegeManager;
-import com.marklogic.mgmt.security.ProtectedCollectionsManager;
-import com.marklogic.mgmt.security.RoleManager;
-import com.marklogic.mgmt.security.UserManager;
-import com.marklogic.mgmt.tasks.TaskManager;
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.appservers.ServerManager;
+import com.marklogic.mgmt.resource.databases.DatabaseManager;
+import com.marklogic.mgmt.resource.forests.ForestManager;
+import com.marklogic.mgmt.resource.groups.GroupManager;
+import com.marklogic.mgmt.resource.security.*;
+import com.marklogic.mgmt.resource.tasks.TaskManager;
 import com.marklogic.mgmt.util.SimplePropertySource;
 import com.marklogic.mgmt.util.SystemPropertySource;
+
+import java.io.IOException;
 
 /**
  * Big facade-style class for the MarkLogic Management API. Use this to instantiate or access any resource, as it will
@@ -78,6 +66,7 @@ public class API extends LoggingObject {
 		    ManageConfig mc = manageClient.getManageConfig();
 		    if (mc.getAdminUsername() != null && mc.getAdminPassword() != null) {
 			    AdminConfig ac = new AdminConfig(mc.getHost(), 8001, mc.getAdminUsername(), mc.getAdminPassword());
+			    ac.setConfigureSimpleSsl(mc.isAdminConfigureSimpleSsl());
 			    this.adminManager = new AdminManager(ac);
 		    }
 	    }
@@ -102,8 +91,29 @@ public class API extends LoggingObject {
      * @param host
      */
     public void connect(String host) {
-        ManageConfig mc = this.manageClient.getManageConfig();
-        connect(host, mc.getUsername(), mc.getPassword(), mc.getAdminUsername(), mc.getAdminPassword());
+        connect(host, this.manageClient.getManageConfig());
+    }
+
+	/**
+	 * Connect to a (presumably) different MarkLogic Management API.
+	 *
+	 * @param host
+	 * @param mc
+	 */
+	public void connect(String host, ManageConfig mc) {
+	    if (logger.isInfoEnabled()) {
+		    logger.info("Connecting to host: " + host);
+	    }
+	    SimplePropertySource sps = new SimplePropertySource("mlHost", host, "mlManageUsername", mc.getUsername(),
+		    "mlManagePassword", mc.getPassword(), "mlAdminUsername", mc.getAdminUsername(), "mlAdminPassword", mc.getAdminPassword(),
+		    "mlManageSimpleSsl", mc.isConfigureSimpleSsl() + "", "mlAdminSimpleSsl", mc.isAdminConfigureSimpleSsl() + "",
+		    "mlManageScheme", mc.getScheme(), "mlAdminScheme", mc.getAdminScheme(), "mlAdminPort", mc.getAdminPort() + "",
+		    "mlManagePort", mc.getPort() + "");
+	    this.manageClient = new ManageClient(new DefaultManageConfigFactory(sps).newManageConfig());
+	    initializeAdminManager();
+	    if (logger.isInfoEnabled()) {
+		    logger.info("Connected to host: " + host);
+	    }
     }
 
     /**
@@ -128,16 +138,13 @@ public class API extends LoggingObject {
      * @param adminPassword
      */
     public void connect(String host, String username, String password, String adminUsername, String adminPassword) {
-        if (logger.isInfoEnabled()) {
-            logger.info("Connecting to host: " + host);
-        }
-        SimplePropertySource sps = new SimplePropertySource("mlHost", host, "mlManageUsername", username,
-                "mlManagePassword", password, "mlAdminUsername", adminUsername, "mlAdminPassword", adminPassword);
-        this.manageClient = new ManageClient(new DefaultManageConfigFactory(sps).newManageConfig());
-        initializeAdminManager();
-        if (logger.isInfoEnabled()) {
-            logger.info("Connected to host: " + host);
-        }
+    	ManageConfig mc = new ManageConfig();
+    	mc.setHost(host);
+    	mc.setUsername(username);
+    	mc.setPassword(password);
+    	mc.setAdminUsername(adminUsername);
+    	mc.setAdminPassword(adminPassword);
+    	connect(host, mc);
     }
 
     /**
@@ -157,19 +164,6 @@ public class API extends LoggingObject {
      */
     public DatabaseClient newClient() {
         return new DefaultAppConfigFactory(new SystemPropertySource()).newAppConfig().newDatabaseClient();
-    }
-
-    /**
-     * Construct a new DatabaseClient, assuming DIGEST authentication.
-     *
-     * @param host
-     * @param port
-     * @param user
-     * @param password
-     * @return
-     */
-    public DatabaseClient newClient(String host, Integer port, String user, String password) {
-        return DatabaseClientFactory.newClient(host, port, user, password, Authentication.DIGEST);
     }
 
     /**

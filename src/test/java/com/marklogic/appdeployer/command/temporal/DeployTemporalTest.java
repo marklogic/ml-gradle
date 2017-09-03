@@ -4,8 +4,8 @@ import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand;
-import com.marklogic.mgmt.temporal.TemporalAxesManager;
-import com.marklogic.mgmt.temporal.TemporalCollectionManager;
+import com.marklogic.mgmt.resource.temporal.TemporalAxesManager;
+import com.marklogic.mgmt.resource.temporal.TemporalCollectionManager;
 import com.marklogic.rest.util.ResourcesFragment;
 import org.junit.Test;
 

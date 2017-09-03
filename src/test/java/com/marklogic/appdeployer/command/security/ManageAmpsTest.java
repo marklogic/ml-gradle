@@ -3,8 +3,8 @@ package com.marklogic.appdeployer.command.security;
 import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
 import com.marklogic.mgmt.ManageClient;
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.security.AmpManager;
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.security.AmpManager;
 import org.junit.Test;
 
 public class ManageAmpsTest extends AbstractManageResourceTest {
@@ -70,7 +70,7 @@ public class ManageAmpsTest extends AbstractManageResourceTest {
 	/**
 	 * The second amp doesn't have a modules database specified, so we can verify the amp can still be
 	 * created/deleted when it refers to a filesystem module.
-	 * 
+	 *
 	 * @return
 	 */
 	@Override

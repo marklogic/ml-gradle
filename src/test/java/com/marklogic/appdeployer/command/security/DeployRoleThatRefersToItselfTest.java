@@ -1,7 +1,7 @@
 package com.marklogic.appdeployer.command.security;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.mgmt.security.RoleManager;
+import com.marklogic.mgmt.resource.security.RoleManager;
 import org.junit.Test;
 
 import java.io.File;

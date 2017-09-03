@@ -5,7 +5,7 @@ import com.marklogic.appdeployer.export.impl.AbstractResourceExporter;
 import com.marklogic.appdeployer.export.ExportedResources;
 import com.marklogic.appdeployer.export.impl.SimpleExportInputs;
 import com.marklogic.mgmt.ManageClient;
-import com.marklogic.mgmt.security.AmpManager;
+import com.marklogic.mgmt.resource.security.AmpManager;
 import com.marklogic.rest.util.ResourcesFragment;
 
 import java.io.File;

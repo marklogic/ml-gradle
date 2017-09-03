@@ -1,104 +1,129 @@
 package com.marklogic.mgmt.api.forest;
 
-import java.util.List;
-
 import com.marklogic.mgmt.api.ApiObject;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import java.util.List;
+
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ForestBackup extends ApiObject {
 
-    private String backupId;
-    private Boolean backupEnabled;
-    private String backupDirectory;
-    private String backupType;
-    private Integer backupPeriod;
-    private String backupMonthDay;
-    private List<String> backupDay;
-    private String backupStartDate;
-    private String backupStartTime;
-    private String backupTimestamp;
+	@XmlElement(name = "backup-id")
+	private String backupId;
 
-    public String getBackupId() {
-        return backupId;
-    }
+	@XmlElement(name = "backup-enabled")
+	private Boolean backupEnabled;
 
-    public void setBackupId(String backupId) {
-        this.backupId = backupId;
-    }
+	@XmlElement(name = "backup-directory")
+	private String backupDirectory;
 
-    public Boolean isBackupEnabled() {
-        return backupEnabled;
-    }
+	@XmlElement(name = "backup-type")
+	private String backupType;
 
-    public void setBackupEnabled(Boolean backupEnabled) {
-        this.backupEnabled = backupEnabled;
-    }
+	@XmlElement(name = "backup-period")
+	private Integer backupPeriod;
 
-    public String getBackupDirectory() {
-        return backupDirectory;
-    }
+	@XmlElement(name = "backup-month-day")
+	private String backupMonthDay;
 
-    public void setBackupDirectory(String backupDirectory) {
-        this.backupDirectory = backupDirectory;
-    }
+	@XmlElementWrapper(name = "backup-days")
+	@XmlElement(name = "backup-day")
+	private List<String> backupDay;
 
-    public String getBackupType() {
-        return backupType;
-    }
+	@XmlElement(name = "backup-start-date")
+	private String backupStartDate;
 
-    public void setBackupType(String backupType) {
-        this.backupType = backupType;
-    }
+	@XmlElement(name = "backup-start-time")
+	private String backupStartTime;
 
-    public Integer getBackupPeriod() {
-        return backupPeriod;
-    }
+	@XmlElement(name = "backup-timestamp")
+	private String backupTimestamp;
 
-    public void setBackupPeriod(Integer backupPeriod) {
-        this.backupPeriod = backupPeriod;
-    }
+	public String getBackupId() {
+		return backupId;
+	}
 
-    public String getBackupMonthDay() {
-        return backupMonthDay;
-    }
+	public void setBackupId(String backupId) {
+		this.backupId = backupId;
+	}
 
-    public void setBackupMonthDay(String backupMonthDay) {
-        this.backupMonthDay = backupMonthDay;
-    }
+	public Boolean isBackupEnabled() {
+		return backupEnabled;
+	}
 
-    public List<String> getBackupDay() {
-        return backupDay;
-    }
+	public void setBackupEnabled(Boolean backupEnabled) {
+		this.backupEnabled = backupEnabled;
+	}
 
-    public void setBackupDay(List<String> backupDay) {
-        this.backupDay = backupDay;
-    }
+	public String getBackupDirectory() {
+		return backupDirectory;
+	}
 
-    public String getBackupStartDate() {
-        return backupStartDate;
-    }
+	public void setBackupDirectory(String backupDirectory) {
+		this.backupDirectory = backupDirectory;
+	}
 
-    public void setBackupStartDate(String backupStartDate) {
-        this.backupStartDate = backupStartDate;
-    }
+	public String getBackupType() {
+		return backupType;
+	}
 
-    public String getBackupStartTime() {
-        return backupStartTime;
-    }
+	public void setBackupType(String backupType) {
+		this.backupType = backupType;
+	}
 
-    public void setBackupStartTime(String backupStartTime) {
-        this.backupStartTime = backupStartTime;
-    }
+	public Integer getBackupPeriod() {
+		return backupPeriod;
+	}
 
-    public String getBackupTimestamp() {
-        return backupTimestamp;
-    }
+	public void setBackupPeriod(Integer backupPeriod) {
+		this.backupPeriod = backupPeriod;
+	}
 
-    public void setBackupTimestamp(String backupTimestamp) {
-        this.backupTimestamp = backupTimestamp;
-    }
+	public String getBackupMonthDay() {
+		return backupMonthDay;
+	}
 
-    public Boolean getBackupEnabled() {
-        return backupEnabled;
-    }
+	public void setBackupMonthDay(String backupMonthDay) {
+		this.backupMonthDay = backupMonthDay;
+	}
+
+	public List<String> getBackupDay() {
+		return backupDay;
+	}
+
+	public void setBackupDay(List<String> backupDay) {
+		this.backupDay = backupDay;
+	}
+
+	public String getBackupStartDate() {
+		return backupStartDate;
+	}
+
+	public void setBackupStartDate(String backupStartDate) {
+		this.backupStartDate = backupStartDate;
+	}
+
+	public String getBackupStartTime() {
+		return backupStartTime;
+	}
+
+	public void setBackupStartTime(String backupStartTime) {
+		this.backupStartTime = backupStartTime;
+	}
+
+	public String getBackupTimestamp() {
+		return backupTimestamp;
+	}
+
+	public void setBackupTimestamp(String backupTimestamp) {
+		this.backupTimestamp = backupTimestamp;
+	}
+
+	public Boolean getBackupEnabled() {
+		return backupEnabled;
+	}
 
 }

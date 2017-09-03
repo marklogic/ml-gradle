@@ -9,9 +9,9 @@ import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import com.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand;
 import com.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
-import com.marklogic.mgmt.appservers.ServerManager;
-import com.marklogic.mgmt.databases.DatabaseManager;
-import com.marklogic.mgmt.restapis.RestApiManager;
+import com.marklogic.mgmt.resource.appservers.ServerManager;
+import com.marklogic.mgmt.resource.databases.DatabaseManager;
+import com.marklogic.mgmt.resource.restapis.RestApiManager;
 
 /**
  * This test ensures that the convenience methods for creating and deleting a sample application work properly, and thus

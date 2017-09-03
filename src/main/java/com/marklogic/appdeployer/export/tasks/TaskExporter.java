@@ -5,8 +5,8 @@ import com.marklogic.appdeployer.export.impl.AbstractNamedResourceExporter;
 import com.marklogic.appdeployer.export.impl.ExportInputs;
 import com.marklogic.appdeployer.export.impl.SimpleExportInputs;
 import com.marklogic.mgmt.ManageClient;
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.tasks.TaskManager;
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.tasks.TaskManager;
 
 import java.io.File;
 

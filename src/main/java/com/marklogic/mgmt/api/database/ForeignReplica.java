@@ -1,10 +1,20 @@
 package com.marklogic.mgmt.api.database;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ForeignReplica {
 
-    private String foreignClusterName;
-    private String foreignDatabaseName;
-    private String foreignForestName;
+	@XmlElement(name = "foreign-cluster-name")
+	private String foreignClusterName;
+
+	@XmlElement(name = "foreign-database-name")
+	private String foreignDatabaseName;
+
+	@XmlElement(name = "foreign-forest-name")
+	private String foreignForestName;
 
     public String getForeignClusterName() {
         return foreignClusterName;

@@ -5,7 +5,7 @@ import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.SaveReceipt;
-import com.marklogic.mgmt.databases.DatabaseManager;
+import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.rest.util.JsonNodeUtil;
 
 import java.io.File;
@@ -49,7 +49,7 @@ public class DeployContentDatabasesCommand extends DeployDatabaseCommand {
             String payload = getPayload(context);
             if (payload != null) {
                 DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
-                String json = tokenReplacer.replaceTokens(payload, appConfig, true);
+                String json = payloadTokenReplacer.replaceTokens(payload, appConfig, true);
                 SaveReceipt receipt = dbMgr.save(json);
 	            if (shouldCreateForests(context, payload)) {
 		            buildDeployForestsCommand(payload, receipt, context).execute(context);
@@ -74,12 +74,12 @@ public class DeployContentDatabasesCommand extends DeployDatabaseCommand {
         if (node != null) {
             logger.info("No content database files found, so not deleting content databases");
             String payload = node.toString();
-            String json = tokenReplacer.replaceTokens(payload, appConfig, false);
+            String json = payloadTokenReplacer.replaceTokens(payload, appConfig, false);
 
             DatabaseManager dbMgr = newDatabaseManageForDeleting(context);
             dbMgr.delete(json);
             if (appConfig.isTestPortSet()) {
-                json = tokenReplacer.replaceTokens(payload, appConfig, true);
+                json = payloadTokenReplacer.replaceTokens(payload, appConfig, true);
                 dbMgr.delete(json);
             }
         } else {

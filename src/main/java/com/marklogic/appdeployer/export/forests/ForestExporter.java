@@ -4,8 +4,8 @@ import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.export.impl.AbstractNamedResourceExporter;
 import com.marklogic.appdeployer.export.impl.ExportInputs;
 import com.marklogic.mgmt.ManageClient;
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.forests.ForestManager;
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.forests.ForestManager;
 
 import java.io.File;
 

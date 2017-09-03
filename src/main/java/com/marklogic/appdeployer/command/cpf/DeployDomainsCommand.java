@@ -2,8 +2,8 @@ package com.marklogic.appdeployer.command.cpf;
 
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
-import com.marklogic.mgmt.cpf.AbstractCpfResourceManager;
-import com.marklogic.mgmt.cpf.DomainManager;
+import com.marklogic.mgmt.resource.cpf.AbstractCpfResourceManager;
+import com.marklogic.mgmt.resource.cpf.DomainManager;
 
 public class DeployDomainsCommand extends AbstractCpfResourceCommand {
 

@@ -5,8 +5,8 @@ import java.util.Map;
 import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
 import com.marklogic.appdeployer.command.CommandContext;
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.security.CertificateTemplateManager;
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.security.CertificateTemplateManager;
 import com.marklogic.rest.util.Fragment;
 
 public class ManageCertificateTemplatesTest extends AbstractManageResourceTest {

@@ -1,13 +1,12 @@
 package com.marklogic.appdeployer.command.security;
 
-import java.io.File;
-
-import org.springframework.http.ResponseEntity;
-
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
-import com.marklogic.mgmt.security.CertificateAuthorityManager;
+import com.marklogic.mgmt.resource.security.CertificateAuthorityManager;
+import org.springframework.http.ResponseEntity;
+
+import java.io.File;
 
 public class DeployCertificateAuthoritiesCommand extends AbstractCommand {
 

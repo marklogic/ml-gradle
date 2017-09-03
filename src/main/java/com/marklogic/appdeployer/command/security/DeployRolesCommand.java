@@ -6,9 +6,9 @@ import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.PayloadParser;
-import com.marklogic.mgmt.ResourceManager;
+import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.api.security.Role;
-import com.marklogic.mgmt.security.RoleManager;
+import com.marklogic.mgmt.resource.security.RoleManager;
 import com.marklogic.rest.util.Fragment;
 
 import java.io.File;

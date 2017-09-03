@@ -1,19 +1,20 @@
 package com.marklogic.appdeployer.impl;
 
+import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.AppDeployer;
+import com.marklogic.appdeployer.command.AbstractCommand;
+import com.marklogic.appdeployer.command.Command;
+import com.marklogic.appdeployer.command.CommandContext;
+import com.marklogic.appdeployer.command.UndoableCommand;
+import com.marklogic.client.ext.helper.LoggingObject;
+import com.marklogic.mgmt.ManageClient;
+import com.marklogic.mgmt.admin.AdminManager;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import com.marklogic.appdeployer.command.AbstractCommand;
-import com.marklogic.client.helper.LoggingObject;
-import com.marklogic.appdeployer.AppConfig;
-import com.marklogic.appdeployer.AppDeployer;
-import com.marklogic.appdeployer.command.Command;
-import com.marklogic.appdeployer.command.CommandContext;
-import com.marklogic.appdeployer.command.UndoableCommand;
-import com.marklogic.mgmt.ManageClient;
-import com.marklogic.mgmt.admin.AdminManager;
+import java.util.regex.Pattern;
 
 /**
  * Abstract base class that just needs the subclass to define the list of Command instances to use. Handles executing
@@ -39,7 +40,7 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
 
     /**
      * The subclass just needs to define the list of commands to be invoked.
-     * 
+     *
      * @return
      */
     protected abstract List<Command> getCommands();
@@ -54,12 +55,26 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
         CommandContext context = new CommandContext(appConfig, manageClient, adminManager);
 
         String[] filenamesToIgnore = appConfig.getResourceFilenamesToIgnore();
+	    Pattern excludePattern = appConfig.getResourceFilenamesExcludePattern();
+	    Pattern includePattern = appConfig.getResourceFilenamesIncludePattern();
+
         for (Command command : commands) {
             String name = command.getClass().getName();
             logger.info(format("Executing command [%s] with sort order [%d]", name, command.getExecuteSortOrder()));
+
             if (command instanceof AbstractCommand) {
-	            ((AbstractCommand)command).setFilenamesToIgnore(filenamesToIgnore);
+            	AbstractCommand abstractCommand = (AbstractCommand)command;
+            	if (filenamesToIgnore != null) {
+		            abstractCommand.setFilenamesToIgnore(filenamesToIgnore);
+	            }
+	            if (excludePattern != null) {
+            		abstractCommand.setResourceFilenamesExcludePattern(excludePattern);
+	            }
+	            if (includePattern != null) {
+            		abstractCommand.setResourceFilenamesIncludePattern(includePattern);
+	            }
             }
+
             command.execute(context);
             logger.info(format("Finished executing command [%s]\n", name));
         }

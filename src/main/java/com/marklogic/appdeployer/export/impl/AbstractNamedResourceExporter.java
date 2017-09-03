@@ -3,7 +3,7 @@ package com.marklogic.appdeployer.export.impl;
 import com.marklogic.appdeployer.export.ExportedResources;
 import com.marklogic.appdeployer.export.impl.AbstractResourceExporter;
 import com.marklogic.mgmt.ManageClient;
-import com.marklogic.mgmt.ResourceManager;
+import com.marklogic.mgmt.resource.ResourceManager;
 
 import java.io.File;
 import java.util.ArrayList;

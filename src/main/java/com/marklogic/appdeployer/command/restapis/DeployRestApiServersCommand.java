@@ -8,8 +8,8 @@ import com.marklogic.appdeployer.command.UndoableCommand;
 import com.marklogic.appdeployer.util.RestApiUtil;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.admin.ActionRequiringRestart;
-import com.marklogic.mgmt.appservers.ServerManager;
-import com.marklogic.mgmt.restapis.RestApiManager;
+import com.marklogic.mgmt.resource.appservers.ServerManager;
+import com.marklogic.mgmt.resource.restapis.RestApiManager;
 
 import java.io.File;
 
@@ -57,10 +57,10 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
 			RestApiManager mgr = new RestApiManager(context.getManageClient());
 			AppConfig appConfig = context.getAppConfig();
 
-			mgr.createRestApi(tokenReplacer.replaceTokens(payload, appConfig, false));
+			mgr.createRestApi(payloadTokenReplacer.replaceTokens(payload, appConfig, false));
 
 			if (appConfig.isTestPortSet()) {
-				mgr.createRestApi(tokenReplacer.replaceTokens(payload, appConfig, true));
+				mgr.createRestApi(payloadTokenReplacer.replaceTokens(payload, appConfig, true));
 			}
 		}
 	}
@@ -123,7 +123,7 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
 
 		String payload = getRestApiPayload(context);
 		if (payload != null) {
-			payload = tokenReplacer.replaceTokens(payload, appConfig, false);
+			payload = payloadTokenReplacer.replaceTokens(payload, appConfig, false);
 			final String serverName = new RestApiManager(manageClient).extractNameFromJson(payload);
 
 			if (mgr.exists(serverName)) {

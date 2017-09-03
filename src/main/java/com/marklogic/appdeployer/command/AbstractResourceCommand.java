@@ -1,8 +1,7 @@
 package com.marklogic.appdeployer.command;
 
-import java.io.File;
-
-import com.marklogic.mgmt.ResourceManager;
+import com.marklogic.mgmt.admin.AdminManager;
+import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.admin.ActionRequiringRestart;
 import com.marklogic.mgmt.admin.AdminManager;

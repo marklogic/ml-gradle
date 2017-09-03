@@ -2,8 +2,8 @@ package com.marklogic.appdeployer.command.mimetypes;
 
 import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.mimetypes.MimetypeManager;
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.mimetypes.MimetypeManager;
 
 public class ManageMimetypesTest extends AbstractManageResourceTest {
 

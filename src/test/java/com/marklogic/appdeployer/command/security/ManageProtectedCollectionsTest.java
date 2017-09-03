@@ -2,8 +2,8 @@ package com.marklogic.appdeployer.command.security;
 
 import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.security.ProtectedCollectionsManager;
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.security.ProtectedCollectionsManager;
 
 public class ManageProtectedCollectionsTest extends AbstractManageResourceTest {
 

@@ -1,12 +1,12 @@
 package com.marklogic.mgmt.api.security;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.marklogic.mgmt.ResourceManager;
+import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.Resource;
-import com.marklogic.mgmt.security.ProtectedCollectionsManager;
+import com.marklogic.mgmt.resource.security.ProtectedCollectionsManager;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProtectedCollection extends Resource {
 

@@ -1,20 +1,19 @@
 package com.marklogic.mgmt.selector;
 
 import com.marklogic.mgmt.ManageClient;
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.appservers.ServerManager;
-import com.marklogic.mgmt.databases.DatabaseManager;
-import com.marklogic.mgmt.security.AmpManager;
-import com.marklogic.mgmt.security.PrivilegeManager;
-import com.marklogic.mgmt.security.RoleManager;
-import com.marklogic.mgmt.security.UserManager;
-import com.marklogic.mgmt.tasks.TaskManager;
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.appservers.ServerManager;
+import com.marklogic.mgmt.resource.databases.DatabaseManager;
+import com.marklogic.mgmt.resource.security.AmpManager;
+import com.marklogic.mgmt.resource.security.PrivilegeManager;
+import com.marklogic.mgmt.resource.security.RoleManager;
+import com.marklogic.mgmt.resource.security.UserManager;
+import com.marklogic.mgmt.resource.tasks.TaskManager;
 import com.marklogic.rest.util.ResourcesFragment;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public abstract class AbstractNameMatchingResourceSelector implements ResourceSelector {

@@ -60,6 +60,12 @@ public class DefaultAdminConfigFactory extends PropertySourceFactory implements 
 		    c.setScheme(prop);
 	    }
 
+	    prop = getProperty("mlAdminSimpleSsl");
+	    if (prop != null) {
+	    	logger.info("Use simple SSL for Admin app server: " + prop);
+	    	c.setConfigureSimpleSsl(Boolean.parseBoolean(prop));
+	    }
+
         return c;
     }
 

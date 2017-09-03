@@ -1,12 +1,12 @@
 package com.marklogic.appdeployer.command.appservers;
 
-import java.io.File;
-
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
-import com.marklogic.mgmt.appservers.ServerManager;
+import com.marklogic.mgmt.resource.appservers.ServerManager;
+
+import java.io.File;
 
 /**
  * Command for updating an existing REST API server that was presumably created via /v1/rest-apis.
@@ -38,11 +38,11 @@ public class UpdateRestApiServersCommand extends AbstractCommand {
 
             String payload = copyFileToString(f);
 
-            String json = tokenReplacer.replaceTokens(payload, appConfig, false);
+            String json = payloadTokenReplacer.replaceTokens(payload, appConfig, false);
             mgr.save(json);
 
             if (appConfig.isTestPortSet()) {
-                json = tokenReplacer.replaceTokens(payload, appConfig, true);
+                json = payloadTokenReplacer.replaceTokens(payload, appConfig, true);
                 mgr.save(json);
             }
         } else {

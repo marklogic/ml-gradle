@@ -1,14 +1,14 @@
 package com.marklogic.mgmt.api.group;
 
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.api.API;
+import com.marklogic.mgmt.api.Resource;
+import com.marklogic.mgmt.resource.groups.GroupManager;
+import com.marklogic.mgmt.resource.tasks.TaskManager;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.api.API;
-import com.marklogic.mgmt.api.Resource;
-import com.marklogic.mgmt.groups.GroupManager;
-import com.marklogic.mgmt.tasks.TaskManager;
 
 public class Group extends Resource {
 
@@ -87,7 +87,7 @@ public class Group extends Resource {
     /**
      * Convenience method that adds the given events and then updates the group, ensuring that trace events are
      * activated.
-     * 
+     *
      * @param events
      */
     public void trace(String... events) {
@@ -98,7 +98,7 @@ public class Group extends Resource {
 
     /**
      * Convenience method for removing some trace events.
-     * 
+     *
      * @param events
      */
     public void untrace(String... events) {

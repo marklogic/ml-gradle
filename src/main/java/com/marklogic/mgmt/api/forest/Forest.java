@@ -1,31 +1,62 @@
 package com.marklogic.mgmt.api.forest;
 
-import java.util.List;
-
-import com.marklogic.mgmt.ResourceManager;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.Resource;
 import com.marklogic.mgmt.api.database.DatabaseReplication;
-import com.marklogic.mgmt.forests.ForestManager;
-import com.marklogic.mgmt.hosts.HostManager;
+import com.marklogic.mgmt.resource.forests.ForestManager;
+import com.marklogic.mgmt.resource.hosts.HostManager;
 
+import javax.xml.bind.annotation.*;
+import java.util.List;
+
+@XmlRootElement(name = "forest-properties")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Forest extends Resource {
 
-    private String forestName;
+	@XmlElement(name = "forest-name")
+	private String forestName;
+
     private Boolean enabled;
     private String host;
-    private String dataDirectory;
-    private String largeDataDirectory;
-    private String fastDataDirectory;
-    private String updatesAllowed;
+
+	@XmlElement(name = "data-directory")
+	private String dataDirectory;
+
+	@XmlElement(name = "large-data-directory")
+	private String largeDataDirectory;
+
+	@XmlElement(name = "fast-data-directory")
+	private String fastDataDirectory;
+
+	@XmlElement(name = "updates-allowed")
+	private String updatesAllowed;
+
     private String availability;
-    private Boolean rebalancerEnable;
-    private List<Range> range;
-    private Boolean failoverEnable;
-    private List<String> failoverHost;
-    private List<ForestBackup> forestBackup;
-    private List<DatabaseReplication> databaseReplication;
-    private List<ForestReplica> forestReplica;
+
+	@XmlElement(name = "rebalancer-enable")
+	private Boolean rebalancerEnable;
+
+	@XmlElementWrapper(name = "ranges")
+	private List<Range> range;
+
+	@XmlElement(name = "failover-enable")
+	private Boolean failoverEnable;
+
+	@XmlElementWrapper(name = "failover-hosts")
+	@XmlElement(name = "failover-host")
+	private List<String> failoverHost;
+
+	@XmlElementWrapper(name = "forest-backups")
+	private List<ForestBackup> forestBackup;
+
+	@XmlElementWrapper(name = "database-replication")
+	private DatabaseReplication databaseReplication;
+
+	@XmlElementWrapper(name = "forest-replicas")
+	@XmlElement(name = "forest-replica")
+	private List<ForestReplica> forestReplica;
 
     public Forest() {
     }
@@ -173,11 +204,11 @@ public class Forest extends Resource {
         this.forestBackup = forestBackup;
     }
 
-    public List<DatabaseReplication> getDatabaseReplication() {
+    public DatabaseReplication getDatabaseReplication() {
         return databaseReplication;
     }
 
-    public void setDatabaseReplication(List<DatabaseReplication> databaseReplication) {
+    public void setDatabaseReplication(DatabaseReplication databaseReplication) {
         this.databaseReplication = databaseReplication;
     }
 

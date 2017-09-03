@@ -1,5 +1,10 @@
 package com.marklogic.appdeployer.command;
 
+import com.marklogic.client.ext.helper.LoggingObject;
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.SaveReceipt;
+import org.springframework.util.FileCopyUtils;
+
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -7,12 +12,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.springframework.util.FileCopyUtils;
-
-import com.marklogic.client.helper.LoggingObject;
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.SaveReceipt;
+import java.util.regex.Pattern;
 
 /**
  * Abstract base class that provides some convenience methods for implementing a command. Subclasses will typically
@@ -23,7 +23,7 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
     private int executeSortOrder = Integer.MAX_VALUE;
     private boolean storeResourceIdsAsCustomTokens = false;
 
-    protected TokenReplacer tokenReplacer = new DefaultTokenReplacer();
+    protected PayloadTokenReplacer payloadTokenReplacer = new DefaultPayloadTokenReplacer();
     private FilenameFilter resourceFilenameFilter = new ResourceFilenameFilter();
 
     /**
@@ -44,22 +44,54 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
         if (filenames == null || filenames.length == 0) {
             return;
         }
-        if (resourceFilenameFilter != null && resourceFilenameFilter instanceof ResourceFilenameFilter) {
-            ResourceFilenameFilter rff = (ResourceFilenameFilter) resourceFilenameFilter;
-            Set<String> set = null;
-            if (rff.getFilenamesToIgnore() != null) {
-                set = rff.getFilenamesToIgnore();
-            } else {
-                set = new HashSet<>();
-            }
-            for (String f : filenames) {
-                set.add(f);
-            }
-            rff.setFilenamesToIgnore(set);
+        if (resourceFilenameFilter != null) {
+        	if (resourceFilenameFilter instanceof ResourceFilenameFilter) {
+		        ResourceFilenameFilter rff = (ResourceFilenameFilter) resourceFilenameFilter;
+		        Set<String> set = null;
+		        if (rff.getFilenamesToIgnore() != null) {
+			        set = rff.getFilenamesToIgnore();
+		        } else {
+			        set = new HashSet<>();
+		        }
+		        for (String f : filenames) {
+			        set.add(f);
+		        }
+		        rff.setFilenamesToIgnore(set);
+	        } else {
+		        logger.warn("resourceFilenameFilter is not an instanceof ResourceFilenameFilter, so unable to set resource filenames to ignore");
+	        }
         } else {
             this.resourceFilenameFilter = new ResourceFilenameFilter(filenames);
         }
     }
+
+    public void setResourceFilenamesExcludePattern(Pattern pattern) {
+    	if (resourceFilenameFilter != null) {
+    		if (resourceFilenameFilter instanceof ResourceFilenameFilter) {
+			    ((ResourceFilenameFilter)resourceFilenameFilter).setExcludePattern(pattern);
+		    } else {
+    			logger.warn("resourceFilenameFilter is not an instanceof ResourceFilenameFilter, so unable to set exclude pattern");
+		    }
+	    } else {
+    		ResourceFilenameFilter rff = new ResourceFilenameFilter();
+    		rff.setExcludePattern(pattern);
+    		this.resourceFilenameFilter = rff;
+	    }
+    }
+
+	public void setResourceFilenamesIncludePattern(Pattern pattern) {
+		if (resourceFilenameFilter != null) {
+			if (resourceFilenameFilter instanceof ResourceFilenameFilter) {
+				((ResourceFilenameFilter)resourceFilenameFilter).setIncludePattern(pattern);
+			} else {
+				logger.warn("resourceFilenameFilter is not an instanceof ResourceFilenameFilter, so unable to set include pattern");
+			}
+		} else {
+			ResourceFilenameFilter rff = new ResourceFilenameFilter();
+			rff.setIncludePattern(pattern);
+			this.resourceFilenameFilter = rff;
+		}
+	}
 
     /**
      * Simplifies reading the contents of a File into a String.
@@ -87,7 +119,7 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 	 */
 	protected String copyFileToString(File f, CommandContext context) {
 		String str = copyFileToString(f);
-		return str != null ? tokenReplacer.replaceTokens(str, context.getAppConfig(), false) : str;
+		return str != null ? payloadTokenReplacer.replaceTokens(str, context.getAppConfig(), false) : str;
 	}
 
     /**
@@ -148,8 +180,8 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
         return files;
     }
 
-    public void setTokenReplacer(TokenReplacer tokenReplacer) {
-        this.tokenReplacer = tokenReplacer;
+    public void setPayloadTokenReplacer(PayloadTokenReplacer payloadTokenReplacer) {
+        this.payloadTokenReplacer = payloadTokenReplacer;
     }
 
     public void setExecuteSortOrder(int executeSortOrder) {

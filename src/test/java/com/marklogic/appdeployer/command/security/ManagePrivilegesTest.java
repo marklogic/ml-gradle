@@ -2,8 +2,8 @@ package com.marklogic.appdeployer.command.security;
 
 import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.security.PrivilegeManager;
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.security.PrivilegeManager;
 
 /**
  * TODO Unable to update a privilege of kind "uri".

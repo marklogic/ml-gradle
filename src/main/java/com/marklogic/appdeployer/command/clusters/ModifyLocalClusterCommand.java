@@ -3,7 +3,7 @@ package com.marklogic.appdeployer.command.clusters;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
-import com.marklogic.mgmt.clusters.ClusterManager;
+import com.marklogic.mgmt.resource.clusters.ClusterManager;
 
 import java.io.File;
 
@@ -25,7 +25,7 @@ public class ModifyLocalClusterCommand extends AbstractCommand {
 			for (File f : configDir.listFiles()) {
 				if (f.isFile() && f.getName().startsWith("local-cluster")) {
 					String payload = copyFileToString(f);
-					payload = tokenReplacer.replaceTokens(payload, context.getAppConfig(), false);
+					payload = payloadTokenReplacer.replaceTokens(payload, context.getAppConfig(), false);
 					new ClusterManager(context.getManageClient()).modifyLocalCluster(payload, context.getAdminManager());
 				}
 			}

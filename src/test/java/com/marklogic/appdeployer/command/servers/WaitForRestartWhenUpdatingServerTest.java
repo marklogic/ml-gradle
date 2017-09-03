@@ -3,7 +3,7 @@ package com.marklogic.appdeployer.command.servers;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.appservers.DeployOtherServersCommand;
-import com.marklogic.mgmt.appservers.ServerManager;
+import com.marklogic.mgmt.resource.appservers.ServerManager;
 import org.junit.After;
 import org.junit.Test;
 

@@ -2,13 +2,15 @@ package com.marklogic.appdeployer.command.modules;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
-import com.marklogic.client.modulesloader.impl.AssetFileFilter;
+import com.marklogic.client.ext.modulesloader.impl.AssetFileFilter;
 import com.marklogic.junit.Fragment;
 import com.marklogic.junit.PermissionsFragment;
 import com.marklogic.xcc.template.XccTemplate;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.File;
 
 import java.io.File;
 
@@ -84,19 +86,27 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void loadModulesWithCustomPermissions() {
-		appConfig.setModulePermissions(appConfig.getModulePermissions() + ",app-user,execute");
+        appConfig.setModulePermissions(appConfig.getModulePermissions() + ",app-user,execute");
 
 		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
 
 		appDeployer.deploy(appConfig);
 
-		PermissionsFragment perms = getDocumentPermissions("/ext/sample-lib.xqy", xccTemplate);
-		perms.assertPermissionCount(4);
-		perms.assertPermissionExists("rest-admin", "read");
-		perms.assertPermissionExists("rest-admin", "update");
-		perms.assertPermissionExists("rest-extension-user", "execute");
-		perms.assertPermissionExists("app-user", "execute");
-	}
+        PermissionsFragment perms = getDocumentPermissions("/ext/sample-lib.xqy", xccTemplate);
+	    perms.assertPermissionCount(6);
+
+	    // Default permissions set by AppConfig
+        perms.assertPermissionExists("rest-admin", "read");
+        perms.assertPermissionExists("rest-admin", "update");
+        perms.assertPermissionExists("rest-extension-user", "execute");
+
+        // Custom permission
+        perms.assertPermissionExists("app-user", "execute");
+
+        // Permissions that the REST API still applies, which seems like a bug
+		perms.assertPermissionExists("rest-reader", "read");
+		perms.assertPermissionExists("rest-writer", "update");
+    }
 
 	@Test
 	public void deleteTestModules() {
@@ -115,17 +125,11 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 	public void loadModulesWithAssetFileFilterAndTokenReplacement() {
 		appConfig.setAssetFileFilter(new TestFileFilter());
 
-		/**
-		 * Add a couple tokens to replace in the modules. It's still a good practice to ensure these tokens don't
-		 * hit on anything accidentally, so their names are capitalized. But since the module token replacement
-		 * follows the Roxy convention by default and prefixes properties with "@ml.", our modules then need
-		 * "@ml.%%COLOR%%", for example.
-		 */
-		appConfig.getCustomTokens().put("COLOR", "red");
-		appConfig.getCustomTokens().put("DESCRIPTION", "${COLOR} description");
-
-		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
-		appDeployer.deploy(appConfig);
+        String xml = xccTemplate.executeAdhocQuery("doc('/ext/lib/test.xqy')");
+        Fragment f = parse(xml);
+        f.assertElementValue("/test/color", "red");
+        f.assertElementValue("/test/description", "red description");
+    }
 
 		assertEquals("true", xccTemplate.executeAdhocQuery("doc-available('/ext/lib/test.xqy')"));
 		assertEquals("false", xccTemplate.executeAdhocQuery("doc-available('/ext/lib/test2.xqy')"));
@@ -138,18 +142,16 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 	}
 
 	@Test
-	public void testServerExists() {
-		appConfig.getConfigDir().setBaseDir(new File(("src/test/resources/sample-app/db-only-config")));
-		appConfig.setTestRestPort(8541);
-		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
+	public void deleteTestModules() {
+		appConfig.setDeleteTestModules(true);
+		appConfig.setDeleteTestModulesPattern("/ext/lib/*.xqy");
 
+		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand(),
+			new DeleteTestModulesCommand());
 		appDeployer.deploy(appConfig);
 
-		String[] uris = new String[]{"/Default/sample-app/rest-api/options/sample-app-options.xml",
-			"/Default/sample-app/rest-api/options/sample-app-options.xml"};
-		for (String uri : uris) {
-			assertEquals("true", xccTemplate.executeAdhocQuery(format("doc-available('%s')", uri)));
-		}
+		String xquery = "fn:count(cts:uri-match('/ext/**.xqy'))";
+		assertEquals(1, Integer.parseInt(xccTemplate.executeAdhocQuery(xquery)));
 	}
 
 	private void assertModuleExistsWithDefaultPermissions(String message, String uri) {
@@ -159,14 +161,22 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 
 	/**
 	 * Apparently, the REST API won't let you remove these 3 default permissions, they're always present.
+	 *
+	 * And, now that we're loading modules via the REST API by default, rest-reader/read and rest-writer/update are
+	 * always present, at least on 8.0-6.3 and 9.0-1.1, which seems like a bug.
 	 */
 	private void assertDefaultPermissionsExists(String uri) {
 		PermissionsFragment perms = getDocumentPermissions(uri, xccTemplate);
-		perms.assertPermissionCount(3);
+		perms.assertPermissionCount(5);
 		perms.assertPermissionExists("rest-admin", "read");
 		perms.assertPermissionExists("rest-admin", "update");
 		perms.assertPermissionExists("rest-extension-user", "execute");
+
+		// Not really expected!
+		perms.assertPermissionExists("rest-reader", "read");
+		perms.assertPermissionExists("rest-writer", "update");
 	}
+
 }
 
 class TestFileFilter extends AssetFileFilter {

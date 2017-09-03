@@ -8,9 +8,9 @@ import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand
 import com.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand;
 import com.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
-import com.marklogic.mgmt.cpf.CpfConfigManager;
-import com.marklogic.mgmt.cpf.DomainManager;
-import com.marklogic.mgmt.cpf.PipelineManager;
+import com.marklogic.mgmt.resource.cpf.CpfConfigManager;
+import com.marklogic.mgmt.resource.cpf.DomainManager;
+import com.marklogic.mgmt.resource.cpf.PipelineManager;
 
 public class ManageCpfTest extends AbstractAppDeployerTest {
 

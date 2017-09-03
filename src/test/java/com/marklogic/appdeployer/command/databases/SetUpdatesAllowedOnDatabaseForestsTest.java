@@ -1,8 +1,8 @@
 package com.marklogic.appdeployer.command.databases;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.mgmt.databases.DatabaseManager;
-import com.marklogic.mgmt.forests.ForestManager;
+import com.marklogic.mgmt.resource.databases.DatabaseManager;
+import com.marklogic.mgmt.resource.forests.ForestManager;
 import org.junit.After;
 import org.junit.Test;
 

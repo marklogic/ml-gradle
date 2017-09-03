@@ -6,7 +6,7 @@ import org.junit.After;
 import org.junit.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.mgmt.databases.DatabaseManager;
+import com.marklogic.mgmt.resource.databases.DatabaseManager;
 
 /**
  * Verifies support for bumping up the number of content forests and then re-deploying. Does not yet support lowering

@@ -4,8 +4,8 @@ import org.junit.Before;
 
 import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
-import com.marklogic.mgmt.ResourceManager;
-import com.marklogic.mgmt.security.UserManager;
+import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.security.UserManager;
 import com.marklogic.rest.util.Fragment;
 
 public class ManageUsersTest extends AbstractManageResourceTest {

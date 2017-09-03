@@ -12,8 +12,6 @@ import org.junit.Test;
 
 import java.io.File;
 
-import java.io.File;
-
 public class LoadModulesTest extends AbstractAppDeployerTest {
 
 	private XccTemplate xccTemplate;
@@ -86,50 +84,43 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void loadModulesWithCustomPermissions() {
-        appConfig.setModulePermissions(appConfig.getModulePermissions() + ",app-user,execute");
+		appConfig.setModulePermissions(appConfig.getModulePermissions() + ",app-user,execute");
 
 		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
 
 		appDeployer.deploy(appConfig);
 
-        PermissionsFragment perms = getDocumentPermissions("/ext/sample-lib.xqy", xccTemplate);
-	    perms.assertPermissionCount(6);
+		PermissionsFragment perms = getDocumentPermissions("/ext/sample-lib.xqy", xccTemplate);
+		perms.assertPermissionCount(6);
 
-	    // Default permissions set by AppConfig
-        perms.assertPermissionExists("rest-admin", "read");
-        perms.assertPermissionExists("rest-admin", "update");
-        perms.assertPermissionExists("rest-extension-user", "execute");
+		// Default permissions set by AppConfig
+		perms.assertPermissionExists("rest-admin", "read");
+		perms.assertPermissionExists("rest-admin", "update");
+		perms.assertPermissionExists("rest-extension-user", "execute");
 
-        // Custom permission
-        perms.assertPermissionExists("app-user", "execute");
+		// Custom permission
+		perms.assertPermissionExists("app-user", "execute");
 
-        // Permissions that the REST API still applies, which seems like a bug
+		// Permissions that the REST API still applies, which seems like a bug
 		perms.assertPermissionExists("rest-reader", "read");
 		perms.assertPermissionExists("rest-writer", "update");
-    }
-
-	@Test
-	public void deleteTestModules() {
-		appConfig.setDeleteTestModules(true);
-		appConfig.setDeleteTestModulesPattern("/ext/lib/*.xqy");
-
-		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand(),
-			new DeleteTestModulesCommand());
-		appDeployer.deploy(appConfig);
-
-		String xquery = "fn:count(cts:uri-match('/ext/**.xqy'))";
-		assertEquals(1, Integer.parseInt(xccTemplate.executeAdhocQuery(xquery)));
 	}
 
 	@Test
 	public void loadModulesWithAssetFileFilterAndTokenReplacement() {
 		appConfig.setAssetFileFilter(new TestFileFilter());
 
-        String xml = xccTemplate.executeAdhocQuery("doc('/ext/lib/test.xqy')");
-        Fragment f = parse(xml);
-        f.assertElementValue("/test/color", "red");
-        f.assertElementValue("/test/description", "red description");
-    }
+		/**
+		 * Add a couple tokens to replace in the modules. It's still a good practice to ensure these tokens don't
+		 * hit on anything accidentally, so their names are capitalized. But since the module token replacement
+		 * follows the Roxy convention by default and prefixes properties with "@ml.", our modules then need
+		 * "@ml.%%COLOR%%", for example.
+		 */
+		appConfig.getCustomTokens().put("COLOR", "red");
+		appConfig.getCustomTokens().put("DESCRIPTION", "${COLOR} description");
+
+		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
+		appDeployer.deploy(appConfig);
 
 		assertEquals("true", xccTemplate.executeAdhocQuery("doc-available('/ext/lib/test.xqy')"));
 		assertEquals("false", xccTemplate.executeAdhocQuery("doc-available('/ext/lib/test2.xqy')"));
@@ -138,7 +129,21 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 		Fragment f = parse(xml);
 		f.assertElementValue("/test/color", "red");
 		f.assertElementValue("/test/description", "red description");
+	}
 
+	@Test
+	public void testServerExists() {
+		appConfig.getConfigDir().setBaseDir(new File(("src/test/resources/sample-app/db-only-config")));
+		appConfig.setTestRestPort(8541);
+		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
+
+		appDeployer.deploy(appConfig);
+
+		String[] uris = new String[] { "/Default/sample-app/rest-api/options/sample-app-options.xml",
+			"/Default/sample-app/rest-api/options/sample-app-options.xml" };
+		for (String uri : uris) {
+			assertEquals("true", xccTemplate.executeAdhocQuery(format("doc-available('%s')", uri)));
+		}
 	}
 
 	@Test

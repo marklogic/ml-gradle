@@ -1,9 +1,8 @@
 package com.marklogic.gradle.task.tasks
 
-import org.gradle.api.tasks.TaskAction
-
 import com.marklogic.gradle.task.MarkLogicTask
-import com.marklogic.mgmt.tasks.TaskManager
+import com.marklogic.mgmt.resource.tasks.TaskManager
+import org.gradle.api.tasks.TaskAction
 
 class DeleteAllTasksTask extends MarkLogicTask {
 

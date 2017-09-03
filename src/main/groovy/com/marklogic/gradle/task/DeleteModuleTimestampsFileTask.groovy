@@ -1,9 +1,8 @@
 package com.marklogic.gradle.task
 
+import com.marklogic.client.ext.modulesloader.impl.PropertiesModuleManager
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
-
-import com.marklogic.client.modulesloader.impl.PropertiesModuleManager
 
 class DeleteModuleTimestampsFileTask extends DefaultTask {
 

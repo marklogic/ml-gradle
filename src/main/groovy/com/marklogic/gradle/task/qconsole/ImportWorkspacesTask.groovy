@@ -1,7 +1,7 @@
 package com.marklogic.gradle.task.qconsole
 
 import com.marklogic.client.DatabaseClient
-import com.marklogic.client.qconsole.impl.DefaultWorkspaceManager
+import com.marklogic.client.ext.qconsole.impl.DefaultWorkspaceManager
 import com.marklogic.gradle.task.MarkLogicTask
 import org.gradle.api.tasks.TaskAction
 

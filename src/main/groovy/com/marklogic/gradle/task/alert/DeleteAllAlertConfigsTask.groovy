@@ -3,7 +3,7 @@ package com.marklogic.gradle.task.alert
 import org.gradle.api.tasks.TaskAction
 
 import com.marklogic.gradle.task.MarkLogicTask
-import com.marklogic.mgmt.alert.AlertConfigManager
+import com.marklogic.mgmt.resource.alert.AlertConfigManager
 
 class DeleteAllAlertConfigsTask extends MarkLogicTask {
 

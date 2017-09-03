@@ -21,6 +21,13 @@ import com.marklogic.gradle.task.cluster.*
 import com.marklogic.gradle.task.cpf.DeployCpfTask
 import com.marklogic.gradle.task.cpf.LoadDefaultPipelinesTask
 import com.marklogic.gradle.task.databases.*
+import com.marklogic.gradle.task.datamovement.AddCollectionsTask
+import com.marklogic.gradle.task.datamovement.AddPermissionsTask
+import com.marklogic.gradle.task.datamovement.DeleteCollectionsTask
+import com.marklogic.gradle.task.datamovement.RemoveCollectionsTask
+import com.marklogic.gradle.task.datamovement.RemovePermissionsTask
+import com.marklogic.gradle.task.datamovement.SetCollectionsTask
+import com.marklogic.gradle.task.datamovement.SetPermissionsTask
 import com.marklogic.gradle.task.es.GenerateModelArtifactsTask
 import com.marklogic.gradle.task.export.ExportResourcesTask
 import com.marklogic.gradle.task.flexrep.*
@@ -114,13 +121,35 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlClearModulesDatabase", type: ClearModulesDatabaseTask, group: dbGroup, dependsOn: "mlDeleteModuleTimestampsFile", description: "Deletes potentially all of the documents in the modules database; has a property for excluding documents from deletion")
 		project.task("mlClearSchemasDatabase", type: ClearSchemasDatabaseTask, group: dbGroup, description: "Deletes all documents in the schemas database")
 		project.task("mlClearTriggersDatabase", type: ClearTriggersDatabaseTask, group: dbGroup, description: "Deletes all documents in the triggers database")
-		project.task("mlDeleteCollection", type: DeleteCollectionTask, group: dbGroup, description: "Delete the collection of documents in the content database; use -Pcollection=name to specify the collection name on the command line")
 		project.task("mlDeployDatabases", type: DeployDatabasesTask, group: dbGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Deploy each database, updating it if it exists, in the configuration directory")
 		project.task("mlMergeContentDatabase", type: MergeContentDatabaseTask, group: dbGroup, description: "Merge the database named by mlAppConfig.contentDatabaseName")
 		project.task("mlMergeDatabase", type: MergeDatabaseTask, group: dbGroup, description: "Merge the database named by the project property dbName; e.g. gradle mlMergeDatabase -PdbName=my-database")
 		project.task("mlReindexContentDatabase", type: ReindexContentDatabaseTask, group: dbGroup, description: "Reindex the database named by mlAppConfig.contentDatabaseName")
 		project.task("mlReindexDatabase", type: ReindexDatabaseTask, group: dbGroup, description: "Reindex the database named by the project property dbName; e.g. gradle mlReindexDatabase -PdbName=my-database")
 		project.task("mlSetContentUpdatesAllowed", type: SetContentUpdatesAllowedTask, group: dbGroup, description: "Sets updated-allowed on each primary forest for the content database; must set the mode via e.g. -Pmode=flash-backup")
+
+		String dmGroup = "ml-Gradle Data Movement"
+		String dmGroupMessage = "; can also set the properties threadCount, batchSize, applyConsistentSnapshot, " +
+			"jobName, and logBatches to configure how the Data Movement QueryBatcher operates.";
+		project.task("mlAddCollections", type: AddCollectionsTask, group: dmGroup, description: "Add all documents, either in a comma-separated list of " +
+			"collection names specified by the 'whereCollections' property or matching a URI pattern specified by the 'whereUriPattern' property or matching a URIs query specified by the 'whereUrisQuery' property, " +
+			"to a comma-separated list of collection names specified by the 'collections' property" + dmGroupMessage)
+		project.task("mlDeleteCollections", type: DeleteCollectionsTask, group: dmGroup, description: "Delete all documents in a comma-separated list of " +
+			"collection names specified by the 'collections' property" + dmGroupMessage)
+		project.task("mlRemoveCollections", type: RemoveCollectionsTask, group: dmGroup, description: "Remove all documents, either in a comma-separated list of " +
+			"collection names specified by the 'whereCollections' property or matching a URI pattern specified by the 'whereUriPattern' property or matching a URIs query specified by the 'whereUrisQuery' property, " +
+			"from a comma-separated list of collection names specified by the 'collections' property; " +
+			"if the values of 'whereCollections' and 'collections' are the same, you only need to specify the 'collections' property" + dmGroupMessage)
+		project.task("mlSetCollections", type: SetCollectionsTask, group: dmGroup, description: "Set collections on all documents, either in a comma-separated list of " +
+			"collection names specified by the 'whereCollections' property or matching a URI pattern specified by the 'whereUriPattern' property or matching a URIs query specified by the 'whereUrisQuery' property, " +
+			"to a comma-separated list of collection names specified by the 'collections' property" + dmGroupMessage)
+
+		project.task("mlAddPermissions", type: AddPermissionsTask, group: dmGroup, description: "Add permissions, specified as a comma-separated list of roles and capabilities via the 'permissions' property, " +
+			"to all documents either in the set of collection names specified by the 'collections' property or with URIs matching the pattern specified by the 'whereUriPattern' property or matching a URIs query specified by the 'whereUrisQuery' property" + dmGroupMessage)
+		project.task("mlRemovePermissions", type: RemovePermissionsTask, group: dmGroup, description: "Remove permissions, specified as a comma-separated list of roles and capabilities via the 'permissions' property, " +
+			"from all documents either in the set of collection names specified by the 'collections' property or with URIs matching the pattern specified by the 'whereUriPattern' property or matching a URIs query specified by the 'whereUrisQuery' property" + dmGroupMessage)
+		project.task("mlSetPermissions", type: SetPermissionsTask, group: dmGroup, description: "Set permissions, specified as a comma-separated list of roles and capabilities via the 'permissions' property, " +
+			"on all documents in the set of collection names specified by the 'collections' property or with URIs matching the pattern specified by the 'whereUriPattern' property or matching a URIs query specified by the 'whereUrisQuery' property" + dmGroupMessage)
 
 		String devGroup = "ml-gradle Development"
 		project.task("mlCreateResource", type: CreateResourceTask, group: devGroup, description: "Create a new resource extension in the modules services directory; use -PresourceName and -PresourceType to set the resource name and type (either xqy or sjs)")

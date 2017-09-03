@@ -9,7 +9,7 @@ import org.junit.Test;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.path.json.JsonPath;
 import com.marklogic.client.document.XMLDocumentManager;
-import com.marklogic.client.helper.DatabaseClientConfig;
+import com.marklogic.client.ext.helper.DatabaseClientConfig;
 import com.marklogic.client.io.DocumentMetadataHandle;
 import com.marklogic.client.io.Format;
 import com.marklogic.client.io.StringHandle;
@@ -27,9 +27,9 @@ public class SearchDocumentsViaRestAssuredTest extends AbstractSampleProjectTest
         logger.info("Initializing RestAssured...");
 
         String protocol = "http://";
-        
+
         /*
-         * If SSL were enabled on the REST API server, would need to uncomment these lines. 
+         * If SSL were enabled on the REST API server, would need to uncomment these lines.
          */
         // protocol = "https://";
         // RestAssured.config = RestAssured.config().sslConfig(
@@ -39,7 +39,7 @@ public class SearchDocumentsViaRestAssuredTest extends AbstractSampleProjectTest
         RestAssured.baseURI = protocol + config.getHost();
         RestAssured.port = config.getPort();
         RestAssured.authentication = basic(config.getUsername(), config.getPassword());
-        
+
 
         logger.info("RestAssured URI: " + RestAssured.baseURI);
         logger.info("RestAssured port: " + RestAssured.port);

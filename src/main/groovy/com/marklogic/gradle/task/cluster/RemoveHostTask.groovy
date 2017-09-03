@@ -1,7 +1,7 @@
 package com.marklogic.gradle.task.cluster
 
 import com.marklogic.gradle.task.MarkLogicTask
-import com.marklogic.mgmt.clusters.ClusterManager
+import com.marklogic.mgmt.resource.clusters.ClusterManager
 import org.gradle.api.tasks.TaskAction
 
 class RemoveHostTask extends MarkLogicTask {

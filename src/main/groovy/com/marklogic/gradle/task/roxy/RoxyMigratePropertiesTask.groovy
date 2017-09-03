@@ -4,6 +4,7 @@ import org.gradle.api.tasks.TaskAction
 
 class RoxyMigratePropertiesTask extends RoxyTask {
 
+	Set<String> allRoxyProperties = new LinkedHashSet<>()
 	def roxyPropertyFiles = ["default.properties", "build.properties"]
 	def roxyGradleMapping = [
 		"app-name"                : "mlAppName",
@@ -66,6 +67,10 @@ class RoxyMigratePropertiesTask extends RoxyTask {
 			}
 		}
 
+		properties.append("\n# Added automatically by ml-gradle under the assumption that a Roxy application defines all of the app servers that it needs ")
+		properties.append("\n# and thus doesn't need ml-gradle to automatically create a REST API server for it.")
+		properties.append("\nmlNoRestServer=true\n")
+
 		properties.append("\n# All other Roxy properties\n")
 		roxyProperties.each { entry ->
 			String key = entry.key
@@ -86,8 +91,19 @@ class RoxyMigratePropertiesTask extends RoxyTask {
 		if (file.exists()) {
 			new File("backup-" + filename).write(file.text)
 		}
-		println "Writing: " + filename
-		file.write(text)
+		file.withWriter { writer ->
+			roxyGradleMapping.each { k, v ->
+				def val = roxyProperties.get(k)
+				if (val) writer.append(v).append("=").append(val).append("\n")
+			}
+			allRoxyProperties.removeAll(roxyGradleMapping.keySet())
+			allRoxyProperties.each{ prop ->
+				writer.append(prop).append("=").append("unmapped").append("\n")
+			}
+		}
 	}
 
+	String getRoxyHome(){
+		project.hasProperty("mlRoxyHome") ? project.property("mlRoxyHome") : ""
+	}
 }

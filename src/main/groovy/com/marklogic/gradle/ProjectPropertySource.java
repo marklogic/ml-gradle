@@ -1,7 +1,7 @@
 package com.marklogic.gradle;
 
-import com.marklogic.client.helper.LoggingObject;
-import com.marklogic.client.modulesloader.tokenreplacer.PropertiesSource;
+import com.marklogic.client.ext.helper.LoggingObject;
+import com.marklogic.client.ext.tokenreplacer.PropertiesSource;
 import com.marklogic.mgmt.util.PropertySource;
 import org.gradle.api.Project;
 

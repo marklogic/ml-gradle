@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Abstract base class that just needs the subclass to define the list of Command instances to use. Handles executing
@@ -54,12 +55,26 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
         CommandContext context = new CommandContext(appConfig, manageClient, adminManager);
 
         String[] filenamesToIgnore = appConfig.getResourceFilenamesToIgnore();
+	    Pattern excludePattern = appConfig.getResourceFilenamesExcludePattern();
+	    Pattern includePattern = appConfig.getResourceFilenamesIncludePattern();
+
         for (Command command : commands) {
             String name = command.getClass().getName();
             logger.info(format("Executing command [%s] with sort order [%d]", name, command.getExecuteSortOrder()));
+
             if (command instanceof AbstractCommand) {
-	            ((AbstractCommand)command).setFilenamesToIgnore(filenamesToIgnore);
+            	AbstractCommand abstractCommand = (AbstractCommand)command;
+            	if (filenamesToIgnore != null) {
+		            abstractCommand.setFilenamesToIgnore(filenamesToIgnore);
+	            }
+	            if (excludePattern != null) {
+            		abstractCommand.setResourceFilenamesExcludePattern(excludePattern);
+	            }
+	            if (includePattern != null) {
+            		abstractCommand.setResourceFilenamesIncludePattern(includePattern);
+	            }
             }
+
             command.execute(context);
             logger.info(format("Finished executing command [%s]\n", name));
         }

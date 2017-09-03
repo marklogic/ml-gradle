@@ -129,7 +129,10 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    p.setProperty("mlGenerateSchema", "false");
 	    p.setProperty("mlGenerateSearchOptions", "false");
 	    p.setProperty("mlGenerateExtractionTemplate", "false");
+
 	    p.setProperty("mlResourceFilenamesToIgnore", "role1.json,role2.xml");
+	    p.setProperty("mlResourceFilenamesToExcludeRegex", "dev-.*");
+	    p.setProperty("mlResourceFilenamesToIncludeRegex", "qa-.*");
 
 	    p.setProperty("mlDatabaseNamesAndReplicaCounts", "Documents,1,Security,2");
 	    p.setProperty("mlReplicaForestDataDirectory", "/var/data");
@@ -208,6 +211,8 @@ public class DefaultAppConfigFactoryTest extends Assert {
 
         assertEquals("role1.json", config.getResourceFilenamesToIgnore()[0]);
 	    assertEquals("role2.xml", config.getResourceFilenamesToIgnore()[1]);
+	    assertEquals("dev-.*", config.getResourceFilenamesExcludePattern().pattern());
+	    assertEquals("qa-.*", config.getResourceFilenamesIncludePattern().pattern());
 
 	    assertEquals("Documents,1,Security,2", config.getDatabaseNamesAndReplicaCounts());
 	    assertEquals("/var/data", config.getReplicaForestDataDirectory());

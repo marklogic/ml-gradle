@@ -9,9 +9,6 @@ public class ConnectTest extends AbstractApiTest {
 	 */
 	@Test
 	public void test() {
-		manageConfig.setScheme("https");
-		manageConfig.setConfigureSimpleSsl(true);
-
 		api.connect(manageConfig.getHost(), manageConfig);
 		api.getDb().list();
 

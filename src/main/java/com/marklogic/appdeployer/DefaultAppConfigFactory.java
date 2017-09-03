@@ -9,6 +9,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class DefaultAppConfigFactory extends PropertySourceFactory implements AppConfigFactory {
 
@@ -498,6 +499,18 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			String[] values = prop.split(",");
 			logger.info("Ignoring resource filenames: " + Arrays.asList(values));
 			c.setResourceFilenamesToIgnore(values);
+		}
+
+		prop = getProperty("mlResourceFilenamesToExcludeRegex");
+		if (prop != null) {
+			logger.info("Excluding resource filenames matching regex: " + prop);
+			c.setResourceFilenamesExcludePattern(Pattern.compile(prop));
+		}
+
+		prop = getProperty("mlResourceFilenamesToIncludeRegex");
+		if (prop != null) {
+			logger.info("Including resource filenames matching regex: " + prop);
+			c.setResourceFilenamesIncludePattern(Pattern.compile(prop));
 		}
 
 		/**

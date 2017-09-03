@@ -12,6 +12,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Abstract base class that provides some convenience methods for implementing a command. Subclasses will typically
@@ -43,22 +44,54 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
         if (filenames == null || filenames.length == 0) {
             return;
         }
-        if (resourceFilenameFilter != null && resourceFilenameFilter instanceof ResourceFilenameFilter) {
-            ResourceFilenameFilter rff = (ResourceFilenameFilter) resourceFilenameFilter;
-            Set<String> set = null;
-            if (rff.getFilenamesToIgnore() != null) {
-                set = rff.getFilenamesToIgnore();
-            } else {
-                set = new HashSet<>();
-            }
-            for (String f : filenames) {
-                set.add(f);
-            }
-            rff.setFilenamesToIgnore(set);
+        if (resourceFilenameFilter != null) {
+        	if (resourceFilenameFilter instanceof ResourceFilenameFilter) {
+		        ResourceFilenameFilter rff = (ResourceFilenameFilter) resourceFilenameFilter;
+		        Set<String> set = null;
+		        if (rff.getFilenamesToIgnore() != null) {
+			        set = rff.getFilenamesToIgnore();
+		        } else {
+			        set = new HashSet<>();
+		        }
+		        for (String f : filenames) {
+			        set.add(f);
+		        }
+		        rff.setFilenamesToIgnore(set);
+	        } else {
+		        logger.warn("resourceFilenameFilter is not an instanceof ResourceFilenameFilter, so unable to set resource filenames to ignore");
+	        }
         } else {
             this.resourceFilenameFilter = new ResourceFilenameFilter(filenames);
         }
     }
+
+    public void setResourceFilenamesExcludePattern(Pattern pattern) {
+    	if (resourceFilenameFilter != null) {
+    		if (resourceFilenameFilter instanceof ResourceFilenameFilter) {
+			    ((ResourceFilenameFilter)resourceFilenameFilter).setExcludePattern(pattern);
+		    } else {
+    			logger.warn("resourceFilenameFilter is not an instanceof ResourceFilenameFilter, so unable to set exclude pattern");
+		    }
+	    } else {
+    		ResourceFilenameFilter rff = new ResourceFilenameFilter();
+    		rff.setExcludePattern(pattern);
+    		this.resourceFilenameFilter = rff;
+	    }
+    }
+
+	public void setResourceFilenamesIncludePattern(Pattern pattern) {
+		if (resourceFilenameFilter != null) {
+			if (resourceFilenameFilter instanceof ResourceFilenameFilter) {
+				((ResourceFilenameFilter)resourceFilenameFilter).setIncludePattern(pattern);
+			} else {
+				logger.warn("resourceFilenameFilter is not an instanceof ResourceFilenameFilter, so unable to set include pattern");
+			}
+		} else {
+			ResourceFilenameFilter rff = new ResourceFilenameFilter();
+			rff.setIncludePattern(pattern);
+			this.resourceFilenameFilter = rff;
+		}
+	}
 
     /**
      * Simplifies reading the contents of a File into a String.

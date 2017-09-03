@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Encapsulates common configuration properties for an application deployed to MarkLogic. These properties include not
@@ -172,6 +173,8 @@ public class AppConfig {
 	private boolean generateSearchOptions = true;
 
 	private String[] resourceFilenamesToIgnore;
+	private Pattern resourceFilenamesExcludePattern;
+	private Pattern resourceFilenamesIncludePattern;
 
 	private Map<String, Object> additionalProperties = new HashMap<>();
 
@@ -902,5 +905,21 @@ public class AppConfig {
 
 	public void setConfiguredDatabaseClientFactory(ConfiguredDatabaseClientFactory configuredDatabaseClientFactory) {
 		this.configuredDatabaseClientFactory = configuredDatabaseClientFactory;
+	}
+
+	public Pattern getResourceFilenamesExcludePattern() {
+		return resourceFilenamesExcludePattern;
+	}
+
+	public void setResourceFilenamesExcludePattern(Pattern resourceFilenamesExcludePattern) {
+		this.resourceFilenamesExcludePattern = resourceFilenamesExcludePattern;
+	}
+
+	public Pattern getResourceFilenamesIncludePattern() {
+		return resourceFilenamesIncludePattern;
+	}
+
+	public void setResourceFilenamesIncludePattern(Pattern resourceFilenamesIncludePattern) {
+		this.resourceFilenamesIncludePattern = resourceFilenamesIncludePattern;
 	}
 }

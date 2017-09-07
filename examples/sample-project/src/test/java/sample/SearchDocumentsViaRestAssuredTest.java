@@ -9,7 +9,7 @@ import org.junit.Test;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.path.json.JsonPath;
 import com.marklogic.client.document.XMLDocumentManager;
-import com.marklogic.client.ext.helper.DatabaseClientConfig;
+import com.marklogic.client.ext.DatabaseClientConfig;
 import com.marklogic.client.io.DocumentMetadataHandle;
 import com.marklogic.client.io.Format;
 import com.marklogic.client.io.StringHandle;

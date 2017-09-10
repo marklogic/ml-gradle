@@ -38,6 +38,7 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 		DefaultModulesLoader modulesLoader = new DefaultModulesLoader(new AssetFileLoader(modulesClient));
 		modulesLoader.setModulesManager(null);
 
+		// Load without a ModulesManager first
 		File dir = new File("src/test/resources/sample-base-dir");
 		Set<File> files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
 		assertEquals(13, files.size());
@@ -48,11 +49,17 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 		assertModuleExists("/lib/module4.xqy");
 		final int initialModuleCount = getUriCountInModulesDatabase();
 
-		// Load again with a modules manager, make sure all files are loaded but no new docs in the modules database
+		// Use a modules manager, but set the timestamp in the future first
 		PropertiesModuleManager moduleManager = new PropertiesModuleManager();
-		moduleManager.deletePropertiesFile();
 		modulesLoader.setAssetFileLoader(new AssetFileLoader(modulesClient, moduleManager));
 		modulesLoader.setModulesManager(moduleManager);
+		moduleManager.setMinimumFileTimestampToLoad(System.currentTimeMillis() + 10000);
+		files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
+		assertEquals("No files should have been loaded since the minimum last-modified timestamp is in the future", 0, files.size());
+
+		// Remove the timestamp minimum, all the modules should be loaded
+		moduleManager.deletePropertiesFile();
+		moduleManager.setMinimumFileTimestampToLoad(0);
 		files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
 		assertEquals("All files should have been loaded since a ModulesManager wasn't used on the first load", 13, files.size());
 		assertEquals("No new modules should have been created", initialModuleCount, getUriCountInModulesDatabase());
@@ -61,6 +68,7 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 		files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
 		assertEquals("No files should have been loaded since none were new or modified", 0, files.size());
 		assertEquals("Module count shouldn't have changed either", initialModuleCount, getUriCountInModulesDatabase());
+
 	}
 
 	private int getUriCountInModulesDatabase() {

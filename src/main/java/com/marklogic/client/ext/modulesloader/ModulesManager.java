@@ -13,7 +13,7 @@ public interface ModulesManager {
      */
     void initialize();
 
-    boolean hasFileBeenModifiedSinceLastInstalled(File file);
+    boolean hasFileBeenModifiedSinceLastLoaded(File file);
 
-    void saveLastInstalledTimestamp(File file, Date date);
+    void saveLastLoadedTimestamp(File file, Date date);
 }

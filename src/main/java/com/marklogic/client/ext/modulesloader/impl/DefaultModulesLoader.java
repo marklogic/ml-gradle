@@ -223,7 +223,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		Resource r = modules.getPropertiesFile();
 		if (r != null && r.exists()) {
 			File f = getFileFromResource(r);
-			if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(f)) {
+			if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastLoaded(f)) {
 				return;
 			}
 
@@ -266,7 +266,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 			}
 
 			if (modulesManager != null) {
-				modulesManager.saveLastInstalledTimestamp(f, new Date());
+				modulesManager.saveLastLoadedTimestamp(f, new Date());
 			}
 
 			loadedModules.add(f);
@@ -347,7 +347,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 					logger.warn("Unable to load module from file: " + f.getAbsolutePath() + "; cause: " + e.getMessage(), e);
 					loadedModules.add(f);
 					if (modulesManager != null) {
-						modulesManager.saveLastInstalledTimestamp(f, new Date());
+						modulesManager.saveLastLoadedTimestamp(f, new Date());
 					}
 				} else {
 					throw e;
@@ -371,7 +371,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 					logger.warn("Unable to load module from file: " + f.getAbsolutePath() + "; cause: " + e.getMessage(), e);
 					loadedModules.add(f);
 					if (modulesManager != null) {
-						modulesManager.saveLastInstalledTimestamp(f, new Date());
+						modulesManager.saveLastLoadedTimestamp(f, new Date());
 					}
 				} else {
 					throw e;
@@ -398,12 +398,12 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	}
 
 	public File installService(File file, ExtensionMetadata metadata, MethodParameters... methodParams) {
-		if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(file)) {
+		if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastLoaded(file)) {
 			return null;
 		}
 		installService(new FileSystemResource(file), metadata, methodParams);
 		if (modulesManager != null) {
-			modulesManager.saveLastInstalledTimestamp(file, new Date());
+			modulesManager.saveLastLoadedTimestamp(file, new Date());
 		}
 		return file;
 	}
@@ -431,12 +431,12 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	}
 
 	public File installTransform(File file, ExtensionMetadata metadata) {
-		if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(file)) {
+		if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastLoaded(file)) {
 			return null;
 		}
 		installTransform(new FileSystemResource(file), metadata);
 		if (modulesManager != null) {
-			modulesManager.saveLastInstalledTimestamp(file, new Date());
+			modulesManager.saveLastLoadedTimestamp(file, new Date());
 		}
 		return file;
 	}
@@ -468,12 +468,12 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	}
 
 	public File installQueryOptions(File f) {
-		if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(f)) {
+		if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastLoaded(f)) {
 			return null;
 		}
 		installQueryOptions(new FileSystemResource(f));
 		if (modulesManager != null) {
-			modulesManager.saveLastInstalledTimestamp(f, new Date());
+			modulesManager.saveLastLoadedTimestamp(f, new Date());
 		}
 		return f;
 	}
@@ -516,12 +516,12 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	}
 
 	public File installNamespace(File f) {
-		if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(f)) {
+		if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastLoaded(f)) {
 			return null;
 		}
 		installNamespace(new FileSystemResource(f));
 		if (modulesManager != null) {
-			modulesManager.saveLastInstalledTimestamp(f, new Date());
+			modulesManager.saveLastLoadedTimestamp(f, new Date());
 		}
 		return f;
 	}

@@ -19,10 +19,10 @@ public class ModulesManagerDocumentFileProcessor implements DocumentFileProcesso
 	public DocumentFile processDocumentFile(DocumentFile documentFile) {
 		File file = documentFile.getFile();
 		if (file != null) {
-			if (!modulesManager.hasFileBeenModifiedSinceLastInstalled(file)) {
+			if (!modulesManager.hasFileBeenModifiedSinceLastLoaded(file)) {
 				return null;
 			}
-			modulesManager.saveLastInstalledTimestamp(file, new Date());
+			modulesManager.saveLastLoadedTimestamp(file, new Date());
 		}
 		return documentFile;
 	}

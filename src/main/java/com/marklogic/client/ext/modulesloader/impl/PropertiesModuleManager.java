@@ -15,6 +15,7 @@ public class PropertiesModuleManager extends LoggingObject implements ModulesMan
 
     private Properties props;
     private File propertiesFile;
+    private long minimumFileTimestampToLoad;
 
     public PropertiesModuleManager() {
         this(new File(DEFAULT_FILE_PATH));
@@ -54,18 +55,26 @@ public class PropertiesModuleManager extends LoggingObject implements ModulesMan
         }
     }
 
-    public boolean hasFileBeenModifiedSinceLastInstalled(File file) {
+    public boolean hasFileBeenModifiedSinceLastLoaded(File file) {
+    	if (minimumFileTimestampToLoad > 0 && file.lastModified() < minimumFileTimestampToLoad) {
+    		if (logger.isDebugEnabled()) {
+    			logger.debug(String.format("lastModified for file '%s' is %d, which is before the minimumFileTimestampToLoad of %d",
+				    file.getAbsolutePath(), file.lastModified(), minimumFileTimestampToLoad));
+		    }
+    		return false;
+	    }
+
         String key = buildKey(file);
         String value = props.getProperty(key);
         if (value != null) {
             long lastModified = file.lastModified();
-            long lastInstalled = Long.parseLong(value);
-            return lastModified > lastInstalled;
+            long lastLoaded = Long.parseLong(value);
+            return lastModified > lastLoaded;
         }
         return true;
     }
 
-    public void saveLastInstalledTimestamp(File file, Date date) {
+    public void saveLastLoadedTimestamp(File file, Date date) {
         String key = buildKey(file);
         props.setProperty(key, date.getTime() + "");
         FileWriter fw = null;
@@ -94,4 +103,8 @@ public class PropertiesModuleManager extends LoggingObject implements ModulesMan
     protected String buildKey(File file) {
         return file.getAbsolutePath().toLowerCase();
     }
+
+	public void setMinimumFileTimestampToLoad(long minimumFileTimestampToLoad) {
+		this.minimumFileTimestampToLoad = minimumFileTimestampToLoad;
+	}
 }

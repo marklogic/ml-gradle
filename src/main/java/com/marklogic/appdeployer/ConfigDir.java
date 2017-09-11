@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Defines all of the directories where configuration files can be found.
  *
- * TODO Eventually turn this into an interface. 
+ * TODO Eventually turn this into an interface.
  */
 public class ConfigDir {
 
@@ -91,6 +91,10 @@ public class ConfigDir {
 	public File getUsersDir() {
 		return new File(getSecurityDir(), "users");
 	}
+
+	public File getProtectedPathsDir() { return new File(getSecurityDir(), "protected-paths"); }
+
+	public File getQueryRoleSetsDir() { return new File(getSecurityDir(), "query-rolesets"); }
 
 	public File getServersDir() {
 		return new File(baseDir, "servers");

@@ -1,0 +1,9 @@
+{
+	"path-expression":"/test:element",
+	"path-namespace":[
+		{"prefix":"test", "namespace-uri":"http://marklogic.com"}
+	],
+	"permission": [
+		{"role-name":"view-admin", "capability":"read"}
+	]
+}

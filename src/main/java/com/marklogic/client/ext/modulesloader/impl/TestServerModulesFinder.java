@@ -13,7 +13,7 @@ import com.marklogic.client.ext.modulesloader.Modules;
 public class TestServerModulesFinder extends BaseModulesFinder {
 
     @Override
-    public Modules findModules(File baseDir) {
+    public Modules findModules(String baseDir) {
         Modules modules = new Modules();
         addOptions(modules, baseDir);
         addPropertiesFile(modules, baseDir);

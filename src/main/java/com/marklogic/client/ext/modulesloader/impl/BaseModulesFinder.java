@@ -1,17 +1,18 @@
 package com.marklogic.client.ext.modulesloader.impl;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-
 import com.marklogic.client.ext.helper.FilenameUtil;
 import com.marklogic.client.ext.modulesloader.Modules;
 import com.marklogic.client.ext.modulesloader.ModulesFinder;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
+
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Abstract implementation that provides implementations for loading all the different kinds of modules, but doesn't
@@ -21,6 +22,7 @@ public abstract class BaseModulesFinder implements ModulesFinder {
 
     private FilenameFilter transformFilenameFilter = new TransformFilenameFilter();
     private FilenameFilter namespaceFilenameFilter = new NamespaceFilenameFilter();
+	private ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
     /**
      * Whether to treat paths that aren't recognized by this class (i.e. not services, options, namespaces, or
@@ -28,8 +30,6 @@ public abstract class BaseModulesFinder implements ModulesFinder {
      */
     private boolean includeUnrecognizedPathsAsAssetPaths = true;
 
-    private String extPath = "ext";
-    private String rootPath = "root";
     private String servicesPath = "services";
     private String optionsPath = "options";
     private String namespacesPath = "namespaces";
@@ -43,91 +43,77 @@ public abstract class BaseModulesFinder implements ModulesFinder {
      * @param modules
      * @param baseDir
      */
-    protected void addPropertiesFile(Modules modules, File baseDir) {
-        File jsonFile = new File(baseDir, "rest-properties.json");
-        if (jsonFile.exists()) {
-            modules.setPropertiesFile(new FileSystemResource(jsonFile));
-        }
+    protected void addPropertiesFile(Modules modules, String baseDir) {
+		List<Resource> properties = findResources(baseDir, "rest-properties.json");
+		if (properties.size() == 1) {
+			modules.setPropertiesFile(properties.get(0));
+		}
     }
 
-    protected void addServices(Modules modules, File baseDir) {
-        File servicesBaseDir = new File(baseDir, servicesPath);
-        List<Resource> services = new ArrayList<>();
-        if (servicesBaseDir.exists()) {
-            for (File f : servicesBaseDir.listFiles()) {
-                if (FilenameUtil.isXqueryFile(f.getName()) || FilenameUtil.isJavascriptFile(f.getName())) {
-                    services.add(new FileSystemResource(f));
-                }
-            }
-        }
-        modules.setServices(services);
+    protected void addServices(Modules modules, String baseDir) {
+		modules.setServices(findResources(baseDir,
+			servicesPath + File.separator + "*.xq*",
+			servicesPath + File.separator + "*.sjs"));
     }
 
-    protected void addAssetDirectories(Modules modules, File baseDir) {
-        List<Resource> dirs = new ArrayList<>();
-        File dir = new File(baseDir, extPath);
-        if (dir.exists()) {
-            dirs.add(new FileSystemResource(dir));
-        }
-        dir = new File(baseDir, rootPath);
-        if (dir.exists()) {
-            dirs.add(new FileSystemResource(dir));
-        }
+    protected void addAssetDirectories(Modules modules, String baseDir) {
+		List<Resource> dirs = new ArrayList<>();
 
-        if (includeUnrecognizedPathsAsAssetPaths && baseDir != null && baseDir.exists()) {
-            List<String> recognizedPaths = getRecognizedPaths();
-            for (File f : baseDir.listFiles()) {
-                if (f.isDirectory() && !recognizedPaths.contains(f.getName())) {
-                    dirs.add(new FileSystemResource(f));
-                }
-            }
-        }
+		List<String> recognizedPaths = getRecognizedPaths();
+
+		// classpath needs the trailing / to find child dirs
+		findResources(baseDir, "*", "*/").stream().forEach(resource -> {
+			File f = null;
+			try {
+				f = resource.getFile();
+			} catch (IOException e) {}
+
+			if (!recognizedPaths.contains(resource.getFilename())) {
+				if (f == null || f.isDirectory()) {
+					if (dirs.indexOf(resource) < 0) {
+						dirs.add(resource);
+					}
+				}
+			}
+		});
 
         modules.setAssetDirectories(dirs);
     }
 
     protected List<String> getRecognizedPaths() {
-        return Arrays
-                .asList(new String[] { extPath, rootPath, optionsPath, servicesPath, transformsPath, namespacesPath, schemasPath });
+        return Arrays.asList(optionsPath, servicesPath, transformsPath, namespacesPath, schemasPath);
     }
 
-    protected void addOptions(Modules modules, File baseDir) {
-        File queryOptionsBaseDir = new File(baseDir, optionsPath);
-        List<Resource> queryOptions = new ArrayList<>();
-        if (queryOptionsBaseDir.exists()) {
-            for (File f : queryOptionsBaseDir.listFiles()) {
-                String filename = f.getName();
-                if (filename.endsWith(".xml") || filename.endsWith(".json")) {
-                    queryOptions.add(new FileSystemResource(f));
-                }
-            }
-        }
-        modules.setOptions(queryOptions);
+    protected void addOptions(Modules modules, String baseDir) {
+        modules.setOptions(findResources(baseDir, optionsPath + "**/*.*"));
     }
 
-    protected void addNamespaces(Modules modules, File baseDir) {
-        File namespacesDir = new File(baseDir, namespacesPath);
-        List<Resource> namespaces = new ArrayList<>();
-        if (namespacesDir.exists()) {
-            for (File f : namespacesDir.listFiles(namespaceFilenameFilter)) {
-                namespaces.add(new FileSystemResource(f));
-            }
-        }
-        modules.setNamespaces(namespaces);
+    protected void addNamespaces(Modules modules, String baseDir) {
+        modules.setNamespaces(findResources(baseDir, namespacesPath + "**/*.*"));
     }
 
-    protected void addTransforms(Modules modules, File baseDir) {
-        File transformsBaseDir = new File(baseDir, transformsPath);
-        List<Resource> transforms = new ArrayList<>();
-        if (transformsBaseDir.exists()) {
-            for (File f : transformsBaseDir.listFiles(transformFilenameFilter)) {
-                transforms.add(new FileSystemResource(f));
-            }
-        }
-        modules.setTransforms(transforms);
+    protected void addTransforms(Modules modules, String baseDir) {
+        modules.setTransforms(findResources(
+        	baseDir + File.separator + transformsPath,
+			"*.xq*", "*.xsl*", "*.sjs"));
     }
 
-    public FilenameFilter getTransformFilenameFilter() {
+	protected List<Resource> findResources(String basePath, String... paths) {
+		List<Resource> list = new ArrayList<>();
+		for (String path : paths) {
+			try {
+				String finalPath = basePath + File.separator + path;
+				Resource[] r = resolver.getResources(finalPath);
+				list.addAll(Arrays.asList(r));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return list;
+	}
+
+
+	public FilenameFilter getTransformFilenameFilter() {
         return transformFilenameFilter;
     }
 
@@ -165,14 +151,6 @@ public abstract class BaseModulesFinder implements ModulesFinder {
 
     public void setIncludeUnrecognizedPathsAsAssetPaths(boolean includeUnrecognizedPathsAsAssetPaths) {
         this.includeUnrecognizedPathsAsAssetPaths = includeUnrecognizedPathsAsAssetPaths;
-    }
-
-    public void setExtPath(String extPath) {
-        this.extPath = extPath;
-    }
-
-    public void setRootPath(String rootPath) {
-        this.rootPath = rootPath;
     }
 }
 

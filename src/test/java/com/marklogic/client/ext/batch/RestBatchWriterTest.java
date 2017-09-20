@@ -48,7 +48,6 @@ public class RestBatchWriterTest extends AbstractIntegrationTest {
 		FileHandle fileHandle = new FileHandle(transform.getFile());
 		fileHandle.setFormat(Format.XML);
 		transMgr.writeXQueryTransform("simple", fileHandle);
-		client.release();
 
 
 		DocumentWriteOperation op = new DocumentWriteOperationImpl(DocumentWriteOperation.OperationType.DOCUMENT_WRITE,
@@ -61,7 +60,6 @@ public class RestBatchWriterTest extends AbstractIntegrationTest {
 		writer.initialize();
 		writer.write(Arrays.asList(op));
 		writer.waitForCompletion();
-		client.release();
 
 		client = newClient("Documents");
 		XMLDocumentManager docMgr = client.newXMLDocumentManager();

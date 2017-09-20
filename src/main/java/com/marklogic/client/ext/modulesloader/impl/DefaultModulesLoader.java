@@ -9,11 +9,10 @@ import com.marklogic.client.admin.ServerConfigurationManager.UpdatePolicy;
 import com.marklogic.client.ext.file.DocumentFile;
 import com.marklogic.client.ext.helper.FilenameUtil;
 import com.marklogic.client.ext.helper.LoggingObject;
+import com.marklogic.client.ext.modulesloader.*;
 import com.marklogic.client.io.Format;
 import com.marklogic.client.io.InputStreamHandle;
-import com.marklogic.client.ext.modulesloader.*;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
@@ -87,9 +86,13 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	 * because the /v1/ext endpoint is so slow - load assets instead via a RestApiAssetLoader or an XccAssetLoader
 	 * passed into a constructor for this class.
 	 */
-	public Set<File> loadModules(File baseDir, ModulesFinder modulesFinder, DatabaseClient client) {
+	public Set<Resource> loadModules(String baseDir, ModulesFinder modulesFinder, DatabaseClient client) {
+		if (!baseDir.startsWith("file:") && !baseDir.startsWith("classpath")) {
+			baseDir = "file:" + baseDir;
+		}
+
 		if (logger.isDebugEnabled()) {
-			logger.debug("Loading modules from base directory: " + baseDir.getAbsolutePath());
+			logger.debug("Loading modules from base directory: " + baseDir);
 		}
 		setDatabaseClient(client);
 
@@ -103,7 +106,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 			initializeDefaultTaskExecutor();
 		}
 
-		Set<File> loadedModules = new HashSet<>();
+		Set<Resource> loadedModules = new HashSet<>();
 		loadProperties(modules, loadedModules);
 		loadNamespaces(modules, loadedModules);
 		loadAssets(modules, loadedModules);
@@ -115,7 +118,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		waitForTaskExecutorToFinish();
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("Finished loading modules from base directory: " + baseDir.getAbsolutePath());
+			logger.debug("Finished loading modules from base directory: " + baseDir);
 		}
 		return loadedModules;
 	}
@@ -140,41 +143,6 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		} else if (logger.isDebugEnabled()) {
 			logger.debug("shutdownTaskExecutorAfterLoadingModules is set to false, so not shutting down taskExecutor");
 		}
-	}
-
-	/**
-	 * Specialized method for loading modules from the classpath. Currently does not support loading asset modules.
-	 *
-	 * @param rootPath
-	 * @param client
-	 */
-	public void loadClasspathModules(String rootPath, DatabaseClient client) {
-		setDatabaseClient(client);
-
-		Modules modules = new DefaultModulesFinder().findClasspathModules("classpath:" + rootPath);
-
-		ExtensionLibrariesManager mgr = client.newServerConfigManager().newExtensionLibrariesManager();
-		for (Resource r : modules.getAssets()) {
-			installAsset(r, rootPath, mgr);
-		}
-
-		for (Resource r : modules.getNamespaces()) {
-			installNamespace(r);
-		}
-
-		for (Resource r : modules.getOptions()) {
-			installQueryOptions(r);
-		}
-
-		for (Resource r : modules.getTransforms()) {
-			installTransform(r, new ExtensionMetadata());
-		}
-
-		for (Resource r : modules.getServices()) {
-			installService(r, new ExtensionMetadata());
-		}
-
-		waitForTaskExecutorToFinish();
 	}
 
 	/**
@@ -219,18 +187,18 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	 * @param modules
 	 * @param loadedModules
 	 */
-	protected void loadProperties(Modules modules, Set<File> loadedModules) {
+	protected void loadProperties(Modules modules, Set<Resource> loadedModules) {
 		Resource r = modules.getPropertiesFile();
 		if (r != null && r.exists()) {
 			File f = getFileFromResource(r);
-			if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(f)) {
+			if (f != null && modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(f)) {
 				return;
 			}
 
 			ServerConfigurationManager mgr = client.newServerConfigManager();
 			ObjectMapper m = new ObjectMapper();
 			try {
-				JsonNode node = m.readTree(f);
+				JsonNode node = m.readTree(r.getInputStream());
 				if (node.has("document-transform-all")) {
 					mgr.setDefaultDocumentReadTransformAll(node.get("document-transform-all").asBoolean());
 				}
@@ -265,23 +233,22 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 				throw new RuntimeException("Unable to read REST configuration from file: " + f.getAbsolutePath(), e);
 			}
 
-			if (modulesManager != null) {
+			if (f != null && modulesManager != null) {
 				modulesManager.saveLastInstalledTimestamp(f, new Date());
 			}
 
-			loadedModules.add(f);
+			loadedModules.add(r);
 		}
 	}
 
 	protected File getFileFromResource(Resource r) {
 		try {
 			return r.getFile();
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
-		}
+		} catch (IOException ex) {}
+		return null;
 	}
 
-	protected void loadAssets(Modules modules, Set<File> loadedModules) {
+	protected void loadAssets(Modules modules, Set<Resource> loadedModules) {
 		List<Resource> dirs = modules.getAssetDirectories();
 		if (dirs == null || dirs.isEmpty()) {
 			return;
@@ -289,10 +256,12 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 
 		String[] paths = new String[dirs.size()];
 		for (int i = 0; i < dirs.size(); i++) {
-			paths[i] = getFileFromResource(dirs.get(i)).getAbsolutePath();
+			try {
+				paths[i] = dirs.get(i).getURI().toString();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		}
-
-		Set<File> files = null;
 
 		List<DocumentFile> list = assetFileLoader.loadFiles(paths);
 		if (staticChecker != null && !list.isEmpty()) {
@@ -306,9 +275,9 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 				}
 			}
 		}
-		files = new HashSet<>();
+		Set<Resource> files = new HashSet<>();
 		for (DocumentFile asset : list) {
-			files.add(asset.getFile());
+			files.add(asset.getResource());
 		}
 
 		if (files != null) {
@@ -316,39 +285,35 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		}
 	}
 
-	protected void loadQueryOptions(Modules modules, Set<File> loadedModules) {
+	protected void loadQueryOptions(Modules modules, Set<Resource> loadedModules) {
 		if (modules.getOptions() == null) {
 			return;
 		}
 
 		for (Resource r : modules.getOptions()) {
-			File f = installQueryOptions(getFileFromResource(r));
-			if (f != null) {
-				loadedModules.add(f);
+			if (installQueryOptions(r) != null) {
+				loadedModules.add(r);
 			}
 		}
 	}
 
-	protected void loadTransforms(Modules modules, Set<File> loadedModules) {
+	protected void loadTransforms(Modules modules, Set<Resource> loadedModules) {
 		if (modules.getTransforms() == null) {
 			return;
 		}
 
 		for (Resource r : modules.getTransforms()) {
-			File f = getFileFromResource(r);
 			try {
 				ExtensionMetadataAndParams emap = extensionMetadataProvider.provideExtensionMetadataAndParams(r);
-				f = installTransform(f, emap.metadata);
-				if (f != null) {
-					loadedModules.add(f);
+				if (installTransform(r, emap.metadata) != null) {
+					loadedModules.add(r);
 				}
 			} catch (RuntimeException e) {
 				if (catchExceptions) {
-					logger.warn("Unable to load module from file: " + f.getAbsolutePath() + "; cause: " + e.getMessage(), e);
-					loadedModules.add(f);
-					if (modulesManager != null) {
-						modulesManager.saveLastInstalledTimestamp(f, new Date());
-					}
+					logger.warn("Unable to load module from file: " + r.getFilename() + "; cause: " + e.getMessage(), e);
+					// update the timestamp so that mlWatch doesn't keep trying again and again
+					loadedModules.add(r);
+					updateTimestamp(r);
 				} else {
 					throw e;
 				}
@@ -356,59 +321,46 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		}
 	}
 
-	protected void loadResources(Modules modules, Set<File> loadedModules) {
+	protected void loadResources(Modules modules, Set<Resource> loadedModules) {
 		if (modules.getServices() == null) {
 			return;
 		}
 
 		for (Resource r : modules.getServices()) {
-			File f = getFileFromResource(r);
 			try {
 				ExtensionMetadataAndParams emap = extensionMetadataProvider.provideExtensionMetadataAndParams(r);
-				f = installService(f, emap.metadata, emap.methods.toArray(new MethodParameters[]{}));
+				if (installService(r, emap.metadata, emap.methods.toArray(new MethodParameters[]{})) != null) {
+					loadedModules.add(r);
+				}
 			} catch (RuntimeException e) {
 				if (catchExceptions) {
-					logger.warn("Unable to load module from file: " + f.getAbsolutePath() + "; cause: " + e.getMessage(), e);
-					loadedModules.add(f);
-					if (modulesManager != null) {
-						modulesManager.saveLastInstalledTimestamp(f, new Date());
-					}
+					logger.warn("Unable to load module from file: " + r.getFilename() + "; cause: " + e.getMessage(), e);
+					// update the timestamp so that mlWatch doesn't keep trying again and again
+					loadedModules.add(r);
+					updateTimestamp(r);
 				} else {
 					throw e;
 				}
 			}
-			if (f != null) {
-				loadedModules.add(f);
-			}
 		}
 	}
 
-	protected void loadNamespaces(Modules modules, Set<File> loadedModules) {
+	protected void loadNamespaces(Modules modules, Set<Resource> loadedModules) {
 		if (modules.getNamespaces() == null) {
 			return;
 		}
 
 		for (Resource r : modules.getNamespaces()) {
-			File f = getFileFromResource(r);
-			f = installNamespace(f);
-			if (f != null) {
-				loadedModules.add(f);
+			if (installNamespace(r) != null) {
+				loadedModules.add(r);
 			}
 		}
 	}
 
-	public File installService(File file, ExtensionMetadata metadata, MethodParameters... methodParams) {
-		if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(file)) {
+	public Resource installService(Resource r, final ExtensionMetadata metadata, final MethodParameters... methodParams) {
+		if (!hasFileBeenModified(r)) {
 			return null;
 		}
-		installService(new FileSystemResource(file), metadata, methodParams);
-		if (modulesManager != null) {
-			modulesManager.saveLastInstalledTimestamp(file, new Date());
-		}
-		return file;
-	}
-
-	public void installService(Resource r, final ExtensionMetadata metadata, final MethodParameters... methodParams) {
 		final ResourceExtensionsManager extMgr = client.newServerConfigManager().newResourceExtensionsManager();
 		final String resourceName = getExtensionNameFromFile(r);
 		if (metadata.getTitle() == null) {
@@ -421,64 +373,45 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		} catch (IOException ie) {
 			throw new RuntimeException("Unable to read service resource: " + ie.getMessage(), ie);
 		}
-		final InputStreamHandle finalHandle = h;
-		executeTask(new Runnable() {
-			@Override
-			public void run() {
-				extMgr.writeServices(resourceName, finalHandle, metadata, methodParams);
-			}
-		});
+		executeTask(() -> extMgr.writeServices(resourceName, h, metadata, methodParams));
+
+		updateTimestamp(r);
+		return r;
 	}
 
-	public File installTransform(File file, ExtensionMetadata metadata) {
-		if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(file)) {
+	public Resource installTransform(Resource r, final ExtensionMetadata metadata) {
+		if (!hasFileBeenModified(r)) {
 			return null;
 		}
-		installTransform(new FileSystemResource(file), metadata);
-		if (modulesManager != null) {
-			modulesManager.saveLastInstalledTimestamp(file, new Date());
-		}
-		return file;
-	}
-
-	public void installTransform(Resource r, final ExtensionMetadata metadata) {
 		final String filename = r.getFilename();
 		final TransformExtensionsManager mgr = client.newServerConfigManager().newTransformExtensionsManager();
 		final String transformName = getExtensionNameFromFile(r);
 		logger.info(String.format("Loading %s transform from resource %s", transformName, filename));
-		InputStreamHandle h = null;
+		InputStreamHandle h;
 		try {
 			h = new InputStreamHandle(r.getInputStream());
 		} catch (IOException ie) {
 			throw new RuntimeException("Unable to read transform resource: " + ie.getMessage(), ie);
 		}
-		final InputStreamHandle finalHandle = h;
-		executeTask(new Runnable() {
-			@Override
-			public void run() {
-				if (FilenameUtil.isXslFile(filename)) {
-					mgr.writeXSLTransform(transformName, finalHandle, metadata);
-				} else if (FilenameUtil.isJavascriptFile(filename)) {
-					mgr.writeJavascriptTransform(transformName, finalHandle, metadata);
-				} else {
-					mgr.writeXQueryTransform(transformName, finalHandle, metadata);
-				}
-			}
-		});
+		executeTask(() -> {
+            if (FilenameUtil.isXslFile(filename)) {
+                mgr.writeXSLTransform(transformName, h, metadata);
+            } else if (FilenameUtil.isJavascriptFile(filename)) {
+                mgr.writeJavascriptTransform(transformName, h, metadata);
+            } else {
+                mgr.writeXQueryTransform(transformName, h, metadata);
+            }
+        });
+		updateTimestamp(r);
+
+		return r;
 	}
 
-	public File installQueryOptions(File f) {
-		if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(f)) {
+	public Resource installQueryOptions(Resource r) {
+		if (!hasFileBeenModified(r)) {
 			return null;
 		}
-		installQueryOptions(new FileSystemResource(f));
-		if (modulesManager != null) {
-			modulesManager.saveLastInstalledTimestamp(f, new Date());
-		}
-		return f;
-	}
 
-	public void installQueryOptions(Resource r) {
 		final String filename = r.getFilename();
 		final String name = getExtensionNameFromFile(r);
 		logger.info(String.format("Loading %s query options from file %s", name, filename));
@@ -489,17 +422,15 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		} catch (IOException ie) {
 			throw new RuntimeException("Unable to read transform resource: " + ie.getMessage(), ie);
 		}
-		final InputStreamHandle writeHandle = h;
-		executeTask(new Runnable() {
-			@Override
-			public void run() {
-				if (filename.endsWith(".json")) {
-					mgr.writeOptions(name, writeHandle.withFormat(Format.JSON));
-				} else {
-					mgr.writeOptions(name, writeHandle);
-				}
-			}
-		});
+		executeTask(() -> {
+            if (filename.endsWith(".json")) {
+                mgr.writeOptions(name, h.withFormat(Format.JSON));
+            } else {
+                mgr.writeOptions(name, h);
+            }
+        });
+		updateTimestamp(r);
+		return r;
 	}
 
 	/**
@@ -515,25 +446,18 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		taskExecutor.execute(r);
 	}
 
-	public File installNamespace(File f) {
-		if (modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(f)) {
+	public Resource installNamespace(Resource r) {
+		if (!hasFileBeenModified(r)) {
 			return null;
 		}
-		installNamespace(new FileSystemResource(f));
-		if (modulesManager != null) {
-			modulesManager.saveLastInstalledTimestamp(f, new Date());
-		}
-		return f;
-	}
 
-	public void installNamespace(Resource r) {
 		String prefix = getExtensionNameFromFile(r);
-		String namespaceUri = null;
+		String namespaceUri;
 		try {
 			namespaceUri = new String(FileCopyUtils.copyToByteArray(r.getInputStream()));
 		} catch (IOException ie) {
 			logger.error("Unable to install namespace from file: " + r.getFilename(), ie);
-			return;
+			return null;
 		}
 		NamespacesManager mgr = client.newServerConfigManager().newNamespacesManager();
 		String existingUri = mgr.readPrefix(prefix);
@@ -543,6 +467,9 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		}
 		logger.info(String.format("Adding namespace with prefix of %s and URI of %s", prefix, namespaceUri));
 		mgr.addPrefix(prefix, namespaceUri);
+		updateTimestamp(r);
+
+		return r;
 	}
 
 	protected String getExtensionNameFromFile(Resource r) {
@@ -603,5 +530,25 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 
 	public void setAssetFileLoader(AssetFileLoader assetFileLoader) {
 		this.assetFileLoader = assetFileLoader;
+	}
+
+	private boolean hasFileBeenModified(Resource resource) {
+		boolean modified = true;
+		if (modulesManager != null) {
+			try {
+				File file = resource.getFile();
+				modified = modulesManager.hasFileBeenModifiedSinceLastInstalled(file);
+			} catch (IOException e) {}
+		}
+		return modified;
+	}
+
+	private void updateTimestamp(Resource resource) {
+		if (modulesManager != null) {
+			try {
+				File file = resource.getFile();
+				modulesManager.saveLastInstalledTimestamp(file, new Date());
+			} catch (IOException e) {}
+		}
 	}
 }

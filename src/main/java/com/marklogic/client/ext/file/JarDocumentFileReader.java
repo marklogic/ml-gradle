@@ -30,10 +30,10 @@ public class JarDocumentFileReader extends LoggingObject implements DocumentFile
 	public List<DocumentFile> readDocumentFiles(String... paths) {
 		List<DocumentFile> documentFiles = new ArrayList<>();
 		for (String path : paths) {
-			findResources(path, "**/*.xq*", "**/*.xs*", "**/*.sjs").stream().forEach(resource -> {
+			findResources(path, "**/*.*").stream().forEach(resource -> {
 				DocumentFile documentFile = buildDocumentFile(path, resource);
-				documentFile = processDocumentFile(documentFile);
 				if (documentFile != null) {
+					documentFile = processDocumentFile(documentFile);
 					documentFiles.add(documentFile);
 				}
 			});
@@ -89,8 +89,8 @@ public class JarDocumentFileReader extends LoggingObject implements DocumentFile
 		for (String path : paths) {
 			try {
 				String finalPath = basePath;
-				if (!finalPath.endsWith(File.separator)) {
-					finalPath += File.separator;
+				if (!finalPath.endsWith("/") && !path.startsWith("/")) {
+					finalPath += "/";
 				}
 				finalPath += path;
 				Resource[] r = resolver.getResources(finalPath);
@@ -113,11 +113,22 @@ public class JarDocumentFileReader extends LoggingObject implements DocumentFile
 			if (uriPrefix != null) {
 				uri = uriPrefix + uri;
 			}
-			DocumentFile df = new DocumentFile(uri, resource);
-			return df;
+
+			// some extra sanity checking to avoid trying to load directories
+			File f = null;
+			try {
+				f = resource.getFile();
+			} catch (IOException e) {}
+
+			if (!uri.endsWith("/") && (f == null || !f.isDirectory())) {
+				DocumentFile df = new DocumentFile(uri, resource);
+				return df;
+			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+
+		return null;
 	}
 
 	protected DocumentFile processDocumentFile(DocumentFile documentFile) {

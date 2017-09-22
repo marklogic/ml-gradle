@@ -10,13 +10,14 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * Abstract implementation that provides implementations for loading all the different kinds of modules, but doesn't
- * actually implement findModules.
+ * Abstract implementation that provides implementations for loading all the different kinds of modules.
+ * Subclasses need to override the findModulesWithResolvedBaseDir method.
  */
 public abstract class BaseModulesFinder implements ModulesFinder {
 
@@ -52,8 +53,8 @@ public abstract class BaseModulesFinder implements ModulesFinder {
 
     protected void addServices(Modules modules, String baseDir) {
 		modules.setServices(findResources(baseDir,
-			servicesPath + File.separator + "*.xq*",
-			servicesPath + File.separator + "*.sjs"));
+			servicesPath + "/*.xq*",
+			servicesPath + "/*.sjs"));
     }
 
     protected void addAssetDirectories(Modules modules, String baseDir) {
@@ -94,7 +95,7 @@ public abstract class BaseModulesFinder implements ModulesFinder {
 
     protected void addTransforms(Modules modules, String baseDir) {
         modules.setTransforms(findResources(
-        	baseDir + File.separator + transformsPath,
+        	baseDir + "/" + transformsPath,
 			"*.xq*", "*.xsl*", "*.sjs"));
     }
 
@@ -102,7 +103,11 @@ public abstract class BaseModulesFinder implements ModulesFinder {
 		List<Resource> list = new ArrayList<>();
 		for (String path : paths) {
 			try {
-				String finalPath = basePath + File.separator + path;
+				String finalPath = basePath;
+				if (!finalPath.endsWith("/") && !path.startsWith("/")) {
+					finalPath += "/";
+				}
+				finalPath += path;
 				Resource[] r = resolver.getResources(finalPath);
 				list.addAll(Arrays.asList(r));
 			} catch (IOException e) {
@@ -152,6 +157,17 @@ public abstract class BaseModulesFinder implements ModulesFinder {
     public void setIncludeUnrecognizedPathsAsAssetPaths(boolean includeUnrecognizedPathsAsAssetPaths) {
         this.includeUnrecognizedPathsAsAssetPaths = includeUnrecognizedPathsAsAssetPaths;
     }
+
+	@Override
+	public final Modules findModules(String baseDir) {
+		if (!baseDir.startsWith("file:") && !baseDir.startsWith("classpath")) {
+			baseDir = Paths.get(baseDir).toUri().toString();
+		}
+
+		return findModulesWithResolvedBaseDir(baseDir);
+	}
+
+	protected abstract Modules findModulesWithResolvedBaseDir(String resolvedBaseDir);
 }
 
 class TransformFilenameFilter implements FilenameFilter {

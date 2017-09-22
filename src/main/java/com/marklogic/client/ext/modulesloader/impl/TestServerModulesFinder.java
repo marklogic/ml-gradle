@@ -1,7 +1,5 @@
 package com.marklogic.client.ext.modulesloader.impl;
 
-import java.io.File;
-
 import com.marklogic.client.ext.modulesloader.Modules;
 
 /**
@@ -13,7 +11,7 @@ import com.marklogic.client.ext.modulesloader.Modules;
 public class TestServerModulesFinder extends BaseModulesFinder {
 
     @Override
-    public Modules findModules(String baseDir) {
+    protected Modules findModulesWithResolvedBaseDir(String baseDir) {
         Modules modules = new Modules();
         addOptions(modules, baseDir);
         addPropertiesFile(modules, baseDir);

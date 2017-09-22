@@ -17,6 +17,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class RestBatchWriterTest extends AbstractIntegrationTest {
 	@Test
 	public void writeDocumentWithTransform() throws IOException {
 		DatabaseClient client = newClient("Documents");
-		Resource transform = new FileSystemResource("./src/test/resources/transform/simple.xqy");
+		Resource transform = new FileSystemResource(Paths.get("src", "test", "resources", "transform", "simple.xqy").toString());
 		TransformExtensionsManager transMgr = client.newServerConfigManager().newTransformExtensionsManager();
 		FileHandle fileHandle = new FileHandle(transform.getFile());
 		fileHandle.setFormat(Format.XML);

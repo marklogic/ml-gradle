@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.springframework.core.io.Resource;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.Set;
 
 /**
@@ -19,7 +20,7 @@ public class StaticCheckModulesTest extends AbstractIntegrationTest {
 	private XccStaticChecker staticChecker;
 
 	private String database = "Modules";
-	private String dir = "src/test/resources/static-check";
+	private String dir = Paths.get("src", "test", "resources", "static-check").toString();
 
 	@Before
 	public void setup() {

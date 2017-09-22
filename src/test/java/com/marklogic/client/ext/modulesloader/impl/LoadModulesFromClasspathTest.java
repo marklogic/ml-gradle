@@ -26,7 +26,7 @@ public class LoadModulesFromClasspathTest extends AbstractIntegrationTest {
 	}
 
 	@Test
-	public void test() {
+	public void testInsideJar() {
 		assertEquals(0, getUriCountInModulesDatabase());
 
 		AssetFileLoader assetFileLoader = new AssetFileLoader(modulesClient);
@@ -45,16 +45,32 @@ public class LoadModulesFromClasspathTest extends AbstractIntegrationTest {
 		 */
 		Set<Resource> resources = l.loadModules("classpath*:/ml-modules", new DefaultModulesFinder(), client);
 
-		assertEquals(21, resources.size());
-		// ext/**/* = 4
-		// include-this-too/**/* = 2
-		// options/sample-options = 2
-		// root/**/* = 4
-		// services/* = 7
-		// transforms/* = 13
-		// total = 32
-		assertEquals(32, getUriCountInModulesDatabase());
+		assertEquals(26, resources.size());
+		assertEquals(37, getUriCountInModulesDatabase());
+	}
 
+	@Test
+	public void testInsideCp() {
+		assertEquals(0, getUriCountInModulesDatabase());
+
+		AssetFileLoader assetFileLoader = new AssetFileLoader(modulesClient);
+		assetFileLoader.setDocumentFileReader(new JarDocumentFileReader());
+		DefaultModulesLoader l = new DefaultModulesLoader(assetFileLoader);
+
+		/**
+		 * A ModulesManager isn't yet useful because it's used for recording the last-loaded timestamp for files, which
+		 * doesn't yet work for classpath resources.
+		 */
+		l.setModulesManager(null);
+
+		/**
+		 * Don't include "classpath:" on this! The method will do it for you. It needs to know the root path within
+		 * the classpath that you expect to find your modules.
+		 */
+		Set<Resource> resources = l.loadModules("classpath*:/sample-base-dir", new DefaultModulesFinder(), client);
+
+		assertEquals(26, resources.size());
+		assertEquals(37, getUriCountInModulesDatabase());
 	}
 
 	private int getUriCountInModulesDatabase() {

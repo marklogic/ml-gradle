@@ -22,6 +22,7 @@ import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -87,10 +88,6 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	 * passed into a constructor for this class.
 	 */
 	public Set<Resource> loadModules(String baseDir, ModulesFinder modulesFinder, DatabaseClient client) {
-		if (!baseDir.startsWith("file:") && !baseDir.startsWith("classpath")) {
-			baseDir = "file:" + baseDir;
-		}
-
 		if (logger.isDebugEnabled()) {
 			logger.debug("Loading modules from base directory: " + baseDir);
 		}

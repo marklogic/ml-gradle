@@ -6,6 +6,7 @@ import com.marklogic.client.ext.file.DocumentFileReader;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +16,7 @@ public class DocumentFinderTest extends Assert {
 
 	@Test
 	public void noFileFilter() {
-		String path = "src/test/resources/schemas";
+		String path = Paths.get("src", "test", "resources", "schemas").toString();
 		List<DocumentFile> list = sut.readDocumentFiles(path);
 		assertEquals(5, list.size());
 

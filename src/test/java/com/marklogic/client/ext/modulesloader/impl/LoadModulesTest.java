@@ -5,6 +5,7 @@ import com.marklogic.client.ext.AbstractIntegrationTest;
 import org.junit.Test;
 import org.springframework.core.io.Resource;
 
+import java.nio.file.Paths;
 import java.util.Set;
 
 public class LoadModulesTest extends AbstractIntegrationTest {
@@ -29,19 +30,25 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 		DefaultModulesLoader modulesLoader = new DefaultModulesLoader(new AssetFileLoader(modulesClient));
 		modulesLoader.setModulesManager(null);
 
-		String dir = "src/test/resources/sample-base-dir";
+		String dir = Paths.get("src", "test", "resources", "sample-base-dir").toString();
 		Set<Resource> files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
-		assertEquals(21, files.size());
+		assertEquals(26, files.size());
 		assertModuleExists("/ext/module1.xqy");
 		assertModuleExists("/ext/module1.sjs");
 		assertModuleExists("/ext/lib/module2.xqy");
 		assertModuleExists("/ext/lib/module2.sjs");
+		assertModuleExists("/ext/path.with.dots/inside-dots.xqy");
+		assertModuleExists("/ext/rewriter-ext.json");
+		assertModuleExists("/ext/rewriter-ext.xml");
 		assertModuleExists("/include-module.xqy");
 		assertModuleExists("/include-module.sjs");
 		assertModuleExists("/module3.xqy");
 		assertModuleExists("/module3.sjs");
+		assertModuleExists("/rewriter.json");
+		assertModuleExists("/rewriter.xml");
 		assertModuleExists("/lib/module4.xqy");
 		assertModuleExists("/lib/module4.sjs");
+
 		final int initialModuleCount = getUriCountInModulesDatabase();
 
 		// Load again with a modules manager, make sure all files are loaded but no new docs in the modules database
@@ -50,7 +57,7 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 		modulesLoader.setAssetFileLoader(new AssetFileLoader(modulesClient, moduleManager));
 		modulesLoader.setModulesManager(moduleManager);
 		files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
-		assertEquals("All files should have been loaded since a ModulesManager wasn't used on the first load", 21, files.size());
+		assertEquals("All files should have been loaded since a ModulesManager wasn't used on the first load", 26, files.size());
 		assertEquals("No new modules should have been created", initialModuleCount, getUriCountInModulesDatabase());
 
 		// Load again; this time, no files should have been loaded

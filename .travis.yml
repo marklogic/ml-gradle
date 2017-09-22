@@ -1,6 +1,6 @@
 language: java
 jdk:
-  - oraclejdk7
+  - oraclejdk8
 sudo: true
 before_install:
   - echo 'America/Los_Angeles' | sudo tee /etc/timezone
@@ -13,4 +13,5 @@ script:
 #whitelist
 branches:
   only:
+    - master
     - dev

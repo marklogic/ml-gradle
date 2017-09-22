@@ -49,7 +49,7 @@ public class ModulesWatcher extends LoggingObject implements Runnable {
 		ModulesFinder finder = new DefaultModulesFinder();
 		while (true) {
 			for (String modulesPath : paths) {
-				loader.loadModules(new File(modulesPath), finder, client);
+				loader.loadModules(modulesPath, finder, client);
 			}
 			try {
 				Thread.sleep(sleepTime);

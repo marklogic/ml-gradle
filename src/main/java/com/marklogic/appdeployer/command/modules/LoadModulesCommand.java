@@ -63,12 +63,12 @@ public class LoadModulesCommand extends AbstractCommand {
 		try {
 			for (String modulesPath : config.getModulePaths()) {
 				logger.info("Loading asset modules from dir: " + modulesPath);
-				modulesLoader.loadModules(new File(modulesPath), new AssetModulesFinder(), client);
+				modulesLoader.loadModules(modulesPath, new AssetModulesFinder(), client);
 			}
 
 			for (String modulesPath : config.getModulePaths()) {
 				logger.info("Loading all non-asset modules from dir: " + modulesPath);
-				modulesLoader.loadModules(new File(modulesPath), new AllButAssetsModulesFinder(), client);
+				modulesLoader.loadModules(modulesPath, new AllButAssetsModulesFinder(), client);
 			}
 		} finally {
 			client.release();
@@ -88,7 +88,7 @@ public class LoadModulesCommand extends AbstractCommand {
 		try {
 			for (String modulesPath : config.getModulePaths()) {
 				logger.info("Loading modules into test server from dir: " + modulesPath);
-				testLoader.loadModules(new File(modulesPath), new TestServerModulesFinder(), client);
+				testLoader.loadModules(modulesPath, new TestServerModulesFinder(), client);
 			}
 		} finally {
 			client.release();

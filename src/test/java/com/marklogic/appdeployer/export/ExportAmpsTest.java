@@ -22,7 +22,7 @@ public class ExportAmpsTest extends AbstractExportTest {
 	public void test() throws Exception {
 		String amp1 = "{\n" +
 			"  \"namespace\": \"http://example.com/uri\",\n" +
-			"  \"local-name\": \"abctest-amp\",\n" +
+			"  \"local-name\": \"abctest-docs-amp\",\n" +
 			"  \"document-uri\": \"/module/path/name\",\n" +
 			"  \"modules-database\": \"Documents\",\n" +
 			"  \"role\": [\"rest-writer\"]\n" +
@@ -30,7 +30,7 @@ public class ExportAmpsTest extends AbstractExportTest {
 
 		String amp2 = "{\n" +
 			"  \"namespace\": \"http://example.com/uri\",\n" +
-			"  \"local-name\": \"abctest-amp\",\n" +
+			"  \"local-name\": \"abctest-mods-amp\",\n" +
 			"  \"document-uri\": \"/module/path/name\",\n" +
 			"  \"modules-database\": \"Modules\",\n" +
 			"  \"role\": [\"rest-writer\"]\n" +
@@ -61,8 +61,8 @@ public class ExportAmpsTest extends AbstractExportTest {
 
 	private void verifyAmpsCanBeExportedViaProperties() throws Exception {
 		Properties props = new Properties();
-		props.put("amps", "/manage/v2/amps/abctest-amp?namespace=http://example.com/uri&document-uri=/module/path/name&modules-database=Documents," +
-			"/manage/v2/amps/abctest-amp?namespace=http://example.com/uri&document-uri=/module/path/name&modules-database=Modules");
+		props.put("amps", "/manage/v2/amps/abctest-docs-amp?namespace=http://example.com/uri&document-uri=/module/path/name&modules-database=Documents," +
+			"/manage/v2/amps/abctest-mods-amp?namespace=http://example.com/uri&document-uri=/module/path/name&modules-database=Modules");
 		PropertiesResourceSelector selector = new PropertiesResourceSelector(props);
 		verifyAmpsCanBeExported(selector);
 	}
@@ -76,16 +76,21 @@ public class ExportAmpsTest extends AbstractExportTest {
 		// Kick the tires on our JSON annotations on Amp
 		ResourceMapper mapper = new DefaultResourceMapper(new API(manageClient));
 
-		Amp amp = mapper.readResource(new String(FileCopyUtils.copyToByteArray(files.get(0))), Amp.class);
-		assertEquals("http://example.com/uri", amp.getNamespace());
-		assertEquals("abctest-amp", amp.getLocalName());
-		assertEquals("/module/path/name", amp.getDocumentUri());
-		assertEquals("Documents", amp.getModulesDatabase());
+		// order of amps is not very reliable
+		for (File file : files) {
+			Amp amp = mapper.readResource(new String(FileCopyUtils.copyToByteArray(files.get(0))), Amp.class);
+			assertEquals("http://example.com/uri", amp.getNamespace());
+			assertEquals("/module/path/name", amp.getDocumentUri());
 
-		amp = mapper.readResource(new String(FileCopyUtils.copyToByteArray(files.get(1))), Amp.class);
-		assertEquals("http://example.com/uri", amp.getNamespace());
-		assertEquals("abctest-amp", amp.getLocalName());
-		assertEquals("/module/path/name", amp.getDocumentUri());
-		assertEquals("Modules", amp.getModulesDatabase());
+			if (amp.getLocalName().equals("abctest-docs-amp")) {
+				assertEquals("Documents", amp.getModulesDatabase());
+			}
+			else if (amp.getLocalName().equals("abctest-mods-amp")) {
+				assertEquals("Modules", amp.getModulesDatabase());
+			}
+			else {
+				fail("Invalid amp name");
+			}
+		}
 	}
 }

@@ -16,14 +16,14 @@ set | grep TRAVIS
 test $1 && arg1=$1
 if [[ $arg1 = 'release' ]]; then
   ver=${ML_VERSION}
-  fname=MarkLogic-RHEL6-${ver}.x86_64.rpm
+  fname=MarkLogic-${ver}.x86_64.rpm
   fnamedeb="marklogic_"
   fnamedeb=$fnamedeb$ver
   suff="_amd64.deb"
   fnamedeb=$fnamedeb$suff
 
   curl -c cookies.txt --data "email=${MLBUILD_USER}&password=${MLBUILD_PASSWORD}" https://developer.marklogic.com/login
-  dl_link=$(curl -b cookies.txt --data "download=/download/binaries/8.0/${fname}" https://developer.marklogic.com/get-download-url | perl -pe 's/.*"path":"([^"]+).*/\1/')
+  dl_link=$(curl -b cookies.txt --data "download=/download/binaries/9.0/${fname}" https://developer.marklogic.com/get-download-url | perl -pe 's/.*"path":"([^"]+).*/\1/')
   url="https://developer.marklogic.com${dl_link}"
 
   echo "********* Downloading MarkLogic $ver"
@@ -45,7 +45,7 @@ else
   # if the user passed a day string as a param then use it instead
   test $1 && day=$1
   # make a version number out of the date
-  ver="8.0-$day"
+  ver="9.0-$day"
 
   echo "********* Downloading MarkLogic nightly $ver"
 
@@ -56,7 +56,7 @@ else
   suff="_amd64.deb"
   fnamedeb=$fnamedeb$suff
 
-  url="https://root.marklogic.com/nightly/builds/linux64/rh6-intel64-80-test-1.marklogic.com/b8_0/pkgs.$day/$fname"
+  url="https://root.marklogic.com/nightly/builds/linux64-rh7/rh7v-intel64-90-test-build.marklogic.com/b9_0/pkgs.$day/$fname"
 
   status=$(curl -k --anyauth -u $MLBUILD_USER:$MLBUILD_PASSWORD --head --write-out %{http_code} --silent --output /dev/null $url)
   if [[ $status = 200 ]]; then

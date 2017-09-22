@@ -188,7 +188,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		Resource r = modules.getPropertiesFile();
 		if (r != null && r.exists()) {
 			File f = getFileFromResource(r);
-			if (f != null && modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastInstalled(f)) {
+			if (f != null && modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastLoaded(f)) {
 				return;
 			}
 
@@ -231,7 +231,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 			}
 
 			if (f != null && modulesManager != null) {
-				modulesManager.saveLastInstalledTimestamp(f, new Date());
+				modulesManager.saveLastLoadedTimestamp(f, new Date());
 			}
 
 			loadedModules.add(r);
@@ -534,7 +534,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		if (modulesManager != null) {
 			try {
 				File file = resource.getFile();
-				modified = modulesManager.hasFileBeenModifiedSinceLastInstalled(file);
+				modified = modulesManager.hasFileBeenModifiedSinceLastLoaded(file);
 			} catch (IOException e) {}
 		}
 		return modified;
@@ -544,7 +544,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		if (modulesManager != null) {
 			try {
 				File file = resource.getFile();
-				modulesManager.saveLastInstalledTimestamp(file, new Date());
+				modulesManager.saveLastLoadedTimestamp(file, new Date());
 			} catch (IOException e) {}
 		}
 	}

@@ -1,6 +1,7 @@
 package com.marklogic.client.ext.file;
 
 import com.marklogic.client.io.Format;
+import org.springframework.core.io.Resource;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -34,8 +35,8 @@ public class DefaultDocumentFormatGetter implements FormatGetter {
 	}
 
 	@Override
-	public Format getFormat(File file) {
-		String name = file.getName();
+	public Format getFormat(Resource resource) {
+		String name = resource.getFilename();
 
 		for (String ext : xmlExtensions) {
 			if (name.endsWith(ext)) {

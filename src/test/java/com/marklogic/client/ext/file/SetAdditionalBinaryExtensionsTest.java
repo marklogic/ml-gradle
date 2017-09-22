@@ -4,6 +4,7 @@ import com.marklogic.client.ext.AbstractIntegrationTest;
 import com.marklogic.client.io.Format;
 import org.junit.Test;
 
+import java.nio.file.Paths;
 import java.util.List;
 
 public class SetAdditionalBinaryExtensionsTest extends AbstractIntegrationTest {
@@ -15,7 +16,7 @@ public class SetAdditionalBinaryExtensionsTest extends AbstractIntegrationTest {
 
 		GenericFileLoader loader = new GenericFileLoader(client);
 		loader.setAdditionalBinaryExtensions("test1", "test2");
-		List<DocumentFile> files = loader.loadFiles("src/test/resources/binary-test");
+		List<DocumentFile> files = loader.loadFiles(Paths.get("src", "test", "resources", "binary-test").toString());
 		for (DocumentFile file : files) {
 			String name = file.getFile().getName();
 			if ("file.test1".equals(name) || "file.test2".equals(name)) {

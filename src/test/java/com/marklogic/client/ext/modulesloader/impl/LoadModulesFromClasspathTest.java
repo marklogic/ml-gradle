@@ -2,8 +2,13 @@ package com.marklogic.client.ext.modulesloader.impl;
 
 import com.marklogic.client.ext.AbstractIntegrationTest;
 import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.ext.file.JarDocumentFileReader;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.springframework.core.io.Resource;
+
+import java.util.Set;
 
 /**
  * Program for manually testing loading modules from the classpath instead of from the filesystem. This uses the test
@@ -13,20 +18,20 @@ public class LoadModulesFromClasspathTest extends AbstractIntegrationTest {
 
 	private DatabaseClient modulesClient;
 
-	@After
-	public void teardown() {
-		if (modulesClient != null) {
-			modulesClient.release();
-		}
+	@Before
+	public void setup() {
+		client = newClient("Modules");
+		modulesClient = client;
+		modulesClient.newServerEval().xquery("cts:uris((), (), cts:true-query()) ! xdmp:document-delete(.)").eval();
 	}
 
 	@Test
-	public void test() {
-		newClient("Modules").newServerEval().xquery("cts:uris((), (), cts:true-query()) ! xdmp:document-delete(.)").eval();
-		modulesClient = client;
-		client = newClient();
+	public void testInsideJar() {
+		assertEquals(0, getUriCountInModulesDatabase());
 
-		DefaultModulesLoader l = new DefaultModulesLoader();
+		AssetFileLoader assetFileLoader = new AssetFileLoader(modulesClient);
+		assetFileLoader.setDocumentFileReader(new JarDocumentFileReader());
+		DefaultModulesLoader l = new DefaultModulesLoader(assetFileLoader);
 
 		/**
 		 * A ModulesManager isn't yet useful because it's used for recording the last-loaded timestamp for files, which
@@ -38,10 +43,37 @@ public class LoadModulesFromClasspathTest extends AbstractIntegrationTest {
 		 * Don't include "classpath:" on this! The method will do it for you. It needs to know the root path within
 		 * the classpath that you expect to find your modules.
 		 */
-		l.loadClasspathModules("/ml-modules", client);
+		Set<Resource> resources = l.loadModules("classpath*:/ml-modules", new DefaultModulesFinder(), client);
 
-		String count = modulesClient.newServerEval().xquery("count(cts:uris((), (), cts:true-query()))").evalAs(String.class);
-		assertEquals(17, Integer.parseInt(count));
+		assertEquals(26, resources.size());
+		assertEquals(37, getUriCountInModulesDatabase());
+	}
 
+	@Test
+	public void testInsideCp() {
+		assertEquals(0, getUriCountInModulesDatabase());
+
+		AssetFileLoader assetFileLoader = new AssetFileLoader(modulesClient);
+		assetFileLoader.setDocumentFileReader(new JarDocumentFileReader());
+		DefaultModulesLoader l = new DefaultModulesLoader(assetFileLoader);
+
+		/**
+		 * A ModulesManager isn't yet useful because it's used for recording the last-loaded timestamp for files, which
+		 * doesn't yet work for classpath resources.
+		 */
+		l.setModulesManager(null);
+
+		/**
+		 * Don't include "classpath:" on this! The method will do it for you. It needs to know the root path within
+		 * the classpath that you expect to find your modules.
+		 */
+		Set<Resource> resources = l.loadModules("classpath*:/sample-base-dir", new DefaultModulesFinder(), client);
+
+		assertEquals(26, resources.size());
+		assertEquals(37, getUriCountInModulesDatabase());
+	}
+
+	private int getUriCountInModulesDatabase() {
+		return Integer.parseInt(modulesClient.newServerEval().xquery("count(cts:uris((), (), cts:true-query()))").evalAs(String.class));
 	}
 }

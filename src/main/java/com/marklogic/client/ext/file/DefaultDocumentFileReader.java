@@ -6,6 +6,8 @@ import org.springframework.util.ClassUtils;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -72,7 +74,18 @@ public class DefaultDocumentFileReader extends LoggingObject implements FileVisi
 	 * @return
 	 */
 	protected Path constructPath(String path) {
-		File f = new File(path);
+		File f;
+		if (path.startsWith("classpath") || path.startsWith("file:")) {
+			try {
+				f = new File(new URI(path));
+			}
+			catch (URISyntaxException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		else {
+			f = new File(path);
+		}
 		return f.exists() ? Paths.get(f.getAbsolutePath()) : null;
 	}
 

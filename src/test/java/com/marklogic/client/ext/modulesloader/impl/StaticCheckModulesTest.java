@@ -4,8 +4,10 @@ import com.marklogic.client.ext.AbstractIntegrationTest;
 import com.marklogic.xcc.template.XccTemplate;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.core.io.Resource;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.Set;
 
 /**
@@ -18,7 +20,7 @@ public class StaticCheckModulesTest extends AbstractIntegrationTest {
 	private XccStaticChecker staticChecker;
 
 	private String database = "Modules";
-	private File dir = new File("src/test/resources/static-check");
+	private String dir = Paths.get("src", "test", "resources", "static-check").toString();
 
 	@Before
 	public void setup() {
@@ -41,7 +43,7 @@ public class StaticCheckModulesTest extends AbstractIntegrationTest {
 		staticChecker.setBulkCheck(false);
 		staticChecker.setCheckLibraryModules(false);
 
-		Set<File> files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
+		Set<Resource> files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
 		assertEquals("All 3 modules should have been loaded because we didn't static check the bad libary module",
 			3, files.size());
 	}
@@ -66,7 +68,7 @@ public class StaticCheckModulesTest extends AbstractIntegrationTest {
 		staticChecker.setCheckLibraryModules(true);
 		modulesLoader.setCatchExceptions(true);
 
-		Set<File> files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
+		Set<Resource> files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
 		assertEquals("The modules should have been loaded, and error messages logged but not thrown", 3, files.size());
 	}
 
@@ -75,7 +77,7 @@ public class StaticCheckModulesTest extends AbstractIntegrationTest {
 		staticChecker.setBulkCheck(true);
 		staticChecker.setCheckLibraryModules(false);
 
-		Set<File> files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
+		Set<Resource> files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
 		assertEquals("The load should have succeeded because we didn't check library modules", 3, files.size());
 	}
 
@@ -98,7 +100,7 @@ public class StaticCheckModulesTest extends AbstractIntegrationTest {
 		staticChecker.setCheckLibraryModules(true);
 		modulesLoader.setCatchExceptions(true);
 
-		Set<File> files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
+		Set<Resource> files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
 		assertEquals("The modules should have been loaded, and error messages logged but not thrown", 3, files.size());
 	}
 }

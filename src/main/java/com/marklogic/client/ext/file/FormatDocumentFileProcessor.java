@@ -20,7 +20,8 @@ public class FormatDocumentFileProcessor implements DocumentFileProcessor {
 
 	@Override
 	public DocumentFile processDocumentFile(DocumentFile documentFile) {
-		Format format = formatGetter.getFormat(documentFile.getFile());
+
+		Format format = formatGetter.getFormat(documentFile.getResource());
 		if (format != null) {
 			documentFile.setFormat(format);
 		}

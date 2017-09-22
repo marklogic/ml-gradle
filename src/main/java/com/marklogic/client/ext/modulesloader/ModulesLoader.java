@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Set;
 
 import com.marklogic.client.DatabaseClient;
+import org.springframework.core.io.Resource;
 
 /**
  * Interface for objects that can load a set of modules via the REST API, which is intended to include not just what the
@@ -20,5 +21,5 @@ public interface ModulesLoader {
      * @param client
      * @return
      */
-    Set<File> loadModules(File directory, ModulesFinder modulesFinder, DatabaseClient client);
+    Set<Resource> loadModules(String directory, ModulesFinder modulesFinder, DatabaseClient client);
 }

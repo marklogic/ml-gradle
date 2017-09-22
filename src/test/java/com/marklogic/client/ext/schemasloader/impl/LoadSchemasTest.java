@@ -6,6 +6,7 @@ import com.marklogic.client.ext.helper.ClientHelper;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.nio.file.Paths;
 import java.util.List;
 
 public class LoadSchemasTest extends AbstractIntegrationTest {
@@ -23,7 +24,7 @@ public class LoadSchemasTest extends AbstractIntegrationTest {
 	@Test
 	public void test() {
 		DefaultSchemasLoader loader = new DefaultSchemasLoader(client);
-		List<DocumentFile> files = loader.loadSchemas("src/test/resources/schemas");
+		List<DocumentFile> files = loader.loadSchemas(Paths.get("src", "test", "resources", "schemas").toString());
 		assertEquals(5, files.size());
 
 		ClientHelper helper = new ClientHelper(client);

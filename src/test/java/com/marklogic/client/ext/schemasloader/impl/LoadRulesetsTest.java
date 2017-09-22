@@ -7,6 +7,7 @@ import com.marklogic.client.io.DocumentMetadataHandle;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.nio.file.Paths;
 import java.util.List;
 
 public class LoadRulesetsTest extends AbstractIntegrationTest {
@@ -24,7 +25,7 @@ public class LoadRulesetsTest extends AbstractIntegrationTest {
 	@Test
 	public void test() {
 		DefaultSchemasLoader loader = new DefaultSchemasLoader(client);
-		List<DocumentFile> files = loader.loadSchemas("src/test/resources/rulesets/collection-test");
+		List<DocumentFile> files = loader.loadSchemas(Paths.get("src", "test", "resources", "rulesets", "collection-test").toString());
 		assertEquals(2, files.size());
 
 		ClientHelper helper = new ClientHelper(client);

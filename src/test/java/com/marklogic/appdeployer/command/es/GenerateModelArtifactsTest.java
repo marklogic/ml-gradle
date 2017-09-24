@@ -13,7 +13,6 @@ import org.junit.Test;
 
 import java.io.File;
 
-@Ignore("Ignoring until ML9 is released")
 public class GenerateModelArtifactsTest extends AbstractAppDeployerTest {
 
 	@After

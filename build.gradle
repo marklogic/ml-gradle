@@ -4,11 +4,11 @@ plugins {
   id "eclipse"
   id "idea"
   id "com.jfrog.bintray" version "1.5"
-	id "com.github.jk1.dependency-license-report" version "0.3.11"
+  id "com.github.jk1.dependency-license-report" version "0.3.11"
 }
 
-sourceCompatibility = "1.7"
-targetCompatibility = "1.7"
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
 
 repositories {
   jcenter()
@@ -24,10 +24,10 @@ dependencies {
   testCompile ('com.marklogic:ml-junit:3.0-alpha1')
   testCompile('commons-io:commons-io:2.5')
 
-	// Forcing Spring to use logback instead of commons-logging
-	runtime "ch.qos.logback:logback-classic:1.1.8"
-	runtime group: "org.slf4j", name: "jcl-over-slf4j", version: "1.7.22"
-	runtime group: "org.slf4j", name: "slf4j-api", version: "1.7.22"
+  // Forcing Spring to use logback instead of commons-logging
+  runtime "ch.qos.logback:logback-classic:1.1.8"
+  runtime group: "org.slf4j", name: "jcl-over-slf4j", version: "1.7.22"
+  runtime group: "org.slf4j", name: "slf4j-api", version: "1.7.22"
 }
 
 // This ensures that Gradle includes in the published jar any non-java files under src/main/java
@@ -68,5 +68,12 @@ if (project.hasProperty("myBintrayUser")) {
         released = new Date()
       }
     }
+  }
+}
+
+test {
+  testLogging {
+    events 'started','passed', 'skipped', 'failed'
+    exceptionFormat 'full'
   }
 }

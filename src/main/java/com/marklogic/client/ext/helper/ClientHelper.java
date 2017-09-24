@@ -65,8 +65,4 @@ public class ClientHelper extends LoggingObject {
     public String eval(String expr) {
         return getClient().newServerEval().xquery(expr).evalAs(String.class);
     }
-
-    public void release() {
-        getClient().release();
-    }
 }

@@ -17,8 +17,8 @@ repositories {
 }
 
 dependencies {
-  compile 'com.marklogic:marklogic-client-api:4.0.1'
-  compile 'com.marklogic:marklogic-xcc:9.0.1'
+  compile 'com.marklogic:marklogic-client-api:4.0.2'
+  compile 'com.marklogic:marklogic-xcc:9.0.2'
   compile 'org.jdom:jdom2:2.0.6'
   compile 'org.springframework:spring-context:4.3.7.RELEASE'
 
@@ -69,5 +69,12 @@ if (project.hasProperty("myBintrayUser")) {
         released = new Date()
       }
     }
+  }
+}
+
+test {
+  testLogging {
+    events 'started','passed', 'skipped', 'failed'
+    exceptionFormat 'full'
   }
 }

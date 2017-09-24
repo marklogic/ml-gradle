@@ -31,13 +31,4 @@ public abstract class AbstractIntegrationTest extends Assert {
 		clientConfig.setDatabase(currentDatabase);
 		return client;
 	}
-
-	@After
-	public void releaseClient() {
-		if (client != null) {
-			client.release();
-		}
-	}
-
-
 }

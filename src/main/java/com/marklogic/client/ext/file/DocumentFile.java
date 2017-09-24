@@ -1,14 +1,14 @@
 package com.marklogic.client.ext.file;
 
 import com.marklogic.client.document.DocumentWriteOperation;
-import com.marklogic.client.io.DocumentMetadataHandle;
-import com.marklogic.client.io.FileHandle;
-import com.marklogic.client.io.Format;
-import com.marklogic.client.io.StringHandle;
+import com.marklogic.client.io.*;
 import com.marklogic.client.io.marker.AbstractWriteHandle;
 import com.marklogic.client.io.marker.DocumentMetadataWriteHandle;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 
 /**
@@ -22,16 +22,24 @@ import java.nio.file.Path;
 public class DocumentFile implements DocumentWriteOperation {
 
 	private String uri;
-	private File file;
+	private Resource resource;
 	private Format format;
 	private DocumentMetadataHandle documentMetadata;
 	private String temporalDocumentURI;
 	private String modifiedContent;
 	private Path rootPath;
 
+	public DocumentFile(String uri, Resource resource) {
+		init(uri, resource);
+	}
+
 	public DocumentFile(String uri, File file) {
+		init(uri, new FileSystemResource(file));
+	}
+
+	private void init(String uri, Resource resource) {
 		this.uri = uri;
-		this.file = file;
+		this.resource = resource;
 		this.documentMetadata = new DocumentMetadataHandle();
 	}
 
@@ -56,7 +64,12 @@ public class DocumentFile implements DocumentWriteOperation {
 			StringHandle h = new StringHandle(modifiedContent);
 			return format != null ? h.withFormat(format) : h;
 		}
-		FileHandle h = new FileHandle(file);
+		InputStreamHandle h = null;
+		try {
+			h = new InputStreamHandle(resource.getInputStream());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 		return format != null ? h.withFormat(format) : h;
 	}
 
@@ -66,15 +79,25 @@ public class DocumentFile implements DocumentWriteOperation {
 	}
 
 	public String getFileExtension() {
-		if (file != null) {
-			String name = file.getName();
+		if (resource != null) {
+			String name = resource.getFilename();
 			int pos = name.lastIndexOf('.');
 			return pos < 0 ? name : name.substring(pos + 1);
 		}
 		return null;
 	}
 
+	public Resource getResource() {
+		return resource;
+	}
+
 	public File getFile() {
+		File file;
+		try {
+			file = resource.getFile();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 		return file;
 	}
 
@@ -94,8 +117,8 @@ public class DocumentFile implements DocumentWriteOperation {
 		this.uri = uri;
 	}
 
-	public void setFile(File file) {
-		this.file = file;
+	public void setResource(Resource resource) {
+		this.resource = resource;
 	}
 
 	public Format getFormat() {

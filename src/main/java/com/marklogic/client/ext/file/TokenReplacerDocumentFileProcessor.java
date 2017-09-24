@@ -3,10 +3,12 @@ package com.marklogic.client.ext.file;
 import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.client.io.Format;
 import com.marklogic.client.ext.tokenreplacer.TokenReplacer;
+import org.springframework.core.io.Resource;
 import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 /**
  * Processor that delegates to a TokenReplacer for replacing tokens in the content of a DocumentFile. In order to
@@ -26,12 +28,12 @@ public class TokenReplacerDocumentFileProcessor extends LoggingObject implements
 		if (tokenReplacer != null && moduleCanBeReadAsString(documentFile.getFormat())) {
 			String text = documentFile.getModifiedContent();
 			if (text == null) {
-				File file = documentFile.getFile();
-				if (file != null) {
+				Resource resource = documentFile.getResource();
+				if (resource != null) {
 					try {
-						text = new String(FileCopyUtils.copyToByteArray(file));
+						text = new String(FileCopyUtils.copyToByteArray(resource.getInputStream()));
 					} catch (IOException ie) {
-						logger.warn("Unable to replace tokens in file: " + file.getAbsolutePath() + "; cause: " + ie.getMessage());
+						logger.warn("Unable to replace tokens in file: " + documentFile.getUri() + "; cause: " + ie.getMessage());
 					}
 				}
 			}

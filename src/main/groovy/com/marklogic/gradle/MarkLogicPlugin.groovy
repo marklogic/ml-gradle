@@ -62,13 +62,9 @@ import com.marklogic.mgmt.ManageConfig
 import com.marklogic.mgmt.admin.AdminConfig
 import com.marklogic.mgmt.admin.AdminManager
 import com.marklogic.mgmt.admin.DefaultAdminConfigFactory
-import com.sun.jersey.core.spi.component.ProviderServices
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.slf4j.LoggerFactory
-
-import java.util.logging.Level
-import java.util.logging.Logger
 
 class MarkLogicPlugin implements Plugin<Project> {
 
@@ -76,8 +72,6 @@ class MarkLogicPlugin implements Plugin<Project> {
 
 	void apply(Project project) {
 		logger.info("\nInitializing ml-gradle")
-
-		quietDownJerseyLogging()
 
 		initializeAppDeployerObjects(project)
 
@@ -292,17 +286,5 @@ class MarkLogicPlugin implements Plugin<Project> {
 		SimpleAppDeployer deployer = new SimpleAppDeployer(context.getManageClient(), context.getAdminManager())
 		deployer.setCommands(commands)
 		return deployer
-	}
-
-	/**
-	 * When the MarkLogic DatabaseClient class is used in Gradle, the Jersey ProviderServices class spits out
-	 * a lot of not helpful logging at the INFO level. So we bump it down to WARNING to avoid that.
-	 */
-	void quietDownJerseyLogging() {
-		try {
-			Logger.getLogger(ProviderServices.class.getName()).setLevel(Level.WARNING)
-		} catch (Exception e) {
-			// Ignore, not important
-		}
 	}
 }

@@ -1,12 +1,11 @@
 What is Gradle?
 ===============
 
-Gradle is a standard build tool that is used for building and deploying primarily Java applications, but it can be used for any codebase. 
-The full user guide for Gradle is available at http://www.gradle.org/docs/current/userguide/userguide.html. 
+Gradle is a standard build tool that is used for building and deploying primarily Java applications, but it can be used for any codebase. Check out the [Gradle user guide](http://www.gradle.org/docs/current/userguide/userguide.html) for more information.
 
 What is ml-gradle?
 =========
-ml-gradle is a [Gradle plugin](http://www.gradle.org/plugins "") that supports a number of tasks pertaining to deploying an 
+ml-gradle is a [Gradle plugin](https://plugins.gradle.org/ "") that supports a number of tasks pertaining to deploying an 
 application to MarkLogic and interacting with other features of MarkLogic via a Gradle build file. The bulk of the 
 functionality provided by ml-gradle is actually in [ml-app-deployer](https://github.com/rjrudin/ml-app-deployer) - ml-gradle 
 is just intended to be a thin wrapper around this library, exposing its functionality via Gradle tasks and properties.

@@ -6,6 +6,7 @@ import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.admin.*;
 import com.marklogic.client.admin.ResourceExtensionsManager.MethodParameters;
 import com.marklogic.client.admin.ServerConfigurationManager.UpdatePolicy;
+import com.marklogic.client.ext.datamovement.listener.LoadModulesFailureListener;
 import com.marklogic.client.ext.file.DocumentFile;
 import com.marklogic.client.ext.helper.FilenameUtil;
 import com.marklogic.client.ext.helper.LoggingObject;
@@ -23,10 +24,7 @@ import org.springframework.util.FileCopyUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Default implementation of ModulesLoader. Loads everything except assets via the REST API. Assets are either loaded
@@ -44,6 +42,8 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	private TaskExecutor taskExecutor;
 	private int taskThreadCount = 16;
 	private boolean shutdownTaskExecutorAfterLoadingModules = true;
+
+	private List<LoadModulesFailureListener> failureListeners = new ArrayList<>();
 
 	/**
 	 * When set to true, exceptions thrown while loading transforms and resources will be caught and logged, and the
@@ -440,7 +440,14 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		if (taskExecutor == null) {
 			initializeDefaultTaskExecutor();
 		}
-		taskExecutor.execute(r);
+		taskExecutor.execute(() -> {
+			try {
+				r.run();
+			}
+			catch(Exception e) {
+				failureListeners.forEach(listener -> listener.processFailure(e));
+			}
+		});
 	}
 
 	public Resource installNamespace(Resource r) {
@@ -527,6 +534,14 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 
 	public void setAssetFileLoader(AssetFileLoader assetFileLoader) {
 		this.assetFileLoader = assetFileLoader;
+	}
+
+	public void addFailureListener(LoadModulesFailureListener listener) {
+		this.failureListeners.add(listener);
+	}
+
+	public void removeFailureListener(LoadModulesFailureListener listener) {
+		this.failureListeners.remove(listener);
 	}
 
 	private boolean hasFileBeenModified(Resource resource) {

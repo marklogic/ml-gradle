@@ -14,21 +14,22 @@ public class PropertiesModuleManager extends LoggingObject implements ModulesMan
     public static final String DEFAULT_FILE_PATH = "build/ml-javaclient-util/module-timestamps.properties";
 
     private Properties props;
-    private File propertiesFile;
+    private String propertiesFilePath;
     private long minimumFileTimestampToLoad;
 
     public PropertiesModuleManager() {
-        this(new File(DEFAULT_FILE_PATH));
+        this(DEFAULT_FILE_PATH);
     }
 
-    public PropertiesModuleManager(File propertiesFile) {
+    public PropertiesModuleManager(String propertiesFilePath) {
         props = new Properties();
-        this.propertiesFile = propertiesFile;
+        this.propertiesFilePath = propertiesFilePath;
     }
 
     @Override
     public void initialize() {
-        this.propertiesFile.getParentFile().mkdirs();
+    	File propertiesFile = new File(propertiesFilePath);
+        propertiesFile.getParentFile().mkdirs();
         if (propertiesFile.exists()) {
             FileInputStream fis = null;
             try {
@@ -50,8 +51,10 @@ public class PropertiesModuleManager extends LoggingObject implements ModulesMan
     }
 
     public void deletePropertiesFile() {
+		File propertiesFile = new File(propertiesFilePath);
         if (propertiesFile.exists()) {
             propertiesFile.delete();
+            props.clear();
         }
     }
 
@@ -79,7 +82,7 @@ public class PropertiesModuleManager extends LoggingObject implements ModulesMan
         props.setProperty(key, date.getTime() + "");
         FileWriter fw = null;
         try {
-            fw = new FileWriter(propertiesFile);
+            fw = new FileWriter(new File(propertiesFilePath));
             props.store(fw, "");
         } catch (Exception e) {
             logger.warn("Unable to store properties, cause: " + e.getMessage());

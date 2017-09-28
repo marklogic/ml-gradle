@@ -3,7 +3,9 @@ package com.marklogic.client.ext.modulesloader.impl;
 import com.marklogic.client.ext.helper.FilenameUtil;
 import com.marklogic.client.ext.modulesloader.Modules;
 import com.marklogic.client.ext.modulesloader.ModulesFinder;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
@@ -64,18 +66,21 @@ public abstract class BaseModulesFinder implements ModulesFinder {
 
 		// classpath needs the trailing / to find child dirs
 		findResources(baseDir, "*", "*/").stream().forEach(resource -> {
-			File f = null;
 			try {
-				f = resource.getFile();
-			} catch (IOException e) {}
-
-			if (!recognizedPaths.contains(resource.getFilename())) {
-				if (f == null || f.isDirectory()) {
-					if (dirs.indexOf(resource) < 0) {
+				File f = new File(resource.getURL().getFile());
+				String uri = resource.getURI().toString();
+				boolean isRecognized = recognizedPaths.contains(f.getName());
+				// when the modules are in a jar inside a war
+				boolean hasWeirdWarPath = uri.contains("jar:war");
+				if (!(isRecognized || hasWeirdWarPath)) {
+					boolean isDir = (resource instanceof FileSystemResource && f.isDirectory());
+					boolean isUrlResource = (resource instanceof UrlResource);
+					boolean notInList = dirs.indexOf(resource) < 0;
+					if ((isDir || isUrlResource) && notInList) {
 						dirs.add(resource);
 					}
 				}
-			}
+			} catch (IOException e) {}
 		});
 
         modules.setAssetDirectories(dirs);

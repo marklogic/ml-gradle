@@ -17,6 +17,7 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 		client = newClient("Modules");
 		client.newServerEval().xquery("cts:uris((), (), cts:true-query()) ! xdmp:document-delete(.)").eval();
 		modulesClient = client;
+		assertEquals("No new modules should have been created", 0, getUriCountInModulesDatabase());
 
 		/**
 		 * Odd - the Client REST API doesn't allow for loading namespaces when the DatabaseClient has a database
@@ -59,12 +60,15 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 		files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
 		assertEquals("No files should have been loaded since the minimum last-modified timestamp is in the future", 0, files.size());
 
-		// Remove the timestamp minimum, all the modules should be loaded
-		moduleManager.deletePropertiesFile();
-		moduleManager.setMinimumFileTimestampToLoad(0);
-		files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
-		assertEquals("All files should have been loaded since a ModulesManager wasn't used on the first load", 26, files.size());
-		assertEquals("No new modules should have been created", initialModuleCount, getUriCountInModulesDatabase());
+		// run this section twice to test that a bug was fixed in deletePropertiesFile
+		for (int i = 0; i < 2; i++) {
+			// Remove the timestamp minimum, all the modules should be loaded
+			moduleManager.deletePropertiesFile();
+			moduleManager.setMinimumFileTimestampToLoad(0);
+			files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
+			assertEquals("All files should have been loaded since a ModulesManager wasn't used on the first load", 26, files.size());
+			assertEquals("No new modules should have been created", initialModuleCount, getUriCountInModulesDatabase());
+		}
 
 		// Load again; this time, no files should have been loaded
 		files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);

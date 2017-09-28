@@ -23,7 +23,7 @@ public class DefaultModulesLoaderFactory extends LoggingObject implements Module
 		ModulesManager modulesManager = null;
 		String path = appConfig.getModuleTimestampsPath();
 		if (path != null) {
-			modulesManager = new PropertiesModuleManager(new File(path));
+			modulesManager = new PropertiesModuleManager(path);
 		}
 
 		DatabaseClient modulesDatabaseClient = appConfig.newModulesDatabaseClient();

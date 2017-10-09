@@ -1,6 +1,7 @@
 package com.marklogic.client.ext.modulesloader.impl;
 
 import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.ext.batch.BatchWriter;
 import com.marklogic.client.ext.file.GenericFileLoader;
 import com.marklogic.client.ext.modulesloader.ModulesManager;
 
@@ -18,6 +19,19 @@ public class AssetFileLoader extends GenericFileLoader {
 
 	public AssetFileLoader(DatabaseClient modulesDatabaseClient, ModulesManager modulesManager) {
 		super(modulesDatabaseClient);
+		initializeAssetFileLoader(modulesManager);
+	}
+
+	public AssetFileLoader(BatchWriter batchWriter) {
+		this(batchWriter, null);
+	}
+
+	public AssetFileLoader(BatchWriter batchWriter, ModulesManager modulesManager) {
+		super(batchWriter);
+		initializeAssetFileLoader(modulesManager);
+	}
+
+	protected void initializeAssetFileLoader(ModulesManager modulesManager) {
 		addFileFilter(new AssetFileFilter());
 		addDocumentFileProcessor(new ExtDocumentFileProcessor());
 		if (modulesManager != null) {

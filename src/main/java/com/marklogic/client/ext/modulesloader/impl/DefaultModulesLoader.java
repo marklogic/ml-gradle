@@ -38,9 +38,9 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	private ModulesManager modulesManager;
 	private StaticChecker staticChecker;
 
-	// For parallelizing writes of modules
+	// For parallelizing writes of REST API modules - e.g. services/options/transforms
 	private TaskExecutor taskExecutor;
-	private int taskThreadCount = 16;
+	private int taskThreadCount = 8;
 	private boolean shutdownTaskExecutorAfterLoadingModules = true;
 
 	private List<LoadModulesFailureListener> failureListeners = new ArrayList<>();

@@ -23,7 +23,6 @@ import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -139,42 +138,6 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 			}
 		} else if (logger.isDebugEnabled()) {
 			logger.debug("shutdownTaskExecutorAfterLoadingModules is set to false, so not shutting down taskExecutor");
-		}
-	}
-
-	/**
-	 * This method is useful for when loading assets from a resource from the classpath. For loading modules from a
-	 * filesystem, just use installAssets, which uses the much more powerful/flexible XccAssetLoader.
-	 *
-	 * @param r
-	 * @param rootPath
-	 * @param mgr
-	 */
-	public void installAsset(Resource r, String rootPath, ExtensionLibrariesManager mgr) {
-		try {
-			String path = r.getURL().getPath();
-			if (logger.isDebugEnabled()) {
-				logger.debug("Original asset URL path: " + path);
-			}
-			if (path.contains("!")) {
-				path = path.split("!")[1];
-				if (logger.isDebugEnabled()) {
-					logger.debug("Path after ! symbol: " + path);
-				}
-				if (path.startsWith(rootPath)) {
-					path = path.substring(rootPath.length());
-					if (logger.isDebugEnabled()) {
-						logger.debug("Path without root path: " + path);
-					}
-				}
-			}
-			if (logger.isInfoEnabled()) {
-				logger.info("Writing asset at path: " + path);
-			}
-			mgr.write(path, new InputStreamHandle(r.getInputStream()));
-		} catch (IOException ie) {
-			logger.error("Unable to load asset from resource: " + r.getFilename() + "; cause: " + ie.getMessage(), ie);
-			logger.error("Will continue trying to load other modules");
 		}
 	}
 

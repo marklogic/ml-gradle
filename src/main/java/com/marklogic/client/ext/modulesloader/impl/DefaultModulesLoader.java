@@ -194,41 +194,43 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 
 			ServerConfigurationManager mgr = client.newServerConfigManager();
 			ObjectMapper m = new ObjectMapper();
+			JsonNode node = null;
 			try {
-				JsonNode node = m.readTree(r.getInputStream());
-				if (node.has("document-transform-all")) {
-					mgr.setDefaultDocumentReadTransformAll(node.get("document-transform-all").asBoolean());
-				}
-				if (node.has("document-transform-out")) {
-					mgr.setDefaultDocumentReadTransform(node.get("document-transform-out").asText());
-				}
-				if (node.has("update-policy")) {
-					mgr.setUpdatePolicy(UpdatePolicy.valueOf(node.get("update-policy").asText()));
-				}
-				if (node.has("validate-options")) {
-					mgr.setQueryOptionValidation(node.get("validate-options").asBoolean());
-				}
-				if (node.has("validate-queries")) {
-					mgr.setQueryValidation(node.get("validate-queries").asBoolean());
-				}
-				if (node.has("debug")) {
-					mgr.setServerRequestLogging(node.get("debug").asBoolean());
-				}
-				if (logger.isInfoEnabled()) {
-					logger.info("Writing REST server configuration");
-					logger.info("Default document read transform: " + mgr.getDefaultDocumentReadTransform());
-					logger.info("Transform all documents on read: " + mgr.getDefaultDocumentReadTransformAll());
-					logger.info("Validate query options: " + mgr.getQueryOptionValidation());
-					logger.info("Validate queries: " + mgr.getQueryValidation());
-					logger.info("Output debugging: " + mgr.getServerRequestLogging());
-					if (mgr.getUpdatePolicy() != null) {
-						logger.info("Update policy: " + mgr.getUpdatePolicy().name());
-					}
-				}
-				mgr.writeConfiguration();
-			} catch (Exception e) {
-				throw new RuntimeException("Unable to read REST configuration from file: " + f.getAbsolutePath(), e);
+				node = m.readTree(r.getInputStream());
+			} catch (IOException ex) {
+				throw new RuntimeException("Unable to read REST configuration from file: " + f.getAbsolutePath(), ex);
 			}
+
+			if (node.has("document-transform-all")) {
+				mgr.setDefaultDocumentReadTransformAll(node.get("document-transform-all").asBoolean());
+			}
+			if (node.has("document-transform-out")) {
+				mgr.setDefaultDocumentReadTransform(node.get("document-transform-out").asText());
+			}
+			if (node.has("update-policy")) {
+				mgr.setUpdatePolicy(UpdatePolicy.valueOf(node.get("update-policy").asText()));
+			}
+			if (node.has("validate-options")) {
+				mgr.setQueryOptionValidation(node.get("validate-options").asBoolean());
+			}
+			if (node.has("validate-queries")) {
+				mgr.setQueryValidation(node.get("validate-queries").asBoolean());
+			}
+			if (node.has("debug")) {
+				mgr.setServerRequestLogging(node.get("debug").asBoolean());
+			}
+			if (logger.isInfoEnabled()) {
+				logger.info("Writing REST server configuration");
+				logger.info("Default document read transform: " + mgr.getDefaultDocumentReadTransform());
+				logger.info("Transform all documents on read: " + mgr.getDefaultDocumentReadTransformAll());
+				logger.info("Validate query options: " + mgr.getQueryOptionValidation());
+				logger.info("Validate queries: " + mgr.getQueryValidation());
+				logger.info("Output debugging: " + mgr.getServerRequestLogging());
+				if (mgr.getUpdatePolicy() != null) {
+					logger.info("Update policy: " + mgr.getUpdatePolicy().name());
+				}
+			}
+			mgr.writeConfiguration();
 
 			if (f != null && modulesManager != null) {
 				modulesManager.saveLastLoadedTimestamp(f, new Date());

@@ -446,6 +446,12 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			c.setDeleteTestModulesPattern(prop);
 		}
 
+		prop = getProperty("mlModulesLoaderThreadCount");
+		if (prop != null) {
+			logger.info("Modules loader thread count: " + prop);
+			c.setModulesLoaderThreadCount(Integer.parseInt(prop));
+		}
+
 		/**
 		 * The following properties are all for generating Entity Services artifacts.
 		 */

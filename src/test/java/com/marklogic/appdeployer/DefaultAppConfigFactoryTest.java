@@ -121,6 +121,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
         p.setProperty("mlModuleTimestampsPath", "custom/timestamps/path.properties");
         p.setProperty("mlDeleteTestModules", "true");
         p.setProperty("mlDeleteTestModulesPattern", "/some/pattern");
+        p.setProperty("mlModulesLoaderThreadCount", "3");
 
         p.setProperty("mlModelsPath", "ml/models");
         p.setProperty("mlInstanceConverterPath", "ext/my/path");
@@ -193,6 +194,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
         assertFalse(config.isUseRoxyTokenPrefix());
         assertTrue(config.isDeleteTestModules());
         assertEquals("/some/pattern", config.getDeleteTestModulesPattern());
+        assertEquals(3, config.getModulesLoaderThreadCount());
 
         assertEquals("ml/models", config.getModelsPath());
         assertEquals("ext/my/path", config.getInstanceConverterPath());

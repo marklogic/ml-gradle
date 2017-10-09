@@ -113,6 +113,7 @@ public class AppConfig {
 	private String moduleTimestampsPath = PropertiesModuleManager.DEFAULT_FILE_PATH;
 	private boolean deleteTestModules = false;
 	private String deleteTestModulesPattern = "/test/**";
+	private int modulesLoaderThreadCount = 8;
 
     private String schemasPath;
     private ConfigDir configDir;
@@ -921,5 +922,13 @@ public class AppConfig {
 
 	public void setResourceFilenamesIncludePattern(Pattern resourceFilenamesIncludePattern) {
 		this.resourceFilenamesIncludePattern = resourceFilenamesIncludePattern;
+	}
+
+	public int getModulesLoaderThreadCount() {
+		return modulesLoaderThreadCount;
+	}
+
+	public void setModulesLoaderThreadCount(int modulesLoaderThreadCount) {
+		this.modulesLoaderThreadCount = modulesLoaderThreadCount;
 	}
 }

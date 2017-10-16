@@ -116,7 +116,7 @@ public abstract class BaseModulesFinder implements ModulesFinder {
 				Resource[] r = resolver.getResources(finalPath);
 				list.addAll(Arrays.asList(r));
 			} catch (IOException e) {
-				e.printStackTrace();
+				throw new RuntimeException("Unable to find resources at path: " + path, e);
 			}
 		}
 		return list;

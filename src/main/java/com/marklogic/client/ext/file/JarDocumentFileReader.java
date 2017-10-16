@@ -96,7 +96,7 @@ public class JarDocumentFileReader extends LoggingObject implements DocumentFile
 				Resource[] r = resolver.getResources(finalPath);
 				list.addAll(Arrays.asList(r));
 			} catch (IOException e) {
-				e.printStackTrace();
+				throw new RuntimeException("Unable to find resources at path: " + path, e);
 			}
 		}
 		return list;
@@ -137,7 +137,10 @@ public class JarDocumentFileReader extends LoggingObject implements DocumentFile
 				documentFile = processor.processDocumentFile(documentFile);
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				if (logger.isErrorEnabled()) {
+					logger.error("Error while processing document file; file: " + documentFile.getFile().getAbsolutePath()
+						+ "; cause: " + e.getMessage(), e);
+				}
 			}
 			if (documentFile == null) {
 				break;

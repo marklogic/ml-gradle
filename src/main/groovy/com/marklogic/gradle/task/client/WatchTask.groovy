@@ -50,7 +50,7 @@ class WatchTask extends MarkLogicTask {
 		DatabaseClient client = newClient()
 		while (true) {
 			for (String path : paths) {
-				loader.loadModules(new File(path), new DefaultModulesFinder(), client);
+				loader.loadModules(path, new DefaultModulesFinder(), client);
 			}
 			try {
 				Thread.sleep(sleepTime);

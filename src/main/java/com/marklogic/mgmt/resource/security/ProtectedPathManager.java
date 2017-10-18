@@ -3,6 +3,8 @@ package com.marklogic.mgmt.resource.security;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.resource.AbstractResourceManager;
 import com.marklogic.rest.util.Fragment;
+import com.marklogic.rest.util.ResourcesFragment;
+import org.springframework.web.client.ResourceAccessException;
 
 import java.util.List;
 
@@ -65,4 +67,25 @@ public class ProtectedPathManager extends AbstractResourceManager {
 
 	@Override
 	protected boolean useAdminUser() { return true; }
+
+
+	/**
+	 * Testing the deployment/undeployment of protected paths intermittently fails when performing a GET on the
+	 * /manage/v2/protected-paths endpoint. A single retry seems to address the issue, though the cause is still
+	 * unknown.
+	 *
+	 * @return ResourcesFragment
+	 */
+	@Override
+	public ResourcesFragment getAsXml() {
+		try {
+			return new ResourcesFragment(getManageClient().getXmlAsAdmin(getResourcesPath()));
+		} catch (ResourceAccessException ex) {
+			if (logger.isWarnEnabled()) {
+				logger.warn("Unable to get list of protected paths, retrying; cause: " + ex.getMessage());
+			}
+			return new ResourcesFragment(getManageClient().getXmlAsAdmin(getResourcesPath()));
+		}
+	}
+
 }

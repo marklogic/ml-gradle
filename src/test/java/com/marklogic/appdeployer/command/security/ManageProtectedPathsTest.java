@@ -21,14 +21,4 @@ public class ManageProtectedPathsTest extends AbstractManageResourceTest {
 		return new String[] { "/test:element" };
 	}
 
-	/*
-	@Override
-	protected void afterResourcesCreatedAgain() {
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-	*/
 }

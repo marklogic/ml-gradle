@@ -30,7 +30,8 @@ public class PayloadParser {
                 throw new RuntimeException("Cannot get field value from JSON; field name: " + fieldName + "; JSON: "
                         + payload);
             }
-            return node.get(fieldName).asText();
+            return node.get(fieldName).isTextual() ? node.get(fieldName).asText() : node.get(fieldName).toString();
+
         } else {
             Fragment f = new Fragment(payload);
             String xpath = String.format("/node()/*[local-name(.) = '%s']", fieldName);

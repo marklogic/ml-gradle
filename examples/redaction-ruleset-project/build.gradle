@@ -5,7 +5,7 @@ buildscript {
 		maven { url "http://developer.marklogic.com/maven2/" }
 	}
 	dependencies {
-		//Needed for CorbTask to dynamicaly generate properties from CORB Options class
+		//Needed for CorbTask below
 		classpath 'com.marklogic:marklogic-corb:2.3.2'
 	}
 }
@@ -22,27 +22,21 @@ repositories {
 }
 
 configurations {
-	// This configuration captures the dependencies for running corb (Content Reprocessing in Bulk).
-	// This is only needed if you want to run corb via Gradle tasks.
-	// If you do, using com.marklogic.gradle.task.CorbTask is a useful starting point, as shown below.
+	// Needed to run corb task below.
 	corb
 }
-
 dependencies {
 	// required to run CoRB2
 	corb 'com.marklogic:marklogic-corb:2.3.2'
 	// optional
-	//corb 'org.jasypt:jasypt:1.9.2' // would be necessary to leverage JasyptDecrypter
 }
-
 /*
  * ml-gradle adds an instance of com.marklogic.appdeployer.AppConfig to the Gradle project under the key "mlAppConfig".
  * This instance can be modified to affect the behavior of ml-gradle.
  */
 ext {
-	// mlAppConfig is an instance of com.marklogic.appdeployer.AppConfig
 	mlAppConfig {
-		// XCC URL for running corb task below and for creating triggers on pre-8.0-4 builds of MarkLogic
+		// XCC URL for running corb task below
 		contentXccUrl = "xcc://${mlUsername}:${mlPassword}@${mlHost}:${mlRestPort}"
 	}
 }

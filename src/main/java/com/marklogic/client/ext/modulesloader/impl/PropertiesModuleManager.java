@@ -59,7 +59,7 @@ public class PropertiesModuleManager extends LoggingObject implements ModulesMan
     }
 
     public boolean hasFileBeenModifiedSinceLastLoaded(File file) {
-    	if (minimumFileTimestampToLoad > 0 && file.lastModified() < minimumFileTimestampToLoad) {
+    	if (minimumFileTimestampToLoad > 0 && file.lastModified() <= minimumFileTimestampToLoad) {
     		if (logger.isDebugEnabled()) {
     			logger.debug(String.format("lastModified for file '%s' is %d, which is before the minimumFileTimestampToLoad of %d",
 				    file.getAbsolutePath(), file.lastModified(), minimumFileTimestampToLoad));

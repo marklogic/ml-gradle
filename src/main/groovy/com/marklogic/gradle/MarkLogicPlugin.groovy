@@ -147,7 +147,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 
 		String devGroup = "ml-gradle Development"
 		project.task("mlCreateResource", type: CreateResourceTask, group: devGroup, description: "Create a new resource extension in the modules services directory; use -PresourceName and -PresourceType to set the resource name and type (either xqy or sjs)")
-		project.task("mlCreateTransform", type: CreateTransformTask, group: devGroup, description: "Create a new transform in the modules transforms directory; use -PtranssformName and -PtransformType to set the transform name and type (xqy, xsl, or sjs)")
+		project.task("mlCreateTransform", type: CreateTransformTask, group: devGroup, description: "Create a new transform in the modules transforms directory; use -PtransformName and -PtransformType to set the transform name and type (xqy, xsl, or sjs)")
 		project.task("mlExportResources", type: ExportResourcesTask, group: devGroup, description: "Export resources based on a properties file specified via -PpropertiesFile, -Pprefix, or -Pregex; use -PincludeTypes to select resource types to export via a comma-delimited string; use -PexportPath to specify where to export resources to")
 		project.task("mlPrepareRestApiDependencies", type: PrepareRestApiDependenciesTask, group: devGroup, dependsOn: project.configurations["mlRestApi"], description: "Downloads (if necessary) and unzips in the build directory all mlRestApi dependencies")
 		project.task("mlNewProject", type: NewProjectTask, group: devGroup, description: "Run a wizard for creating a new project, which includes running mlScaffold")

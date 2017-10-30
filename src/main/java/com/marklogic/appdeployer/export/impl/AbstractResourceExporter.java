@@ -9,6 +9,7 @@ import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.util.ObjectMapperFactory;
 import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
@@ -29,7 +30,7 @@ public abstract class AbstractResourceExporter extends LoggingObject implements 
 
 	protected AbstractResourceExporter(ManageClient manageClient) {
 		this.manageClient = manageClient;
-		this.objectMapper = new ObjectMapper();
+		this.objectMapper = ObjectMapperFactory.getObjectMapper();
 	}
 
 	protected boolean isFormatXml() {
@@ -42,7 +43,7 @@ public abstract class AbstractResourceExporter extends LoggingObject implements 
 			if (node.has(key)) {
 				node.remove(key);
 				try {
-					return payloadParser.getObjectMapper().writeValueAsString(node);
+					return ObjectMapperFactory.getObjectMapper().writeValueAsString(node);
 				} catch (JsonProcessingException e) {
 					throw new RuntimeException("Unable to write forest JSON out as string: " + e.getMessage(), e);
 				}

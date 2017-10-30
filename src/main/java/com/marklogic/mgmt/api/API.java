@@ -1,6 +1,7 @@
 package com.marklogic.mgmt.api;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -28,6 +29,7 @@ import com.marklogic.mgmt.resource.forests.ForestManager;
 import com.marklogic.mgmt.resource.groups.GroupManager;
 import com.marklogic.mgmt.resource.security.*;
 import com.marklogic.mgmt.resource.tasks.TaskManager;
+import com.marklogic.mgmt.util.ObjectMapperFactory;
 import com.marklogic.mgmt.util.SimplePropertySource;
 import com.marklogic.mgmt.util.SystemPropertySource;
 
@@ -73,14 +75,7 @@ public class API extends LoggingObject {
     }
 
     protected ObjectMapper buildDefaultObjectMapper() {
-        ObjectMapper m = new ObjectMapper();
-        m.setPropertyNamingStrategy(new LowerCaseWithHyphensStrategy());
-        m.setSerializationInclusion(Include.NON_NULL);
-        m.enable(SerializationFeature.INDENT_OUTPUT);
-        m.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        // This is needed at least for localname on Element instances
-        m.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
-        return m;
+        return ObjectMapperFactory.getObjectMapper();
     }
 
     /**

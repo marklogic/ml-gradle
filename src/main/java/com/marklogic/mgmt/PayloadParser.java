@@ -1,7 +1,9 @@
 package com.marklogic.mgmt;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.marklogic.mgmt.util.ObjectMapperFactory;
 import com.marklogic.rest.util.Fragment;
 
 /**
@@ -9,9 +11,12 @@ import com.marklogic.rest.util.Fragment;
  */
 public class PayloadParser {
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper;
 
     public JsonNode parseJson(String json) {
+    	if (objectMapper == null) {
+    		objectMapper = ObjectMapperFactory.getObjectMapper();
+	    }
         try {
             return objectMapper.readTree(json);
         } catch (Exception e) {
@@ -43,6 +48,9 @@ public class PayloadParser {
     }
 
     public boolean isJsonPayload(String payload) {
+    	if (payload == null) {
+    		return false;
+	    }
         String s = payload.trim();
         return s.startsWith("{") || s.startsWith("[");
     }

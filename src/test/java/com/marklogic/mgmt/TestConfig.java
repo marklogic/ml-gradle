@@ -37,7 +37,11 @@ public class TestConfig {
 
     @Bean
     public ManageConfig manageConfig() {
-        return new ManageConfig(getMlManageHost(), 8002, getMlManageUsername(), getMlManagePassword());
+        ManageConfig config = new ManageConfig(getMlManageHost(), 8002, getMlManageUsername(), getMlManagePassword());
+
+        // Clean the JSON by default
+	    config.setCleanJsonPayloads(true);
+	    return config;
     }
 
     /**
@@ -48,7 +52,7 @@ public class TestConfig {
         return new AdminConfig(getMlManageHost(), 8001, getMlManageUsername(), getMlManagePassword());
     }
 
-    
+
     public String getMlManageHost() {
         return mlManageHost;
     }

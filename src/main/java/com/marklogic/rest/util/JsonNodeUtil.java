@@ -1,9 +1,9 @@
 package com.marklogic.rest.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.marklogic.mgmt.util.ObjectMapperFactory;
 
 import java.io.File;
 import java.util.*;
@@ -11,14 +11,13 @@ import java.util.*;
 public class JsonNodeUtil {
 
     public static JsonNode mergeJsonFiles(List<File> files) {
-        ObjectMapper m = new ObjectMapper();
         List<JsonNode> nodes = new ArrayList<>();
         Set<String> fieldNames = new HashSet<>();
         for (File f : files) {
             if (f.exists()) {
                 JsonNode node = null;
                 try {
-                    node = m.readTree(f);
+                    node = ObjectMapperFactory.getObjectMapper().readTree(f);
                 } catch (Exception e) {
                     throw new RuntimeException("Unable to read JSON from file: " + f.getAbsolutePath(), e);
                 }

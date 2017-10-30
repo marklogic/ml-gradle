@@ -66,6 +66,12 @@ public class DefaultManageConfigFactory extends PropertySourceFactory implements
 		    c.setConfigureSimpleSsl(Boolean.parseBoolean(prop));
 	    }
 
+	    prop = getProperty("mlManageCleanJsonPayloads");
+	    if (prop != null) {
+	    	logger.info("Cleaning Management API JSON payloads: " + prop);
+	    	c.setCleanJsonPayloads(Boolean.parseBoolean(prop));
+	    }
+
 	    prop = getProperty("mlAdminUsername");
         if (prop != null) {
             logger.info("Manage admin username: " + prop);

@@ -1,6 +1,8 @@
 package com.marklogic.mgmt;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.marklogic.client.ext.helper.LoggingObject;
+import com.marklogic.mgmt.util.ObjectMapperFactory;
 import com.marklogic.rest.util.Fragment;
 import com.marklogic.rest.util.RestTemplateUtil;
 import org.jdom2.Namespace;
@@ -9,6 +11,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +26,7 @@ public class ManageClient extends LoggingObject {
     private ManageConfig manageConfig;
     private RestTemplate restTemplate;
     private RestTemplate adminRestTemplate;
+	private PayloadParser payloadParser;
 
     /**
      * Can use this constructor when the default values in ManageConfig will work.
@@ -187,13 +192,44 @@ public class ManageClient extends LoggingObject {
         adminRestTemplate.delete(buildUri(path));
     }
 
-    public HttpEntity<String> buildJsonEntity(String json) {
+	/**
+	 * Per #187 and version 3.1.0, when an HttpEntity is constructed with a JSON payload, this method will check to see
+	 * if it should "clean" the JSON via the Jackson library, which is primarily intended for removing comments from
+	 * JSON (comments that Jackson allows, but aren't allowed by the JSON spec). This behavior is disabled by default.
+	 *
+	 * @param json
+	 * @return
+	 */
+	public HttpEntity<String> buildJsonEntity(String json) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        if (manageConfig != null && manageConfig.isCleanJsonPayloads()) {
+        	json = cleanJsonPayload(json);
+        }
         return new HttpEntity<String>(json, headers);
     }
 
-    public HttpEntity<String> buildXmlEntity(String xml) {
+	/**
+	 * Per #187, and version 3.1.0, this will also use Jackson to remove any comments in the JSON payload, as Jackson
+	 * is now configured to ignore comments, but we still don't want to include them in the payload sent to MarkLogic.
+	 * @param payload
+	 * @return
+	 */
+	protected String cleanJsonPayload(String payload) {
+		if (payloadParser == null) {
+			payloadParser = new PayloadParser();
+		}
+		JsonNode node = payloadParser.parseJson(payload);
+		StringWriter sw = new StringWriter();
+		try {
+			ObjectMapperFactory.getObjectMapper().writer().writeValue(sw, node);
+		} catch (IOException ex) {
+			throw new RuntimeException("Unable to write JSON payload as JsonNode back out to a string, cause: " + ex.getMessage());
+		}
+		return sw.toString();
+	}
+
+	public HttpEntity<String> buildXmlEntity(String xml) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_XML);
         return new HttpEntity<String>(xml, headers);
@@ -213,7 +249,7 @@ public class ManageClient extends LoggingObject {
         }
     }
 
-    public URI buildUri(String path) {
+	public URI buildUri(String path) {
         return manageConfig.buildUri(path);
     }
 

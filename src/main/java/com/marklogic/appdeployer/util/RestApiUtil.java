@@ -4,11 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.marklogic.mgmt.util.ObjectMapperFactory;
 
 public abstract class RestApiUtil {
 
 	public static String buildDefaultRestApiJson() {
-        ObjectMapper m = new ObjectMapper();
+        ObjectMapper m = ObjectMapperFactory.getObjectMapper();
         ObjectNode node = m.createObjectNode();
         ObjectNode n = node.putObject("rest-api");
         n.put("name", "%%NAME%%");

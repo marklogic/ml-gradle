@@ -123,7 +123,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	 * If an AsyncTaskExecutor is used for loading options/services/transforms, we need to wait for the tasks to complete
 	 * before we e.g. release the DatabaseClient.
 	 */
-	protected void waitForTaskExecutorToFinish() {
+	public void waitForTaskExecutorToFinish() {
 		if (shutdownTaskExecutorAfterLoadingModules) {
 			if (taskExecutor instanceof ExecutorConfigurationSupport) {
 				((ExecutorConfigurationSupport) taskExecutor).shutdown();

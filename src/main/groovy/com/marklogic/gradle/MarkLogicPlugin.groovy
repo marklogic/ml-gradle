@@ -54,6 +54,7 @@ import com.marklogic.gradle.task.tasks.DeployTasksTask
 import com.marklogic.gradle.task.tasks.UndeployTasksTask
 import com.marklogic.gradle.task.tasks.WaitForTaskServerTask
 import com.marklogic.gradle.task.temporal.DeployTemporalTask
+import com.marklogic.gradle.task.tests.RoxyTest
 import com.marklogic.gradle.task.trigger.DeployTriggersTask
 import com.marklogic.gradle.task.viewschemas.DeployViewSchemasTask
 import com.marklogic.mgmt.DefaultManageConfigFactory
@@ -249,6 +250,9 @@ class MarkLogicPlugin implements Plugin<Project> {
 			"Use -ProxyProjectPath to define the location of your Roxy project.")
 		project.task("mlRoxyMigrateProject", group: roxyGroup, description: "Run all tasks for migrating a Roxy project into this Gradle project. " +
 			"Use -ProxyProjectPath to define the location of your Roxy project.", dependsOn: ["mlRoxyMigrateBuildSteps", "mlRoxyMigrateFiles", "mlRoxyMigrateProperties"])
+
+		String testGroup = "ml-gradle Test";
+		project.task("mlRoxyTest", type: RoxyTest, group: testGroup, description: "Run Roxy Unit Tests", dependsOn: ["mlDeployApp", "mlPostDeploy"])
 		logger.info("Finished initializing ml-gradle\n")
 	}
 

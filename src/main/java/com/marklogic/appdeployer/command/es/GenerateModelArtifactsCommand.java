@@ -226,6 +226,8 @@ public class GenerateModelArtifactsCommand extends AbstractCommand {
 		if (template != null) {
 			File dir = new File(appConfig.getSchemasPath());
 			dir.mkdirs();
+			dir = new File(dir, "tde");
+			dir.mkdirs();
 			File out = new File(dir, code.getTitle() + "-" + code.getVersion() + ".tdex");
 			String logMessage = "Wrote extraction template to: ";
 			if (out.exists()) {

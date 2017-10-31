@@ -42,7 +42,7 @@ public class GenerateModelArtifactsTest extends AbstractAppDeployerTest {
 		assertTrue(new File(projectPath, "src/main/ml-modules/ext/entity-services/Race-0.0.1.xqy").exists());
 		assertTrue(new File(projectPath, "src/main/ml-modules/options/Race.xml").exists());
 		assertTrue(new File(projectPath, "src/main/ml-schemas/Race-0.0.1.xsd").exists());
-		assertTrue(new File(projectPath, "src/main/ml-schemas/Race-0.0.1.tdex").exists());
+		assertTrue(new File(projectPath, "src/main/ml-schemas/tde/Race-0.0.1.tdex").exists());
 		assertTrue(new File(projectPath, "src/main/ml-config/databases/content-database.json").exists());
 		assertTrue("A schemas db file needs to be created since the ES content-database.json file refers to one",
 			new File(projectPath, "src/main/ml-config/databases/schemas-database.json").exists());

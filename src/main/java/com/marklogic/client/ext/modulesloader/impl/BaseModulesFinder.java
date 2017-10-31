@@ -1,6 +1,7 @@
 package com.marklogic.client.ext.modulesloader.impl;
 
 import com.marklogic.client.ext.helper.FilenameUtil;
+import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.client.ext.modulesloader.Modules;
 import com.marklogic.client.ext.modulesloader.ModulesFinder;
 import org.springframework.core.io.FileSystemResource;
@@ -21,7 +22,7 @@ import java.util.List;
  * Abstract implementation that provides implementations for loading all the different kinds of modules.
  * Subclasses need to override the findModulesWithResolvedBaseDir method.
  */
-public abstract class BaseModulesFinder implements ModulesFinder {
+public abstract class BaseModulesFinder extends LoggingObject implements ModulesFinder {
 
     private FilenameFilter transformFilenameFilter = new TransformFilenameFilter();
     private FilenameFilter namespaceFilenameFilter = new NamespaceFilenameFilter();
@@ -165,10 +166,20 @@ public abstract class BaseModulesFinder implements ModulesFinder {
 
 	@Override
 	public final Modules findModules(String baseDir) {
+    	if (logger.isDebugEnabled()) {
+    		logger.debug("Finding modules in baseDir: " + baseDir);
+	    }
 		if (!baseDir.startsWith("file:") && !baseDir.startsWith("classpath")) {
-			baseDir = Paths.get(baseDir).toUri().toString();
+			/**
+			 * Have to wrap this in a File first to address an issue where Gradle, when running in daemon mode, will
+			 * resolve values passed into the Paths class from the directory where the daemon mode was launched, which
+			 * may not be the current directory.
+			 */
+			baseDir = new File(baseDir).toURI().toString();
+			if (logger.isDebugEnabled()) {
+				logger.debug("Finding modules in baseDir, which was modified to be: " + baseDir);
+			}
 		}
-
 		return findModulesWithResolvedBaseDir(baseDir);
 	}
 

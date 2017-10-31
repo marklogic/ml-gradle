@@ -23,7 +23,7 @@ buildscript {
 }
 
 plugins {
-    id "com.marklogic.ml-gradle" version "2.7.1"
+    id "com.marklogic.ml-gradle" version "3.0.0"
 }
 
 repositories {
@@ -47,16 +47,9 @@ dependencies {
     //corb 'org.jasypt:jasypt:1.9.2' // would be necessary to leverage JasyptDecrypter
 }
 
-/*
- * ml-gradle adds an instance of com.marklogic.appdeployer.AppConfig to the Gradle project under the key "mlAppConfig".
- * This instance can be modified to affect the behavior of ml-gradle.
- */
 ext {
-    // mlAppConfig is an instance of com.marklogic.appdeployer.AppConfig
-    mlAppConfig {
-        // XCC URL for running corb task below and for creating triggers on pre-8.0-4 builds of MarkLogic
-        contentXccUrl = "xcc://${mlUsername}:${mlPassword}@${mlHost}:${mlRestPort}"
-    }
+    // XCC URL for running corb task below
+    contentXccUrl = "xcc://${mlUsername}:${mlPassword}@${mlHost}:${mlRestPort}"
 }
 
 /*

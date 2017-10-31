@@ -40,9 +40,6 @@ publishing {
       artifact sourcesJar
     }
   }
-	repositories {
-		mavenLocal()
-	}
 }
 
 if (project.hasProperty("myBintrayUser")) {

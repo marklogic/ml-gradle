@@ -1,54 +1,87 @@
 buildscript {
 	repositories {
 		jcenter()
-		// Needed for corb dependency: XCC
+		// Needed for mlcp dependency: XCC
 		maven { url "http://developer.marklogic.com/maven2/" }
 	}
 	dependencies {
-		//Needed for CorbTask below
-		classpath 'com.marklogic:marklogic-corb:2.3.2'
+		classpath "com.marklogic:marklogic-contentpump:9.0.3"
+		classpath "com.marklogic:ml-gradle:3.0.0"
 	}
 }
 
-plugins {
-	id "com.marklogic.ml-gradle" version "3.0.0"
-}
+apply plugin: "com.marklogic.ml-gradle"
 
 repositories {
 	jcenter()
-
-	// Needed for corb dependency: XCC
+	// Needed for mlcp dependency
 	maven { url "http://developer.marklogic.com/maven2/" }
+	maven { url "http://repository.cloudera.com/artifactory/cloudera-repos/" }
 }
 
 configurations {
-	// Needed to run corb task below.
-	corb
-}
-dependencies {
-	// required to run CoRB2
-	corb 'com.marklogic:marklogic-corb:2.3.2'
-	// optional
-}
-/*
- * ml-gradle adds an instance of com.marklogic.appdeployer.AppConfig to the Gradle project under the key "mlAppConfig".
- * This instance can be modified to affect the behavior of ml-gradle.
- */
-ext {
-	mlAppConfig {
-		// XCC URL for running corb task below
-		contentXccUrl = "xcc://${mlUsername}:${mlPassword}@${mlHost}:${mlRestPort}"
+	mlcp {
+		resolutionStrategy {
+			force "xml-apis:xml-apis:1.4.01"
+		}
 	}
 }
 
+
+dependencies {
+	mlcp "com.marklogic:mlcp:9.0.3"
+	mlcp files("lib")
+}
+
+/***************************************************************
+					Optional tasks to test redaction of data
+***************************************************************/
+
 /*
- * This optional task demonstrates validating redaction rules via a locally run CORB process.
- * To execute this task simply run it after you have successfully deployed the redaction rulesets (via mlAppDeploy or mlLoadSchemas).
+* The import task below is an example of using the built-in MLCP Task in ml-gradle and will import sample JSON
+* documents to the specified content database while applying the applicable collections to the content so that
+* the redaction rules can be applied
+* */
+task importSampleRedactionData(type: com.marklogic.gradle.task.MlcpTask) {
+	description = "Example of using mlcp and MlcpTask to import documents to test redaction rules"
+	classpath = configurations.mlcp
+	command = "IMPORT"
+	database = mlAppConfig.contentDatabaseName
+	input_file_path = "data/import"
+	output_collections = "security-rules,pii-rules,email-rules"
+	output_permissions = "rest-reader,read,rest-writer,update"
+	output_uri_replace = ".*import,'/import'"
+	logOutputUri = "/redaction.txt"
+}
+
+
+/*
+* The export task below shows an example of using JavaExec inside Gradle to invoke MLCP to export the documents.
+* This task, while a useful example, must be invoked this way because the built-in MLCP task does not yet recognize
+* the "redaction" option being passed. This will be addressed in a future release.
+* Exported documents will be within this project folder under /data/export
+* */
+task exportSampleRedactionData(type: JavaExec) {
+	classpath = configurations.mlcp
+	main = 'com.marklogic.contentpump.ContentPump'
+
+	args = [
+		"EXPORT",
+		"-host", "${mlHost}",
+		"-port", "8130",
+		"-username", "${mlUsername}",
+		"-password", "${mlPassword}",
+		"-database", mlAppConfig.contentDatabaseName,
+		"-output_file_path", "data/export",
+		"-collection_filter", "security-rules",
+		"-redaction", "security-rules"]
+	/*
+	* Applying "security-rules" as the redaction collection will redact both email and SSN fields in the documents
+	* You may also redact just the email or ths SSN fields individually by applying only those specific collections
+	* i.e. "pii-rules" OR "email-rules"
+
  */
-task validateRedactionRulesetsAdhoc(type: com.marklogic.gradle.task.CorbTask) {
-	xccConnectionUri = contentXccUrl
-	urisModule = "src/main/ml-modules/ext/redaction-ruleset-validation/corb/redaction-rules-uris.xqy|ADHOC"
-	processModule = "src/main/ml-modules/ext/redaction-ruleset-validation/corb/validate-redaction-rules.xqy|ADHOC"
 
 }
+
 

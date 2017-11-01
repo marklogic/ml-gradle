@@ -13,6 +13,8 @@ class RoxyTest extends MarkLogicTask{
 	@TaskAction
 	void runAllTests() {
 		AppConfig config = getAppConfig()
+		String testResultDir = getProject().getProperties().get("mlTestResultDir")
+		String roxyResultDir = "${testResultDir}/roxy-tests"
 		ManageClient testClient = new ManageClient(
 			new ManageConfig(config.getHost(), config.getTestRestPort(), getAdminUsername(), getAdminPassword()))
 		String xml = testClient.getXml("/test/default.xqy?func=list","rt",
@@ -33,19 +35,19 @@ class RoxyTest extends MarkLogicTask{
 
 			logger.info("Running tests for suite: " + suiteName)
 			Fragment resultXml = testClient.getXml(suiteUrl)
-
-			String resultDirName = "${mlTestResultDir}/roxy-tests"
-			File resultsDir = new File(resultDirName)
+			File resultsDir = new File(roxyResultDir)
 			resultsDir.isDirectory() ? null : resultsDir.mkdirs()
 
-			String filename = "${resultDirName}/${suiteName}.xml"
+			String filename = "${roxyResultDir}/${suiteName}.xml"
 			File junitXmlFile = new File(filename)
 			logger.info("Writing result XML to " + filename)
 			junitXmlFile.write resultXml.getPrettyXml()
 		}
+
+		println "Finished writing test results to ${roxyResultDir}"
 	}
 
 	static String urlEncode(String string) {
-		return java.net.URLEncoder.encode(string, "UTF-8")
+		return URLEncoder.encode(string, "UTF-8")
 	}
 }

@@ -55,6 +55,44 @@ public class DatabaseManager extends AbstractResourceManager {
         getManageClient().postJson(path, format("{\"operation\":\"%s\"}", operation));
         logger.info(format("Finished invoking operation %s on database %s", operation, databaseIdOrName));
     }
+    
+    public String getResourceId(String payload){
+    	return super.getResourceId(payload);
+    }
+    
+    /**
+     * Detaches or disassociates any sub-databases from this database
+     * @param databaseIdOrName
+     */
+    public void detachSubDatabases(String databaseIdOrName){
+    	logger.info("Detaching sub-databases from database: " + databaseIdOrName);
+    	save(format("{\"database-name\":\"%s\", \"subdatabase\": []}", databaseIdOrName));
+    	logger.info("Finished detaching sub-databases from database: " + databaseIdOrName);
+    }
+    
+    /**
+     * Attaches/associates the specified databases with this database, making it a super-database.
+     * Note: that the databases listed in subDbNames must have already been created.
+     * 
+     * @param databaseIdOrName
+     * @param subDbNames
+     */
+    public void attachSubDatabases(String databaseIdOrName, List<String> subDbNames){
+    	String payload = format("{\"database-name\":\"%s\", \"subdatabase\": [", databaseIdOrName);
+    	for(int index = 0; index < subDbNames.size(); index++){
+    		if(index > 0){ payload += ","; }
+    		payload += format("{\"database-name\":\"%s\"}", subDbNames.get(index));
+    	}
+    	payload += "]}";
+    	logger.info("Attaching sub-databases to database: " + databaseIdOrName + ", using configured payload: " + payload);
+    	save(payload);
+    	logger.info("Finished attaching sub-databases to database: " + databaseIdOrName);
+    	
+    }
+    
+    public List<String> getSubDatabases(String databaseNameOrId) {
+    	return getPropertiesAsXml(databaseNameOrId).getElementValues("/node()/m:subdatabases/m:subdatabase/m:database-name");
+    }
 
     public void deleteByName(String databaseName) {
         String json = format("{\"database-name\":\"%s\"}", databaseName);

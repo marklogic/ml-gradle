@@ -1,9 +1,9 @@
 package com.marklogic.mgmt.resource.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.marklogic.mgmt.resource.AbstractResourceManager;
 import com.marklogic.mgmt.ManageClient;
+import com.marklogic.mgmt.resource.AbstractResourceManager;
+import com.marklogic.mgmt.util.ObjectMapperFactory;
 import com.marklogic.rest.util.Fragment;
 import org.springframework.http.ResponseEntity;
 
@@ -54,7 +54,7 @@ public class CertificateTemplateManager extends AbstractResourceManager {
 
     public ResponseEntity<String> generateTemporaryCertificate(String templateIdOrName, String commonName,
             int validFor, String dnsName, String ipAddress, boolean ifNecessary) {
-        ObjectNode node = new ObjectMapper().createObjectNode();
+        ObjectNode node = ObjectMapperFactory.getObjectMapper().createObjectNode();
         node.put("operation", "generate-temporary-certificate");
         node.put("valid-for", validFor);
         node.put("common-name", commonName);
@@ -75,7 +75,7 @@ public class CertificateTemplateManager extends AbstractResourceManager {
     }
 
     public Fragment getCertificatesForTemplate(String templateIdOrName) {
-        ObjectNode node = new ObjectMapper().createObjectNode();
+        ObjectNode node = ObjectMapperFactory.getObjectMapper().createObjectNode();
         node.put("operation", "get-certificates-for-template");
 
         String json = node.toString();

@@ -21,6 +21,7 @@ public class ManageConfig extends RestConfig {
     private boolean adminConfigureSimpleSsl;
     private String adminScheme = "http";
     private int adminPort = 8001;
+    private boolean cleanJsonPayloads = false;
 
     public ManageConfig() {
         this("localhost", DEFAULT_PASSWORD);
@@ -80,5 +81,13 @@ public class ManageConfig extends RestConfig {
 
 	public void setAdminScheme(String adminScheme) {
 		this.adminScheme = adminScheme;
+	}
+
+	public boolean isCleanJsonPayloads() {
+		return cleanJsonPayloads;
+	}
+
+	public void setCleanJsonPayloads(boolean cleanJsonPayloads) {
+		this.cleanJsonPayloads = cleanJsonPayloads;
 	}
 }

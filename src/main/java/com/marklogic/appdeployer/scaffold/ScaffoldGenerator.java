@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.util.RestApiUtil;
 import com.marklogic.client.ext.helper.LoggingObject;
+import com.marklogic.mgmt.util.ObjectMapperFactory;
 import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
@@ -19,10 +20,13 @@ import java.io.IOException;
  */
 public class ScaffoldGenerator extends LoggingObject {
 
-	protected ObjectMapper objectMapper = new ObjectMapper();
+	protected ObjectMapper objectMapper;
 	private PrettyPrinter prettyPrinter = new DefaultPrettyPrinter();
 
 	public void generateScaffold(String path, AppConfig config) {
+		if (objectMapper == null) {
+			objectMapper = ObjectMapperFactory.getObjectMapper();
+		}
 		File rootDir = new File(path);
 
 		File configDir = getConfigDir(rootDir);
@@ -232,4 +236,11 @@ public class ScaffoldGenerator extends LoggingObject {
 		return new File(rootDir, "src/main/ml-modules");
 	}
 
+	public void setObjectMapper(ObjectMapper objectMapper) {
+		this.objectMapper = objectMapper;
+	}
+
+	public void setPrettyPrinter(PrettyPrinter prettyPrinter) {
+		this.prettyPrinter = prettyPrinter;
+	}
 }

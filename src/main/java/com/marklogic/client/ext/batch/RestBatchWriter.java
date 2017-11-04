@@ -1,9 +1,7 @@
 package com.marklogic.client.ext.batch;
 
 import com.marklogic.client.DatabaseClient;
-import com.marklogic.client.document.DocumentManager;
 import com.marklogic.client.document.DocumentWriteOperation;
-import com.marklogic.client.document.DocumentWriteSet;
 import com.marklogic.client.document.ServerTransform;
 import com.marklogic.client.io.Format;
 
@@ -14,16 +12,19 @@ import java.util.List;
  * REST API-based implementation, using the Java Client API. By default, this will call release() on each of the
  * DatabaseClient objects that are passed in. Be sure to disable this if you want to keep using those DatabaseClient
  * objects.
+ * <p>
+ * To customize what this does with every batch, you can set a new instance of BatchHandler. This class defaults to using
+ * DefaultBatchHandler; it'll pass its instances of Format and ServerTransform to that class.
  */
 public class RestBatchWriter extends BatchWriterSupport {
 
 	private List<DatabaseClient> databaseClients;
 	private int clientIndex = 0;
 	private boolean releaseDatabaseClients = true;
-	private ServerTransform serverTransform;
 
-	// Specific to Client API 4.0.+
 	private Format contentFormat;
+	private ServerTransform serverTransform;
+	private BatchHandler batchHandler;
 
 	public RestBatchWriter(DatabaseClient databaseClient) {
 		this(databaseClient, true);
@@ -46,6 +47,17 @@ public class RestBatchWriter extends BatchWriterSupport {
 		executeRunnable(runnable, items);
 	}
 
+	@Override
+	public void initialize() {
+		super.initialize();
+		if (batchHandler == null) {
+			DefaultBatchHandler dbh = new DefaultBatchHandler();
+			dbh.setContentFormat(contentFormat);
+			dbh.setServerTransform(serverTransform);
+			this.batchHandler = dbh;
+		}
+	}
+
 	protected DatabaseClient determineDatabaseClientToUse() {
 		if (clientIndex >= databaseClients.size()) {
 			clientIndex = 0;
@@ -59,40 +71,9 @@ public class RestBatchWriter extends BatchWriterSupport {
 		return new Runnable() {
 			@Override
 			public void run() {
-				DocumentManager<?, ?> mgr = buildDocumentManager(client);
-				if (contentFormat != null) {
-					mgr.setContentFormat(contentFormat);
-				}
-
-				DocumentWriteSet set = mgr.newWriteSet();
-				for (DocumentWriteOperation item : items) {
-					set.add(item);
-				}
-				int count = set.size();
-				if (logger.isDebugEnabled()) {
-					logger.debug("Writing " + count + " documents to MarkLogic");
-				}
-				if (serverTransform != null) {
-					mgr.write(set, serverTransform);
-				} else {
-					mgr.write(set);
-				}
-				if (logger.isInfoEnabled()) {
-					logger.info("Wrote " + count + " documents to MarkLogic");
-				}
+				batchHandler.handleBatch(client, items);
 			}
 		};
-	}
-
-	/**
-	 * Factored out so it can be overridden for e.g. those already using MarkLogic 9, who may need to set the content
-	 * format on the manager.
-	 *
-	 * @param client
-	 * @return
-	 */
-	protected DocumentManager<?, ?> buildDocumentManager(DatabaseClient client) {
-		return client.newDocumentManager();
 	}
 
 	@Override

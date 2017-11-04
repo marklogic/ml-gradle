@@ -38,7 +38,7 @@ public class XccTemplate {
     public XccTemplate(ContentSource contentSource) {
     	this.contentSource = contentSource;
     }
-    
+
     public <T> T execute(XccCallback<T> callback) {
         Session session = contentSource.newSession();
         try {

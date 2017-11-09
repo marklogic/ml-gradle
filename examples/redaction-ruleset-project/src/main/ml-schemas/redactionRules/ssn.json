@@ -1,0 +1,12 @@
+{
+	"rule": {
+		"description": "hide SSNs",
+		"path": "//ssn",
+		"method": {
+			"function": "redact-us-ssn"
+		},
+		"options": {
+			"pattern": "partial"
+		}
+	}
+}

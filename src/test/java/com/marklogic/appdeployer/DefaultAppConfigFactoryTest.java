@@ -111,6 +111,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
         p.setProperty("mlContentDatabaseName", "my-content-db");
         p.setProperty("mlModulesDatabaseName", "my-modules");
         p.setProperty("mlSchemasDatabaseName", "my-schemas-db");
+        p.setProperty("mlTriggersDatabaseName", "my-triggers-db");
         p.setProperty("mlSchemasPath", "/my/schemas");
 	    p.setProperty("mlDeleteForests", "false");
         p.setProperty("mlDeleteReplicas", "false");
@@ -186,6 +187,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
         assertEquals("my-content-db", config.getContentDatabaseName());
         assertEquals("my-modules", config.getModulesDatabaseName());
         assertEquals("my-schemas-db", config.getSchemasDatabaseName());
+        assertEquals("my-triggers-db", config.getTriggersDatabaseName());
         assertEquals("/my/schemas", config.getSchemasPath());
 	    assertFalse(config.isDeleteForests());
         assertFalse(config.isDeleteReplicas());

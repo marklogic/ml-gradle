@@ -69,15 +69,22 @@ task importSampleData(type: com.marklogic.gradle.task.MlcpTask) {
 	classpath = configurations.mlcp
 	command = "IMPORT"
 	database = mlAppConfig.contentDatabaseName
-	input_file_path = "data/import"
 	output_collections = "sample-import"
 	output_permissions = "rest-reader,read,rest-writer,update"
 	output_uri_replace = ".*import,'/import'"
+
 	/**
 	 * New in ml-gradle 2.6.0 - set this to define a URI in your content database for mlcp's log output to be written to
 	 * as a text document. This can also be a variable, Gradle property, etc.
 	 */
 	logOutputUri = "/slappy.txt"
+
+	/**
+	 * The args array can be used for any MLCP parameters that are not supported by the MlcpBean class that MlcpTask
+	 * delegates to. input_file_path is supported by MlcpTask; this is just included as an example of using the args
+	 * array.
+ 	 */
+	args = ["-input_file_path", "data/import"]
 }
 
 /**

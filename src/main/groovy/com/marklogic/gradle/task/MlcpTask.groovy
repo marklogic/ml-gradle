@@ -57,6 +57,9 @@ class MlcpTask extends JavaExec {
 					case ["class", "logger", "command", "password"]:
 						// skip for now
 						return
+					case "additionalOptions":
+						// Not supported by this task; use JavaExec's args instead
+						return
 					default:
 						propVal = val
 						break
@@ -84,15 +87,15 @@ class MlcpTask extends JavaExec {
 			}
 		}
 
+		// Include any args that a user has configured via the args parameter of the Gradle task
+		newArgs.addAll(getArgs())
+
 		println "mlcp arguments, excluding password: " + newArgs
 
 		if (!isCopy) {
 			newArgs.add("-password")
 			newArgs.add(password ? password : config.getRestAdminPassword())
 		}
-
-		// Include any args that a user has configured via the args parameter of the Gradle task
-		newArgs.addAll(getArgs())
 
 		setArgs(newArgs)
 

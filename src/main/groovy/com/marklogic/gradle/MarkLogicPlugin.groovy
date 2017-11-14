@@ -24,6 +24,7 @@ import com.marklogic.gradle.task.databases.*
 import com.marklogic.gradle.task.datamovement.AddCollectionsTask
 import com.marklogic.gradle.task.datamovement.AddPermissionsTask
 import com.marklogic.gradle.task.datamovement.DeleteCollectionsTask
+import com.marklogic.gradle.task.datamovement.ExportModulesTask
 import com.marklogic.gradle.task.datamovement.RemoveCollectionsTask
 import com.marklogic.gradle.task.datamovement.RemovePermissionsTask
 import com.marklogic.gradle.task.datamovement.SetCollectionsTask
@@ -181,6 +182,9 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlReloadModules", group: modulesGroup, dependsOn: ["mlClearModulesDatabase", "mlLoadModules"], description: "Reloads modules by first clearing the modules database and then loading modules")
 		project.task("mlWatch", type: WatchTask, group: modulesGroup, description: "Run a loop that checks for new/modified modules every second and loads any that it finds. To ignore files that are already dirty and only process new changes, include -PignoreDirty=true . ")
 		project.task("mlDeleteModuleTimestampsFile", type: DeleteModuleTimestampsFileTask, group: modulesGroup, description: "Delete the properties file in the build directory that keeps track of when each module was last loaded")
+		project.task("mlExportModules", type: ExportModulesTask, group: modulesGroup, description: "Export modules matching a URI pattern of ** (can be overridden via -PuriPattern) from the database " +
+			"defined by mlModulesDatabaseName (can be overridden via -PdatabaseName) to the last path defined by mlModulePaths (can be overridden via -PexportPath). For each module that cannot be exported, " +
+			"an error will be logged; an error will be thrown instead by setting -PlogErrors to false.")
 
 		String qconsoleGroup = "ml-gradle qconsole"
 		project.task("mlImportWorkspaces", type: ImportWorkspacesTask, group: qconsoleGroup, description: "Import workspaces into qconsole")

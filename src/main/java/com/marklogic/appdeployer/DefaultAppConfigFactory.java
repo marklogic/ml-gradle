@@ -223,7 +223,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			c.setAppServicesExternalName(prop);
 		}
 
-		if (getProperty("mlAppServicesSimpleSsl") != null) {
+		if ("true".equals(getProperty("mlAppServicesSimpleSsl"))) {
 			logger.info("Using simple SSL context and 'ANY' hostname verifier for authenticating against the App-Services server");
 			c.setAppServicesSimpleSslConfig();
 		}
@@ -331,7 +331,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		 * When modules are loaded via the Client REST API, if the app server requires an SSL connection, then
 		 * setting this property will force the simplest SSL connection to be created.
 		 */
-		if (getProperty("mlSimpleSsl") != null) {
+		if ("true".equals(getProperty("mlSimpleSsl"))) {
 			logger.info(
 				"Using simple SSL context and 'ANY' hostname verifier for authenticating against client REST API server");
 			c.setSimpleSslConfig();

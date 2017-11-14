@@ -108,7 +108,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
         p.setProperty("mlModulePermissions", "some-perm,read,some-perm,update");
         p.setProperty("mlAdditionalBinaryExtensions", ".gradle,.properties");
         p.setProperty("mlConfigPath", "src/test/resources/sample-app/empty-ml-config");
-        p.setProperty("mlSimpleSsl", "anyvalue");
+        p.setProperty("mlSimpleSsl", "true");
         p.setProperty("mlContentDatabaseName", "my-content-db");
         p.setProperty("mlModulesDatabaseName", "my-modules");
         p.setProperty("mlSchemasDatabaseName", "my-schemas-db");

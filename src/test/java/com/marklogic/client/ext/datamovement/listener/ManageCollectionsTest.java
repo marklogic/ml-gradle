@@ -1,6 +1,7 @@
 package com.marklogic.client.ext.datamovement.listener;
 
 import com.marklogic.client.datamovement.DeleteListener;
+import com.marklogic.client.datamovement.ExportListener;
 import com.marklogic.client.datamovement.QueryBatch;
 import com.marklogic.client.datamovement.QueryBatchListener;
 import com.marklogic.client.ext.AbstractIntegrationTest;
@@ -8,9 +9,11 @@ import com.marklogic.client.ext.batch.RestBatchWriter;
 import com.marklogic.client.ext.batch.SimpleDocumentWriteOperation;
 import com.marklogic.client.ext.datamovement.QueryBatcherTemplate;
 import com.marklogic.client.ext.datamovement.UrisQueryQueryBatcherBuilder;
+import com.marklogic.client.ext.datamovement.consumer.WriteToFileConsumer;
 import com.marklogic.client.ext.helper.ClientHelper;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -45,6 +48,16 @@ public class ManageCollectionsTest extends AbstractIntegrationTest {
 			new SimpleDocumentWriteOperation(secondUri, "<two/>", COLLECTION)
 		));
 		writer.waitForCompletion();
+
+		// Do a quick test of exporting the data
+		ExportListener exportListener = new ExportListener();
+		File exportDir = new File("build/export-test");
+		exportDir.mkdirs();
+		WriteToFileConsumer l = new WriteToFileConsumer(exportDir);
+		exportListener.onDocumentReady(l);
+		qbt.applyOnCollections(exportListener, COLLECTION);
+		assertTrue(new File(exportDir, firstUri).exists());
+		assertTrue(new File(exportDir, secondUri).exists());
 
 		// Set collections
 		qbt.applyOnCollections(new SetCollectionsListener(COLLECTION, "red"), COLLECTION);
@@ -101,6 +114,7 @@ public class ManageCollectionsTest extends AbstractIntegrationTest {
 		qbt.apply(new SetCollectionsListener(COLLECTION, "green"), builder);
 		assertUriInCollections(firstUri, COLLECTION, "blue");
 		assertUriInCollections(secondUri, COLLECTION, "blue");
+
 	}
 
 	private void assertUriInCollections(String uri, String... collections) {

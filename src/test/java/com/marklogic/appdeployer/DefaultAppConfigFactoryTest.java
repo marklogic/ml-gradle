@@ -103,6 +103,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    p.setProperty("mlAppServicesSimpleSsl", "true");
 
 	    p.setProperty("mlContentForestsPerHost", "17");
+	    p.setProperty("mlCreateForests", "false");
 	    p.setProperty("mlForestsPerHost", "some-db,2,other-db,3");
         p.setProperty("mlModulePermissions", "some-perm,read,some-perm,update");
         p.setProperty("mlAdditionalBinaryExtensions", ".gradle,.properties");
@@ -174,6 +175,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    assertEquals(DatabaseClientFactory.SSLHostnameVerifier.ANY, config.getAppServicesSslHostnameVerifier());
 
 	    assertEquals((Integer) 17, config.getContentForestsPerHost());
+	    assertFalse(config.isCreateForests());
 	    Map<String, Integer> forestCounts = config.getForestCounts();
 	    assertEquals(2, (int)forestCounts.get("some-db"));
 	    assertEquals(3, (int)forestCounts.get("other-db"));

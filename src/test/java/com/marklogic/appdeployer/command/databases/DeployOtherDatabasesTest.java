@@ -1,6 +1,7 @@
 package com.marklogic.appdeployer.command.databases;
 
 import java.io.File;
+import java.util.regex.Pattern;
 
 import org.junit.Test;
 
@@ -10,6 +11,29 @@ import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 
 public class DeployOtherDatabasesTest extends AbstractAppDeployerTest {
+
+	@Test
+	public void dontCreateForests() {
+		ConfigDir configDir = appConfig.getConfigDir();
+		configDir.setBaseDir(new File("src/test/resources/sample-app/lots-of-databases"));
+
+		appConfig.setResourceFilenamesIncludePattern(Pattern.compile("other-schemas-database.*"));
+		appConfig.setCreateForests(false);
+
+		initializeAppDeployer(new DeployOtherDatabasesCommand());
+
+		final String dbName = "other-sample-app-schemas";
+		DatabaseManager dbMgr = new DatabaseManager(manageClient);
+
+		try {
+			appDeployer.deploy(appConfig);
+			assertTrue(dbMgr.exists(dbName));
+			assertTrue("No forests should have been created for the database", dbMgr.getForestIds(dbName).isEmpty());
+		} finally {
+			undeploySampleApp();
+			assertFalse(dbMgr.exists(dbName));
+		}
+	}
 
     @Test
     public void test() {

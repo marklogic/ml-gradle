@@ -238,6 +238,12 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			c.setContentForestsPerHost(Integer.parseInt(prop));
 		}
 
+		prop = getProperty("mlCreateForests");
+		if (prop != null) {
+			logger.info("Create forests for each deployed database: " + prop);
+			c.setCreateForests(Boolean.parseBoolean(prop));
+		}
+
 		/**
 		 * For any database besides the content database, configure the number of forests per host.
 		 */

@@ -59,7 +59,8 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
     private int forestsPerHost = 1;
 
     /**
-     * Passed on to DeployForestsCommand.
+     * Passed on to DeployForestsCommand. If forests are to be created, controls whether forests on created on every
+     * host or only one one host.
      */
     private boolean createForestsOnEachHost = true;
 
@@ -99,16 +100,11 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
             databaseName = receipt.getResourceId();
             if (shouldCreateForests(context, payload)) {
 	            buildDeployForestsCommand(payload, receipt, context).execute(context);
-            } else {
-            	if (logger.isInfoEnabled()) {
-            		logger.info("Found custom forests for database, so not creating default forests");
-	            }
-            }
-            // subdatabases? create and attach
-            if(!isSubDatabase()){
-            	this.addSubDatabases(dbMgr, context, receipt.getResourceId());
             }
 
+            if(!isSubDatabase()){
+            	this.addSubDatabases(dbMgr, context, databaseName);
+            }
         }
     }
 
@@ -236,7 +232,9 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
     }
 
 	/**
-	 * This is where we check to see if a custom forests directory exists at ./forests/(database name). The database
+	 * Determines if forests should be created after a database is deployed.
+	 *
+	 * This includes checking to see if a custom forests directory exists at ./forests/(database name). The database
 	 * name is extracted from the payload via a PayloadParser. This check can be disabled by setting
 	 * checkForCustomForests to false.
 	 *
@@ -245,10 +243,21 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 	 * @return
 	 */
 	protected boolean shouldCreateForests(CommandContext context, String payload) {
+		if (!context.getAppConfig().isCreateForests()) {
+			if (logger.isInfoEnabled()) {
+				logger.info("Forest creation is disabled, so not creating any forests");
+			}
+			return false;
+		}
+
 		if (isCheckForCustomForests()) {
 			PayloadParser parser = new PayloadParser();
 			String dbName = parser.getPayloadFieldValue(payload, "database-name");
-			return !customForestsExist(context, dbName);
+			boolean exist = !customForestsExist(context, dbName);
+			if (exist && logger.isInfoEnabled()) {
+				logger.info("Found custom forests for database " + dbName + ", so not creating default forests");
+			}
+			return exist;
 		}
 		return true;
 	}

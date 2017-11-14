@@ -124,6 +124,9 @@ public class AppConfig {
     // Allows for creating a triggers database without a config file for one
     private boolean createTriggersDatabase = false;
 
+    // Controls whether forests are created when a database is created
+    private boolean createForests = true;
+
     // Controls whether forests are deleted when a database is deleted
     private boolean deleteForests = true;
 
@@ -730,7 +733,15 @@ public class AppConfig {
         this.deleteForests = deleteForests;
     }
 
-    public boolean isNoRestServer() {
+	public boolean isCreateForests() {
+		return createForests;
+	}
+
+	public void setCreateForests(boolean createForests) {
+		this.createForests = createForests;
+	}
+
+	public boolean isNoRestServer() {
         return noRestServer;
     }
 

@@ -53,10 +53,6 @@ public class DeployContentDatabasesCommand extends DeployDatabaseCommand {
                 SaveReceipt receipt = dbMgr.save(json);
 	            if (shouldCreateForests(context, payload)) {
 		            buildDeployForestsCommand(payload, receipt, context).execute(context);
-	            } else {
-		            if (logger.isInfoEnabled()) {
-			            logger.info("Found custom forests for database, so not creating default forests");
-		            }
 	            }
             }
         }
@@ -77,10 +73,10 @@ public class DeployContentDatabasesCommand extends DeployDatabaseCommand {
             String json = payloadTokenReplacer.replaceTokens(payload, appConfig, false);
 
             DatabaseManager dbMgr = newDatabaseManageForDeleting(context);
-            
+
             // remove subdatabases if they exist
             removeSubDatabases(dbMgr, context, dbMgr.getResourceId(json));
-            
+
             dbMgr.delete(json);
             if (appConfig.isTestPortSet()) {
                 json = payloadTokenReplacer.replaceTokens(payload, appConfig, true);

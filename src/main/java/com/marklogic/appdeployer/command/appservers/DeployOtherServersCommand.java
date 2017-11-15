@@ -4,8 +4,11 @@ import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.ResourceFilenameFilter;
 import com.marklogic.appdeployer.command.SortOrderConstants;
+import com.marklogic.mgmt.PayloadParser;
+import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
+import com.marklogic.mgmt.util.ObjectMapperFactory;
 
 import java.io.File;
 
@@ -38,4 +41,21 @@ public class DeployOtherServersCommand extends AbstractResourceCommand {
         return 0;
     }
 
+	/**
+	 * If the payload has a group-name that differs from the group name in the AppConfig, then this returns a new
+	 * ServerManager using the group-name in the payload.
+	 *
+	 * @param mgr
+	 * @param context
+	 * @param payload
+	 * @return
+	 */
+	@Override
+	protected ResourceManager adjustResourceManagerForPayload(ResourceManager mgr, CommandContext context, String payload) {
+		String groupName = new PayloadParser().getPayloadFieldValue(payload, "group-name", false);
+		if (groupName != null && !groupName.equals(context.getAppConfig().getGroupName())) {
+			return new ServerManager(context.getManageClient(), groupName);
+		}
+		return mgr;
+	}
 }

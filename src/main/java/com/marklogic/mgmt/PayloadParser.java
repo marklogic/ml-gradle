@@ -28,20 +28,31 @@ public class PayloadParser {
         return getPayloadFieldValue(payload, idFieldName);
     }
 
-    public String getPayloadFieldValue(String payload, String fieldName) {
+	public String getPayloadFieldValue(String payload, String fieldName) {
+    	return getPayloadFieldValue(payload, fieldName, true);
+	}
+
+	public String getPayloadFieldValue(String payload, String fieldName, boolean throwErrorIfNotFound) {
         if (isJsonPayload(payload)) {
             JsonNode node = parseJson(payload);
             if (!node.has(fieldName)) {
-                throw new RuntimeException("Cannot get field value from JSON; field name: " + fieldName + "; JSON: "
-                        + payload);
+            	if (throwErrorIfNotFound) {
+		            throw new RuntimeException("Cannot get field value from JSON; field name: " + fieldName + "; JSON: "
+			            + payload);
+	            } else {
+            		return null;
+	            }
             }
             return node.get(fieldName).isTextual() ? node.get(fieldName).asText() : node.get(fieldName).toString();
-
         } else {
             Fragment f = new Fragment(payload);
             String xpath = String.format("/node()/*[local-name(.) = '%s']", fieldName);
             if (!f.elementExists(xpath)) {
-                throw new RuntimeException("Cannot get field value from XML at path: " + xpath + "; XML: " + payload);
+            	if (throwErrorIfNotFound) {
+		            throw new RuntimeException("Cannot get field value from XML at path: " + xpath + "; XML: " + payload);
+	            } else {
+            		return null;
+	            }
             }
             return f.getElementValues(xpath).get(0);
         }

@@ -125,18 +125,19 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
      * @param context
      * @param f
      */
-    protected void deleteResource(final ResourceManager mgr, CommandContext context, File f) {
+    protected void deleteResource(ResourceManager mgr, CommandContext context, File f) {
         final String payload = copyFileToString(f, context);
+        final ResourceManager resourceManager = adjustResourceManagerForPayload(mgr, context, payload);
         try {
             if (restartAfterDelete) {
                 context.getAdminManager().invokeActionRequiringRestart(new ActionRequiringRestart() {
                     @Override
                     public boolean execute() {
-                        return mgr.delete(payload).isDeleted();
+                        return resourceManager.delete(payload).isDeleted();
                     }
                 });
             } else {
-                mgr.delete(payload);
+	            resourceManager.delete(payload);
             }
         } catch (RuntimeException e) {
             if (catchExceptionOnDeleteFailure) {

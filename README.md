@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/rjrudin/ml-app-deployer.svg?branch=dev)](https://travis-ci.org/rjrudin/ml-app-deployer)
+[![Build Status](https://travis-ci.org/marklogic-community/ml-app-deployer.svg?branch=dev)](https://travis-ci.org/marklogic-community/ml-app-deployer)
 
 ## What is ml-app-deployer?
 

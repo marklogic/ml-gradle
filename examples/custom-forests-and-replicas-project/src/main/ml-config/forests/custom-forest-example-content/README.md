@@ -1,6 +1,6 @@
 Starting in version 2.3.0 of ml-gradle, both mlDeploy and mlDeployCustomForests will process
-each directory under ./ml-config/forests. The directory can be named anything - but a good practice is
-to name it after the database for the forests, just to keep things simple. 
+each directory under ./ml-config/forests. Each directory is assumed to be a database name, and thus the forest files
+within each directory are created for the database with the same name as the directory.
 
 Currently, only JSON files in the directories are supported. A JSON file may contain a single JSON object,
 defining a single forest, or it can contain an array of many JSON objects, each defining a single forest. This

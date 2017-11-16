@@ -253,11 +253,11 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 		if (isCheckForCustomForests()) {
 			PayloadParser parser = new PayloadParser();
 			String dbName = parser.getPayloadFieldValue(payload, "database-name");
-			boolean exist = !customForestsExist(context, dbName);
-			if (exist && logger.isInfoEnabled()) {
+			boolean customForestsDontExist = !customForestsExist(context, dbName);
+			if (!customForestsDontExist && logger.isInfoEnabled()) {
 				logger.info("Found custom forests for database " + dbName + ", so not creating default forests");
 			}
-			return exist;
+			return customForestsDontExist;
 		}
 		return true;
 	}

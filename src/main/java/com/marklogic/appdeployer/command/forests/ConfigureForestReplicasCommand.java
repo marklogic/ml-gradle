@@ -240,10 +240,42 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 		ForestReplica replica = new ForestReplica();
 		replica.setHost(replicaHostId);
 		replica.setReplicaName(name);
-		replica.setDataDirectory(appConfig.getReplicaForestDataDirectory());
-		replica.setLargeDataDirectory(appConfig.getReplicaForestLargeDataDirectory());
-		replica.setFastDataDirectory(appConfig.getReplicaForestFastDataDirectory());
 
+		// First set to the database-agnostic forest directories
+		replica.setDataDirectory(appConfig.getForestDataDirectory());
+		replica.setFastDataDirectory(appConfig.getForestFastDataDirectory());
+		replica.setLargeDataDirectory(appConfig.getForestLargeDataDirectory());
+
+		// Now set to the database-specific forest directories if set
+		if (databaseName != null) {
+			Map<String, String> map = appConfig.getDatabaseDataDirectories();
+			if (map != null && map.containsKey(databaseName)) {
+				replica.setDataDirectory(map.get(databaseName));
+			}
+
+			map = appConfig.getDatabaseFastDataDirectories();
+			if (map != null && map.containsKey(databaseName)) {
+				replica.setFastDataDirectory(map.get(databaseName));
+			}
+
+			map = appConfig.getDatabaseLargeDataDirectories();
+			if (map != null && map.containsKey(databaseName)) {
+				replica.setLargeDataDirectory(map.get(databaseName));
+			}
+		}
+
+		// Now set to the replica forest directories if set
+		if (appConfig.getReplicaForestDataDirectory() != null) {
+			replica.setDataDirectory(appConfig.getReplicaForestDataDirectory());
+		}
+		if (appConfig.getReplicaForestFastDataDirectory() != null) {
+			replica.setFastDataDirectory(appConfig.getReplicaForestFastDataDirectory());
+		}
+		if (appConfig.getReplicaForestLargeDataDirectory() != null) {
+			replica.setLargeDataDirectory(appConfig.getReplicaForestLargeDataDirectory());
+		}
+
+		// And now set to the database-specific replica forest directories if set
 		if (databaseName != null) {
 			Map<String, String> map = appConfig.getDatabaseReplicaDataDirectories();
 			if (map != null && map.containsKey(databaseName)) {

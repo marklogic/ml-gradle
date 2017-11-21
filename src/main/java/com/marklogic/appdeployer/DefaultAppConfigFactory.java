@@ -6,9 +6,7 @@ import com.marklogic.mgmt.util.PropertySource;
 import com.marklogic.mgmt.util.PropertySourceFactory;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class DefaultAppConfigFactory extends PropertySourceFactory implements AppConfigFactory {
@@ -266,22 +264,76 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			c.setDatabaseNamesAndReplicaCounts(prop);
 		}
 
+		prop = getProperty("mlForestDataDirectory");
+		if (prop != null) {
+			logger.info("Default forest data directory for all databases: " + prop);
+			c.setForestDataDirectory(prop);
+		}
+
+		prop = getProperty("mlForestFastDataDirectory");
+		if (prop != null) {
+			logger.info("Default forest fast data directory for all databases: " + prop);
+			c.setForestFastDataDirectory(prop);
+		}
+
+		prop = getProperty("mlForestLargeDataDirectory");
+		if (prop != null) {
+			logger.info("Default forest large data directory for all databases: " + prop);
+			c.setForestLargeDataDirectory(prop);
+		}
+
 		prop = getProperty("mlReplicaForestDataDirectory");
 		if (prop != null) {
-			logger.info("Replica forest data directory " + prop);
+			logger.info("Default replica forest data directory for all databases: " + prop);
 			c.setReplicaForestDataDirectory(prop);
 		}
 
 		prop = getProperty("mlReplicaForestLargeDataDirectory");
 		if (prop != null) {
-			logger.info("Replica forest large data directory " + prop);
+			logger.info("Default replica forest large data directory for all databases: " + prop);
 			c.setReplicaForestLargeDataDirectory(prop);
 		}
 
 		prop = getProperty("mlReplicaForestFastDataDirectory");
 		if (prop != null) {
-			logger.info("Replica forest fast data directory " + prop);
+			logger.info("Default replica forest fast data directory for all databases: " + prop);
 			c.setReplicaForestFastDataDirectory(prop);
+		}
+
+		prop = getProperty("mlDatabaseDataDirectories");
+		if (prop != null) {
+			logger.info("Databases and forest data directories: " + prop);
+			c.setDatabaseDataDirectories(buildMapFromCommaDelimitedString(prop));
+		}
+
+		prop = getProperty("mlDatabaseFastDataDirectories");
+		if (prop != null) {
+			logger.info("Databases and forest fast data directories: " + prop);
+			c.setDatabaseFastDataDirectories(buildMapFromCommaDelimitedString(prop));
+		}
+
+		prop = getProperty("mlDatabaseLargeDataDirectories");
+		if (prop != null) {
+			logger.info("Databases and forest large data directories: " + prop);
+			c.setDatabaseLargeDataDirectories(buildMapFromCommaDelimitedString(prop));
+		}
+
+		prop = getProperty("mlDatabaseReplicaDataDirectories");
+		if (prop != null) {
+			logger.info("Databases and replica forest data directories: " + prop);
+			c.setDatabaseReplicaDataDirectories(buildMapFromCommaDelimitedString(prop));
+		}
+
+		prop = getProperty("mlDatabaseReplicaFastDataDirectories");
+		if (prop != null) {
+			logger.info("Databases and replica forest fast data directories: " + prop);
+			c.setDatabaseReplicaFastDataDirectories(buildMapFromCommaDelimitedString(prop));
+		}
+
+		prop = getProperty("mlDatabaseReplicaLargeDataDirectories");
+		if (prop != null) {
+			logger.info("Databases and replica forest large data directories: " + prop);
+			c.setDatabaseReplicaLargeDataDirectories(buildMapFromCommaDelimitedString(prop));
 		}
 
 		/**
@@ -544,4 +596,12 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		return c;
 	}
 
+	protected Map<String, String> buildMapFromCommaDelimitedString(String str) {
+		Map<String, String> map = new HashMap<>();
+		String[] tokens = str.split(",");
+		for (int i = 0; i < tokens.length; i += 2) {
+			map.put(tokens[i], tokens[i + 1]);
+		}
+		return map;
+	}
 }

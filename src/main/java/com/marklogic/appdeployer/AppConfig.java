@@ -149,6 +149,19 @@ public class AppConfig {
     // Comma-delimited string used for configuring forest replicas
     private String databaseNamesAndReplicaCounts;
 
+    // Data/fast/large directories for default forests
+    private String forestDataDirectory;
+    private String forestFastDataDirectory;
+    private String forestLargeDataDirectory;
+
+    // Comma-delimited string of database names and data directories
+    private Map<String, String> databaseDataDirectories;
+    private Map<String, String> databaseFastDataDirectories;
+    private Map<String, String> databaseLargeDataDirectories;
+    private Map<String, String> databaseReplicaDataDirectories;
+    private Map<String, String> databaseReplicaFastDataDirectories;
+    private Map<String, String> databaseReplicaLargeDataDirectories;
+
     // Configures the data-directory for replica forests built dynamically
     private String replicaForestDataDirectory;
     private String replicaForestLargeDataDirectory;
@@ -941,5 +954,77 @@ public class AppConfig {
 
 	public void setModulesLoaderThreadCount(int modulesLoaderThreadCount) {
 		this.modulesLoaderThreadCount = modulesLoaderThreadCount;
+	}
+
+	public Map<String, String> getDatabaseDataDirectories() {
+		return databaseDataDirectories;
+	}
+
+	public void setDatabaseDataDirectories(Map<String, String> databaseDataDirectories) {
+		this.databaseDataDirectories = databaseDataDirectories;
+	}
+
+	public Map<String, String> getDatabaseFastDataDirectories() {
+		return databaseFastDataDirectories;
+	}
+
+	public void setDatabaseFastDataDirectories(Map<String, String> databaseFastDataDirectories) {
+		this.databaseFastDataDirectories = databaseFastDataDirectories;
+	}
+
+	public Map<String, String> getDatabaseLargeDataDirectories() {
+		return databaseLargeDataDirectories;
+	}
+
+	public void setDatabaseLargeDataDirectories(Map<String, String> databaseLargeDataDirectories) {
+		this.databaseLargeDataDirectories = databaseLargeDataDirectories;
+	}
+
+	public String getForestDataDirectory() {
+		return forestDataDirectory;
+	}
+
+	public void setForestDataDirectory(String forestDataDirectory) {
+		this.forestDataDirectory = forestDataDirectory;
+	}
+
+	public String getForestFastDataDirectory() {
+		return forestFastDataDirectory;
+	}
+
+	public void setForestFastDataDirectory(String forestFastDataDirectory) {
+		this.forestFastDataDirectory = forestFastDataDirectory;
+	}
+
+	public String getForestLargeDataDirectory() {
+		return forestLargeDataDirectory;
+	}
+
+	public void setForestLargeDataDirectory(String forestLargeDataDirectory) {
+		this.forestLargeDataDirectory = forestLargeDataDirectory;
+	}
+
+	public Map<String, String> getDatabaseReplicaDataDirectories() {
+		return databaseReplicaDataDirectories;
+	}
+
+	public void setDatabaseReplicaDataDirectories(Map<String, String> databaseReplicaDataDirectories) {
+		this.databaseReplicaDataDirectories = databaseReplicaDataDirectories;
+	}
+
+	public Map<String, String> getDatabaseReplicaFastDataDirectories() {
+		return databaseReplicaFastDataDirectories;
+	}
+
+	public void setDatabaseReplicaFastDataDirectories(Map<String, String> databaseReplicaFastDataDirectories) {
+		this.databaseReplicaFastDataDirectories = databaseReplicaFastDataDirectories;
+	}
+
+	public Map<String, String> getDatabaseReplicaLargeDataDirectories() {
+		return databaseReplicaLargeDataDirectories;
+	}
+
+	public void setDatabaseReplicaLargeDataDirectories(Map<String, String> databaseReplicaLargeDataDirectories) {
+		this.databaseReplicaLargeDataDirectories = databaseReplicaLargeDataDirectories;
 	}
 }

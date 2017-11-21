@@ -20,6 +20,7 @@ public class Forest extends Resource {
 
     private Boolean enabled;
     private String host;
+    private String database;
 
 	@XmlElement(name = "data-directory")
 	private String dataDirectory;
@@ -230,5 +231,13 @@ public class Forest extends Resource {
 
 	public void setForestReplica(List<ForestReplica> forestReplica) {
 		this.forestReplica = forestReplica;
+	}
+
+	public String getDatabase() {
+		return database;
+	}
+
+	public void setDatabase(String database) {
+		this.database = database;
 	}
 }

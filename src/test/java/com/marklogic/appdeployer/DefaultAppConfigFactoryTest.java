@@ -138,9 +138,22 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    p.setProperty("mlResourceFilenamesToIncludeRegex", "qa-.*");
 
 	    p.setProperty("mlDatabaseNamesAndReplicaCounts", "Documents,1,Security,2");
+
+	    p.setProperty("mlForestDataDirectory", "/data/path");
+	    p.setProperty("mlForestFastDataDirectory", "/fast/path");
+	    p.setProperty("mlForestLargeDataDirectory", "/large/path");
+
 	    p.setProperty("mlReplicaForestDataDirectory", "/var/data");
 	    p.setProperty("mlReplicaForestFastDataDirectory", "/var/fast");
 	    p.setProperty("mlReplicaForestLargeDataDirectory", "/var/large");
+
+	    p.setProperty("mlDatabaseDataDirectories", "Documents,/data/documents,Security,/data/security");
+	    p.setProperty("mlDatabaseFastDataDirectories", "Documents,/fast/documents,Security,/fast/security");
+	    p.setProperty("mlDatabaseLargeDataDirectories", "Documents,/large/documents,Security,/large/security");
+
+	    p.setProperty("mlDatabaseReplicaDataDirectories", "Documents,/data/replicas,Security,/data/security/replicas");
+	    p.setProperty("mlDatabaseReplicaFastDataDirectories", "Documents,/fast/replicas,Security,/fast/security/replicas");
+	    p.setProperty("mlDatabaseReplicaLargeDataDirectories", "Documents,/large/replicas,Security,/large/security/replicas");
 
 	    p.setProperty("mlSortRolesByDependencies", "false");
 
@@ -221,9 +234,34 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    assertEquals("qa-.*", config.getResourceFilenamesIncludePattern().pattern());
 
 	    assertEquals("Documents,1,Security,2", config.getDatabaseNamesAndReplicaCounts());
+
+	    assertEquals("/data/path", config.getForestDataDirectory());
+	    assertEquals("/fast/path", config.getForestFastDataDirectory());
+	    assertEquals("/large/path", config.getForestLargeDataDirectory());
+
 	    assertEquals("/var/data", config.getReplicaForestDataDirectory());
 	    assertEquals("/var/fast", config.getReplicaForestFastDataDirectory());
 	    assertEquals("/var/large", config.getReplicaForestLargeDataDirectory());
+
+	    Map<String, String> map = config.getDatabaseDataDirectories();
+	    assertEquals("/data/documents", map.get("Documents"));
+	    assertEquals("/data/security", map.get("Security"));
+	    map = config.getDatabaseFastDataDirectories();
+	    assertEquals("/fast/documents", map.get("Documents"));
+	    assertEquals("/fast/security", map.get("Security"));
+	    map = config.getDatabaseLargeDataDirectories();
+	    assertEquals("/large/documents", map.get("Documents"));
+	    assertEquals("/large/security", map.get("Security"));
+
+	    map = config.getDatabaseReplicaDataDirectories();
+	    assertEquals("/data/replicas", map.get("Documents"));
+	    assertEquals("/data/security/replicas", map.get("Security"));
+	    map = config.getDatabaseReplicaFastDataDirectories();
+	    assertEquals("/fast/replicas", map.get("Documents"));
+	    assertEquals("/fast/security/replicas", map.get("Security"));
+	    map = config.getDatabaseReplicaLargeDataDirectories();
+	    assertEquals("/large/replicas", map.get("Documents"));
+	    assertEquals("/large/security/replicas", map.get("Security"));
 
 	    assertFalse(config.isSortRolesByDependencies());
     }

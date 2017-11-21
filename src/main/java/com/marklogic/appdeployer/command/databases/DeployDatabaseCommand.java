@@ -8,7 +8,9 @@ import com.marklogic.appdeployer.command.UndoableCommand;
 import com.marklogic.appdeployer.command.forests.DeployForestsCommand;
 import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.SaveReceipt;
+import com.marklogic.mgmt.api.forest.Forest;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
+import com.marklogic.mgmt.util.ObjectMapperFactory;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -289,13 +291,52 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
      */
     protected DeployForestsCommand buildDeployForestsCommand(String dbPayload, SaveReceipt receipt,
             CommandContext context) {
+    	final String databaseName = receipt.getResourceId();
+
         DeployForestsCommand c = new DeployForestsCommand();
         c.setCreateForestsOnEachHost(createForestsOnEachHost);
         c.setForestsPerHost(determineForestCountPerHost(dbPayload, context));
         c.setForestFilename(forestFilename);
-        c.setDatabaseName(receipt.getResourceId());
-        c.setForestPayload(DeployForestsCommand.DEFAULT_FOREST_PAYLOAD);
+        c.setDatabaseName(databaseName);
+
+        Forest forest = buildForest(context.getAppConfig());
+        forest.setObjectMapper(ObjectMapperFactory.getObjectMapper());
+	    c.setForestPayload(forest.getJson());
         return c;
+    }
+
+    protected Forest buildForest(AppConfig config) {
+	    Forest forest = new Forest();
+	    forest.setForestName("%%FOREST_NAME%%");
+	    forest.setHost("%%FOREST_HOST%%");
+	    forest.setDatabase("%%FOREST_DATABASE%%");
+
+	    // First see if we have any database-agnostic forest directories
+	    if (config.getForestDataDirectory() != null) {
+	    	forest.setDataDirectory(config.getForestDataDirectory());
+	    }
+	    if (config.getForestFastDataDirectory() != null) {
+	    	forest.setFastDataDirectory(config.getForestFastDataDirectory());
+	    }
+	    if (config.getForestLargeDataDirectory() != null) {
+	    	forest.setLargeDataDirectory(config.getForestLargeDataDirectory());
+	    }
+
+	    // Now check for database-specific forest directories
+	    Map<String, String> map = config.getDatabaseDataDirectories();
+	    if (map != null && map.containsKey(databaseName)) {
+		    forest.setDataDirectory(map.get(databaseName));
+	    }
+	    map = config.getDatabaseFastDataDirectories();
+	    if (map != null && map.containsKey(databaseName)) {
+		    forest.setFastDataDirectory(map.get(databaseName));
+	    }
+	    map = config.getDatabaseLargeDataDirectories();
+	    if (map != null && map.containsKey(databaseName)) {
+		    forest.setLargeDataDirectory(map.get(databaseName));
+	    }
+
+	    return forest;
     }
 
     /**

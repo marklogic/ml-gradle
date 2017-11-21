@@ -107,11 +107,16 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 
 			for (String databaseName : databaseNamesAndReplicaCounts.keySet()) {
 				logger.info(format("Deleting forest replicas for database %s", databaseName));
-				List<String> forestNames = dbMgr.getForestNames(databaseName);
-				for (String forestName : forestNames) {
-					deleteReplicas(forestName, forestMgr);
+				if (!dbMgr.exists(databaseName)) {
+					logger.warn(format("Database %s does not exist, so not able to delete forest replica for it; perhaps a previous command deleted the database?"));
 				}
-				logger.info(format("Finished deleting forest replicas for database %s", databaseName));
+				else {
+					List<String> forestNames = dbMgr.getForestNames(databaseName);
+					for (String forestName : forestNames) {
+						deleteReplicas(forestName, forestMgr);
+					}
+					logger.info(format("Finished deleting forest replicas for database %s", databaseName));
+				}
 			}
 
 			for (String forestName : forestNamesAndReplicaCounts.keySet()) {

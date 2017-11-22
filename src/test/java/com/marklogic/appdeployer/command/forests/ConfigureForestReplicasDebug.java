@@ -20,9 +20,6 @@ public class ConfigureForestReplicasDebug {
         ManageClient manageClient = new ManageClient(config);
         AppConfig appConfig = new AppConfig();
         appConfig.setDatabaseNamesAndReplicaCounts("testdb,1");
-        appConfig.setReplicaForestDataDirectory("/var/opt/MarkLogic/Replica");
-        appConfig.setReplicaForestLargeDataDirectory("/var/opt/MarkLogic/Large");
-        appConfig.setReplicaForestFastDataDirectory("/var/opt/MarkLogic/Fast");
         CommandContext context = new CommandContext(appConfig, manageClient, null);
 
         DeployDatabaseCommand ddc = new DeployDatabaseCommand();

@@ -5,6 +5,7 @@ import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
+import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.rest.util.Fragment;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -51,21 +52,43 @@ public class RestApiManager extends LoggingObject {
 	/**
 	 * Will need to wait for MarkLogic to restart, so consider using AdminManager with this.
 	 *
-	 * @param serverName
-	 * @param groupName
-	 * @param includeModules
-	 * @param includeContent
+	 * @param request
 	 * @return
 	 */
-	public boolean deleteRestApi(String serverName, String groupName, boolean includeModules, boolean includeContent) {
-		if (new ServerManager(client, groupName).exists(serverName)) {
-			String path = format("/v1/rest-apis/%s?", serverName);
-			if (includeModules) {
-				path += "include=modules&";
+	public boolean deleteRestApi(RestApiDeletionRequest request) {
+		ServerManager serverManager = new ServerManager(client, request.getGroupName());
+		final String serverName = request.getServerName();
+		if (serverManager.exists(serverName)) {
+			String path = format("/v1/rest-apis/%s", serverName);
+
+			if (request.isIncludeContent() || request.isIncludeContent()) {
+				path += "?";
+
+				DatabaseManager databaseManager = new DatabaseManager(client);
+				String payload = serverManager.getPropertiesAsJson(serverName);
+				PayloadParser parser = new PayloadParser();
+
+				if (request.isIncludeModules()) {
+					if (request.isDeleteModulesReplicaForests()) {
+						String modulesDatabase = parser.getPayloadFieldValue(payload, "modules-database");
+						if (databaseManager.exists(modulesDatabase)) {
+							databaseManager.deleteReplicaForests(modulesDatabase);
+						}
+					}
+					path += "include=modules&";
+				}
+
+				if (request.isIncludeContent()) {
+					if (request.isDeleteContentReplicaForests()) {
+						String contentDatabase = parser.getPayloadFieldValue(payload, "content-database");
+						if (databaseManager.exists(contentDatabase)) {
+							databaseManager.deleteReplicaForests(contentDatabase);
+						}
+					}
+					path += "include=content";
+				}
 			}
-			if (includeContent) {
-				path += "include=content";
-			}
+
 			logger.info("Deleting REST API, path: " + path);
 			client.getRestTemplate().exchange(client.buildUri(path), HttpMethod.DELETE, null, String.class);
 			logger.info("Deleted REST API");

@@ -9,6 +9,7 @@ import com.marklogic.appdeployer.util.RestApiUtil;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.admin.ActionRequiringRestart;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
+import com.marklogic.mgmt.resource.restapis.RestApiDeletionRequest;
 import com.marklogic.mgmt.resource.restapis.RestApiManager;
 
 import java.io.File;
@@ -22,6 +23,10 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
 
 	private boolean deleteModulesDatabase = true;
 	private boolean deleteContentDatabase = false;
+
+	// Controls whether this command first deletes replica forests if it's supposed to delete the modules or content databases
+	private boolean deleteModulesReplicaForests = true;
+	private boolean deleteContentReplicaForests = true;
 
 	private String restApiFilename;
 
@@ -94,7 +99,7 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
 
 	/**
 	 * If we have a test REST API, we first modify it to point at Documents for the modules database so we can safely
-	 * delete each REST API
+	 * delete each REST API.
 	 *
 	 * @param context
 	 */
@@ -142,9 +147,24 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
 		return RestApiUtil.buildDefaultRestApiJson();
 	}
 
+	/**
+	 * Delete the REST API server with the given name.
+	 *
+	 * @param serverName
+	 * @param groupName
+	 * @param manageClient
+	 * @param includeModules
+	 * @param includeContent
+	 * @return
+	 */
 	protected boolean deleteRestApi(String serverName, String groupName, ManageClient manageClient,
 									boolean includeModules, boolean includeContent) {
-		return new RestApiManager(manageClient).deleteRestApi(serverName, groupName, includeModules, includeContent);
+		RestApiDeletionRequest request = new RestApiDeletionRequest(serverName, groupName);
+		request.setIncludeContent(includeContent);
+		request.setIncludeModules(includeModules);
+		request.setDeleteContentReplicaForests(isDeleteContentReplicaForests());
+		request.setDeleteModulesReplicaForests(isDeleteModulesReplicaForests());
+		return new RestApiManager(manageClient).deleteRestApi(request);
 	}
 
 	public boolean isDeleteModulesDatabase() {
@@ -169,5 +189,21 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
 
 	public void setRestApiFilename(String restApiFilename) {
 		this.restApiFilename = restApiFilename;
+	}
+
+	public boolean isDeleteModulesReplicaForests() {
+		return deleteModulesReplicaForests;
+	}
+
+	public void setDeleteModulesReplicaForests(boolean deleteModulesReplicaForests) {
+		this.deleteModulesReplicaForests = deleteModulesReplicaForests;
+	}
+
+	public boolean isDeleteContentReplicaForests() {
+		return deleteContentReplicaForests;
+	}
+
+	public void setDeleteContentReplicaForests(boolean deleteContentReplicaForests) {
+		this.deleteContentReplicaForests = deleteContentReplicaForests;
 	}
 }

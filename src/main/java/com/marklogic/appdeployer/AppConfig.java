@@ -142,6 +142,7 @@ public class AppConfig {
     private String modulePermissions = "rest-admin,read,rest-admin,update,rest-extension-user,execute";
 
     private FileFilter assetFileFilter;
+    private FileFilter schemasFileFilter;
 
     // Additional module extensions that should be loaded as binaries into the modules database
     private String[] additionalBinaryExtensions;
@@ -588,7 +589,15 @@ public class AppConfig {
         this.assetFileFilter = assetFileFilter;
     }
 
-    public String getFlexrepPath() {
+	public FileFilter getSchemasFileFilter() {
+		return schemasFileFilter;
+	}
+
+	public void setSchemasFileFilter(FileFilter schemasFileFilter) {
+		this.schemasFileFilter = schemasFileFilter;
+	}
+
+	public String getFlexrepPath() {
         return flexrepPath;
     }
 

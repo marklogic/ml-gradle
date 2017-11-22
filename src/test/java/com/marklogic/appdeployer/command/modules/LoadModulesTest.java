@@ -2,7 +2,7 @@ package com.marklogic.appdeployer.command.modules;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
-import com.marklogic.client.ext.modulesloader.impl.AssetFileFilter;
+import com.marklogic.client.ext.modulesloader.impl.DefaultFileFilter;
 import com.marklogic.junit.Fragment;
 import com.marklogic.junit.PermissionsFragment;
 import com.marklogic.xcc.template.XccTemplate;
@@ -139,8 +139,8 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 
 		appDeployer.deploy(appConfig);
 
-		String[] uris = new String[] { "/Default/sample-app/rest-api/options/sample-app-options.xml",
-			"/Default/sample-app/rest-api/options/sample-app-options.xml" };
+		String[] uris = new String[]{"/Default/sample-app/rest-api/options/sample-app-options.xml",
+			"/Default/sample-app/rest-api/options/sample-app-options.xml"};
 		for (String uri : uris) {
 			assertEquals("true", xccTemplate.executeAdhocQuery(format("doc-available('%s')", uri)));
 		}
@@ -166,7 +166,7 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 
 	/**
 	 * Apparently, the REST API won't let you remove these 3 default permissions, they're always present.
-	 *
+	 * <p>
 	 * And, now that we're loading modules via the REST API by default, rest-reader/read and rest-writer/update are
 	 * always present, at least on 8.0-6.3 and 9.0-1.1, which seems like a bug.
 	 */
@@ -184,7 +184,7 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 
 }
 
-class TestFileFilter extends AssetFileFilter {
+class TestFileFilter extends DefaultFileFilter {
 
 	@Override
 	public boolean accept(File f) {

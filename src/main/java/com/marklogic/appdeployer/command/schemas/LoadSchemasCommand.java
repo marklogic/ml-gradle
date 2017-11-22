@@ -6,7 +6,10 @@ import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.FailedRequestException;
+import com.marklogic.client.ext.schemasloader.SchemasLoader;
 import com.marklogic.client.ext.schemasloader.impl.DefaultSchemasLoader;
+
+import java.io.FileFilter;
 
 public class LoadSchemasCommand extends AbstractCommand {
 
@@ -22,7 +25,7 @@ public class LoadSchemasCommand extends AbstractCommand {
 	protected void loadSchemasIntoSchemasDatabase(CommandContext context) {
 		AppConfig config = context.getAppConfig();
 		DatabaseClient client = config.newSchemasDatabaseClient();
-		DefaultSchemasLoader schemasLoader = new DefaultSchemasLoader(client);
+		SchemasLoader schemasLoader = buildSchemasLoader(context, client);
 		try {
 			String schemasPath = config.getSchemasPath();
 			logger.info("Loading schemas from path: " + schemasPath);
@@ -38,5 +41,22 @@ public class LoadSchemasCommand extends AbstractCommand {
 		} finally {
 			client.release();
 		}
+	}
+
+	/**
+	 * Will utilize schemasFileFilter in AppConfig if it's been set.
+	 *
+	 * @param context
+	 * @param client
+	 * @return
+	 */
+	protected SchemasLoader buildSchemasLoader(CommandContext context, DatabaseClient client) {
+		AppConfig config = context.getAppConfig();
+		DefaultSchemasLoader schemasLoader = new DefaultSchemasLoader(client);
+		FileFilter filter = config.getSchemasFileFilter();
+		if (filter != null) {
+			schemasLoader.addFileFilter(filter);
+		}
+		return schemasLoader;
 	}
 }

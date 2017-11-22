@@ -63,11 +63,7 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
     }
 
     protected void undeploySampleApp() {
-        try {
-            appDeployer.undeploy(appConfig);
-        } catch (Exception e) {
-            logger.warn("Error while waiting for MarkLogic to restart: " + e.getMessage());
-        }
+	    appDeployer.undeploy(appConfig);
     }
 
     protected XccTemplate newModulesXccTemplate() {

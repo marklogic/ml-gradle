@@ -18,7 +18,7 @@ public class DeployGroupsCommand extends AbstractResourceCommand {
 
     @Override
     protected File[] getResourceDirs(CommandContext context) {
-        return new File[] { new File(context.getAppConfig().getConfigDir().getBaseDir(), "groups") };
+        return new File[] { context.getAppConfig().getConfigDir().getGroupsDir() };
     }
 
     @Override

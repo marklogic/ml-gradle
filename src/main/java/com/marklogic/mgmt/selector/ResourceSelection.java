@@ -1,11 +1,10 @@
 package com.marklogic.mgmt.selector;
 
-import com.marklogic.mgmt.api.security.Amp;
-
 public interface ResourceSelection {
 
 	String AMPS = "amps";
 	String DATABASES = "databases";
+	String GROUPS = "groups";
 	String PRIVILEGES_EXECUTE = "privilegesExecute";
 	String PRIVILEGES_URI = "privilegesUri";
 	String ROLES = "roles";
@@ -14,6 +13,8 @@ public interface ResourceSelection {
 	String USERS = "users";
 
 	String[] getDatabaseNames();
+
+	String[] getGroupNames();
 
 	String[] getPrivilegeExecuteNames();
 

@@ -2,6 +2,7 @@ package com.marklogic.appdeployer.export;
 
 import com.marklogic.appdeployer.export.appservers.ServerExporter;
 import com.marklogic.appdeployer.export.databases.DatabaseExporter;
+import com.marklogic.appdeployer.export.groups.GroupExporter;
 import com.marklogic.appdeployer.export.impl.CompositeResourceExporter;
 import com.marklogic.appdeployer.export.security.AmpExporter;
 import com.marklogic.appdeployer.export.security.PrivilegeExporter;
@@ -22,14 +23,26 @@ public class Exporter extends LoggingObject {
 
 	private CompositeResourceExporter compositeExporter;
 	private ManageClient manageClient;
+	private String groupName;
 
 	public static Exporter client(ManageClient manageClient) {
 		return new Exporter(manageClient);
 	}
 
 	public Exporter(ManageClient manageClient) {
+		this(manageClient, null);
+	}
+
+	/**
+	 * If set, the groupName will be used when exporting servers and tasks.
+	 *
+	 * @param manageClient
+	 * @param groupName
+	 */
+	public Exporter(ManageClient manageClient, String groupName) {
 		this.manageClient = manageClient;
 		compositeExporter = new CompositeResourceExporter();
+		this.groupName = groupName;
 	}
 
 	public Exporter select(ResourceSelector selector) {
@@ -67,6 +80,10 @@ public class Exporter extends LoggingObject {
 		return add(new DatabaseExporter(manageClient, databaseNames));
 	}
 
+	public Exporter groups(String... groupNames) {
+		return add(new GroupExporter(manageClient, groupNames));
+	}
+
 	public Exporter privilegesExecute(String... privilegeNames) {
 		return add(new PrivilegeExporter(manageClient, privilegeNames));
 	}
@@ -82,15 +99,34 @@ public class Exporter extends LoggingObject {
 	}
 
 	public Exporter servers(String... serverNames) {
-		return add(new ServerExporter(manageClient, serverNames));
+		return add(buildServerExporter(serverNames));
+	}
+
+	public Exporter serversNoDatabases(String... serverNames) {
+		ServerExporter se = buildServerExporter(serverNames);
+		se.setExportDatabases(false);
+		return add(se);
+	}
+
+	protected ServerExporter buildServerExporter(String... serverNames) {
+		return groupName != null ? new ServerExporter(groupName, manageClient, serverNames) : new ServerExporter(manageClient, serverNames);
 	}
 
 	public Exporter tasks(String... taskNames) {
-		return add(new TaskExporter(manageClient, taskNames));
+		TaskExporter te;
+		if (groupName != null) {
+			te = new TaskExporter(groupName, manageClient, taskNames);
+		} else {
+			te = new TaskExporter(manageClient, taskNames);
+		}
+		return add(te);
 	}
 
 	public Exporter users(String... usernames) {
 		return add(new UserExporter(manageClient, usernames));
 	}
 
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
+	}
 }

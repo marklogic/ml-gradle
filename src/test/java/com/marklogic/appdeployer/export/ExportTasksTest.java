@@ -25,7 +25,7 @@ public class ExportTasksTest extends AbstractExportTest {
 		PrefixResourceSelector selector = new PrefixResourceSelector("/path");
 		selector.setIncludeTypesAsString(ResourceSelection.TASKS + "," + ResourceSelection.USERS);
 
-		ExportedResources resources = new Exporter(manageClient).select(selector).export(exportDir);
+		ExportedResources resources = new Exporter(manageClient, "Default").select(selector).export(exportDir);
 		assertEquals(1, resources.getFiles().size());
 		assertEquals("query.xqy.json", resources.getFiles().get(0).getName());
 

@@ -128,6 +128,10 @@ public class ConfigDir {
 		return new File(getFlexrepDir(), "configs");
 	}
 
+	public File getGroupsDir() {
+		return new File(baseDir, "groups");
+	}
+
 	public File getViewSchemasDir() {
 		return new File(baseDir, "view-schemas");
 	}

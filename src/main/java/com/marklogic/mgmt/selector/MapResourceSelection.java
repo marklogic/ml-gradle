@@ -40,6 +40,11 @@ public class MapResourceSelection implements ResourceSelection {
 	}
 
 	@Override
+	public String[] getGroupNames() {
+		return getSelectedResourceNames(GROUPS);
+	}
+
+	@Override
 	public String[] getPrivilegeExecuteNames() {
 		return getSelectedResourceNames(PRIVILEGES_EXECUTE);
 	}

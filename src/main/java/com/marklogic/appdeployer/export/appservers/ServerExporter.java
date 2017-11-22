@@ -47,7 +47,7 @@ public class ServerExporter extends AbstractNamedResourceExporter {
 	}
 
 	protected ExportedResources exportDatabases(File baseDir, ExportedResources resources) {
-		ServerManager mgr = new ServerManager(getManageClient());
+		ServerManager mgr = groupName != null ? new ServerManager(getManageClient(), groupName) : new ServerManager(getManageClient());
 		for (String serverName : getResourceNames()) {
 			String json = mgr.getPropertiesAsJson(serverName);
 			ObjectNode server = (ObjectNode) payloadParser.parseJson(json);

@@ -4,6 +4,7 @@ import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
+import com.marklogic.mgmt.resource.groups.GroupManager;
 import com.marklogic.mgmt.resource.security.AmpManager;
 import com.marklogic.mgmt.resource.security.PrivilegeManager;
 import com.marklogic.mgmt.resource.security.RoleManager;
@@ -30,6 +31,7 @@ public abstract class AbstractNameMatchingResourceSelector implements ResourceSe
 		select(selection, new DatabaseManager(manageClient), MapResourceSelection.DATABASES);
 		select(selection, new RoleManager(manageClient), MapResourceSelection.ROLES);
 		select(selection, new UserManager(manageClient), MapResourceSelection.USERS);
+		select(selection, new GroupManager(manageClient), MapResourceSelection.GROUPS);
 		selectPrivileges(selection, manageClient);
 		selectTasks(selection, manageClient);
 		selectAmps(selection, manageClient);

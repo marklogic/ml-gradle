@@ -20,7 +20,9 @@ public class ExportedResources {
 		this.messages = new ArrayList<>();
 		if (messages != null) {
 			for (String s : messages) {
-				this.messages.add(s);
+				if (s != null) {
+					this.messages.add(s);
+				}
 			}
 		}
 	}

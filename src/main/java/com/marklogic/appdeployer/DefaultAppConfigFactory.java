@@ -25,6 +25,18 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 
 		String prop = null;
 
+		prop = getProperty("mlCatchDeployExceptions");
+		if (prop != null) {
+			logger.info("Catch deploy exceptions: " + prop);
+			c.setCatchDeployExceptions(Boolean.parseBoolean(prop));
+		}
+
+		prop = getProperty("mlCatchUndeployExceptions");
+		if (prop != null) {
+			logger.info("Catch undeploy exceptions: " + prop);
+			c.setCatchUndeployExceptions(Boolean.parseBoolean(prop));
+		}
+
 		/**
 		 * mlUsername and mlPassword are used as the default username/password for the admin, rest-admin, and manage-admin
 		 * roles when there isn't a specific username/password combo for those roles.

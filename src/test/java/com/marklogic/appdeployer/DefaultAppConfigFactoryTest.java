@@ -72,13 +72,14 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		assertEquals("appword", config.getAppServicesPassword());
 	}
 
-	/**
-     * As of 2.2.0.
-     */
     @Test
     public void allProperties() {
         Properties p = new Properties();
-        p.setProperty("mlHost", "prophost");
+
+        p.setProperty("mlCatchDeployExceptions", "true");
+	    p.setProperty("mlCatchUndeployExceptions", "true");
+
+	    p.setProperty("mlHost", "prophost");
         p.setProperty("mlAppName", "propname");
         p.setProperty("mlNoRestServer", "true");
         p.setProperty("mlUsername", "propuser1");
@@ -160,6 +161,9 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    sut = new DefaultAppConfigFactory(new SimplePropertySource(p));
         AppConfig config = sut.newAppConfig();
 
+        assertTrue(config.isCatchDeployExceptions());
+        assertTrue(config.isCatchUndeployExceptions());
+        
         assertEquals("prophost", config.getHost());
         assertEquals("propname", config.getName());
         assertTrue(config.isNoRestServer());

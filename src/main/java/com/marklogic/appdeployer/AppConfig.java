@@ -65,6 +65,9 @@ public class AppConfig {
     private String name = DEFAULT_APP_NAME;
     private String host = DEFAULT_HOST;
 
+    private boolean catchDeployExceptions = false;
+    private boolean catchUndeployExceptions = false;
+
     // Used to construct DatabaseClient instances based on inputs defined in this class
     private ConfiguredDatabaseClientFactory configuredDatabaseClientFactory = new DefaultConfiguredDatabaseClientFactory();
 
@@ -1026,5 +1029,21 @@ public class AppConfig {
 
 	public void setDatabaseReplicaLargeDataDirectories(Map<String, String> databaseReplicaLargeDataDirectories) {
 		this.databaseReplicaLargeDataDirectories = databaseReplicaLargeDataDirectories;
+	}
+
+	public boolean isCatchDeployExceptions() {
+		return catchDeployExceptions;
+	}
+
+	public void setCatchDeployExceptions(boolean catchDeployExceptions) {
+		this.catchDeployExceptions = catchDeployExceptions;
+	}
+
+	public boolean isCatchUndeployExceptions() {
+		return catchUndeployExceptions;
+	}
+
+	public void setCatchUndeployExceptions(boolean catchUndeployExceptions) {
+		this.catchUndeployExceptions = catchUndeployExceptions;
 	}
 }

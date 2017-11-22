@@ -45,7 +45,12 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
      */
     protected abstract List<Command> getCommands();
 
-    public void deploy(AppConfig appConfig) {
+	/**
+	 * Calls execute on each of the configured commands.
+	 *
+	 * @param appConfig
+	 */
+	public void deploy(AppConfig appConfig) {
         logger.info(format("Deploying app %s with config dir of: %s\n", appConfig.getName(), appConfig.getConfigDir()
                 .getBaseDir().getAbsolutePath()));
 
@@ -54,35 +59,67 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
 
         CommandContext context = new CommandContext(appConfig, manageClient, adminManager);
 
-        String[] filenamesToIgnore = appConfig.getResourceFilenamesToIgnore();
-	    Pattern excludePattern = appConfig.getResourceFilenamesExcludePattern();
-	    Pattern includePattern = appConfig.getResourceFilenamesIncludePattern();
-
         for (Command command : commands) {
             String name = command.getClass().getName();
             logger.info(format("Executing command [%s] with sort order [%d]", name, command.getExecuteSortOrder()));
-
-            if (command instanceof AbstractCommand) {
-            	AbstractCommand abstractCommand = (AbstractCommand)command;
-            	if (filenamesToIgnore != null) {
-		            abstractCommand.setFilenamesToIgnore(filenamesToIgnore);
-	            }
-	            if (excludePattern != null) {
-            		abstractCommand.setResourceFilenamesExcludePattern(excludePattern);
-	            }
-	            if (includePattern != null) {
-            		abstractCommand.setResourceFilenamesIncludePattern(includePattern);
-	            }
-            }
-
-            command.execute(context);
+            prepareCommand(command, context);
+            executeCommand(command, context);
             logger.info(format("Finished executing command [%s]\n", name));
         }
 
         logger.info(format("Deployed app %s", appConfig.getName()));
     }
 
-    public void undeploy(AppConfig appConfig) {
+	/**
+	 * Prepare the given command before either execute or undo is called on it.
+	 *
+	 * @param command
+	 * @param context
+	 */
+	protected void prepareCommand(Command command, CommandContext context) {
+	    if (command instanceof AbstractCommand) {
+	    	AppConfig appConfig = context.getAppConfig();
+		    String[] filenamesToIgnore = appConfig.getResourceFilenamesToIgnore();
+		    Pattern excludePattern = appConfig.getResourceFilenamesExcludePattern();
+		    Pattern includePattern = appConfig.getResourceFilenamesIncludePattern();
+
+		    AbstractCommand abstractCommand = (AbstractCommand)command;
+		    if (filenamesToIgnore != null) {
+			    abstractCommand.setFilenamesToIgnore(filenamesToIgnore);
+		    }
+		    if (excludePattern != null) {
+			    abstractCommand.setResourceFilenamesExcludePattern(excludePattern);
+		    }
+		    if (includePattern != null) {
+			    abstractCommand.setResourceFilenamesIncludePattern(includePattern);
+		    }
+	    }
+    }
+
+	/**
+	 * Executes the command, catching an exception if desired.
+	 *
+	 * @param command
+	 * @param context
+	 */
+	protected void executeCommand(Command command, CommandContext context) {
+    	try {
+    		command.execute(context);
+	    } catch (RuntimeException ex) {
+    		if (context.getAppConfig().isCatchDeployExceptions()) {
+    			logger.error(format("Command [%s] threw exception that was caught; cause: %s", command.getClass().getName(), ex.getMessage()), ex);
+		    } else {
+    			throw ex;
+		    }
+	    }
+    }
+
+	/**
+	 * Calls undo on each of the configured commands that implements the UndoableCommand interface.
+	 *
+	 * @param appConfig
+	 */
+	public void undeploy(AppConfig appConfig) {
         logger.info(format("Undeploying app %s with config dir: %s\n", appConfig.getName(), appConfig.getConfigDir()
                 .getBaseDir().getAbsolutePath()));
 
@@ -96,16 +133,36 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
         }
 
         Collections.sort(undoableCommands, new UndoComparator());
+        CommandContext context = new CommandContext(appConfig, manageClient, adminManager);
 
         for (UndoableCommand command : undoableCommands) {
             String name = command.getClass().getName();
             logger.info(format("Undoing command [%s] with sort order [%d]", name, command.getUndoSortOrder()));
-            command.undo(new CommandContext(appConfig, manageClient, adminManager));
+            prepareCommand(command, context);
+            undoCommand(command, context);
             logger.info(format("Finished undoing command [%s]\n", name));
         }
 
         logger.info(format("Undeployed app %s", appConfig.getName()));
     }
+
+	/**
+	 * Calls undo on the command, catching an exception if desired.
+	 *
+	 * @param command
+	 * @param context
+	 */
+	protected void undoCommand(UndoableCommand command, CommandContext context) {
+		try {
+			command.undo(context);
+		} catch (RuntimeException ex) {
+			if (context.getAppConfig().isCatchUndeployExceptions()) {
+				logger.error(format("Command [%s] threw exception that was caught; cause: %s", command.getClass().getName(), ex.getMessage()), ex);
+			} else {
+				throw ex;
+			}
+		}
+	}
 }
 
 class ExecuteComparator implements Comparator<Command> {

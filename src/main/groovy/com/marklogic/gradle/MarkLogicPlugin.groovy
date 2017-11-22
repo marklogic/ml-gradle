@@ -130,7 +130,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 			"collection names specified by the 'whereCollections' property or matching a URI pattern specified by the 'whereUriPattern' property or matching a URIs query specified by the 'whereUrisQuery' property, " +
 			"to a comma-separated list of collection names specified by the 'collections' property" + dmGroupMessage)
 		project.task("mlDeleteCollections", type: DeleteCollectionsTask, group: dmGroup, description: "Delete all documents in a comma-separated list of " +
-			"collection names specified by the 'collections' property" + dmGroupMessage)
+			"collection names specified by the 'collections' property" + dmGroupMessage + " Can also specify the collections as a task property. ")
 		project.task("mlRemoveCollections", type: RemoveCollectionsTask, group: dmGroup, description: "Remove all documents, either in a comma-separated list of " +
 			"collection names specified by the 'whereCollections' property or matching a URI pattern specified by the 'whereUriPattern' property or matching a URIs query specified by the 'whereUrisQuery' property, " +
 			"from a comma-separated list of collection names specified by the 'collections' property; " +

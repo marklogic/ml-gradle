@@ -1,0 +1,20 @@
+buildscript {
+	repositories {
+		mavenLocal()
+		jcenter()
+	}
+	dependencies {
+		classpath "com.marklogic:ml-gradle:${mlGradleVersion}"
+	}
+}
+
+plugins {
+	id "net.saliman.properties" version "1.4.6"
+}
+
+apply plugin: "com.marklogic.ml-gradle"
+
+repositories {
+	mavenLocal()
+	jcenter()
+}

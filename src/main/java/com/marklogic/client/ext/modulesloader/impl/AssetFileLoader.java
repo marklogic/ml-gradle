@@ -32,7 +32,7 @@ public class AssetFileLoader extends GenericFileLoader {
 	}
 
 	protected void initializeAssetFileLoader(ModulesManager modulesManager) {
-		addFileFilter(new AssetFileFilter());
+		addFileFilter(new DefaultFileFilter());
 		addDocumentFileProcessor(new ExtDocumentFileProcessor());
 		if (modulesManager != null) {
 			addDocumentFileProcessor(new ModulesManagerDocumentFileProcessor(modulesManager));

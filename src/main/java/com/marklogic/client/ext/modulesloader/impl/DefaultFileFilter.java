@@ -6,7 +6,7 @@ import java.io.FileFilter;
 /**
  * Simple implementation that accepts every file and ignores anything starting with ".".
  */
-public class AssetFileFilter implements FileFilter {
+public class DefaultFileFilter implements FileFilter {
 
     @Override
     public boolean accept(File f) {

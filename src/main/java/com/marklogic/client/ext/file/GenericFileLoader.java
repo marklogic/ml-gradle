@@ -200,4 +200,24 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 	public void setLogFileUris(boolean logFileUris) {
 		this.logFileUris = logFileUris;
 	}
+
+	public DocumentFileReader getDocumentFileReader() {
+		return documentFileReader;
+	}
+
+	public BatchWriter getBatchWriter() {
+		return batchWriter;
+	}
+
+	public TokenReplacer getTokenReplacer() {
+		return tokenReplacer;
+	}
+
+	public List<FileFilter> getFileFilters() {
+		return fileFilters;
+	}
+
+	public List<DocumentFileProcessor> getDocumentFileProcessors() {
+		return documentFileProcessors;
+	}
 }

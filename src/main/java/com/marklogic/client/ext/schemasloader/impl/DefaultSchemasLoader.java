@@ -3,8 +3,8 @@ package com.marklogic.client.ext.schemasloader.impl;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.ext.batch.BatchWriter;
 import com.marklogic.client.ext.file.GenericFileLoader;
-import com.marklogic.client.ext.file.DefaultDocumentFileReader;
 import com.marklogic.client.ext.file.DocumentFile;
+import com.marklogic.client.ext.modulesloader.impl.DefaultFileFilter;
 import com.marklogic.client.ext.schemasloader.SchemasLoader;
 
 import java.util.List;
@@ -20,7 +20,7 @@ public class DefaultSchemasLoader extends GenericFileLoader implements SchemasLo
 	 */
 	public DefaultSchemasLoader(DatabaseClient databaseClient) {
 		super(databaseClient);
-		initializeDocumentFileReader();
+		initializeDefaultSchemasLoader();
 	}
 
 	/**
@@ -30,16 +30,16 @@ public class DefaultSchemasLoader extends GenericFileLoader implements SchemasLo
 	 */
 	public DefaultSchemasLoader(BatchWriter batchWriter) {
 		super(batchWriter);
-		initializeDocumentFileReader();
+		initializeDefaultSchemasLoader();
 	}
 
 	/**
-	 * Configures and sets a DefaultDocumentFileReader with a TDE-specific file processor.
+	 * Adds the DocumentFileProcessors and FileFilters specific to loading schemas, which will then be used to construct
+	 * a DocumentFileReader by the parent class.
 	 */
-	protected void initializeDocumentFileReader() {
-		DefaultDocumentFileReader reader = new DefaultDocumentFileReader();
-		reader.addDocumentFileProcessor(new TdeDocumentFileProcessor());
-		setDocumentFileReader(reader);
+	protected void initializeDefaultSchemasLoader() {
+		addDocumentFileProcessor(new TdeDocumentFileProcessor());
+		addFileFilter(new DefaultFileFilter());
 	}
 
 	/**

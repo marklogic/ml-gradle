@@ -53,7 +53,17 @@ class ExportResourcesTask extends MarkLogicTask {
 		}
 		println "Exporting resources to: " + path
 
-		ExportedResources resources = new Exporter(getManageClient()).select(selector).export(path)
+		Exporter exporter
+		if (project.hasProperty("mlGroupName")) {
+			String group = project.property("mlGroupName")
+			println "Will export servers and tasks in group: " + group
+			exporter = new Exporter(getManageClient(), group)
+		} else {
+			exporter = new Exporter(getManageClient())
+		}
+
+		ExportedResources resources = exporter.select(selector).export(path)
+
 		println "Exported files:"
 		for (File f : resources.getFiles()) {
 			println f.getAbsolutePath()

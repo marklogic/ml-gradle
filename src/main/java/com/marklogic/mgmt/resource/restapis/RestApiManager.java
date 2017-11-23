@@ -61,7 +61,7 @@ public class RestApiManager extends LoggingObject {
 		if (serverManager.exists(serverName)) {
 			String path = format("/v1/rest-apis/%s", serverName);
 
-			if (request.isIncludeContent() || request.isIncludeContent()) {
+			if (request.isIncludeModules() || request.isIncludeContent()) {
 				path += "?";
 
 				DatabaseManager databaseManager = new DatabaseManager(client);

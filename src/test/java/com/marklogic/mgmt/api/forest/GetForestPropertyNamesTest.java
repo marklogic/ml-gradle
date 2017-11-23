@@ -14,7 +14,7 @@ public class GetForestPropertyNamesTest extends Assert {
     @Test
     public void forest() {
         List<String> list = new Forest().getPropertyNames();
-        assertEquals("As of ML 9.0-1.1, expecting 15 forest property names", 15, list.size());
+        assertEquals("As of ML 9.0-3, expecting 16 forest property names", 16, list.size());
     }
 
     @Test

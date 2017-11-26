@@ -26,6 +26,7 @@ import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.appdeployer.command.schemas.LoadSchemasCommand;
 import com.marklogic.appdeployer.command.security.*;
 import com.marklogic.appdeployer.command.tasks.DeployScheduledTasksCommand;
+import com.marklogic.appdeployer.command.taskservers.UpdateTaskServerCommand;
 import com.marklogic.appdeployer.command.temporal.DeployTemporalAxesCommand;
 import com.marklogic.appdeployer.command.temporal.DeployTemporalCollectionsCommand;
 import com.marklogic.appdeployer.command.temporal.DeployTemporalCollectionsLSQTCommand;
@@ -140,6 +141,7 @@ public class CommandMapBuilder {
 		// Tasks
 		List<Command> taskCommands = new ArrayList<Command>();
 		taskCommands.add(new DeployScheduledTasksCommand());
+		taskCommands.add(new UpdateTaskServerCommand());
 		map.put("mlTaskCommands", taskCommands);
 
 		// Temporal

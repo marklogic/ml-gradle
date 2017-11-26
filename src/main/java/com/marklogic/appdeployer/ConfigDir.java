@@ -156,6 +156,10 @@ public class ConfigDir {
 		return new File(baseDir, "tasks");
 	}
 
+	public File getTaskServersDir() {
+		return new File(baseDir, "task-servers");
+	}
+
 	public void setDatabasesPath(String databasesPath) {
 		this.databasesPath = databasesPath;
 	}

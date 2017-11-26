@@ -46,6 +46,7 @@ public abstract class SortOrderConstants {
 	public static Integer DEPLOY_TEMPORAL_COLLECTIONS_LSQT = 752;
 
     public static Integer DEPLOY_SCHEDULED_TASKS = 800;
+    public static Integer UPDATE_TASK_SERVER = 810;
 
     public static Integer DEPLOY_DEFAULT_PIPELINES = 900;
     public static Integer DEPLOY_PIPELINES = 905;

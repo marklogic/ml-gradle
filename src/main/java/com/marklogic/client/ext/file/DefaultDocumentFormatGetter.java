@@ -13,7 +13,7 @@ import java.util.List;
 public class DefaultDocumentFormatGetter implements FormatGetter {
 
 	public final static String[] DEFAULT_BINARY_EXTENSIONS = new String[]{".swf", ".jpeg", ".jpg", ".png", ".gif",
-		".svg", ".ttf", ".eot", ".woff", ".woff2", ".otf", ".cur", ".ico"};
+		".svg", ".ttf", ".eot", ".woff", ".woff2", ".otf", ".cur", ".ico", ".gzip", ".zip", ".gz", ".tar", ".jar"};
 
 	public final static String[] DEFAULT_XML_EXTENSIONS = new String[]{"xml", "xsl", "xslt", "xsd", "tdex"};
 	public final static String[] DEFAULT_JSON_EXTENSIONS = new String[]{"json", "tdej"};

@@ -1,90 +1,57 @@
 package com.marklogic.client.ext.file;
 
-import com.marklogic.client.ext.helper.LoggingObject;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.util.ClassUtils;
 
 import java.io.File;
-import java.io.FileFilter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class JarDocumentFileReader extends LoggingObject implements DocumentFileReader {
+/**
+ * Implementation of DocumentFileReader for reading documents in a JAR file. Not as feature-rich as
+ * DefaultDocumentFileReader, mostly because of the challenges of accessing such documents.
+ */
+public class JarDocumentFileReader extends AbstractDocumentFileReader implements DocumentFileReader {
 
 	private ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-	private List<FileFilter> fileFilters;
-	private List<DocumentFileProcessor> documentFileProcessors = new ArrayList<>();
-	FormatDocumentFileProcessor formatDocumentFileProcessor;
+	private List<FilenameFilter> filenameFilters = new ArrayList<>();
 	private String uriPrefix = "/";
+	private String resourcePattern = "**/*";
 
 	public JarDocumentFileReader() {
-		initialize();
+		super();
 	}
 
 	@Override
 	public List<DocumentFile> readDocumentFiles(String... paths) {
 		List<DocumentFile> documentFiles = new ArrayList<>();
 		for (String path : paths) {
-			findResources(path, "**/*.*").stream().forEach(resource -> {
+			findResources(path, resourcePattern).stream().forEach(resource -> {
 				DocumentFile documentFile = buildDocumentFile(path, resource);
 				if (documentFile != null) {
 					documentFile = processDocumentFile(documentFile);
-					documentFiles.add(documentFile);
+					if (documentFile != null) {
+						documentFiles.add(documentFile);
+					}
 				}
 			});
 		}
 		return documentFiles;
 	}
 
-	public DocumentFileProcessor getDocumentFileProcessor(String classShortName) {
-		for (DocumentFileProcessor processor : documentFileProcessors) {
-			if (ClassUtils.getShortName(processor.getClass()).equals(classShortName)) {
-				return processor;
-			}
-		}
-		return null;
-	}
-
-	public void addDocumentFileProcessor(DocumentFileProcessor processor) {
-		if (documentFileProcessors == null) {
-			documentFileProcessors = new ArrayList<>();
-		}
-		documentFileProcessors.add(processor);
-	}
-
-	public void addFileFilter(FileFilter fileFilter) {
-		if (fileFilters == null) {
-			fileFilters = new ArrayList<>();
-		}
-		fileFilters.add(fileFilter);
-	}
-
-	public List<DocumentFileProcessor> getDocumentFileProcessors() {
-		return documentFileProcessors;
-	}
-
-	public void setDocumentFileProcessors(List<DocumentFileProcessor> documentFileProcessors) {
-		this.documentFileProcessors = documentFileProcessors;
-	}
-
-	public List<FileFilter> getFileFilters() {
-		return fileFilters;
-	}
-
-	public void setFileFilters(List<FileFilter> fileFilters) {
-		this.fileFilters = fileFilters;
-	}
-
-	public void setUriPrefix(String uriPrefix) {
-		this.uriPrefix = uriPrefix;
-	}
-
-	private List<Resource> findResources(String basePath, String... paths) {
+	/**
+	 * Uses Spring's PathMatchingResourcePatternResolver to find resources on the given paths, relative to the given
+	 * base path.
+	 *
+	 * @param basePath
+	 * @param paths
+	 * @return
+	 */
+	protected List<Resource> findResources(String basePath, String... paths) {
 		List<Resource> list = new ArrayList<>();
 		for (String path : paths) {
 			try {
@@ -93,8 +60,15 @@ public class JarDocumentFileReader extends LoggingObject implements DocumentFile
 					finalPath += "/";
 				}
 				finalPath += path;
-				Resource[] r = resolver.getResources(finalPath);
-				list.addAll(Arrays.asList(r));
+				if (logger.isDebugEnabled()) {
+					logger.debug("Finding resources in path: " + finalPath);
+				}
+				Resource[] resources = resolver.getResources(finalPath);
+				for (Resource r : resources) {
+					if (canReadResource(r)) {
+						list.add(r);
+					}
+				}
 			} catch (IOException e) {
 				throw new RuntimeException("Unable to find resources at path: " + path, e);
 			}
@@ -102,9 +76,40 @@ public class JarDocumentFileReader extends LoggingObject implements DocumentFile
 		return list;
 	}
 
-	protected void initialize() {
-		formatDocumentFileProcessor = new FormatDocumentFileProcessor();
-		addDocumentFileProcessor(formatDocumentFileProcessor);
+	/**
+	 * Uses the list of FilenameFilter objects to determine if a document can be read from the given resource.
+	 *
+	 * @param r
+	 * @return
+	 */
+	protected boolean canReadResource(Resource r) {
+		if (r == null) {
+			return false;
+		}
+		String filename = r.getFilename();
+		if (filename == null) {
+			return false;
+		}
+
+		boolean canRead = true;
+
+		if (filenameFilters != null) {
+			for (FilenameFilter filter : filenameFilters) {
+				if (!filter.accept(null, filename)) {
+					canRead = false;
+					break;
+				}
+			}
+		}
+
+		return canRead;
+	}
+
+	public void addFilenameFilter(FilenameFilter filenameFilter) {
+		if (filenameFilters == null) {
+			filenameFilters = new ArrayList<>();
+		}
+		filenameFilters.add(filenameFilter);
 	}
 
 	protected DocumentFile buildDocumentFile(String rootPath, Resource resource) {
@@ -118,7 +123,8 @@ public class JarDocumentFileReader extends LoggingObject implements DocumentFile
 			File f = null;
 			try {
 				f = resource.getFile();
-			} catch (IOException e) {}
+			} catch (IOException e) {
+			}
 
 			if (!uri.endsWith("/") && (f == null || !f.isDirectory())) {
 				DocumentFile df = new DocumentFile(uri, resource);
@@ -131,21 +137,19 @@ public class JarDocumentFileReader extends LoggingObject implements DocumentFile
 		return null;
 	}
 
-	protected DocumentFile processDocumentFile(DocumentFile documentFile) {
-		for (DocumentFileProcessor processor : documentFileProcessors) {
-			try {
-				documentFile = processor.processDocumentFile(documentFile);
-			}
-			catch (Exception e) {
-				if (logger.isErrorEnabled()) {
-					logger.error("Error while processing document file; file: " + documentFile.getFile().getAbsolutePath()
-						+ "; cause: " + e.getMessage(), e);
-				}
-			}
-			if (documentFile == null) {
-				break;
-			}
-		}
-		return documentFile;
+	public void setUriPrefix(String uriPrefix) {
+		this.uriPrefix = uriPrefix;
+	}
+
+	public void setResourcePattern(String resourcePattern) {
+		this.resourcePattern = resourcePattern;
+	}
+
+	public List<FilenameFilter> getFilenameFilters() {
+		return filenameFilters;
+	}
+
+	public void setFilenameFilters(List<FilenameFilter> filenameFilters) {
+		this.filenameFilters = filenameFilters;
 	}
 }

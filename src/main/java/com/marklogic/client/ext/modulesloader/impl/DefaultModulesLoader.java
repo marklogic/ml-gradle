@@ -528,4 +528,8 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 			} catch (IOException e) {}
 		}
 	}
+
+	public AssetFileLoader getAssetFileLoader() {
+		return assetFileLoader;
+	}
 }

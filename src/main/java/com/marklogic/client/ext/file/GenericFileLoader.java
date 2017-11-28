@@ -96,14 +96,26 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 	protected DocumentFileReader buildDocumentFileReader() {
 		DefaultDocumentFileReader reader = new DefaultDocumentFileReader();
 
-		for (DocumentFileProcessor processor : buildDocumentFileProcessors()) {
-			reader.addDocumentFileProcessor(processor);
-		}
-
 		if (fileFilters != null) {
 			for (FileFilter filter : fileFilters) {
 				reader.addFileFilter(filter);
 			}
+		}
+
+		prepareAbstractDocumentFileReader(reader);
+		return reader;
+	}
+
+	/**
+	 * This was initially part of building a DefaultDocumentFileReader. But in the event that a client sets a custom
+	 * DocumentFileReader on this class that extends AbstractDocumentFileReader, it's useful to reuse this code on
+	 * that custom DocumentFileReader. Thus, it's public.
+	 *
+	 * @param reader
+	 */
+	public void prepareAbstractDocumentFileReader(AbstractDocumentFileReader reader) {
+		for (DocumentFileProcessor processor : buildDocumentFileProcessors()) {
+			reader.addDocumentFileProcessor(processor);
 		}
 
 		if (additionalBinaryExtensions != null) {
@@ -119,8 +131,6 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 					"so unable to add additionalBinaryExtensions: " + Arrays.asList(additionalBinaryExtensions));
 			}
 		}
-
-		return reader;
 	}
 
 	/**

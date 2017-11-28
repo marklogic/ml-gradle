@@ -1,8 +1,5 @@
 package com.marklogic.client.ext.file;
 
-import com.marklogic.client.ext.helper.LoggingObject;
-import org.springframework.util.ClassUtils;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -16,23 +13,22 @@ import java.util.List;
 /**
  * Non-threadsafe implementation that implements FileVisitor as a way of descending one or more file paths.
  */
-public class DefaultDocumentFileReader extends LoggingObject implements FileVisitor<Path>, DocumentFileReader {
+public class DefaultDocumentFileReader extends AbstractDocumentFileReader implements FileVisitor<Path>, DocumentFileReader {
 
 	private Path currentRootPath;
 	private List<FileFilter> fileFilters;
 	private List<DocumentFile> documentFiles;
-	private List<DocumentFileProcessor> documentFileProcessors;
 	private String uriPrefix = "/";
 
 	// Each of these are eagerly instantiated, and we retain a reference in case a client wants to modify them
 	private CollectionsFileDocumentFileProcessor collectionsFileDocumentFileProcessor;
 	private PermissionsFileDocumentFileProcessor permissionsFileDocumentFileProcessor;
-	private FormatDocumentFileProcessor formatDocumentFileProcessor;
 
 	/**
 	 * Calls initialize to instantiate some default DocumentFileProcessor objects.
 	 */
 	public DefaultDocumentFileReader() {
+		super();
 		initialize();
 	}
 
@@ -78,12 +74,10 @@ public class DefaultDocumentFileReader extends LoggingObject implements FileVisi
 		if (path.startsWith("classpath") || path.startsWith("file:")) {
 			try {
 				f = new File(new URI(path));
-			}
-			catch (URISyntaxException e) {
+			} catch (URISyntaxException e) {
 				throw new RuntimeException(e);
 			}
-		}
-		else {
+		} else {
 			f = new File(path);
 		}
 		return f.exists() ? Paths.get(f.getAbsolutePath()) : null;
@@ -164,43 +158,16 @@ public class DefaultDocumentFileReader extends LoggingObject implements FileVisi
 		return df;
 	}
 
-	protected DocumentFile processDocumentFile(DocumentFile documentFile) {
-		for (DocumentFileProcessor processor : documentFileProcessors) {
-			documentFile = processor.processDocumentFile(documentFile);
-			if (documentFile == null) {
-				break;
-			}
-		}
-		return documentFile;
-	}
-
 	protected void initialize() {
 		collectionsFileDocumentFileProcessor = new CollectionsFileDocumentFileProcessor();
 		permissionsFileDocumentFileProcessor = new PermissionsFileDocumentFileProcessor();
-		formatDocumentFileProcessor = new FormatDocumentFileProcessor();
 
 		addFileFilter(collectionsFileDocumentFileProcessor);
 		addFileFilter(permissionsFileDocumentFileProcessor);
 
 		addDocumentFileProcessor(collectionsFileDocumentFileProcessor);
 		addDocumentFileProcessor(permissionsFileDocumentFileProcessor);
-		addDocumentFileProcessor(formatDocumentFileProcessor);
-	}
-
-	public DocumentFileProcessor getDocumentFileProcessor(String classShortName) {
-		for (DocumentFileProcessor processor : documentFileProcessors) {
-			if (ClassUtils.getShortName(processor.getClass()).equals(classShortName)) {
-				return processor;
-			}
-		}
-		return null;
-	}
-
-	public void addDocumentFileProcessor(DocumentFileProcessor processor) {
-		if (documentFileProcessors == null) {
-			documentFileProcessors = new ArrayList<>();
-		}
-		documentFileProcessors.add(processor);
+		addDocumentFileProcessor(getFormatDocumentFileProcessor());
 	}
 
 	public void addFileFilter(FileFilter fileFilter) {
@@ -208,14 +175,6 @@ public class DefaultDocumentFileReader extends LoggingObject implements FileVisi
 			fileFilters = new ArrayList<>();
 		}
 		fileFilters.add(fileFilter);
-	}
-
-	public List<DocumentFileProcessor> getDocumentFileProcessors() {
-		return documentFileProcessors;
-	}
-
-	public void setDocumentFileProcessors(List<DocumentFileProcessor> documentFileProcessors) {
-		this.documentFileProcessors = documentFileProcessors;
 	}
 
 	public List<FileFilter> getFileFilters() {
@@ -236,9 +195,5 @@ public class DefaultDocumentFileReader extends LoggingObject implements FileVisi
 
 	public PermissionsFileDocumentFileProcessor getPermissionsFileDocumentFileProcessor() {
 		return permissionsFileDocumentFileProcessor;
-	}
-
-	public FormatDocumentFileProcessor getFormatDocumentFileProcessor() {
-		return formatDocumentFileProcessor;
 	}
 }

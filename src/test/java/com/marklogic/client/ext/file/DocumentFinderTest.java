@@ -14,16 +14,20 @@ public class DocumentFinderTest extends Assert {
 
 	private DocumentFileReader sut = new DefaultDocumentFileReader();
 
+	/**
+	 * Note that this does find the ".do-not-load", as DefaultDocumentFileReader doesn't ignore .* files by default.
+	 */
 	@Test
 	public void noFileFilter() {
 		String path = Paths.get("src", "test", "resources", "schemas").toString();
 		List<DocumentFile> list = sut.readDocumentFiles(path);
-		assertEquals(5, list.size());
+		assertEquals(6, list.size());
 
 		List<String> uris = new ArrayList<>();
 		for (DocumentFile file : list) {
 			uris.add(file.getUri());
 		}
+		assertTrue(uris.contains("/.do-not-load"));
 		assertTrue(uris.contains("/child/child.tdej"));
 		assertTrue(uris.contains("/child/grandchild/grandchild.tdex"));
 		assertTrue(uris.contains("/parent.tdex"));

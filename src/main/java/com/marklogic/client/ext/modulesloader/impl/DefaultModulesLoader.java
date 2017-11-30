@@ -57,6 +57,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	public DefaultModulesLoader() {
 		this.extensionMetadataProvider = new DefaultExtensionMetadataProvider();
 		this.modulesManager = new PropertiesModuleManager();
+		failureListeners.add(new SimpleLoadModulesFailureListener());
 	}
 
 	public DefaultModulesLoader(AssetFileLoader assetFileLoader) {
@@ -531,5 +532,9 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 
 	public AssetFileLoader getAssetFileLoader() {
 		return assetFileLoader;
+	}
+
+	public List<LoadModulesFailureListener> getFailureListeners() {
+		return failureListeners;
 	}
 }

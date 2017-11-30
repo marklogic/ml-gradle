@@ -3,6 +3,7 @@ package com.marklogic.appdeployer;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.ext.SecurityContextType;
@@ -139,6 +140,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    p.setProperty("mlResourceFilenamesToIncludeRegex", "qa-.*");
 
 	    p.setProperty("mlDatabaseNamesAndReplicaCounts", "Documents,1,Security,2");
+	    p.setProperty("mlDatabaseNamesWithForestsOnOneHost", "Documents,Security");
 
 	    p.setProperty("mlForestDataDirectory", "/data/path");
 	    p.setProperty("mlForestFastDataDirectory", "/fast/path");
@@ -163,7 +165,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 
         assertTrue(config.isCatchDeployExceptions());
         assertTrue(config.isCatchUndeployExceptions());
-        
+
         assertEquals("prophost", config.getHost());
         assertEquals("propname", config.getName());
         assertTrue(config.isNoRestServer());
@@ -238,6 +240,11 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    assertEquals("qa-.*", config.getResourceFilenamesIncludePattern().pattern());
 
 	    assertEquals("Documents,1,Security,2", config.getDatabaseNamesAndReplicaCounts());
+
+	    Set<String> set = config.getDatabaseNamesWithForestsOnOneHost();
+	    assertEquals(2, set.size());
+	    assertTrue(set.contains("Documents"));
+	    assertTrue(set.contains("Security"));
 
 	    assertEquals("/data/path", config.getForestDataDirectory());
 	    assertEquals("/fast/path", config.getForestFastDataDirectory());

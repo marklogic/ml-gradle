@@ -276,6 +276,17 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			c.setDatabaseNamesAndReplicaCounts(prop);
 		}
 
+		prop = getProperty("mlDatabaseNamesWithForestsOnOneHost");
+		if (prop != null) {
+			logger.info("Databases that will have their forest(s) created on a single host: " + prop);
+			String[] names = prop.split(",");
+			Set<String> set = new HashSet<>();
+			for (String name : names) {
+				set.add(name);
+			}
+			c.setDatabaseNamesWithForestsOnOneHost(set);
+		}
+
 		prop = getProperty("mlForestDataDirectory");
 		if (prop != null) {
 			logger.info("Default forest data directory for all databases: " + prop);

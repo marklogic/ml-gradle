@@ -14,10 +14,7 @@ import com.marklogic.client.ext.tokenreplacer.PropertiesSource;
 
 import javax.net.ssl.SSLContext;
 import java.io.FileFilter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -152,6 +149,9 @@ public class AppConfig {
 
     // Comma-delimited string used for configuring forest replicas
     private String databaseNamesAndReplicaCounts;
+
+    // Comma-delimited string of database names that should only have forests (most likely just one) created on one host
+    private Set<String> databaseNamesWithForestsOnOneHost;
 
     // Data/fast/large directories for default forests
     private String forestDataDirectory;
@@ -1054,5 +1054,13 @@ public class AppConfig {
 
 	public void setCatchUndeployExceptions(boolean catchUndeployExceptions) {
 		this.catchUndeployExceptions = catchUndeployExceptions;
+	}
+
+	public Set<String> getDatabaseNamesWithForestsOnOneHost() {
+		return databaseNamesWithForestsOnOneHost;
+	}
+
+	public void setDatabaseNamesWithForestsOnOneHost(Set<String> databaseNamesWithForestsOnOneHost) {
+		this.databaseNamesWithForestsOnOneHost = databaseNamesWithForestsOnOneHost;
 	}
 }

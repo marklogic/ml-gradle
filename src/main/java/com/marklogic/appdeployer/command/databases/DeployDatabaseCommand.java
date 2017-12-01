@@ -16,7 +16,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Can be used for creating any kind of database with any sorts of forests. Specifying a config file for the database or
@@ -284,9 +283,6 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
     /**
      * Allows for how an instance of DeployForestsCommand is built to be overridden by a subclass.
      *
-     * Starting in 3.2.0, the "createForestsOnEachHost" property is overridden if the database name is in the
-     * databaseNamesWithForestsOnOneHost property in AppConfig.
-     *
      * @param dbPayload
      *            Needed so we can look up forest counts based on the database name
      * @param receipt
@@ -298,17 +294,7 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
     	final String databaseName = receipt.getResourceId();
 
         DeployForestsCommand c = new DeployForestsCommand();
-
-	    Set<String> names = context.getAppConfig().getDatabaseNamesWithForestsOnOneHost();
-	    if (names != null && names.contains(databaseName)) {
-	    	if (logger.isInfoEnabled()) {
-	    		logger.info("Will only create forest(s) on one host for database: " + databaseName);
-		    }
-	    	c.setCreateForestsOnEachHost(false);
-	    } else {
-		    c.setCreateForestsOnEachHost(createForestsOnEachHost);
-	    }
-
+        c.setCreateForestsOnEachHost(createForestsOnEachHost);
         c.setForestsPerHost(determineForestCountPerHost(dbPayload, context));
         c.setForestFilename(forestFilename);
         c.setDatabaseName(databaseName);

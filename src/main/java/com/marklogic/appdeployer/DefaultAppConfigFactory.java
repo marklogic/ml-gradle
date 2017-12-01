@@ -276,7 +276,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			c.setDatabaseNamesAndReplicaCounts(prop);
 		}
 
-		prop = getProperty("mlDatabaseNamesWithForestsOnOneHost");
+		prop = getProperty("mlDatabasesWithForestsOnOneHost");
 		if (prop != null) {
 			logger.info("Databases that will have their forest(s) created on a single host: " + prop);
 			String[] names = prop.split(",");
@@ -284,7 +284,24 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			for (String name : names) {
 				set.add(name);
 			}
-			c.setDatabaseNamesWithForestsOnOneHost(set);
+			c.setDatabasesWithForestsOnOneHost(set);
+		}
+
+		prop = getProperty("mlDatabaseHosts");
+		if (prop != null) {
+			logger.info("Databases and the hosts that their forests will be created on: " + prop);
+			String[] tokens = prop.split(",");
+			Map<String, Set<String>> map = new HashMap<>();
+			for (int i = 0; i < tokens.length; i += 2) {
+				String dbName = tokens[i];
+				String[] hostNames = tokens[i + 1].split("\\|");
+				Set<String> names = new HashSet<>();
+				for (String name : hostNames) {
+					names.add(name);
+				}
+				map.put(dbName, names);
+			}
+			c.setDatabaseHosts(map);
 		}
 
 		prop = getProperty("mlForestDataDirectory");

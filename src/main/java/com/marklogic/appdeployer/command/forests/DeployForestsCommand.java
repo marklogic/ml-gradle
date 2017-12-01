@@ -12,6 +12,8 @@ import org.springframework.util.StringUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This command is for a simple use case where all the forests created for a database have the same structure,
@@ -76,12 +78,7 @@ public class DeployForestsCommand extends AbstractCommand {
 
         // Find out which hosts to create forests on
         List<String> hostNames = new HostManager(context.getManageClient()).getHostNames();
-        if (!createForestsOnEachHost) {
-            String first = hostNames.get(0);
-            logger.info(format("Only creating forests on the first host: " + first));
-            hostNames = new ArrayList<>();
-            hostNames.add(first);
-        }
+        hostNames = determineHostNamesForForest(context, hostNames);
 
         // Find out how many forests exist already
         int countOfExistingForests = new DatabaseManager(context.getManageClient()).getPrimaryForestIds(getForestDatabaseName(appConfig)).size();
@@ -102,6 +99,42 @@ public class DeployForestsCommand extends AbstractCommand {
                 i++;
             }
         }
+    }
+
+	/**
+	 * @param context
+	 * @param hostNames
+	 * @return
+	 */
+	protected List<String> determineHostNamesForForest(CommandContext context, List<String> hostNames) {
+	    Set<String> databaseNames = context.getAppConfig().getDatabasesWithForestsOnOneHost();
+	    boolean onlyOnOneHost = databaseNames != null && databaseNames.contains(this.databaseName);
+
+	    if (!createForestsOnEachHost || onlyOnOneHost) {
+		    String first = hostNames.get(0);
+		    logger.info(format("Only creating forests on the first host: " + first));
+		    hostNames = new ArrayList<>();
+		    hostNames.add(first);
+		    return hostNames;
+	    }
+
+	    Map<String, Set<String>> databaseHosts = context.getAppConfig().getDatabaseHosts();
+	    if (databaseHosts != null) {
+	    	Set<String> selectedHostNames = databaseHosts.get(this.databaseName);
+	    	if (selectedHostNames != null) {
+	    		List<String> newHostNames = new ArrayList<>();
+	    		for (String name : selectedHostNames) {
+	    			if (hostNames.contains(name)) {
+	    				newHostNames.add(name);
+				    } else {
+	    				logger.warn(format("Host '%s' for database '%s' is not recognized, ignoring", name, this.databaseName));
+				    }
+			    }
+			    return newHostNames;
+		    }
+	    }
+
+	    return hostNames;
     }
 
     protected String getForestName(AppConfig appConfig, int forestNumber) {

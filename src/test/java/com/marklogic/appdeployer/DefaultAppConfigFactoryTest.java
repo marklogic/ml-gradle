@@ -140,7 +140,8 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    p.setProperty("mlResourceFilenamesToIncludeRegex", "qa-.*");
 
 	    p.setProperty("mlDatabaseNamesAndReplicaCounts", "Documents,1,Security,2");
-	    p.setProperty("mlDatabaseNamesWithForestsOnOneHost", "Documents,Security");
+	    p.setProperty("mlDatabasesWithForestsOnOneHost", "Documents,Security");
+	    p.setProperty("mlDatabaseHosts", "Documents,host1|host2|host3,Security,host1|host2");
 
 	    p.setProperty("mlForestDataDirectory", "/data/path");
 	    p.setProperty("mlForestFastDataDirectory", "/fast/path");
@@ -241,10 +242,20 @@ public class DefaultAppConfigFactoryTest extends Assert {
 
 	    assertEquals("Documents,1,Security,2", config.getDatabaseNamesAndReplicaCounts());
 
-	    Set<String> set = config.getDatabaseNamesWithForestsOnOneHost();
+	    Set<String> set = config.getDatabasesWithForestsOnOneHost();
 	    assertEquals(2, set.size());
 	    assertTrue(set.contains("Documents"));
 	    assertTrue(set.contains("Security"));
+
+	    Map<String, Set<String>> databaseHosts = config.getDatabaseHosts();
+	    assertEquals(2, databaseHosts.size());
+	    assertEquals(3, databaseHosts.get("Documents").size());
+	    assertTrue(databaseHosts.get("Documents").contains("host1"));
+	    assertTrue(databaseHosts.get("Documents").contains("host2"));
+	    assertTrue(databaseHosts.get("Documents").contains("host3"));
+	    assertEquals(2, databaseHosts.get("Security").size());
+	    assertTrue(databaseHosts.get("Security").contains("host1"));
+	    assertTrue(databaseHosts.get("Security").contains("host2"));
 
 	    assertEquals("/data/path", config.getForestDataDirectory());
 	    assertEquals("/fast/path", config.getForestFastDataDirectory());

@@ -151,7 +151,9 @@ public class AppConfig {
     private String databaseNamesAndReplicaCounts;
 
     // Comma-delimited string of database names that should only have forests (most likely just one) created on one host
-    private Set<String> databaseNamesWithForestsOnOneHost;
+    private Set<String> databasesWithForestsOnOneHost;
+
+    private Map<String, Set<String>> databaseHosts;
 
     // Data/fast/large directories for default forests
     private String forestDataDirectory;
@@ -1056,11 +1058,19 @@ public class AppConfig {
 		this.catchUndeployExceptions = catchUndeployExceptions;
 	}
 
-	public Set<String> getDatabaseNamesWithForestsOnOneHost() {
-		return databaseNamesWithForestsOnOneHost;
+	public Set<String> getDatabasesWithForestsOnOneHost() {
+		return databasesWithForestsOnOneHost;
 	}
 
-	public void setDatabaseNamesWithForestsOnOneHost(Set<String> databaseNamesWithForestsOnOneHost) {
-		this.databaseNamesWithForestsOnOneHost = databaseNamesWithForestsOnOneHost;
+	public void setDatabasesWithForestsOnOneHost(Set<String> databasesWithForestsOnOneHost) {
+		this.databasesWithForestsOnOneHost = databasesWithForestsOnOneHost;
+	}
+
+	public Map<String, Set<String>> getDatabaseHosts() {
+		return databaseHosts;
+	}
+
+	public void setDatabaseHosts(Map<String, Set<String>> databaseHosts) {
+		this.databaseHosts = databaseHosts;
 	}
 }

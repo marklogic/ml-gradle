@@ -25,7 +25,7 @@ public class CreateForestsOnOneHostDebug {
 		AppConfig appConfig = new AppConfig();
 		Set<String> names = new HashSet<>();
 		names.add("testdb");
-		appConfig.setDatabaseNamesWithForestsOnOneHost(names);
+		appConfig.setDatabasesWithForestsOnOneHost(names);
 		CommandContext context = new CommandContext(appConfig, manageClient, null);
 
 		DeployDatabaseCommand ddc = new DeployDatabaseCommand();

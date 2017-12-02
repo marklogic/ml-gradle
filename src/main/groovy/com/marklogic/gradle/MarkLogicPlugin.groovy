@@ -7,11 +7,8 @@ import com.marklogic.appdeployer.command.Command
 import com.marklogic.appdeployer.command.CommandContext
 import com.marklogic.appdeployer.command.CommandMapBuilder
 import com.marklogic.appdeployer.impl.SimpleAppDeployer
-import com.marklogic.gradle.task.DeleteModuleTimestampsFileTask
-import com.marklogic.gradle.task.DeployAppTask
-import com.marklogic.gradle.task.NewProjectTask
-import com.marklogic.gradle.task.PrintCommandsTask
-import com.marklogic.gradle.task.UndeployAppTask
+import com.marklogic.appdeployer.util.SimplePropertiesSource
+import com.marklogic.gradle.task.*
 import com.marklogic.gradle.task.admin.InitTask
 import com.marklogic.gradle.task.admin.InstallAdminTask
 import com.marklogic.gradle.task.alert.DeleteAllAlertConfigsTask
@@ -21,14 +18,7 @@ import com.marklogic.gradle.task.cluster.*
 import com.marklogic.gradle.task.cpf.DeployCpfTask
 import com.marklogic.gradle.task.cpf.LoadDefaultPipelinesTask
 import com.marklogic.gradle.task.databases.*
-import com.marklogic.gradle.task.datamovement.AddCollectionsTask
-import com.marklogic.gradle.task.datamovement.AddPermissionsTask
-import com.marklogic.gradle.task.datamovement.DeleteCollectionsTask
-import com.marklogic.gradle.task.datamovement.ExportModulesTask
-import com.marklogic.gradle.task.datamovement.RemoveCollectionsTask
-import com.marklogic.gradle.task.datamovement.RemovePermissionsTask
-import com.marklogic.gradle.task.datamovement.SetCollectionsTask
-import com.marklogic.gradle.task.datamovement.SetPermissionsTask
+import com.marklogic.gradle.task.datamovement.*
 import com.marklogic.gradle.task.es.GenerateModelArtifactsTask
 import com.marklogic.gradle.task.export.ExportResourcesTask
 import com.marklogic.gradle.task.flexrep.*
@@ -75,6 +65,8 @@ class MarkLogicPlugin implements Plugin<Project> {
 		logger.info("\nInitializing ml-gradle")
 
 		initializeAppDeployerObjects(project)
+
+		copyGradlePropertiesToCustomTokensIfRequested(project)
 
 		project.getConfigurations().create("mlRestApi")
 
@@ -151,6 +143,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlCreateTransform", type: CreateTransformTask, group: devGroup, description: "Create a new transform in the modules transforms directory; use -PtransformName and -PtransformType to set the transform name and type (xqy, xsl, or sjs)")
 		project.task("mlExportResources", type: ExportResourcesTask, group: devGroup, description: "Export resources based on a properties file specified via -PpropertiesFile, -Pprefix, or -Pregex; use -PincludeTypes to select resource types to export via a comma-delimited string; use -PexportPath to specify where to export resources to")
 		project.task("mlPrepareRestApiDependencies", type: PrepareRestApiDependenciesTask, group: devGroup, dependsOn: project.configurations["mlRestApi"], description: "Downloads (if necessary) and unzips in the build directory all mlRestApi dependencies")
+		project.task("mlPrintTokens", type: PrintTokensTask, group: devGroup, description: "Print the customTokens map on the mlAppConfig object (typically for debugging purposes)")
 		project.task("mlNewProject", type: NewProjectTask, group: devGroup, description: "Run a wizard for creating a new project, which includes running mlScaffold")
 		project.task("mlScaffold", type: GenerateScaffoldTask, group: devGroup, description: "Generate project scaffold for a new project")
 
@@ -247,7 +240,46 @@ class MarkLogicPlugin implements Plugin<Project> {
 			"Use -ProxyProjectPath to define the location of your Roxy project.")
 		project.task("mlRoxyMigrateProject", group: roxyGroup, description: "Run all tasks for migrating a Roxy project into this Gradle project. " +
 			"Use -ProxyProjectPath to define the location of your Roxy project.", dependsOn: ["mlRoxyMigrateBuildSteps", "mlRoxyMigrateFiles", "mlRoxyMigrateProperties"])
+
 		logger.info("Finished initializing ml-gradle\n")
+	}
+
+	/**
+	 * New in 3.2.0 - if mlPropsAsTokens is set to true, then all Gradle properties will be added to the AppConfig
+	 * customTokens map with "%%" as a default prefix and suffix. The prefix and suffix can be overridden via
+	 * mlTokenPrefix and mlTokenSuffix respectively.
+	 */
+	void copyGradlePropertiesToCustomTokensIfRequested(Project project) {
+		if (project.hasProperty("mlPropsAsTokens")) {
+			String value = project.property("mlPropsAsTokens")
+			if ("true".equalsIgnoreCase(value)) {
+				AppConfig appConfig = project.extensions.getByName("mlAppConfig")
+				Properties props = new Properties()
+				Map<String, ?> gradleProperties = project.getProperties()
+				for (String key : gradleProperties.keySet()) {
+					if ("properties".equals(key)) {
+						continue
+					}
+					Object val = gradleProperties.get(key)
+					if (val instanceof String) {
+						props.setProperty(key, val)
+					} else {
+						props.setProperty(key, val.toString())
+					}
+				}
+
+				String prefix = "%%"
+				String suffix = "%%"
+				if (project.hasProperty("mlTokenPrefix")) {
+					prefix = project.property("mlTokenPrefix")
+				}
+				if (project.hasProperty("mlTokenSuffix")) {
+					suffix = project.property("mlTokenSuffix")
+				}
+
+				appConfig.populateCustomTokens(new SimplePropertiesSource(props), prefix, suffix)
+			}
+		}
 	}
 
 	void initializeAppDeployerObjects(Project project) {

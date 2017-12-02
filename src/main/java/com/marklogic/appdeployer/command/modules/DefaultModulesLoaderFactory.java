@@ -1,6 +1,7 @@
 package com.marklogic.appdeployer.command.modules;
 
 import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.util.MapPropertiesSource;
 import com.marklogic.client.ext.batch.RestBatchWriter;
 import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.client.ext.modulesloader.ModulesLoader;
@@ -79,15 +80,8 @@ public class DefaultModulesLoaderFactory extends LoggingObject implements Module
 	protected TokenReplacer buildModuleTokenReplacer(AppConfig appConfig) {
 		DefaultTokenReplacer r = appConfig.isUseRoxyTokenPrefix() ? new RoxyTokenReplacer() : new DefaultTokenReplacer();
 		final Map<String, String> customTokens = appConfig.getCustomTokens();
-		if (customTokens != null && !customTokens.isEmpty()) {
-			r.addPropertiesSource(new PropertiesSource() {
-				@Override
-				public Properties getProperties() {
-					Properties p = new Properties();
-					p.putAll(customTokens);
-					return p;
-				}
-			});
+		if (customTokens != null) {
+			r.addPropertiesSource(new MapPropertiesSource(customTokens));
 		}
 
 		if (appConfig.getModuleTokensPropertiesSources() != null) {

@@ -176,10 +176,10 @@ public class AppConfig {
     // Path to use for DeployFlexrepCommand
     private String flexrepPath;
 
-    // Whether or not to replace tokens in modules
+	// Whether or not to replace tokens in modules
     private boolean replaceTokensInModules = true;
     // Whether or not to prefix each module token with "@ml."
-    private boolean useRoxyTokenPrefix = true;
+    private boolean useRoxyTokenPrefix = false;
     // Additional PropertiesSources instance to use for replacing module tokens
     private List<PropertiesSource> moduleTokensPropertiesSources = new ArrayList<>();
 
@@ -215,6 +215,39 @@ public class AppConfig {
         configDir = new ConfigDir();
         schemasPath = defaultSchemasPath;
     }
+
+	public void populateCustomTokens(PropertiesSource propertiesSource) {
+		populateCustomTokens(propertiesSource, "%%", "%%");
+	}
+
+	/**
+	 * Populate the customTokens map in this class with the properties from the given properties source.
+	 * @param propertiesSource
+	 * @param prefix optional; if set, then each token key that is added has the prefix prepended to it
+	 * @param suffix optional; if set, then each token key that is added has the suffix appended to it
+	 */
+	public void populateCustomTokens(PropertiesSource propertiesSource, String prefix, String suffix) {
+		Properties props = propertiesSource.getProperties();
+		if (props != null) {
+			if (customTokens == null) {
+				customTokens = new HashMap<>();
+			}
+			for (Object key : props.keySet()) {
+				String skey = (String)key;
+				String value = props.getProperty(skey);
+				if (value != null) {
+					String token = skey;
+					if (prefix != null) {
+						token = prefix + token;
+					}
+					if (suffix != null) {
+						token = token + suffix;
+					}
+					customTokens.put(token, value);
+				}
+			}
+		}
+	}
 
     public void setSimpleSslConfig() {
 		setRestSslContext(SimpleX509TrustManager.newSSLContext());

@@ -117,7 +117,8 @@ class MarkLogicPlugin implements Plugin<Project> {
 
 		String dmGroup = "ml-Gradle Data Movement"
 		String dmGroupMessage = "; can also set the properties threadCount, batchSize, applyConsistentSnapshot, " +
-			"jobName, and logBatches to configure how the Data Movement QueryBatcher operates.";
+			"jobName, and logBatches to configure how the Data Movement QueryBatcher operates. " +
+			"Setting the database property instructs the task to connect to the database via port 8000.";
 		project.task("mlAddCollections", type: AddCollectionsTask, group: dmGroup, description: "Add all documents, either in a comma-separated list of " +
 			"collection names specified by the 'whereCollections' property or matching a URI pattern specified by the 'whereUriPattern' property or matching a URIs query specified by the 'whereUrisQuery' property, " +
 			"to a comma-separated list of collection names specified by the 'collections' property" + dmGroupMessage)

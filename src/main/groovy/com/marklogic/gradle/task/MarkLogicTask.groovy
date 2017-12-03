@@ -44,8 +44,20 @@ class MarkLogicTask extends DefaultTask {
 		project.hasProperty("mlAdminPassword") ? project.property("mlAdminPassword") : project.property("mlPassword")
 	}
 
+	/**
+	 * If the "database" property is set, then the DatabaseClient that's returned will use the App-Services port
+	 * (defaults to 8000) to connect to the given database. Otherwise, the DatabaseClient will try to connect to the
+	 * REST API server defined by mlRestPort.
+	 * @return
+	 */
 	DatabaseClient newClient() {
-        getAppConfig().newDatabaseClient()
+		if (project.hasProperty("database")) {
+			println "Connecting via the App-Services port to database: " + project.property("database")
+			return getAppConfig().newAppServicesDatabaseClient(project.property("database"))
+		}
+		else {
+			getAppConfig().newDatabaseClient()
+		}
     }
 
     void deployWithCommandListProperty(String propertyName) {

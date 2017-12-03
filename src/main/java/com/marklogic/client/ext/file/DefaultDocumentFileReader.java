@@ -54,8 +54,8 @@ public class DefaultDocumentFileReader extends AbstractDocumentFileReader implem
 					throw new RuntimeException(format("IO error while walking file tree at path: %s", path), ie);
 				}
 			} else {
-				if (logger.isWarnEnabled()) {
-					logger.warn("Path does not exist, so not reading files from it: " + path);
+				if (logger.isInfoEnabled()) {
+					logger.info("Path does not exist, so not reading files from it: " + path);
 				}
 			}
 		}

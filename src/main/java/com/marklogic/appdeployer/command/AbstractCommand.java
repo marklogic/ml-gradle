@@ -133,11 +133,25 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
     protected SaveReceipt saveResource(ResourceManager mgr, CommandContext context, File f) {
 		String payload = copyFileToString(f, context);
 		mgr = adjustResourceManagerForPayload(mgr, context, payload);
+		payload = adjustPayloadBeforeSavingResource(mgr, context, f, payload);
         SaveReceipt receipt = mgr.save(payload);
         if (storeResourceIdsAsCustomTokens) {
             storeTokenForResourceId(receipt, context);
         }
         return receipt;
+    }
+
+	/**
+	 * Allow subclass to override this in order to fiddle with the payload before it's saved; called by saveResource.
+	 *
+	 * @param mgr
+	 * @param context
+	 * @param f
+	 * @param payload
+	 * @return
+	 */
+    protected String adjustPayloadBeforeSavingResource(ResourceManager mgr, CommandContext context, File f, String payload) {
+    	return payload;
     }
 
 	/**

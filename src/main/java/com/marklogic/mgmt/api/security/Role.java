@@ -55,10 +55,23 @@ public class Role extends Resource {
 		this.roleName = roleName;
 	}
 
+	public void clearPermissionsAndRoles() {
+		if (role != null) {
+			role.clear();
+		}
+		if (permission != null) {
+			permission.clear();
+		}
+	}
+
 	public boolean hasPermissionWithOwnRoleName() {
-		if (permission != null && roleName != null) {
+		return hasPermissionWithRoleName(this.roleName);
+	}
+
+	public boolean hasPermissionWithRoleName(String someRoleName) {
+		if (permission != null && someRoleName != null) {
 			for (Permission perm : permission) {
-				if (roleName.equals(perm.getRoleName())) {
+				if (someRoleName.equals(perm.getRoleName())) {
 					return true;
 				}
 			}

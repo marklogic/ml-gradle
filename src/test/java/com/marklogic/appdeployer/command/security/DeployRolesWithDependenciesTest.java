@@ -1,13 +1,28 @@
 package com.marklogic.appdeployer.command.security;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.mgmt.resource.security.RoleManager;
 import org.junit.Test;
 
 import java.io.File;
 
+/**
+ * Each of these tests verifies that the roles in the given config dir can be deployed successfully based on their
+ * dependencies with one another.
+ */
 public class DeployRolesWithDependenciesTest extends AbstractAppDeployerTest {
+
+	@Test
+	public void roleWithPermissions() {
+		appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/roles-with-permissions"));
+
+		initializeAppDeployer(new DeployRolesCommand());
+		try {
+			deploySampleApp();
+		} finally {
+			undeploySampleApp();
+		}
+	}
 
 	/**
 	 * This scenario has a mix of XML/JSON files (to verify that we parse each correctly) and a big jumble of roles.
@@ -16,16 +31,12 @@ public class DeployRolesWithDependenciesTest extends AbstractAppDeployerTest {
 	public void testSorting() {
 		appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/roles-with-dependencies"));
 
-		DeployRolesCommand command = new DeployRolesCommand();
-		File[] files = command.listFilesInDirectory(appConfig.getConfigDir().getRolesDir(),
-			new CommandContext(appConfig, manageClient, null));
-
-		assertEquals("role3.json", files[0].getName());
-		assertEquals("role2.xml", files[1].getName());
-		assertEquals("role1.json", files[2].getName());
-		assertEquals("role4.xml", files[3].getName());
-		assertEquals("role5.json", files[4].getName());
-		assertEquals("role0.json", files[5].getName());
+		initializeAppDeployer(new DeployRolesCommand());
+		try {
+			deploySampleApp();
+		} finally {
+			undeploySampleApp();
+		}
 	}
 
 	/**
@@ -36,19 +47,12 @@ public class DeployRolesWithDependenciesTest extends AbstractAppDeployerTest {
 	public void testEvenMoreRoles() {
 		appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/even-more-roles-with-dependencies"));
 
-		DeployRolesCommand command = new DeployRolesCommand();
-		File[] files = command.listFilesInDirectory(appConfig.getConfigDir().getRolesDir(),
-			new CommandContext(appConfig, manageClient, null));
-
-		assertEquals("abc-login-role.json", files[0].getName());
-		assertEquals("abc-ui-developer.json", files[1].getName());
-		assertEquals("xyz-reader.json", files[2].getName());
-		assertEquals("xyz-writer.json", files[3].getName());
-		assertEquals("xyz-admin.json", files[4].getName());
-		assertEquals("abc-sss-ui-role.json", files[5].getName());
-		assertEquals("abc-ui-offline-user.json", files[6].getName());
-		assertEquals("abc-ui-offline-admin.json", files[7].getName());
-		assertEquals("abc-ui-admin.json", files[8].getName());
+		initializeAppDeployer(new DeployRolesCommand());
+		try {
+			deploySampleApp();
+		} finally {
+			undeploySampleApp();
+		}
 	}
 
 	/**
@@ -59,14 +63,12 @@ public class DeployRolesWithDependenciesTest extends AbstractAppDeployerTest {
 	public void anotherSortingTest() {
 		appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/more-roles-with-dependencies"));
 
-		DeployRolesCommand command = new DeployRolesCommand();
-		File[] files = command.listFilesInDirectory(appConfig.getConfigDir().getRolesDir(),
-			new CommandContext(appConfig, manageClient, null));
-
-		assertEquals("role0.json", files[0].getName());
-		assertEquals("role2.json", files[1].getName());
-		assertEquals("role3.json", files[2].getName());
-		assertEquals("role1.json", files[3].getName());
+		initializeAppDeployer(new DeployRolesCommand());
+		try {
+			deploySampleApp();
+		} finally {
+			undeploySampleApp();
+		}
 	}
 
 	@Test

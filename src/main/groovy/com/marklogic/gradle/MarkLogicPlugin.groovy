@@ -251,35 +251,36 @@ class MarkLogicPlugin implements Plugin<Project> {
 	 * mlTokenPrefix and mlTokenSuffix respectively.
 	 */
 	void copyGradlePropertiesToCustomTokensIfRequested(Project project) {
+		boolean usePropsAsTokens = true
 		if (project.hasProperty("mlPropsAsTokens")) {
-			String value = project.property("mlPropsAsTokens")
-			if ("true".equalsIgnoreCase(value)) {
-				AppConfig appConfig = project.extensions.getByName("mlAppConfig")
-				Properties props = new Properties()
-				Map<String, ?> gradleProperties = project.getProperties()
-				for (String key : gradleProperties.keySet()) {
-					if ("properties".equals(key)) {
-						continue
-					}
-					Object val = gradleProperties.get(key)
-					if (val instanceof String) {
-						props.setProperty(key, val)
-					} else {
-						props.setProperty(key, val.toString())
-					}
+			usePropsAsTokens = !project.property("mlPropsAsTokens").equals("false")
+		}
+		if (usePropsAsTokens) {
+			AppConfig appConfig = project.extensions.getByName("mlAppConfig")
+			Properties props = new Properties()
+			Map<String, ?> gradleProperties = project.getProperties()
+			for (String key : gradleProperties.keySet()) {
+				if ("properties".equals(key)) {
+					continue
 				}
-
-				String prefix = "%%"
-				String suffix = "%%"
-				if (project.hasProperty("mlTokenPrefix")) {
-					prefix = project.property("mlTokenPrefix")
+				Object val = gradleProperties.get(key)
+				if (val instanceof String) {
+					props.setProperty(key, val)
+				} else {
+					props.setProperty(key, val.toString())
 				}
-				if (project.hasProperty("mlTokenSuffix")) {
-					suffix = project.property("mlTokenSuffix")
-				}
-
-				appConfig.populateCustomTokens(new SimplePropertiesSource(props), prefix, suffix)
 			}
+
+			String prefix = "%%"
+			String suffix = "%%"
+			if (project.hasProperty("mlTokenPrefix")) {
+				prefix = project.property("mlTokenPrefix")
+			}
+			if (project.hasProperty("mlTokenSuffix")) {
+				suffix = project.property("mlTokenSuffix")
+			}
+
+			appConfig.populateCustomTokens(new SimplePropertiesSource(props), prefix, suffix)
 		}
 	}
 

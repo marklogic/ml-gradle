@@ -154,6 +154,7 @@ public class AppConfig {
     private Set<String> databasesWithForestsOnOneHost;
 
     private Map<String, Set<String>> databaseHosts;
+    private Map<String, Set<String>> databaseGroups;
 
     // Data/fast/large directories for default forests
     private String forestDataDirectory;
@@ -1105,5 +1106,13 @@ public class AppConfig {
 
 	public void setDatabaseHosts(Map<String, Set<String>> databaseHosts) {
 		this.databaseHosts = databaseHosts;
+	}
+
+	public Map<String, Set<String>> getDatabaseGroups() {
+		return databaseGroups;
+	}
+
+	public void setDatabaseGroups(Map<String, Set<String>> databaseGroups) {
+		this.databaseGroups = databaseGroups;
 	}
 }

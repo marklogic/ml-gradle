@@ -32,7 +32,13 @@ public class ConfigureForestReplicasDebug {
 		Map<String, Set<String>> databaseHosts = new LinkedHashMap<>();
 		Set<String> hosts = new LinkedHashSet<>();
 		databaseHosts.put(dbName, hosts);
-		//appConfig.setDatabaseHosts(databaseHosts);
+		appConfig.setDatabaseHosts(databaseHosts);
+
+		Map<String, Set<String>> databaseGroups = new LinkedHashMap<>();
+		Set<String> groups = new LinkedHashSet<>();
+		groups.add("Default");
+		databaseGroups.put(dbName, groups);
+		appConfig.setDatabaseGroups(databaseGroups);
 
 		CommandContext context = new CommandContext(appConfig, manageClient, null);
 
@@ -44,8 +50,8 @@ public class ConfigureForestReplicasDebug {
 		ConfigureForestReplicasCommand cfrc = new ConfigureForestReplicasCommand();
 
 		// Deploy the database, and then configure replicas
-		ddc.execute(context);
-		cfrc.execute(context);
+		//ddc.execute(context);
+		//cfrc.execute(context);
 
 		// Deploy again to make sure there are no errors
 		//cfrc.execute(context);

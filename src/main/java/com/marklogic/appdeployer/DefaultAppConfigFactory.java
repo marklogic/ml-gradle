@@ -287,21 +287,16 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			c.setDatabasesWithForestsOnOneHost(set);
 		}
 
+		prop = getProperty("mlDatabaseGroups");
+		if (prop != null) {
+			logger.info("Databases and the groups containing the hosts that their forests will be created on: " + prop);
+			c.setDatabaseGroups(buildSetMapFromDelimitedString(prop));
+		}
+
 		prop = getProperty("mlDatabaseHosts");
 		if (prop != null) {
 			logger.info("Databases and the hosts that their forests will be created on: " + prop);
-			String[] tokens = prop.split(",");
-			Map<String, Set<String>> map = new LinkedHashMap<>();
-			for (int i = 0; i < tokens.length; i += 2) {
-				String dbName = tokens[i];
-				String[] hostNames = tokens[i + 1].split("\\|");
-				Set<String> names = new LinkedHashSet<>();
-				for (String name : hostNames) {
-					names.add(name);
-				}
-				map.put(dbName, names);
-			}
-			c.setDatabaseHosts(map);
+			c.setDatabaseHosts(buildSetMapFromDelimitedString(prop));
 		}
 
 		prop = getProperty("mlForestDataDirectory");
@@ -641,6 +636,21 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		String[] tokens = str.split(",");
 		for (int i = 0; i < tokens.length; i += 2) {
 			map.put(tokens[i], tokens[i + 1]);
+		}
+		return map;
+	}
+
+	protected Map<String, Set<String>> buildSetMapFromDelimitedString(String str) {
+		String[] tokens = str.split(",");
+		Map<String, Set<String>> map = new LinkedHashMap<>();
+		for (int i = 0; i < tokens.length; i += 2) {
+			String dbName = tokens[i];
+			String[] hostNames = tokens[i + 1].split("\\|");
+			Set<String> names = new LinkedHashSet<>();
+			for (String name : hostNames) {
+				names.add(name);
+			}
+			map.put(dbName, names);
 		}
 		return map;
 	}

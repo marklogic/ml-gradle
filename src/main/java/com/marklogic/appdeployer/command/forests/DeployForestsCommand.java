@@ -6,6 +6,7 @@ import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.forests.ForestManager;
+import com.marklogic.mgmt.resource.groups.GroupManager;
 import com.marklogic.mgmt.resource.hosts.HostManager;
 import org.springframework.util.StringUtils;
 
@@ -32,6 +33,7 @@ public class DeployForestsCommand extends AbstractCommand {
     private String forestFilename;
     private String forestPayload;
     private boolean createForestsOnEachHost = true;
+    private HostMapProvider hostMapProvider;
 
     public DeployForestsCommand() {
         setExecuteSortOrder(SortOrderConstants.DEPLOY_FORESTS);
@@ -118,31 +120,115 @@ public class DeployForestsCommand extends AbstractCommand {
 		    return hostNames;
 	    }
 
-	    Map<String, Set<String>> databaseHosts = context.getAppConfig().getDatabaseHosts();
-	    if (databaseHosts != null) {
-	    	Set<String> selectedHostNames = databaseHosts.get(this.databaseName);
-	    	if (selectedHostNames != null) {
-	    		List<String> newHostNames = new ArrayList<>();
-	    		for (String name : selectedHostNames) {
-	    			if (hostNames.contains(name)) {
-	    				newHostNames.add(name);
-				    } else {
-	    				logger.warn(format("Host '%s' for database '%s' is not recognized, ignoring", name, this.databaseName));
-				    }
-			    }
+	    List<String> hostNamesFromDatabaseGroups = determineHostsNamesBasedOnDatabaseGroups(context, hostNames);
+	    if (hostNamesFromDatabaseGroups != null) {
+	    	return hostNamesFromDatabaseGroups;
+	    }
 
-			    if (logger.isInfoEnabled()) {
-	    			logger.info(format("Creating forests for database '%s' on hosts: %s", this.databaseName, newHostNames));
-			    }
-
-			    return newHostNames;
-		    }
+	    List<String> hostNamesFromDatabaseHosts = determineHostNamesBasedOnDatabaseHosts(context, hostNames);
+	    if (hostNamesFromDatabaseHosts != null) {
+	    	return hostNamesFromDatabaseHosts;
 	    }
 
 	    return hostNames;
     }
 
-    protected String getForestName(AppConfig appConfig, int forestNumber) {
+	/**
+	 *
+	 * @param context
+	 * @param hostNames
+	 * @return
+	 */
+	protected List<String> determineHostsNamesBasedOnDatabaseGroups(CommandContext context, List<String> hostNames) {
+		Map<String, Set<String>> databaseGroups = context.getAppConfig().getDatabaseGroups();
+		if (databaseGroups != null) {
+			Set<String> selectedGroupNames = databaseGroups.get(this.databaseName);
+			if (selectedGroupNames != null) {
+
+				if (hostMapProvider == null) {
+					hostMapProvider = groupName -> new GroupManager(context.getManageClient()).getHostIdsAndNames(groupName);
+				}
+
+				List<String> selectedHostNames = new ArrayList<>();
+
+				if (logger.isInfoEnabled()) {
+					logger.info(format("Creating forests on hosts in groups %s for database '%s'", selectedGroupNames, this.databaseName));
+				}
+
+				for (String groupName : selectedGroupNames) {
+					Map<String, String> hostIdsAndNames = hostMapProvider.getHostIdsAndNames(groupName);
+					if (hostIdsAndNames != null && !hostIdsAndNames.isEmpty()) {
+						for (String hostName : hostIdsAndNames.values()) {
+							// sanity check
+							if (!selectedHostNames.contains(hostName)) {
+								selectedHostNames.add(hostName);
+							}
+						}
+					}
+					else {
+						logger.warn("No hosts found for group: " + groupName);
+					}
+				}
+
+				Map<String, Set<String>> databaseHosts = context.getAppConfig().getDatabaseHosts();
+				if (databaseHosts != null) {
+					Set<String> set = databaseHosts.get(this.databaseName);
+					if (set != null && !set.isEmpty()) {
+						logger.warn(format("Database groups and database hosts were both specified for database '%s'; " +
+							"only database groups are being used, database hosts will be ignored.", this.databaseName));
+					}
+				}
+
+				if (logger.isInfoEnabled()) {
+					logger.info(format("Creating forests on hosts %s based on groups %s for database '%s'", selectedHostNames, selectedGroupNames, this.databaseName));
+				}
+
+				return selectedHostNames;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 *
+	 * @param context
+	 * @param hostNames
+	 * @return
+	 */
+	protected List<String> determineHostNamesBasedOnDatabaseHosts(CommandContext context, List<String> hostNames) {
+		Map<String, Set<String>> databaseHosts = context.getAppConfig().getDatabaseHosts();
+		if (databaseHosts != null) {
+			Set<String> databaseHostNames = databaseHosts.get(this.databaseName);
+			if (databaseHostNames != null) {
+				List<String> selectedHostNames = new ArrayList<>();
+				for (String name : databaseHostNames) {
+					if (hostNames.contains(name)) {
+						selectedHostNames.add(name);
+					} else {
+						logger.warn(format("Host '%s' for database '%s' is not recognized, ignoring", name, this.databaseName));
+					}
+				}
+
+				if (logger.isInfoEnabled()) {
+					logger.info(format("Creating forests for database '%s' on hosts: %s", this.databaseName, selectedHostNames));
+				}
+
+				return selectedHostNames;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Construct the name of a forest. Protected so it can be overridden. Could eventually have a strategy interface here
+	 * for allowing for easy customization.
+	 *
+	 * @param appConfig
+	 * @param forestNumber
+	 * @return
+	 */
+	protected String getForestName(AppConfig appConfig, int forestNumber) {
         return databaseName + "-" + forestNumber;
     }
 
@@ -189,4 +275,15 @@ public class DeployForestsCommand extends AbstractCommand {
     public void setCreateForestsOnEachHost(boolean createForestsOnEachHost) {
         this.createForestsOnEachHost = createForestsOnEachHost;
     }
+
+	public void setHostMapProvider(HostMapProvider hostMapProvider) {
+		this.hostMapProvider = hostMapProvider;
+	}
+}
+
+/**
+ * This really only exists to facilitate unit testing.
+ */
+interface HostMapProvider {
+	Map<String, String> getHostIdsAndNames(String groupName);
 }

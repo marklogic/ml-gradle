@@ -10,6 +10,7 @@ import com.marklogic.mgmt.api.forest.ForestReplica;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.forests.ForestManager;
 import com.marklogic.mgmt.resource.forests.ForestStatus;
+import com.marklogic.mgmt.resource.groups.GroupManager;
 import com.marklogic.mgmt.resource.hosts.HostManager;
 
 import java.util.*;
@@ -27,6 +28,7 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 	private Map<String, Integer> databaseNamesAndReplicaCounts = new HashMap<>();
 	private Map<String, Integer> forestNamesAndReplicaCounts = new HashMap<>();
 	private boolean deleteReplicasOnUndo = true;
+	private GroupHostMapProvider groupHostMapProvider;
 
 	/**
 	 * By default, the execute sort order is Integer.MAX_VALUE as a way of guaranteeing that the referenced primary
@@ -252,19 +254,64 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 	 * @return
 	 */
 	protected List<String> getHostIdsForDatabaseForests(String databaseName, Map<String, String> hostIdsAndNames, CommandContext context) {
-		List<String> hostIds = new ArrayList<>();
+		List<String> selectedHostIds = new ArrayList<>();
+
+		Map<String, Set<String>> databaseGroupMap = context.getAppConfig().getDatabaseGroups();
+		Set<String> databaseGroups = databaseGroupMap != null ? databaseGroupMap.get(databaseName) : null;
 
 		Map<String, Set<String>> databaseHostMap = context.getAppConfig().getDatabaseHosts();
 		Set<String> databaseHosts = databaseHostMap != null ? databaseHostMap.get(databaseName) : null;
 
+		if (databaseGroups != null && !databaseGroups.isEmpty()) {
+			if (groupHostMapProvider == null) {
+				groupHostMapProvider = groupName -> new GroupManager(context.getManageClient()).getHostIdsAndNames(groupName);
+			}
+
+			if (logger.isInfoEnabled()) {
+				logger.info(format("Creating replica forests on hosts in groups %s for database '%s'", databaseGroups, databaseName));
+			}
+
+			for (String groupName : databaseGroups) {
+				Map<String, String> groupHostIdsAndNames = groupHostMapProvider.getGroupHostMap(groupName);
+				if (groupHostIdsAndNames == null || groupHostIdsAndNames.isEmpty()) {
+					logger.warn("No hosts found for group: " + groupName);
+					continue;
+				}
+
+				Set<String> groupHostIds = groupHostIdsAndNames.keySet();
+				for (String hostId : hostIdsAndNames.keySet()) {
+					if (groupHostIds.contains(hostId)) {
+						selectedHostIds.add(hostId);
+					}
+				}
+			}
+
+			if (!selectedHostIds.isEmpty()) {
+				if (logger.isInfoEnabled()) {
+					logger.info(format("Creating forests on hosts %s based on groups %s for database '%s'", selectedHostIds, databaseGroups, databaseName));
+				}
+				if (databaseHosts != null && !databaseHosts.isEmpty()) {
+					logger.warn(format("Database groups and database hosts were both specified for database '%s'; " +
+						"only database groups are being used, database hosts will be ignored.", databaseName));
+				}
+				return selectedHostIds;
+			}
+
+			logger.warn("Did not find any valid hosts in selected groups: " + databaseGroups);
+		}
+
+		/**
+		 * If no database groups were specified, then retain any host that is either in the set of database hosts, or
+		 * all hosts in case no database hosts were specified.
+		 */
 		for (String hostId : hostIdsAndNames.keySet()) {
 			String hostName = hostIdsAndNames.get(hostId);
 			if ((databaseHosts == null || databaseHosts.contains(hostName))) {
-				hostIds.add(hostId);
+				selectedHostIds.add(hostId);
 			}
 		}
 
-		return hostIds;
+		return selectedHostIds;
 	}
 
 	/**
@@ -355,4 +402,15 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 	public void setDatabaseNamesAndReplicaCounts(Map<String, Integer> databaseNamesAndReplicaCounts) {
 		this.databaseNamesAndReplicaCounts = databaseNamesAndReplicaCounts;
 	}
+
+	public void setGroupHostMapProvider(GroupHostMapProvider groupHostMapProvider) {
+		this.groupHostMapProvider = groupHostMapProvider;
+	}
+}
+
+/**
+ * This really only exists to facilitate unit testing.
+ */
+interface GroupHostMapProvider {
+	Map<String, String> getGroupHostMap(String groupName);
 }

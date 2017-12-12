@@ -142,6 +142,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    p.setProperty("mlDatabaseNamesAndReplicaCounts", "Documents,1,Security,2");
 	    p.setProperty("mlDatabasesWithForestsOnOneHost", "Documents,Security");
 	    p.setProperty("mlDatabaseHosts", "Documents,host1|host2|host3,Security,host1|host2");
+	    p.setProperty("mlDatabaseGroups", "Documents,group1|group2,Security,group1");
 
 	    p.setProperty("mlForestDataDirectory", "/data/path");
 	    p.setProperty("mlForestFastDataDirectory", "/fast/path");
@@ -256,6 +257,14 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    assertEquals(2, databaseHosts.get("Security").size());
 	    assertTrue(databaseHosts.get("Security").contains("host1"));
 	    assertTrue(databaseHosts.get("Security").contains("host2"));
+
+	    Map<String, Set<String>> databaseGroups = config.getDatabaseGroups();
+	    assertEquals(2, databaseGroups.size());
+	    assertEquals(2, databaseGroups.get("Documents").size());
+	    assertTrue(databaseGroups.get("Documents").contains("group1"));
+	    assertTrue(databaseGroups.get("Documents").contains("group2"));
+	    assertEquals(1, databaseGroups.get("Security").size());
+	    assertTrue(databaseGroups.get("Security").contains("group1"));
 
 	    assertEquals("/data/path", config.getForestDataDirectory());
 	    assertEquals("/fast/path", config.getForestFastDataDirectory());

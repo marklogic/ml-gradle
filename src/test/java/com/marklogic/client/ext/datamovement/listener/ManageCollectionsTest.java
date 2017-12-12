@@ -2,8 +2,7 @@ package com.marklogic.client.ext.datamovement.listener;
 
 import com.marklogic.client.datamovement.DeleteListener;
 import com.marklogic.client.datamovement.ExportListener;
-import com.marklogic.client.datamovement.QueryBatch;
-import com.marklogic.client.datamovement.QueryBatchListener;
+import com.marklogic.client.datamovement.ExportToWriterListener;
 import com.marklogic.client.ext.AbstractIntegrationTest;
 import com.marklogic.client.ext.batch.RestBatchWriter;
 import com.marklogic.client.ext.batch.SimpleDocumentWriteOperation;
@@ -12,8 +11,10 @@ import com.marklogic.client.ext.datamovement.UrisQueryQueryBatcherBuilder;
 import com.marklogic.client.ext.datamovement.consumer.WriteToFileConsumer;
 import com.marklogic.client.ext.helper.ClientHelper;
 import org.junit.Test;
+import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class ManageCollectionsTest extends AbstractIntegrationTest {
 	private static final String COLLECTION = "modify-query-collections-test";
 
 	@Test
-	public void setThenAddThenRemove() {
+	public void setThenAddThenRemove() throws Exception {
 		String firstUri = "dmsdk-test-1.xml";
 		String secondUri = "dmsdk-test-2.xml";
 
@@ -31,11 +32,8 @@ public class ManageCollectionsTest extends AbstractIntegrationTest {
 		qbt.setBatchSize(1);
 		qbt.setThreadCount(2);
 
-		qbt.addUrisReadyListeners(new QueryBatchListener() {
-			@Override
-			public void processEvent(QueryBatch batch) {
-				System.out.println("Testing, job batch number: " + batch.getJobBatchNumber() + "; " + batch.getJobTicket().getJobId());
-			}
+		qbt.addUrisReadyListeners(batch -> {
+			System.out.println("Testing, job batch number: " + batch.getJobBatchNumber() + "; " + batch.getJobTicket().getJobId());
 		});
 
 		// Clear out the test documents
@@ -58,6 +56,16 @@ public class ManageCollectionsTest extends AbstractIntegrationTest {
 		qbt.applyOnCollections(exportListener, COLLECTION);
 		assertTrue(new File(exportDir, firstUri).exists());
 		assertTrue(new File(exportDir, secondUri).exists());
+
+		// Now try exporting all of the documents to one file
+		File exportFile = new File(exportDir, "exportToFileTest.xml");
+		FileWriter fileWriter = new FileWriter(exportFile);
+		ExportToWriterListener exportToWriterListener = new ExportToWriterListener(fileWriter);
+		exportToWriterListener.onGenerateOutput(new XmlOutputListener());
+		qbt.applyOnCollections(exportToWriterListener, COLLECTION);
+		fileWriter.close();
+		String exportedXml = new String(FileCopyUtils.copyToByteArray(exportFile));
+		assertEquals("<one/><two/>", exportedXml);
 
 		// Set collections
 		qbt.applyOnCollections(new SetCollectionsListener(COLLECTION, "red"), COLLECTION);

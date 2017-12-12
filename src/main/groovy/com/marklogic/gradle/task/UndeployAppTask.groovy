@@ -1,11 +1,10 @@
 package com.marklogic.gradle.task
 
-import org.gradle.api.tasks.TaskAction
+class UndeployAppTask extends AbstractConfirmableTask {
 
-class UndeployAppTask extends MarkLogicTask {
+	@Override
+	void executeIfConfirmed() {
+		getAppDeployer().undeploy(getAppConfig())
+	}
 
-    @TaskAction
-    void deployApp() {
-        getAppDeployer().undeploy(getAppConfig())
-    }
 }

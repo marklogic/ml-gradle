@@ -1,22 +1,16 @@
 package com.marklogic.gradle.task.databases
 
-import org.gradle.api.tasks.TaskAction
-
-import com.marklogic.gradle.task.MarkLogicTask
+import com.marklogic.gradle.task.AbstractConfirmableTask
 import com.marklogic.mgmt.resource.databases.DatabaseManager
 
-class ClearContentDatabaseTask extends MarkLogicTask {
+class ClearContentDatabaseTask extends AbstractConfirmableTask {
 
-    @TaskAction
-    void clearModules() {
-        if (project.hasProperty("deleteAll")) {
-            println "Clearing all documents in content database"
-            DatabaseManager mgr = new DatabaseManager(getManageClient())
-            mgr.clearDatabase(getAppConfig().getContentDatabaseName())
-            println "Finished clearing all documents in content database"
-        } else {
-            println "To clear the database, include the deleteAll parameter e.g. -PdeleteAll=true"
-            return
-        }
-    }
+	@Override
+	void executeIfConfirmed() {
+		println "Clearing content database"
+		DatabaseManager mgr = new DatabaseManager(getManageClient())
+		mgr.clearDatabase(getAppConfig().getContentDatabaseName())
+		println "Finished clearing content database"
+	}
+
 }

@@ -79,7 +79,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlPostUndeploy", group: deployGroup, description: "Add dependsOn to this task to add tasks at the end of mlUndeploy").mustRunAfter(["mlUndeployApp"])
 		project.task("mlDeploy", group: deployGroup, dependsOn: ["mlDeployApp", "mlPostDeploy"],
 			description: "Deploys all application resources in the configuration directory and allows for additional steps via mlPostDeploy.dependsOn. Use -Pignore to specify a comma-delimited list of short class names of ml-app-deployer command classes to ignore while deploying.").mustRunAfter("mlClearModulesDatabase")
-		project.task("mlUndeploy", group: deployGroup, dependsOn: ["mlUndeployApp", "mlPostUndeploy"], description: "Undeploys all application resources in the configuration directory and allows for additional steps via mlPostUndeploy.dependsOn")
+		project.task("mlUndeploy", group: deployGroup, dependsOn: ["mlUndeployApp", "mlPostUndeploy"], description: "Undeploys all application resources in the configuration directory and allows for additional steps via mlPostUndeploy.dependsOn; requires -Pconfirm=true to be set so this isn't accidentally executed")
 		project.task("mlRedeploy", group: deployGroup, dependsOn: ["mlClearModulesDatabase", "mlDeploy"], description: "Clears the modules database and then deploys the application")
 
 		String adminGroup = "ml-gradle Admin"
@@ -104,7 +104,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlRestartCluster", type: RestartClusterTask, group: clusterGroup, description: "Restart the local cluster")
 
 		String dbGroup = "ml-gradle Database"
-		project.task("mlClearContentDatabase", type: ClearContentDatabaseTask, group: dbGroup, description: "Deletes all documents in the content database; requires -PdeleteAll=true to be set so you don't accidentally do this")
+		project.task("mlClearContentDatabase", type: ClearContentDatabaseTask, group: dbGroup, description: "Deletes all documents in the content database; requires -Pconfirm=true to be set so this isn't accidentally executed")
 		project.task("mlClearModulesDatabase", type: ClearModulesDatabaseTask, group: dbGroup, dependsOn: "mlDeleteModuleTimestampsFile", description: "Deletes potentially all of the documents in the modules database; has a property for excluding documents from deletion")
 		project.task("mlClearSchemasDatabase", type: ClearSchemasDatabaseTask, group: dbGroup, description: "Deletes all documents in the schemas database")
 		project.task("mlClearTriggersDatabase", type: ClearTriggersDatabaseTask, group: dbGroup, description: "Deletes all documents in the triggers database")

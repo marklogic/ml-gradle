@@ -130,6 +130,11 @@ public class DeployForestsCommand extends AbstractCommand {
 	    				logger.warn(format("Host '%s' for database '%s' is not recognized, ignoring", name, this.databaseName));
 				    }
 			    }
+
+			    if (logger.isInfoEnabled()) {
+	    			logger.info(format("Creating forests for database '%s' on hosts: %s", this.databaseName, newHostNames));
+			    }
+
 			    return newHostNames;
 		    }
 	    }

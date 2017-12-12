@@ -291,11 +291,11 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		if (prop != null) {
 			logger.info("Databases and the hosts that their forests will be created on: " + prop);
 			String[] tokens = prop.split(",");
-			Map<String, Set<String>> map = new HashMap<>();
+			Map<String, Set<String>> map = new LinkedHashMap<>();
 			for (int i = 0; i < tokens.length; i += 2) {
 				String dbName = tokens[i];
 				String[] hostNames = tokens[i + 1].split("\\|");
-				Set<String> names = new HashSet<>();
+				Set<String> names = new LinkedHashSet<>();
 				for (String name : hostNames) {
 					names.add(name);
 				}

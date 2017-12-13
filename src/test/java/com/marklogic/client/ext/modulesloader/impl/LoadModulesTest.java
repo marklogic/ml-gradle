@@ -2,18 +2,25 @@ package com.marklogic.client.ext.modulesloader.impl;
 
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.ext.AbstractIntegrationTest;
+import com.marklogic.client.ext.tokenreplacer.DefaultTokenReplacer;
+import com.marklogic.client.ext.tokenreplacer.TokenReplacer;
+import com.marklogic.client.io.BytesHandle;
+import com.marklogic.client.io.StringHandle;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.core.io.Resource;
 
 import java.nio.file.Paths;
+import java.util.Properties;
 import java.util.Set;
 
 public class LoadModulesTest extends AbstractIntegrationTest {
 
 	private DatabaseClient modulesClient;
+	private DefaultModulesLoader modulesLoader;
 
-	@Test
-	public void test() {
+	@Before
+	public void setup() {
 		client = newClient("Modules");
 		client.newServerEval().xquery("cts:uris((), (), cts:true-query()) ! xdmp:document-delete(.)").eval();
 		modulesClient = client;
@@ -28,9 +35,41 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 		client = configuredDatabaseClientFactory.newDatabaseClient(clientConfig);
 		clientConfig.setDatabase(currentDatabase);
 
-		DefaultModulesLoader modulesLoader = new DefaultModulesLoader(new AssetFileLoader(modulesClient));
+		modulesLoader = new DefaultModulesLoader(new AssetFileLoader(modulesClient));
 		modulesLoader.setModulesManager(null);
+	}
 
+	/**
+	 * This test is a little brittle because it assumes the URI of options/services/transforms that are loaded
+	 * into the Modules database.
+	 */
+	@Test
+	public void replaceTokens() {
+		String dir = Paths.get("src", "test", "resources", "token-replace").toString();
+
+		DefaultTokenReplacer tokenReplacer = new DefaultTokenReplacer();
+		Properties props = new Properties();
+		props.setProperty("%%REPLACEME%%", "hello-world");
+		tokenReplacer.setProperties(props);
+		modulesLoader.setTokenReplacer(tokenReplacer);
+
+		modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
+
+		String optionsXml = modulesClient.newXMLDocumentManager().read(
+			"/Default/App-Services/rest-api/options/sample-options.xml", new StringHandle()).get();
+		assertTrue(optionsXml.contains("fn:collection('hello-world')"));
+
+		String serviceText = new String(modulesClient.newDocumentManager().read(
+			"/marklogic.rest.resource/sample/assets/resource.xqy", new BytesHandle()).get());
+		assertTrue(serviceText.contains("xdmp:log(\"hello-world called\")"));
+
+		String transformText = new String(modulesClient.newDocumentManager().read(
+			"/marklogic.rest.transform/xquery-transform/assets/transform.xqy", new BytesHandle()).get());
+		assertTrue(transformText.contains("xdmp:log(\"hello-world\")"));
+	}
+
+	@Test
+	public void test() {
 		String dir = Paths.get("src", "test", "resources", "sample-base-dir").toString();
 		Set<Resource> files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
 		assertEquals(26, files.size());

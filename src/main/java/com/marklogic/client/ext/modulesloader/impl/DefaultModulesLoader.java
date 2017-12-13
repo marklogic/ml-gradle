@@ -11,8 +11,9 @@ import com.marklogic.client.ext.file.DocumentFile;
 import com.marklogic.client.ext.helper.FilenameUtil;
 import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.client.ext.modulesloader.*;
+import com.marklogic.client.ext.tokenreplacer.TokenReplacer;
 import com.marklogic.client.io.Format;
-import com.marklogic.client.io.InputStreamHandle;
+import com.marklogic.client.io.StringHandle;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.io.Resource;
 import org.springframework.core.task.SyncTaskExecutor;
@@ -41,6 +42,10 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	private TaskExecutor taskExecutor;
 	private int taskThreadCount = 8;
 	private boolean shutdownTaskExecutorAfterLoadingModules = true;
+
+	// For replacing tokens in options/services/transforms
+	// Tokens in asset modules are replaced via the AssetFileLoader instance
+	private TokenReplacer tokenReplacer;
 
 	private List<LoadModulesFailureListener> failureListeners = new ArrayList<>();
 
@@ -164,7 +169,6 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 			} catch (IOException ex) {
 				throw new RuntimeException("Unable to read REST configuration from file: " + f.getAbsolutePath(), ex);
 			}
-
 			if (node.has("document-transform-all")) {
 				mgr.setDefaultDocumentReadTransformAll(node.get("document-transform-all").asBoolean());
 			}
@@ -330,12 +334,8 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 			metadata.setTitle(resourceName + " resource extension");
 		}
 		logger.info(String.format("Loading %s resource extension from file %s", resourceName, r.getFilename()));
-		InputStreamHandle h;
-		try {
-			h = new InputStreamHandle(r.getInputStream());
-		} catch (IOException ie) {
-			throw new RuntimeException("Unable to read service resource: " + ie.getMessage(), ie);
-		}
+
+		StringHandle h = new StringHandle(readAndReplaceTokens(r));
 		executeTask(() -> extMgr.writeServices(resourceName, h, metadata, methodParams));
 
 		updateTimestamp(r);
@@ -350,12 +350,8 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		final TransformExtensionsManager mgr = client.newServerConfigManager().newTransformExtensionsManager();
 		final String transformName = getExtensionNameFromFile(r);
 		logger.info(String.format("Loading %s transform from resource %s", transformName, filename));
-		InputStreamHandle h;
-		try {
-			h = new InputStreamHandle(r.getInputStream());
-		} catch (IOException ie) {
-			throw new RuntimeException("Unable to read transform resource: " + ie.getMessage(), ie);
-		}
+
+		StringHandle h = new StringHandle(readAndReplaceTokens(r));
 		executeTask(() -> {
             if (FilenameUtil.isXslFile(filename)) {
                 mgr.writeXSLTransform(transformName, h, metadata);
@@ -379,12 +375,8 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		final String name = getExtensionNameFromFile(r);
 		logger.info(String.format("Loading %s query options from file %s", name, filename));
 		final QueryOptionsManager mgr = client.newServerConfigManager().newQueryOptionsManager();
-		InputStreamHandle h;
-		try {
-			h = new InputStreamHandle(r.getInputStream());
-		} catch (IOException ie) {
-			throw new RuntimeException("Unable to read transform resource: " + ie.getMessage(), ie);
-		}
+
+		StringHandle h = new StringHandle(readAndReplaceTokens(r));
 		executeTask(() -> {
             if (filename.endsWith(".json")) {
                 mgr.writeOptions(name, h.withFormat(Format.JSON));
@@ -394,6 +386,24 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
         });
 		updateTimestamp(r);
 		return r;
+	}
+
+	/**
+	 * Handles reading in the content of a Resource, and then replacing tokens in it if a tokenReplacer has been set.
+	 */
+	protected String readAndReplaceTokens(Resource r) {
+		String content;
+		try {
+			content = new String(FileCopyUtils.copyToByteArray(r.getInputStream()));
+		} catch (IOException e) {
+			throw new RuntimeException("Unable to read content from: " + r.getDescription() + "; cause: " + e.getMessage(), e);
+		}
+
+		if (tokenReplacer != null) {
+			content = tokenReplacer.replaceTokens(content);
+		}
+
+		return content;
 	}
 
 	/**
@@ -536,5 +546,13 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 
 	public List<LoadModulesFailureListener> getFailureListeners() {
 		return failureListeners;
+	}
+
+	public TokenReplacer getTokenReplacer() {
+		return tokenReplacer;
+	}
+
+	public void setTokenReplacer(TokenReplacer tokenReplacer) {
+		this.tokenReplacer = tokenReplacer;
 	}
 }

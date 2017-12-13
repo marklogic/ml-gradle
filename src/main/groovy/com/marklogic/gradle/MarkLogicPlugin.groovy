@@ -290,9 +290,6 @@ class MarkLogicPlugin implements Plugin<Project> {
 
 		ProjectPropertySource propertySource = new ProjectPropertySource(project);
 		AppConfig appConfig = new DefaultAppConfigFactory(propertySource).newAppConfig()
-		if (appConfig.isReplaceTokensInModules()) {
-			appConfig.getModuleTokensPropertiesSources().add(propertySource);
-		}
 		project.extensions.add("mlAppConfig", appConfig)
 
 		ManageConfig manageConfig = new DefaultManageConfigFactory(new ProjectPropertySource(project)).newManageConfig()

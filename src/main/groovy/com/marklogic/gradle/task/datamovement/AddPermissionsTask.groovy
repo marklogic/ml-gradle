@@ -16,23 +16,12 @@ class AddPermissionsTask extends DataMovementTask {
 
 		String[] permissions = getProject().property("permissions").split(",")
 		QueryBatchListener listener = new AddPermissionsListener(permissions)
-		QueryBatcherBuilder builder = null
 
-		String message = "permissions " + Arrays.asList(permissions) + " to documents "
-
-		if (hasWhereCollectionsProperty()) {
-			builder = constructBuilderFromWhereCollections()
-			message += "in collections " + Arrays.asList(this.whereCollections)
-		} else if (hasWhereUriPatternProperty()) {
-			builder = constructBuilderFromWhereUriPattern()
-			message += "matching URI pattern " + this.whereUriPattern
-		}  else if (hasWhereUrisQueryProperty()) {
-			builder = constructBuilderFromWhereUrisQuery()
-			message += "matching URIs query " + this.whereUrisQuery
-		}
+		BuilderAndMessage builderAndMessage = determineBuilderAndMessage()
+		String message = "permissions " + Arrays.asList(permissions) + " to documents " + builderAndMessage.message
 
 		println "Adding " + message
-		applyWithQueryBatcherBuilder(listener, builder)
+		applyWithQueryBatcherBuilder(listener, builderAndMessage.builder)
 		println "Finished adding " + message
 	}
 }

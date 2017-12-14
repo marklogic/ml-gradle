@@ -21,27 +21,22 @@ class RemoveCollectionsTask extends DataMovementTask {
 		}
 
 		String[] collections = getProject().property("collections").split(",")
-		String message = " from collections " + Arrays.asList(collections)
-		QueryBatchListener listener = new RemoveCollectionsListener(collections)
-		QueryBatcherBuilder builder = null
 
-		if (hasWhereUriPatternProperty()) {
-			builder = constructBuilderFromWhereUriPattern()
-			message = "matching URI pattern " + this.whereUriPattern + message
-		}
-		else if (hasWhereUrisQueryProperty()) {
-			builder = constructBuilderFromWhereUrisQuery()
-			message = "matching URIs query " + this.whereUrisQuery + message
-		}
-		else {
-			if (hasWhereCollectionsProperty()) {
-				builder = constructBuilderFromWhereCollections()
-			} else {
-				this.whereCollections = collections
-				builder = new CollectionsQueryBatcherBuilder(this.whereCollections)
-			}
+		BuilderAndMessage builderAndMessage = determineBuilderAndMessage()
+		QueryBatcherBuilder builder
+		String message = " from collections " + Arrays.asList(collections)
+
+		if (builderAndMessage != null) {
+			builder = builderAndMessage.builder
+			message = builderAndMessage.message + message
+		} else {
+			// If no "where" clause was set, then assume the collections being removed are the ones to select from
+			this.whereCollections = collections
+			builder = new CollectionsQueryBatcherBuilder(this.whereCollections)
 			message = "in collections " + Arrays.asList(this.whereCollections) + message
 		}
+
+		QueryBatchListener listener = new RemoveCollectionsListener(collections)
 
 		println "Removing documents " + message
 		applyWithQueryBatcherBuilder(listener, builder)

@@ -32,6 +32,31 @@ class DataMovementTask extends MarkLogicTask {
 		return hasWhereCollectionsProperty() || hasWhereUriPatternProperty() || hasWhereUrisQueryProperty()
 	}
 
+	/**
+	 * Determines the QueryBatcherBuilder to use based on which "where" property has been set by the user. Also constructs
+	 * a message based on the selected builder that is useful for logging.
+	 *
+	 * Part of the intent here is to allow for a new "where" property to be supported without any of the subclasses
+	 * having to care about it.
+	 *
+	 * @return
+	 */
+	BuilderAndMessage determineBuilderAndMessage() {
+		QueryBatcherBuilder builder = null
+		String message = null
+		if (hasWhereCollectionsProperty()) {
+			builder = constructBuilderFromWhereCollections()
+			message = "in collections " + Arrays.asList(this.whereCollections)
+		} else if (hasWhereUriPatternProperty()) {
+			builder = constructBuilderFromWhereUriPattern()
+			message = "matching URI pattern [" + this.whereUriPattern + "]"
+		} else if (hasWhereUrisQueryProperty()) {
+			builder = constructBuilderFromWhereUrisQuery()
+			message = "matching URIs query [" + this.whereUrisQuery + "]"
+		}
+		return builder != null ? new BuilderAndMessage(builder, message) : null
+	}
+
 	QueryBatcherBuilder constructBuilderFromWhereCollections() {
 		this.whereCollections = getProject().property("whereCollections").split(",")
 		return new CollectionsQueryBatcherBuilder(this.whereCollections)

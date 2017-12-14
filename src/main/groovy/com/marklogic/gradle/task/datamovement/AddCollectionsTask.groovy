@@ -16,23 +16,12 @@ class AddCollectionsTask extends DataMovementTask {
 
 		String[] collections = getProject().property("collections").split(",")
 		QueryBatchListener listener = new AddCollectionsListener(collections)
-		QueryBatcherBuilder builder = null
 
-		String message = " to collections " + Arrays.asList(collections);
-
-		if (hasWhereCollectionsProperty()) {
-			builder = constructBuilderFromWhereCollections()
-			message = "in collections " + Arrays.asList(this.whereCollections) + message
-		} else if (hasWhereUriPatternProperty()) {
-			builder = constructBuilderFromWhereUriPattern()
-			message = "matching URI pattern " + this.whereUriPattern + message
-		} else if (hasWhereUrisQueryProperty()) {
-			builder = constructBuilderFromWhereUrisQuery()
-			message = "matching URIs query " + this.whereUrisQuery + message
-		}
+		BuilderAndMessage builderAndMessage = determineBuilderAndMessage()
+		String message = builderAndMessage.message + " to collections " + Arrays.asList(collections);
 
 		println "Adding documents " + message
-		applyWithQueryBatcherBuilder(listener, builder)
+		applyWithQueryBatcherBuilder(listener, builderAndMessage.builder)
 		println "Finished adding documents " + message
 	}
 }

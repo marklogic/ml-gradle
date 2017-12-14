@@ -1,9 +1,6 @@
 package com.marklogic.gradle.task.datamovement
 
 import com.marklogic.client.datamovement.QueryBatchListener
-import com.marklogic.client.ext.datamovement.CollectionsQueryBatcherBuilder
-import com.marklogic.client.ext.datamovement.QueryBatcherBuilder
-import com.marklogic.client.ext.datamovement.UriPatternQueryBatcherBuilder
 import com.marklogic.client.ext.datamovement.listener.RemovePermissionsListener
 import org.gradle.api.tasks.TaskAction
 
@@ -18,23 +15,12 @@ class RemovePermissionsTask extends DataMovementTask {
 
 		String[] permissions = getProject().property("permissions").split(",")
 		QueryBatchListener listener = new RemovePermissionsListener(permissions)
-		QueryBatcherBuilder builder = null
 
-		String message = "permissions " + Arrays.asList(permissions) + " from documents "
-
-		if (hasWhereCollectionsProperty()) {
-			builder = constructBuilderFromWhereCollections()
-			message += "in collections " + Arrays.asList(this.whereCollections)
-		} else if (hasWhereUriPatternProperty()) {
-			builder = constructBuilderFromWhereUriPattern()
-			message += "matching URI pattern " + this.whereUriPattern
-		} else if (hasWhereUrisQueryProperty()) {
-			builder = constructBuilderFromWhereUrisQuery()
-			message += "matching URIs query " + this.whereUrisQuery
-		}
+		BuilderAndMessage builderAndMessage = determineBuilderAndMessage()
+		String message = "permissions " + Arrays.asList(permissions) + " from documents " + builderAndMessage.message
 
 		println "Removing " + message
-		applyWithQueryBatcherBuilder(listener, builder)
+		applyWithQueryBatcherBuilder(listener, builderAndMessage.builder)
 		println "Finished removing " + message
 	}
 }

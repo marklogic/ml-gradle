@@ -10,7 +10,7 @@ class ExportModulesTask extends DataMovementTask {
 
 	@TaskAction
 	void exportModules() {
-		String exportPath = ""
+		String exportPath
 		String uriPattern = "**"
 		String databaseName = getAppConfig().getModulesDatabaseName()
 		boolean logErrors = true

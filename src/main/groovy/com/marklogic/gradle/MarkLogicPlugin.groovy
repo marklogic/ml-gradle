@@ -139,6 +139,13 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlSetPermissions", type: SetPermissionsTask, group: dmGroup, description: "Set permissions, specified as a comma-separated list of roles and capabilities via the 'permissions' property, " +
 			"on all documents in the set of collection names specified by the 'collections' property or with URIs matching the pattern specified by the 'whereUriPattern' property or matching a URIs query specified by the 'whereUrisQuery' property" + dmGroupMessage)
 
+		project.task("mlExportToFile", type: ExportToFileTask, group: dmGroup, description: "Export documents, either in a comma-separated list of " +
+			"collection names specified by the 'whereCollections' property or matching a URI pattern specified by the 'whereUriPattern' property or matching a URIs query specified by the 'whereUrisQuery' property, " +
+			"to a file specified by the 'exportPath' property, which defaults to build/export.xml. " +
+			"The properties 'filePrefix' and 'fileSuffix' can be used to add text to the beginning and/or end of the file. " +
+			"The properties 'transform', 'recordPrefix', and 'recordSuffix' " +
+			"can be set as well, with each corresponding to a field on the Data Movement SDK ExportToWriterListener class. ")
+
 		String devGroup = "ml-gradle Development"
 		project.task("mlCreateResource", type: CreateResourceTask, group: devGroup, description: "Create a new resource extension in the modules services directory; use -PresourceName and -PresourceType to set the resource name and type (either xqy or sjs)")
 		project.task("mlCreateTransform", type: CreateTransformTask, group: devGroup, description: "Create a new transform in the modules transforms directory; use -PtransformName and -PtransformType to set the transform name and type (xqy, xsl, or sjs)")

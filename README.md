@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/marklogic-community/ml-app-deployer.svg?branch=dev)](https://travis-ci.org/marklogic-community/ml-app-deployer)
-
 ## What is ml-app-deployer?
 
 ml-app-deployer is a Java library that provides two capabilities:

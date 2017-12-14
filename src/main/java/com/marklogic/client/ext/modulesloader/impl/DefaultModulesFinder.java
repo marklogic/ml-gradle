@@ -13,8 +13,8 @@ public class DefaultModulesFinder extends BaseModulesFinder implements ModulesFi
     @Override
     protected Modules findModulesWithResolvedBaseDir(String baseDir) {
         Modules modules = new Modules();
+	    addAssetDirectories(modules, baseDir);
         addServices(modules, baseDir);
-        addAssetDirectories(modules, baseDir);
         addOptions(modules, baseDir);
         addTransforms(modules, baseDir);
         addNamespaces(modules, baseDir);

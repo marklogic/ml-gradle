@@ -48,16 +48,10 @@ public abstract class BaseModulesFinder extends LoggingObject implements Modules
      * @param baseDir
      */
     protected void addPropertiesFile(Modules modules, String baseDir) {
-		List<Resource> properties = findResources(baseDir, "rest-properties.json");
+		List<Resource> properties = findResources("REST properties file", baseDir, "rest-properties.json");
 		if (properties.size() == 1) {
 			modules.setPropertiesFile(properties.get(0));
 		}
-    }
-
-    protected void addServices(Modules modules, String baseDir) {
-		modules.setServices(findResources(baseDir,
-			servicesPath + "/*.xq*",
-			servicesPath + "/*.sjs"));
     }
 
     protected void addAssetDirectories(Modules modules, String baseDir) {
@@ -66,7 +60,7 @@ public abstract class BaseModulesFinder extends LoggingObject implements Modules
 		List<String> recognizedPaths = getRecognizedPaths();
 
 		// classpath needs the trailing / to find child dirs
-		findResources(baseDir, "*", "*/").stream().forEach(resource -> {
+		findResources("asset module directories", baseDir, "*", "*/").stream().forEach(resource -> {
 			try {
 				File f = new File(resource.getURL().getFile());
 				String uri = resource.getURI().toString();
@@ -91,21 +85,34 @@ public abstract class BaseModulesFinder extends LoggingObject implements Modules
         return Arrays.asList(optionsPath, servicesPath, transformsPath, namespacesPath, schemasPath);
     }
 
-    protected void addOptions(Modules modules, String baseDir) {
-        modules.setOptions(findResources(baseDir, optionsPath + "**/*.*"));
+	protected void addNamespaces(Modules modules, String baseDir) {
+		modules.setNamespaces(findResources("namespaces", baseDir, namespacesPath + "/*.*"));
+	}
+
+	protected void addOptions(Modules modules, String baseDir) {
+        modules.setOptions(findResources("options modules", baseDir, optionsPath + "/*.*"));
     }
 
-    protected void addNamespaces(Modules modules, String baseDir) {
-        modules.setNamespaces(findResources(baseDir, namespacesPath + "**/*.*"));
+	protected void addServices(Modules modules, String baseDir) {
+		modules.setServices(findResources("service modules", baseDir,
+			servicesPath + "/*.xq*",
+			servicesPath + "/*.sjs"));
+	}
+
+	protected void addTransforms(Modules modules, String baseDir) {
+        modules.setTransforms(findResources("transform modules", baseDir,
+			transformsPath + "/*.xq*",
+	        transformsPath + "/*.xsl*",
+	        transformsPath + "/*.sjs"));
     }
 
-    protected void addTransforms(Modules modules, String baseDir) {
-        modules.setTransforms(findResources(
-        	baseDir + "/" + transformsPath,
-			"*.xq*", "*.xsl*", "*.sjs"));
-    }
-
-	protected List<Resource> findResources(String basePath, String... paths) {
+	/**
+	 * @param moduleType used for a log message
+	 * @param basePath
+	 * @param paths
+	 * @return
+	 */
+	protected List<Resource> findResources(String moduleType, String basePath, String... paths) {
 		List<Resource> list = new ArrayList<>();
 		for (String path : paths) {
 			try {
@@ -114,6 +121,9 @@ public abstract class BaseModulesFinder extends LoggingObject implements Modules
 					finalPath += "/";
 				}
 				finalPath += path;
+				if (logger.isInfoEnabled()) {
+					logger.info("Finding " + moduleType + " at path: " + finalPath);
+				}
 				Resource[] r = resolver.getResources(finalPath);
 				list.addAll(Arrays.asList(r));
 			} catch (IOException e) {

@@ -43,7 +43,7 @@ public class DefaultDocumentFileReader extends AbstractDocumentFileReader implem
 		documentFiles = new ArrayList<>();
 		for (String path : paths) {
 			if (logger.isDebugEnabled()) {
-				logger.debug(format("Finding documents at path: %s", path));
+				logger.debug(format("Finding files at path: %s", path));
 			}
 			Path p = constructPath(path);
 			if (p != null) {

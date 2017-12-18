@@ -1,6 +1,7 @@
 package com.marklogic.appdeployer.command.restapis;
 
 import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
@@ -72,7 +73,7 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
 
 	protected String getRestApiPayload(CommandContext context) {
 		File f = findRestApiConfigFile(context);
-		if (f.exists()) {
+		if (f != null && f.exists()) {
 			return copyFileToString(f);
 		} else if (context.getAppConfig().isNoRestServer()) {
 			logger.info(format("Could not find REST API file at %s, will not deploy/undeploy a REST API server", f.getAbsolutePath()));
@@ -83,11 +84,40 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
 		}
 	}
 
+	/**
+	 * Will always return a non-null file; if it can't find a file, returns a reference to the first file it tried.
+	 *
+	 * @param context
+	 * @return
+	 */
 	protected File findRestApiConfigFile(CommandContext context) {
 		if (restApiFilename != null) {
-			return new File(context.getAppConfig().getConfigDir().getBaseDir(), restApiFilename);
-		} else {
-			return context.getAppConfig().getConfigDir().getRestApiFile();
+			File restApiFile = null;
+			// Check each ConfigDir for the file, with the last one winning
+			for (ConfigDir configDir : context.getAppConfig().getConfigDirs()) {
+				File f = new File(configDir.getBaseDir(), restApiFilename);
+				if (f.exists()) {
+					restApiFile = f;
+				}
+			}
+			if (restApiFile == null) {
+				restApiFile = new File(context.getAppConfig().getFirstConfigDir().getBaseDir(), restApiFilename);
+			}
+			return restApiFile;
+		}
+		else {
+			File restApiFile = null;
+			// Check each ConfigDir for the file, with the last one winning
+			for (ConfigDir configDir : context.getAppConfig().getConfigDirs()) {
+				File f = configDir.getRestApiFile();
+				if (f != null && f.exists()) {
+					restApiFile = f;
+				}
+			}
+			if (restApiFile == null) {
+				restApiFile = context.getAppConfig().getFirstConfigDir().getRestApiFile();
+			}
+			return restApiFile;
 		}
 	}
 

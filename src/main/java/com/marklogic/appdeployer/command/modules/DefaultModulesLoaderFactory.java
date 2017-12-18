@@ -46,11 +46,14 @@ public class DefaultModulesLoaderFactory extends LoggingObject implements Module
 			assetFileLoader.addFileFilter(appConfig.getAssetFileFilter());
 		}
 
+		DefaultModulesLoader modulesLoader = new DefaultModulesLoader(assetFileLoader);
+
 		if (appConfig.isReplaceTokensInModules()) {
-			assetFileLoader.setTokenReplacer(buildModuleTokenReplacer(appConfig));
+			TokenReplacer tokenReplacer = buildModuleTokenReplacer(appConfig);
+			assetFileLoader.setTokenReplacer(tokenReplacer);
+			modulesLoader.setTokenReplacer(tokenReplacer);
 		}
 
-		DefaultModulesLoader modulesLoader = new DefaultModulesLoader(assetFileLoader);
 		modulesLoader.setModulesManager(modulesManager);
 		modulesLoader.setTaskThreadCount(threadCount);
 

@@ -58,16 +58,30 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		 * The path to the directory containing all the resource configuration files. Defaults to src/main/ml-config.
 		 * mlConfigPath is the preferred one, as its name is consistent with other properties that refer to a path.
 		 * mlConfigDir is deprecated but still supported.
+		 *
+		 * As of 3.3.0, mlConfigPaths is the preferred property, and mlConfigDir and mlConfigPath will be ignored if
+		 * it's set.
 		 */
-		prop = getProperty("mlConfigDir");
+		prop = getProperty("mlConfigPaths");
 		if (prop != null) {
-			logger.info("mlConfigDir is deprecated; please use mlConfigPath; Config dir: " + prop);
-			c.setConfigDir(new ConfigDir(new File(prop)));
+			logger.info("Config paths: " + prop);
+			List<ConfigDir> list = new ArrayList<>();
+			for (String path : prop.split(",")) {
+				list.add(new ConfigDir(new File(path)));
+			}
+			c.setConfigDirs(list);
 		}
-		prop = getProperty("mlConfigPath");
-		if (prop != null) {
-			logger.info("Config path: " + prop);
-			c.setConfigDir(new ConfigDir(new File(prop)));
+		else {
+			prop = getProperty("mlConfigDir");
+			if (prop != null) {
+				logger.info("mlConfigDir is deprecated; please use mlConfigPath; Config dir: " + prop);
+				c.setConfigDir(new ConfigDir(new File(prop)));
+			}
+			prop = getProperty("mlConfigPath");
+			if (prop != null) {
+				logger.info("Config path: " + prop);
+				c.setConfigDir(new ConfigDir(new File(prop)));
+			}
 		}
 
 		/**

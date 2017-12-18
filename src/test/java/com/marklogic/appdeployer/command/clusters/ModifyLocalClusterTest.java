@@ -26,7 +26,7 @@ public class ModifyLocalClusterTest extends AbstractAppDeployerTest {
 			mgr.modifyLocalCluster("{\"ssl-fips-enabled\":false}", adminManager);
 			assertEquals("false", mgr.getLocalClusterProperties().getElementValue(sslFipsXpath));
 		} else {
-			appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/cluster-test"));
+			appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/cluster-test"));
 			initializeAppDeployer(new ModifyLocalClusterCommand());
 			appDeployer.deploy(appConfig);
 			assertEquals("false", mgr.getLocalClusterProperties().getElementValue(sslFipsXpath));

@@ -1,6 +1,7 @@
 package com.marklogic.appdeployer.command.appservers;
 
 import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
@@ -52,9 +53,23 @@ public class UpdateRestApiServersCommand extends AbstractCommand {
 
     protected File findRestApiConfigFile(CommandContext context) {
         if (restApiFilename != null) {
-            return new File(context.getAppConfig().getConfigDir().getBaseDir(), restApiFilename);
+	        File f = null;
+	        for (ConfigDir configDir : context.getAppConfig().getConfigDirs()) {
+		        File tmpFile = new File(configDir.getBaseDir(), restApiFilename);
+		        if (tmpFile != null && tmpFile.exists()) {
+			        f = tmpFile;
+		        }
+	        }
+	        return f;
         } else {
-            return context.getAppConfig().getConfigDir().getRestApiServerFile();
+        	File f = null;
+        	for (ConfigDir configDir : context.getAppConfig().getConfigDirs()) {
+        		File tmpFile = configDir.getRestApiFile();
+        		if (tmpFile != null && tmpFile.exists()) {
+        			f = tmpFile;
+		        }
+	        }
+            return f;
         }
     }
 }

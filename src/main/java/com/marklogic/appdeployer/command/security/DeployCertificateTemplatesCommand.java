@@ -20,7 +20,7 @@ public class DeployCertificateTemplatesCommand extends AbstractResourceCommand {
 
     @Override
     protected File[] getResourceDirs(CommandContext context) {
-        return new File[] { new File(context.getAppConfig().getConfigDir().getSecurityDir(), "certificate-templates") };
+    	return findResourceDirs(context, configDir -> configDir.getCertificateTemplatesDir());
     }
 
     @Override

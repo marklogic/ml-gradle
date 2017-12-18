@@ -59,7 +59,7 @@ public class DeployRolesCommand extends AbstractResourceCommand {
 	}
 
 	protected File[] getResourceDirs(CommandContext context) {
-		return new File[]{context.getAppConfig().getConfigDir().getRolesDir()};
+		return findResourceDirs(context, configDir -> configDir.getRolesDir());
 	}
 
 	@Override

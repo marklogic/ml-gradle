@@ -1,6 +1,7 @@
 package com.marklogic.appdeployer.command.forests;
 
 import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
@@ -49,13 +50,15 @@ public class DeployForestsCommand extends AbstractCommand {
     public void execute(CommandContext context) {
         String payload = null;
         if (forestFilename != null) {
-            File dir = context.getAppConfig().getConfigDir().getForestsDir();
-            if (dir.exists()) {
-                File f = new File(dir, forestFilename);
-                if (f.exists()) {
-                    payload = copyFileToString(f);
-                }
-            }
+        	for (ConfigDir configDir : context.getAppConfig().getConfigDirs()) {
+		        File dir = configDir.getForestsDir();
+		        if (dir.exists()) {
+			        File f = new File(dir, forestFilename);
+			        if (f.exists()) {
+				        payload = copyFileToString(f);
+			        }
+		        }
+	        }
         }
 
         if (payload == null && StringUtils.hasText(forestPayload)) {

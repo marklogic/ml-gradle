@@ -157,7 +157,7 @@ public class GenerateModelArtifactsCommand extends AbstractCommand {
 	protected void generateDatabaseProperties(AppConfig appConfig, GeneratedCode code) {
 		String props = code.getDatabaseProperties();
 		if (props != null) {
-			File dbDir = appConfig.getConfigDir().getDatabasesDir();
+			File dbDir = appConfig.getFirstConfigDir().getDatabasesDir();
 			dbDir.mkdirs();
 			File out = new File(dbDir, "content-database.json");
 			String logMessage = "Wrote database properties to: ";

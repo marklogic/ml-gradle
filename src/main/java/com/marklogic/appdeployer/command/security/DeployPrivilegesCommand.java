@@ -21,7 +21,7 @@ public class DeployPrivilegesCommand extends AbstractResourceCommand {
 
     @Override
     protected File[] getResourceDirs(CommandContext context) {
-        return new File[] { context.getAppConfig().getConfigDir().getPrivilegesDir() };
+    	return findResourceDirs(context, configDir -> configDir.getPrivilegesDir());
     }
 
     @Override

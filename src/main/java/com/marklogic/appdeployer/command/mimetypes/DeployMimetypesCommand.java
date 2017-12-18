@@ -19,7 +19,7 @@ public class DeployMimetypesCommand extends AbstractResourceCommand {
 
     @Override
     protected File[] getResourceDirs(CommandContext context) {
-        return new File[] { new File(context.getAppConfig().getConfigDir().getBaseDir(), "mimetypes") };
+    	return findResourceDirs(context, configDir -> configDir.getMimetypesDir());
     }
 
     @Override

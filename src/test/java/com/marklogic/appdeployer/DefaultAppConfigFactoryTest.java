@@ -109,7 +109,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    p.setProperty("mlForestsPerHost", "some-db,2,other-db,3");
         p.setProperty("mlModulePermissions", "some-perm,read,some-perm,update");
         p.setProperty("mlAdditionalBinaryExtensions", ".gradle,.properties");
-        p.setProperty("mlConfigPath", "src/test/resources/sample-app/empty-ml-config");
+        p.setProperty("mlConfigPaths", "src/test/resources/sample-app/custom-forests,src/test/resources/sample-app/alert-config");
         p.setProperty("mlSimpleSsl", "true");
         p.setProperty("mlContentDatabaseName", "my-content-db");
         p.setProperty("mlModulesDatabaseName", "my-modules");
@@ -204,7 +204,12 @@ public class DefaultAppConfigFactoryTest extends Assert {
         String[] extensions = config.getAdditionalBinaryExtensions();
         assertEquals(".gradle", extensions[0]);
         assertEquals(".properties", extensions[1]);
-        assertTrue(config.getConfigDir().getBaseDir().getAbsolutePath().contains("empty-ml-config"));
+
+        List<ConfigDir> configDirs = config.getConfigDirs();
+        assertEquals(2, configDirs.size());
+        assertTrue(configDirs.get(0).getBaseDir().getAbsolutePath().contains("custom-forests"));
+	    assertTrue(configDirs.get(1).getBaseDir().getAbsolutePath().contains("alert-config"));
+
         assertNotNull(config.getRestSslContext());
         assertNotNull(config.getRestSslHostnameVerifier());
         assertEquals("my-content-db", config.getContentDatabaseName());
@@ -307,7 +312,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 
 		sut = new DefaultAppConfigFactory(new SimplePropertySource(p));
 		AppConfig config = sut.newAppConfig();
-		assertTrue(config.getConfigDir().getBaseDir().getAbsolutePath().contains("empty-ml-config"));
+		assertTrue(config.getFirstConfigDir().getBaseDir().getAbsolutePath().contains("empty-ml-config"));
 	}
 
     @Test

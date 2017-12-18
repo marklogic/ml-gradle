@@ -1,6 +1,7 @@
 package com.marklogic.appdeployer.command.cpf;
 
 import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.mgmt.resource.cpf.AbstractCpfResourceManager;
@@ -16,13 +17,15 @@ public abstract class AbstractCpfResourceCommand extends AbstractCommand {
     @Override
     public void execute(CommandContext context) {
         AppConfig config = context.getAppConfig();
-        File dir = new File(config.getConfigDir().getCpfDir(), getCpfDirectoryName());
-        if (dir.exists()) {
-            AbstractCpfResourceManager mgr = getResourceManager(context);
-            for (File f : listFilesInDirectory(dir)) {
-                String payload = copyFileToString(f, context);
-                mgr.save(config.getTriggersDatabaseName(), payload);
-            }
+        for (ConfigDir configDir : config.getConfigDirs()) {
+	        File dir = new File(configDir.getCpfDir(), getCpfDirectoryName());
+	        if (dir.exists()) {
+		        AbstractCpfResourceManager mgr = getResourceManager(context);
+		        for (File f : listFilesInDirectory(dir)) {
+			        String payload = copyFileToString(f, context);
+			        mgr.save(config.getTriggersDatabaseName(), payload);
+		        }
+	        }
         }
     }
 }

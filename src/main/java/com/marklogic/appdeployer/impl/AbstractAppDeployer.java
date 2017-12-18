@@ -2,6 +2,7 @@ package com.marklogic.appdeployer.impl;
 
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.AppDeployer;
+import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.Command;
 import com.marklogic.appdeployer.command.CommandContext;
@@ -51,8 +52,11 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
 	 * @param appConfig
 	 */
 	public void deploy(AppConfig appConfig) {
-        logger.info(format("Deploying app %s with config dir of: %s\n", appConfig.getName(), appConfig.getConfigDir()
-                .getBaseDir().getAbsolutePath()));
+		List<String> configPaths = new ArrayList<>();
+		for (ConfigDir configDir : appConfig.getConfigDirs()) {
+			configPaths.add(configDir.getBaseDir().getAbsolutePath());
+		}
+        logger.info(format("Deploying app %s with config dirs: %s\n", appConfig.getName(), configPaths));
 
         List<Command> commands = getCommands();
         Collections.sort(commands, new ExecuteComparator());
@@ -120,8 +124,11 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
 	 * @param appConfig
 	 */
 	public void undeploy(AppConfig appConfig) {
-        logger.info(format("Undeploying app %s with config dir: %s\n", appConfig.getName(), appConfig.getConfigDir()
-                .getBaseDir().getAbsolutePath()));
+		List<String> configPaths = new ArrayList<>();
+		for (ConfigDir configDir : appConfig.getConfigDirs()) {
+			configPaths.add(configDir.getBaseDir().getAbsolutePath());
+		}
+        logger.info(format("Undeploying app %s with config dirs: %s\n", appConfig.getName(), configPaths));
 
         List<Command> commands = getCommands();
 

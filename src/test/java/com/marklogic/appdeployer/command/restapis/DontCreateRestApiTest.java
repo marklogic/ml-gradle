@@ -11,7 +11,7 @@ public class DontCreateRestApiTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void test() {
-		appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/db-only-config"));
+		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/db-only-config"));
 		appConfig.setNoRestServer(true);
 
 		initializeAppDeployer(new DeployRestApiServersCommand(), new DeployContentDatabasesCommand(1));

@@ -1,6 +1,7 @@
 package com.marklogic.appdeployer.command.flexrep;
 
 import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
@@ -37,12 +38,15 @@ public class DeployFlexrepCommand extends AbstractCommand implements UndoableCom
         if (flexrepBaseDir != null) {
             SimpleAppDeployer d = new SimpleAppDeployer(context.getManageClient(), context.getAdminManager(),
                     new DeployCpfConfigsCommand(), new DeployDomainsCommand(), new DeployPipelinesCommand(), new DeployConfigsCommand(), new DeployTargetsCommand(), new DeployOtherServersCommand());
-            File currentBaseDir = appConfig.getConfigDir().getBaseDir();
-            appConfig.getConfigDir().setBaseDir(flexrepBaseDir);
-            try {
-                d.deploy(appConfig);
-            } finally {
-                appConfig.getConfigDir().setBaseDir(currentBaseDir);
+
+            for (ConfigDir configDir : appConfig.getConfigDirs()) {
+	            File currentBaseDir = configDir.getBaseDir();
+	            configDir.setBaseDir(flexrepBaseDir);
+	            try {
+		            d.deploy(appConfig);
+	            } finally {
+		            configDir.setBaseDir(currentBaseDir);
+	            }
             }
         }
     }
@@ -54,12 +58,15 @@ public class DeployFlexrepCommand extends AbstractCommand implements UndoableCom
         File flexrepBaseDir = getFlexrepBaseDir(appConfig);
         if (flexrepBaseDir != null) {
             SimpleAppDeployer d = new SimpleAppDeployer(context.getManageClient(), context.getAdminManager(), new DeployOtherServersCommand());
-            File currentBaseDir = appConfig.getConfigDir().getBaseDir();
-            appConfig.getConfigDir().setBaseDir(flexrepBaseDir);
-            try {
-                d.undeploy(appConfig);
-            } finally {
-                appConfig.getConfigDir().setBaseDir(currentBaseDir);
+
+            for (ConfigDir configDir : appConfig.getConfigDirs()) {
+	            File currentBaseDir = configDir.getBaseDir();
+	            configDir.setBaseDir(flexrepBaseDir);
+	            try {
+		            d.undeploy(appConfig);
+	            } finally {
+		            configDir.setBaseDir(currentBaseDir);
+	            }
             }
         }
     }
@@ -70,16 +77,22 @@ public class DeployFlexrepCommand extends AbstractCommand implements UndoableCom
             return null;
         }
 
-        File flexrepDir = appConfig.getConfigDir().getFlexrepDir();
-        if (flexrepDir == null || !flexrepDir.exists()) {
-            return null;
-        }
+	    /**
+	     * Little trickier in 3.3.0 - gotta check every ConfigDir to see if a flexrep base directory exists. Last
+	     * one wins.
+	     */
+	    File flexrepBaseDir = null;
+        for (ConfigDir configDir : appConfig.getConfigDirs()) {
+	        File flexrepDir = configDir.getFlexrepDir();
+	        if (flexrepDir == null || !flexrepDir.exists()) {
+		        continue;
+	        }
 
-        File flexrepBaseDir = new File(flexrepDir, path);
-        if (flexrepBaseDir == null || !flexrepBaseDir.exists()) {
-            return null;
+	        File tmp = new File(flexrepDir, path);
+	        if (tmp != null && tmp.exists()) {
+		        flexrepBaseDir = tmp;
+	        }
         }
-
         return flexrepBaseDir;
     }
 }

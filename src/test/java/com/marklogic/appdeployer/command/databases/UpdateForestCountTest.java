@@ -16,7 +16,7 @@ public class UpdateForestCountTest extends AbstractAppDeployerTest {
 
     @Test
     public void test() {
-        appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/db-only-config"));
+        appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/db-only-config"));
         DatabaseManager mgr = new DatabaseManager(manageClient);
 
         initializeAppDeployer(new DeployContentDatabasesCommand());

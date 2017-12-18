@@ -43,7 +43,7 @@ public class ManageScheduledTasksTest extends AbstractManageResourceTest {
 
     @Test
     public void associateChildDirectoryWithGroup() {
-	    appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/tasks-in-child-dir"));
+	    appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/tasks-in-child-dir"));
     	initializeAppDeployer(new DeployGroupsCommand(), new DeployScheduledTasksCommand());
     	try {
 		    appDeployer.deploy(appConfig);

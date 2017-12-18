@@ -22,7 +22,7 @@ public class ExportDatabaseTest extends AbstractExportTest {
 	@Test
 	public void exportDatabaseWithTwoForests() throws Exception {
 		// Deploy our simple app
-		appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/db-only-config"));
+		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/db-only-config"));
 		initializeAppDeployer(new DeployContentDatabasesCommand(2));
 		deploySampleApp();
 
@@ -47,7 +47,7 @@ public class ExportDatabaseTest extends AbstractExportTest {
 		undeploySampleApp();
 
 		// Deploy from the export dir!
-		appConfig.getConfigDir().setBaseDir(exportDir);
+		appConfig.getFirstConfigDir().setBaseDir(exportDir);
 		initializeAppDeployer(new DeployOtherDatabasesCommand(), new DeployCustomForestsCommand());
 		deploySampleApp();
 

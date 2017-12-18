@@ -12,7 +12,7 @@ public class ExportPrivilegesTest extends AbstractExportTest {
 
 	@Before
 	public void setup() {
-		appConfig.getConfigDir().setBaseDir(exportDir);
+		appConfig.getFirstConfigDir().setBaseDir(exportDir);
 		initializeAppDeployer(new DeployPrivilegesCommand());
 	}
 

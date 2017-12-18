@@ -28,10 +28,11 @@ public class DeployTargetsCommand extends AbstractCommand {
 	@Override
 	public void execute(CommandContext context) {
 		AppConfig appConfig = context.getAppConfig();
-		deployTargets(context, appConfig.getConfigDir(), appConfig.getContentDatabaseName());
-
-		for (File dir : appConfig.getConfigDir().getDatabaseResourceDirectories()) {
-			deployTargets(context, new ConfigDir(dir), dir.getName());
+		for (ConfigDir configDir : appConfig.getConfigDirs()) {
+			deployTargets(context, configDir, appConfig.getContentDatabaseName());
+			for (File dir : configDir.getDatabaseResourceDirectories()) {
+				deployTargets(context, new ConfigDir(dir), dir.getName());
+			}
 		}
 	}
 

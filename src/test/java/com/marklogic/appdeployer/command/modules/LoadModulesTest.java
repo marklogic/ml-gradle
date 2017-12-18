@@ -116,6 +116,7 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 		 * follows the Roxy convention by default and prefixes properties with "@ml.", our modules then need
 		 * "@ml.%%COLOR%%", for example.
 		 */
+		appConfig.setUseRoxyTokenPrefix(true);
 		appConfig.getCustomTokens().put("COLOR", "red");
 		appConfig.getCustomTokens().put("DESCRIPTION", "${COLOR} description");
 
@@ -133,7 +134,7 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void testServerExists() {
-		appConfig.getConfigDir().setBaseDir(new File(("src/test/resources/sample-app/db-only-config")));
+		appConfig.getFirstConfigDir().setBaseDir(new File(("src/test/resources/sample-app/db-only-config")));
 		appConfig.setTestRestPort(8541);
 		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
 

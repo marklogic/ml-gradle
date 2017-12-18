@@ -11,7 +11,7 @@ public class IgnoreCommandErrorTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void ignoreErrorOnUndeploy() {
-		appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/db-only-config"));
+		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/db-only-config"));
 
 		initializeAppDeployer(new DeployRestApiServersCommand(true), new DeployContentDatabasesCommand(1));
 		deploySampleApp();

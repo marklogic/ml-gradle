@@ -1,5 +1,6 @@
 package com.marklogic.appdeployer.command.taskservers;
 
+import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
@@ -23,19 +24,21 @@ public class UpdateTaskServerCommand extends AbstractCommand {
 
 	@Override
 	public void execute(CommandContext context) {
-		File dir = context.getAppConfig().getConfigDir().getTaskServersDir();
-		if (dir.exists()) {
-			if (logger.isInfoEnabled()) {
-				logger.info("Processing files in directory: " + dir.getAbsolutePath());
-			}
-
-			TaskServerManager mgr = new TaskServerManager(context.getManageClient());
-			for (File f : listFilesInDirectory(dir)) {
+		for (ConfigDir configDir : context.getAppConfig().getConfigDirs()) {
+			File dir = configDir.getTaskServersDir();
+			if (dir.exists()) {
 				if (logger.isInfoEnabled()) {
-					logger.info("Processing file: " + f.getAbsolutePath());
+					logger.info("Processing files in directory: " + dir.getAbsolutePath());
 				}
-				String payload = copyFileToString(f, context);
-				mgr.updateTaskServer(taskServerName, payload);
+
+				TaskServerManager mgr = new TaskServerManager(context.getManageClient());
+				for (File f : listFilesInDirectory(dir)) {
+					if (logger.isInfoEnabled()) {
+						logger.info("Processing file: " + f.getAbsolutePath());
+					}
+					String payload = copyFileToString(f, context);
+					mgr.updateTaskServer(taskServerName, payload);
+				}
 			}
 		}
 	}

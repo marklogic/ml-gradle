@@ -46,7 +46,7 @@ public class UpdateContentDatabasesTest extends AbstractAppDeployerTest {
 
     @Test
     public void multipleDatabaseConfigFiles() throws Exception {
-        ConfigDir dir = appConfig.getConfigDir();
+        ConfigDir dir = appConfig.getFirstConfigDir();
         dir.getContentDatabaseFiles().add(new File(dir.getDatabasesDir(), "more-content-db-config.json"));
 
         initializeAppDeployer(new DeployRestApiServersCommand(), new DeployTriggersDatabaseCommand(),

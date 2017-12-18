@@ -14,9 +14,10 @@ public class DeployQueryRoleSetsCommand extends AbstractResourceCommand {
 		setExecuteSortOrder(SortOrderConstants.DEPLOY_QUERY_ROLE_SETS);
 		setUndoSortOrder(SortOrderConstants.DELETE_QUERY_ROLE_SETS);
 	}
+	
 	@Override
 	protected File[] getResourceDirs(CommandContext context) {
-		return new File[] { context.getAppConfig().getConfigDir().getQueryRoleSetsDir() };
+		return findResourceDirs(context, configDir -> configDir.getQueryRoleSetsDir());
 	}
 
 	@Override

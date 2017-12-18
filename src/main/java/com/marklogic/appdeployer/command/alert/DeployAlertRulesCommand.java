@@ -24,10 +24,11 @@ public class DeployAlertRulesCommand extends AbstractCommand {
 	@Override
 	public void execute(CommandContext context) {
 		AppConfig appConfig = context.getAppConfig();
-		deployRules(context, appConfig.getConfigDir(), appConfig.getContentDatabaseName());
-
-		for (File dir : appConfig.getConfigDir().getDatabaseResourceDirectories()) {
-			deployRules(context, new ConfigDir(dir), dir.getName());
+		for (ConfigDir configDir : appConfig.getConfigDirs()) {
+			deployRules(context, configDir, appConfig.getContentDatabaseName());
+			for (File dir : configDir.getDatabaseResourceDirectories()) {
+				deployRules(context, new ConfigDir(dir), dir.getName());
+			}
 		}
 	}
 

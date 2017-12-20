@@ -1,6 +1,5 @@
-package com.marklogic.client.ext.datamovement.consumer;
+package com.marklogic.client.ext.datamovement.job;
 
-import com.marklogic.client.datamovement.ExportListener;
 import com.marklogic.client.ext.datamovement.AbstractDataMovementTest;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,15 +12,16 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-public class WriteToZipFileTest extends AbstractDataMovementTest {
+public class ExportToZipTest extends AbstractDataMovementTest {
 
-	private File exportFile = new File("build/write-to-zip-file-test.zip");
-	private WriteToZipConsumer writeToZipConsumer;
+	private File exportFile;
+	private ExportToZipJob exportToZipJob;
 
 	@Before
 	public void setupConsumer() {
-		exportFile.getParentFile().mkdirs();
-		writeToZipConsumer = new WriteToZipConsumer(exportFile);
+		exportFile = new File("build/export-test/" + System.currentTimeMillis() + "-write-to-zip-file-test.zip");
+		exportToZipJob = new ExportToZipJob(exportFile);
+		exportToZipJob.setWhereCollections(COLLECTION);
 	}
 
 	@Test
@@ -32,7 +32,7 @@ public class WriteToZipFileTest extends AbstractDataMovementTest {
 
 	@Test
 	public void flattenUri() {
-		writeToZipConsumer.setFlattenUri(true);
+		exportToZipJob.getWriteToZipConsumer().setFlattenUri(true);
 		exportToZip();
 		assertZipFileContainsEntryNames("dmsdk-test-1.xml", "dmsdk-test-2.xml");
 	}
@@ -40,19 +40,13 @@ public class WriteToZipFileTest extends AbstractDataMovementTest {
 	@Test
 	public void uriPrefix() {
 		final String prefix = "/example";
-		writeToZipConsumer.setUriPrefix(prefix);
+		exportToZipJob.getWriteToZipConsumer().setUriPrefix(prefix);
 		exportToZip();
 		assertZipFileContainsEntryNames(prefix + FIRST_URI, prefix + SECOND_URI);
 	}
+
 	private void exportToZip() {
-		ExportListener listener = new ExportListener();
-		listener.onDocumentReady(writeToZipConsumer);
-		queryBatcherTemplate.applyOnCollections(listener, COLLECTION);
-		try {
-			writeToZipConsumer.close();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		exportToZipJob.run(client);
 	}
 
 	private void assertZipFileContainsEntryNames(String... names) {

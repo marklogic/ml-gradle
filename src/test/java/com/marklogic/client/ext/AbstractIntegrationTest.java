@@ -28,6 +28,17 @@ public abstract class AbstractIntegrationTest extends Assert {
 		return client;
 	}
 
+	@After
+	public void releaseClientOnTearDown() {
+		if (client != null) {
+			try {
+				client.release();
+			} catch (Exception ex) {
+				// That's fine, the test probably released it already
+			}
+		}
+	}
+
 	protected DatabaseClient newClient(String database) {
 		String currentDatabase = clientConfig.getDatabase();
 		clientConfig.setDatabase(database);

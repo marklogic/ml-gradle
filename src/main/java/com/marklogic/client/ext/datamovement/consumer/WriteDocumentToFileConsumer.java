@@ -14,13 +14,14 @@ import java.util.function.Consumer;
  * Consumer implementation that is intended to be used with DMSDK's ExportListener. Writes each document to a File based
  * on the directory passed to this class's constructor plus the document's URI.
  */
-public class WriteToFileConsumer extends LoggingObject implements Consumer<DocumentRecord> {
+public class WriteDocumentToFileConsumer extends LoggingObject implements Consumer<DocumentRecord> {
 
 	private File baseDir;
 	private boolean logErrors = true;
 
-	public WriteToFileConsumer(File baseDir) {
+	public WriteDocumentToFileConsumer(File baseDir) {
 		this.baseDir = baseDir;
+		this.baseDir.mkdirs();
 	}
 
 	@Override

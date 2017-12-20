@@ -1,7 +1,12 @@
-package com.marklogic.client.ext.datamovement.listener;
+package com.marklogic.client.ext.datamovement.job;
 
 import com.marklogic.client.ext.datamovement.AbstractDataMovementTest;
 import com.marklogic.client.ext.datamovement.UrisQueryQueryBatcherBuilder;
+import com.marklogic.client.ext.datamovement.job.AddCollectionsJob;
+import com.marklogic.client.ext.datamovement.job.RemoveCollectionsJob;
+import com.marklogic.client.ext.datamovement.job.SetCollectionsJob;
+import com.marklogic.client.ext.datamovement.listener.RemoveCollectionsListener;
+import com.marklogic.client.ext.datamovement.listener.SetCollectionsListener;
 import com.marklogic.client.ext.helper.ClientHelper;
 import org.junit.Test;
 
@@ -11,23 +16,21 @@ public class ManageCollectionsTest extends AbstractDataMovementTest {
 
 	@Test
 	public void setThenAddThenRemove() {
-		// Set collections
-		queryBatcherTemplate.applyOnCollections(new SetCollectionsListener(COLLECTION, "red"), COLLECTION);
+		new SetCollectionsJob(COLLECTION, "red").setWhereCollections(COLLECTION).run(client);
 		assertUriInCollections(FIRST_URI, COLLECTION, "red");
 		assertUriInCollections(SECOND_URI, COLLECTION, "red");
 
-		// Add collections
-		queryBatcherTemplate.applyOnCollections(new AddCollectionsListener("blue", "green"), COLLECTION);
+		new AddCollectionsJob("blue", "green").setWhereCollections(COLLECTION).run(client);
 		assertUriInCollections(FIRST_URI, COLLECTION, "red", "blue", "green");
 		assertUriInCollections(SECOND_URI, COLLECTION, "red", "blue", "green");
 
 		// Remove collections
-		queryBatcherTemplate.applyOnCollections(new RemoveCollectionsListener("red", "blue", "green"), COLLECTION);
+		new RemoveCollectionsJob("red", "blue", "green").setWhereCollections(COLLECTION).run(client);
 		assertUriInCollections(FIRST_URI, COLLECTION);
 		assertUriInCollections(SECOND_URI, COLLECTION);
 
 		// Set via URI pattern
-		queryBatcherTemplate.applyOnUriPattern(new SetCollectionsListener(COLLECTION, "red"), "/test/dmsdk-test-*.xml");
+		new SetCollectionsJob(COLLECTION, "red").setWhereUriPattern("/test/dmsdk-test-*.xml").run(client);
 		assertUriInCollections(FIRST_URI, COLLECTION, "red");
 		assertUriInCollections(SECOND_URI, COLLECTION, "red");
 
@@ -37,7 +40,7 @@ public class ManageCollectionsTest extends AbstractDataMovementTest {
 
 		// Set via XQuery URIs query
 		String xquery = String.format("cts:document-query(('%s', '%s'))", FIRST_URI, SECOND_URI);
-		queryBatcherTemplate.applyOnUrisQuery(new SetCollectionsListener(COLLECTION, "green"), xquery);
+		new SetCollectionsJob(COLLECTION, "green").setWhereUrisQuery(xquery).run(client);
 		assertUriInCollections(FIRST_URI, COLLECTION, "green");
 		assertUriInCollections(SECOND_URI, COLLECTION, "green");
 
@@ -66,7 +69,6 @@ public class ManageCollectionsTest extends AbstractDataMovementTest {
 		queryBatcherTemplate.apply(new SetCollectionsListener(COLLECTION, "green"), builder);
 		assertUriInCollections(FIRST_URI, COLLECTION, "blue");
 		assertUriInCollections(SECOND_URI, COLLECTION, "blue");
-
 	}
 
 	private void assertUriInCollections(String uri, String... collections) {

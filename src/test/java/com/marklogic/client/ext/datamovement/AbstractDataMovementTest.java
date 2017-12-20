@@ -4,6 +4,7 @@ import com.marklogic.client.datamovement.DeleteListener;
 import com.marklogic.client.ext.AbstractIntegrationTest;
 import com.marklogic.client.ext.batch.RestBatchWriter;
 import com.marklogic.client.ext.batch.SimpleDocumentWriteOperation;
+import com.marklogic.client.ext.datamovement.job.DeleteCollectionsJob;
 import org.junit.Before;
 
 import java.util.Arrays;
@@ -28,7 +29,7 @@ public abstract class AbstractDataMovementTest extends AbstractIntegrationTest {
 		queryBatcherTemplate.setThreadCount(2);
 
 		queryBatcherTemplate.applyOnDocumentUris(new DeleteListener(), FIRST_URI, SECOND_URI);
-		queryBatcherTemplate.applyOnCollections(new DeleteListener(), COLLECTION);
+		new DeleteCollectionsJob(COLLECTION).run(client);
 
 		// Insert documents
 		RestBatchWriter writer = new RestBatchWriter(client, false);

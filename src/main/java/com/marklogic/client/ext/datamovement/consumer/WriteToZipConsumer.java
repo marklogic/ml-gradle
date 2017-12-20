@@ -55,9 +55,13 @@ public class WriteToZipConsumer extends LoggingObject implements Consumer<Docume
 	}
 
 	@Override
-	public void close() throws IOException {
+	public void close() {
 		if (zipOutputStream != null) {
-			zipOutputStream.close();
+			try {
+				zipOutputStream.close();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 

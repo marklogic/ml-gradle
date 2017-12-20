@@ -1,10 +1,13 @@
-package com.marklogic.client.ext.datamovement.listener;
+package com.marklogic.client.ext.datamovement.job;
 
 import com.marklogic.client.datamovement.DeleteListener;
 import com.marklogic.client.ext.AbstractIntegrationTest;
 import com.marklogic.client.ext.batch.RestBatchWriter;
 import com.marklogic.client.ext.batch.SimpleDocumentWriteOperation;
 import com.marklogic.client.ext.datamovement.QueryBatcherTemplate;
+import com.marklogic.client.ext.datamovement.job.AddPermissionsJob;
+import com.marklogic.client.ext.datamovement.job.RemovePermissionsJob;
+import com.marklogic.client.ext.datamovement.job.SetPermissionsJob;
 import com.marklogic.client.ext.helper.ClientHelper;
 import com.marklogic.client.io.DocumentMetadataHandle;
 import org.junit.Test;
@@ -19,7 +22,7 @@ public class ManagePermissionsTest extends AbstractIntegrationTest {
 	 */
 	@Test
 	public void test() {
-		final String uri = "1.xml";
+		final String uri = "/test/manage-permissions-test.xml";
 
 		QueryBatcherTemplate qbt = new QueryBatcherTemplate(newClient("Documents"));
 
@@ -42,7 +45,7 @@ public class ManagePermissionsTest extends AbstractIntegrationTest {
 		assertTrue(perms.get("app-user").contains(DocumentMetadataHandle.Capability.UPDATE));
 
 		// Set permissions
-		qbt.applyOnDocumentUris(new SetPermissionsListener("alert-user", "read", "alert-user", "update"), uri);
+		new SetPermissionsJob("alert-user", "read", "alert-user", "update").setWhereUris(uri).run(client);
 		perms = helper.getMetadata(uri).getPermissions();
 		assertEquals(1, perms.size());
 		assertEquals(2, perms.get("alert-user").size());
@@ -50,7 +53,7 @@ public class ManagePermissionsTest extends AbstractIntegrationTest {
 		assertTrue(perms.get("alert-user").contains(DocumentMetadataHandle.Capability.UPDATE));
 
 		// Add permissions
-		qbt.applyOnDocumentUris(new AddPermissionsListener("app-user", "read", "app-user", "update"), uri);
+		new AddPermissionsJob("app-user", "read", "app-user", "update").setWhereUris(uri).run(client);
 		perms = helper.getMetadata(uri).getPermissions();
 		assertEquals(2, perms.size());
 		assertEquals(2, perms.get("alert-user").size());
@@ -61,7 +64,7 @@ public class ManagePermissionsTest extends AbstractIntegrationTest {
 		assertTrue(perms.get("app-user").contains(DocumentMetadataHandle.Capability.UPDATE));
 
 		// Remove permissions
-		qbt.applyOnDocumentUris(new RemovePermissionsListener("app-user", "read", "app-user", "update"), uri);
+		new RemovePermissionsJob("app-user", "read", "app-user", "update").setWhereUris(uri).run(client);
 		perms = helper.getMetadata(uri).getPermissions();
 		assertEquals(1, perms.size());
 		assertEquals(2, perms.get("alert-user").size());

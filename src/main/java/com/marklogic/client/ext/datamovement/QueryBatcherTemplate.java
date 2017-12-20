@@ -2,7 +2,6 @@ package com.marklogic.client.ext.datamovement;
 
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.datamovement.*;
-import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.client.query.RawCombinedQueryDefinition;
 import com.marklogic.client.query.RawStructuredQueryDefinition;
 import com.marklogic.client.query.StringQueryDefinition;
@@ -16,17 +15,13 @@ import java.util.List;
  * Spring-style Template class for simplifying common usages of QueryBatcher. Threadsafe, at least as long as
  * DatabaseClient and DataMovementManager are threadsafe.
  */
-public class QueryBatcherTemplate extends LoggingObject {
+public class QueryBatcherTemplate extends BatcherConfig {
 
 	private DatabaseClient databaseClient;
 	private DataMovementManager dataMovementManager;
-	private int threadCount = 8;
-	private int batchSize;
 	private boolean applyConsistentSnapshot = true;
 	private boolean awaitCompletion = true;
 	private boolean stopJob = true;
-	private String jobName;
-	private ForestConfiguration forestConfig;
 	private List<QueryFailureListener> queryFailureListeners;
 	private List<QueryBatchListener> urisReadyListeners;
 
@@ -151,7 +146,7 @@ public class QueryBatcherTemplate extends LoggingObject {
 	 * DatabaseClient that was used to instantiate this class.
 	 * <p>
 	 * The given listener can be null. In such a scenario, it's expected that listeners have been defined on this class
-	 * via the setQueryBatchListeners method.
+	 * via the setQueryBatchListeners method, or are already included in the given QueryBatcher.
 	 * </p>
 	 * <p>
 	 * Notes on how the job is run:
@@ -170,30 +165,44 @@ public class QueryBatcherTemplate extends LoggingObject {
 	 * @return
 	 */
 	public QueryBatcherJobTicket apply(QueryBatchListener urisReadyListener, QueryBatcher queryBatcher) {
-		if (threadCount > 0) {
-			queryBatcher.withThreadCount(threadCount);
-		}
-		if (batchSize > 0) {
-			queryBatcher.withBatchSize(batchSize);
-		}
+		prepareBatcher(queryBatcher);
+
 		if (applyConsistentSnapshot) {
 			queryBatcher.withConsistentSnapshot();
 		}
-		if (jobName != null) {
-			queryBatcher.withJobName(jobName);
-		}
-		if (forestConfig != null) {
-			queryBatcher.withForestConfig(forestConfig);
-		}
+
 		if (urisReadyListeners != null) {
-			queryBatcher.setUrisReadyListeners(urisReadyListeners.toArray(new QueryBatchListener[]{}));
-		}
-		if (queryFailureListeners != null) {
-			queryBatcher.setQueryFailureListeners(queryFailureListeners.toArray(new QueryFailureListener[]{}));
+			// If listeners already exist, add the ones configured on this class before the existing ones
+			QueryBatchListener[] existingListeners = queryBatcher.getQuerySuccessListeners();
+			if (existingListeners == null || existingListeners.length == 0) {
+				queryBatcher.setUrisReadyListeners(urisReadyListeners.toArray(new QueryBatchListener[]{}));
+			} else {
+				List<QueryBatchListener> newListeners = new ArrayList<>();
+				newListeners.addAll(urisReadyListeners);
+				for (QueryBatchListener listener : existingListeners) {
+					newListeners.add(listener);
+				}
+				queryBatcher.setUrisReadyListeners(newListeners.toArray(new QueryBatchListener[]{}));
+			}
 		}
 
 		if (urisReadyListener != null) {
 			queryBatcher.onUrisReady(urisReadyListener);
+		}
+
+		if (queryFailureListeners != null) {
+			// If listeners already exist, add the ones configured on this class before the existing ones
+			QueryFailureListener[] existingListeners = queryBatcher.getQueryFailureListeners();
+			if (existingListeners == null || existingListeners.length == 0) {
+				queryBatcher.setQueryFailureListeners(queryFailureListeners.toArray(new QueryFailureListener[]{}));
+			} else {
+				List<QueryFailureListener> newListeners = new ArrayList<>();
+				newListeners.addAll(queryFailureListeners);
+				for (QueryFailureListener listener : existingListeners) {
+					newListeners.add(listener);
+				}
+				queryBatcher.setQueryFailureListeners(newListeners.toArray(new QueryFailureListener[]{}));
+			}
 		}
 
 		JobTicket jobTicket = dataMovementManager.startJob(queryBatcher);
@@ -206,24 +215,6 @@ public class QueryBatcherTemplate extends LoggingObject {
 		}
 
 		return new QueryBatcherJobTicket(dataMovementManager, queryBatcher, jobTicket);
-	}
-
-	/**
-	 * If set to above zero, then each constructed QueryBatcher will use the given thread count.
-	 *
-	 * @param threadCount
-	 */
-	public void setThreadCount(int threadCount) {
-		this.threadCount = threadCount;
-	}
-
-	/**
-	 * If set to above zero, then each constructed QueryBatcher will use the given batch size.
-	 *
-	 * @param batchSize
-	 */
-	public void setBatchSize(int batchSize) {
-		this.batchSize = batchSize;
 	}
 
 	/**
@@ -265,14 +256,6 @@ public class QueryBatcherTemplate extends LoggingObject {
 	 */
 	public DatabaseClient getDatabaseClient() {
 		return databaseClient;
-	}
-
-	public void setJobName(String jobName) {
-		this.jobName = jobName;
-	}
-
-	public void setForestConfig(ForestConfiguration forestConfig) {
-		this.forestConfig = forestConfig;
 	}
 
 	public void addQueryFailureListeners(QueryFailureListener... listeners) {

@@ -18,7 +18,7 @@ public abstract class AbstractQueryBatcherJob extends BatcherConfig implements Q
 
 	private boolean applyConsistentSnapshot = false;
 	private boolean awaitCompletion = true;
-	private boolean stopAfterCompletion = true;
+	private boolean stopJobAfterCompletion = true;
 
 	// A client can provide its own DataMovementManager to be reused
 	private DataMovementManager dataMovementManager;
@@ -54,7 +54,7 @@ public abstract class AbstractQueryBatcherJob extends BatcherConfig implements Q
 
 		if (awaitCompletion) {
 			queryBatcher.awaitCompletion();
-			if (stopAfterCompletion) {
+			if (stopJobAfterCompletion) {
 				dmm.stopJob(queryBatcher);
 			}
 			if (jobDescription != null && logger.isInfoEnabled()) {
@@ -235,12 +235,12 @@ public abstract class AbstractQueryBatcherJob extends BatcherConfig implements Q
 		return this;
 	}
 
-	public boolean isStopAfterCompletion() {
-		return stopAfterCompletion;
+	public boolean isStopJobAfterCompletion() {
+		return stopJobAfterCompletion;
 	}
 
-	public AbstractQueryBatcherJob setStopAfterCompletion(boolean stopAfterCompletion) {
-		this.stopAfterCompletion = stopAfterCompletion;
+	public AbstractQueryBatcherJob setStopJobAfterCompletion(boolean stopJobAfterCompletion) {
+		this.stopJobAfterCompletion = stopJobAfterCompletion;
 		return this;
 	}
 

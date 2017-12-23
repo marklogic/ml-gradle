@@ -16,7 +16,7 @@ public class ExportDocumentsToSingleFileTest extends AbstractDataMovementTest {
 
 		String exportedXml = new String(FileCopyUtils.copyToByteArray(exportFile));
 		logger.info("Exported XML: " + exportedXml);
-		assertTrue(exportedXml.contains("<one/>"));
-		assertTrue(exportedXml.contains("<two/>"));
+		assertTrue(exportedXml.contains("<test>" + FIRST_URI + "</test>"));
+		assertTrue(exportedXml.contains("<test>" + SECOND_URI + "</test>"));
 	}
 }

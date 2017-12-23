@@ -6,7 +6,6 @@ import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.admin.*;
 import com.marklogic.client.admin.ResourceExtensionsManager.MethodParameters;
 import com.marklogic.client.admin.ServerConfigurationManager.UpdatePolicy;
-import com.marklogic.client.ext.datamovement.listener.LoadModulesFailureListener;
 import com.marklogic.client.ext.file.DocumentFile;
 import com.marklogic.client.ext.helper.FilenameUtil;
 import com.marklogic.client.ext.helper.LoggingObject;

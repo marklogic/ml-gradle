@@ -1,6 +1,5 @@
 package com.marklogic.client.ext.modulesloader.impl;
 
-import com.marklogic.client.ext.datamovement.listener.LoadModulesFailureListener;
 import com.marklogic.client.ext.helper.LoggingObject;
 
 public class SimpleLoadModulesFailureListener extends LoggingObject implements LoadModulesFailureListener {

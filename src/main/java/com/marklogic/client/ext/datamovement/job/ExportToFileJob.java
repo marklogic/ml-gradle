@@ -13,8 +13,8 @@ import java.io.IOException;
 public class ExportToFileJob extends AbstractQueryBatcherJob {
 
 	private File exportFile;
-	private String filePrefix;
-	private String fileSuffix;
+	private String fileHeader;
+	private String fileFooter;
 	private FileWriter fileWriter;
 	private ExportToWriterListener exportToWriterListener;
 	private boolean includeXmlOutputListener = true;
@@ -41,8 +41,8 @@ public class ExportToFileJob extends AbstractQueryBatcherJob {
 
 		if (ticket.getQueryBatcher().isStopped()) {
 			try {
-				if (fileSuffix != null) {
-					fileWriter.write(fileSuffix);
+				if (fileFooter != null) {
+					fileWriter.write(fileFooter);
 				}
 			} catch (IOException ie) {
 				throw new RuntimeException(ie);
@@ -67,8 +67,8 @@ public class ExportToFileJob extends AbstractQueryBatcherJob {
 		}
 
 		try {
-			if (filePrefix != null) {
-				fileWriter.write(filePrefix);
+			if (fileHeader != null) {
+				fileWriter.write(fileHeader);
 				fileWriter.write("\n");
 			}
 		} catch (IOException e) {
@@ -99,12 +99,12 @@ public class ExportToFileJob extends AbstractQueryBatcherJob {
 		return exportToWriterListener;
 	}
 
-	public void setFilePrefix(String filePrefix) {
-		this.filePrefix = filePrefix;
+	public void setFileHeader(String fileHeader) {
+		this.fileHeader = fileHeader;
 	}
 
-	public void setFileSuffix(String fileSuffix) {
-		this.fileSuffix = fileSuffix;
+	public void setFileFooter(String fileFooter) {
+		this.fileFooter = fileFooter;
 	}
 
 	public void setIncludeXmlOutputListener(boolean includeXmlOutputListener) {

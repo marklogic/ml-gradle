@@ -1,13 +1,15 @@
 package com.marklogic.client.ext.datamovement;
 
 import com.marklogic.client.datamovement.DeleteListener;
+import com.marklogic.client.document.DocumentWriteOperation;
 import com.marklogic.client.ext.AbstractIntegrationTest;
 import com.marklogic.client.ext.batch.RestBatchWriter;
 import com.marklogic.client.ext.batch.SimpleDocumentWriteOperation;
 import com.marklogic.client.ext.datamovement.job.DeleteCollectionsJob;
 import org.junit.Before;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Abstract class for making it easier to test DMSDK listeners and consumers.
@@ -31,12 +33,17 @@ public abstract class AbstractDataMovementTest extends AbstractIntegrationTest {
 		queryBatcherTemplate.applyOnDocumentUris(new DeleteListener(), FIRST_URI, SECOND_URI);
 		new DeleteCollectionsJob(COLLECTION).run(client);
 
-		// Insert documents
+		writeDocuments(FIRST_URI, SECOND_URI);
+	}
+
+	protected void writeDocuments(String... uris) {
 		RestBatchWriter writer = new RestBatchWriter(client, false);
-		writer.write(Arrays.asList(
-			new SimpleDocumentWriteOperation(FIRST_URI, "<one/>", COLLECTION),
-			new SimpleDocumentWriteOperation(SECOND_URI, "<two/>", COLLECTION)
-		));
+		List<DocumentWriteOperation> list = new ArrayList<>();
+		for (String uri : uris) {
+			list.add(new SimpleDocumentWriteOperation(uri, "<test>" + uri + "</test>", COLLECTION));
+		}
+		writer.write(list);
 		writer.waitForCompletion();
 	}
+
 }

@@ -25,11 +25,11 @@ public class ExportBatchesToDirectoryTest extends AbstractDataMovementTest {
 	@Test
 	public void test() throws Exception {
 		job.getExportBatchesToDirectoryListener()
-			.withConsistentSnapshot()
 			.withFileHeader("<results>")
 			.withFileFooter("</results>")
 			.withRecordPrefix("<wrapper>")
-			.withRecordSuffix("</wrapper>");
+			.withRecordSuffix("</wrapper>")
+			.withConsistentSnapshot();
 
 		job.run(client);
 
@@ -49,7 +49,7 @@ public class ExportBatchesToDirectoryTest extends AbstractDataMovementTest {
 	@Test
 	public void customFileExtension() {
 		job.getExportBatchesToDirectoryListener()
-			.withFileExtension("txt")
+			.withFileExtension(".txt")
 			.withFilenamePrefix("my-batch-");
 		job.run(client);
 

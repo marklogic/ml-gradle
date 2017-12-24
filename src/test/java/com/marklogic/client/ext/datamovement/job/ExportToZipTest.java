@@ -27,14 +27,14 @@ public class ExportToZipTest extends AbstractDataMovementTest {
 	@Test
 	public void test() {
 		exportToZip();
-		assertZipFileContainsEntryNames(FIRST_URI, SECOND_URI);
+		assertZipFileContainsEntryNames(exportFile, FIRST_URI, SECOND_URI);
 	}
 
 	@Test
 	public void flattenUri() {
 		exportToZipJob.getWriteToZipConsumer().setFlattenUri(true);
 		exportToZip();
-		assertZipFileContainsEntryNames("dmsdk-test-1.xml", "dmsdk-test-2.xml");
+		assertZipFileContainsEntryNames(exportFile, "dmsdk-test-1.xml", "dmsdk-test-2.xml");
 	}
 
 	@Test
@@ -42,35 +42,11 @@ public class ExportToZipTest extends AbstractDataMovementTest {
 		final String prefix = "/example";
 		exportToZipJob.getWriteToZipConsumer().setUriPrefix(prefix);
 		exportToZip();
-		assertZipFileContainsEntryNames(prefix + FIRST_URI, prefix + SECOND_URI);
+		assertZipFileContainsEntryNames(exportFile, prefix + FIRST_URI, prefix + SECOND_URI);
 	}
 
 	private void exportToZip() {
 		exportToZipJob.run(client);
-	}
-
-	private void assertZipFileContainsEntryNames(String... names) {
-		Set<String> entryNames = new HashSet<>();
-		try {
-			ZipFile zipFile = new ZipFile(exportFile);
-			try {
-				Enumeration<?> entries = zipFile.entries();
-				while (entries.hasMoreElements()) {
-					ZipEntry zipEntry = (ZipEntry) entries.nextElement();
-					entryNames.add(zipEntry.getName());
-				}
-			} finally {
-				zipFile.close();
-			}
-		} catch (IOException ie) {
-			throw new RuntimeException(ie);
-		}
-
-		logger.info("Entry names: " + entryNames);
-		for (String name : names) {
-			assertTrue(entryNames.contains(name));
-		}
-		assertEquals(names.length, entryNames.size());
 	}
 
 }

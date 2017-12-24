@@ -39,7 +39,7 @@ public class ExportToZipJob extends AbstractQueryBatcherJob {
 
 	@Override
 	protected String getJobDescription() {
-		return "Exporting documents " + getQueryDescription() + " to file at: " + exportFile.getAbsolutePath();
+		return "Exporting documents " + getQueryDescription() + " to file at: " + exportFile;
 	}
 
 	/**

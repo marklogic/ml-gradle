@@ -28,7 +28,7 @@ public class ExportToFileJob extends AbstractQueryBatcherJob {
 		try {
 			this.fileWriter = new FileWriter(exportFile);
 		} catch (IOException ie) {
-			throw new RuntimeException("Unable to open FileWriter on file: " + exportFile.getAbsolutePath() + "; cause: " + ie.getMessage(), ie);
+			throw new RuntimeException("Unable to open FileWriter on file: " + exportFile + "; cause: " + ie.getMessage(), ie);
 		}
 
 		this.exportToWriterListener = new ExportToWriterListener(fileWriter);
@@ -78,7 +78,7 @@ public class ExportToFileJob extends AbstractQueryBatcherJob {
 
 	@Override
 	protected String getJobDescription() {
-		return "Exporting documents " + getQueryDescription() + " to file at: " + exportFile.getAbsolutePath();
+		return "Exporting documents " + getQueryDescription() + " to file at: " + exportFile;
 	}
 
 	/**

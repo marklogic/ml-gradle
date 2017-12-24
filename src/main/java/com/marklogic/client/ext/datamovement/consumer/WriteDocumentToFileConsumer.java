@@ -29,12 +29,12 @@ public class WriteDocumentToFileConsumer extends LoggingObject implements Consum
 		String uri = documentRecord.getUri();
 		File outputFile = getOutputFile(documentRecord);
 		if (logger.isDebugEnabled()) {
-			logger.debug("Writing document with URI " + uri + " to file: " + outputFile.getAbsolutePath());
+			logger.debug("Writing document with URI " + uri + " to file: " + outputFile);
 		}
 		try {
 			writeDocumentToFile(documentRecord, outputFile);
 		} catch (IOException e) {
-			String message = "Unable to write document to file; URI: " + uri + "; file: " + outputFile.getAbsolutePath();
+			String message = "Unable to write document to file; URI: " + uri + "; file: " + outputFile;
 			if (logErrors) {
 				logger.warn(message, e);
 			} else {

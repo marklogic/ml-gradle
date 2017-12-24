@@ -1,20 +1,12 @@
 package com.marklogic.client.ext.datamovement.listener;
 
-import com.marklogic.client.datamovement.BatchFailureListener;
-import com.marklogic.client.datamovement.ExportListener;
 import com.marklogic.client.datamovement.ExportToWriterListener;
 import com.marklogic.client.datamovement.QueryBatch;
-import com.marklogic.client.document.DocumentManager;
-import com.marklogic.client.document.ServerTransform;
-import com.marklogic.client.io.Format;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Supports exporting each QueryBatch to a separate File in a given directory.
@@ -24,56 +16,35 @@ import java.util.Set;
  * Reuses ExportToWriterListener. Many of the properties that can be set on this class are copied over to each
  * ExportToWriterListener, which handles writing each QueryBatch to a File via a FileWriter.
  */
-public class ExportBatchesToDirectoryListener extends ExportListener {
-
-	private static Logger logger = LoggerFactory.getLogger(ExportBatchesToDirectoryListener.class);
+public class ExportBatchesToDirectoryListener extends AbstractExportBatchesListener {
 
 	private File exportDir;
 
-	// Specific to this class - controls the name of each file that is written to
-	private String fileExtension = "xml";
-	private String filenamePrefix = "batch-";
-
 	// Copied over to the ExportToWriterListener instances created by this class
 	private boolean includeXmlOutputListener = true;
-	private ServerTransform transform;
-	private Format nonDocumentFormat;
-	private boolean consistentSnapshot;
-	private Set<DocumentManager.Metadata> categories = new HashSet();
 	private String recordPrefix;
 	private String recordSuffix;
 	private String fileHeader;
 	private String fileFooter;
 
 	public ExportBatchesToDirectoryListener(File exportDir) {
+		withFileExtension(".xml");
 		this.exportDir = exportDir;
 		this.exportDir.mkdirs();
 	}
 
-	@Override
-	public void processEvent(QueryBatch queryBatch) {
-		try {
-			writeDocuments(queryBatch);
-		} catch (Throwable t) {
-			for (BatchFailureListener<QueryBatch> queryBatchFailureListener : getBatchFailureListeners()) {
-				try {
-					queryBatchFailureListener.processFailure(queryBatch, t);
-				} catch (Throwable t2) {
-					logger.error("Exception thrown by an onFailure listener", t2);
-				}
-			}
-		}
-	}
-
 	/**
+	 * Uses a FileWriter to write the batch to a single file.
+	 *
 	 * @param queryBatch
 	 * @throws IOException
 	 */
-	protected void writeDocuments(QueryBatch queryBatch) throws IOException {
+	protected void exportBatch(QueryBatch queryBatch) {
 		File file = getFileForBatch(queryBatch, exportDir);
 
-		FileWriter fileWriter = new FileWriter(file);
+		FileWriter fileWriter = null;
 		try {
+			fileWriter = new FileWriter(file);
 			if (fileHeader != null) {
 				fileWriter.write(fileHeader);
 			}
@@ -85,25 +56,19 @@ public class ExportBatchesToDirectoryListener extends ExportListener {
 			if (fileFooter != null) {
 				fileWriter.write(fileFooter);
 			}
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
 		} finally {
-			fileWriter.close();
+			if (fileWriter != null) {
+				try {
+					fileWriter.close();
+				} catch (IOException e) {
+					LoggerFactory.getLogger(getClass()).warn("Unable to close FileWriter: " + e.getMessage(), e);
+				}
+			}
 		}
 	}
 
-	/**
-	 * Determine the File to write to for the given query batch.
-	 *
-	 * @param queryBatch
-	 * @param exportDir
-	 * @return
-	 */
-	protected File getFileForBatch(QueryBatch queryBatch, File exportDir) {
-		String filename = queryBatch.getJobBatchNumber() + "." + fileExtension;
-		if (filenamePrefix != null) {
-			filename = filenamePrefix + filename;
-		}
-		return new File(exportDir, filename);
-	}
 
 	/**
 	 * Copies all of the applicable properties to the listener that have been set on this class.
@@ -111,22 +76,10 @@ public class ExportBatchesToDirectoryListener extends ExportListener {
 	 * @param listener
 	 */
 	protected void prepareExportToWriterListener(ExportToWriterListener listener) {
+		super.prepareExportListener(listener);
+
 		if (includeXmlOutputListener) {
 			listener.onGenerateOutput(new XmlOutputListener());
-		}
-		if (consistentSnapshot) {
-			listener.withConsistentSnapshot();
-		}
-		if (categories != null) {
-			for (DocumentManager.Metadata category : categories) {
-				listener.withMetadataCategory(category);
-			}
-		}
-		if (nonDocumentFormat != null) {
-			listener.withNonDocumentFormat(nonDocumentFormat);
-		}
-		if (transform != null) {
-			listener.withTransform(transform);
 		}
 		if (recordPrefix != null) {
 			listener.withRecordPrefix(recordPrefix);
@@ -134,31 +87,6 @@ public class ExportBatchesToDirectoryListener extends ExportListener {
 		if (recordSuffix != null) {
 			listener.withRecordSuffix(recordSuffix);
 		}
-	}
-
-	public ExportBatchesToDirectoryListener withFileExtension(String fileExtension) {
-		this.fileExtension = fileExtension;
-		return this;
-	}
-
-	public ExportBatchesToDirectoryListener withConsistentSnapshot() {
-		this.consistentSnapshot = true;
-		return this;
-	}
-
-	public ExportBatchesToDirectoryListener withMetadataCategory(DocumentManager.Metadata category) {
-		this.categories.add(category);
-		return this;
-	}
-
-	public ExportBatchesToDirectoryListener withNonDocumentFormat(Format nonDocumentFormat) {
-		this.nonDocumentFormat = nonDocumentFormat;
-		return this;
-	}
-
-	public ExportBatchesToDirectoryListener withTransform(ServerTransform transform) {
-		this.transform = transform;
-		return this;
 	}
 
 	public ExportBatchesToDirectoryListener withRecordPrefix(String recordPrefix) {
@@ -181,12 +109,8 @@ public class ExportBatchesToDirectoryListener extends ExportListener {
 		return this;
 	}
 
-	public void setIncludeXmlOutputListener(boolean includeXmlOutputListener) {
+	public ExportBatchesToDirectoryListener withXmlOutputListener(boolean includeXmlOutputListener) {
 		this.includeXmlOutputListener = includeXmlOutputListener;
-	}
-
-	public ExportBatchesToDirectoryListener withFilenamePrefix(String filenamePrefix) {
-		this.filenamePrefix = filenamePrefix;
 		return this;
 	}
 }

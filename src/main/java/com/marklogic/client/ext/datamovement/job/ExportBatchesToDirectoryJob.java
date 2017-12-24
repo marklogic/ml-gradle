@@ -17,7 +17,7 @@ public class ExportBatchesToDirectoryJob extends AbstractQueryBatcherJob {
 
 	@Override
 	protected String getJobDescription() {
-		return "Exporting batches of documents " + getQueryDescription() + " to files at: " + exportDir.getAbsolutePath();
+		return "Exporting batches of documents " + getQueryDescription() + " to files at: " + exportDir;
 	}
 
 	public ExportBatchesToDirectoryListener getExportBatchesToDirectoryListener() {

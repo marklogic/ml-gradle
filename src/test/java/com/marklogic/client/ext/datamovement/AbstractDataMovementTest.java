@@ -8,8 +8,11 @@ import com.marklogic.client.ext.batch.SimpleDocumentWriteOperation;
 import com.marklogic.client.ext.datamovement.job.DeleteCollectionsJob;
 import org.junit.Before;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * Abstract class for making it easier to test DMSDK listeners and consumers.
@@ -44,6 +47,30 @@ public abstract class AbstractDataMovementTest extends AbstractIntegrationTest {
 		}
 		writer.write(list);
 		writer.waitForCompletion();
+	}
+
+	protected void assertZipFileContainsEntryNames(File file, String... names) {
+		Set<String> entryNames = new HashSet<>();
+		try {
+			ZipFile zipFile = new ZipFile(file);
+			try {
+				Enumeration<?> entries = zipFile.entries();
+				while (entries.hasMoreElements()) {
+					ZipEntry zipEntry = (ZipEntry) entries.nextElement();
+					entryNames.add(zipEntry.getName());
+				}
+			} finally {
+				zipFile.close();
+			}
+		} catch (IOException ie) {
+			throw new RuntimeException(ie);
+		}
+
+		logger.info("Entry names: " + entryNames);
+		for (String name : names) {
+			assertTrue(entryNames.contains(name));
+		}
+		assertEquals(names.length, entryNames.size());
 	}
 
 }

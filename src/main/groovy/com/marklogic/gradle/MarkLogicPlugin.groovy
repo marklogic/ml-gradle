@@ -42,6 +42,8 @@ import com.marklogic.gradle.task.servers.UndeployOtherServersTask
 import com.marklogic.gradle.task.shell.ShellTask
 import com.marklogic.gradle.task.tasks.DeleteAllTasksTask
 import com.marklogic.gradle.task.tasks.DeployTasksTask
+import com.marklogic.gradle.task.tasks.DisableAllTasksTask
+import com.marklogic.gradle.task.tasks.EnableAllTasksTask
 import com.marklogic.gradle.task.tasks.UndeployTasksTask
 import com.marklogic.gradle.task.tasks.WaitForTaskServerTask
 import com.marklogic.gradle.task.temporal.DeployTemporalTask
@@ -208,6 +210,8 @@ class MarkLogicPlugin implements Plugin<Project> {
 		String taskGroup = "ml-gradle Task"
 		project.task("mlDeleteAllTasks", type: DeleteAllTasksTask, group: taskGroup, description: "Delete all scheduled tasks in the cluster")
 		project.task("mlDeployTasks", type: DeployTasksTask, group: taskGroup, description: "Deploy each scheduled task, updating it if it exists, in the configuration directory")
+		project.task("mlDisableAllTasks", type: DisableAllTasksTask, group: taskGroup, description: "Disable each scheduled task in the group identified by the mlGroupName property, which defaults to 'Default'")
+		project.task("mlEnableAllTasks", type: EnableAllTasksTask, group: taskGroup, description: "Enable each scheduled task in the group identified by the mlGroupName property, which defaults to 'Default'")
 		project.task("mlUndeployTasks", type: UndeployTasksTask, group: taskGroup, description: "Undeploy (delete) each scheduled task in the configuration directory")
 		project.task("mlWaitForTaskServer", type: WaitForTaskServerTask, group: taskGroup, description: "Wait for the task server to not have any requests in progress")
 

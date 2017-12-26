@@ -8,9 +8,15 @@ public class AddCollectionsJob extends AbstractQueryBatcherJob implements QueryB
 
 	private String[] collections;
 
+	public AddCollectionsJob() {
+		super();
+		addRequiredJobProperty("collections", "Comma-delimited list collections to which selected records are added",
+			value -> setCollections(value.split(",")));
+	}
+
 	public AddCollectionsJob(String... collections) {
-		this.collections = collections;
-		this.addUrisReadyListener(new AddCollectionsListener(collections));
+		this();
+		setCollections(collections);
 	}
 
 	@Override
@@ -18,4 +24,8 @@ public class AddCollectionsJob extends AbstractQueryBatcherJob implements QueryB
 		return "Adding documents " + getQueryDescription() + " to collections " + Arrays.asList(collections);
 	}
 
+	public void setCollections(String... collections) {
+		this.collections = collections;
+		this.addUrisReadyListener(new AddCollectionsListener(collections));
+	}
 }

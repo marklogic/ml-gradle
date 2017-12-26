@@ -3,6 +3,7 @@ package com.marklogic.client.ext.datamovement;
 import com.marklogic.client.datamovement.DeleteListener;
 import com.marklogic.client.document.DocumentWriteOperation;
 import com.marklogic.client.ext.AbstractIntegrationTest;
+import com.marklogic.client.ext.batch.DataMovementBatchWriter;
 import com.marklogic.client.ext.batch.RestBatchWriter;
 import com.marklogic.client.ext.batch.SimpleDocumentWriteOperation;
 import com.marklogic.client.ext.datamovement.job.DeleteCollectionsJob;
@@ -40,7 +41,8 @@ public abstract class AbstractDataMovementTest extends AbstractIntegrationTest {
 	}
 
 	protected void writeDocuments(String... uris) {
-		RestBatchWriter writer = new RestBatchWriter(client, false);
+		DataMovementBatchWriter writer = new DataMovementBatchWriter(client);
+		writer.initialize();
 		List<DocumentWriteOperation> list = new ArrayList<>();
 		for (String uri : uris) {
 			list.add(new SimpleDocumentWriteOperation(uri, "<test>" + uri + "</test>", COLLECTION));

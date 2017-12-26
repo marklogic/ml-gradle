@@ -28,7 +28,7 @@ public class ExportBatchesToDirectoryListener extends AbstractExportBatchesListe
 	private String fileFooter;
 
 	public ExportBatchesToDirectoryListener(File exportDir) {
-		withFileExtension(".xml");
+		withFilenameExtension(".xml");
 		this.exportDir = exportDir;
 		this.exportDir.mkdirs();
 	}

@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
+import java.util.Properties;
 
 public class ExportBatchesToDirectoryTest extends AbstractDataMovementTest {
 
@@ -24,12 +25,13 @@ public class ExportBatchesToDirectoryTest extends AbstractDataMovementTest {
 
 	@Test
 	public void test() throws Exception {
-		job.getExportBatchesToDirectoryListener()
-			.withFileHeader("<results>")
-			.withFileFooter("</results>")
-			.withRecordPrefix("<wrapper>")
-			.withRecordSuffix("</wrapper>")
-			.withConsistentSnapshot();
+		Properties props = new Properties();
+		props.setProperty("fileHeader", "<results>");
+		props.setProperty("fileFooter", "</results>");
+		props.setProperty("recordPrefix", "<wrapper>");
+		props.setProperty("recordSuffix", "</wrapper>");
+		props.setProperty("consistentSnapshot", "true");
+		job.configureJob(props);
 
 		job.run(client);
 
@@ -48,8 +50,8 @@ public class ExportBatchesToDirectoryTest extends AbstractDataMovementTest {
 
 	@Test
 	public void customFileExtension() {
-		job.getExportBatchesToDirectoryListener()
-			.withFileExtension(".txt")
+		job.getExportListener()
+			.withFilenameExtension(".txt")
 			.withFilenamePrefix("my-batch-");
 		job.run(client);
 

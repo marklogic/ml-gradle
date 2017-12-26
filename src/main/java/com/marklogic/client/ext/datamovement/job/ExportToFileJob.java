@@ -3,6 +3,7 @@ package com.marklogic.client.ext.datamovement.job;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.datamovement.ExportToWriterListener;
 import com.marklogic.client.datamovement.QueryBatcher;
+import com.marklogic.client.document.ServerTransform;
 import com.marklogic.client.ext.datamovement.QueryBatcherJobTicket;
 import com.marklogic.client.ext.datamovement.listener.XmlOutputListener;
 
@@ -19,7 +20,34 @@ public class ExportToFileJob extends AbstractQueryBatcherJob {
 	private ExportToWriterListener exportToWriterListener;
 	private boolean includeXmlOutputListener = true;
 
+	public ExportToFileJob() {
+		super();
+
+		addRequiredJobProperty("exportPath", "The path of the file to which selected records are exported",
+			value -> setExportFile(new File(value)));
+
+		addJobProperty("fileHeader", "Optional content that should be written to the start of each file",
+			value -> setFileHeader(value));
+
+		addJobProperty("fileFooter", "Optional content that should be written to the end of each file",
+			value -> setFileFooter(value));
+
+		addJobProperty("recordPrefix", "Optional content to be written before each record is written",
+			value -> getExportListener().withRecordPrefix(value));
+
+		addJobProperty("recordSuffix", "Optional content to be written after each record is written",
+			value -> getExportListener().withRecordSuffix(value));
+
+		addJobProperty("transform", "Optional REST transform to apply to each record before it is written",
+			value -> getExportListener().withTransform(new ServerTransform(value)));
+	}
+
 	public ExportToFileJob(File exportFile) {
+		this();
+		setExportFile(exportFile);
+	}
+
+	public void setExportFile(File exportFile) {
 		this.exportFile = exportFile;
 		File parentFile = this.exportFile.getParentFile();
 		if (parentFile != null) {
@@ -90,12 +118,16 @@ public class ExportToFileJob extends AbstractQueryBatcherJob {
 		return fileWriter;
 	}
 
+	public File getExportFile() {
+		return exportFile;
+	}
+
 	/**
 	 * Allow client to fiddle with the ExportToWriterListener that's created by this class.
 	 *
 	 * @return
 	 */
-	public ExportToWriterListener getExportToWriterListener() {
+	public ExportToWriterListener getExportListener() {
 		return exportToWriterListener;
 	}
 

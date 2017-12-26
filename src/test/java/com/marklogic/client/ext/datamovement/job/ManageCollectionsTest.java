@@ -11,6 +11,7 @@ import com.marklogic.client.ext.helper.ClientHelper;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Properties;
 
 public class ManageCollectionsTest extends AbstractDataMovementTest {
 
@@ -25,7 +26,19 @@ public class ManageCollectionsTest extends AbstractDataMovementTest {
 		assertUriInCollections(SECOND_URI, COLLECTION, "red", "blue", "green");
 
 		// Remove collections
-		new RemoveCollectionsJob("red", "blue", "green").setWhereCollections(COLLECTION).run(client);
+		Properties props = new Properties();
+		props.setProperty("collections", "red");
+		RemoveCollectionsJob removeCollectionsJob = new RemoveCollectionsJob();
+		List<String> messages = removeCollectionsJob.configureJob(props);
+		assertTrue("Should not have any validation messages: " + messages, messages.isEmpty());
+		removeCollectionsJob.run(client);
+
+		props.setProperty("collections", "blue,green");
+		props.setProperty("whereCollections", COLLECTION);
+		removeCollectionsJob = new RemoveCollectionsJob();
+		messages = removeCollectionsJob.configureJob(props);
+		assertTrue("Should not have any validation messages: " + messages, messages.isEmpty());
+		removeCollectionsJob.run(client);
 		assertUriInCollections(FIRST_URI, COLLECTION);
 		assertUriInCollections(SECOND_URI, COLLECTION);
 

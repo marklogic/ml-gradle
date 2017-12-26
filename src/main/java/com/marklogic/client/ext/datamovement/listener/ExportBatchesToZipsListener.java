@@ -18,7 +18,7 @@ public class ExportBatchesToZipsListener extends AbstractExportBatchesListener {
 	private String uriPrefix;
 
 	public ExportBatchesToZipsListener(File exportDir) {
-		withFileExtension(".zip");
+		withFilenameExtension(".zip");
 		this.exportDir = exportDir;
 		this.exportDir.mkdirs();
 	}

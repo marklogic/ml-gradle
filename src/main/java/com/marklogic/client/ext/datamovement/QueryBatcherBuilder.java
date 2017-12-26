@@ -9,5 +9,10 @@ import com.marklogic.client.datamovement.QueryBatcher;
  */
 public interface QueryBatcherBuilder {
 
+	/**
+	 * @param databaseClient      typically needed for constructing a QueryDefinition
+	 * @param dataMovementManager
+	 * @return
+	 */
 	QueryBatcher buildQueryBatcher(DatabaseClient databaseClient, DataMovementManager dataMovementManager);
 }

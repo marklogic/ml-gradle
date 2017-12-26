@@ -3,20 +3,25 @@ package com.marklogic.client.ext.datamovement.job;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.datamovement.*;
 import com.marklogic.client.ext.datamovement.*;
+import com.marklogic.client.ext.datamovement.listener.SimpleBatchLoggingListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
+import java.util.function.Consumer;
 
 /**
  * Provides basic plumbing for implementing QueryBatcherJob.
  */
-public abstract class AbstractQueryBatcherJob extends BatcherConfig implements QueryBatcherJob {
+public abstract class AbstractQueryBatcherJob extends BatcherConfig implements QueryBatcherJob, ConfigurableJob {
+
+	private List<JobProperty> jobProperties = new ArrayList<>();
 
 	private List<QueryBatchListener> urisReadyListeners;
 	private List<QueryFailureListener> queryFailureListeners;
 
-	private boolean applyConsistentSnapshot = false;
+	private boolean consistentSnapshot = false;
 	private boolean awaitCompletion = true;
 	private boolean stopJobAfterCompletion = true;
 
@@ -30,11 +35,16 @@ public abstract class AbstractQueryBatcherJob extends BatcherConfig implements Q
 	private String[] whereCollections;
 	private String whereUriPattern;
 	private String whereUrisQuery;
+	private boolean requireWhereProperty = true;
 
 	/**
 	 * @return a description of the job that is useful for logging purposes.
 	 */
 	protected abstract String getJobDescription();
+
+	protected AbstractQueryBatcherJob() {
+		addQueryBatcherJobProperties();
+	}
 
 	@Override
 	public QueryBatcherJobTicket run(DatabaseClient databaseClient) {
@@ -65,6 +75,77 @@ public abstract class AbstractQueryBatcherJob extends BatcherConfig implements Q
 		return new QueryBatcherJobTicket(dmm, queryBatcher, jobTicket);
 	}
 
+	@Override
+	public List<String> configureJob(Properties props) {
+		List<String> messages = new ArrayList<>();
+
+		for (JobProperty jobProperty : this.jobProperties) {
+			String name = jobProperty.getPropertyName();
+			String value = props.getProperty(name);
+			if (value != null && value.trim().length() > 0) {
+				jobProperty.getPropertyValueConsumer().accept(value);
+			} else if (jobProperty.isRequired()) {
+				messages.add("The property '" + name + "' is required");
+			}
+		}
+
+		if (requireWhereProperty && !isWherePropertySet() && queryBatcherBuilder == null) {
+			messages.add("At least one 'where' property must be set for selecting records to process");
+		}
+
+		return messages;
+	}
+
+	@Override
+	public List<JobProperty> getJobProperties() {
+		return jobProperties;
+	}
+
+	protected void addQueryBatcherJobProperties() {
+		addJobProperty("batchSize", "Number of records to process at once; defaults to " + DEFAULT_BATCH_SIZE,
+			value -> setBatchSize(Integer.parseInt(value)));
+
+		addJobProperty("consistentSnapshot", "Whether or not to apply a consistent snapshot to the query for records; defaults to false",
+			value -> setConsistentSnapshot(Boolean.parseBoolean(value)));
+
+		addJobProperty("jobName", "Optional name for the Data Movement job", value -> setJobName(value));
+
+		addJobProperty("logBatches", "Log each batch to stdout as it's processed",
+			value -> addUrisReadyListener(new SimpleBatchLoggingListener()));
+
+		addJobProperty("logBatchesWithLogger", "Log each batch as it's processed at the info-level using SLF4J",
+			value -> addUrisReadyListener(new SimpleBatchLoggingListener(true)));
+
+		addJobProperty("threadCount", "Number of threads to process records with; default to " + DEFAULT_THREAD_COUNT,
+			value -> setThreadCount(Integer.parseInt(value)));
+
+		addWhereJobProperties();
+	}
+
+	protected void addWhereJobProperties() {
+		addJobProperty("whereCollections", "Comma-delimited list of collections for selecting records to process",
+			value -> setWhereCollections(value.split(",")));
+
+		addJobProperty("whereUriPattern", "URI pattern for selecting records to process",
+			value -> setWhereUriPattern(value));
+
+		addJobProperty("whereUris", "Comma-delimited list of URIs for selecting records to process",
+			value -> setWhereUris(value.split(",")));
+
+		addJobProperty("whereUrisQuery", "CTS URIs query for selecting records to process",
+			value -> setWhereUrisQuery(value));
+	}
+
+	protected void addJobProperty(String name, String description, Consumer<String> propertyValueConsumer) {
+		jobProperties.add(new SimpleJobProperty(name, description, propertyValueConsumer));
+	}
+
+	protected void addRequiredJobProperty(String name, String description, Consumer<String> propertyValueConsumer) {
+		SimpleJobProperty prop = new SimpleJobProperty(name, description, propertyValueConsumer);
+		prop.setRequired(true);
+		jobProperties.add(prop);
+	}
+
 	/**
 	 * Can be overridden by the subclass to prepare the QueryBatcher before the job is started.
 	 *
@@ -73,7 +154,7 @@ public abstract class AbstractQueryBatcherJob extends BatcherConfig implements Q
 	protected void prepareQueryBatcher(QueryBatcher queryBatcher) {
 		super.prepareBatcher(queryBatcher);
 
-		if (applyConsistentSnapshot) {
+		if (consistentSnapshot) {
 			queryBatcher.withConsistentSnapshot();
 		}
 
@@ -91,8 +172,6 @@ public abstract class AbstractQueryBatcherJob extends BatcherConfig implements Q
 	}
 
 	/**
-	 * For subclasses to use to construct a QueryBatcherBuilder based on the "where" properties that have been set.
-	 *
 	 * @return
 	 */
 	protected QueryBatcherBuilder newQueryBatcherBuilder() {
@@ -100,21 +179,19 @@ public abstract class AbstractQueryBatcherJob extends BatcherConfig implements Q
 			return queryBatcherBuilder;
 		}
 
-		if (isWherePropertySet()) {
-			if (whereUris != null && whereUris.length > 0) {
-				return new DocumentUrisQueryBatcherBuilder(whereUris);
-			}
-			if (whereCollections != null) {
-				return new CollectionsQueryBatcherBuilder(whereCollections);
-			}
-			if (whereUriPattern != null) {
-				return new UriPatternQueryBatcherBuilder(whereUriPattern);
-			}
-			if (whereUrisQuery != null) {
-				return new UrisQueryQueryBatcherBuilder(whereUrisQuery);
-			}
+		if (whereUris != null && whereUris.length > 0) {
+			return new DocumentUrisQueryBatcherBuilder(whereUris);
 		}
-		throw new IllegalArgumentException("No 'where' property has been set, unable to construct a QueryBatcherBuilder");
+		if (whereCollections != null) {
+			return new CollectionsQueryBatcherBuilder(whereCollections);
+		}
+		if (whereUriPattern != null) {
+			return new UriPatternQueryBatcherBuilder(whereUriPattern);
+		}
+		if (whereUrisQuery != null) {
+			return new UrisQueryQueryBatcherBuilder(whereUrisQuery);
+		}
+		return null;
 	}
 
 	/**
@@ -126,19 +203,19 @@ public abstract class AbstractQueryBatcherJob extends BatcherConfig implements Q
 			return "with custom query";
 		}
 
-		if (isWherePropertySet()) {
-			if (whereUris != null && whereUris.length > 0) {
-				return "with URIs " + Arrays.asList(whereUris);
-			} else if (whereCollections != null && whereCollections.length > 0) {
-				return "in collections " + Arrays.asList(this.whereCollections);
-			} else if (whereUriPattern != null) {
-				return "matching URI pattern [" + whereUriPattern + "]";
-			} else if (whereUrisQuery != null) {
-				return "matching URIs query [" + whereUrisQuery + "]";
-			}
+		if (whereUris != null && whereUris.length > 0) {
+			return "with URIs " + Arrays.asList(whereUris);
+		} else if (whereCollections != null && whereCollections.length > 0) {
+			return "in collections " + Arrays.asList(this.whereCollections);
+		} else if (whereUriPattern != null) {
+			return "matching URI pattern [" + whereUriPattern + "]";
+		} else if (whereUrisQuery != null) {
+			return "matching URIs query [" + whereUrisQuery + "]";
 		}
-		throw new IllegalArgumentException("No 'where' property has been set, unable to construct a description of the query");
+
+		return null;
 	}
+
 
 	protected boolean isWherePropertySet() {
 		return
@@ -217,12 +294,12 @@ public abstract class AbstractQueryBatcherJob extends BatcherConfig implements Q
 		return this;
 	}
 
-	public boolean isApplyConsistentSnapshot() {
-		return applyConsistentSnapshot;
+	public boolean isConsistentSnapshot() {
+		return consistentSnapshot;
 	}
 
-	public AbstractQueryBatcherJob setApplyConsistentSnapshot(boolean applyConsistentSnapshot) {
-		this.applyConsistentSnapshot = applyConsistentSnapshot;
+	public AbstractQueryBatcherJob setConsistentSnapshot(boolean consistentSnapshot) {
+		this.consistentSnapshot = consistentSnapshot;
 		return this;
 	}
 
@@ -252,5 +329,9 @@ public abstract class AbstractQueryBatcherJob extends BatcherConfig implements Q
 	public AbstractQueryBatcherJob setQueryBatcherBuilder(QueryBatcherBuilder queryBatcherBuilder) {
 		this.queryBatcherBuilder = queryBatcherBuilder;
 		return this;
+	}
+
+	public void setRequireWhereProperty(boolean requireWhereProperty) {
+		this.requireWhereProperty = requireWhereProperty;
 	}
 }

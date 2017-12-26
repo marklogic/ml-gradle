@@ -18,7 +18,7 @@ import java.util.Set;
  */
 public abstract class AbstractExportBatchesListener extends ExportListener {
 
-	private String fileExtension = "";
+	private String filenameExtension = "";
 	private String filenamePrefix = "batch-";
 
 	private ServerTransform transform;
@@ -51,7 +51,7 @@ public abstract class AbstractExportBatchesListener extends ExportListener {
 	 * @return
 	 */
 	protected File getFileForBatch(QueryBatch queryBatch, File exportDir) {
-		String filename = queryBatch.getJobBatchNumber() + fileExtension;
+		String filename = queryBatch.getJobBatchNumber() + filenameExtension;
 		if (filenamePrefix != null) {
 			filename = filenamePrefix + filename;
 		}
@@ -86,8 +86,8 @@ public abstract class AbstractExportBatchesListener extends ExportListener {
 		return this;
 	}
 
-	public AbstractExportBatchesListener withFileExtension(String fileExtension) {
-		this.fileExtension = fileExtension;
+	public AbstractExportBatchesListener withFilenameExtension(String filenameExtension) {
+		this.filenameExtension = filenameExtension;
 		return this;
 	}
 

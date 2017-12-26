@@ -9,9 +9,12 @@ import com.marklogic.client.ext.helper.LoggingObject;
  */
 public class BatcherConfig extends LoggingObject {
 
+	public final static Integer DEFAULT_BATCH_SIZE = 100;
+	public final static Integer DEFAULT_THREAD_COUNT = 8;
+
 	private String jobName;
-	private Integer batchSize = 100;
-	private Integer threadCount = 8;
+	private Integer batchSize = DEFAULT_BATCH_SIZE;
+	private Integer threadCount = DEFAULT_THREAD_COUNT;
 	private ForestConfiguration forestConfig;
 
 	public void prepareBatcher(Batcher batcher) {

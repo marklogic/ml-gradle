@@ -1,9 +1,8 @@
 package com.marklogic.gradle.task.datamovement
 
 import com.marklogic.client.DatabaseClient
-import com.marklogic.client.datamovement.ExportListener
-import com.marklogic.client.ext.datamovement.QueryBatcherTemplate
-import com.marklogic.client.ext.datamovement.consumer.WriteToFileConsumer
+import com.marklogic.client.ext.datamovement.consumer.WriteDocumentToFileConsumer
+import com.marklogic.client.ext.datamovement.job.SimpleExportJob
 import org.gradle.api.tasks.TaskAction
 
 class ExportModulesTask extends DataMovementTask {
@@ -41,17 +40,15 @@ class ExportModulesTask extends DataMovementTask {
 		}
 
 		File out = new File(exportPath)
+		out.mkdirs()
+
 		println "Will export modules from database '" + databaseName + "' matching pattern '" + uriPattern + "' to path: " + out.getAbsolutePath()
 
 		DatabaseClient client = getAppConfig().newAppServicesDatabaseClient(databaseName)
 		try {
-			WriteToFileConsumer consumer = new WriteToFileConsumer(out)
+			WriteDocumentToFileConsumer consumer = new WriteDocumentToFileConsumer(out)
 			consumer.setLogErrors(logErrors)
-
-			QueryBatcherTemplate template = newQueryBatcherTemplate(client)
-			ExportListener listener = new ExportListener()
-			listener.onDocumentReady(consumer)
-			template.applyOnUriPattern(listener, "**")
+			new SimpleExportJob(consumer).setWhereUriPattern("**").run(client)
 		} finally {
 			client.release()
 		}

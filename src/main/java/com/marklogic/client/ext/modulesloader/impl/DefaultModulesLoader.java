@@ -6,7 +6,9 @@ import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.admin.*;
 import com.marklogic.client.admin.ResourceExtensionsManager.MethodParameters;
 import com.marklogic.client.admin.ServerConfigurationManager.UpdatePolicy;
+import com.marklogic.client.ext.file.DefaultDocumentFileReader;
 import com.marklogic.client.ext.file.DocumentFile;
+import com.marklogic.client.ext.file.DocumentFileReader;
 import com.marklogic.client.ext.helper.FilenameUtil;
 import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.client.ext.modulesloader.*;
@@ -24,6 +26,7 @@ import org.springframework.util.FileCopyUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Default implementation of ModulesLoader. Loads everything except assets via the REST API. Assets are either loaded
@@ -56,6 +59,22 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	private boolean catchExceptions = false;
 
 	/**
+	 * When not null, this will be applied against every Resource that's found and if it doesn't match the pattern,
+	 * it will not be loaded.
+	 */
+	private Pattern includeFilenamePattern;
+
+	/**
+	 * Use this when you need to load REST modules and asset modules as well (non-REST modules).
+	 *
+	 * @param assetFileLoader
+	 */
+	public DefaultModulesLoader(AssetFileLoader assetFileLoader) {
+		this();
+		this.assetFileLoader = assetFileLoader;
+	}
+
+	/**
 	 * Use this when you don't need to load asset modules.
 	 */
 	public DefaultModulesLoader() {
@@ -64,11 +83,9 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		failureListeners.add(new SimpleLoadModulesFailureListener());
 	}
 
-	public DefaultModulesLoader(AssetFileLoader assetFileLoader) {
-		this();
-		this.assetFileLoader = assetFileLoader;
-	}
-
+	/**
+	 *
+	 */
 	public void initializeDefaultTaskExecutor() {
 		if (taskThreadCount > 1) {
 			ThreadPoolTaskExecutor tpte = new ThreadPoolTaskExecutor();
@@ -155,57 +172,58 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	 */
 	protected void loadProperties(Modules modules, Set<Resource> loadedModules) {
 		Resource r = modules.getPropertiesFile();
-		if (r != null && r.exists()) {
-			File f = getFileFromResource(r);
-			if (f != null && modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastLoaded(f)) {
-				return;
-			}
-
-			ServerConfigurationManager mgr = client.newServerConfigManager();
-			ObjectMapper m = new ObjectMapper();
-			JsonNode node = null;
-			try {
-				node = m.readTree(r.getInputStream());
-			} catch (IOException ex) {
-				throw new RuntimeException("Unable to read REST configuration from file: " + f.getAbsolutePath(), ex);
-			}
-			if (node.has("document-transform-all")) {
-				mgr.setDefaultDocumentReadTransformAll(node.get("document-transform-all").asBoolean());
-			}
-			if (node.has("document-transform-out")) {
-				mgr.setDefaultDocumentReadTransform(node.get("document-transform-out").asText());
-			}
-			if (node.has("update-policy")) {
-				mgr.setUpdatePolicy(UpdatePolicy.valueOf(node.get("update-policy").asText()));
-			}
-			if (node.has("validate-options")) {
-				mgr.setQueryOptionValidation(node.get("validate-options").asBoolean());
-			}
-			if (node.has("validate-queries")) {
-				mgr.setQueryValidation(node.get("validate-queries").asBoolean());
-			}
-			if (node.has("debug")) {
-				mgr.setServerRequestLogging(node.get("debug").asBoolean());
-			}
-			if (logger.isInfoEnabled()) {
-				logger.info("Writing REST server configuration");
-				logger.info("Default document read transform: " + mgr.getDefaultDocumentReadTransform());
-				logger.info("Transform all documents on read: " + mgr.getDefaultDocumentReadTransformAll());
-				logger.info("Validate query options: " + mgr.getQueryOptionValidation());
-				logger.info("Validate queries: " + mgr.getQueryValidation());
-				logger.info("Output debugging: " + mgr.getServerRequestLogging());
-				if (mgr.getUpdatePolicy() != null) {
-					logger.info("Update policy: " + mgr.getUpdatePolicy().name());
-				}
-			}
-			mgr.writeConfiguration();
-
-			if (f != null && modulesManager != null) {
-				modulesManager.saveLastLoadedTimestamp(f, new Date());
-			}
-
-			loadedModules.add(r);
+		if (r == null || !r.exists() || ignoreResource(r)) {
+			return;
 		}
+		File f = getFileFromResource(r);
+		if (f != null && modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastLoaded(f)) {
+			return;
+		}
+
+		ServerConfigurationManager mgr = client.newServerConfigManager();
+		ObjectMapper m = new ObjectMapper();
+		JsonNode node = null;
+		try {
+			node = m.readTree(r.getInputStream());
+		} catch (IOException ex) {
+			throw new RuntimeException("Unable to read REST configuration from file: " + f.getAbsolutePath(), ex);
+		}
+		if (node.has("document-transform-all")) {
+			mgr.setDefaultDocumentReadTransformAll(node.get("document-transform-all").asBoolean());
+		}
+		if (node.has("document-transform-out")) {
+			mgr.setDefaultDocumentReadTransform(node.get("document-transform-out").asText());
+		}
+		if (node.has("update-policy")) {
+			mgr.setUpdatePolicy(UpdatePolicy.valueOf(node.get("update-policy").asText()));
+		}
+		if (node.has("validate-options")) {
+			mgr.setQueryOptionValidation(node.get("validate-options").asBoolean());
+		}
+		if (node.has("validate-queries")) {
+			mgr.setQueryValidation(node.get("validate-queries").asBoolean());
+		}
+		if (node.has("debug")) {
+			mgr.setServerRequestLogging(node.get("debug").asBoolean());
+		}
+		if (logger.isInfoEnabled()) {
+			logger.info("Writing REST server configuration");
+			logger.info("Default document read transform: " + mgr.getDefaultDocumentReadTransform());
+			logger.info("Transform all documents on read: " + mgr.getDefaultDocumentReadTransformAll());
+			logger.info("Validate query options: " + mgr.getQueryOptionValidation());
+			logger.info("Validate queries: " + mgr.getQueryValidation());
+			logger.info("Output debugging: " + mgr.getServerRequestLogging());
+			if (mgr.getUpdatePolicy() != null) {
+				logger.info("Update policy: " + mgr.getUpdatePolicy().name());
+			}
+		}
+		mgr.writeConfiguration();
+
+		if (f != null && modulesManager != null) {
+			modulesManager.saveLastLoadedTimestamp(f, new Date());
+		}
+
+		loadedModules.add(r);
 	}
 
 	protected File getFileFromResource(Resource r) {
@@ -215,6 +233,11 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		return null;
 	}
 
+	/**
+	 *
+	 * @param modules
+	 * @param loadedModules
+	 */
 	protected void loadAssets(Modules modules, Set<Resource> loadedModules) {
 		List<Resource> dirs = modules.getAssetDirectories();
 		if (dirs == null || dirs.isEmpty()) {
@@ -234,6 +257,16 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 			logger.info("Loading asset modules from paths: " + Arrays.asList(paths));
 		}
 
+		if (includeFilenamePattern != null) {
+			// Make sure the DocumentFileReader is not null
+			assetFileLoader.initializeDocumentFileReader();
+			DocumentFileReader dfr = assetFileLoader.getDocumentFileReader();
+			if (dfr instanceof DefaultDocumentFileReader) {
+				DefaultDocumentFileReader reader = (DefaultDocumentFileReader)dfr;
+				reader.addFileFilter(pathname -> includeFilenamePattern.matcher(pathname.getAbsolutePath()).matches());
+			}
+		}
+
 		List<DocumentFile> list = assetFileLoader.loadFiles(paths);
 		if (staticChecker != null && !list.isEmpty()) {
 			try {
@@ -246,16 +279,17 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 				}
 			}
 		}
-		Set<Resource> files = new HashSet<>();
-		for (DocumentFile asset : list) {
-			files.add(asset.getResource());
-		}
 
-		if (files != null) {
-			loadedModules.addAll(files);
+		for (DocumentFile asset : list) {
+			loadedModules.add(asset.getResource());
 		}
 	}
 
+	/**
+	 *
+	 * @param modules
+	 * @param loadedModules
+	 */
 	protected void loadQueryOptions(Modules modules, Set<Resource> loadedModules) {
 		if (modules.getOptions() == null) {
 			return;
@@ -268,6 +302,11 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		}
 	}
 
+	/**
+	 *
+	 * @param modules
+	 * @param loadedModules
+	 */
 	protected void loadTransforms(Modules modules, Set<Resource> loadedModules) {
 		if (modules.getTransforms() == null) {
 			return;
@@ -292,6 +331,11 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		}
 	}
 
+	/**
+	 *
+	 * @param modules
+	 * @param loadedModules
+	 */
 	protected void loadResources(Modules modules, Set<Resource> loadedModules) {
 		if (modules.getServices() == null) {
 			return;
@@ -316,6 +360,11 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		}
 	}
 
+	/**
+	 *
+	 * @param modules
+	 * @param loadedModules
+	 */
 	protected void loadNamespaces(Modules modules, Set<Resource> loadedModules) {
 		if (modules.getNamespaces() == null) {
 			return;
@@ -328,8 +377,15 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		}
 	}
 
+	/**
+	 *
+	 * @param r
+	 * @param metadata
+	 * @param methodParams
+	 * @return
+	 */
 	public Resource installService(Resource r, final ExtensionMetadata metadata, final MethodParameters... methodParams) {
-		if (!hasFileBeenModified(r)) {
+		if (!hasFileBeenModified(r) || ignoreResource(r)) {
 			return null;
 		}
 		final ResourceExtensionsManager extMgr = client.newServerConfigManager().newResourceExtensionsManager();
@@ -346,8 +402,14 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		return r;
 	}
 
+	/**
+	 *
+	 * @param r
+	 * @param metadata
+	 * @return
+	 */
 	public Resource installTransform(Resource r, final ExtensionMetadata metadata) {
-		if (!hasFileBeenModified(r)) {
+		if (!hasFileBeenModified(r) || ignoreResource(r)) {
 			return null;
 		}
 		final String filename = r.getFilename();
@@ -370,8 +432,13 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		return r;
 	}
 
+	/**
+	 *
+	 * @param r
+	 * @return
+	 */
 	public Resource installQueryOptions(Resource r) {
-		if (!hasFileBeenModified(r)) {
+		if (!hasFileBeenModified(r) || ignoreResource(r)) {
 			return null;
 		}
 
@@ -430,8 +497,13 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		});
 	}
 
+	/**
+	 *
+	 * @param r
+	 * @return
+	 */
 	public Resource installNamespace(Resource r) {
-		if (!hasFileBeenModified(r)) {
+		if (!hasFileBeenModified(r) || ignoreResource(r)) {
 			return null;
 		}
 
@@ -456,12 +528,42 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		return r;
 	}
 
+	/**
+	 *
+	 * @param r
+	 * @return
+	 */
 	protected String getExtensionNameFromFile(Resource r) {
 		String name = r.getFilename();
 		int pos = name.lastIndexOf('.');
 		if (pos < 0)
 			return name;
 		return name.substring(0, pos);
+	}
+
+	/**
+	 * If includeFilenamePattern is not null, then it is matched against the absolute path of the File that is resolved from
+	 * the given resource. If the pattern doesn't match the absolute path, then true is returned. If a File cannot be
+	 * resolved, then false is returned.
+	 *
+	 * @param r
+	 * @return
+	 */
+	protected boolean ignoreResource(Resource r) {
+		if (includeFilenamePattern != null) {
+			File file = null;
+			try {
+				file = r.getFile();
+			} catch (IOException e) {
+				if (logger.isInfoEnabled()) {
+					logger.info("Cannot resolve a File for resource: " + r + "; cannot determine if file should be ignored or not; cause: " + e.getMessage());
+				}
+			}
+			if (file != null && !includeFilenamePattern.matcher(file.getAbsolutePath()).matches()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void setDatabaseClient(DatabaseClient client) {
@@ -558,5 +660,9 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 
 	public void setTokenReplacer(TokenReplacer tokenReplacer) {
 		this.tokenReplacer = tokenReplacer;
+	}
+
+	public void setIncludeFilenamePattern(Pattern includeFilenamePattern) {
+		this.includeFilenamePattern = includeFilenamePattern;
 	}
 }

@@ -65,9 +65,7 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 	 */
 	public List<DocumentFile> loadFiles(String... paths) {
 		batchWriter.initialize();
-		if (documentFileReader == null) {
-			documentFileReader = buildDocumentFileReader();
-		}
+		initializeDocumentFileReader();
 
 		List<DocumentFile> documentFiles = documentFileReader.readDocumentFiles(paths);
 		if (documentFiles != null && !documentFiles.isEmpty()) {
@@ -90,20 +88,20 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 	/**
 	 * If no DocumentFileReader is set, this will construct a DefaultDocumentFileReader, which is then configured based
 	 * on several properties of this class.
-	 *
-	 * @return
 	 */
-	protected DocumentFileReader buildDocumentFileReader() {
-		DefaultDocumentFileReader reader = new DefaultDocumentFileReader();
+	public void initializeDocumentFileReader() {
+		if (this.documentFileReader == null) {
+			DefaultDocumentFileReader reader = new DefaultDocumentFileReader();
 
-		if (fileFilters != null) {
-			for (FileFilter filter : fileFilters) {
-				reader.addFileFilter(filter);
+			if (fileFilters != null) {
+				for (FileFilter filter : fileFilters) {
+					reader.addFileFilter(filter);
+				}
 			}
-		}
 
-		prepareAbstractDocumentFileReader(reader);
-		return reader;
+			prepareAbstractDocumentFileReader(reader);
+			this.documentFileReader = reader;
+		}
 	}
 
 	/**

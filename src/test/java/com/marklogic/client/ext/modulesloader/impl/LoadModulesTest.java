@@ -3,7 +3,6 @@ package com.marklogic.client.ext.modulesloader.impl;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.ext.AbstractIntegrationTest;
 import com.marklogic.client.ext.tokenreplacer.DefaultTokenReplacer;
-import com.marklogic.client.ext.tokenreplacer.TokenReplacer;
 import com.marklogic.client.io.BytesHandle;
 import com.marklogic.client.io.StringHandle;
 import org.junit.Before;
@@ -13,6 +12,7 @@ import org.springframework.core.io.Resource;
 import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 public class LoadModulesTest extends AbstractIntegrationTest {
 
@@ -66,6 +66,23 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 		String transformText = new String(modulesClient.newDocumentManager().read(
 			"/marklogic.rest.transform/xquery-transform/assets/transform.xqy", new BytesHandle()).get());
 		assertTrue(transformText.contains("xdmp:log(\"hello-world\")"));
+	}
+
+	@Test
+	public void withFilenamePattern() {
+		verifyModuleCountWithPattern(".*options.*(xml)", "Should only load the single XML options file", 1);
+		verifyModuleCountWithPattern(".*transforms.*", "Should only load the 5 transforms", 5);
+		verifyModuleCountWithPattern(".*services.*", "Should only load the 3 services", 3);
+		verifyModuleCountWithPattern(".*", "Should load every file", 26);
+		verifyModuleCountWithPattern(".*/ext.*", "Should only load the 7 assets under /ext", 7);
+	}
+
+	private void verifyModuleCountWithPattern(String pattern, String message, int count) {
+		String dir = Paths.get("src", "test", "resources", "sample-base-dir").toString();
+		modulesLoader.setIncludeFilenamePattern(Pattern.compile(pattern));
+		Set<Resource> files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
+		logger.info(files.size() + "");
+		assertEquals(message, count, files.size());
 	}
 
 	@Test

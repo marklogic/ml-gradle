@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.regex.Pattern;
 
 public class LoadModulesTest extends AbstractAppDeployerTest {
 
@@ -158,6 +159,18 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 
 		String xquery = "fn:count(cts:uri-match('/ext/**.xqy'))";
 		assertEquals(1, Integer.parseInt(xccTemplate.executeAdhocQuery(xquery)));
+	}
+
+	@Test
+	public void includeModulesPattern() {
+		appConfig.setModuleFilenamesIncludePattern(Pattern.compile(".*/ext.*"));
+
+		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
+		appDeployer.deploy(appConfig);
+
+		String xquery = "fn:count(cts:uris((), (), cts:true-query()))";
+		assertEquals("Should have the 3 /ext modules plus the REST API properties file, which was loaded when the REST server was created",
+			4, Integer.parseInt(xccTemplate.executeAdhocQuery(xquery)));
 	}
 
 	private void assertModuleExistsWithDefaultPermissions(String message, String uri) {

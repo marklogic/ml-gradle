@@ -108,6 +108,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    p.setProperty("mlCreateForests", "false");
 	    p.setProperty("mlForestsPerHost", "some-db,2,other-db,3");
         p.setProperty("mlModulePermissions", "some-perm,read,some-perm,update");
+        p.setProperty("mlModulesRegex", "some-pattern");
         p.setProperty("mlAdditionalBinaryExtensions", ".gradle,.properties");
         p.setProperty("mlConfigPaths", "src/test/resources/sample-app/custom-forests,src/test/resources/sample-app/alert-config");
         p.setProperty("mlSimpleSsl", "true");
@@ -201,6 +202,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    assertEquals(2, (int)forestCounts.get("some-db"));
 	    assertEquals(3, (int)forestCounts.get("other-db"));
         assertEquals("some-perm,read,some-perm,update", config.getModulePermissions());
+        assertEquals("some-pattern", config.getModuleFilenamesIncludePattern().pattern());
         String[] extensions = config.getAdditionalBinaryExtensions();
         assertEquals(".gradle", extensions[0]);
         assertEquals(".properties", extensions[1]);

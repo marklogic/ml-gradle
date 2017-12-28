@@ -15,6 +15,7 @@ import com.marklogic.xcc.template.XccTemplate;
 
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 public class DefaultModulesLoaderFactory extends LoggingObject implements ModulesLoaderFactory {
 
@@ -60,6 +61,12 @@ public class DefaultModulesLoaderFactory extends LoggingObject implements Module
 		if (appConfig.isStaticCheckAssets()) {
 			modulesLoader.setStaticChecker(newStaticChecker(appConfig));
 		}
+
+		Pattern modulesPattern = appConfig.getModuleFilenamesIncludePattern();
+		if (modulesPattern != null) {
+			modulesLoader.setIncludeFilenamePattern(modulesPattern);
+		}
+
 		return modulesLoader;
 	}
 

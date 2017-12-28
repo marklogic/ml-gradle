@@ -185,7 +185,9 @@ public class AppConfig {
     // Additional PropertiesSources instance to use for replacing module tokens
     private List<PropertiesSource> moduleTokensPropertiesSources = new ArrayList<>();
 
-    private Map<String, Integer> forestCounts = new HashMap<>();
+	private Pattern moduleFilenamesIncludePattern;
+
+	private Map<String, Integer> forestCounts = new HashMap<>();
 
     // Entity Services properties
     private String modelsPath = "data/entity-services";
@@ -1148,5 +1150,13 @@ public class AppConfig {
 
 	public void setConfigDirs(List<ConfigDir> configDirs) {
 		this.configDirs = configDirs;
+	}
+
+	public Pattern getModuleFilenamesIncludePattern() {
+		return moduleFilenamesIncludePattern;
+	}
+
+	public void setModuleFilenamesIncludePattern(Pattern moduleFilenamesIncludePattern) {
+		this.moduleFilenamesIncludePattern = moduleFilenamesIncludePattern;
 	}
 }

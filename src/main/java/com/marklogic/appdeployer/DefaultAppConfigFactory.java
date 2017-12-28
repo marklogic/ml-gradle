@@ -518,6 +518,12 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			c.setModuleTimestampsPath(prop);
 		}
 
+		prop = getProperty("mlModulesRegex");
+		if (prop != null) {
+			logger.info("Including module filenames matching regex: " + prop);
+			c.setModuleFilenamesIncludePattern(Pattern.compile(prop));
+		}
+
 		/**
 		 * Whether or not to load asset modules in bulk - i.e. in one transaction. Defaults to true.
 		 */

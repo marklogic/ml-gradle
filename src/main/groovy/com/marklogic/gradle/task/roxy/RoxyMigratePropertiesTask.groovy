@@ -4,7 +4,6 @@ import org.gradle.api.tasks.TaskAction
 
 class RoxyMigratePropertiesTask extends RoxyTask {
 
-	Set<String> allRoxyProperties = new LinkedHashSet<>()
 	def roxyPropertyFiles = ["default.properties", "build.properties"]
 	def roxyGradleMapping = [
 		"app-name"                : "mlAppName",
@@ -91,19 +90,8 @@ class RoxyMigratePropertiesTask extends RoxyTask {
 		if (file.exists()) {
 			new File("backup-" + filename).write(file.text)
 		}
-		file.withWriter { writer ->
-			roxyGradleMapping.each { k, v ->
-				def val = roxyProperties.get(k)
-				if (val) writer.append(v).append("=").append(val).append("\n")
-			}
-			allRoxyProperties.removeAll(roxyGradleMapping.keySet())
-			allRoxyProperties.each{ prop ->
-				writer.append(prop).append("=").append("unmapped").append("\n")
-			}
-		}
+		println "Writing: " + filename
+		file.write(text)
 	}
 
-	String getRoxyHome(){
-		project.hasProperty("mlRoxyHome") ? project.property("mlRoxyHome") : ""
-	}
 }

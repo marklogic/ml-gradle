@@ -1,5 +1,6 @@
 package com.marklogic.gradle.task
 
+import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -19,8 +20,9 @@ abstract class AbstractConfirmableTask extends MarkLogicTask {
 			}
 		}
 
+		// Throwing an exception so that any tasks that are run after this task are not executed either
 		if (!executed) {
-			println "To execute this task, set the 'confirm' property to 'true'; e.g. '-Pconfirm=true'"
+			throw new GradleException("To execute this task, set the 'confirm' property to 'true'; e.g. '-Pconfirm=true'")
 		}
 	}
 

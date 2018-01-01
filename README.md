@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/marklogic-community/ml-javaclient-util.svg?branch=master)](https://travis-ci.org/marklogic-community/ml-javaclient-util)
-
 ml-javaclient-util is a library of Java classes that provide some useful functionality on top of 
 the [MarkLogic Java Client API](http://docs.marklogic.com/guide/java). Those features include:
 

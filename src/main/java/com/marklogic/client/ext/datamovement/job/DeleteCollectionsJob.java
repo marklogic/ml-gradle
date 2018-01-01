@@ -12,6 +12,7 @@ public class DeleteCollectionsJob extends AbstractQueryBatcherJob {
 
 	public DeleteCollectionsJob() {
 		super();
+		setRequireWhereProperty(false);
 		addRequiredJobProperty("collections", "Comma-delimited list of collections to delete",
 			value -> setCollections(value.split(",")));
 	}

@@ -8,11 +8,11 @@ import com.marklogic.rest.util.Fragment;
 
 import java.util.List;
 
-public class QueryRoleSetsManager extends AbstractResourceManager {
+public class QueryRolesetsManager extends AbstractResourceManager {
 
 	private boolean updateAllowed = false;
 
-	public QueryRoleSetsManager(ManageClient client) {
+	public QueryRolesetsManager(ManageClient client) {
 		super(client);
 	}
 

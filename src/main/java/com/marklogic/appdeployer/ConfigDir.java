@@ -114,7 +114,7 @@ public class ConfigDir {
 
 	public File getProtectedPathsDir() { return new File(getSecurityDir(), "protected-paths"); }
 
-	public File getQueryRoleSetsDir() { return new File(getSecurityDir(), "query-rolesets"); }
+	public File getQueryRolesetsDir() { return new File(getSecurityDir(), "query-rolesets"); }
 
 	public File getServersDir() {
 		return new File(baseDir, "servers");

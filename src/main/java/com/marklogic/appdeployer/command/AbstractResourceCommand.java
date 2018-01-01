@@ -55,6 +55,8 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 				File dir = resourceDirFinder.getResourceDir(configDir);
 				if (dir != null && dir.exists()) {
 					list.add(dir);
+				} else if (dir != null && logger.isInfoEnabled()) {
+					logger.info("No resource directory found at: " + dir.getAbsolutePath());
 				}
 			}
 		}
@@ -71,13 +73,13 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
                 logger.info("Processing files in directory: " + resourceDir.getAbsolutePath());
             }
             for (File f : listFilesInDirectory(resourceDir, context)) {
-                if (logger.isInfoEnabled()) {
-                    logger.info("Processing file: " + f.getAbsolutePath());
-                }
-                SaveReceipt receipt = saveResource(mgr, context, f);
-                afterResourceSaved(mgr, context, f, receipt);
+		            if (logger.isInfoEnabled()) {
+			            logger.info("Processing file: " + f.getAbsolutePath());
+		            }
+		            SaveReceipt receipt = saveResource(mgr, context, f);
+		            afterResourceSaved(mgr, context, f, receipt);
+	            }
             }
-        }
     }
 
 	/**

@@ -14,7 +14,7 @@ public abstract class SortOrderConstants {
     public static Integer DEPLOY_PROTECTED_COLLECTIONS = 80;
     public static Integer DEPLOY_MIMETYPES = 90;
 	public static Integer DEPLOY_PROTECTED_PATHS = 95;
-	public static Integer DEPLOY_QUERY_ROLE_SETS = 97;
+	public static Integer DEPLOY_QUERY_ROLESETS = 97;
 
     public static Integer DEPLOY_TRIGGERS_DATABASE = 100;
     public static Integer DEPLOY_SCHEMAS_DATABASE = 100;
@@ -74,7 +74,7 @@ public abstract class SortOrderConstants {
     public static Integer DELETE_CERTIFICATE_AUTHORITIES = 9020;
     public static Integer DELETE_EXTERNAL_SECURITY = 9030;
     public static Integer DELETE_PROTECTED_COLLECTIONS = 9040;
-	public static Integer DELETE_QUERY_ROLE_SETS = 9050;
+	public static Integer DELETE_QUERY_ROLESETS = 9050;
 
     // Roles can reference privileges, so must delete roles first
     public static Integer DELETE_ROLES = 9060;

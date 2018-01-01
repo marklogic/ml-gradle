@@ -4,24 +4,24 @@ import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.resource.ResourceManager;
-import com.marklogic.mgmt.resource.security.QueryRoleSetsManager;
+import com.marklogic.mgmt.resource.security.QueryRolesetsManager;
 
 import java.io.File;
 
-public class DeployQueryRoleSetsCommand extends AbstractResourceCommand {
+public class DeployQueryRolesetsCommand extends AbstractResourceCommand {
 
-	public DeployQueryRoleSetsCommand() {
-		setExecuteSortOrder(SortOrderConstants.DEPLOY_QUERY_ROLE_SETS);
-		setUndoSortOrder(SortOrderConstants.DELETE_QUERY_ROLE_SETS);
+	public DeployQueryRolesetsCommand() {
+		setExecuteSortOrder(SortOrderConstants.DEPLOY_QUERY_ROLESETS);
+		setUndoSortOrder(SortOrderConstants.DELETE_QUERY_ROLESETS);
 	}
-	
+
 	@Override
 	protected File[] getResourceDirs(CommandContext context) {
-		return findResourceDirs(context, configDir -> configDir.getQueryRoleSetsDir());
+		return findResourceDirs(context, configDir -> configDir.getQueryRolesetsDir());
 	}
 
 	@Override
 	protected ResourceManager getResourceManager(CommandContext context) {
-		return new QueryRoleSetsManager(context.getManageClient());
+		return new QueryRolesetsManager(context.getManageClient());
 	}
 }

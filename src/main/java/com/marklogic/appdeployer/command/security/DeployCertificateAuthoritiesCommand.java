@@ -33,6 +33,8 @@ public class DeployCertificateAuthoritiesCommand extends AbstractCommand {
 					    }
 				    }
 			    }
+		    } else {
+			    logResourceDirectoryNotFound(dir);
 		    }
 	    }
     }

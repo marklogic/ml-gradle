@@ -55,8 +55,8 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 				File dir = resourceDirFinder.getResourceDir(configDir);
 				if (dir != null && dir.exists()) {
 					list.add(dir);
-				} else if (dir != null && logger.isInfoEnabled()) {
-					logger.info("No resource directory found at: " + dir.getAbsolutePath());
+				} else {
+					logResourceDirectoryNotFound(dir);
 				}
 			}
 		}
@@ -67,20 +67,22 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 	}
 
 	protected void processExecuteOnResourceDir(CommandContext context, File resourceDir) {
-        if (resourceDir.exists()) {
-            ResourceManager mgr = getResourceManager(context);
-            if (logger.isInfoEnabled()) {
-                logger.info("Processing files in directory: " + resourceDir.getAbsolutePath());
-            }
-            for (File f : listFilesInDirectory(resourceDir, context)) {
-		            if (logger.isInfoEnabled()) {
-			            logger.info("Processing file: " + f.getAbsolutePath());
-		            }
-		            SaveReceipt receipt = saveResource(mgr, context, f);
-		            afterResourceSaved(mgr, context, f, receipt);
-	            }
-            }
-    }
+		if (resourceDir.exists()) {
+			ResourceManager mgr = getResourceManager(context);
+			if (logger.isInfoEnabled()) {
+				logger.info("Processing files in directory: " + resourceDir.getAbsolutePath());
+			}
+			for (File f : listFilesInDirectory(resourceDir, context)) {
+				if (logger.isInfoEnabled()) {
+					logger.info("Processing file: " + f.getAbsolutePath());
+				}
+				SaveReceipt receipt = saveResource(mgr, context, f);
+				afterResourceSaved(mgr, context, f, receipt);
+			}
+		} else {
+			logResourceDirectoryNotFound(resourceDir);
+		}
+	}
 
 	/**
 	 * Defaults to the parent method. This was extracted so that a subclass can override it and have access to the

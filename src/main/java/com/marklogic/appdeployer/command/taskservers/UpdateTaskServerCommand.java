@@ -39,6 +39,8 @@ public class UpdateTaskServerCommand extends AbstractCommand {
 					String payload = copyFileToString(f, context);
 					mgr.updateTaskServer(taskServerName, payload);
 				}
+			} else {
+				logResourceDirectoryNotFound(dir);
 			}
 		}
 	}

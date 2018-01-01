@@ -30,6 +30,8 @@ public class ModifyLocalClusterCommand extends AbstractCommand {
 						new ClusterManager(context.getManageClient()).modifyLocalCluster(payload, context.getAdminManager());
 					}
 				}
+			} else {
+				logResourceDirectoryNotFound(clustersDir);
 			}
 		}
 	}

@@ -64,6 +64,7 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 
 		if ((databaseNamesAndReplicaCounts == null || databaseNamesAndReplicaCounts.isEmpty())
 			&& (forestNamesAndReplicaCounts == null || forestNamesAndReplicaCounts.isEmpty())) {
+			logger.info("No database or forest replica counts defined, so not configuring any forest replicas");
 			return;
 		}
 

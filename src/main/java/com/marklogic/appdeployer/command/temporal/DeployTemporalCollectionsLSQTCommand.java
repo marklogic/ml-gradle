@@ -37,7 +37,8 @@ public class DeployTemporalCollectionsLSQTCommand extends AbstractCommand {
 				}
 				new TemporalCollectionLSQTManager(context.getManageClient(), databaseIdOrName, temporalCollectionName).save(payload);
 			}
+		} else {
+			logResourceDirectoryNotFound(dir);
 		}
-
 	}
 }

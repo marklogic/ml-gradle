@@ -76,6 +76,8 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 			        }
 			        dbCommands.add(buildDeployDatabaseCommand(f));
 		        }
+	        } else {
+	        	logResourceDirectoryNotFound(dir);
 	        }
         }
         return dbCommands;

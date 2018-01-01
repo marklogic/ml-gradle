@@ -48,6 +48,8 @@ public class DeployFlexrepCommand extends AbstractCommand implements UndoableCom
 		            configDir.setBaseDir(currentBaseDir);
 	            }
             }
+        } else {
+	        logResourceDirectoryNotFound(flexrepBaseDir);
         }
     }
 
@@ -74,6 +76,9 @@ public class DeployFlexrepCommand extends AbstractCommand implements UndoableCom
     protected File getFlexrepBaseDir(AppConfig appConfig) {
         String path = appConfig.getFlexrepPath();
         if (path == null) {
+        	if (logger.isInfoEnabled()) {
+        		logger.info("Flexrep path not configured, so not attempting to find any Flexrep resources to deploy");
+	        }
             return null;
         }
 
@@ -85,6 +90,7 @@ public class DeployFlexrepCommand extends AbstractCommand implements UndoableCom
         for (ConfigDir configDir : appConfig.getConfigDirs()) {
 	        File flexrepDir = configDir.getFlexrepDir();
 	        if (flexrepDir == null || !flexrepDir.exists()) {
+		        logResourceDirectoryNotFound(flexrepDir);
 		        continue;
 	        }
 

@@ -48,6 +48,8 @@ public class DeployAlertActionsCommand extends AbstractCommand {
 					deployActionsInDirectory(f, context, databaseIdOrName);
 				}
 			}
+		} else {
+			logResourceDirectoryNotFound(configsDir);
 		}
 	}
 

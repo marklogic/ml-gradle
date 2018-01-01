@@ -25,6 +25,8 @@ public abstract class AbstractCpfResourceCommand extends AbstractCommand {
 			        String payload = copyFileToString(f, context);
 			        mgr.save(config.getTriggersDatabaseName(), payload);
 		        }
+	        } else {
+		        logResourceDirectoryNotFound(dir);
 	        }
         }
     }

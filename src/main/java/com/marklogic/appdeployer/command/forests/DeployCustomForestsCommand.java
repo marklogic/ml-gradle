@@ -39,6 +39,8 @@ public class DeployCustomForestsCommand extends AbstractCommand {
 						processDirectory(f, context);
 					}
 				}
+			} else {
+				logResourceDirectoryNotFound(dir);
 			}
 		}
 	}

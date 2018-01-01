@@ -44,6 +44,8 @@ public class DeployTargetsCommand extends AbstractCommand {
 					deployTargetsInDirectory(f, context, databaseIdOrName);
 				}
 			}
+		} else {
+			logResourceDirectoryNotFound(configsDir);
 		}
 	}
 

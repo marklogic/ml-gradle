@@ -67,7 +67,7 @@ public class UpdateRestApiServersCommand extends AbstractCommand {
 		} else {
 			File f = null;
 			for (ConfigDir configDir : context.getAppConfig().getConfigDirs()) {
-				File tmpFile = configDir.getRestApiFile();
+				File tmpFile = configDir.getRestApiServerFile();
 				if (tmpFile.exists()) {
 					f = tmpFile;
 					if (logger.isInfoEnabled()) {

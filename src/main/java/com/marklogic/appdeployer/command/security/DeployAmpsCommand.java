@@ -21,7 +21,7 @@ public class DeployAmpsCommand extends AbstractResourceCommand {
 
     @Override
     protected File[] getResourceDirs(CommandContext context) {
-        return new File[] { context.getAppConfig().getConfigDir().getAmpsDir() };
+    	return findResourceDirs(context, configDir -> configDir.getAmpsDir());
     }
 
     @Override

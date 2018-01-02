@@ -206,6 +206,12 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
         return files;
     }
 
+    protected void logResourceDirectoryNotFound(File dir) {
+    	 if (dir != null && logger.isInfoEnabled()) {
+		    logger.info("No resource directory found at: " + dir.getAbsolutePath());
+	    }
+    }
+
     public void setPayloadTokenReplacer(PayloadTokenReplacer payloadTokenReplacer) {
         this.payloadTokenReplacer = payloadTokenReplacer;
     }

@@ -14,7 +14,7 @@ public class DeployRolesWithDependenciesTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void roleWithPermissions() {
-		appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/roles-with-permissions"));
+		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/roles-with-permissions"));
 
 		initializeAppDeployer(new DeployRolesCommand());
 		try {
@@ -29,7 +29,7 @@ public class DeployRolesWithDependenciesTest extends AbstractAppDeployerTest {
 	 */
 	@Test
 	public void testSorting() {
-		appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/roles-with-dependencies"));
+		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/roles-with-dependencies"));
 
 		initializeAppDeployer(new DeployRolesCommand());
 		try {
@@ -45,7 +45,7 @@ public class DeployRolesWithDependenciesTest extends AbstractAppDeployerTest {
 	 */
 	@Test
 	public void testEvenMoreRoles() {
-		appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/even-more-roles-with-dependencies"));
+		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/even-more-roles-with-dependencies"));
 
 		initializeAppDeployer(new DeployRolesCommand());
 		try {
@@ -61,7 +61,7 @@ public class DeployRolesWithDependenciesTest extends AbstractAppDeployerTest {
 	 */
 	@Test
 	public void anotherSortingTest() {
-		appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/more-roles-with-dependencies"));
+		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/more-roles-with-dependencies"));
 
 		initializeAppDeployer(new DeployRolesCommand());
 		try {
@@ -73,7 +73,7 @@ public class DeployRolesWithDependenciesTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void test() {
-		appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/roles-with-dependencies"));
+		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/roles-with-dependencies"));
 		initializeAppDeployer(new DeployRolesCommand());
 
 		try {

@@ -116,7 +116,8 @@ public class AppConfig {
 	private int modulesLoaderThreadCount = 8;
 
     private String schemasPath;
-    private ConfigDir configDir;
+
+    private List<ConfigDir> configDirs;
 
     // Passed into the PayloadTokenReplacer that subclasses of AbstractCommand use
     private Map<String, String> customTokens = new HashMap<>();
@@ -154,6 +155,7 @@ public class AppConfig {
     private Set<String> databasesWithForestsOnOneHost;
 
     private Map<String, Set<String>> databaseHosts;
+    private Map<String, Set<String>> databaseGroups;
 
     // Data/fast/large directories for default forests
     private String forestDataDirectory;
@@ -183,7 +185,9 @@ public class AppConfig {
     // Additional PropertiesSources instance to use for replacing module tokens
     private List<PropertiesSource> moduleTokensPropertiesSources = new ArrayList<>();
 
-    private Map<String, Integer> forestCounts = new HashMap<>();
+	private Pattern moduleFilenamesIncludePattern;
+
+	private Map<String, Integer> forestCounts = new HashMap<>();
 
     // Entity Services properties
     private String modelsPath = "data/entity-services";
@@ -212,7 +216,8 @@ public class AppConfig {
     public AppConfig(String defaultModulePath, String defaultSchemasPath) {
         modulePaths = new ArrayList<String>();
         modulePaths.add(defaultModulePath);
-        configDir = new ConfigDir();
+        configDirs = new ArrayList<>();
+        configDirs.add(new ConfigDir());
         schemasPath = defaultSchemasPath;
     }
 
@@ -523,16 +528,40 @@ public class AppConfig {
     }
 
     /**
+     * As of 3.3.0, this now returns the first ConfigDir in the List of ConfigsDir that this class now maintains.
+     *
      * @return a {@code ConfigDir} instance that defines the location of the configuration directory (where files are
      * stored that are then loaded via MarkLogic Management API endpoints) as well as paths to specific
      * resources within that directory
      */
+    @Deprecated
     public ConfigDir getConfigDir() {
-        return configDir;
+    	return getFirstConfigDir();
     }
 
-    public void setConfigDir(ConfigDir configDir) {
-        this.configDir = configDir;
+	/**
+	 * Starting in 3.3.0, use this when you only care about the first ConfigDir in the List of ConfigDirs maintained by
+	 * this class.
+	 *
+	 * @return
+	 */
+	public ConfigDir getFirstConfigDir() {
+	    if (configDirs == null || configDirs.isEmpty()) {
+		    this.configDirs = new ArrayList<>();
+		    this.configDirs.add(new ConfigDir());
+	    }
+	    return configDirs.get(0);
+    }
+
+	/**
+	 * As of 3.3.0, this is instead clearing and adding the ConfigDir to the List of ConfigDirs that this class now
+	 * maintains.
+	 *
+	 * @param configDir
+	 */
+	public void setConfigDir(ConfigDir configDir) {
+		this.configDirs = new ArrayList<>();
+		this.configDirs.add(configDir);
     }
 
     /**
@@ -1105,5 +1134,29 @@ public class AppConfig {
 
 	public void setDatabaseHosts(Map<String, Set<String>> databaseHosts) {
 		this.databaseHosts = databaseHosts;
+	}
+
+	public Map<String, Set<String>> getDatabaseGroups() {
+		return databaseGroups;
+	}
+
+	public void setDatabaseGroups(Map<String, Set<String>> databaseGroups) {
+		this.databaseGroups = databaseGroups;
+	}
+
+	public List<ConfigDir> getConfigDirs() {
+		return configDirs;
+	}
+
+	public void setConfigDirs(List<ConfigDir> configDirs) {
+		this.configDirs = configDirs;
+	}
+
+	public Pattern getModuleFilenamesIncludePattern() {
+		return moduleFilenamesIncludePattern;
+	}
+
+	public void setModuleFilenamesIncludePattern(Pattern moduleFilenamesIncludePattern) {
+		this.moduleFilenamesIncludePattern = moduleFilenamesIncludePattern;
 	}
 }

@@ -1,5 +1,6 @@
 package com.marklogic.appdeployer.command.forests;
 
+import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
@@ -29,13 +30,17 @@ public class DeployCustomForestsCommand extends AbstractCommand {
 
 	@Override
 	public void execute(CommandContext context) {
-		File dir = new File(context.getAppConfig().getConfigDir().getBaseDir(), customForestsPath);
-		if (dir != null && dir.exists()) {
-			payloadParser = new PayloadParser();
-			for (File f : dir.listFiles()) {
-				if (f.isDirectory()) {
-					processDirectory(f, context);
+		for (ConfigDir configDir : context.getAppConfig().getConfigDirs()) {
+			File dir = new File(configDir.getBaseDir(), customForestsPath);
+			if (dir != null && dir.exists()) {
+				payloadParser = new PayloadParser();
+				for (File f : dir.listFiles()) {
+					if (f.isDirectory()) {
+						processDirectory(f, context);
+					}
 				}
+			} else {
+				logResourceDirectoryNotFound(dir);
 			}
 		}
 	}

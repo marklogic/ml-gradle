@@ -61,6 +61,8 @@ public class CommandMapBuilder {
 		securityCommands.add(new DeployExternalSecurityCommand());
 		securityCommands.add(new DeployPrivilegesCommand());
 		securityCommands.add(new DeployProtectedCollectionsCommand());
+		securityCommands.add(new DeployProtectedPathsCommand());
+		securityCommands.add(new DeployQueryRolesetsCommand());
 		map.put("mlSecurityCommands", securityCommands);
 
 		// Cluster

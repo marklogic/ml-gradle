@@ -28,7 +28,7 @@ public class DeployOtherServersCommand extends AbstractResourceCommand {
 
     @Override
     protected File[] getResourceDirs(CommandContext context) {
-        return new File[] { context.getAppConfig().getConfigDir().getServersDir() };
+    	return findResourceDirs(context.getAppConfig(), configDir -> configDir.getServersDir());
     }
 
     @Override

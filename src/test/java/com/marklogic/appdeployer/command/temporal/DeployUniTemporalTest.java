@@ -15,7 +15,7 @@ public class DeployUniTemporalTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void test() {
-		appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/uni-temporal-config"));
+		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/uni-temporal-config"));
 
 		initializeAppDeployer(new DeployContentDatabasesCommand(1),
 			new DeploySchemasDatabaseCommand(), new DeployTemporalAxesCommand(),

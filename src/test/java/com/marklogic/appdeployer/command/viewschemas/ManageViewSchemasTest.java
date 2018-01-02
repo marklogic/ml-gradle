@@ -21,7 +21,7 @@ public class ManageViewSchemasTest extends AbstractManageResourceTest {
 
 	@Override
 	protected void initializeAndDeploy() {
-		appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/view-schemas"));
+		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/view-schemas"));
 
 		initializeAppDeployer(new DeployRestApiServersCommand(), new DeploySchemasDatabaseCommand(),
 			new DeployContentDatabasesCommand(1), new DeployOtherDatabasesCommand(),

@@ -10,12 +10,10 @@ import com.marklogic.mgmt.api.forest.ForestReplica;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.forests.ForestManager;
 import com.marklogic.mgmt.resource.forests.ForestStatus;
+import com.marklogic.mgmt.resource.groups.GroupManager;
 import com.marklogic.mgmt.resource.hosts.HostManager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Command for configuring - i.e. creating and setting - replica forests for existing databases and/or primary forests.
@@ -30,6 +28,7 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 	private Map<String, Integer> databaseNamesAndReplicaCounts = new HashMap<>();
 	private Map<String, Integer> forestNamesAndReplicaCounts = new HashMap<>();
 	private boolean deleteReplicasOnUndo = true;
+	private GroupHostMapProvider groupHostMapProvider;
 
 	/**
 	 * By default, the execute sort order is Integer.MAX_VALUE as a way of guaranteeing that the referenced primary
@@ -65,16 +64,18 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 
 		if ((databaseNamesAndReplicaCounts == null || databaseNamesAndReplicaCounts.isEmpty())
 			&& (forestNamesAndReplicaCounts == null || forestNamesAndReplicaCounts.isEmpty())) {
+			logger.info("No database or forest replica counts defined, so not configuring any forest replicas");
 			return;
 		}
-		HostManager hostMgr = new HostManager(context.getManageClient());
+
 		ForestManager forestMgr = new ForestManager(context.getManageClient());
 
-		List<String> hostIds = hostMgr.getHostIds();
-		if (hostIds.size() == 1) {
+		Map<String, String> hostIdsAndNames = new HostManager(context.getManageClient()).getHostIdsAndNames();
+
+		if (hostIdsAndNames.size() == 1) {
 			if (logger.isInfoEnabled()) {
-				logger.info("Only found one host ID, so not configuring any replica forests; host ID: "
-					+ hostIds.get(0));
+				logger.info("Only found one host, so not configuring any replica forests; host: "
+					+ hostIdsAndNames.keySet().iterator().next());
 			}
 			return;
 		}
@@ -82,14 +83,14 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 		for (String databaseName : databaseNamesAndReplicaCounts.keySet()) {
 			int replicaCount = databaseNamesAndReplicaCounts.get(databaseName);
 			if (replicaCount > 0) {
-				configureDatabaseReplicaForests(databaseName, replicaCount, hostIds, context);
+				configureDatabaseReplicaForests(databaseName, replicaCount, hostIdsAndNames, context);
 			}
 		}
 
 		for (String forestName : forestNamesAndReplicaCounts.keySet()) {
 			int replicaCount = forestNamesAndReplicaCounts.get(forestName);
 			if (replicaCount > 0) {
-				configureReplicaForests(null, forestName, replicaCount, hostIds, context, forestMgr);
+				configureReplicaForests(null, forestName, replicaCount, hostIdsAndNames, context, forestMgr);
 			}
 		}
 	}
@@ -145,15 +146,15 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 	 *
 	 * @param databaseName
 	 * @param replicaCount
-	 * @param hostIds
+	 * @param hostIdsAndNames
 	 */
-	protected void configureDatabaseReplicaForests(String databaseName, int replicaCount, List<String> hostIds,
+	protected void configureDatabaseReplicaForests(String databaseName, int replicaCount, Map<String, String> hostIdsAndNames,
 	                                               CommandContext context) {
 		ForestManager forestMgr = new ForestManager(context.getManageClient());
 		DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
 		List<String> forestNames = dbMgr.getForestNames(databaseName);
 		for (String name : forestNames) {
-			configureReplicaForests(databaseName, name, replicaCount, hostIds, context, forestMgr);
+			configureReplicaForests(databaseName, name, replicaCount, hostIdsAndNames, context, forestMgr);
 		}
 	}
 
@@ -164,11 +165,11 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 	 * @param databaseName
 	 * @param forestIdOrName
 	 * @param replicaCount
-	 * @param hostIds
+	 * @param hostIdsAndNames
 	 * @param context
 	 * @param forestMgr
 	 */
-	protected void configureReplicaForests(String databaseName, String forestIdOrName, int replicaCount, List<String> hostIds,
+	protected void configureReplicaForests(String databaseName, String forestIdOrName, int replicaCount, Map<String, String> hostIdsAndNames,
 	                                       CommandContext context, ForestManager forestMgr) {
 		ForestStatus status = forestMgr.getForestStatus(forestIdOrName);
 		if (!status.isPrimary()) {
@@ -181,7 +182,7 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 		}
 
 		logger.info(format("Creating forest replicas for primary forest %s", forestIdOrName));
-		createReplicaForests(databaseName, forestIdOrName, replicaCount, hostIds, context, forestMgr);
+		createReplicaForests(databaseName, forestIdOrName, replicaCount, hostIdsAndNames, context, forestMgr);
 		logger.info(format("Finished creating forest replicas for primary forest %s", forestIdOrName));
 	}
 
@@ -192,13 +193,13 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 	 * @param databaseName
 	 * @param forestIdOrName
 	 * @param replicaCount
-	 * @param hostIds
+	 * @param hostIdsAndNames
 	 * @param context
 	 * @param forestMgr
 	 * @return a map where the keys are replica forest names, and the value of each key is the ID of the host that
 	 * the replica was created on
 	 */
-	protected Map<String, String> createReplicaForests(String databaseName, String forestIdOrName, int replicaCount, List<String> hostIds,
+	protected Map<String, String> createReplicaForests(String databaseName, String forestIdOrName, int replicaCount, Map<String, String> hostIdsAndNames,
 	                                                   CommandContext context, ForestManager forestMgr) {
 
 		// Using the Forest class to generate JSON
@@ -209,9 +210,20 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 
 		String primaryForestHostId = forestMgr.getHostId(forestIdOrName);
 		Map<String, String> replicaNamesAndHostIds = new HashMap<>();
+
+		List<String> hostIds = getHostIdsForDatabaseForests(databaseName, hostIdsAndNames, context);
+
+		if (replicaCount >= hostIds.size()) {
+			throw new IllegalArgumentException(String.format("Not enough hosts exists to create %d replicas for database '%s'; " +
+					"possible hosts, which may include the host with the primary forest and thus cannot have a replica: %s",
+				replicaCount, databaseName, hostIds));
+		}
+
 		int size = hostIds.size();
 		for (int i = 0; i < size; i++) {
 			String hostId = hostIds.get(i);
+			// Once we find the host that the primary forest is on, we start creating N replicas on subsequent hosts,
+			// where N = replicaCount.
 			if (hostId.equals(primaryForestHostId)) {
 				int nextReplicaHostIndex = i + 1;
 				for (int j = 1; j <= replicaCount; j++) {
@@ -230,6 +242,77 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 		String json = forest.getJson();
 		context.getManageClient().putJson(forestMgr.getPropertiesPath(forestIdOrName), json);
 		return replicaNamesAndHostIds;
+	}
+
+	/**
+	 * If databaseHosts has been populated on the AppConfig object inside the CommandContext, and there's an entry for
+	 * the given database name, then this will only return the hosts that have been set for the given database name.
+	 * Otherwise, all hosts are returned.
+	 *
+	 * @param databaseName
+	 * @param hostIdsAndNames
+	 * @param context
+	 * @return
+	 */
+	protected List<String> getHostIdsForDatabaseForests(String databaseName, Map<String, String> hostIdsAndNames, CommandContext context) {
+		List<String> selectedHostIds = new ArrayList<>();
+
+		Map<String, Set<String>> databaseGroupMap = context.getAppConfig().getDatabaseGroups();
+		Set<String> databaseGroups = databaseGroupMap != null ? databaseGroupMap.get(databaseName) : null;
+
+		Map<String, Set<String>> databaseHostMap = context.getAppConfig().getDatabaseHosts();
+		Set<String> databaseHosts = databaseHostMap != null ? databaseHostMap.get(databaseName) : null;
+
+		if (databaseGroups != null && !databaseGroups.isEmpty()) {
+			if (groupHostMapProvider == null) {
+				groupHostMapProvider = groupName -> new GroupManager(context.getManageClient()).getHostIdsAndNames(groupName);
+			}
+
+			if (logger.isInfoEnabled()) {
+				logger.info(format("Creating replica forests on hosts in groups %s for database '%s'", databaseGroups, databaseName));
+			}
+
+			for (String groupName : databaseGroups) {
+				Map<String, String> groupHostIdsAndNames = groupHostMapProvider.getGroupHostMap(groupName);
+				if (groupHostIdsAndNames == null || groupHostIdsAndNames.isEmpty()) {
+					logger.warn("No hosts found for group: " + groupName);
+					continue;
+				}
+
+				Set<String> groupHostIds = groupHostIdsAndNames.keySet();
+				for (String hostId : hostIdsAndNames.keySet()) {
+					if (groupHostIds.contains(hostId)) {
+						selectedHostIds.add(hostId);
+					}
+				}
+			}
+
+			if (!selectedHostIds.isEmpty()) {
+				if (logger.isInfoEnabled()) {
+					logger.info(format("Creating forests on hosts %s based on groups %s for database '%s'", selectedHostIds, databaseGroups, databaseName));
+				}
+				if (databaseHosts != null && !databaseHosts.isEmpty()) {
+					logger.warn(format("Database groups and database hosts were both specified for database '%s'; " +
+						"only database groups are being used, database hosts will be ignored.", databaseName));
+				}
+				return selectedHostIds;
+			}
+
+			logger.warn("Did not find any valid hosts in selected groups: " + databaseGroups);
+		}
+
+		/**
+		 * If no database groups were specified, then retain any host that is either in the set of database hosts, or
+		 * all hosts in case no database hosts were specified.
+		 */
+		for (String hostId : hostIdsAndNames.keySet()) {
+			String hostName = hostIdsAndNames.get(hostId);
+			if ((databaseHosts == null || databaseHosts.contains(hostName))) {
+				selectedHostIds.add(hostId);
+			}
+		}
+
+		return selectedHostIds;
 	}
 
 	/**
@@ -320,4 +403,15 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 	public void setDatabaseNamesAndReplicaCounts(Map<String, Integer> databaseNamesAndReplicaCounts) {
 		this.databaseNamesAndReplicaCounts = databaseNamesAndReplicaCounts;
 	}
+
+	public void setGroupHostMapProvider(GroupHostMapProvider groupHostMapProvider) {
+		this.groupHostMapProvider = groupHostMapProvider;
+	}
+}
+
+/**
+ * This really only exists to facilitate unit testing.
+ */
+interface GroupHostMapProvider {
+	Map<String, String> getGroupHostMap(String groupName);
 }

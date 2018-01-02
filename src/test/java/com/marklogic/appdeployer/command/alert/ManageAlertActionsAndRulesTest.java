@@ -25,7 +25,7 @@ public class ManageAlertActionsAndRulesTest extends AbstractManageResourceTest {
 
 	@Override
     protected void initializeAndDeploy() {
-        appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/alert-config"));
+        appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/alert-config"));
 
         initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployOtherDatabasesCommand(),
                 new DeployAlertConfigsCommand(), newCommand(), new DeployAlertRulesCommand());

@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.regex.Pattern;
 
 public class LoadModulesTest extends AbstractAppDeployerTest {
 
@@ -116,6 +117,7 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 		 * follows the Roxy convention by default and prefixes properties with "@ml.", our modules then need
 		 * "@ml.%%COLOR%%", for example.
 		 */
+		appConfig.setUseRoxyTokenPrefix(true);
 		appConfig.getCustomTokens().put("COLOR", "red");
 		appConfig.getCustomTokens().put("DESCRIPTION", "${COLOR} description");
 
@@ -133,7 +135,7 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void testServerExists() {
-		appConfig.getConfigDir().setBaseDir(new File(("src/test/resources/sample-app/db-only-config")));
+		appConfig.getFirstConfigDir().setBaseDir(new File(("src/test/resources/sample-app/db-only-config")));
 		appConfig.setTestRestPort(8541);
 		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
 
@@ -157,6 +159,18 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 
 		String xquery = "fn:count(cts:uri-match('/ext/**.xqy'))";
 		assertEquals(1, Integer.parseInt(xccTemplate.executeAdhocQuery(xquery)));
+	}
+
+	@Test
+	public void includeModulesPattern() {
+		appConfig.setModuleFilenamesIncludePattern(Pattern.compile(".*/ext.*"));
+
+		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
+		appDeployer.deploy(appConfig);
+
+		String xquery = "fn:count(cts:uris((), (), cts:true-query()))";
+		assertEquals("Should have the 3 /ext modules plus the REST API properties file, which was loaded when the REST server was created",
+			4, Integer.parseInt(xccTemplate.executeAdhocQuery(xquery)));
 	}
 
 	private void assertModuleExistsWithDefaultPermissions(String message, String uri) {

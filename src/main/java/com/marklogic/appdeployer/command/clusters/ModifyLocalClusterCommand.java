@@ -1,5 +1,6 @@
 package com.marklogic.appdeployer.command.clusters;
 
+import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
@@ -20,13 +21,17 @@ public class ModifyLocalClusterCommand extends AbstractCommand {
 
 	@Override
 	public void execute(CommandContext context) {
-		File configDir = context.getAppConfig().getConfigDir().getClustersDir();
-		if (configDir != null && configDir.exists()) {
-			for (File f : configDir.listFiles()) {
-				if (f.isFile() && f.getName().startsWith("local-cluster")) {
-					String payload = copyFileToString(f, context);
-					new ClusterManager(context.getManageClient()).modifyLocalCluster(payload, context.getAdminManager());
+		for (ConfigDir configDir : context.getAppConfig().getConfigDirs()) {
+			File clustersDir = configDir.getClustersDir();
+			if (clustersDir != null && clustersDir.exists()) {
+				for (File f : clustersDir.listFiles()) {
+					if (f.isFile() && f.getName().startsWith("local-cluster")) {
+						String payload = copyFileToString(f, context);
+						new ClusterManager(context.getManageClient()).modifyLocalCluster(payload, context.getAdminManager());
+					}
 				}
+			} else {
+				logResourceDirectoryNotFound(clustersDir);
 			}
 		}
 	}

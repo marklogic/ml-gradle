@@ -16,10 +16,11 @@ public class DeployTemporalCollectionsLSQTCommand extends AbstractCommand {
 	@Override
 	public void execute(CommandContext context) {
 		AppConfig appConfig = context.getAppConfig();
-		deployTemporalCollectionsLsqt(context, appConfig.getConfigDir(), appConfig.getContentDatabaseName());
-
-		for (File dir : appConfig.getConfigDir().getDatabaseResourceDirectories()) {
-			deployTemporalCollectionsLsqt(context, new ConfigDir(dir), dir.getName());
+		for (ConfigDir configDir : appConfig.getConfigDirs()) {
+			deployTemporalCollectionsLsqt(context, configDir, appConfig.getContentDatabaseName());
+			for (File dir : configDir.getDatabaseResourceDirectories()) {
+				deployTemporalCollectionsLsqt(context, new ConfigDir(dir), dir.getName());
+			}
 		}
 	}
 
@@ -36,7 +37,8 @@ public class DeployTemporalCollectionsLSQTCommand extends AbstractCommand {
 				}
 				new TemporalCollectionLSQTManager(context.getManageClient(), databaseIdOrName, temporalCollectionName).save(payload);
 			}
+		} else {
+			logResourceDirectoryNotFound(dir);
 		}
-
 	}
 }

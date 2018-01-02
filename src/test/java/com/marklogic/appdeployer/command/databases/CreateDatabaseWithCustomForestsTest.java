@@ -70,7 +70,7 @@ public class CreateDatabaseWithCustomForestsTest extends AbstractAppDeployerTest
 
     @Test
     public void configDirWithDatabaseFileButNoForestFile() {
-        appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/db-only-config"));
+        appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/db-only-config"));
 
         final int numberOfForests = 2;
 

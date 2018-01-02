@@ -13,7 +13,7 @@ public class DeployRoleThatRefersToItselfTest extends AbstractAppDeployerTest {
 	 */
 	@Test
 	public void test() {
-		appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/role-refers-to-itself"));
+		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/role-refers-to-itself"));
 		initializeAppDeployer(new DeployRolesCommand());
 
 		try {

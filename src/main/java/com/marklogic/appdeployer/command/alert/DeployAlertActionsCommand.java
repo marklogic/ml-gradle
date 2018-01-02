@@ -31,10 +31,12 @@ public class DeployAlertActionsCommand extends AbstractCommand {
 	@Override
 	public void execute(CommandContext context) {
 		AppConfig appConfig = context.getAppConfig();
-		deployActions(context, appConfig.getConfigDir(), appConfig.getContentDatabaseName());
+		for (ConfigDir configDir : appConfig.getConfigDirs()) {
+			deployActions(context, configDir, appConfig.getContentDatabaseName());
 
-		for (File dir : appConfig.getConfigDir().getDatabaseResourceDirectories()) {
-			deployActions(context, new ConfigDir(dir), dir.getName());
+			for (File dir : configDir.getDatabaseResourceDirectories()) {
+				deployActions(context, new ConfigDir(dir), dir.getName());
+			}
 		}
 	}
 
@@ -46,6 +48,8 @@ public class DeployAlertActionsCommand extends AbstractCommand {
 					deployActionsInDirectory(f, context, databaseIdOrName);
 				}
 			}
+		} else {
+			logResourceDirectoryNotFound(configsDir);
 		}
 	}
 

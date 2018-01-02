@@ -14,7 +14,7 @@ public class DeployOtherDatabasesTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void dontCreateForests() {
-		ConfigDir configDir = appConfig.getConfigDir();
+		ConfigDir configDir = appConfig.getFirstConfigDir();
 		configDir.setBaseDir(new File("src/test/resources/sample-app/lots-of-databases"));
 
 		appConfig.setResourceFilenamesIncludePattern(Pattern.compile("other-schemas-database.*"));
@@ -37,7 +37,7 @@ public class DeployOtherDatabasesTest extends AbstractAppDeployerTest {
 
     @Test
     public void test() {
-        ConfigDir configDir = appConfig.getConfigDir();
+        ConfigDir configDir = appConfig.getFirstConfigDir();
         configDir.setBaseDir(new File("src/test/resources/sample-app/lots-of-databases"));
         configDir.getContentDatabaseFiles().add(new File(configDir.getDatabasesDir(), "more-content-db-config.json"));
 

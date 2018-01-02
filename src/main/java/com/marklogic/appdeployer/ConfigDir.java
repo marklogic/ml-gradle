@@ -80,12 +80,32 @@ public class ConfigDir {
 		return new File(getSecurityDir(), "amps");
 	}
 
+	public File getCertificateAuthoritiesDir() {
+		return new File(getSecurityDir(), "certificate-authorities");
+	}
+
+	public File getCertificateTemplatesDir() {
+		return new File(getSecurityDir(), "certificate-templates");
+	}
+
+	public File getExternalSecuritiesDir() {
+		return new File(getSecurityDir(), "external-security");
+	}
+
 	public File getPrivilegesDir() {
 		return new File(getSecurityDir(), "privileges");
 	}
 
+	public File getProtectedCollectionsDir() {
+		return new File(getSecurityDir(), "protected-collections");
+	}
+
 	public File getRolesDir() {
 		return new File(getSecurityDir(), "roles");
+	}
+
+	public File getTriggersDir() {
+		return new File(getBaseDir(), "triggers");
 	}
 
 	public File getUsersDir() {
@@ -94,7 +114,7 @@ public class ConfigDir {
 
 	public File getProtectedPathsDir() { return new File(getSecurityDir(), "protected-paths"); }
 
-	public File getQueryRoleSetsDir() { return new File(getSecurityDir(), "query-rolesets"); }
+	public File getQueryRolesetsDir() { return new File(getSecurityDir(), "query-rolesets"); }
 
 	public File getServersDir() {
 		return new File(baseDir, "servers");
@@ -130,6 +150,10 @@ public class ConfigDir {
 
 	public File getGroupsDir() {
 		return new File(baseDir, "groups");
+	}
+
+	public File getMimetypesDir() {
+		return new File(baseDir, "mimetypes");
 	}
 
 	public File getViewSchemasDir() {

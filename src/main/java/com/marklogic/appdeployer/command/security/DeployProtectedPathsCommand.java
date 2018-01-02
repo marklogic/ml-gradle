@@ -9,16 +9,16 @@ import com.marklogic.mgmt.resource.security.UserManager;
 
 import java.io.File;
 
-public class DeployProtectedPathCommand extends AbstractResourceCommand{
+public class DeployProtectedPathsCommand extends AbstractResourceCommand {
 
-	public DeployProtectedPathCommand() {
+	public DeployProtectedPathsCommand() {
 		setExecuteSortOrder(SortOrderConstants.DEPLOY_PROTECTED_PATHS);
 		setUndoSortOrder(SortOrderConstants.DELETE_PROTECTED_PATHS);
 	}
 
 	@Override
 	protected File[] getResourceDirs(CommandContext context) {
-		return new File[] { context.getAppConfig().getConfigDir().getProtectedPathsDir() };
+		return findResourceDirs(context, configDir -> configDir.getProtectedPathsDir());
 	}
 
 	@Override

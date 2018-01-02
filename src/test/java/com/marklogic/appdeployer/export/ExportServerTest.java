@@ -21,7 +21,7 @@ public class ExportServerTest extends AbstractExportTest {
 
 	@Test
 	public void test() {
-		appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/default-modules-database-config"));
+		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/default-modules-database-config"));
 		initializeAppDeployer(new DeployRestApiServersCommand(true));
 		deploySampleApp();
 
@@ -29,7 +29,7 @@ public class ExportServerTest extends AbstractExportTest {
 
 		undeploySampleApp();
 
-		appConfig.getConfigDir().setBaseDir(exportDir);
+		appConfig.getFirstConfigDir().setBaseDir(exportDir);
 		initializeAppDeployer(new DeployOtherServersCommand(), new DeployOtherDatabasesCommand());
 		deploySampleApp();
 	}
@@ -49,7 +49,7 @@ public class ExportServerTest extends AbstractExportTest {
 		assertFalse(new GroupManager(manageClient).exists(groupName));
 		assertFalse(new ServerManager(manageClient).exists(serverName));
 
-		appConfig.getConfigDir().setBaseDir(exportDir);
+		appConfig.getFirstConfigDir().setBaseDir(exportDir);
 		deploySampleApp();
 
 		assertTrue(new GroupManager(manageClient).exists(groupName));

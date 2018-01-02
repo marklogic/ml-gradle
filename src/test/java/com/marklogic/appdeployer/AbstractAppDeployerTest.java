@@ -89,6 +89,6 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
     }
 
     protected void setConfigBaseDir(String path) {
-        appConfig.getConfigDir().setBaseDir(new File("src/test/resources/" + path));
+        appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/" + path));
     }
 }

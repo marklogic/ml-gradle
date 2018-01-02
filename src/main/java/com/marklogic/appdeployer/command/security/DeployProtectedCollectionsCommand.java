@@ -17,7 +17,7 @@ public class DeployProtectedCollectionsCommand extends AbstractResourceCommand {
 
     @Override
     protected File[] getResourceDirs(CommandContext context) {
-        return new File[] { new File(context.getAppConfig().getConfigDir().getSecurityDir(), "protected-collections") };
+    	return findResourceDirs(context, configDir -> configDir.getProtectedCollectionsDir());
     }
 
     @Override

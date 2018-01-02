@@ -33,7 +33,8 @@ public class Fragment {
             list.add(Namespace.getNamespace("db", "http://marklogic.com/manage/databases"));
             list.add(Namespace.getNamespace("es", "http://marklogic.com/entity-services"));
             list.add(Namespace.getNamespace("f", "http://marklogic.com/manage/forests"));
-            list.add(Namespace.getNamespace("h", "http://marklogic.com/manage/hosts"));
+	        list.add(Namespace.getNamespace("g", "http://marklogic.com/manage/groups"));
+	        list.add(Namespace.getNamespace("h", "http://marklogic.com/manage/hosts"));
             list.add(Namespace.getNamespace("m", "http://marklogic.com/manage"));
             list.add(Namespace.getNamespace("s", "http://marklogic.com/manage/servers"));
             list.add(Namespace.getNamespace("msec", "http://marklogic.com/manage/security"));

@@ -66,24 +66,26 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 
     protected List<DeployDatabaseCommand> buildDatabaseCommands(CommandContext context) {
         List<DeployDatabaseCommand> dbCommands = new ArrayList<>();
-        ConfigDir configDir = context.getAppConfig().getConfigDir();
-        File dir = configDir.getDatabasesDir();
-        if (dir != null && dir.exists()) {
-            ignoreKnownDatabaseFilenames(context);
-            for (File f : listFilesInDirectory(dir)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Will process other database in file: " + f.getName());
-                }
-                dbCommands.add(buildDeployDatabaseCommand(f));
-            }
+        for (ConfigDir configDir : context.getAppConfig().getConfigDirs()) {
+	        File dir = configDir.getDatabasesDir();
+	        if (dir != null && dir.exists()) {
+		        ignoreKnownDatabaseFilenames(context);
+		        for (File f : listFilesInDirectory(dir)) {
+			        if (logger.isDebugEnabled()) {
+				        logger.debug("Will process other database in file: " + f.getName());
+			        }
+			        dbCommands.add(buildDeployDatabaseCommand(f));
+		        }
+	        } else {
+	        	logResourceDirectoryNotFound(dir);
+	        }
         }
         return dbCommands;
     }
 
     protected DeployDatabaseCommand buildDeployDatabaseCommand(File file) {
-	    DeployDatabaseCommand c = new DeployDatabaseCommand();
+	    DeployDatabaseCommand c = new DeployDatabaseCommand(file);
 	    c.setForestsPerHost(getForestsPerHost());
-	    c.setDatabaseFilename(file.getName());
 	    c.setCheckForCustomForests(isCheckForCustomForests());
 	    c.setForestFilename(getForestFilename());
 	    c.setCreateForestsOnEachHost(isCreateForestsOnEachHost());
@@ -97,8 +99,13 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
      */
     protected void ignoreKnownDatabaseFilenames(CommandContext context) {
         Set<String> ignore = new HashSet<>();
-        for (File f : context.getAppConfig().getConfigDir().getContentDatabaseFiles()) {
-            ignore.add(f.getName());
+        for (ConfigDir configDir : context.getAppConfig().getConfigDirs()) {
+        	List<File> list = configDir.getContentDatabaseFiles();
+        	if (list != null && !list.isEmpty()) {
+		        for (File f : list) {
+			        ignore.add(f.getName());
+		        }
+	        }
         }
         ignore.add(DeploySchemasDatabaseCommand.DATABASE_FILENAME);
         ignore.add(DeployTriggersDatabaseCommand.DATABASE_FILENAME);

@@ -24,7 +24,7 @@ public class DeployTriggersCommand extends AbstractResourceCommand {
 
     @Override
     protected File[] getResourceDirs(CommandContext context) {
-        return new File[] { new File(context.getAppConfig().getConfigDir().getBaseDir(), "triggers") };
+    	return findResourceDirs(context, configDir -> configDir.getTriggersDir());
     }
 
     @Override

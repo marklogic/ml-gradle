@@ -108,8 +108,9 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    p.setProperty("mlCreateForests", "false");
 	    p.setProperty("mlForestsPerHost", "some-db,2,other-db,3");
         p.setProperty("mlModulePermissions", "some-perm,read,some-perm,update");
+        p.setProperty("mlModulesRegex", "some-pattern");
         p.setProperty("mlAdditionalBinaryExtensions", ".gradle,.properties");
-        p.setProperty("mlConfigPath", "src/test/resources/sample-app/empty-ml-config");
+        p.setProperty("mlConfigPaths", "src/test/resources/sample-app/custom-forests,src/test/resources/sample-app/alert-config");
         p.setProperty("mlSimpleSsl", "true");
         p.setProperty("mlContentDatabaseName", "my-content-db");
         p.setProperty("mlModulesDatabaseName", "my-modules");
@@ -142,6 +143,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    p.setProperty("mlDatabaseNamesAndReplicaCounts", "Documents,1,Security,2");
 	    p.setProperty("mlDatabasesWithForestsOnOneHost", "Documents,Security");
 	    p.setProperty("mlDatabaseHosts", "Documents,host1|host2|host3,Security,host1|host2");
+	    p.setProperty("mlDatabaseGroups", "Documents,group1|group2,Security,group1");
 
 	    p.setProperty("mlForestDataDirectory", "/data/path");
 	    p.setProperty("mlForestFastDataDirectory", "/fast/path");
@@ -200,10 +202,16 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    assertEquals(2, (int)forestCounts.get("some-db"));
 	    assertEquals(3, (int)forestCounts.get("other-db"));
         assertEquals("some-perm,read,some-perm,update", config.getModulePermissions());
+        assertEquals("some-pattern", config.getModuleFilenamesIncludePattern().pattern());
         String[] extensions = config.getAdditionalBinaryExtensions();
         assertEquals(".gradle", extensions[0]);
         assertEquals(".properties", extensions[1]);
-        assertTrue(config.getConfigDir().getBaseDir().getAbsolutePath().contains("empty-ml-config"));
+
+        List<ConfigDir> configDirs = config.getConfigDirs();
+        assertEquals(2, configDirs.size());
+        assertTrue(configDirs.get(0).getBaseDir().getAbsolutePath().contains("custom-forests"));
+	    assertTrue(configDirs.get(1).getBaseDir().getAbsolutePath().contains("alert-config"));
+
         assertNotNull(config.getRestSslContext());
         assertNotNull(config.getRestSslHostnameVerifier());
         assertEquals("my-content-db", config.getContentDatabaseName());
@@ -257,6 +265,14 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    assertTrue(databaseHosts.get("Security").contains("host1"));
 	    assertTrue(databaseHosts.get("Security").contains("host2"));
 
+	    Map<String, Set<String>> databaseGroups = config.getDatabaseGroups();
+	    assertEquals(2, databaseGroups.size());
+	    assertEquals(2, databaseGroups.get("Documents").size());
+	    assertTrue(databaseGroups.get("Documents").contains("group1"));
+	    assertTrue(databaseGroups.get("Documents").contains("group2"));
+	    assertEquals(1, databaseGroups.get("Security").size());
+	    assertTrue(databaseGroups.get("Security").contains("group1"));
+
 	    assertEquals("/data/path", config.getForestDataDirectory());
 	    assertEquals("/fast/path", config.getForestFastDataDirectory());
 	    assertEquals("/large/path", config.getForestLargeDataDirectory());
@@ -298,7 +314,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 
 		sut = new DefaultAppConfigFactory(new SimplePropertySource(p));
 		AppConfig config = sut.newAppConfig();
-		assertTrue(config.getConfigDir().getBaseDir().getAbsolutePath().contains("empty-ml-config"));
+		assertTrue(config.getFirstConfigDir().getBaseDir().getAbsolutePath().contains("empty-ml-config"));
 	}
 
     @Test

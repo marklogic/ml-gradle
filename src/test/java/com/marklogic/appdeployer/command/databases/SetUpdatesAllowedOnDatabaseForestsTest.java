@@ -20,7 +20,7 @@ public class SetUpdatesAllowedOnDatabaseForestsTest extends AbstractAppDeployerT
 
     @Test
     public void test() {
-        appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/db-only-config"));
+        appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/db-only-config"));
         initializeAppDeployer(new DeployContentDatabasesCommand(2));
         appDeployer.deploy(appConfig);
 

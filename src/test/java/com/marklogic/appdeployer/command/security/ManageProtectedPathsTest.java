@@ -13,7 +13,7 @@ public class ManageProtectedPathsTest extends AbstractManageResourceTest {
 
 	@Override
 	protected Command newCommand() {
-		return new DeployProtectedPathCommand();
+		return new DeployProtectedPathsCommand();
 	}
 
 	@Override

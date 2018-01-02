@@ -28,7 +28,7 @@ public class DeployFlexrepTest extends AbstractAppDeployerTest {
 
     @Test
     public void configureMaster() {
-        appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/flexrep-config"));
+        appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/flexrep-config"));
 
         initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployTriggersDatabaseCommand(),
                 new DeployCpfConfigsCommand(), new DeployDomainsCommand(), new DeployPipelinesCommand(),
@@ -49,7 +49,7 @@ public class DeployFlexrepTest extends AbstractAppDeployerTest {
 
     @Test
     public void noFlexrepDir() {
-        appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/empty-ml-config"));
+        appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/empty-ml-config"));
 
         initializeAppDeployer(new DeployTargetsCommand());
 
@@ -59,7 +59,7 @@ public class DeployFlexrepTest extends AbstractAppDeployerTest {
 
     @Test
     public void masterFlexrep() {
-        appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/flexrep-combined"));
+        appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/flexrep-combined"));
 
         appConfig.setFlexrepPath("master");
         initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployTriggersDatabaseCommand(), new DeployFlexrepCommand());
@@ -82,7 +82,7 @@ public class DeployFlexrepTest extends AbstractAppDeployerTest {
 
     @Test
     public void replicaFlexrep() {
-        appConfig.getConfigDir().setBaseDir(new File("src/test/resources/sample-app/flexrep-combined"));
+        appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/flexrep-combined"));
 
         appConfig.setFlexrepPath("replica");
         initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployTriggersDatabaseCommand(), new DeployFlexrepCommand());

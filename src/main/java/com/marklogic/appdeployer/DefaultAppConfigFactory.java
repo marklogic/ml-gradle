@@ -58,16 +58,30 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		 * The path to the directory containing all the resource configuration files. Defaults to src/main/ml-config.
 		 * mlConfigPath is the preferred one, as its name is consistent with other properties that refer to a path.
 		 * mlConfigDir is deprecated but still supported.
+		 *
+		 * As of 3.3.0, mlConfigPaths is the preferred property, and mlConfigDir and mlConfigPath will be ignored if
+		 * it's set.
 		 */
-		prop = getProperty("mlConfigDir");
+		prop = getProperty("mlConfigPaths");
 		if (prop != null) {
-			logger.info("mlConfigDir is deprecated; please use mlConfigPath; Config dir: " + prop);
-			c.setConfigDir(new ConfigDir(new File(prop)));
+			logger.info("Config paths: " + prop);
+			List<ConfigDir> list = new ArrayList<>();
+			for (String path : prop.split(",")) {
+				list.add(new ConfigDir(new File(path)));
+			}
+			c.setConfigDirs(list);
 		}
-		prop = getProperty("mlConfigPath");
-		if (prop != null) {
-			logger.info("Config path: " + prop);
-			c.setConfigDir(new ConfigDir(new File(prop)));
+		else {
+			prop = getProperty("mlConfigDir");
+			if (prop != null) {
+				logger.info("mlConfigDir is deprecated; please use mlConfigPath; Config dir: " + prop);
+				c.setConfigDir(new ConfigDir(new File(prop)));
+			}
+			prop = getProperty("mlConfigPath");
+			if (prop != null) {
+				logger.info("Config path: " + prop);
+				c.setConfigDir(new ConfigDir(new File(prop)));
+			}
 		}
 
 		/**
@@ -287,21 +301,16 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			c.setDatabasesWithForestsOnOneHost(set);
 		}
 
+		prop = getProperty("mlDatabaseGroups");
+		if (prop != null) {
+			logger.info("Databases and the groups containing the hosts that their forests will be created on: " + prop);
+			c.setDatabaseGroups(buildSetMapFromDelimitedString(prop));
+		}
+
 		prop = getProperty("mlDatabaseHosts");
 		if (prop != null) {
 			logger.info("Databases and the hosts that their forests will be created on: " + prop);
-			String[] tokens = prop.split(",");
-			Map<String, Set<String>> map = new HashMap<>();
-			for (int i = 0; i < tokens.length; i += 2) {
-				String dbName = tokens[i];
-				String[] hostNames = tokens[i + 1].split("\\|");
-				Set<String> names = new HashSet<>();
-				for (String name : hostNames) {
-					names.add(name);
-				}
-				map.put(dbName, names);
-			}
-			c.setDatabaseHosts(map);
+			c.setDatabaseHosts(buildSetMapFromDelimitedString(prop));
 		}
 
 		prop = getProperty("mlForestDataDirectory");
@@ -509,6 +518,12 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			c.setModuleTimestampsPath(prop);
 		}
 
+		prop = getProperty("mlModulesRegex");
+		if (prop != null) {
+			logger.info("Including module filenames matching regex: " + prop);
+			c.setModuleFilenamesIncludePattern(Pattern.compile(prop));
+		}
+
 		/**
 		 * Whether or not to load asset modules in bulk - i.e. in one transaction. Defaults to true.
 		 */
@@ -641,6 +656,21 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		String[] tokens = str.split(",");
 		for (int i = 0; i < tokens.length; i += 2) {
 			map.put(tokens[i], tokens[i + 1]);
+		}
+		return map;
+	}
+
+	protected Map<String, Set<String>> buildSetMapFromDelimitedString(String str) {
+		String[] tokens = str.split(",");
+		Map<String, Set<String>> map = new LinkedHashMap<>();
+		for (int i = 0; i < tokens.length; i += 2) {
+			String dbName = tokens[i];
+			String[] hostNames = tokens[i + 1].split("\\|");
+			Set<String> names = new LinkedHashSet<>();
+			for (String name : hostNames) {
+				names.add(name);
+			}
+			map.put(dbName, names);
 		}
 		return map;
 	}

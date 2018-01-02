@@ -2,6 +2,7 @@ package com.marklogic.appdeployer.command.databases;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.SaveReceipt;
@@ -9,6 +10,7 @@ import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.rest.util.JsonNodeUtil;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -104,7 +106,13 @@ public class DeployContentDatabasesCommand extends DeployDatabaseCommand {
     }
 
     protected JsonNode mergeContentDatabaseFiles(AppConfig appConfig) {
-        List<File> files = appConfig.getConfigDir().getContentDatabaseFiles();
+        List<File> files = new ArrayList<>();
+        for (ConfigDir configDir : appConfig.getConfigDirs()) {
+        	List<File> list = configDir.getContentDatabaseFiles();
+        	if (list != null && !list.isEmpty()) {
+        		files.addAll(list);
+	        }
+        }
         if (logger.isInfoEnabled()) {
             logger.info("Merging JSON files at locations: " + files);
         }

@@ -1,15 +1,18 @@
 package com.marklogic.appdeployer.command;
 
+import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.mgmt.admin.AdminManager;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.admin.ActionRequiringRestart;
-import com.marklogic.mgmt.admin.AdminManager;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 
 import java.io.File;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Provides a basic implementation for creating/updating a resource while an app is being deployed and then deleting it
@@ -32,21 +35,54 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
         }
     }
 
-    protected void processExecuteOnResourceDir(CommandContext context, File resourceDir) {
-        if (resourceDir.exists()) {
-            ResourceManager mgr = getResourceManager(context);
-            if (logger.isInfoEnabled()) {
-                logger.info("Processing files in directory: " + resourceDir.getAbsolutePath());
-            }
-            for (File f : listFilesInDirectory(resourceDir, context)) {
-                if (logger.isInfoEnabled()) {
-                    logger.info("Processing file: " + f.getAbsolutePath());
-                }
-                SaveReceipt receipt = saveResource(mgr, context, f);
-                afterResourceSaved(mgr, context, f, receipt);
-            }
-        }
-    }
+	protected File[] findResourceDirs(CommandContext context, ResourceDirFinder resourceDirFinder) {
+		return findResourceDirs(context.getAppConfig(), resourceDirFinder);
+	}
+
+	/**
+	 * A subclass is likely to use this as a simple way of selecting all of the resource directories, specific to the
+	 * subclass's resource, within each ConfigDir on the AppConfig.
+	 *
+	 * @param appConfig
+	 * @param resourceDirFinder
+	 * @return
+	 */
+	protected File[] findResourceDirs(AppConfig appConfig, ResourceDirFinder resourceDirFinder) {
+		List<File> list = new ArrayList<>();
+		List<ConfigDir> configDirs = appConfig.getConfigDirs();
+		if (configDirs != null && !configDirs.isEmpty()) {
+			for (ConfigDir configDir : appConfig.getConfigDirs()) {
+				File dir = resourceDirFinder.getResourceDir(configDir);
+				if (dir != null && dir.exists()) {
+					list.add(dir);
+				} else {
+					logResourceDirectoryNotFound(dir);
+				}
+			}
+		}
+		else {
+			logger.warn("No ConfigDir objects found in AppConfig, unable to find resource directories");
+		}
+		return list.toArray(new File[]{});
+	}
+
+	protected void processExecuteOnResourceDir(CommandContext context, File resourceDir) {
+		if (resourceDir.exists()) {
+			ResourceManager mgr = getResourceManager(context);
+			if (logger.isInfoEnabled()) {
+				logger.info("Processing files in directory: " + resourceDir.getAbsolutePath());
+			}
+			for (File f : listFilesInDirectory(resourceDir, context)) {
+				if (logger.isInfoEnabled()) {
+					logger.info("Processing file: " + f.getAbsolutePath());
+				}
+				SaveReceipt receipt = saveResource(mgr, context, f);
+				afterResourceSaved(mgr, context, f, receipt);
+			}
+		} else {
+			logResourceDirectoryNotFound(resourceDir);
+		}
+	}
 
 	/**
 	 * Defaults to the parent method. This was extracted so that a subclass can override it and have access to the

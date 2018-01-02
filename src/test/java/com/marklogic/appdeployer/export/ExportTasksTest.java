@@ -33,7 +33,7 @@ public class ExportTasksTest extends AbstractExportTest {
 		mgr.deleteTaskWithPath(taskPath);
 		assertFalse(mgr.exists(taskPath));
 
-		appConfig.getConfigDir().setBaseDir(exportDir);
+		appConfig.getFirstConfigDir().setBaseDir(exportDir);
 		deploySampleApp();
 		assertTrue(mgr.exists(taskPath));
 

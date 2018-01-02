@@ -121,8 +121,8 @@ public abstract class BaseModulesFinder extends LoggingObject implements Modules
 					finalPath += "/";
 				}
 				finalPath += path;
-				if (logger.isInfoEnabled()) {
-					logger.info("Finding " + moduleType + " at path: " + finalPath);
+				if (logger.isDebugEnabled()) {
+					logger.debug("Finding " + moduleType + " at path: " + finalPath);
 				}
 				Resource[] r = resolver.getResources(finalPath);
 				list.addAll(Arrays.asList(r));

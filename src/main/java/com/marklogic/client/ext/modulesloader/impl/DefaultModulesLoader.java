@@ -109,8 +109,8 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	 * passed into a constructor for this class.
 	 */
 	public Set<Resource> loadModules(String baseDir, ModulesFinder modulesFinder, DatabaseClient client) {
-		if (logger.isInfoEnabled()) {
-			logger.info("Loading modules from base directory: " + baseDir);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Loading modules from base directory: " + baseDir);
 		}
 		setDatabaseClient(client);
 
@@ -135,8 +135,8 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 
 		waitForTaskExecutorToFinish();
 
-		if (logger.isInfoEnabled()) {
-			logger.info("Finished loading modules from base directory: " + baseDir);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Finished loading modules from base directory: " + baseDir);
 		}
 
 		return loadedModules;
@@ -253,8 +253,8 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 			}
 		}
 
-		if (logger.isInfoEnabled()) {
-			logger.info("Loading asset modules from paths: " + Arrays.asList(paths));
+		if (logger.isDebugEnabled()) {
+			logger.debug("Loading asset modules from paths: " + Arrays.asList(paths));
 		}
 
 		if (includeFilenamePattern != null) {

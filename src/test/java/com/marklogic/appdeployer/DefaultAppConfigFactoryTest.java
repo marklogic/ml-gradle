@@ -34,6 +34,14 @@ public class DefaultAppConfigFactoryTest extends Assert {
     }
 
     @Test
+    public void moduleTimestampsPath() {
+	    Properties p = new Properties();
+	    p.setProperty("mlModuleTimestampsPath", "");
+	    AppConfig config = new DefaultAppConfigFactory(new SimplePropertySource(p)).newAppConfig();
+	    assertNull(config.getModuleTimestampsPath());
+    }
+    
+    @Test
     public void unrecognizedProperties() {
         sut = new DefaultAppConfigFactory(new SimplePropertySource("foo.mlHost", "host", "foo.mlUsername", "user"));
         AppConfig config = sut.newAppConfig();

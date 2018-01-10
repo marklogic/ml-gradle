@@ -74,7 +74,8 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 		verifyModuleCountWithPattern(".*transforms.*", "Should only load the 5 transforms", 5);
 		verifyModuleCountWithPattern(".*services.*", "Should only load the 3 services", 3);
 		verifyModuleCountWithPattern(".*", "Should load every file", 26);
-		verifyModuleCountWithPattern(".*/ext.*", "Should only load the 7 assets under /ext", 7);
+		verifyModuleCountWithPattern(".*/ext.*(lib|dots)/.*xqy", "Should only load the xqy asset modules " +
+			"under ext/lib and ext/path/with/dots", 2);
 	}
 
 	private void verifyModuleCountWithPattern(String pattern, String message, int count) {

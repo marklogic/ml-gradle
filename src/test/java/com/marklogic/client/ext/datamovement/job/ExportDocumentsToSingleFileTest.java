@@ -43,7 +43,7 @@ public class ExportDocumentsToSingleFileTest extends AbstractDataMovementTest {
 
 		String exportedXml = new String(FileCopyUtils.copyToByteArray(job.getExportFile()));
 		logger.info("Exported XML: " + exportedXml);
-		assertTrue(exportedXml.startsWith("<results><record><test>"));
+		assertTrue(exportedXml.startsWith("<results>\n<record><test>"));
 		assertTrue(exportedXml.endsWith("</test></record></results>"));
 	}
 }

@@ -263,7 +263,16 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 			DocumentFileReader dfr = assetFileLoader.getDocumentFileReader();
 			if (dfr instanceof DefaultDocumentFileReader) {
 				DefaultDocumentFileReader reader = (DefaultDocumentFileReader)dfr;
-				reader.addFileFilter(pathname -> includeFilenamePattern.matcher(pathname.getAbsolutePath()).matches());
+				reader.addDocumentFileProcessor(documentFile -> {
+					File f = documentFile.getFile();
+					if (f == null) {
+						return null;
+					}
+					if (!includeFilenamePattern.matcher(f.getAbsolutePath()).matches()) {
+						return null;
+					}
+					return documentFile;
+				});
 			}
 		}
 

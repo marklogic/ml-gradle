@@ -514,8 +514,13 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 
 		prop = getProperty("mlModuleTimestampsPath");
 		if (prop != null) {
-			logger.info("Module timestamps path: " + prop);
-			c.setModuleTimestampsPath(prop);
+			if (prop.trim().length() == 0) {
+				logger.info("Disabling use of module timestamps file");
+				c.setModuleTimestampsPath(null);
+			} else {
+				logger.info("Module timestamps path: " + prop);
+				c.setModuleTimestampsPath(prop);
+			}
 		}
 
 		prop = getProperty("mlModulesRegex");

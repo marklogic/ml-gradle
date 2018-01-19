@@ -1,6 +1,7 @@
 package com.marklogic.appdeployer.command;
 
 import com.marklogic.client.ext.helper.LoggingObject;
+import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.SaveReceipt;
 import org.springframework.util.FileCopyUtils;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -25,6 +27,7 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 
     protected PayloadTokenReplacer payloadTokenReplacer = new DefaultPayloadTokenReplacer();
     private FilenameFilter resourceFilenameFilter = new ResourceFilenameFilter();
+    private PayloadParser payloadParser = new PayloadParser();
 
     /**
      * A subclass can set the executeSortOrder attribute to whatever value it needs.
@@ -151,7 +154,19 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 	 * @return
 	 */
     protected String adjustPayloadBeforeSavingResource(ResourceManager mgr, CommandContext context, File f, String payload) {
-    	return payload;
+	    String[] props = context.getAppConfig().getExcludeProperties();
+	    if (props != null && props.length > 0) {
+		    logger.info("Excluding properties %s from payload", Arrays.asList(props));
+		    payload = payloadParser.excludeProperties(payload, props);
+	    }
+
+	    props = context.getAppConfig().getIncludeProperties();
+	    if (props != null && props.length > 0) {
+		    logger.info("Including only properties %s from payload", Arrays.asList(props));
+		    payload = payloadParser.includeProperties(payload, props);
+	    }
+
+	    return payload;
     }
 
 	/**

@@ -46,6 +46,7 @@ public class DeployRolesCommand extends AbstractResourceCommand {
 
 	@Override
 	protected String adjustPayloadBeforeSavingResource(ResourceManager mgr, CommandContext context, File f, String payload) {
+		payload = super.adjustPayloadBeforeSavingResource(mgr, context, f, payload);
 		if (removeRolesAndPermissionsDuringDeployment) {
 			if (resourceMapper == null) {
 				API api = new API(context.getManageClient(), context.getAdminManager());

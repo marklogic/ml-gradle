@@ -203,6 +203,11 @@ public class AppConfig {
 	private Pattern resourceFilenamesExcludePattern;
 	private Pattern resourceFilenamesIncludePattern;
 
+	// Properties to exclude from resource payloads
+	private String[] excludeProperties;
+	// Properties to include in resource payloads
+	private String[] includeProperties;
+
 	private Map<String, Object> additionalProperties = new HashMap<>();
 
 	public AppConfig() {
@@ -1136,7 +1141,29 @@ public class AppConfig {
 		this.databaseHosts = databaseHosts;
 	}
 
-	public Map<String, Set<String>> getDatabaseGroups() {
+	public void setExcludeProperties(String... excludeProperties) {
+    	if (this.includeProperties != null && this.includeProperties.length > 0) {
+		    throw new IllegalStateException("Setting excludeProperties and includeProperties at the same time is not permitted");
+	    }
+    	this.excludeProperties = excludeProperties;
+	}
+
+	public String[] getExcludeProperties() {
+    	return this.excludeProperties;
+	}
+
+	public void setIncludeProperties(String... includeProperties) {
+		if (this.excludeProperties != null && this.excludeProperties.length > 0) {
+			throw new IllegalStateException("Setting excludeProperties and includeProperties at the same time is not permitted");
+		}
+    	this.includeProperties = includeProperties;
+	}
+
+	public String[] getIncludeProperties() {
+    	return this.includeProperties;
+  }
+
+  public Map<String, Set<String>> getDatabaseGroups() {
 		return databaseGroups;
 	}
 

@@ -111,6 +111,8 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
         String payload = buildPayload(context);
         if (payload != null) {
             DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
+
+            payload = adjustPayloadBeforeSavingResource(dbMgr, context, null, payload);
             SaveReceipt receipt = dbMgr.save(payload);
 
             databaseName = receipt.getResourceId();

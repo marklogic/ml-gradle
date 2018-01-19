@@ -5,6 +5,7 @@ import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
+import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
 
 import java.io.File;
@@ -37,14 +38,13 @@ public class UpdateRestApiServersCommand extends AbstractCommand {
 
 			ServerManager mgr = new ServerManager(context.getManageClient(), appConfig.getGroupName());
 
-			String payload = copyFileToString(f);
-
-			String json = payloadTokenReplacer.replaceTokens(payload, appConfig, false);
-			mgr.save(json);
+			saveResource(mgr, context, f);
 
 			if (appConfig.isTestPortSet()) {
-				json = payloadTokenReplacer.replaceTokens(payload, appConfig, true);
-				mgr.save(json);
+				String payload = copyFileToString(f, context);
+				payload = payloadTokenReplacer.replaceTokens(payload, appConfig, true);
+				payload = adjustPayloadBeforeSavingResource(mgr, context, f, payload);
+				mgr.save(payload);
 			}
 		}
 	}

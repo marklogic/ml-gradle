@@ -99,6 +99,7 @@ public class DeployForestsCommand extends AbstractCommand {
                     payload = payload.replace("%%FOREST_NAME%%", forestName);
                     payload = payload.replace("%%FOREST_DATABASE%%", getForestDatabaseName(appConfig));
                     logger.info(format("Creating forest %s on host %s", forestName, hostName));
+                    payload = adjustPayloadBeforeSavingResource(mgr, context, null, payload);
                     mgr.save(payload);
                 }
                 i++;

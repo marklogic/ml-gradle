@@ -48,6 +48,10 @@ public class DeployContentDatabasesCommand extends DeployDatabaseCommand {
 
         AppConfig appConfig = context.getAppConfig();
         if (appConfig.isTestPortSet()) {
+	        if (logger.isInfoEnabled()) {
+		        logger.info(format("Creating/updating test content database '%s' associated with test REST server on port %d",
+			        appConfig.getTestRestServerName(), appConfig.getTestRestPort()));
+	        }
             String payload = getPayload(context);
             if (payload != null) {
                 DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
@@ -56,6 +60,9 @@ public class DeployContentDatabasesCommand extends DeployDatabaseCommand {
 	            if (shouldCreateForests(context, payload)) {
 		            buildDeployForestsCommand(payload, receipt, context).execute(context);
 	            }
+            } else {
+            	logger.warn(format("Could not determine what payload to use for creating/updating test content database '%s'",
+		            appConfig.getTestRestServerName()));
             }
         }
     }

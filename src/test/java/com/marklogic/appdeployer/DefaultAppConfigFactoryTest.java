@@ -40,7 +40,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    AppConfig config = new DefaultAppConfigFactory(new SimplePropertySource(p)).newAppConfig();
 	    assertNull(config.getModuleTimestampsPath());
     }
-    
+
     @Test
     public void unrecognizedProperties() {
         sut = new DefaultAppConfigFactory(new SimplePropertySource("foo.mlHost", "host", "foo.mlUsername", "user"));
@@ -103,7 +103,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
         p.setProperty("mlRestCertPassword", "restCertPassword");
         p.setProperty("mlRestExternalName", "restExternalName");
 
-	    p.setProperty("mlAppServicesUsername", "appServicesUsername");
+        p.setProperty("mlAppServicesUsername", "appServicesUsername");
 	    p.setProperty("mlAppServicesPassword", "appServicesPassword");
 	    p.setProperty("mlAppServicesPort", "8123");
 	    p.setProperty("mlAppServicesAuthentication", "kerBEROS");
@@ -111,6 +111,9 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    p.setProperty("mlAppServicesCertPassword", "appServicesCertPassword");
 	    p.setProperty("mlAppServicesExternalName", "appServicesExternalName");
 	    p.setProperty("mlAppServicesSimpleSsl", "true");
+
+	    p.setProperty("mlRestServerName", "my-rest-server");
+	    p.setProperty("mlTestRestServerName", "my-test-rest-server");
 
 	    p.setProperty("mlContentForestsPerHost", "17");
 	    p.setProperty("mlCreateForests", "false");
@@ -203,6 +206,9 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    assertEquals("appServicesExternalName", config.getAppServicesExternalName());
 	    assertNotNull(config.getAppServicesSslContext());
 	    assertEquals(DatabaseClientFactory.SSLHostnameVerifier.ANY, config.getAppServicesSslHostnameVerifier());
+
+	    assertEquals("my-rest-server", config.getRestServerName());
+	    assertEquals("my-test-rest-server", config.getTestRestServerName());
 
 	    assertEquals((Integer) 17, config.getContentForestsPerHost());
 	    assertFalse(config.isCreateForests());

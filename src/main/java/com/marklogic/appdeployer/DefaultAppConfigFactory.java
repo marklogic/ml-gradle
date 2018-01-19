@@ -252,6 +252,18 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			c.setAppServicesSimpleSslConfig();
 		}
 
+		prop = getProperty("mlRestServerName");
+		if (prop != null) {
+			logger.info("REST server name: " + prop);
+			c.setRestServerName(prop);
+		}
+
+		prop = getProperty("mlTestRestServerName");
+		if (prop != null) {
+			logger.info("Test REST server name: " + prop);
+			c.setTestRestServerName(prop);
+		}
+
 		/**
 		 * When a content database is created, this property can be used to control the number of forests per host for
 		 * that database.

@@ -8,68 +8,54 @@ import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
-import javax.net.ssl.*;
-import java.io.IOException;
-import java.security.cert.CertificateException;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocket;
 import java.security.cert.X509Certificate;
 
 public class RestTemplateUtil {
 
-	public static RestTemplate newRestTemplate(RestConfig config) {
-		return newRestTemplate(config.getHost(), config.getPort(), config.getUsername(), config.getPassword(), config.isConfigureSimpleSsl());
-	}
+	private final static Logger logger = LoggerFactory.getLogger(RestTemplateUtil.class);
 
 	public static RestTemplate newRestTemplate(String host, int port, String username, String password) {
-		return newRestTemplate(host, port, username, password, false);
+		return newRestTemplate(new RestConfig(host, port, username, password));
 	}
 
-	/**
-	 *
-	 * @param host
-	 * @param port
-	 * @param username
-	 * @param password
-	 * @param configureSimpleSsl if true, then a very simple SSLContext that trusts every request will be added to the
-	 *                           HttpClient that RestTemplate uses
-	 * @return
-	 */
-	public static RestTemplate newRestTemplate(String host, int port, String username, String password, boolean configureSimpleSsl) {
-		BasicCredentialsProvider prov = new BasicCredentialsProvider();
-		prov.setCredentials(new AuthScope(host, port, AuthScope.ANY_REALM), new UsernamePasswordCredentials(username,
-			password));
+	public static RestTemplate newRestTemplate(RestConfig config) {
+		HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
 
-		HttpClientBuilder httpClientBuilder = HttpClientBuilder.create().setDefaultCredentialsProvider(prov);
+		String username = config.getUsername();
+		if (username != null) {
+			BasicCredentialsProvider prov = new BasicCredentialsProvider();
+			prov.setCredentials(new AuthScope(config.getHost(), config.getPort(), AuthScope.ANY_REALM),
+				new UsernamePasswordCredentials(username, config.getPassword()));
+			httpClientBuilder = httpClientBuilder.setDefaultCredentialsProvider(prov);
+		}
 
-		if (configureSimpleSsl) {
-			try {
-				SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
-					@Override
-					public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-						return true;
-					}
-				}).build();
-				httpClientBuilder.setSslcontext(sslContext);
-				httpClientBuilder.setHostnameVerifier(new X509HostnameVerifier() {
-					@Override
-					public void verify(String host, SSLSocket ssl) throws IOException {}
-
-					@Override
-					public void verify(String host, X509Certificate cert) throws SSLException {}
-
-					@Override
-					public void verify(String host, String[] cns, String[] subjectAlts) throws SSLException {}
-
-					@Override
-					public boolean verify(String s, SSLSession sslSession) {
-						return false;
-					}
-				});
-			} catch (Exception ex) {
-				throw new RuntimeException("Unable to configure simple SSL approach: " + ex.getMessage(), ex);
+		if (config.isConfigureSimpleSsl()) {
+			if (logger.isInfoEnabled()) {
+				logger.info("Configuring simple SSL approach for connecting to: " + config.getBaseUrl());
 			}
+			configureSimpleSsl(httpClientBuilder);
+		}
+
+		if (config.getSslContext() != null) {
+			if (logger.isInfoEnabled()) {
+				logger.info("Using custom SSLContext for connecting to: " + config.getBaseUrl());
+			}
+			httpClientBuilder.setSslcontext(config.getSslContext());
+		}
+
+		if (config.getHostnameVerifier() != null) {
+			if (logger.isInfoEnabled()) {
+				logger.info("Using custom X509HostnameVerifier for connecting to: " + config.getBaseUrl());
+			}
+			httpClientBuilder.setHostnameVerifier(config.getHostnameVerifier());
 		}
 
 		HttpClient client = httpClientBuilder.build();
@@ -77,5 +63,38 @@ public class RestTemplateUtil {
 		RestTemplate rt = new RestTemplate(new HttpComponentsClientHttpRequestFactory(client));
 		rt.setErrorHandler(new MgmtResponseErrorHandler());
 		return rt;
+	}
+
+	private static void configureSimpleSsl(HttpClientBuilder httpClientBuilder) {
+		try {
+			SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
+				@Override
+				public boolean isTrusted(X509Certificate[] chain, String authType) {
+					return true;
+				}
+			}).build();
+			httpClientBuilder.setSslcontext(sslContext);
+		} catch (Exception ex) {
+			throw new RuntimeException("Unable to configure simple SSLContext, cause: " + ex.getMessage(), ex);
+		}
+
+		httpClientBuilder.setHostnameVerifier(new X509HostnameVerifier() {
+			@Override
+			public void verify(String host, SSLSocket ssl) {
+			}
+
+			@Override
+			public void verify(String host, X509Certificate cert) {
+			}
+
+			@Override
+			public void verify(String host, String[] cns, String[] subjectAlts) {
+			}
+
+			@Override
+			public boolean verify(String s, SSLSession sslSession) {
+				return false;
+			}
+		});
 	}
 }

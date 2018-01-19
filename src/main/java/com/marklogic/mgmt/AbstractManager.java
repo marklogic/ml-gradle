@@ -1,23 +1,12 @@
 package com.marklogic.mgmt;
 
 import com.marklogic.client.ext.helper.LoggingObject;
-import com.marklogic.mgmt.ManageClient;
-import com.marklogic.mgmt.PayloadParser;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ClassUtils;
 
 public class AbstractManager extends LoggingObject {
 
     protected PayloadParser payloadParser = new PayloadParser();
-
-    /**
-     * Manager classes that need to connect to ML as a user with the admin role should override this to return true.
-     *
-     * @return
-     */
-    protected boolean useAdminUser() {
-        return false;
-    }
 
     /**
      * Assumes the resource name is based on the class name - e.g. RoleManager would have a resource name of "role".
@@ -45,18 +34,16 @@ public class AbstractManager extends LoggingObject {
     }
 
     protected ResponseEntity<String> putPayload(ManageClient client, String path, String payload) {
-        boolean useAdmin = useAdminUser();
         if (payloadParser.isJsonPayload(payload)) {
-            return useAdmin ? client.putJsonAsAdmin(path, payload) : client.putJson(path, payload);
+            return client.putJson(path, payload);
         }
-        return useAdmin ? client.putXmlAsAdmin(path, payload) : client.putXml(path, payload);
+        return client.putXml(path, payload);
     }
 
     protected ResponseEntity<String> postPayload(ManageClient client, String path, String payload) {
-        boolean useAdmin = useAdminUser();
         if (payloadParser.isJsonPayload(payload)) {
-            return useAdmin ? client.postJsonAsAdmin(path, payload) : client.postJson(path, payload);
+            return client.postJson(path, payload);
         }
-        return useAdmin ? client.postXmlAsAdmin(path, payload) : client.postXml(path, payload);
+        return client.postXml(path, payload);
     }
 }

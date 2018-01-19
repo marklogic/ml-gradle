@@ -10,11 +10,6 @@ public class ProtectedCollectionsManager extends AbstractResourceManager {
     }
 
     @Override
-    protected boolean useAdminUser() {
-        return true;
-    }
-
-    @Override
     public String getResourcesPath() {
         return "/manage/v2/protected-collections";
     }

@@ -23,6 +23,8 @@ public class CreateRestApiAsNonAdminUserTest extends AbstractAppDeployerTest {
 
     private XccTemplate xccTemplate;
 
+    private String originalManageUsername, originalManagePassword;
+
     @Before
     public void setup() {
         xccTemplate = newModulesXccTemplate();
@@ -30,25 +32,35 @@ public class CreateRestApiAsNonAdminUserTest extends AbstractAppDeployerTest {
 
     @After
     public void teardown() {
-        undeploySampleApp();
+    	ManageConfig config = new ManageConfig(manageConfig.getHost(), manageConfig.getPort(),
+		    originalManageUsername, originalManagePassword);
+    	this.manageClient = new ManageClient(config);
+
+	    initializeAppDeployer(new DeployRestApiServersCommand(true), new DeployRolesCommand(), new DeployUsersCommand());
+    	undeploySampleApp();
     }
 
     @Test
     public void test() {
+    	originalManageUsername = manageConfig.getUsername();
+    	originalManagePassword = manageConfig.getPassword();
+
         // Use config specific to this test
         appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/non-admin-test/ml-config")));
         appConfig.getModulePaths().clear();
         appConfig.getModulePaths().add("src/test/resources/non-admin-test/ml-modules");
 
+        // Deploy a non-admin user for testing
+        initializeAppDeployer(new DeployRolesCommand(), new DeployUsersCommand());
+        deploySampleApp();
+
         // Now rebuild ManageClient using a ManageConfig that doesn't require the admin user
         ManageConfig newConfig = new ManageConfig(manageConfig.getHost(), manageConfig.getPort(),
                 "sample-app-manage-admin", "sample-app-manage-admin");
-        newConfig.setAdminUsername(manageConfig.getUsername());
-        newConfig.setAdminPassword(manageConfig.getPassword());
         this.manageClient = new ManageClient(newConfig);
 
         // And ensure we use our custom user for loading modules; the custom app role has the privileges required for
-        // inserting modules via XCC
+        // inserting modules via the REST API
         appConfig.setRestAdminUsername("sample-app-rest-admin");
         appConfig.setRestAdminPassword("sample-app-rest-admin");
 

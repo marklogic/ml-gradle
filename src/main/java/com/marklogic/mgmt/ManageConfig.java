@@ -9,78 +9,31 @@ import com.marklogic.rest.util.RestConfig;
  */
 public class ManageConfig extends RestConfig {
 
-    /**
-     * These are assumed as sensible defaults in a development environment, where teams often use admin/admin for the
-     * admin login. They are of course expected to change in a real environment.
-     */
-    public static final String DEFAULT_USERNAME = "admin";
-    public static final String DEFAULT_PASSWORD = "admin";
+	/**
+	 * These are assumed as sensible defaults in a development environment, where teams often use admin/admin for the
+	 * admin login. They are of course expected to change in a real environment.
+	 */
+	public static final String DEFAULT_USERNAME = "admin";
+	public static final String DEFAULT_PASSWORD = "admin";
 
-    private String adminUsername;
-    private String adminPassword;
-    private boolean adminConfigureSimpleSsl;
-    private String adminScheme = "http";
-    private int adminPort = 8001;
-    private boolean cleanJsonPayloads = false;
+	private boolean cleanJsonPayloads = false;
 
-    public ManageConfig() {
-        this("localhost", DEFAULT_PASSWORD);
-    }
-
-    public ManageConfig(String host, String password) {
-        this(host, 8002, DEFAULT_USERNAME, password);
-    }
-
-    public ManageConfig(String host, int port, String username, String password) {
-        super(host, port, username, password);
-        setAdminUsername(username);
-        setAdminPassword(password);
-    }
-
-    @Override
-    public String toString() {
-        return String.format("[ManageConfig host: %s, port: %d, username: %s, admin username: %s]", getHost(),
-                getPort(), getUsername(), adminUsername);
-    }
-
-    public String getAdminUsername() {
-        return adminUsername;
-    }
-
-    public void setAdminUsername(String adminUsername) {
-        this.adminUsername = adminUsername;
-    }
-
-    public String getAdminPassword() {
-        return adminPassword;
-    }
-
-    public void setAdminPassword(String adminPassword) {
-        this.adminPassword = adminPassword;
-    }
-
-	public boolean isAdminConfigureSimpleSsl() {
-		return adminConfigureSimpleSsl;
+	public ManageConfig() {
+		this("localhost", DEFAULT_PASSWORD);
 	}
 
-	public void setAdminConfigureSimpleSsl(boolean adminConfigureSimpleSsl) {
-		this.adminConfigureSimpleSsl = adminConfigureSimpleSsl;
+	public ManageConfig(String host, String password) {
+		super(host, 8002, DEFAULT_USERNAME, password);
 	}
 
-	public int getAdminPort() {
-		return adminPort;
+	public ManageConfig(String host, int port, String username, String password) {
+		super(host, port, username, password);
 	}
 
-	public void setAdminPort(int adminPort) {
-		this.adminPort = adminPort;
-	}
-
-	public String getAdminScheme() {
-		return adminScheme;
-	}
-
-	public void setAdminScheme(String adminScheme) {
-		this.adminScheme = adminScheme;
+	@Override
+	public String toString() {
+		return String.format("[ManageConfig host: %s, port: %d, username: %s]", getHost(),
+			getPort(), getUsername());
 	}
 
 	public boolean isCleanJsonPayloads() {

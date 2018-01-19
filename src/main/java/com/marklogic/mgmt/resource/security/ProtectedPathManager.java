@@ -65,10 +65,6 @@ public class ProtectedPathManager extends AbstractResourceManager {
 		return id;
 	}
 
-	@Override
-	protected boolean useAdminUser() { return true; }
-
-
 	/**
 	 * Testing the deployment/undeployment of protected paths intermittently fails when performing a GET on the
 	 * /manage/v2/protected-paths endpoint. A single retry seems to address the issue, though the cause is still
@@ -79,12 +75,12 @@ public class ProtectedPathManager extends AbstractResourceManager {
 	@Override
 	public ResourcesFragment getAsXml() {
 		try {
-			return new ResourcesFragment(getManageClient().getXmlAsAdmin(getResourcesPath()));
+			return new ResourcesFragment(getManageClient().getXml(getResourcesPath()));
 		} catch (ResourceAccessException ex) {
 			if (logger.isWarnEnabled()) {
 				logger.warn("Unable to get list of protected paths, retrying; cause: " + ex.getMessage());
 			}
-			return new ResourcesFragment(getManageClient().getXmlAsAdmin(getResourcesPath()));
+			return new ResourcesFragment(getManageClient().getXml(getResourcesPath()));
 		}
 	}
 

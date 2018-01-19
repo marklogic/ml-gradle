@@ -48,7 +48,6 @@ public class API extends LoggingObject {
     public API(ManageClient client) {
         this.manageClient = client;
         setObjectMapper(buildDefaultObjectMapper());
-        initializeAdminManager();
     }
 
     public API(ManageClient client, AdminManager adminManager) {
@@ -60,18 +59,6 @@ public class API extends LoggingObject {
     public API(ManageClient client, ObjectMapper mapper) {
         this.manageClient = client;
         this.objectMapper = mapper;
-        initializeAdminManager();
-    }
-
-    protected void initializeAdminManager() {
-    	if (manageClient != null) {
-		    ManageConfig mc = manageClient.getManageConfig();
-		    if (mc.getAdminUsername() != null && mc.getAdminPassword() != null) {
-			    AdminConfig ac = new AdminConfig(mc.getHost(), 8001, mc.getAdminUsername(), mc.getAdminPassword());
-			    ac.setConfigureSimpleSsl(mc.isAdminConfigureSimpleSsl());
-			    this.adminManager = new AdminManager(ac);
-		    }
-	    }
     }
 
     protected ObjectMapper buildDefaultObjectMapper() {
@@ -100,27 +87,14 @@ public class API extends LoggingObject {
 		    logger.info("Connecting to host: " + host);
 	    }
 	    SimplePropertySource sps = new SimplePropertySource("mlHost", host, "mlManageUsername", mc.getUsername(),
-		    "mlManagePassword", mc.getPassword(), "mlAdminUsername", mc.getAdminUsername(), "mlAdminPassword", mc.getAdminPassword(),
-		    "mlManageSimpleSsl", mc.isConfigureSimpleSsl() + "", "mlAdminSimpleSsl", mc.isAdminConfigureSimpleSsl() + "",
-		    "mlManageScheme", mc.getScheme(), "mlAdminScheme", mc.getAdminScheme(), "mlAdminPort", mc.getAdminPort() + "",
+		    "mlManagePassword", mc.getPassword(),
+		    "mlManageSimpleSsl", mc.isConfigureSimpleSsl() + "",
+		    "mlManageScheme", mc.getScheme(),
 		    "mlManagePort", mc.getPort() + "");
 	    this.manageClient = new ManageClient(new DefaultManageConfigFactory(sps).newManageConfig());
-	    initializeAdminManager();
 	    if (logger.isInfoEnabled()) {
 		    logger.info("Connected to host: " + host);
 	    }
-    }
-
-    /**
-     * Connect to a (presumably) different MarkLogic Management API. The username/password are assumed to work for both
-     * the Management API and the Admin API on port 8001.
-     *
-     * @param host
-     * @param username
-     * @param password
-     */
-    public void connect(String host, String username, String password) {
-        connect(host, username, password, username, password);
     }
 
     /**
@@ -129,17 +103,13 @@ public class API extends LoggingObject {
      * @param host
      * @param username
      * @param password
-     * @param adminUsername
-     * @param adminPassword
      */
-    public void connect(String host, String username, String password, String adminUsername, String adminPassword) {
-    	ManageConfig mc = new ManageConfig();
-    	mc.setHost(host);
-    	mc.setUsername(username);
-    	mc.setPassword(password);
-    	mc.setAdminUsername(adminUsername);
-    	mc.setAdminPassword(adminPassword);
-    	connect(host, mc);
+    public void connect(String host, String username, String password) {
+	    ManageConfig mc = new ManageConfig();
+	    mc.setHost(host);
+	    mc.setUsername(username);
+	    mc.setPassword(password);
+	    connect(host, mc);
     }
 
     /**

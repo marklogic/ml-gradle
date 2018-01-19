@@ -72,44 +72,6 @@ public class DefaultManageConfigFactory extends PropertySourceFactory implements
 	    	c.setCleanJsonPayloads(Boolean.parseBoolean(prop));
 	    }
 
-	    prop = getProperty("mlAdminUsername");
-        if (prop != null) {
-            logger.info("Manage admin username: " + prop);
-            c.setAdminUsername(prop);
-        } else if (mlUsername != null) {
-            logger.info("Manage admin username: " + mlUsername);
-            c.setAdminUsername(mlUsername);
-        } else {
-            c.setAdminUsername(c.getUsername());
-        }
-
-        prop = getProperty("mlAdminPassword");
-        if (prop != null) {
-            c.setAdminPassword(prop);
-        } else if (mlPassword != null) {
-            c.setAdminPassword(mlPassword);
-        } else {
-            c.setAdminPassword(c.getPassword());
-        }
-
-	    prop = getProperty("mlAdminPort");
-	    if (prop != null) {
-		    logger.info("Admin port: " + prop);
-		    c.setAdminPort(Integer.parseInt(prop));
-	    }
-
-	    prop = getProperty("mlAdminScheme");
-	    if (prop != null) {
-		    logger.info("Admin scheme: " + prop);
-		    c.setAdminScheme(prop);
-	    }
-
-	    prop = getProperty("mlAdminSimpleSsl");
-	    if (prop != null) {
-		    logger.info("Use simple SSL for Admin app server: " + prop);
-		    c.setAdminConfigureSimpleSsl(Boolean.parseBoolean(prop));
-	    }
-
         return c;
     }
 

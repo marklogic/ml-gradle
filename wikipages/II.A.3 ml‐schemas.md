@@ -1,0 +1,3 @@
+As of version 2.6.0, schemas can be loaded from child directories of `src/main/ml-schemas`, and they can also be loaded into custom collections. See https://github.com/marklogic-community/ml-javaclient-util/wiki/Loading-files#specifying-collections-and-permissions for more information. 
+
+As of version 2.7.0, TDE rulesets no longer need to have a "tdex" or "tdej" suffix. Instead, any document with a URI starting with "/tde" will be put into the "http://marklogic.com/xdmp/tde" collection. 

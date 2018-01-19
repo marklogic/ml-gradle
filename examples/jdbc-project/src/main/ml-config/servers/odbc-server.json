@@ -1,0 +1,10 @@
+{
+  "server-name": "%%NAME%%-odbc",
+  "server-type": "odbc",
+  "root": "/",
+  "group-name": "%%GROUP%%",
+  "port": 8441,
+  "modules-database": "%%MODULES_DATABASE%%",
+  "content-database": "%%DATABASE%%",
+  "authentication": "basic"
+}

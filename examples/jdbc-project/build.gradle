@@ -1,0 +1,25 @@
+plugins {
+	id "com.marklogic.ml-gradle" version "3.3.1"
+	id "java"
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	compile "org.springframework:spring-jdbc:5.0.1.RELEASE"
+
+	/**
+	 * 42.1.4 is the latest version that works.
+	 * Any query using 42.2.0 results in an error of "The server's DateStyle parameter was changed to ISO. The
+	 * JDBC driver requires DateStyle to begin with ISO for correct operation."
+	 */
+	runtime "org.postgresql:postgresql:42.1.4"
+}
+
+task selectFromSysTables(type: JavaExec) {
+	dependsOn = ["compileJava"]
+	classpath = sourceSets.main.runtimeClasspath
+	main = "example.Main"
+}

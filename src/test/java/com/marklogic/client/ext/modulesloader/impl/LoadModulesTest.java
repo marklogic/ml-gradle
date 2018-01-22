@@ -86,6 +86,21 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 	}
 
 	@Test
+	public void customBatchSize() {
+		initializeModulesLoaderWithAssetBatchSize(2);
+		verifyModuleCountWithPattern(".*/ext/.*", "Should load every file", 7);
+	}
+
+	/**
+	 * Just ignoring an invalid batch size, which is anything less than 1.
+	 */
+	@Test
+	public void invalidBatchSize() {
+		initializeModulesLoaderWithAssetBatchSize(-1);
+		verifyModuleCountWithPattern(".*/ext/.*", "Should load every file", 7);
+	}
+
+	@Test
 	public void withFilenamePattern() {
 		verifyModuleCountWithPattern(".*options.*(xml)", "Should only load the single XML options file", 1);
 		verifyModuleCountWithPattern(".*transforms.*", "Should only load the 5 transforms", 5);
@@ -160,4 +175,12 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 			modulesClient.newServerEval().xquery(String.format("fn:doc-available('%s')", uri)).evalAs(String.class)
 		);
 	}
+
+	private void initializeModulesLoaderWithAssetBatchSize(int batchSize) {
+		AssetFileLoader assetFileLoader = new AssetFileLoader(modulesClient);
+		assetFileLoader.setBatchSize(batchSize);
+		modulesLoader = new DefaultModulesLoader(assetFileLoader);
+		modulesLoader.setModulesManager(null);
+	}
+
 }

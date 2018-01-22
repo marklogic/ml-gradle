@@ -15,6 +15,10 @@ import java.util.List;
  * Generic implementation of FileLoader. Delegates to a DocumentFileReader for reading from a set of file paths, and
  * delegates to a BatchWriter for writing to MarkLogic (where that BatchWriter could use XCC, the REST API, or the
  * Data Movement SDK in ML9).
+ *
+ * The batchSize property defaults to null, which means all files are written in one call via the BatchWriter. Setting
+ * this means that the List of DocumentFile objects read from the DocumentFileReader will be written in batches, each
+ * the size of the batchSize property, except for the final one that may be less than this size.
  */
 public class GenericFileLoader extends LoggingObject implements FileLoader {
 
@@ -22,6 +26,7 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 	private BatchWriter batchWriter;
 	private boolean waitForCompletion = true;
 	private boolean logFileUris = true;
+	private Integer batchSize;
 
 	// These are passed on to the DefaultDocumentFileReader that is created if one isn't set
 	private List<FileFilter> fileFilters;
@@ -69,20 +74,54 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 
 		List<DocumentFile> documentFiles = documentFileReader.readDocumentFiles(paths);
 		if (documentFiles != null && !documentFiles.isEmpty()) {
-			if (logger.isInfoEnabled()) {
-				logger.info(format("Writing %d files", documentFiles.size()));
-				if (logFileUris ) {
-					for (DocumentFile df : documentFiles) {
-						logger.info("Writing: " + df.getUri());
-					}
-				}
-			}
-			batchWriter.write(documentFiles);
+			writeBatchOfDocuments(documentFiles, 0);
 			if (waitForCompletion) {
 				batchWriter.waitForCompletion();
 			}
 		}
 		return documentFiles;
+	}
+
+	/**
+	 * If batchSize is not set, then this method will load all the documents in one call to the BatchWriter. Otherwise,
+	 * this will divide up the list of documentFiles into batches matching the value of batchSize, with the last batch
+	 * possibly being less than batchSize.
+	 * 
+	 * @param documentFiles
+	 * @param startPosition
+	 */
+	protected void writeBatchOfDocuments(List<DocumentFile> documentFiles, final int startPosition) {
+		final int documentFilesSize = documentFiles.size();
+		if (startPosition >= documentFilesSize) {
+			return;
+		}
+
+		if (batchSize != null && batchSize < 1) {
+			batchSize = null;
+		}
+
+		// The "end" param to subList below is exclusive, so the highest valid value is the list size
+		int endPosition = batchSize == null ? documentFilesSize : startPosition + batchSize;
+		if (endPosition > documentFilesSize) {
+			endPosition = documentFilesSize;
+		}
+
+		List<DocumentFile> batch = documentFiles.subList(startPosition, endPosition);
+		if (!batch.isEmpty()) {
+			if (logger.isInfoEnabled()) {
+				logger.info(format("Writing %d files", batch.size()));
+				if (logFileUris) {
+					for (DocumentFile df : batch) {
+						logger.info("Writing: " + df.getUri());
+					}
+				}
+			}
+			batchWriter.write(batch);
+		}
+
+		if (endPosition < documentFilesSize) {
+			writeBatchOfDocuments(documentFiles, endPosition);
+		}
 	}
 
 	/**
@@ -227,5 +266,9 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 
 	public List<DocumentFileProcessor> getDocumentFileProcessors() {
 		return documentFileProcessors;
+	}
+
+	public void setBatchSize(Integer batchSize) {
+		this.batchSize = batchSize;
 	}
 }

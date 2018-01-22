@@ -2,6 +2,8 @@ package com.marklogic.client.ext.modulesloader.impl;
 
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.ext.AbstractIntegrationTest;
+import com.marklogic.client.ext.modulesloader.Modules;
+import com.marklogic.client.ext.modulesloader.ModulesFinder;
 import com.marklogic.client.ext.tokenreplacer.DefaultTokenReplacer;
 import com.marklogic.client.io.BytesHandle;
 import com.marklogic.client.io.StringHandle;
@@ -10,6 +12,7 @@ import org.junit.Test;
 import org.springframework.core.io.Resource;
 
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -37,6 +40,20 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 
 		modulesLoader = new DefaultModulesLoader(new AssetFileLoader(modulesClient));
 		modulesLoader.setModulesManager(null);
+	}
+
+	@Test
+	public void pathWithSpaces() {
+		String dir = Paths.get("src", "test", "resources", "path with spaces").toString();
+		ModulesFinder finder = new DefaultModulesFinder();
+		Modules modules = finder.findModules(dir);
+		List<Resource> assetDirectories = modules.getAssetDirectories();
+		assertEquals("Expecting one directory, the 'root' directory", 1, assetDirectories.size());
+
+		// Now load the modules for real
+		modulesLoader.loadModules(dir, finder, client);
+		String moduleXml = modulesClient.newXMLDocumentManager().read("/example/example.xqy", new StringHandle()).get();
+		assertEquals("<example/>", moduleXml.trim());
 	}
 
 	/**

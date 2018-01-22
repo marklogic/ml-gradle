@@ -13,7 +13,6 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -62,7 +61,13 @@ public abstract class BaseModulesFinder extends LoggingObject implements Modules
 		// classpath needs the trailing / to find child dirs
 		findResources("asset module directories", baseDir, "*", "*/").stream().forEach(resource -> {
 			try {
-				File f = new File(resource.getURL().getFile());
+				String resourceFile = resource.getURL().getFile();
+				if (logger.isDebugEnabled()) {
+					logger.debug("Checking resource to see if it's a valid asset directory: " + resourceFile);
+				}
+
+				resourceFile = decodeAssetDirectoryResource(resourceFile);
+				File f = new File(resourceFile);
 				String uri = resource.getURI().toString();
 				boolean isRecognized = recognizedPaths.contains(f.getName());
 				// when the modules are in a jar inside a war
@@ -79,6 +84,29 @@ public abstract class BaseModulesFinder extends LoggingObject implements Modules
 		});
 
         modules.setAssetDirectories(dirs);
+    }
+
+	/**
+	 * There may be other characters that need decoding, but for now, only %20 is being converted back into a space.
+	 *
+	 * The reason %20 exists is because a Resource that represents a potential asset directory is accessed as a URL in
+	 * order to support jar and war files. Accessing the directory as a URL results in spaces being converted to %20.
+	 * In order to construct a File, these must be converted back into spaces.
+	 *
+	 * It may be that performing a full URL decoding on the resourceFile is the correct solution, just don't have enough
+	 * test cases to know that this is safe for sure.
+	 *
+	 * @param resourceFile
+	 * @return
+	 */
+	protected String decodeAssetDirectoryResource(String resourceFile) {
+	    if (resourceFile.contains("%20")) {
+		    resourceFile = resourceFile.replaceAll("%20", " ");
+		    if (logger.isDebugEnabled()) {
+			    logger.debug("Replaced occurrences of %20 with a space in potential asset directory: " + resourceFile);
+		    }
+	    }
+	    return resourceFile;
     }
 
     protected List<String> getRecognizedPaths() {

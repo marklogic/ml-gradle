@@ -114,6 +114,7 @@ public class AppConfig {
 	private boolean deleteTestModules = false;
 	private String deleteTestModulesPattern = "/test/**";
 	private int modulesLoaderThreadCount = 8;
+	private Integer modulesLoaderBatchSize;
 
     private String schemasPath;
 
@@ -1185,5 +1186,13 @@ public class AppConfig {
 
 	public void setSortOtherDatabaseByDependencies(boolean sortOtherDatabaseByDependencies) {
 		this.sortOtherDatabaseByDependencies = sortOtherDatabaseByDependencies;
+	}
+
+	public Integer getModulesLoaderBatchSize() {
+		return modulesLoaderBatchSize;
+	}
+
+	public void setModulesLoaderBatchSize(Integer modulesLoaderBatchSize) {
+		this.modulesLoaderBatchSize = modulesLoaderBatchSize;
 	}
 }

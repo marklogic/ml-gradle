@@ -138,6 +138,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
         p.setProperty("mlDeleteTestModules", "true");
         p.setProperty("mlDeleteTestModulesPattern", "/some/pattern");
         p.setProperty("mlModulesLoaderThreadCount", "3");
+        p.setProperty("mlModulesLoaderBatchSize", "79");
 
         p.setProperty("mlModelsPath", "ml/models");
         p.setProperty("mlInstanceConverterPath", "ext/my/path");
@@ -239,6 +240,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
         assertTrue(config.isDeleteTestModules());
         assertEquals("/some/pattern", config.getDeleteTestModulesPattern());
         assertEquals(3, config.getModulesLoaderThreadCount());
+        assertEquals(new Integer(79), config.getModulesLoaderBatchSize());
 
         assertEquals("ml/models", config.getModelsPath());
         assertEquals("ext/my/path", config.getInstanceConverterPath());

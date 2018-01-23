@@ -71,6 +71,8 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void loadModulesFromMultiplePaths() {
+		// Setting batch size to make sure nothing blows up
+		appConfig.setModulesLoaderBatchSize(1);
 		appConfig.getModulePaths().add("src/test/resources/sample-app/build/mlRestApi/some-library/ml-modules");
 
 		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());

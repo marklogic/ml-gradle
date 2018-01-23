@@ -134,7 +134,7 @@ public class AppConfig {
     // Controls whether replicas are deleted or not when undeploying a database
     private boolean deleteReplicas = true;
 
-    private boolean sortRolesByDependencies = true;
+    private boolean sortOtherDatabaseByDependencies = true;
 
     // As defined by the REST API
     private String modulePermissions = "rest-admin,read,rest-admin,update,rest-extension-user,execute";
@@ -917,14 +917,6 @@ public class AppConfig {
 		this.appServicesPassword = appServicesPassword;
 	}
 
-	public boolean isSortRolesByDependencies() {
-		return sortRolesByDependencies;
-	}
-
-	public void setSortRolesByDependencies(boolean sortRolesByDependencies) {
-		this.sortRolesByDependencies = sortRolesByDependencies;
-	}
-
 	public boolean isDeleteTestModules() {
 		return deleteTestModules;
 	}
@@ -1185,5 +1177,13 @@ public class AppConfig {
 
 	public void setModuleFilenamesIncludePattern(Pattern moduleFilenamesIncludePattern) {
 		this.moduleFilenamesIncludePattern = moduleFilenamesIncludePattern;
+	}
+
+	public boolean isSortOtherDatabaseByDependencies() {
+		return sortOtherDatabaseByDependencies;
+	}
+
+	public void setSortOtherDatabaseByDependencies(boolean sortOtherDatabaseByDependencies) {
+		this.sortOtherDatabaseByDependencies = sortOtherDatabaseByDependencies;
 	}
 }

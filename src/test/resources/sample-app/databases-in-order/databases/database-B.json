@@ -1,0 +1,5 @@
+{
+	"database-name": "%%NAME%%-B",
+	"schema-database": "%%NAME%%-C",
+	"triggers-database": "Triggers"
+}

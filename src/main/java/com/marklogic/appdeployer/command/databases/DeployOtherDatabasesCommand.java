@@ -14,11 +14,13 @@ import java.util.*;
  * uncommon to need to create additional databases (and perhaps REST API servers to go with them).
  * <p>
  * A key aspect of this class is its attempt to deploy/undeploy databases in the correct order. For each database file
- * that it finds that's not one of the default ones, a DeployDatabaseCommand will be created. All of those commands will
- * then be sorted based on the presence of "triggers-database" or "schema-database" within the payload for the command.
+ * that it finds that's not one of the default ones, a DeployDatabaseCommand will be created. These commands are then
+ * sorted based on their dependencies between each other (a database can depend on another database for schemas, triggers,
+ * or security).
  * <p>
  * If the above strategy doesn't work for you, you can always resort to naming your database files to control the order
- * that they're processed in.
+ * that they're processed in. Be sure to set "setSortOtherDatabasesByDependencies" to false in the AppConfig object that
+ * is passed in via a CommandContext to disable the sorting that this command will otherwise perform.
  * </p>
  */
 public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
@@ -48,7 +50,12 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
     }
 
     protected void sortCommandsBeforeExecute(List<DeployDatabaseCommand> list, CommandContext context) {
-        Collections.sort(list, new DeployDatabaseCommandComparator(context, false));
+    	if (context.getAppConfig().isSortOtherDatabaseByDependencies()) {
+		    Collections.sort(list, new DeployDatabaseCommandComparator(context, false));
+	    }
+	    else {
+    		logger.info("Not sorting databases by dependencies; they will be sorted based on their filename instead");
+	    }
     }
 
     @Override

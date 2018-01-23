@@ -40,7 +40,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    AppConfig config = new DefaultAppConfigFactory(new SimplePropertySource(p)).newAppConfig();
 	    assertNull(config.getModuleTimestampsPath());
     }
-    
+
     @Test
     public void unrecognizedProperties() {
         sut = new DefaultAppConfigFactory(new SimplePropertySource("foo.mlHost", "host", "foo.mlUsername", "user"));
@@ -168,8 +168,6 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    p.setProperty("mlDatabaseReplicaDataDirectories", "Documents,/data/replicas,Security,/data/security/replicas");
 	    p.setProperty("mlDatabaseReplicaFastDataDirectories", "Documents,/fast/replicas,Security,/fast/security/replicas");
 	    p.setProperty("mlDatabaseReplicaLargeDataDirectories", "Documents,/large/replicas,Security,/large/security/replicas");
-
-	    p.setProperty("mlSortRolesByDependencies", "false");
 
 	    sut = new DefaultAppConfigFactory(new SimplePropertySource(p));
         AppConfig config = sut.newAppConfig();
@@ -308,8 +306,6 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    map = config.getDatabaseReplicaLargeDataDirectories();
 	    assertEquals("/large/replicas", map.get("Documents"));
 	    assertEquals("/large/security/replicas", map.get("Security"));
-
-	    assertFalse(config.isSortRolesByDependencies());
     }
 
 	/**

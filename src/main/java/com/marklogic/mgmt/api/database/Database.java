@@ -166,6 +166,22 @@ public class Database extends Resource {
         }
     }
 
+	/**
+	 *
+	 * @param other
+	 * @return true if the name of the other database equals the name of this database object's schema database,
+	 * triggers database, or security database
+	 */
+	public boolean dependsOnDatabase(Database other) {
+    	String otherName = other.getDatabaseName();
+
+    	if (otherName == null) {
+    		return false;
+	    }
+
+	    return otherName.equals(schemaDatabase) || otherName.equals(triggersDatabase) || otherName.equals(securityDatabase);
+    }
+
     public String getDatabaseName() {
         return databaseName;
     }

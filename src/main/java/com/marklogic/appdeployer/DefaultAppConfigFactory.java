@@ -643,16 +643,6 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			c.setResourceFilenamesIncludePattern(Pattern.compile(prop));
 		}
 
-		/**
-		 * Version 2.9.0 of ml-app-deployer, by default, sorts role files by reading each file and looking at the role
-		 * dependencies. You can disable this behavior by setting this property to false.
-		 */
-		prop = getProperty("mlSortRolesByDependencies");
-		if (prop != null) {
-			logger.info("Sort roles by dependencies: " + prop);
-			c.setSortRolesByDependencies(Boolean.parseBoolean(prop));
-		}
-
 		prop = getProperty("mlExcludeProperties");
 		if (prop != null) {
 			String[] values = prop.split(",");

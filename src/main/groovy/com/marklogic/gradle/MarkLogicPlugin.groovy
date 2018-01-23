@@ -34,6 +34,7 @@ import com.marklogic.gradle.task.qconsole.ImportWorkspacesTask
 import com.marklogic.gradle.task.roxy.RoxyMigrateBuildStepsTask
 import com.marklogic.gradle.task.roxy.RoxyMigrateFilesTask
 import com.marklogic.gradle.task.roxy.RoxyMigratePropertiesTask
+import com.marklogic.gradle.task.roxy.RoxyGenerateTestScaffoldTask
 import com.marklogic.gradle.task.scaffold.GenerateScaffoldTask
 import com.marklogic.gradle.task.schemas.LoadSchemasTask
 import com.marklogic.gradle.task.security.*
@@ -240,7 +241,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 			"Use -ProxyProjectPath to define the location of your Roxy project.")
 		project.task("mlRoxyMigrateProject", group: roxyGroup, description: "Run all tasks for migrating a Roxy project into this Gradle project. " +
 			"Use -ProxyProjectPath to define the location of your Roxy project.", dependsOn: ["mlRoxyMigrateBuildSteps", "mlRoxyMigrateFiles", "mlRoxyMigrateProperties"])
-
+        project.task("mlGenerateRoxyTest", type: RoxyGenerateTestScaffoldTask, group: roxyGroup, description: "Generate Roxy test scaffolding.", dependsOn: [])
 		logger.info("Finished initializing ml-gradle\n")
 	}
 

@@ -46,33 +46,34 @@ public abstract class AbstractResourceManager extends AbstractManager implements
     }
 
     public ResourcesFragment getAsXml() {
-        Fragment f = manageClient.getXml(getResourcesPath());
-        return new ResourcesFragment(f);
+	    Fragment f = useAdminUser() ? manageClient.getXmlAsAdmin(getResourcesPath())
+		    : manageClient.getXml(getResourcesPath());
+	    return new ResourcesFragment(f);
     }
 
     public Fragment getAsXml(String resourceNameOrId, String... resourceUrlParams) {
         String path = appendParamsAndValuesToPath(getResourcePath(resourceNameOrId, resourceUrlParams));
-        return manageClient.getXml(path);
+	    return useAdminUser() ? manageClient.getXmlAsAdmin(path) : manageClient.getXml(path);
     }
 
     public Fragment getPropertiesAsXml(String resourceNameOrId, String... resourceUrlParams) {
         String path = appendParamsAndValuesToPath(getPropertiesPath(resourceNameOrId, resourceUrlParams));
-        return manageClient.getXml(path);
+	    return useAdminUser() ? manageClient.getXmlAsAdmin(path) : manageClient.getXml(path);
     }
 
     public String getPropertiesAsXmlString(String resourceNameOrId, String... resourceUrlParams) {
         String path = appendParamsAndValuesToPath(getPropertiesPath(resourceNameOrId, resourceUrlParams));
-        return manageClient.getXmlString(path);
+	    return useAdminUser() ? manageClient.getXmlStringAsAdmin(path) : manageClient.getXmlString(path);
     }
 
     public String getAsJson(String resourceNameOrId, String... resourceUrlParams) {
         String path = appendParamsAndValuesToPath(getPropertiesPath(resourceNameOrId, resourceUrlParams));
-        return manageClient.getJson(path);
+	    return useAdminUser() ? manageClient.getJsonAsAdmin(path) : manageClient.getJson(path);
     }
 
     public String getPropertiesAsJson(String resourceNameOrId, String... resourceUrlParams) {
         String path = appendParamsAndValuesToPath(getPropertiesPath(resourceNameOrId, resourceUrlParams));
-        return manageClient.getJson(path);
+	    return useAdminUser() ? manageClient.getJsonAsAdmin(path) : manageClient.getJson(path);
     }
 
     /**
@@ -181,8 +182,12 @@ public abstract class AbstractResourceManager extends AbstractManager implements
     public void deleteAtPath(String path) {
         String label = getResourceName();
         logger.info(format("Deleting %s at path %s", label, path));
-        manageClient.delete(path);
-        logger.info(format("Deleted %s at path %s", label, path));
+	    if (useAdminUser()) {
+		    manageClient.deleteAsAdmin(path);
+	    } else {
+		    manageClient.delete(path);
+	    }
+	    logger.info(format("Deleted %s at path %s", label, path));
     }
 
     /**

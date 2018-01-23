@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.mgmt.util.ObjectMapperFactory;
 import com.marklogic.rest.util.Fragment;
+import com.marklogic.rest.util.RestConfig;
 import com.marklogic.rest.util.RestTemplateUtil;
 import org.jdom2.Namespace;
 import org.springframework.http.*;
@@ -23,8 +24,9 @@ import java.util.List;
  */
 public class ManageClient extends LoggingObject {
 
-    private ManageConfig manageConfig;
-    private RestTemplate restTemplate;
+	private ManageConfig manageConfig;
+	private RestTemplate restTemplate;
+	private RestTemplate adminRestTemplate;
 	private PayloadParser payloadParser;
 
     /**
@@ -44,6 +46,21 @@ public class ManageClient extends LoggingObject {
             logger.info("Initializing ManageClient with manage config of: " + config);
         }
         this.restTemplate = RestTemplateUtil.newRestTemplate(config);
+
+        if (!config.getUsername().equals(config.getAdminUsername())) {
+	        if (logger.isInfoEnabled()) {
+		        logger.info("Initializing ManageClient with admin config, admin user: " + config.getAdminUsername());
+	        }
+
+	        RestConfig rc = new RestConfig(config.getHost(), config.getPort(), config.getAdminUsername(), config.getAdminPassword());
+	        rc.setScheme(config.getScheme());
+	        rc.setConfigureSimpleSsl(config.isConfigureSimpleSsl());
+	        rc.setHostnameVerifier(config.getHostnameVerifier());
+	        rc.setSslContext(config.getSslContext());
+	        this.adminRestTemplate = RestTemplateUtil.newRestTemplate(rc);
+        } else {
+            this.adminRestTemplate = restTemplate;
+        }
     }
 
 	/**
@@ -53,7 +70,19 @@ public class ManageClient extends LoggingObject {
 	 * @param restTemplate
 	 */
 	public ManageClient(RestTemplate restTemplate) {
-		this.restTemplate = restTemplate;
+    	this(restTemplate, restTemplate);
+    }
+
+	/**
+	 * Use this when you want to provide your own RestTemplate as opposed to using the one that's constructed via a
+	 * ManageConfig instance.
+	 *
+	 * @param restTemplate
+	 * @param adminRestTemplate
+	 */
+	public ManageClient(RestTemplate restTemplate, RestTemplate adminRestTemplate) {
+    	this.restTemplate = restTemplate;
+    	this.adminRestTemplate = adminRestTemplate;
     }
 
     public ResponseEntity<String> putJson(String path, String json) {
@@ -61,9 +90,19 @@ public class ManageClient extends LoggingObject {
         return restTemplate.exchange(buildUri(path), HttpMethod.PUT, buildJsonEntity(json), String.class);
     }
 
+    public ResponseEntity<String> putJsonAsAdmin(String path, String json) {
+        logAdminRequest(path, "JSON", "PUT");
+        return adminRestTemplate.exchange(buildUri(path), HttpMethod.PUT, buildJsonEntity(json), String.class);
+    }
+
     public ResponseEntity<String> putXml(String path, String xml) {
         logRequest(path, "XML", "PUT");
         return restTemplate.exchange(buildUri(path), HttpMethod.PUT, buildXmlEntity(xml), String.class);
+    }
+
+    public ResponseEntity<String> putXmlAsAdmin(String path, String xml) {
+        logAdminRequest(path, "XML", "PUT");
+        return adminRestTemplate.exchange(buildUri(path), HttpMethod.PUT, buildXmlEntity(xml), String.class);
     }
 
     public ResponseEntity<String> postJson(String path, String json) {
@@ -71,9 +110,19 @@ public class ManageClient extends LoggingObject {
         return restTemplate.exchange(buildUri(path), HttpMethod.POST, buildJsonEntity(json), String.class);
     }
 
+    public ResponseEntity<String> postJsonAsAdmin(String path, String json) {
+        logAdminRequest(path, "JSON", "POST");
+        return adminRestTemplate.exchange(buildUri(path), HttpMethod.POST, buildJsonEntity(json), String.class);
+    }
+
     public ResponseEntity<String> postXml(String path, String xml) {
         logRequest(path, "XML", "POST");
         return restTemplate.exchange(buildUri(path), HttpMethod.POST, buildXmlEntity(xml), String.class);
+    }
+
+    public ResponseEntity<String> postXmlAsAdmin(String path, String xml) {
+        logAdminRequest(path, "XML", "POST");
+        return adminRestTemplate.exchange(buildUri(path), HttpMethod.POST, buildXmlEntity(xml), String.class);
     }
 
     public ResponseEntity<String> postForm(String path, String... params) {
@@ -102,6 +151,20 @@ public class ManageClient extends LoggingObject {
         return new Fragment(xml, list.toArray(new Namespace[] {}));
     }
 
+	public String getXmlStringAsAdmin(String path) {
+		logAdminRequest(path, "XML", "GET");
+		return getAdminRestTemplate().getForObject(buildUri(path), String.class);
+	}
+
+    public Fragment getXmlAsAdmin(String path, String... namespacePrefixesAndUris) {
+        String xml = getXmlStringAsAdmin(path);
+        List<Namespace> list = new ArrayList<Namespace>();
+        for (int i = 0; i < namespacePrefixesAndUris.length; i += 2) {
+            list.add(Namespace.getNamespace(namespacePrefixesAndUris[i], namespacePrefixesAndUris[i + 1]));
+        }
+        return new Fragment(xml, list.toArray(new Namespace[] {}));
+    }
+
     public String getJson(String path) {
         logRequest(path, "JSON", "GET");
         HttpHeaders headers = new HttpHeaders();
@@ -117,9 +180,22 @@ public class ManageClient extends LoggingObject {
         return getRestTemplate().exchange(uri, HttpMethod.GET, new HttpEntity<>(headers), String.class).getBody();
     }
 
+    public String getJsonAsAdmin(String path) {
+        logAdminRequest(path, "JSON", "GET");
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
+        return getAdminRestTemplate().exchange(buildUri(path), HttpMethod.GET, new HttpEntity<>(headers), String.class)
+                .getBody();
+    }
+
     public void delete(String path) {
         logRequest(path, "", "DELETE");
         restTemplate.delete(buildUri(path));
+    }
+
+    public void deleteAsAdmin(String path) {
+        logAdminRequest(path, "", "DELETE");
+        adminRestTemplate.delete(buildUri(path));
     }
 
 	/**
@@ -187,11 +263,19 @@ public class ManageClient extends LoggingObject {
         return restTemplate;
     }
 
+    public RestTemplate getAdminRestTemplate() {
+        return adminRestTemplate;
+    }
+
     public ManageConfig getManageConfig() {
         return manageConfig;
     }
 
 	public void setRestTemplate(RestTemplate restTemplate) {
 		this.restTemplate = restTemplate;
+	}
+
+	public void setAdminRestTemplate(RestTemplate adminRestTemplate) {
+		this.adminRestTemplate = adminRestTemplate;
 	}
 }

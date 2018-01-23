@@ -4,8 +4,9 @@ import com.marklogic.rest.util.RestConfig;
 
 /**
  * Defines the configuration data for talking to the Mgmt REST API. Also includes properties for the admin user, as this
- * user is typically needed for managing resources such as roles and users. If adminUsername and adminPassword are not
- * set, they default to the username/password attribute values.
+ * user is typically needed for creating an app-specific user (which may depend on app-specific roles and privileges)
+ * which is then used for deploying every other resources. If adminUsername and adminPassword are not set, they default
+ * to the username/password attribute values.
  */
 public class ManageConfig extends RestConfig {
 
@@ -16,6 +17,8 @@ public class ManageConfig extends RestConfig {
 	public static final String DEFAULT_USERNAME = "admin";
 	public static final String DEFAULT_PASSWORD = "admin";
 
+	private String adminUsername;
+	private String adminPassword;
 	private boolean cleanJsonPayloads = false;
 
 	public ManageConfig() {
@@ -28,12 +31,14 @@ public class ManageConfig extends RestConfig {
 
 	public ManageConfig(String host, int port, String username, String password) {
 		super(host, port, username, password);
+		setAdminUsername(username);
+		setAdminPassword(password);
 	}
 
 	@Override
 	public String toString() {
-		return String.format("[ManageConfig host: %s, port: %d, username: %s]", getHost(),
-			getPort(), getUsername());
+		return String.format("[ManageConfig host: %s, port: %d, username: %s, admin username: %s]", getHost(),
+			getPort(), getUsername(), getAdminUsername());
 	}
 
 	public boolean isCleanJsonPayloads() {
@@ -42,5 +47,21 @@ public class ManageConfig extends RestConfig {
 
 	public void setCleanJsonPayloads(boolean cleanJsonPayloads) {
 		this.cleanJsonPayloads = cleanJsonPayloads;
+	}
+
+	public String getAdminUsername() {
+		return adminUsername;
+	}
+
+	public void setAdminUsername(String adminUsername) {
+		this.adminUsername = adminUsername;
+	}
+
+	public String getAdminPassword() {
+		return adminPassword;
+	}
+
+	public void setAdminPassword(String adminPassword) {
+		this.adminPassword = adminPassword;
 	}
 }

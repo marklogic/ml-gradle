@@ -87,10 +87,9 @@ public class API extends LoggingObject {
 		    logger.info("Connecting to host: " + host);
 	    }
 	    SimplePropertySource sps = new SimplePropertySource("mlHost", host, "mlManageUsername", mc.getUsername(),
-		    "mlManagePassword", mc.getPassword(),
-		    "mlManageSimpleSsl", mc.isConfigureSimpleSsl() + "",
-		    "mlManageScheme", mc.getScheme(),
-		    "mlManagePort", mc.getPort() + "");
+		    "mlManagePassword", mc.getPassword(), "mlManageSimpleSsl", mc.isConfigureSimpleSsl() + "",
+		    "mlManageScheme", mc.getScheme(), "mlManagePort", mc.getPort() + "",
+		    "mlAdminUsername", mc.getAdminUsername(), "mlAdminPassword", mc.getAdminPassword());
 	    this.manageClient = new ManageClient(new DefaultManageConfigFactory(sps).newManageConfig());
 	    if (logger.isInfoEnabled()) {
 		    logger.info("Connected to host: " + host);
@@ -105,19 +104,34 @@ public class API extends LoggingObject {
      * @param password
      */
     public void connect(String host, String username, String password) {
-	    ManageConfig mc = new ManageConfig();
-	    mc.setHost(host);
-	    mc.setUsername(username);
-	    mc.setPassword(password);
-	    connect(host, mc);
+	    connect(host, username, password, username, password);
     }
 
-    /**
-     * Constructs a new ClientHelper, using newClient().
-     *
-     * @return
-     */
-    public ClientHelper clientHelper() {
+	/**
+	 * Connect to a (presumably) different MarkLogic Management API.
+	 *
+	 * @param host
+	 * @param username
+	 * @param password
+	 * @param adminUsername
+	 * @param adminPassword
+	 */
+	public void connect(String host, String username, String password, String adminUsername, String adminPassword) {
+		ManageConfig mc = new ManageConfig();
+		mc.setHost(host);
+		mc.setUsername(username);
+		mc.setPassword(password);
+		mc.setAdminUsername(adminUsername);
+		mc.setAdminPassword(adminPassword);
+		connect(host, mc);
+	}
+
+	/**
+	 * Constructs a new ClientHelper, using newClient().
+	 *
+	 * @return
+	 */
+	public ClientHelper clientHelper() {
         return new ClientHelper(newClient());
     }
 

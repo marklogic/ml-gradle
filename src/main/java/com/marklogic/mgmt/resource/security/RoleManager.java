@@ -16,6 +16,11 @@ public class RoleManager extends AbstractResourceManager {
 		super(client);
 	}
 
+	@Override
+	protected boolean useAdminUser() {
+		return true;
+	}
+
 	/**
 	 * When a new role is created, we need to check to see if it has permissions that reference the role name. If so,
 	 * we can't create the role with the given payload - the Manage API will throw an error. Instead, we create the

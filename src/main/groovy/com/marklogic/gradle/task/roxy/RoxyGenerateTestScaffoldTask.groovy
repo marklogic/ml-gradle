@@ -12,11 +12,9 @@ import org.gradle.api.tasks.TaskAction
 //        - Specify the name of the generated test suite
 //    testName        (Default: SampleTest)
 //        - Specify the name of the generated test
-//    boilerplate     (Default: <null>)
-//        - Specify that only boilerplate should be generated
 // Examples:
 //    gradle mlGenerateRoxyTest
-//    gradle mlGenerateRoxyTest -PsuiteName="foo" -PtestName="bar" -ProxySuitesDir="./src/roxyTest/suites" -Pboilerplate
+//    gradle mlGenerateRoxyTest -PsuiteName="foo" -PtestName="bar" -ProxySuitesDir="./src/roxyTest/suites"
 class RoxyGenerateTestScaffoldTask extends RoxyTask {
     CommandLineArguments arguments
 

@@ -28,8 +28,18 @@ public class AdminManager extends AbstractManager {
     }
 
     public AdminManager(AdminConfig adminConfig) {
-        this.adminConfig = adminConfig;
-        this.restTemplate = RestTemplateUtil.newRestTemplate(adminConfig);
+    	setAdminConfig(adminConfig);
+    }
+
+	/**
+	 * Uses the given AdminConfig instance to construct a Spring RestTemplate for communicating with Manage API
+	 * endpoints on port 8001.
+	 *
+	 * @param adminConfig
+	 */
+	public void setAdminConfig(AdminConfig adminConfig) {
+	    this.adminConfig = adminConfig;
+	    this.restTemplate = RestTemplateUtil.newRestTemplate(adminConfig);
     }
 
     public void init() {

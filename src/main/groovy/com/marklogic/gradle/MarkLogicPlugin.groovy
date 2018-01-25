@@ -294,31 +294,43 @@ class MarkLogicPlugin implements Plugin<Project> {
 		ManageConfig manageConfig = new DefaultManageConfigFactory(new ProjectPropertySource(project)).newManageConfig()
 		project.extensions.add("mlManageConfig", manageConfig)
 
-		ManageClient manageClient = new ManageClient(manageConfig)
-		project.extensions.add("mlManageClient", manageClient)
-
-		AdminManager adminManager = new AdminManager(adminConfig)
-		project.extensions.add("mlAdminManager", adminManager)
-
-		CommandContext context = new CommandContext(appConfig, manageClient, adminManager)
-		project.extensions.add("mlCommandContext", context)
-
-		project.extensions.add("mlAppDeployer", newAppDeployer(project, context))
+		AppDeployerInitializer initializer = new AppDeployerInitializer()
+		project.extensions.add("mlAppDeployerInitializer", initializer)
+		initializer.init(project)
 	}
 
-	/**
-	 * Creates an AppDeployer with a default set of commands. A developer can then modify this in an
-	 * ext block.
-	 */
-	AppDeployer newAppDeployer(Project project, CommandContext context) {
+}
+
+/**
+ * This class exists so that an instance of it can be added to the set of project extensions, allowing a developer to
+ * e.g. make modifications to mlManageConfig and mlAdminConfig in an ext block and then re-initialize the main
+ * ml-gradle objects based on those configuration changes.
+ */
+class AppDeployerInitializer {
+	def init(Project project) {
+		/**
+		 * Calling getExtensions().getExtraProperties().set seems to be the right way for assigning an object to a
+		 * property in such a way that it can later be overridden. "extensions.add" does not allow this - once an
+		 * extension object has been added, it cannot be overridden.
+		 */
+		ManageClient manageClient = new ManageClient(project.property("mlManageConfig"))
+		project.getExtensions().getExtraProperties().set("mlManageClient", manageClient)
+
+		AdminManager adminManager = new AdminManager(project.property("mlAdminConfig"))
+		project.getExtensions().getExtraProperties().set("mlAdminManager", adminManager)
+
+		CommandContext context = new CommandContext(project.property("mlAppConfig"), manageClient, adminManager)
+		project.getExtensions().getExtraProperties().set("mlCommandContext", context)
+
 		Map<String, List<Command>> commandMap = new CommandMapBuilder().buildCommandMap();
 		List<Command> commands = new ArrayList<>();
 		for (String name : commandMap.keySet()) {
-			project.extensions.add(name, commandMap.get(name));
+			project.getExtensions().getExtraProperties().set(name, commandMap.get(name));
 			commands.addAll(commandMap.get(name));
 		}
-		SimpleAppDeployer deployer = new SimpleAppDeployer(context.getManageClient(), context.getAdminManager())
+
+		SimpleAppDeployer deployer = new SimpleAppDeployer(manageClient, adminManager)
 		deployer.setCommands(commands)
-		return deployer
+		project.getExtensions().getExtraProperties().set("mlAppDeployer", deployer)
 	}
 }

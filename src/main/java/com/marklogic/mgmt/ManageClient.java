@@ -37,30 +37,49 @@ public class ManageClient extends LoggingObject {
     }
 
     public ManageClient(ManageConfig config) {
-        initialize(config);
+        setManageConfig(config);
     }
 
-    public void initialize(ManageConfig config) {
-        this.manageConfig = config;
-        if (logger.isInfoEnabled()) {
-            logger.info("Initializing ManageClient with manage config of: " + config);
-        }
-        this.restTemplate = RestTemplateUtil.newRestTemplate(config);
+	/**
+	 * Use setManageConfig instead.
+	 *
+	 * @param config
+	 */
+	@Deprecated
+	public void initialize(ManageConfig config) {
+    	setManageConfig(config);
+	}
 
-        if (!config.getUsername().equals(config.getAdminUsername())) {
-	        if (logger.isInfoEnabled()) {
-		        logger.info("Initializing ManageClient with admin config, admin user: " + config.getAdminUsername());
-	        }
+	/**
+	 * Uses the given ManageConfig instance to construct a Spring RestTemplate for communicating with the Manage API.
+	 * In addition, if adminUsername on the ManageConfig instance differs from username, then a separate RestTemplate is
+	 * constructed for making calls to the Manage API that need an admin user (as noted elsewhere, these are usually
+	 * calls for creating users/roles/privileges that only need "manage-admin" and "security", but that's typically
+	 * an admin user).
+	 *
+	 * @param config
+	 */
+	public void setManageConfig(ManageConfig config) {
+	    this.manageConfig = config;
+	    if (logger.isInfoEnabled()) {
+		    logger.info("Initializing ManageClient with manage config of: " + config);
+	    }
+	    this.restTemplate = RestTemplateUtil.newRestTemplate(config);
 
-	        RestConfig rc = new RestConfig(config.getHost(), config.getPort(), config.getAdminUsername(), config.getAdminPassword());
-	        rc.setScheme(config.getScheme());
-	        rc.setConfigureSimpleSsl(config.isConfigureSimpleSsl());
-	        rc.setHostnameVerifier(config.getHostnameVerifier());
-	        rc.setSslContext(config.getSslContext());
-	        this.adminRestTemplate = RestTemplateUtil.newRestTemplate(rc);
-        } else {
-            this.adminRestTemplate = restTemplate;
-        }
+	    if (!config.getUsername().equals(config.getAdminUsername())) {
+		    if (logger.isInfoEnabled()) {
+			    logger.info("Initializing ManageClient with admin config, admin user: " + config.getAdminUsername());
+		    }
+
+		    RestConfig rc = new RestConfig(config.getHost(), config.getPort(), config.getAdminUsername(), config.getAdminPassword());
+		    rc.setScheme(config.getScheme());
+		    rc.setConfigureSimpleSsl(config.isConfigureSimpleSsl());
+		    rc.setHostnameVerifier(config.getHostnameVerifier());
+		    rc.setSslContext(config.getSslContext());
+		    this.adminRestTemplate = RestTemplateUtil.newRestTemplate(rc);
+	    } else {
+		    this.adminRestTemplate = restTemplate;
+	    }
     }
 
 	/**
@@ -243,15 +262,16 @@ public class ManageClient extends LoggingObject {
 
     protected void logRequest(String path, String contentType, String method) {
         if (logger.isInfoEnabled()) {
-            logger.info(String.format("Sending %s %s request as user '%s' to path: %s", contentType, method,
-                    manageConfig.getUsername(), path));
+        	String username = manageConfig != null ? manageConfig.getUsername() : "(unknown)";
+            logger.info(String.format("Sending %s %s request as user '%s' to path: %s", contentType, method, username, path));
         }
     }
 
     protected void logAdminRequest(String path, String contentType, String method) {
         if (logger.isInfoEnabled()) {
+	        String username = manageConfig != null ? manageConfig.getUsername() : "(unknown)";
             logger.info(String.format("Sending %s %s request as user with admin role '%s' to path: %s", contentType,
-                    method, manageConfig.getUsername(), path));
+                    method, username, path));
         }
     }
 

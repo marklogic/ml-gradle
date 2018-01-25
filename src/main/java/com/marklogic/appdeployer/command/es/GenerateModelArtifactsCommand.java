@@ -57,6 +57,10 @@ public class GenerateModelArtifactsCommand extends AbstractCommand {
 	}
 
 	protected GeneratedCode loadModelDefinition(AppConfig appConfig, File f, EntityServicesManager mgr) {
+		return loadModelDefinition(buildCodeGenerationRequest(appConfig),f,mgr);
+	}
+
+	protected GeneratedCode loadModelDefinition(CodeGenerationRequest codeGenerationRequest, File f, EntityServicesManager mgr) {
 		String name = f.getName();
 		String modelDefinition = null;
 		try {
@@ -65,7 +69,7 @@ public class GenerateModelArtifactsCommand extends AbstractCommand {
 			throw new RuntimeException("Unable to read model definition from file: " + f.getAbsolutePath(), e);
 		}
 		String modelUri = mgr.loadModel(name, modelDefinition);
-		return mgr.generateCode(modelUri, buildCodeGenerationRequest(appConfig));
+		return mgr.generateCode(modelUri, codeGenerationRequest);
 	}
 
 	protected CodeGenerationRequest buildCodeGenerationRequest(AppConfig appConfig) {

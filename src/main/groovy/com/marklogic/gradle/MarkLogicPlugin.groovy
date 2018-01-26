@@ -117,6 +117,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlReindexContentDatabase", type: ReindexContentDatabaseTask, group: dbGroup, description: "Reindex the database named by mlAppConfig.contentDatabaseName")
 		project.task("mlReindexDatabase", type: ReindexDatabaseTask, group: dbGroup, description: "Reindex the database named by the project property dbName; e.g. gradle mlReindexDatabase -PdbName=my-database")
 		project.task("mlSetContentUpdatesAllowed", type: SetContentUpdatesAllowedTask, group: dbGroup, description: "Sets updated-allowed on each primary forest for the content database; must set the mode via e.g. -Pmode=flash-backup")
+		project.task("mlUpdateIndexes", type: UpdateIndexesTask, group: dbGroup, description: "Update every database by sending a payload that only contains properties related to how data is indexed")
 
 		String dmGroup = "ml-Gradle Data Movement"
 		String dmMessage = "Run with -PjobProperties (no value needed) for more information."

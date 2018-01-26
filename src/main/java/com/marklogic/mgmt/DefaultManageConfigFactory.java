@@ -80,7 +80,7 @@ public class DefaultManageConfigFactory extends PropertySourceFactory implements
 	    else {
 		    prop = getProperty("mlAdminUsername");
 		    if (prop != null) {
-			    logger.info("DEPRECATED; please use mlSecurityUsername; Manage user with security role: " + prop);
+			    logger.info("mlAdminUsername is deprecated; please use mlSecurityUsername instead; Manage user with security role: " + prop);
 			    c.setSecurityUsername(prop);
 		    } else if (mlUsername != null) {
 			    logger.info("Manage user with security role: " + mlUsername);
@@ -96,7 +96,7 @@ public class DefaultManageConfigFactory extends PropertySourceFactory implements
 	    } else {
 		    prop = getProperty("mlAdminPassword");
 		    if (prop != null) {
-		    	logger.info("DEPRECATED; please use mlSecurityPassword instead of mlAdminPassword");
+		    	logger.info("mlAdminPassword is deprecated; please use mlSecurityPassword instead");
 			    c.setSecurityPassword(prop);
 		    } else if (mlPassword != null) {
 			    c.setSecurityPassword(mlPassword);

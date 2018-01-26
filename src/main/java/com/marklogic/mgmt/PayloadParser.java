@@ -10,6 +10,7 @@ import org.jdom2.output.XMLOutputter;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Utility class for parsing a JSON or XML payload and extracting values.
@@ -88,13 +89,15 @@ public class PayloadParser {
 	 * @return
 	 */
 	public String includeProperties(String payload, String... propertyNames) {
+		List<String> propertyNameList = Arrays.asList(propertyNames);
+
 		if (isJsonPayload(payload)) {
 			JsonNode json = parseJson(payload);
 			ObjectNode node = (ObjectNode) json;
 			Iterator<String> it = json.fieldNames();
 			while (it.hasNext()) {
 				String name = it.next();
-				if (!Arrays.asList(propertyNames).contains(name)) {
+				if (!propertyNameList.contains(name)) {
 					it.remove();
 				}
 			}
@@ -104,7 +107,7 @@ public class PayloadParser {
 			Fragment frag = new Fragment(payload);
 			Element doc = frag.getInternalDoc().getRootElement();
 			for (Element child : doc.getChildren()) {
-				if (!Arrays.asList(propertyNames).contains(child.getName())) {
+				if (!propertyNameList.contains(child.getName())) {
 					child.detach();
 				}
 			}

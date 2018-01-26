@@ -22,32 +22,36 @@ public class DefaultAdminConfigFactory extends PropertySourceFactory implements 
 
         String prop = getProperty("mlAdminHost");
         if (prop != null) {
-            logger.info("Admin host: " + prop);
+            logger.info("Admin interface host: " + prop);
             c.setHost(prop);
         } else {
             prop = getProperty("mlHost");
             if (prop != null) {
-                logger.info("Admin host: " + prop);
+                logger.info("Admin interface host: " + prop);
                 c.setHost(prop);
             }
         }
 
         prop = getProperty("mlAdminPort");
         if (prop != null) {
-            logger.info("Admin port: " + prop);
+            logger.info("Admin interface port: " + prop);
             c.setPort(Integer.parseInt(prop));
         }
 
-        prop = getProperty("mlAdminUsername");
+	    /**
+	     * The Manage API endpoints in the Admin interface still just require the manage-admin role, so the value of
+	     * mlManageUsername should work for these calls.
+	     */
+	    prop = getProperty("mlManageUsername");
         if (prop != null) {
-            logger.info("Admin username: " + prop);
+            logger.info("Admin interface username: " + prop);
             c.setUsername(prop);
         } else if (mlUsername != null) {
-            logger.info("Admin username: " + mlUsername);
+            logger.info("Admin interface username: " + mlUsername);
             c.setUsername(mlUsername);
         }
 
-        prop = getProperty("mlAdminPassword");
+        prop = getProperty("mlManagePassword");
         if (prop != null) {
             c.setPassword(prop);
         } else if (mlPassword != null) {
@@ -56,13 +60,13 @@ public class DefaultAdminConfigFactory extends PropertySourceFactory implements 
 
 	    prop = getProperty("mlAdminScheme");
 	    if (prop != null) {
-		    logger.info("Admin scheme: " + prop);
+		    logger.info("Admin interface scheme: " + prop);
 		    c.setScheme(prop);
 	    }
 
 	    prop = getProperty("mlAdminSimpleSsl");
 	    if (prop != null) {
-	    	logger.info("Use simple SSL for Admin app server: " + prop);
+	    	logger.info("Use simple SSL for Admin interface: " + prop);
 	    	c.setConfigureSimpleSsl(Boolean.parseBoolean(prop));
 	    }
 

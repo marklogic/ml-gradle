@@ -10,8 +10,8 @@ public class UserManager extends AbstractResourceManager {
     }
 
 	@Override
-	protected boolean useAdminUser() {
-		return true;
+	protected boolean useSecurityUser() {
+    	return true;
 	}
 
 }

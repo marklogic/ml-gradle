@@ -17,8 +17,9 @@ public class ManageConfig extends RestConfig {
 	public static final String DEFAULT_USERNAME = "admin";
 	public static final String DEFAULT_PASSWORD = "admin";
 
-	private String adminUsername;
-	private String adminPassword;
+	private String securityUsername;
+	private String securityPassword;
+
 	private boolean cleanJsonPayloads = false;
 
 	public ManageConfig() {
@@ -31,14 +32,14 @@ public class ManageConfig extends RestConfig {
 
 	public ManageConfig(String host, int port, String username, String password) {
 		super(host, port, username, password);
-		setAdminUsername(username);
-		setAdminPassword(password);
+		setSecurityUsername(username);
+		setSecurityPassword(password);
 	}
 
 	@Override
 	public String toString() {
-		return String.format("[ManageConfig host: %s, port: %d, username: %s, admin username: %s]", getHost(),
-			getPort(), getUsername(), getAdminUsername());
+		return String.format("[ManageConfig host: %s, port: %d, username: %s, security username: %s]", getHost(),
+			getPort(), getUsername(), getSecurityUsername());
 	}
 
 	public boolean isCleanJsonPayloads() {
@@ -49,19 +50,59 @@ public class ManageConfig extends RestConfig {
 		this.cleanJsonPayloads = cleanJsonPayloads;
 	}
 
+	/**
+	 * Use getSecurityUsername instead.
+	 *
+	 * @return
+	 */
+	@Deprecated
 	public String getAdminUsername() {
-		return adminUsername;
+		return getSecurityUsername();
 	}
 
-	public void setAdminUsername(String adminUsername) {
-		this.adminUsername = adminUsername;
+	/**
+	 * Use setSecurityUsername instead.
+	 *
+	 * @param username
+	 */
+	@Deprecated
+	public void setAdminUsername(String username) {
+		setSecurityUsername(username);
 	}
 
+	/**
+	 * Use getSecurityPassword instead.
+	 *
+	 * @return
+	 */
+	@Deprecated
 	public String getAdminPassword() {
-		return adminPassword;
+		return getSecurityPassword();
 	}
 
-	public void setAdminPassword(String adminPassword) {
-		this.adminPassword = adminPassword;
+	/**
+	 * Use setSecurityPassword instead.
+	 *
+	 * @param password
+	 */
+	@Deprecated
+	public void setAdminPassword(String password) {
+		setSecurityPassword(password);
+	}
+
+	public String getSecurityUsername() {
+		return securityUsername;
+	}
+
+	public void setSecurityUsername(String securityUsername) {
+		this.securityUsername = securityUsername;
+	}
+
+	public String getSecurityPassword() {
+		return securityPassword;
+	}
+
+	public void setSecurityPassword(String securityPassword) {
+		this.securityPassword = securityPassword;
 	}
 }

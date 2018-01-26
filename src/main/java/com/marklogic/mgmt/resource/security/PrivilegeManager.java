@@ -10,7 +10,7 @@ public class PrivilegeManager extends AbstractResourceManager {
     }
 
 	@Override
-	protected boolean useAdminUser() {
+	protected boolean useSecurityUser() {
 		return true;
 	}
 

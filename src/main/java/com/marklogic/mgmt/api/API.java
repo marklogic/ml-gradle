@@ -89,7 +89,7 @@ public class API extends LoggingObject {
 	    SimplePropertySource sps = new SimplePropertySource("mlHost", host, "mlManageUsername", mc.getUsername(),
 		    "mlManagePassword", mc.getPassword(), "mlManageSimpleSsl", mc.isConfigureSimpleSsl() + "",
 		    "mlManageScheme", mc.getScheme(), "mlManagePort", mc.getPort() + "",
-		    "mlAdminUsername", mc.getAdminUsername(), "mlAdminPassword", mc.getAdminPassword());
+		    "mlSecurityUsername", mc.getSecurityUsername(), "mlSecurityPassword", mc.getSecurityPassword());
 	    this.manageClient = new ManageClient(new DefaultManageConfigFactory(sps).newManageConfig());
 	    if (logger.isInfoEnabled()) {
 		    logger.info("Connected to host: " + host);
@@ -113,16 +113,16 @@ public class API extends LoggingObject {
 	 * @param host
 	 * @param username
 	 * @param password
-	 * @param adminUsername
-	 * @param adminPassword
+	 * @param securityUsername
+	 * @param securityPassword
 	 */
-	public void connect(String host, String username, String password, String adminUsername, String adminPassword) {
+	public void connect(String host, String username, String password, String securityUsername, String securityPassword) {
 		ManageConfig mc = new ManageConfig();
 		mc.setHost(host);
 		mc.setUsername(username);
 		mc.setPassword(password);
-		mc.setAdminUsername(adminUsername);
-		mc.setAdminPassword(adminPassword);
+		mc.setSecurityUsername(securityUsername);
+		mc.setSecurityPassword(securityPassword);
 		connect(host, mc);
 	}
 

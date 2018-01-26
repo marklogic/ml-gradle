@@ -17,7 +17,7 @@ public class GroupManager extends AbstractResourceManager {
 	}
 
 	@Override
-	protected boolean useAdminUser() {
+	protected boolean useSecurityUser() {
 		return true;
 	}
 

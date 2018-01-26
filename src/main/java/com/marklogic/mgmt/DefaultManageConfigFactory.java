@@ -72,24 +72,37 @@ public class DefaultManageConfigFactory extends PropertySourceFactory implements
 	    	c.setCleanJsonPayloads(Boolean.parseBoolean(prop));
 	    }
 
-	    prop = getProperty("mlAdminUsername");
+	    prop = getProperty("mlSecurityUsername");
 	    if (prop != null) {
-		    logger.info("Manage admin username: " + prop);
-		    c.setAdminUsername(prop);
-	    } else if (mlUsername != null) {
-		    logger.info("Manage admin username: " + mlUsername);
-		    c.setAdminUsername(mlUsername);
-	    } else {
-		    c.setAdminUsername(c.getUsername());
+	    	logger.info("Manage user with security role: " + prop);
+	    	c.setSecurityUsername(prop);
+	    }
+	    else {
+		    prop = getProperty("mlAdminUsername");
+		    if (prop != null) {
+			    logger.info("DEPRECATED; please use mlSecurityUsername; Manage user with security role: " + prop);
+			    c.setSecurityUsername(prop);
+		    } else if (mlUsername != null) {
+			    logger.info("Manage user with security role: " + mlUsername);
+			    c.setSecurityUsername(mlUsername);
+		    } else {
+			    c.setSecurityUsername(c.getUsername());
+		    }
 	    }
 
-	    prop = getProperty("mlAdminPassword");
+	    prop = getProperty("mlSecurityPassword");
 	    if (prop != null) {
-		    c.setAdminPassword(prop);
-	    } else if (mlPassword != null) {
-		    c.setAdminPassword(mlPassword);
+	    	c.setSecurityPassword(prop);
 	    } else {
-		    c.setAdminPassword(c.getPassword());
+		    prop = getProperty("mlAdminPassword");
+		    if (prop != null) {
+		    	logger.info("DEPRECATED; please use mlSecurityPassword instead of mlAdminPassword");
+			    c.setSecurityPassword(prop);
+		    } else if (mlPassword != null) {
+			    c.setSecurityPassword(mlPassword);
+		    } else {
+			    c.setSecurityPassword(c.getPassword());
+		    }
 	    }
 
         return c;

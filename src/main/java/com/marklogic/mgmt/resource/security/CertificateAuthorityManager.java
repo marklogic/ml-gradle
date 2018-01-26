@@ -14,6 +14,11 @@ public class CertificateAuthorityManager extends AbstractManager {
         this.manageClient = client;
     }
 
+	@Override
+	protected boolean useSecurityUser() {
+		return true;
+	}
+
     public ResponseEntity<String> create(String payload) {
         RestTemplate t = manageClient.getRestTemplate();
         HttpHeaders headers = new HttpHeaders();

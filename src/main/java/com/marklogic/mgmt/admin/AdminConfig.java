@@ -4,7 +4,7 @@ import com.marklogic.rest.util.RestConfig;
 
 
 /**
- * Defines the configuration data for talking to the Admin REST API.
+ * Defines the configuration data for talking to the Admin Manage API that is by default on port 8001.
  */
 public class AdminConfig extends RestConfig {
 

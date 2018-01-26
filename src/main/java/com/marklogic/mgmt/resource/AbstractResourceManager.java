@@ -8,8 +8,6 @@ import com.marklogic.rest.util.Fragment;
 import com.marklogic.rest.util.ResourcesFragment;
 import org.springframework.http.ResponseEntity;
 
-import javax.xml.ws.Response;
-
 /**
  * This class makes a number of assumptions in order to simplify the implementation of common operations for a MarkLogic
  * management resource. Feel free to override the methods in here in a subclass when those assumptions don't work for a
@@ -46,34 +44,34 @@ public abstract class AbstractResourceManager extends AbstractManager implements
     }
 
     public ResourcesFragment getAsXml() {
-	    Fragment f = useAdminUser() ? manageClient.getXmlAsAdmin(getResourcesPath())
+	    Fragment f = useSecurityUser() ? manageClient.getXmlAsSecurityUser(getResourcesPath())
 		    : manageClient.getXml(getResourcesPath());
 	    return new ResourcesFragment(f);
     }
 
     public Fragment getAsXml(String resourceNameOrId, String... resourceUrlParams) {
         String path = appendParamsAndValuesToPath(getResourcePath(resourceNameOrId, resourceUrlParams));
-	    return useAdminUser() ? manageClient.getXmlAsAdmin(path) : manageClient.getXml(path);
+	    return useSecurityUser() ? manageClient.getXmlAsSecurityUser(path) : manageClient.getXml(path);
     }
 
     public Fragment getPropertiesAsXml(String resourceNameOrId, String... resourceUrlParams) {
         String path = appendParamsAndValuesToPath(getPropertiesPath(resourceNameOrId, resourceUrlParams));
-	    return useAdminUser() ? manageClient.getXmlAsAdmin(path) : manageClient.getXml(path);
+	    return useSecurityUser() ? manageClient.getXmlAsSecurityUser(path) : manageClient.getXml(path);
     }
 
     public String getPropertiesAsXmlString(String resourceNameOrId, String... resourceUrlParams) {
         String path = appendParamsAndValuesToPath(getPropertiesPath(resourceNameOrId, resourceUrlParams));
-	    return useAdminUser() ? manageClient.getXmlStringAsAdmin(path) : manageClient.getXmlString(path);
+	    return useSecurityUser() ? manageClient.getXmlStringAsSecurityUser(path) : manageClient.getXmlString(path);
     }
 
     public String getAsJson(String resourceNameOrId, String... resourceUrlParams) {
         String path = appendParamsAndValuesToPath(getPropertiesPath(resourceNameOrId, resourceUrlParams));
-	    return useAdminUser() ? manageClient.getJsonAsAdmin(path) : manageClient.getJson(path);
+	    return useSecurityUser() ? manageClient.getJsonAsSecurityUser(path) : manageClient.getJson(path);
     }
 
     public String getPropertiesAsJson(String resourceNameOrId, String... resourceUrlParams) {
         String path = appendParamsAndValuesToPath(getPropertiesPath(resourceNameOrId, resourceUrlParams));
-	    return useAdminUser() ? manageClient.getJsonAsAdmin(path) : manageClient.getJson(path);
+	    return useSecurityUser() ? manageClient.getJsonAsSecurityUser(path) : manageClient.getJson(path);
     }
 
     /**
@@ -182,8 +180,8 @@ public abstract class AbstractResourceManager extends AbstractManager implements
     public void deleteAtPath(String path) {
         String label = getResourceName();
         logger.info(format("Deleting %s at path %s", label, path));
-	    if (useAdminUser()) {
-		    manageClient.deleteAsAdmin(path);
+	    if (useSecurityUser()) {
+		    manageClient.deleteAsSecurityUser(path);
 	    } else {
 		    manageClient.delete(path);
 	    }

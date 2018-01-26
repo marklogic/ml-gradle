@@ -21,7 +21,7 @@ public class AdminManager extends AbstractManager {
     private AdminConfig adminConfig;
 
     /**
-     * Can use this constructor when the default values in ManageConfig will work.
+     * Can use this constructor when the default values in AdminConfig will work.
      */
     public AdminManager() {
         this(new AdminConfig());

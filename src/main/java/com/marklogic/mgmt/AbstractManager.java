@@ -1,8 +1,6 @@
 package com.marklogic.mgmt;
 
 import com.marklogic.client.ext.helper.LoggingObject;
-import com.marklogic.mgmt.ManageClient;
-import com.marklogic.mgmt.PayloadParser;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ClassUtils;
 
@@ -11,16 +9,16 @@ public class AbstractManager extends LoggingObject {
     protected PayloadParser payloadParser = new PayloadParser();
 
     /**
-     * Manager classes that need to connect to ML as a user with the admin role should override this to return true.
+     * Manager classes that need to connect to ML as a user with the manage-admin and security roles (e.g. all the
+     * classes for Security resources) should override this to return true.
+     *
      * The main use case for this is while an application may define a user with the manage-admin role that can be used
      * for deploying most resources, that user must first be created. And thus, some user with at least the manage-admin
-     * and security roles must already exist and must be used to create that user. And while only the manage-admin and
-     * security roles are needed, in practice it's likely that this is an admin user. Finally, since that user may
-     * depend on app-specific roles and privileges, then those resources must be created first by the admin user too.
+     * and security roles must already exist and must be used to create that user.
      *
      * @return
      */
-    protected boolean useAdminUser() {
+    protected boolean useSecurityUser() {
         return false;
     }
 
@@ -50,18 +48,18 @@ public class AbstractManager extends LoggingObject {
     }
 
     protected ResponseEntity<String> putPayload(ManageClient client, String path, String payload) {
-        boolean useAdmin = useAdminUser();
+        boolean requiresSecurityUser = useSecurityUser();
         if (payloadParser.isJsonPayload(payload)) {
-            return useAdmin ? client.putJsonAsAdmin(path, payload) : client.putJson(path, payload);
+            return requiresSecurityUser ? client.putJsonAsSecurityUser(path, payload) : client.putJson(path, payload);
         }
-        return useAdmin ? client.putXmlAsAdmin(path, payload) : client.putXml(path, payload);
+        return requiresSecurityUser ? client.putXmlAsSecurityUser(path, payload) : client.putXml(path, payload);
     }
 
     protected ResponseEntity<String> postPayload(ManageClient client, String path, String payload) {
-        boolean useAdmin = useAdminUser();
+        boolean requiresSecurityUser = useSecurityUser();
         if (payloadParser.isJsonPayload(payload)) {
-            return useAdmin ? client.postJsonAsAdmin(path, payload) : client.postJson(path, payload);
+            return requiresSecurityUser ? client.postJsonAsSecurityUser(path, payload) : client.postJson(path, payload);
         }
-        return useAdmin ? client.postXmlAsAdmin(path, payload) : client.postXml(path, payload);
+        return requiresSecurityUser ? client.postXmlAsSecurityUser(path, payload) : client.postXml(path, payload);
     }
 }

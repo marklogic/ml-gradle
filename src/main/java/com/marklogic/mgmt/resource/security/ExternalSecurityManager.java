@@ -9,6 +9,11 @@ public class ExternalSecurityManager extends AbstractResourceManager {
         super(client);
     }
 
+	@Override
+	protected boolean useSecurityUser() {
+		return true;
+	}
+
     @Override
     public String getResourcesPath() {
         return "/manage/v2/external-security";

@@ -17,7 +17,7 @@ public class RoleManager extends AbstractResourceManager {
 	}
 
 	@Override
-	protected boolean useAdminUser() {
+	protected boolean useSecurityUser() {
 		return true;
 	}
 

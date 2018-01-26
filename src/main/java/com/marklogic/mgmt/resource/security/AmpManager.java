@@ -21,6 +21,11 @@ public class AmpManager extends AbstractResourceManager {
 		super(client);
 	}
 
+	@Override
+	protected boolean useSecurityUser() {
+		return true;
+	}
+
 	public String getResourcePath(String resourceNameOrId) {
 		return super.getResourcePath(resourceNameOrId, "namespace", namespace, "document-uri", documentUri,
 			"modules-database", modulesDatabase);

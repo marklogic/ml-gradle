@@ -26,7 +26,7 @@ public class ManageClient extends LoggingObject {
 
 	private ManageConfig manageConfig;
 	private RestTemplate restTemplate;
-	private RestTemplate adminRestTemplate;
+	private RestTemplate securityUserRestTemplate;
 	private PayloadParser payloadParser;
 
     /**
@@ -53,9 +53,8 @@ public class ManageClient extends LoggingObject {
 	/**
 	 * Uses the given ManageConfig instance to construct a Spring RestTemplate for communicating with the Manage API.
 	 * In addition, if adminUsername on the ManageConfig instance differs from username, then a separate RestTemplate is
-	 * constructed for making calls to the Manage API that need an admin user (as noted elsewhere, these are usually
-	 * calls for creating users/roles/privileges that only need "manage-admin" and "security", but that's typically
-	 * an admin user).
+	 * constructed for making calls to the Manage API that need user with the manage-admin and security roles, which is
+	 * often an admin user.
 	 *
 	 * @param config
 	 */
@@ -66,19 +65,20 @@ public class ManageClient extends LoggingObject {
 	    }
 	    this.restTemplate = RestTemplateUtil.newRestTemplate(config);
 
-	    if (!config.getUsername().equals(config.getAdminUsername())) {
+	    String securityUsername = config.getSecurityUsername();
+	    if (securityUsername != null && securityUsername.trim().length() > 0 && !securityUsername.equals(config.getUsername())) {
 		    if (logger.isInfoEnabled()) {
-			    logger.info("Initializing ManageClient with admin config, admin user: " + config.getAdminUsername());
+			    logger.info(format("Initializing separate connection to Manage API with user '%s' that must have both manage-admin and security roles", securityUsername));
 		    }
 
-		    RestConfig rc = new RestConfig(config.getHost(), config.getPort(), config.getAdminUsername(), config.getAdminPassword());
+		    RestConfig rc = new RestConfig(config.getHost(), config.getPort(), securityUsername, config.getSecurityPassword());
 		    rc.setScheme(config.getScheme());
 		    rc.setConfigureSimpleSsl(config.isConfigureSimpleSsl());
 		    rc.setHostnameVerifier(config.getHostnameVerifier());
 		    rc.setSslContext(config.getSslContext());
-		    this.adminRestTemplate = RestTemplateUtil.newRestTemplate(rc);
+		    this.securityUserRestTemplate = RestTemplateUtil.newRestTemplate(rc);
 	    } else {
-		    this.adminRestTemplate = restTemplate;
+		    this.securityUserRestTemplate = restTemplate;
 	    }
     }
 
@@ -101,7 +101,7 @@ public class ManageClient extends LoggingObject {
 	 */
 	public ManageClient(RestTemplate restTemplate, RestTemplate adminRestTemplate) {
     	this.restTemplate = restTemplate;
-    	this.adminRestTemplate = adminRestTemplate;
+    	this.securityUserRestTemplate = adminRestTemplate;
     }
 
     public ResponseEntity<String> putJson(String path, String json) {
@@ -109,42 +109,90 @@ public class ManageClient extends LoggingObject {
         return restTemplate.exchange(buildUri(path), HttpMethod.PUT, buildJsonEntity(json), String.class);
     }
 
+	/**
+	 * Use putJsonAsSecurityUser instead.
+	 *
+	 * @param path
+	 * @param json
+	 * @return
+	 */
+	@Deprecated
     public ResponseEntity<String> putJsonAsAdmin(String path, String json) {
-        logAdminRequest(path, "JSON", "PUT");
-        return adminRestTemplate.exchange(buildUri(path), HttpMethod.PUT, buildJsonEntity(json), String.class);
+		return putJsonAsSecurityUser(path, json);
     }
+
+	public ResponseEntity<String> putJsonAsSecurityUser(String path, String json) {
+		logSecurityUserRequest(path, "JSON", "PUT");
+		return securityUserRestTemplate.exchange(buildUri(path), HttpMethod.PUT, buildJsonEntity(json), String.class);
+	}
 
     public ResponseEntity<String> putXml(String path, String xml) {
         logRequest(path, "XML", "PUT");
         return restTemplate.exchange(buildUri(path), HttpMethod.PUT, buildXmlEntity(xml), String.class);
     }
 
+	/**
+	 * Use putXmlAsSecurityUser.
+	 *
+	 * @param path
+	 * @param xml
+	 * @return
+	 */
+	@Deprecated
     public ResponseEntity<String> putXmlAsAdmin(String path, String xml) {
-        logAdminRequest(path, "XML", "PUT");
-        return adminRestTemplate.exchange(buildUri(path), HttpMethod.PUT, buildXmlEntity(xml), String.class);
+		return putXmlAsSecurityUser(path, xml);
     }
+
+	public ResponseEntity<String> putXmlAsSecurityUser(String path, String xml) {
+		logSecurityUserRequest(path, "XML", "PUT");
+		return securityUserRestTemplate.exchange(buildUri(path), HttpMethod.PUT, buildXmlEntity(xml), String.class);
+	}
 
     public ResponseEntity<String> postJson(String path, String json) {
         logRequest(path, "JSON", "POST");
         return restTemplate.exchange(buildUri(path), HttpMethod.POST, buildJsonEntity(json), String.class);
     }
 
+	/**
+	 * Use postJsonAsSecurityUser instead.
+	 *
+	 * @param path
+	 * @param json
+	 * @return
+	 */
+	@Deprecated
     public ResponseEntity<String> postJsonAsAdmin(String path, String json) {
-        logAdminRequest(path, "JSON", "POST");
-        return adminRestTemplate.exchange(buildUri(path), HttpMethod.POST, buildJsonEntity(json), String.class);
+		return postJsonAsSecurityUser(path, json);
     }
+
+	public ResponseEntity<String> postJsonAsSecurityUser(String path, String json) {
+		logSecurityUserRequest(path, "JSON", "POST");
+		return securityUserRestTemplate.exchange(buildUri(path), HttpMethod.POST, buildJsonEntity(json), String.class);
+	}
 
     public ResponseEntity<String> postXml(String path, String xml) {
         logRequest(path, "XML", "POST");
         return restTemplate.exchange(buildUri(path), HttpMethod.POST, buildXmlEntity(xml), String.class);
     }
 
+	/**
+	 * Use postXmlAsSecurityUser instead.
+	 *
+	 * @param path
+	 * @param xml
+	 * @return
+	 */
+	@Deprecated
     public ResponseEntity<String> postXmlAsAdmin(String path, String xml) {
-        logAdminRequest(path, "XML", "POST");
-        return adminRestTemplate.exchange(buildUri(path), HttpMethod.POST, buildXmlEntity(xml), String.class);
+		return postXmlAsSecurityUser(path, xml);
     }
 
-    public ResponseEntity<String> postForm(String path, String... params) {
+	public ResponseEntity<String> postXmlAsSecurityUser(String path, String xml) {
+		logSecurityUserRequest(path, "XML", "POST");
+		return securityUserRestTemplate.exchange(buildUri(path), HttpMethod.POST, buildXmlEntity(xml), String.class);
+	}
+
+	public ResponseEntity<String> postForm(String path, String... params) {
         logRequest(path, "form", "POST");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -170,19 +218,42 @@ public class ManageClient extends LoggingObject {
         return new Fragment(xml, list.toArray(new Namespace[] {}));
     }
 
+	/**
+	 * Use getXmlStringAsSecurityUser instead.
+	 *
+	 * @param path
+	 * @return
+	 */
+	@Deprecated
 	public String getXmlStringAsAdmin(String path) {
-		logAdminRequest(path, "XML", "GET");
-		return getAdminRestTemplate().getForObject(buildUri(path), String.class);
+		return getXmlStringAsSecurityUser(path);
 	}
 
+	public String getXmlStringAsSecurityUser(String path) {
+		logSecurityUserRequest(path, "XML", "GET");
+		return securityUserRestTemplate.getForObject(buildUri(path), String.class);
+	}
+
+	/**
+	 * Use getXmlAsSecurityUser instead.
+	 *
+	 * @param path
+	 * @param namespacePrefixesAndUris
+	 * @return
+	 */
+	@Deprecated
     public Fragment getXmlAsAdmin(String path, String... namespacePrefixesAndUris) {
-        String xml = getXmlStringAsAdmin(path);
-        List<Namespace> list = new ArrayList<Namespace>();
-        for (int i = 0; i < namespacePrefixesAndUris.length; i += 2) {
-            list.add(Namespace.getNamespace(namespacePrefixesAndUris[i], namespacePrefixesAndUris[i + 1]));
-        }
-        return new Fragment(xml, list.toArray(new Namespace[] {}));
+		return getXmlAsSecurityUser(path, namespacePrefixesAndUris);
     }
+
+	public Fragment getXmlAsSecurityUser(String path, String... namespacePrefixesAndUris) {
+		String xml = getXmlStringAsSecurityUser(path);
+		List<Namespace> list = new ArrayList<Namespace>();
+		for (int i = 0; i < namespacePrefixesAndUris.length; i += 2) {
+			list.add(Namespace.getNamespace(namespacePrefixesAndUris[i], namespacePrefixesAndUris[i + 1]));
+		}
+		return new Fragment(xml, list.toArray(new Namespace[] {}));
+	}
 
     public String getJson(String path) {
         logRequest(path, "JSON", "GET");
@@ -199,22 +270,43 @@ public class ManageClient extends LoggingObject {
         return getRestTemplate().exchange(uri, HttpMethod.GET, new HttpEntity<>(headers), String.class).getBody();
     }
 
+	/**
+	 * Use getJsonAsSecurityUser instead.
+	 *
+	 * @param path
+	 * @return
+	 */
+	@Deprecated
     public String getJsonAsAdmin(String path) {
-        logAdminRequest(path, "JSON", "GET");
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
-        return getAdminRestTemplate().exchange(buildUri(path), HttpMethod.GET, new HttpEntity<>(headers), String.class)
-                .getBody();
+		return getJsonAsSecurityUser(path);
     }
 
-    public void delete(String path) {
+	public String getJsonAsSecurityUser(String path) {
+		logSecurityUserRequest(path, "JSON", "GET");
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
+		return securityUserRestTemplate.exchange(buildUri(path), HttpMethod.GET, new HttpEntity<>(headers), String.class)
+			.getBody();
+	}
+
+	public void delete(String path) {
         logRequest(path, "", "DELETE");
         restTemplate.delete(buildUri(path));
     }
 
+	/**
+	 * Use deleteAsSecurityUser instead.
+	 *
+	 * @param path
+	 */
+	@Deprecated
     public void deleteAsAdmin(String path) {
-        logAdminRequest(path, "", "DELETE");
-        adminRestTemplate.delete(buildUri(path));
+		deleteAsSecurityUser(path);
+    }
+
+    public void deleteAsSecurityUser(String path) {
+	    logSecurityUserRequest(path, "", "DELETE");
+	    securityUserRestTemplate.delete(buildUri(path));
     }
 
 	/**
@@ -267,11 +359,11 @@ public class ManageClient extends LoggingObject {
         }
     }
 
-    protected void logAdminRequest(String path, String contentType, String method) {
+    protected void logSecurityUserRequest(String path, String contentType, String method) {
         if (logger.isInfoEnabled()) {
 	        String username = manageConfig != null ? manageConfig.getUsername() : "(unknown)";
-            logger.info(String.format("Sending %s %s request as user with admin role '%s' to path: %s", contentType,
-                    method, username, path));
+            logger.info(String.format("Sending %s %s request as user '%s' (who must have the 'manage-admin' and 'security' roles) to path: %s",
+	            contentType, method, username, path));
         }
     }
 
@@ -283,8 +375,14 @@ public class ManageClient extends LoggingObject {
         return restTemplate;
     }
 
-    public RestTemplate getAdminRestTemplate() {
-        return adminRestTemplate;
+	/**
+	 * Use getSecurityUserRestTemplate.
+	 *
+	 * @return
+	 */
+	@Deprecated
+	public RestTemplate getAdminRestTemplate() {
+		return getSecurityUserRestTemplate();
     }
 
     public ManageConfig getManageConfig() {
@@ -295,7 +393,21 @@ public class ManageClient extends LoggingObject {
 		this.restTemplate = restTemplate;
 	}
 
-	public void setAdminRestTemplate(RestTemplate adminRestTemplate) {
-		this.adminRestTemplate = adminRestTemplate;
+	/**
+	 * Use setSecurityUserRestTemplate.
+	 *
+	 * @param restTemplate
+	 */
+	@Deprecated
+	public void setAdminRestTemplate(RestTemplate restTemplate) {
+		setSecurityUserRestTemplate(restTemplate);
+	}
+
+	public RestTemplate getSecurityUserRestTemplate() {
+		return securityUserRestTemplate;
+	}
+
+	public void setSecurityUserRestTemplate(RestTemplate restTemplate) {
+		this.securityUserRestTemplate = restTemplate;
 	}
 }

@@ -199,6 +199,7 @@ public class AppConfig {
 	private boolean generateDatabaseProperties = true;
 	private boolean generateExtractionTemplate = true;
 	private boolean generateSearchOptions = true;
+	private String modelsDatabase;
 
 	private String[] resourceFilenamesToIgnore;
 	private Pattern resourceFilenamesExcludePattern;
@@ -1194,5 +1195,13 @@ public class AppConfig {
 
 	public void setModulesLoaderBatchSize(Integer modulesLoaderBatchSize) {
 		this.modulesLoaderBatchSize = modulesLoaderBatchSize;
+	}
+
+	public String getModelsDatabase() {
+		return modelsDatabase;
+	}
+
+	public void setModelsDatabase(String modelsDatabase) {
+		this.modelsDatabase = modelsDatabase;
 	}
 }

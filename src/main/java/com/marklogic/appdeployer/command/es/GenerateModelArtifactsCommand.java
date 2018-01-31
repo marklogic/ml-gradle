@@ -10,6 +10,7 @@ import com.marklogic.client.ext.es.CodeGenerationRequest;
 import com.marklogic.client.ext.es.EntityServicesManager;
 import com.marklogic.client.ext.es.GeneratedCode;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,21 +40,36 @@ public class GenerateModelArtifactsCommand extends AbstractCommand {
 		String modelsPath = appConfig.getModelsPath();
 		File modelsDir = new File(modelsPath);
 		if (modelsDir.exists()) {
-			DatabaseClient client = appConfig.newDatabaseClient();
-			EntityServicesManager mgr = new EntityServicesManager(client);
-			for (File f : modelsDir.listFiles()) {
-				GeneratedCode code = loadModelDefinition(appConfig, f, mgr);
+			DatabaseClient client = buildDatabaseClient(appConfig);
+			try {
+				EntityServicesManager mgr = new EntityServicesManager(client);
+				for (File f : modelsDir.listFiles()) {
+					GeneratedCode code = loadModelDefinition(appConfig, f, mgr);
 
-				File modulesDir = selectModulesDir(appConfig);
-				modulesDir.mkdirs();
+					File modulesDir = selectModulesDir(appConfig);
+					modulesDir.mkdirs();
 
-				generateInstanceConverter(appConfig, code, modulesDir);
-				generateSearchOptions(code, modulesDir);
-				generateDatabaseProperties(appConfig, code);
-				generateSchema(appConfig, code);
-				generateExtractionTemplate(appConfig, code);
+					generateInstanceConverter(appConfig, code, modulesDir);
+					generateSearchOptions(code, modulesDir);
+					generateDatabaseProperties(appConfig, code);
+					generateSchema(appConfig, code);
+					generateExtractionTemplate(appConfig, code);
+				}
+			} finally {
+				client.release();
 			}
 		}
+	}
+
+	protected DatabaseClient buildDatabaseClient(AppConfig appConfig) {
+		String db = appConfig.getModelsDatabase();
+		if (StringUtils.isEmpty(db)) {
+			db = appConfig.getContentDatabaseName();
+		}
+		if (logger.isInfoEnabled()) {
+			logger.info("Will load Entity Services models into database: " + db);
+		}
+		return appConfig.newAppServicesDatabaseClient(db);
 	}
 
 	protected GeneratedCode loadModelDefinition(AppConfig appConfig, File f, EntityServicesManager mgr) {

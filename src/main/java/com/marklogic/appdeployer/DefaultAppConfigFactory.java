@@ -597,6 +597,12 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		/**
 		 * The following properties are all for generating Entity Services artifacts.
 		 */
+		prop = getProperty("mlModelsDatabase");
+		if (prop != null) {
+			logger.info("Entity Services models database: " + prop);
+			c.setModelsDatabase(prop);
+		}
+
 		prop = getProperty("mlModelsPath");
 		if (prop != null) {
 			logger.info("Entity Services models path: " + prop);

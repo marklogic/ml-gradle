@@ -3,12 +3,12 @@ package com.marklogic.appdeployer.command.es;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
+import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand;
-import com.marklogic.appdeployer.command.modules.LoadModulesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
-import com.marklogic.appdeployer.command.schemas.LoadSchemasCommand;
+import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.io.StringHandle;
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -17,8 +17,6 @@ public class GenerateModelArtifactsTest extends AbstractAppDeployerTest {
 
 	@After
 	public void tearDown() {
-		initializeAppDeployer(new DeployContentDatabasesCommand(), new DeploySchemasDatabaseCommand(),
-			new DeployRestApiServersCommand());
 		undeploySampleApp();
 	}
 
@@ -34,8 +32,10 @@ public class GenerateModelArtifactsTest extends AbstractAppDeployerTest {
 		appConfig.getModulePaths().clear();
 		appConfig.getModulePaths().add(projectPath + "/src/main/ml-modules");
 		appConfig.setSchemasPath(projectPath + "/src/main/ml-schemas");
+		appConfig.setModelsDatabase(appConfig.getContentDatabaseName() + "-other");
 
 		initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeploySchemasDatabaseCommand(),
+			new DeployOtherDatabasesCommand(1),
 			new DeployRestApiServersCommand(), new GenerateModelArtifactsCommand());
 		deploySampleApp();
 
@@ -47,6 +47,15 @@ public class GenerateModelArtifactsTest extends AbstractAppDeployerTest {
 		assertTrue("A schemas db file needs to be created since the ES content-database.json file refers to one",
 			new File(projectPath, "src/main/ml-config/databases/schemas-database.json").exists());
 
+		// Verify the model was loaded into the "other" database
+		DatabaseClient modelsClient = appConfig.newAppServicesDatabaseClient(appConfig.getModelsDatabase());
+		try {
+			String raceModel = modelsClient.newDocumentManager().read("/marklogic.com/entity-services/models/race.json").nextContent(new StringHandle()).get();
+			assertTrue("Simple smoke test to make sure the race model came back", raceModel.contains("This schema represents a Runner"));
+		} finally {
+			modelsClient.release();
+		}
+
 		deploySampleApp();
 
 		// These shouldn't exist because the content is the same
@@ -55,10 +64,5 @@ public class GenerateModelArtifactsTest extends AbstractAppDeployerTest {
 		assertFalse(new File(projectPath, "src/main/ml-config/databases/content-database-GENERATED.json").exists());
 		assertFalse(new File(projectPath, "src/main/ml-schemas/Race-0.0.1-GENERATED.xsd").exists());
 		assertFalse(new File(projectPath, "src/main/ml-schemas/Race-0.0.1-GENERATED.tdex").exists());
-
-		// Make sure none of these files break when they're deployed
-		initializeAppDeployer(new DeployContentDatabasesCommand(), new DeploySchemasDatabaseCommand(),
-			new LoadSchemasCommand(), new LoadModulesCommand());
-		//deploySampleApp();
 	}
 }

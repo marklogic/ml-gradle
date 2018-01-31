@@ -141,6 +141,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
         p.setProperty("mlModulesLoaderBatchSize", "79");
 
         p.setProperty("mlModelsPath", "ml/models");
+        p.setProperty("mlModelsDatabase", "my-models-database");
         p.setProperty("mlInstanceConverterPath", "ext/my/path");
         p.setProperty("mlGenerateInstanceConverter", "false");
 	    p.setProperty("mlGenerateDatabaseProperties", "false");
@@ -243,6 +244,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
         assertEquals(new Integer(79), config.getModulesLoaderBatchSize());
 
         assertEquals("ml/models", config.getModelsPath());
+        assertEquals("my-models-database", config.getModelsDatabase());
         assertEquals("ext/my/path", config.getInstanceConverterPath());
         assertFalse(config.isGenerateDatabaseProperties());
 	    assertFalse(config.isGenerateExtractionTemplate());

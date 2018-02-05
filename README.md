@@ -1,47 +1,74 @@
-What is Gradle?
-===============
-
-Gradle is a standard build tool that is used for building and deploying primarily Java applications, but it can be used for any codebase. Check out the [Gradle user guide](http://www.gradle.org/docs/current/userguide/userguide.html) for more information.
-
-What is ml-gradle?
+Automate everything involving MarkLogic with Gradle
 =========
-ml-gradle is a [Gradle plugin](https://plugins.gradle.org/ "") that supports a number of tasks pertaining to deploying an 
-application to MarkLogic and interacting with other features of MarkLogic via a Gradle build file. The bulk of the 
-functionality provided by ml-gradle is actually in [ml-app-deployer](https://github.com/rjrudin/ml-app-deployer) - ml-gradle 
-is just intended to be a thin wrapper around this library, exposing its functionality via Gradle tasks and properties.
 
-Why use ml-gradle?
+ml-gradle is a [Gradle](https://gradle.org/) [plugin](https://docs.gradle.org/current/userguide/plugins.html) that can automate everything
+you do with [MarkLogic](https://www.marklogic.com/). Deploy an application, add a host, backup a database, stub out a new project, load modules as you modify them, 
+run an [MLCP](https://developer.marklogic.com/products/mlcp) or [CoRB](https://developer.marklogic.com/code/corb) 
+or [Data Movement](http://docs.marklogic.com/guide/java/data-movement) job - if it involves MarkLogic, 
+ml-gradle either automates it already or can be extended to do so. 
+
+You can use ml-gradle right away with the simple tutorial below, or learn more:
+
+- The [ml-gradle Wiki](https://github.com/marklogic-community/ml-gradle/wiki) guides you through all of the ml-gradle documentation
+- Read the [Getting Started guide](https://github.com/marklogic-community/ml-gradle/wiki/Getting-started) for more details on setting up a new project
+- Browse the [example projects](https://github.com/marklogic-community/ml-gradle/tree/master/examples) for working examples of different ml-gradle features
+
+Start using ml-gradle
 =========
-ml-gradle is a good fit for you and your team if:
 
-1. You're using MarkLogic 8 or 9
-2. You're using Gradle, or you're considering moving away from Ant/Maven/etc to Gradle to manage all of your build processes
-3. You'd like to use a build tool that can manage the dependencies and execution of MarkLogic tools such as the Java Client API, mlcp, corb, recordloader, xqsync
-4. You'd like to have a single all-purpose tool that allows you to define tasks to do anything you need to on your MarkLogic project, 
-including tasks that have nothing to do with MarkLogic. 
+ml-gradle depends on at least [Java 8](https://java.com/en/download/) and [MarkLogic 8 or 9](https://developer.marklogic.com/products), 
+so if you have those installed, you're just a couple minutes away from using ml-gradle to start a new project and deploy an 
+application from it. 
 
-If you're currently using Ant or Maven and are wondering about Gradle, there are many comparisons of these tools on 
-the Internet; I recommend making this shift. If you are using Ant, it's easy to invoke Ant tasks from Gradle. And if 
-you can't move away from Maven, you can try [this Maven plugin for invoking Gradle](https://github.com/if6was9/gradle-maven-plugin).
+First, [install Gradle](https://gradle.org/install/).
 
-What are the main features of ml-gradle?
-=========
-1. Utilizes the new [Management REST API](http://docs.marklogic.com/REST/management) in MarkLogic 8 to configure and deploy all aspects of an application.
-1. Can [watch for new/modified modules](https://github.com/rjrudin/ml-gradle/wiki/Watching-for-module-changes) and automatically 
-load them for you, thus speeding up the code/build/test cycle
-1. Can run Content Pump, Corb, and other Java-based MarkLogic tools without having to copy jars around and worry about a classpath
-1. Can treat packages of MarkLogic code as [true third-party dependencies](https://github.com/rjrudin/ml-gradle/wiki/Preparing-REST-API-dependencies), 
-resolving them just like you would a dependency on a jar, as well as automatically loading such code into your modules database
-1. Can take advantage of [all the features of Gradle](https://docs.gradle.org/current/userguide/overview.html)
+Then, in an empty directory, create a file named "build.gradle" with your favorite text editor and enter the following:
 
-How can I start using ml-gradle?
-=========
-First, check out the [new Getting Started Wiki page](https://github.com/rjrudin/ml-gradle/wiki/Getting-started). 
+    plugins { id "com.marklogic.ml-gradle" version "3.4.0" }
+    
+Then run:
 
-Next, you may want to browse the rest of the [Wiki and FAQ](https://github.com/rjrudin/ml-gradle/wiki).
+    gradle mlNew
 
-Then, have a look around the various [example projects](https://github.com/rjrudin/ml-gradle/tree/master/examples) to see 
-how different resources can be configured. 
+This starts a project wizard to stub out files for your new application. You can accept all the defaults, but be sure to
+enter a valid port number for the "REST API port" question. ml-gradle will then print the following logging:
 
-Finally, if you run into trouble, you can either submit an issue to this project or try asking a question 
-[on stackoverflow with marklogic as a tag](http://stackoverflow.com/questions/tagged/marklogic).
+    Updating build.gradle so that the Gradle properties plugin can be applied
+    Writing: build.gradle
+    Writing: gradle.properties
+    Writing: gradle-dev.properties
+    Writing: gradle-local.properties
+    Writing: gradle-qa.properties
+    Writing: gradle-prod.properties
+    Making directory: src/main/ml-config
+    Making directory: src/main/ml-modules
+    Writing project scaffolding files
+
+You now have an ml-gradle project stubbed out with support for deploying to multiple environments via the 
+[Gradle properties plugin](https://github.com/stevesaliman/gradle-properties-plugin). 
+
+Now deploy it!
+
+    gradle mlDeploy
+    
+And you should see more ml-gradle logging like this:
+
+    :mlDeleteModuleTimestampsFile
+    :mlPrepareRestApiDependencies
+    :mlDeployApp
+    :mlPostDeploy UP-TO-DATE
+    :mlDeploy
+    BUILD SUCCESSFUL
+
+And once that's complete, you can go to the MarkLogic Admin UI on port 8001 to see the resources that have been created 
+(the names of these resources start with the application name you selected in the project wizard, which defaults to myApp):
+
+- Under App Servers, a new REST server named myApp on the port you chose
+- Under Databases, a new content datase named myApp-content and a new modules database named myApp-modules
+- Under Forests, 3 new forests for myApp-content and 1 new forest for myApp-modules
+- Under Security/Users, 3 new users, each prefixed with myApp
+- Under Security/Roles, 5 new roles, each prefixed with myApp
+
+Congratulations! You've used ml-gradle to stub out a new project and deploy its application to MarkLogic. You're now 
+ready to start adding more resources and modules to your project. See the links above this tutorial to learn
+more about using ml-gradle. 

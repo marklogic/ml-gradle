@@ -6,6 +6,7 @@ import com.marklogic.client.ext.ConfiguredDatabaseClientFactory;
 import com.marklogic.client.ext.DatabaseClientConfig;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.X509TrustManager;
 
 /**
  * Default implementation for constructing a new instance of DatabaseClient based on the inputs in an instance of
@@ -38,7 +39,7 @@ public class DefaultConfiguredDatabaseClientFactory implements ConfiguredDatabas
 			SSLContext sslContext = config.getSslContext();
 			DatabaseClientFactory.SSLHostnameVerifier verifier = config.getSslHostnameVerifier();
 			if (sslContext != null) {
-				securityContext = securityContext.withSSLContext(sslContext);
+				securityContext = securityContext.withSSLContext(sslContext, config.getTrustManager());
 			}
 			if (verifier != null) {
 				securityContext = securityContext.withSSLHostnameVerifier(verifier);
@@ -61,44 +62,28 @@ public class DefaultConfiguredDatabaseClientFactory implements ConfiguredDatabas
 		return DatabaseClientFactory.newClient(host, port, database, securityContext);
 	}
 
-	/**
-	 * The Authentication shouldn't be set on the DatabaseClientConfig, but if it is, it's used instead of the value
-	 * of securityContextType.
-	 *
-	 * @param config
-	 * @return
-	 */
-	protected SecurityContextType determineSecurityContextType(DatabaseClientConfig config) {
-		DatabaseClientFactory.Authentication auth = config.getAuthentication();
-		if (auth != null) {
-			if (DatabaseClientFactory.Authentication.BASIC.equals(auth)) {
-				return SecurityContextType.BASIC;
-			} else if (DatabaseClientFactory.Authentication.CERTIFICATE.equals(auth)) {
-				return SecurityContextType.CERTIFICATE;
-			} else if (DatabaseClientFactory.Authentication.KERBEROS.equals(auth)) {
-				return SecurityContextType.KERBEROS;
-			}
-			return SecurityContextType.DIGEST;
-		}
-		return config.getSecurityContextType();
-	}
 
 	protected DatabaseClientFactory.SecurityContext buildCertificateAuthContent(DatabaseClientConfig config) {
+		X509TrustManager trustManager = config.getTrustManager();
+
 		String certFile = config.getCertFile();
 		if (certFile != null) {
 			try {
 				if (config.getCertPassword() != null) {
-					return new DatabaseClientFactory.CertificateAuthContext(certFile, config.getCertPassword());
+					return new DatabaseClientFactory.CertificateAuthContext(certFile, config.getCertPassword(), trustManager);
 				}
-				return new DatabaseClientFactory.CertificateAuthContext(certFile);
+				return new DatabaseClientFactory.CertificateAuthContext(certFile, trustManager);
 			} catch (Exception ex) {
 				throw new RuntimeException("Unable to build CertificateAuthContext: " + ex.getMessage(), ex);
 			}
 		}
+
 		DatabaseClientFactory.SSLHostnameVerifier verifier = config.getSslHostnameVerifier();
+
 		if (verifier != null) {
-			return new DatabaseClientFactory.CertificateAuthContext(config.getSslContext(), verifier);
+			return new DatabaseClientFactory.CertificateAuthContext(config.getSslContext(), verifier, trustManager);
 		}
-		return new DatabaseClientFactory.CertificateAuthContext(config.getSslContext());
+
+		return new DatabaseClientFactory.CertificateAuthContext(config.getSslContext(), trustManager);
 	}
 }

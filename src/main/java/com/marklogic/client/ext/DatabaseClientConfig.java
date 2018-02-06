@@ -1,16 +1,12 @@
 package com.marklogic.client.ext;
 
-import javax.net.ssl.SSLContext;
-
-import com.marklogic.client.DatabaseClientFactory.Authentication;
 import com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.X509TrustManager;
 
 /**
  * Captures all the possible inputs used to construct an instance of DatabaseClient.
- *
- * The Authentication attribute is deprecated, as this class is deprecated in version 4.x of the Java Client API.
- * Use securityContextType and the constants defined in this class to define the particular kind of security context
- * that should be constructed.
  */
 public class DatabaseClientConfig {
 
@@ -25,9 +21,7 @@ public class DatabaseClientConfig {
     private String certFile;
     private String certPassword;
     private String externalName;
-
-	@Deprecated
-	private Authentication authentication;
+    private X509TrustManager trustManager;
 
 	public DatabaseClientConfig() {
     }
@@ -63,16 +57,6 @@ public class DatabaseClientConfig {
 
     public String getPassword() {
         return password;
-    }
-
-    @Deprecated
-    public Authentication getAuthentication() {
-        return authentication;
-    }
-
-    @Deprecated
-    public void setAuthentication(Authentication authentication) {
-        this.authentication = authentication;
     }
 
     public void setHost(String host) {
@@ -145,5 +129,13 @@ public class DatabaseClientConfig {
 
 	public void setExternalName(String externalName) {
 		this.externalName = externalName;
+	}
+
+	public X509TrustManager getTrustManager() {
+		return trustManager;
+	}
+
+	public void setTrustManager(X509TrustManager trustManager) {
+		this.trustManager = trustManager;
 	}
 }

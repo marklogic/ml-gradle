@@ -2,8 +2,8 @@
   "server-name": "sample-app-other-server",
   "server-type": "http",
   "root": "/",
-  "group-name": "Default",
-  "port": 8048,
+  "group-name": "sample-app-other-group",
+  "port": 8049,
   "modules-database": "Modules",
   "content-database": "Documents"
 }

@@ -2,6 +2,8 @@ package com.marklogic.mgmt.resource.appservers;
 
 import com.marklogic.mgmt.resource.AbstractResourceManager;
 import com.marklogic.mgmt.ManageClient;
+import com.marklogic.rest.util.Fragment;
+import com.marklogic.rest.util.ResourcesFragment;
 
 public class ServerManager extends AbstractResourceManager {
 
@@ -18,7 +20,25 @@ public class ServerManager extends AbstractResourceManager {
         this.groupName = groupName != null ? groupName : DEFAULT_GROUP;
     }
 
-    @Override
+	/**
+	 * When doing an existence check, have to take the group name into account.
+	 *
+	 * @param resourceNameOrId
+	 * @param resourceUrlParams
+	 * @return
+	 */
+	@Override
+	public boolean exists(String resourceNameOrId, String... resourceUrlParams) {
+		String path = getResourcesPath();
+		if (groupName != null) {
+			path += "?group-id=" + groupName;
+		}
+		Fragment f = useSecurityUser() ? getManageClient().getXmlAsSecurityUser(path)
+			: getManageClient().getXml(path);
+		return new ResourcesFragment(f).resourceExists(resourceNameOrId);
+	}
+
+	@Override
     public String getResourcePath(String resourceNameOrId, String... resourceUrlParams) {
         return format("%s/%s?group-id=%s", getResourcesPath(), resourceNameOrId, groupName);
     }

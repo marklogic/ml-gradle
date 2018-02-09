@@ -12,6 +12,9 @@ import java.io.File;
 
 public class UpdateServerInOtherGroupTest extends AbstractAppDeployerTest {
 
+	/**
+	 * Creates two servers with the same name, one in Default and one in the other group.
+	 */
 	@Test
 	public void test() {
 		appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/other-group")));
@@ -19,10 +22,11 @@ public class UpdateServerInOtherGroupTest extends AbstractAppDeployerTest {
 		appConfig.setGroupName("Default");
 
 		final String otherGroup = "sample-app-other-group";
-		final String otherServer = "sample-app-other-server";
+		final String serverName = "sample-app-other-server";
 
 		GroupManager groupManager = new GroupManager(manageClient);
-		ServerManager serverManager = new ServerManager(manageClient);
+		ServerManager defaultServerManager = new ServerManager(manageClient);
+		ServerManager otherServerManager = new ServerManager(manageClient, otherGroup);
 
 		initializeAppDeployer(new DeployGroupsCommand(), new DeployOtherServersCommand());
 
@@ -30,13 +34,15 @@ public class UpdateServerInOtherGroupTest extends AbstractAppDeployerTest {
 			deploySampleApp();
 
 			assertTrue(groupManager.exists(otherGroup));
-			assertTrue(serverManager.exists(otherServer));
+			assertTrue(defaultServerManager.exists(serverName));
+			assertTrue(otherServerManager.exists(serverName));
 
 			// Now deploy it again, verifying no errors - i.e. that the other group name is included correctly in the call to update the server
 			deploySampleApp();
 
 			assertTrue(groupManager.exists(otherGroup));
-			assertTrue(serverManager.exists(otherServer));
+			assertTrue(defaultServerManager.exists(serverName));
+			assertTrue(otherServerManager.exists(serverName));
 
 		} finally {
 			undeploySampleApp();

@@ -53,6 +53,8 @@ public class ExportServerTest extends AbstractExportTest {
 		deploySampleApp();
 
 		assertTrue(new GroupManager(manageClient).exists(groupName));
-		assertTrue(new ServerManager(manageClient).exists(serverName));
+
+		assertTrue(new ServerManager(manageClient, groupName).exists(serverName));
+		assertFalse(new ServerManager(manageClient, "Default").exists(serverName));
 	}
 }

@@ -28,9 +28,9 @@ public class ManageCpfTest extends AbstractAppDeployerTest {
         appDeployer.deploy(appConfig);
 
         String dbName = appConfig.getTriggersDatabaseName();
-        assertEquals(2, new DomainManager(manageClient).getAsXml(dbName).getResourceCount());
-        assertEquals(1, new CpfConfigManager(manageClient).getAsXml(dbName).getResourceCount());
-        assertEquals(1, new PipelineManager(manageClient).getAsXml(dbName).getResourceCount());
+        assertEquals(2, new DomainManager(manageClient, dbName).getAsXml().getResourceCount());
+        assertEquals(1, new CpfConfigManager(manageClient, dbName).getAsXml().getResourceCount());
+        assertEquals(1, new PipelineManager(manageClient, dbName).getAsXml().getResourceCount());
     }
 
 }

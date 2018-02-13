@@ -10,20 +10,20 @@ import java.io.File;
 
 public abstract class AbstractCpfResourceCommand extends AbstractCommand {
 
-    protected abstract String getCpfDirectoryName();
+    protected abstract File getCpfResourceDir(ConfigDir configDir);
 
-    protected abstract AbstractCpfResourceManager getResourceManager(CommandContext context);
+    protected abstract AbstractCpfResourceManager getResourceManager(CommandContext context, String databaseIdOrName);
 
     @Override
     public void execute(CommandContext context) {
         AppConfig config = context.getAppConfig();
         for (ConfigDir configDir : config.getConfigDirs()) {
-	        File dir = new File(configDir.getCpfDir(), getCpfDirectoryName());
+	        File dir = getCpfResourceDir(configDir);
 	        if (dir.exists()) {
-		        AbstractCpfResourceManager mgr = getResourceManager(context);
+		        AbstractCpfResourceManager mgr = getResourceManager(context, config.getTriggersDatabaseName());
 		        for (File f : listFilesInDirectory(dir)) {
 			        String payload = copyFileToString(f, context);
-			        mgr.save(config.getTriggersDatabaseName(), payload);
+			        mgr.save(payload);
 		        }
 	        } else {
 		        logResourceDirectoryNotFound(dir);

@@ -68,11 +68,12 @@ public class DeployFlexrepTest extends AbstractAppDeployerTest {
 
         final String domainName = "master-domain";
         final String db = appConfig.getContentDatabaseName();
+        final String triggersDb = appConfig.getTriggersDatabaseName();
         assertTrue(new ServerManager(manageClient).exists("master-flexrep-server"));
-        assertTrue(new DomainManager(manageClient).exists(appConfig.getTriggersDatabaseName(), domainName));
-        assertTrue(new PipelineManager(manageClient).exists(appConfig.getTriggersDatabaseName(), "Flexible Replication"));
-        assertTrue(new PipelineManager(manageClient).exists(appConfig.getTriggersDatabaseName(), "Status Change Handling"));
-        assertTrue(new CpfConfigManager(manageClient).exists(appConfig.getTriggersDatabaseName(), domainName));
+        assertTrue(new DomainManager(manageClient, triggersDb).exists(domainName));
+        assertTrue(new PipelineManager(manageClient, triggersDb).exists("Flexible Replication"));
+        assertTrue(new PipelineManager(manageClient, triggersDb).exists("Status Change Handling"));
+        assertTrue(new CpfConfigManager(manageClient, triggersDb).exists(domainName));
         assertTrue(new ConfigManager(manageClient, db).exists(domainName));
         assertTrue(new TargetManager(manageClient, db, domainName).exists("master-domain-target"));
 
@@ -91,11 +92,12 @@ public class DeployFlexrepTest extends AbstractAppDeployerTest {
 
         final String domainName = "replica-domain";
         final String db = appConfig.getContentDatabaseName();
+        final String triggersDb = appConfig.getTriggersDatabaseName();
         assertTrue(new ServerManager(manageClient).exists("replica-flexrep-server"));
-        assertTrue(new DomainManager(manageClient).exists(appConfig.getTriggersDatabaseName(), domainName));
-        assertTrue(new PipelineManager(manageClient).exists(appConfig.getTriggersDatabaseName(), "Flexible Replication"));
-        assertTrue(new PipelineManager(manageClient).exists(appConfig.getTriggersDatabaseName(), "Status Change Handling"));
-        assertTrue(new CpfConfigManager(manageClient).exists(appConfig.getTriggersDatabaseName(), domainName));
+        assertTrue(new DomainManager(manageClient, triggersDb).exists(domainName));
+        assertTrue(new PipelineManager(manageClient, triggersDb).exists("Flexible Replication"));
+        assertTrue(new PipelineManager(manageClient, triggersDb).exists("Status Change Handling"));
+        assertTrue(new CpfConfigManager(manageClient, triggersDb).exists(domainName));
         assertTrue(new ConfigManager(manageClient, db).exists(domainName));
         assertTrue(new TargetManager(manageClient, db, domainName).exists("replica-domain-target"));
 

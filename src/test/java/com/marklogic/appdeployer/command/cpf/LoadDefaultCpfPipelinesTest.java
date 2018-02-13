@@ -27,10 +27,10 @@ public class LoadDefaultCpfPipelinesTest extends AbstractAppDeployerTest {
 
         String dbName = appConfig.getTriggersDatabaseName();
 
-        PipelineManager mgr = new PipelineManager(manageClient);
-        mgr.loadDefaultPipelines(dbName);
+        PipelineManager mgr = new PipelineManager(manageClient, dbName);
+        mgr.loadDefaultPipelines();
 
-        ResourcesFragment f = mgr.getAsXml(dbName);
+        ResourcesFragment f = mgr.getAsXml();
         assertEquals("As of ML 8.0-3, 23 default pipelines should have been loaded", 23, f.getResourceCount());
     }
 }

@@ -1,56 +1,26 @@
 package com.marklogic.mgmt.resource.cpf;
 
-import com.marklogic.mgmt.AbstractManager;
 import com.marklogic.mgmt.ManageClient;
-import com.marklogic.rest.util.ResourcesFragment;
+import com.marklogic.mgmt.resource.AbstractResourceManager;
 
 /**
- * Can't extend AbstractResourceManager because the URLs for CPF resources require a database ID.
+ * Requires a database ID or name for constructing the endpoint for each kind of CPF resource.
  */
-public abstract class AbstractCpfResourceManager extends AbstractManager {
+public abstract class AbstractCpfResourceManager extends AbstractResourceManager {
 
-    private ManageClient manageClient;
+	private String databaseIdOrName;
 
-    public AbstractCpfResourceManager(ManageClient client) {
-        this.manageClient = client;
-    }
+	public AbstractCpfResourceManager(ManageClient client, String databaseIdOrName) {
+		super(client);
+		this.databaseIdOrName = databaseIdOrName;
+	}
 
-    public String getResourcesPath(String databaseIdOrName) {
-        return format("/manage/v2/databases/%s/%ss", databaseIdOrName, getResourceName());
-    }
+	@Override
+	public String getResourcesPath() {
+		return format("/manage/v2/databases/%s/%ss", databaseIdOrName, getResourceName());
+	}
 
-    public String getResourcePath(String databaseIdOrName, String resourceNameOrId) {
-        return format("%s/%s", getResourcesPath(databaseIdOrName), resourceNameOrId);
-    }
-
-    public String getPropertiesPath(String databaseIdOrName, String resourceNameOrId) {
-        return format("%s/properties", getResourcePath(databaseIdOrName, resourceNameOrId));
-    }
-
-    public ResourcesFragment getAsXml(String databaseIdOrName) {
-        return new ResourcesFragment(manageClient.getXml(getResourcesPath(databaseIdOrName)));
-    }
-
-    public boolean exists(String databaseIdOrName, String resourceIdOrName) {
-        return getAsXml(databaseIdOrName).resourceExists(resourceIdOrName);
-    }
-
-    public void save(String databaseIdOrName, String payload) {
-        String name = getResourceId(payload);
-        String label = getResourceName();
-        if (exists(databaseIdOrName, name)) {
-            String path = getPropertiesPath(databaseIdOrName, name);
-            logger.info(format("Found %s with name of %s, so updating ", label, path));
-            putPayload(manageClient, path, payload);
-            logger.info(format("Updated %s at %s", label, path));
-        } else {
-            logger.info(format("Creating %s: %s", label, name));
-            postPayload(manageClient, getResourcesPath(databaseIdOrName), payload);
-            logger.info(format("Created %s: %s", label, name));
-        }
-    }
-
-    public ManageClient getManageClient() {
-        return manageClient;
-    }
+	public String getDatabaseIdOrName() {
+		return databaseIdOrName;
+	}
 }

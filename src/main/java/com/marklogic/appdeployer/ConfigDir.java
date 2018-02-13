@@ -128,6 +128,18 @@ public class ConfigDir {
 		return new File(baseDir, "cpf");
 	}
 
+	public File getDomainsDir() {
+		return new File(getCpfDir(), "domains");
+	}
+
+	public File getPipelinesDir() {
+		return new File(getCpfDir(), "pipelines");
+	}
+
+	public File getCpfConfigsDir() {
+		return new File(getCpfDir(), "cpf-configs");
+	}
+
 	public File getClustersDir() {
 		return new File(baseDir, "clusters");
 	}

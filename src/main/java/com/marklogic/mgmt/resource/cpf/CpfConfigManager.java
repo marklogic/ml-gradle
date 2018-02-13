@@ -4,8 +4,8 @@ import com.marklogic.mgmt.ManageClient;
 
 public class CpfConfigManager extends AbstractCpfResourceManager {
 
-    public CpfConfigManager(ManageClient client) {
-        super(client);
+    public CpfConfigManager(ManageClient client, String databaseIdOrName) {
+        super(client, databaseIdOrName);
     }
 
     @Override

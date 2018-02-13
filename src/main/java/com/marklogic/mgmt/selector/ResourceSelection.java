@@ -3,8 +3,11 @@ package com.marklogic.mgmt.selector;
 public interface ResourceSelection {
 
 	String AMPS = "amps";
+	String CPF_CONFIGS = "cpfConfigs";
 	String DATABASES = "databases";
+	String DOMAINS = "domains";
 	String GROUPS = "groups";
+	String PIPELINES = "pipelines";
 	String PRIVILEGES_EXECUTE = "privilegesExecute";
 	String PRIVILEGES_URI = "privilegesUri";
 	String ROLES = "roles";
@@ -12,9 +15,15 @@ public interface ResourceSelection {
 	String TASKS = "tasks";
 	String USERS = "users";
 
+	String[] getCpfConfigNames();
+
 	String[] getDatabaseNames();
 
+	String[] getDomainNames();
+
 	String[] getGroupNames();
+
+	String[] getPipelineNames();
 
 	String[] getPrivilegeExecuteNames();
 

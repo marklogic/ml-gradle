@@ -24,8 +24,4 @@ public class RoleExporter extends AbstractNamedResourceExporter {
 		return new ConfigDir(baseDir).getRolesDir();
 	}
 
-	@Override
-	protected String[] getExportMessages() {
-		return new String[] {"The exported role files may have circular dependencies between them that must be resolved before they can be deployed."};
-	}
 }

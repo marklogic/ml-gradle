@@ -4,7 +4,7 @@ import com.marklogic.mgmt.ManageClient;
 
 public class DomainManager extends AbstractCpfResourceManager {
 
-    public DomainManager(ManageClient client) {
-        super(client);
+    public DomainManager(ManageClient client, String databaseIdOrName) {
+        super(client, databaseIdOrName);
     }
 }

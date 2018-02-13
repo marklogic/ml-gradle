@@ -7,14 +7,14 @@ import com.marklogic.mgmt.resource.cpf.PipelineManager;
 
 public class DeployDefaultPipelinesCommand extends AbstractCommand {
 
-    public DeployDefaultPipelinesCommand() {
-        setExecuteSortOrder(SortOrderConstants.DEPLOY_DEFAULT_PIPELINES);
-    }
+	public DeployDefaultPipelinesCommand() {
+		setExecuteSortOrder(SortOrderConstants.DEPLOY_DEFAULT_PIPELINES);
+	}
 
-    @Override
-    public void execute(CommandContext context) {
-        new PipelineManager(context.getManageClient()).loadDefaultPipelines(context.getAppConfig()
-                .getTriggersDatabaseName());
-    }
+	@Override
+	public void execute(CommandContext context) {
+		new PipelineManager(context.getManageClient(), context.getAppConfig().getTriggersDatabaseName())
+			.loadDefaultPipelines();
+	}
 
 }

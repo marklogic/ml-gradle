@@ -203,7 +203,6 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    assertEquals((Integer) 8765, config.getTestRestPort());
         assertEquals("propuser2", config.getRestAdminUsername());
         assertEquals("proppassword2", config.getRestAdminPassword());
-	    assertEquals(DatabaseClientFactory.Authentication.CERTIFICATE, config.getRestAuthentication());
         assertEquals(SecurityContextType.CERTIFICATE, config.getRestSecurityContextType());
         assertEquals("restCertFile", config.getRestCertFile());
         assertEquals("restCertPassword", config.getRestCertPassword());
@@ -213,7 +212,6 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    assertEquals("appServicesUsername", config.getAppServicesUsername());
 	    assertEquals("appServicesPassword", config.getAppServicesPassword());
 	    assertEquals((Integer) 8123, config.getAppServicesPort());
-	    assertEquals(DatabaseClientFactory.Authentication.KERBEROS, config.getAppServicesAuthentication());
 	    assertEquals(SecurityContextType.KERBEROS, config.getAppServicesSecurityContextType());
 	    assertEquals("appServicesCertFile", config.getAppServicesCertFile());
 	    assertEquals("appServicesCertPassword", config.getAppServicesCertPassword());

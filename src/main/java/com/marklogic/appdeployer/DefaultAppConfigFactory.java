@@ -141,7 +141,6 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		prop = getProperty("mlRestAuthentication");
 		if (prop != null) {
 			logger.info("App REST authentication: " + prop);
-			c.setRestAuthentication(DatabaseClientFactory.Authentication.valueOfUncased(prop));
 			c.setRestSecurityContextType(SecurityContextType.valueOf(prop.toUpperCase()));
 		}
 
@@ -232,7 +231,6 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		if (prop != null) {
 			logger.info("App Services authentication: " + prop);
 			c.setAppServicesSecurityContextType(SecurityContextType.valueOf(prop.toUpperCase()));
-			c.setAppServicesAuthentication(DatabaseClientFactory.Authentication.valueOfUncased(prop));
 		}
 
 		prop = getProperty("mlAppServicesCertFile");

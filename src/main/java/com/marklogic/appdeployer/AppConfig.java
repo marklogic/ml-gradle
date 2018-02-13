@@ -77,8 +77,6 @@ public class AppConfig {
     private String restCertFile;
     private String restCertPassword;
     private String restExternalName;
-    @Deprecated
-    private Authentication restAuthentication;
     private Integer restPort = DEFAULT_PORT;
     private Integer testRestPort;
 
@@ -92,8 +90,6 @@ public class AppConfig {
 	private String appServicesCertFile;
 	private String appServicesCertPassword;
 	private String appServicesExternalName;
-	@Deprecated
-	private Authentication appServicesAuthentication;
 
     // These can all be set to override the default names that are generated off of the "name" attribute.
     private String groupName = DEFAULT_GROUP;
@@ -293,7 +289,6 @@ public class AppConfig {
 
     public DatabaseClientConfig newRestDatabaseClientConfig(int port) {
 	    DatabaseClientConfig config = new DatabaseClientConfig(getHost(), port, getRestAdminUsername(), getRestAdminPassword());
-	    config.setAuthentication(getRestAuthentication());
 	    config.setSecurityContextType(restSecurityContextType);
 	    config.setSslHostnameVerifier(getRestSslHostnameVerifier());
 	    config.setSslContext(getRestSslContext());
@@ -323,7 +318,6 @@ public class AppConfig {
     public DatabaseClient newAppServicesDatabaseClient(String databaseName) {
 	    DatabaseClientConfig config = new DatabaseClientConfig(getHost(), getAppServicesPort(), getAppServicesUsername(), getAppServicesPassword());
 	    config.setDatabase(databaseName);
-	    config.setAuthentication(getAppServicesAuthentication());
 	    config.setSecurityContextType(appServicesSecurityContextType);
 	    config.setSslHostnameVerifier(getAppServicesSslHostnameVerifier());
 	    config.setSslContext(getAppServicesSslContext());
@@ -519,20 +513,6 @@ public class AppConfig {
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
-    }
-
-    /**
-     * @return the MarkLogic Java Client {@code Authentication} object that is used for authenticating with a REST API
-     * server for loading modules
-     */
-    @Deprecated
-    public Authentication getRestAuthentication() {
-        return restAuthentication;
-    }
-
-    @Deprecated
-    public void setRestAuthentication(Authentication authentication) {
-        this.restAuthentication = authentication;
     }
 
     /**
@@ -860,16 +840,6 @@ public class AppConfig {
 
 	public void setAppServicesSslHostnameVerifier(SSLHostnameVerifier appServicesSslHostnameVerifier) {
 		this.appServicesSslHostnameVerifier = appServicesSslHostnameVerifier;
-	}
-
-	@Deprecated
-	public Authentication getAppServicesAuthentication() {
-		return appServicesAuthentication;
-	}
-
-	@Deprecated
-	public void setAppServicesAuthentication(Authentication appServicesAuthentication) {
-		this.appServicesAuthentication = appServicesAuthentication;
 	}
 
 	public String getReplicaForestDataDirectory() {

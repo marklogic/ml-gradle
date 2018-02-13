@@ -105,6 +105,12 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			c.setTriggersDatabaseName(prop);
 		}
 
+		prop = getProperty("mlCpfDatabaseName");
+		if (prop != null) {
+			logger.info("CPF database name: " + prop);
+			c.setCpfDatabaseName(prop);
+		}
+
 		/**
 		 * Defines the MarkLogic host that requests should be sent to. Defaults to localhost.
 		 */

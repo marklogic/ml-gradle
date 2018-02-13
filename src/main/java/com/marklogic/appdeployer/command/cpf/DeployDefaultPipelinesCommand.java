@@ -13,7 +13,7 @@ public class DeployDefaultPipelinesCommand extends AbstractCommand {
 
 	@Override
 	public void execute(CommandContext context) {
-		new PipelineManager(context.getManageClient(), context.getAppConfig().getTriggersDatabaseName())
+		new PipelineManager(context.getManageClient(), context.getAppConfig().getCpfDatabaseName())
 			.loadDefaultPipelines();
 	}
 

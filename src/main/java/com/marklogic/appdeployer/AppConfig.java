@@ -104,6 +104,7 @@ public class AppConfig {
     private String testContentDatabaseName;
     private String modulesDatabaseName;
     private String triggersDatabaseName;
+    private String cpfDatabaseName;
     private String schemasDatabaseName;
 
     private List<String> modulePaths;
@@ -1203,5 +1204,13 @@ public class AppConfig {
 
 	public void setModelsDatabase(String modelsDatabase) {
 		this.modelsDatabase = modelsDatabase;
+	}
+
+	public String getCpfDatabaseName() {
+		return cpfDatabaseName != null ? cpfDatabaseName : getTriggersDatabaseName();
+	}
+
+	public void setCpfDatabaseName(String cpfDatabaseName) {
+		this.cpfDatabaseName = cpfDatabaseName;
 	}
 }

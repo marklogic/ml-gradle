@@ -81,6 +81,20 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		assertEquals("appword", config.getAppServicesPassword());
 	}
 
+	@Test
+	public void cpfDatabaseName() {
+    	sut = new DefaultAppConfigFactory(new SimplePropertySource("mlAppName", "test"));
+    	AppConfig config = sut.newAppConfig();
+    	assertEquals("test-triggers", config.getTriggersDatabaseName());
+    	assertEquals("CPF database should default to the triggers database when not specified",
+		    "test-triggers", config.getCpfDatabaseName());
+
+		sut = new DefaultAppConfigFactory(new SimplePropertySource("mlAppName", "test", "mlCpfDatabaseName", "my-cpf-db"));
+		config = sut.newAppConfig();
+		assertEquals("test-triggers", config.getTriggersDatabaseName());
+		assertEquals("my-cpf-db", config.getCpfDatabaseName());
+	}
+
     @Test
     public void allProperties() {
         Properties p = new Properties();

@@ -9,6 +9,7 @@ import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.rest.util.Fragment;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 
 /**
  * For /v1/rest-apis. Currently only supports JSON files.
@@ -33,9 +34,25 @@ public class RestApiManager extends LoggingObject {
 			return null;
 		} else {
 			logger.info("Creating REST API: " + json);
-			ResponseEntity<String> re = client.postJson("/v1/rest-apis", json);
-			logger.info("Created REST API");
-			return re;
+			try {
+				ResponseEntity<String> re = client.postJson("/v1/rest-apis", json);
+				logger.info("Created REST API");
+				return re;
+			} catch (HttpClientErrorException ex) {
+				logWarningIfErrorIsDueToPortInUse(ex);
+				throw ex;
+			}
+		}
+	}
+
+	protected void logWarningIfErrorIsDueToPortInUse(HttpClientErrorException ex) {
+		String body = ex.getResponseBodyAsString();
+		if (body != null && body.contains("Invalid parameter") && body.contains("is in use")) {
+			logger.warn("Caught exception due to a port being in use; this may because the REST server already exists " +
+				"but is using a rewriter that the /v1/rest-apis endpoint does not recognize as a REST rewriter, and thus " +
+				"the /v1/rest-apis endpoint does not think that the REST server has been created yet. The error is then " +
+				"because an attempt is made to create the REST server but it fails because the port is already in use. " +
+				"To fix this, try modifying the URI of the rewriter module so it contains the string 'rest-api'.");
 		}
 	}
 

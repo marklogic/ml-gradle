@@ -137,6 +137,12 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 		String payload = copyFileToString(f, context);
 		mgr = adjustResourceManagerForPayload(mgr, context, payload);
 		payload = adjustPayloadBeforeSavingResource(mgr, context, f, payload);
+
+		// A subclass may decide that the resource shouldn't be saved by returning a null payload
+		if (payload == null) {
+			return null;
+		}
+
         SaveReceipt receipt = mgr.save(payload);
         if (storeResourceIdsAsCustomTokens) {
             storeTokenForResourceId(receipt, context);
@@ -146,6 +152,8 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 
 	/**
 	 * Allow subclass to override this in order to fiddle with the payload before it's saved; called by saveResource.
+	 *
+	 * A subclass can return null from this method to indicate that the resource should not be saved.
 	 *
 	 * @param mgr
 	 * @param context

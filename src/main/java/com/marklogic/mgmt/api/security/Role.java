@@ -55,6 +55,10 @@ public class Role extends Resource {
 		this.roleName = roleName;
 	}
 
+	public boolean hasPermissionsOrRoles() {
+		return (role != null && !role.isEmpty()) || (permission != null && !permission.isEmpty());
+	}
+
 	public void clearPermissionsAndRoles() {
 		if (role != null) {
 			role.clear();

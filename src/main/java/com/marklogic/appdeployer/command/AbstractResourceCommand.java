@@ -110,6 +110,9 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
      */
     protected void afterResourceSaved(ResourceManager mgr, CommandContext context, File resourceFile,
             SaveReceipt receipt) {
+    	if (receipt == null) {
+    		return;
+	    }
     	ResponseEntity<String> response = receipt.getResponse();
     	if (response != null) {
     		HttpHeaders headers = response.getHeaders();

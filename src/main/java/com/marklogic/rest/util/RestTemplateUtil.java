@@ -6,6 +6,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ssl.SSLContextBuilder;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
+import org.apache.http.impl.NoConnectionReuseStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
@@ -58,6 +59,7 @@ public class RestTemplateUtil {
 			httpClientBuilder.setHostnameVerifier(config.getHostnameVerifier());
 		}
 
+		httpClientBuilder.setConnectionReuseStrategy(new NoConnectionReuseStrategy());
 		HttpClient client = httpClientBuilder.build();
 
 		RestTemplate rt = new RestTemplate(new HttpComponentsClientHttpRequestFactory(client));

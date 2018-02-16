@@ -13,6 +13,7 @@ public interface ResourceSelection {
 	String ROLES = "roles";
 	String SERVERS = "servers";
 	String TASKS = "tasks";
+	String TRIGGERS = "triggers";
 	String USERS = "users";
 
 	String[] getCpfConfigNames();
@@ -34,6 +35,8 @@ public interface ResourceSelection {
 	String[] getServerNames();
 
 	String[] getTaskNames();
+
+	String[] getTriggerNames();
 
 	String[] getUserNames();
 

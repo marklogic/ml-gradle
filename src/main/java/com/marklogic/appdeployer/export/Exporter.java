@@ -12,6 +12,7 @@ import com.marklogic.appdeployer.export.security.PrivilegeExporter;
 import com.marklogic.appdeployer.export.security.RoleExporter;
 import com.marklogic.appdeployer.export.security.UserExporter;
 import com.marklogic.appdeployer.export.tasks.TaskExporter;
+import com.marklogic.appdeployer.export.triggers.TriggerExporter;
 import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.selector.ResourceSelection;
@@ -55,12 +56,14 @@ public class Exporter extends LoggingObject {
 		cpfConfigs(triggersDatabase, selection.getCpfConfigNames());
 		databases(selection.getDatabaseNames());
 		domains(triggersDatabase, selection.getDomainNames());
+		groups(selection.getGroupNames());
 		pipelines(triggersDatabase, selection.getPipelineNames());
 		privilegesExecute(selection.getPrivilegeExecuteNames());
 		privilegesUri(selection.getPrivilegeUriNames());
 		roles(selection.getRoleNames());
 		servers(selection.getServerNames());
 		tasks(selection.getTaskNames());
+		triggers(triggersDatabase, selection.getTriggerNames());
 		users(selection.getUserNames());
 		return this;
 	}
@@ -155,6 +158,10 @@ public class Exporter extends LoggingObject {
 			return add(te);
 		}
 		return this;
+	}
+
+	public Exporter triggers(String databaseIdOrName, String... triggerNames) {
+		return (triggerNames != null && triggerNames.length > 0) ? add(new TriggerExporter(manageClient, databaseIdOrName, triggerNames)) : null;
 	}
 
 	public Exporter users(String... usernames) {

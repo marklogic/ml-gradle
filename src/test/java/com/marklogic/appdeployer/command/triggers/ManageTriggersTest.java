@@ -13,7 +13,7 @@ public class ManageTriggersTest extends AbstractManageResourceTest {
     @Override
     protected void initializeAndDeploy() {
         initializeAppDeployer(new DeploySchemasDatabaseCommand(), new DeployTriggersDatabaseCommand(),
-                new DeployContentDatabasesCommand(), newCommand());
+                new DeployContentDatabasesCommand(1), newCommand());
         appDeployer.deploy(appConfig);
     }
 

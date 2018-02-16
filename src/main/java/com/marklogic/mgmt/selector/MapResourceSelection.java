@@ -85,6 +85,11 @@ public class MapResourceSelection implements ResourceSelection {
 	}
 
 	@Override
+	public String[] getTriggerNames() {
+		return getSelectedResourceNames(TRIGGERS);
+	}
+
+	@Override
 	public String[] getUserNames() {
 		return getSelectedResourceNames(USERS);
 	}

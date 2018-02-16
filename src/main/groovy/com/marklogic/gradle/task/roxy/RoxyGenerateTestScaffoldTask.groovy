@@ -27,7 +27,7 @@ class RoxyGenerateTestScaffoldTask extends RoxyTask {
         scaffoldFromTemplates()
     }
 
-    def scaffoldFromTemplates() {
+    def scaffoldFromTemplates() {	    
         def binding = ["testName":arguments.testName, "suiteName":arguments.suiteName]
         def engine = new groovy.text.SimpleTemplateEngine()
 
@@ -66,20 +66,15 @@ class RoxyGenerateTestScaffoldTask extends RoxyTask {
     }
 
     class DefaultValues {
-        static String defaultRoxySuitesDirName = 'roxy/src/test/suites'
         static String defaultSuiteName = 'SampleTestSuite'
-        static String boilerplateSuiteName = 'BoilerplateTestSuite'
         static String templateDirName = 'test-templates'
         static String defaultTestName = 'SampleTest'
         static String resourcesDirName = 'src/main/resources'
         static String sampleDirName = 'sample-tests'
-        static String boilerplateDirName = 'boilerplate-tests'
-        static String defaultTargetSuiteDirName = defaultRoxySuitesDirName + '/' + defaultSuiteName
-        static String boilerplateSuiteDirName = defaultRoxySuitesDirName + '/' + boilerplateSuiteName
     }
 
     class CommandLineArguments {
-        String roxySuitesDirName = DefaultValues.defaultRoxySuitesDirName
+        String roxySuitesDirName = getAppConfig().getModulePaths().last()
         String suiteName = DefaultValues.defaultSuiteName
         String targetSuiteDirName = roxySuitesDirName + '/' + suiteName
         String testName = DefaultValues.defaultTestName

@@ -6,15 +6,13 @@ import org.gradle.api.tasks.TaskAction
 
 // Task mlGenerateRoxyTest : This task uses Groovy's SimpleTemplateEngine to customize the sample test suite
 // Parameters:
-//    roxySuitesDir   (Default: roxy/src/test/suites)
-//        - Specify the target directory for the sample test suite
 //    suiteName       (Default: SampleTestSuite)
 //        - Specify the name of the generated test suite
 //    testName        (Default: SampleTest)
 //        - Specify the name of the generated test
 // Examples:
 //    gradle mlGenerateRoxyTest
-//    gradle mlGenerateRoxyTest -PsuiteName="foo" -PtestName="bar" -ProxySuitesDir="./src/roxyTest/suites"
+//    gradle mlGenerateRoxyTest -PsuiteName="foo" -PtestName="bar"
 class RoxyGenerateTestScaffoldTask extends RoxyTask {
     CommandLineArguments arguments
 
@@ -80,9 +78,6 @@ class RoxyGenerateTestScaffoldTask extends RoxyTask {
         String testName = DefaultValues.defaultTestName
 
         CommandLineArguments() {
-            if (project.hasProperty('roxySuitesDir')) {
-                this.roxySuitesDirName = project.property('roxySuitesDir')
-            }
             if (project.hasProperty('suiteName')) {
                 this.suiteName = project.property('suiteName')
             }

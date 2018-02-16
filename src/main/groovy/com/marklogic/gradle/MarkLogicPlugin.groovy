@@ -241,7 +241,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 			"Use -ProxyProjectPath to define the location of your Roxy project.")
 		project.task("mlRoxyMigrateProject", group: roxyGroup, description: "Run all tasks for migrating a Roxy project into this Gradle project. " +
 			"Use -ProxyProjectPath to define the location of your Roxy project.", dependsOn: ["mlRoxyMigrateBuildSteps", "mlRoxyMigrateFiles", "mlRoxyMigrateProperties"])
-        project.task("mlGenerateRoxyTest", type: RoxyGenerateTestScaffoldTask, group: roxyGroup, description: "Generate Roxy test scaffolding.", dependsOn: [])
+        project.task("mlRoxyGenerateTest", type: RoxyGenerateTestScaffoldTask, group: roxyGroup, description: "Generate Roxy test scaffolding.", dependsOn: [])
 		logger.info("Finished initializing ml-gradle\n")
 	}
 

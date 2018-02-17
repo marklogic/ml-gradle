@@ -77,13 +77,15 @@ public class DefaultWorkspaceManager extends LoggingObject implements WorkspaceM
 			return files;
 		}
 
+		final String importQuery = determineImportScriptToUse();
+
 		for (String workspace : workspaceNames) {
 			File f = new File(userDir, workspace + ".xml");
 			if (f.isFile() && f.exists()) {
 				client.newServerEval()
 					.addVariable("user", user)
 					.addVariable("exported-workspace", new FileHandle(f).withFormat(Format.XML))
-					.xquery(QconsoleScripts.IMPORT).eval();
+					.xquery(importQuery).eval();
 
 				if (logger.isInfoEnabled()) {
 					logger.info(format("Imported workspace from %s", f.getAbsolutePath()));
@@ -94,6 +96,15 @@ public class DefaultWorkspaceManager extends LoggingObject implements WorkspaceM
 		}
 
 		return files;
+	}
+
+	protected String determineImportScriptToUse() {
+		String version = client.newServerEval().xquery("xdmp:version()").evalAs(String.class);
+		String xquery = QconsoleScripts.IMPORT;
+		if (version != null && version.startsWith("8")) {
+			return xquery.replace("qconsole-model:default-database()", "qconsole-model:default-content-source()");
+		}
+		return xquery;
 	}
 
 	/**

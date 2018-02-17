@@ -6,6 +6,11 @@ package com.marklogic.client.ext.qconsole.impl;
  */
 public class QconsoleScripts {
 
+	/**
+	 * This relies on internal APIs in the qconsole-model function that have changed between MarkLogic 8 and 9.
+	 * Specifically, qconsole-model:default-content-source() in ML8 was removed and qconsole-model:default-database()
+	 * can be used instead.
+	 */
 	public static final String IMPORT = "xquery version \"1.0-ml\";\n" +
 		"\n" +
 		"declare namespace qconsole=\"http://marklogic.com/appservices/qconsole\";\n" +
@@ -73,7 +78,7 @@ public class QconsoleScripts {
 		"                            let $content-source :=\n" +
 		"                                if ( exists($q/@content-source) )\n" +
 		"                                then string($q/@content-source)\n" +
-		"                                else qconsole-model:default-content-source()\n" +
+		"                                else qconsole-model:default-database()\n" +
 		"                            let $mode := string($q/@mode)\n" +
 		"                            let $query-text := text { $q }\n" +
 		"                            let $q-uri := concat(\"/queries/\", $qid, \".txt\")\n" +

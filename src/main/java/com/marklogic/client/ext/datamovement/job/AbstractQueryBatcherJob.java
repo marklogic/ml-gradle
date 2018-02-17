@@ -21,7 +21,7 @@ public abstract class AbstractQueryBatcherJob extends BatcherConfig implements Q
 	private List<QueryBatchListener> urisReadyListeners;
 	private List<QueryFailureListener> queryFailureListeners;
 
-	private boolean consistentSnapshot = false;
+	private boolean consistentSnapshot = true;
 	private boolean awaitCompletion = true;
 	private boolean stopJobAfterCompletion = true;
 
@@ -105,7 +105,7 @@ public abstract class AbstractQueryBatcherJob extends BatcherConfig implements Q
 		addJobProperty("batchSize", "Number of records to process at once; defaults to " + DEFAULT_BATCH_SIZE,
 			value -> setBatchSize(Integer.parseInt(value)));
 
-		addJobProperty("consistentSnapshot", "Whether or not to apply a consistent snapshot to the query for records; defaults to false",
+		addJobProperty("consistentSnapshot", "Whether or not to apply a consistent snapshot to the query for records; defaults to true",
 			value -> setConsistentSnapshot(Boolean.parseBoolean(value)));
 
 		addJobProperty("jobName", "Optional name for the Data Movement job", value -> setJobName(value));

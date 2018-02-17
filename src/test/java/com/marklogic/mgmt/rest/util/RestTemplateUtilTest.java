@@ -2,6 +2,7 @@ package com.marklogic.mgmt.rest.util;
 
 import com.marklogic.mgmt.AbstractMgmtTest;
 import com.marklogic.mgmt.ManageClient;
+import com.marklogic.rest.util.RestTemplateUtil;
 import org.apache.http.conn.ssl.SSLContextBuilder;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
@@ -13,6 +14,23 @@ import javax.net.ssl.SSLSocket;
 import java.security.cert.X509Certificate;
 
 public class RestTemplateUtilTest extends AbstractMgmtTest {
+
+	private boolean configurerInvoked = false;
+
+	@Test
+	public void configurerList() {
+		assertEquals(4, RestTemplateUtil.DEFAULT_CONFIGURERS.size());
+
+		assertFalse(configurerInvoked);
+		RestTemplateUtil.DEFAULT_CONFIGURERS.add((restConfig, builder) -> {
+			logger.info("Just a test of adding a configurer");
+			configurerInvoked = true;
+			return builder;
+		});
+
+		new ManageClient(manageConfig);
+		assertTrue(configurerInvoked);
+	}
 
 	/**
 	 * Just a smoke test to inspect the logging.

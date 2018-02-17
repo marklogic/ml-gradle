@@ -38,23 +38,6 @@ class RoxyGenerateTestScaffoldTask extends RoxyTask {
         processTemplateString(engine, binding, arguments.targetSuiteDirName, "/suite-teardown.xqy", suiteTeardownXqyString)
         def setupXqyString = SampleTestFiles.getSetupXqy()
         processTemplateString(engine, binding, arguments.targetSuiteDirName, "/setup.xqy", setupXqyString)
-
-        def sourceTestDataDirectory = project.file(DefaultValues.resourcesDirName + "/" + DefaultValues.sampleDirName + "/test-data")
-        def targetTestDataDirectoryName = arguments.targetSuiteDirName + "/test-data"
-        def targetTestDataDirectory = project.file(targetTestDataDirectoryName)
-        project.file(targetTestDataDirectoryName).mkdirs()
-        project.copy {
-            from sourceTestDataDirectory
-            into targetTestDataDirectory
-            include '**'
-        }
-    }
-
-    def processTemplateFile(engine, binding, targetBaseDir, templateFilePath) {
-        def templateFile = project.file(DefaultValues.resourcesDirName + "/" + DefaultValues.templateDirName + templateFilePath)
-        def template = engine.createTemplate(templateFile).make(binding)
-        def templateResult = template.toString()
-        project.file(targetBaseDir + templateFilePath).write(templateResult)
     }
 
     def processTemplateString(engine, binding, targetBaseDir, templateFilePath, templateString) {
@@ -66,16 +49,13 @@ class RoxyGenerateTestScaffoldTask extends RoxyTask {
     class DefaultValues {
         static String defaultSuiteName = 'SampleTestSuite'
         static String templateDirName = 'test-templates'
-        static String defaultTestName = 'SampleTest'
-        static String resourcesDirName = 'src/main/resources'
-        static String sampleDirName = 'sample-tests'
     }
 
     class CommandLineArguments {
-        String roxySuitesDirName = getAppConfig().getModulePaths().last()
+        String roxySuitesDirName = getAppConfig().getModulePaths().last() + "/tests"
         String suiteName = DefaultValues.defaultSuiteName
         String targetSuiteDirName = roxySuitesDirName + '/' + suiteName
-        String testName = DefaultValues.defaultTestName
+        String testName = 'SampleTest'
 
         CommandLineArguments() {
             if (project.hasProperty('suiteName')) {

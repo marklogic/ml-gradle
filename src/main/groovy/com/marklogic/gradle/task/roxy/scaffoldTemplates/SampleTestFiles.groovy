@@ -9,7 +9,10 @@ import module namespace test = 'http://marklogic.com/roxy/test-helper' at '/test
 
 declare option xdmp:mapping 'false';
 
-test:assert-true(fn:true())
+(
+  test:assert-true(fn:true()),
+  xdmp:log("\$testName COMPLETE....")
+)
 		       """
 	}
 	
@@ -22,7 +25,7 @@ test:assert-true(fn:true())
    If no test-specific setup is required, this file may be deleted.
    Each setup runs in its own transaction.
 :) 
-xdmp:log("Setup COMPLETE....")
+xdmp:log("\$testName Setup COMPLETE....")
 		       """
 	}
 	
@@ -34,7 +37,7 @@ xdmp:log("Setup COMPLETE....")
    You might use this module to remove the document inserted by setup.xqy/setup.sjs
    If no suite-specific teardown is required, this file may be deleted.
 :)
-xdmp:log("Teardown COMPLETE....")
+xdmp:log("\$testName Teardown COMPLETE....")
 		       """
 	}
         
@@ -46,7 +49,7 @@ xdmp:log("Teardown COMPLETE....")
    You can use this to insert some data that will not be modified over the course of the suite's tests.
    If no suite-specific setup is required, this file may be deleted.
 :)
-xdmp:log("Suite Setup COMPLETE....")
+xdmp:log("\$suiteName Suite Setup COMPLETE....")
                """
     }
 
@@ -57,7 +60,7 @@ xdmp:log("Suite Setup COMPLETE....")
    Runs once when your suite is finished, to clean up after the suite's tests.
    If no suite-specific teardown is required, this file may be deleted.
 :)
-xdmp:log("Suite Teardown ENDING....")
+xdmp:log("\$suiteName Suite Teardown ENDING....")
                """
     }
 }

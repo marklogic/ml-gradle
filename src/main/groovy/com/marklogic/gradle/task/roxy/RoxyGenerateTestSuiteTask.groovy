@@ -28,7 +28,7 @@ class RoxyGenerateTestSuiteTask extends RoxyTask {
 
         project.file(arguments.targetSuiteDirName).mkdirs()
         def sampleTestsXqyString = SampleTestFiles.getSampleTestsXqy()
-        processTemplateString(engine, binding, arguments.targetSuiteDirName, "/sample-tests.xqy", sampleTestsXqyString)
+        processTemplateString(engine, binding, arguments.targetSuiteDirName, "/" + arguments.testName + ".xqy", sampleTestsXqyString)
         def suiteSetupXqyString = SampleTestFiles.getSuiteSetupXqy()
         processTemplateString(engine, binding, arguments.targetSuiteDirName, "/suite-setup.xqy", suiteSetupXqyString)
         def suiteTeardownXqyString = SampleTestFiles.getSuiteTeardownXqy()
@@ -51,7 +51,7 @@ class RoxyGenerateTestSuiteTask extends RoxyTask {
         String defaultSuitesDirName = "src/test/ml-modules"
         String suiteName = 'SampleTestSuite'
         String targetSuiteDirName = defaultSuitesDirName + '/' + suiteName
-        String testName = 'SampleTest'
+        String testName = 'sample-tests'
 
         CommandLineArguments() {
             if (project.hasProperty('suiteName')) {

@@ -24,6 +24,8 @@ dependencies {
   compile mlcpUtilDependency
   compile group: 'commons-io', name: 'commons-io', version: '2.5'
 
+	compileOnly "com.marklogic:marklogic-unit-test-client:0.4.0"
+
 	testCompile localGroovy()
 	testCompile gradleTestKit()
 	testCompile 'xmlunit:xmlunit:1.3'

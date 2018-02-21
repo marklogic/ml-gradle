@@ -35,6 +35,7 @@ import com.marklogic.gradle.task.roxy.RoxyMigrateBuildStepsTask
 import com.marklogic.gradle.task.roxy.RoxyMigrateFilesTask
 import com.marklogic.gradle.task.roxy.RoxyMigratePropertiesTask
 import com.marklogic.gradle.task.test.UnitTestTask
+import com.marklogic.gradle.task.test.GenerateUnitTestSuiteTask
 import com.marklogic.gradle.task.scaffold.GenerateScaffoldTask
 import com.marklogic.gradle.task.schemas.LoadSchemasTask
 import com.marklogic.gradle.task.security.*
@@ -244,6 +245,9 @@ class MarkLogicPlugin implements Plugin<Project> {
 			"Use -ProxyProjectPath to define the location of your Roxy project.", dependsOn: ["mlRoxyMigrateBuildSteps", "mlRoxyMigrateFiles", "mlRoxyMigrateProperties"])
 
 		String unitTestGroup = "ml-gradle Unit Test"
+		project.task("mlGenerateUnitTestSuite", type: GenerateUnitTestSuiteTask, group: unitTestGroup,
+			description: "Generate a marklogic-unit-test test suite. The test suite files are written to src/test/ml-modules/root/test/suites by default; use -PsuitesPath to override this. " +
+				"Can use -PsuiteName to override the name of the test suite, and -PtestName to override the name of the test module.")
 		project.task("mlUnitTest", type: UnitTestTask, group: unitTestGroup, description: "Run tests found under /test/suites in the modules database. " +
 			"Connects to MarkLogic via the REST API server defined by mlTestRestPort (or by mlRestPort if mlTestRestPort is not set), and uses mlRest* properties for authentication. " +
 			"Use -PunitTestResultPath to override where test result files are written, which defaults to build/test-results/marklogic-unit-test.")

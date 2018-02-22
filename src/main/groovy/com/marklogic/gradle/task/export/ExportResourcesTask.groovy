@@ -65,13 +65,17 @@ class ExportResourcesTask extends MarkLogicTask {
 		ExportedResources resources = exporter.select(selector).export(path)
 
 		println "Exported files:"
-		for (File f : resources.getFiles()) {
-			println f.getAbsolutePath()
+		if (resources.getFiles() != null) {
+			for (File f : resources.getFiles()) {
+				println f.getAbsolutePath()
+			}
 		}
 
 		println "Export messages:"
-		for (String s : resources.getMessages()) {
-			println s
+		if (resources.getMessages() != null) {
+			for (String s : resources.getMessages()) {
+				println s
+			}
 		}
 	}
 }

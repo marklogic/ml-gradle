@@ -1,10 +1,14 @@
 buildscript {
   repositories {
-	  mavenLocal()
     jcenter()
+
+	  // Needed for ml-unit-test-client dependency until it's available via jcenter()
+	  maven {
+		  url {"https://dl.bintray.com/rjrudin/maven/"}
+	  }
   }
   dependencies {
-	  classpath "com.marklogic:marklogic-unit-test-client:0.4.0"
+	  classpath "com.marklogic:ml-unit-test-client:0.9.1"
     classpath "com.marklogic:ml-gradle:${mlGradleVersion}"
   }
 }
@@ -13,10 +17,18 @@ apply plugin: "java"
 apply plugin: "com.marklogic.ml-gradle"
 
 repositories {
-	mavenLocal()
 	jcenter()
+
+	// Needed for ml-unit-test dependency until it's available via jcenter()
+	maven {
+		url {"https://dl.bintray.com/rjrudin/maven/"}
+	}
 }
 
 dependencies {
-	mlRestApi "com.marklogic:marklogic-unit-test:0.4.0"
+	mlRestApi "com.marklogic:ml-unit-test:0.9.1"
+
+	// For running ml-unit-test tests via JUnit
+	testCompile "com.marklogic:ml-unit-test-client:0.9.1"
+	testCompile "junit:junit:4+"
 }

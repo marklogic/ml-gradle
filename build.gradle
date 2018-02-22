@@ -15,6 +15,11 @@ targetCompatibility = "1.8"
 repositories {
   mavenLocal() // Used for local development only
   jcenter()
+
+	// Needed until ml-unit-test is available via jcenter()
+	maven {
+		url {"https://dl.bintray.com/rjrudin/maven/"}
+	}
 }
 
 dependencies {
@@ -24,7 +29,7 @@ dependencies {
   compile mlcpUtilDependency
   compile group: 'commons-io', name: 'commons-io', version: '2.5'
 
-	compileOnly "com.marklogic:marklogic-unit-test-client:0.4.0"
+	compileOnly "com.marklogic:ml-unit-test-client:0.9.1"
 
 	testCompile localGroovy()
 	testCompile gradleTestKit()

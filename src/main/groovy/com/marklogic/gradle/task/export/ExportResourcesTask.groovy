@@ -16,6 +16,7 @@ class ExportResourcesTask extends MarkLogicTask {
 		String filePropName = "propertiesFile"
 		String prefixPropName = "prefix"
 		String regexPropName = "regex"
+		String triggersDatabase = getAppConfig().getTriggersDatabaseName()
 
 		String includeTypesPropName = "includeTypes"
 		String includeTypes = null
@@ -34,11 +35,13 @@ class ExportResourcesTask extends MarkLogicTask {
 		} else if (getProject().hasProperty(prefixPropName)) {
 			String prefix = getProject().property(prefixPropName)
 			PrefixResourceSelector selector = new PrefixResourceSelector(prefix)
+			selector.setTriggersDatabase(triggersDatabase)
 			selector.setIncludeTypesAsString(includeTypes)
 			export(selector)
 		} else if (getProject().hasProperty(regexPropName)) {
 			String regex = getProject().property(regexPropName)
 			RegexResourceSelector selector = new RegexResourceSelector(regex)
+			selector.setTriggersDatabase(triggersDatabase)
 			selector.setIncludeTypesAsString(includeTypes)
 			export(selector)
 		} else {
@@ -62,7 +65,10 @@ class ExportResourcesTask extends MarkLogicTask {
 			exporter = new Exporter(getManageClient())
 		}
 
-		ExportedResources resources = exporter.select(selector).export(path)
+		ExportedResources resources = exporter
+			.select(selector)
+			.withTriggersDatabase(getAppConfig().getTriggersDatabaseName())
+			.export(path)
 
 		println "Exported files:"
 		if (resources.getFiles() != null) {

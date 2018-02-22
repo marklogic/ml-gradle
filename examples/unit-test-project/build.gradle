@@ -19,7 +19,7 @@ apply plugin: "com.marklogic.ml-gradle"
 repositories {
 	jcenter()
 
-	// Needed for ml-unit-test dependency until it's available via jcenter()
+	// Needed for ml-unit-test and ml-unit-test-client dependencies until they're available via jcenter()
 	maven {
 		url {"https://dl.bintray.com/rjrudin/maven/"}
 	}

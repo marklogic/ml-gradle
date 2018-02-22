@@ -7,16 +7,18 @@ include this by default (not every ml-gradle user will use ml-unit-test), so it 
 
     buildscript {
       repositories {
-        jcenter()
+        jcenter()        
+        maven {
+          url {"https://dl.bintray.com/rjrudin/maven/"}
+        }
       }
       dependencies {
-    	  classpath "com.marklogic:ml-unit-test-client:0.9.1"
+        classpath "com.marklogic:ml-unit-test-client:0.9.1"
       }
     }
 
 Next, the ml-unit-test framework is depended on and installed as an "mlRestApi" dependency
 
-    // Needed for ml-unit-test-client dependency until it's available via jcenter()
     repositories {
       maven {
         url {"https://dl.bintray.com/rjrudin/maven/"}

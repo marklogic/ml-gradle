@@ -3,6 +3,9 @@ package com.marklogic.mgmt.selector;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
+import com.marklogic.mgmt.resource.cpf.CpfConfigManager;
+import com.marklogic.mgmt.resource.cpf.DomainManager;
+import com.marklogic.mgmt.resource.cpf.PipelineManager;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.groups.GroupManager;
 import com.marklogic.mgmt.resource.security.AmpManager;
@@ -10,6 +13,7 @@ import com.marklogic.mgmt.resource.security.PrivilegeManager;
 import com.marklogic.mgmt.resource.security.RoleManager;
 import com.marklogic.mgmt.resource.security.UserManager;
 import com.marklogic.mgmt.resource.tasks.TaskManager;
+import com.marklogic.mgmt.resource.triggers.TriggerManager;
 import com.marklogic.rest.util.ResourcesFragment;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
@@ -20,6 +24,7 @@ import java.util.List;
 public abstract class AbstractNameMatchingResourceSelector implements ResourceSelector {
 
 	private List<String> includeTypes;
+	private String triggersDatabase;
 
 	protected abstract boolean nameMatches(String resourceName);
 
@@ -32,6 +37,14 @@ public abstract class AbstractNameMatchingResourceSelector implements ResourceSe
 		select(selection, new RoleManager(manageClient), MapResourceSelection.ROLES);
 		select(selection, new UserManager(manageClient), MapResourceSelection.USERS);
 		select(selection, new GroupManager(manageClient), MapResourceSelection.GROUPS);
+
+		if (triggersDatabase != null) {
+			select(selection, new CpfConfigManager(manageClient, triggersDatabase), MapResourceSelection.CPF_CONFIGS);
+			select(selection, new DomainManager(manageClient, triggersDatabase), MapResourceSelection.DOMAINS);
+			select(selection, new PipelineManager(manageClient, triggersDatabase), MapResourceSelection.PIPELINES);
+			select(selection, new TriggerManager(manageClient, triggersDatabase), MapResourceSelection.TRIGGERS);
+		}
+
 		selectPrivileges(selection, manageClient);
 		selectTasks(selection, manageClient);
 		selectAmps(selection, manageClient);
@@ -84,8 +97,8 @@ public abstract class AbstractNameMatchingResourceSelector implements ResourceSe
 
 	protected void select(MapResourceSelection selection, ResourceManager mgr, String type) {
 		if (includeTypes == null || includeTypes.contains(type)) {
-			ResourcesFragment databases = mgr.getAsXml();
-			for (String name : databases.getListItemNameRefs()) {
+			ResourcesFragment resources = mgr.getAsXml();
+			for (String name : resources.getListItemNameRefs()) {
 				if (nameMatches(name)) {
 					selection.select(type, name);
 				}
@@ -110,5 +123,13 @@ public abstract class AbstractNameMatchingResourceSelector implements ResourceSe
 				this.includeTypes.add(type);
 			}
 		}
+	}
+
+	public String getTriggersDatabase() {
+		return triggersDatabase;
+	}
+
+	public void setTriggersDatabase(String triggersDatabase) {
+		this.triggersDatabase = triggersDatabase;
 	}
 }

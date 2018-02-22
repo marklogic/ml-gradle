@@ -44,6 +44,9 @@ public class CompositeResourceExporter extends LoggingObject implements Resource
 				resources.add(er);
 			}
 		}
+		if (resources == null) {
+			resources = new ExportedResources(new ArrayList<>(), new String[]{});
+		}
 		return resources;
 	}
 

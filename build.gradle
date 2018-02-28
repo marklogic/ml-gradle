@@ -21,11 +21,14 @@ dependencies {
   compile 'org.apache.httpcomponents:httpclient:4.3.5'
   compile 'org.springframework:spring-web:4.3.5.RELEASE'
 
+	// Don't want to include this in the published jar, just the executable jar
+	compileOnly "com.beust:jcommander:1.72"
+
   testCompile 'com.marklogic:ml-junit:' + mlJunitVersion
   testCompile 'commons-io:commons-io:2.5'
 
   // Forcing Spring to use logback instead of commons-logging
-  runtime "ch.qos.logback:logback-classic:1.1.8"
+  compile "ch.qos.logback:logback-classic:1.1.8" // Needs to be compile for CLI
   runtime group: "org.slf4j", name: "jcl-over-slf4j", version: "1.7.22"
   runtime group: "org.slf4j", name: "slf4j-api", version: "1.7.22"
 }
@@ -76,4 +79,24 @@ test {
     events 'started','passed', 'skipped', 'failed'
     exceptionFormat 'full'
   }
+}
+
+task executableJar(type: Jar) {
+	baseName = "deployer"
+	manifest {
+		attributes("Main-Class": "com.marklogic.appdeployer.cli.Main")
+	}
+	// Include this project's class files
+	from sourceSets.main.output
+	// Include all project dependencies
+	from {
+		configurations.runtime.collect {
+			it.isDirectory() ? it : zipTree(it)
+		}
+	}
+	from {
+		configurations.compileOnly.collect {
+			it.isDirectory() ? it : zipTree(it)
+		}
+	}
 }

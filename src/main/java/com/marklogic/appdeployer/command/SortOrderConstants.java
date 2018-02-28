@@ -65,13 +65,9 @@ public abstract class SortOrderConstants {
     public static Integer DEPLOY_FOREST_REPLICAS = 1200;
 
     // Undo constants
-    public static Integer DELETE_GROUPS = 10000;
-
-    public static Integer DELETE_MIMETYPES = 9500;
 
     public static Integer DELETE_USERS = 9000;
     public static Integer DELETE_CERTIFICATE_TEMPLATES = 9010;
-    public static Integer DELETE_CERTIFICATE_AUTHORITIES = 9020;
     public static Integer DELETE_EXTERNAL_SECURITY = 9030;
     public static Integer DELETE_PROTECTED_COLLECTIONS = 9040;
 	public static Integer DELETE_QUERY_ROLESETS = 9050;
@@ -82,7 +78,11 @@ public abstract class SortOrderConstants {
     // Protected paths reference roles
 	public static Integer DELETE_PROTECTED_PATHS = 9080;
 
-    /*
+	public static Integer DELETE_GROUPS = 8600;
+
+	public static Integer DELETE_MIMETYPES = 8500;
+
+	/*
      * This executes before databases are deleted, as deleting databases normally deletes the primary forests, so we
      * need to make sure the replicas are deleted first.
      */

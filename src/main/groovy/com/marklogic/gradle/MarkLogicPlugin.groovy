@@ -34,6 +34,16 @@ import com.marklogic.gradle.task.qconsole.ImportWorkspacesTask
 import com.marklogic.gradle.task.roxy.RoxyMigrateBuildStepsTask
 import com.marklogic.gradle.task.roxy.RoxyMigrateFilesTask
 import com.marklogic.gradle.task.roxy.RoxyMigratePropertiesTask
+import com.marklogic.gradle.task.scaffold.NewAmpTask
+import com.marklogic.gradle.task.scaffold.NewDatabaseTask
+import com.marklogic.gradle.task.scaffold.NewExternalSecurityTask
+import com.marklogic.gradle.task.scaffold.NewGroupTask
+import com.marklogic.gradle.task.scaffold.NewPrivilegeTask
+import com.marklogic.gradle.task.scaffold.NewProtectedCollectionTask
+import com.marklogic.gradle.task.scaffold.NewRoleTask
+import com.marklogic.gradle.task.scaffold.NewServerTask
+import com.marklogic.gradle.task.scaffold.NewTaskTask
+import com.marklogic.gradle.task.scaffold.NewUserTask
 import com.marklogic.gradle.task.test.UnitTestTask
 import com.marklogic.gradle.task.test.GenerateUnitTestSuiteTask
 import com.marklogic.gradle.task.scaffold.GenerateScaffoldTask
@@ -136,12 +146,23 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlSetPermissions", type: SetPermissionsTask, group: dmGroup, description: "Set permissions on documents. " + dmMessage)
 
 		String devGroup = "ml-gradle Development"
+		final String newResourceMessage = "Non-complex properties can be specified via -Pml-(name of property)."
 		project.task("mlCreateResource", type: CreateResourceTask, group: devGroup, description: "Create a new resource extension in the modules services directory; use -PresourceName and -PresourceType to set the resource name and type (either xqy or sjs)")
 		project.task("mlCreateTransform", type: CreateTransformTask, group: devGroup, description: "Create a new transform in the modules transforms directory; use -PtransformName and -PtransformType to set the transform name and type (xqy, xsl, or sjs)")
 		project.task("mlExportResources", type: ExportResourcesTask, group: devGroup, description: "Export resources based on a properties file specified via -PpropertiesFile, -Pprefix, or -Pregex; use -PincludeTypes to select resource types to export via a comma-delimited string; use -PexportPath to specify where to export resources to")
 		project.task("mlPrepareRestApiDependencies", type: PrepareRestApiDependenciesTask, group: devGroup, dependsOn: project.configurations["mlRestApi"], description: "Downloads (if necessary) and unzips in the build directory all mlRestApi dependencies")
 		project.task("mlPrintTokens", type: PrintTokensTask, group: devGroup, description: "Print the customTokens map on the mlAppConfig object (typically for debugging purposes)")
 		project.task("mlNewProject", type: NewProjectTask, group: devGroup, description: "Run a wizard for creating a new project, which includes running mlScaffold")
+		project.task("mlNewAmp", type: NewAmpTask, group: devGroup, description: "Generate a new amp resource file. " + newResourceMessage)
+		project.task("mlNewDatabase", type: NewDatabaseTask, group: devGroup, description: "Generate a new database resource file. " + newResourceMessage)
+		project.task("mlNewExternalSecurity", type: NewExternalSecurityTask, group: devGroup, description: "Generate a new external security resource file. " + newResourceMessage)
+		project.task("mlNewGroup", type: NewGroupTask, group: devGroup, description: "Generate a new group resource file. " + newResourceMessage)
+		project.task("mlNewPrivilege", type: NewPrivilegeTask, group: devGroup, description: "Generate a new privilege resource file. " + newResourceMessage)
+		project.task("mlNewProtectedCollection", type: NewProtectedCollectionTask, group: devGroup, description: "Generate a new protected collection resource file. " + newResourceMessage)
+		project.task("mlNewRole", type: NewRoleTask, group: devGroup, description: "Generate a new role resource file. " + newResourceMessage)
+		project.task("mlNewServer", type: NewServerTask, group: devGroup, description: "Generate a new server resource file. " + newResourceMessage)
+		project.task("mlNewTask", type: NewTaskTask, group: devGroup, description: "Generate a new task resource file. " + newResourceMessage)
+		project.task("mlNewUser", type: NewUserTask, group: devGroup, description: "Generate a new user resource file. " + newResourceMessage)
 		project.task("mlScaffold", type: GenerateScaffoldTask, group: devGroup, description: "Generate project scaffold for a new project")
 
 		String esGroup = "ml-gradle Entity Services"

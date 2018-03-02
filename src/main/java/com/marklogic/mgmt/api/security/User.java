@@ -1,124 +1,137 @@
 package com.marklogic.mgmt.api.security;
 
-import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.Resource;
+import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.security.UserManager;
 
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@XmlRootElement(name = "user-properties")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class User extends Resource {
 
-    private String userName;
-    private String description;
-    private String password;
-    private List<String> externalName;
-    private List<String> role;
-    private List<Permission> permission;
-    private List<String> collection;
+	@XmlElement(name = "user-name")
+	private String userName;
+	private String description;
+	private String password;
 
-    public User() {
-        super();
-    }
+	@XmlElementWrapper(name = "external-names")
+	@XmlElement(name = "external-name")
+	private List<String> externalName;
 
-    public User(API api, String userName) {
-        super(api);
-        this.userName = userName;
-    }
+	@XmlElementWrapper(name = "roles")
+	private List<String> role;
 
-    @Override
-    protected ResourceManager getResourceManager() {
-        return new UserManager(getClient());
-    }
+	@XmlElementWrapper(name = "permissions")
+	private List<Permission> permission;
 
-    @Override
-    protected String getResourceId() {
-        return userName;
-    }
+	@XmlElementWrapper(name = "collections")
+	private List<String> collection;
 
-    public void addExternalName(String name) {
-        if (externalName == null) {
-            externalName = new ArrayList<>();
-        }
-        externalName.add(name);
-    }
+	public User() {
+		super();
+	}
 
-    public void addRole(String r) {
-        if (role == null) {
-            role = new ArrayList<String>();
-        }
-        role.add(r);
-    }
+	public User(API api, String userName) {
+		super(api);
+		this.userName = userName;
+	}
 
-    public void addPermission(Permission p) {
-        if (permission == null) {
-            permission = new ArrayList<>();
-        }
-        permission.add(p);
-    }
+	@Override
+	protected ResourceManager getResourceManager() {
+		return new UserManager(getClient());
+	}
 
-    public void addCollection(String c) {
-        if (collection == null) {
-            collection = new ArrayList<String>();
-        }
-        collection.add(c);
-    }
+	@Override
+	protected String getResourceId() {
+		return userName;
+	}
 
-    public String getUserName() {
-        return userName;
-    }
+	public void addExternalName(String name) {
+		if (externalName == null) {
+			externalName = new ArrayList<>();
+		}
+		externalName.add(name);
+	}
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
+	public void addRole(String r) {
+		if (role == null) {
+			role = new ArrayList<String>();
+		}
+		role.add(r);
+	}
 
-    public String getDescription() {
-        return description;
-    }
+	public void addPermission(Permission p) {
+		if (permission == null) {
+			permission = new ArrayList<>();
+		}
+		permission.add(p);
+	}
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+	public void addCollection(String c) {
+		if (collection == null) {
+			collection = new ArrayList<String>();
+		}
+		collection.add(c);
+	}
 
-    public String getPassword() {
-        return password;
-    }
+	public String getUserName() {
+		return userName;
+	}
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
 
-    public List<String> getExternalName() {
-        return externalName;
-    }
+	public String getDescription() {
+		return description;
+	}
 
-    public void setExternalName(List<String> externalName) {
-        this.externalName = externalName;
-    }
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
-    public List<String> getRole() {
-        return role;
-    }
+	public String getPassword() {
+		return password;
+	}
 
-    public void setRole(List<String> role) {
-        this.role = role;
-    }
+	public void setPassword(String password) {
+		this.password = password;
+	}
 
-    public List<Permission> getPermission() {
-        return permission;
-    }
+	public List<String> getExternalName() {
+		return externalName;
+	}
 
-    public void setPermission(List<Permission> permission) {
-        this.permission = permission;
-    }
+	public void setExternalName(List<String> externalName) {
+		this.externalName = externalName;
+	}
 
-    public List<String> getCollection() {
-        return collection;
-    }
+	public List<String> getRole() {
+		return role;
+	}
 
-    public void setCollection(List<String> collection) {
-        this.collection = collection;
-    }
+	public void setRole(List<String> role) {
+		this.role = role;
+	}
+
+	public List<Permission> getPermission() {
+		return permission;
+	}
+
+	public void setPermission(List<Permission> permission) {
+		this.permission = permission;
+	}
+
+	public List<String> getCollection() {
+		return collection;
+	}
+
+	public void setCollection(List<String> collection) {
+		this.collection = collection;
+	}
 
 }

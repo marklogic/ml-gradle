@@ -23,7 +23,7 @@ public class Task extends Resource {
     private List<String> taskDay;
     private String taskStartDate;
     private String taskStartTime;
-    private Long taskTimestamp;
+    private String taskTimestamp;
     private String taskDatabase;
     private String taskModules;
     private String taskUser;
@@ -155,11 +155,11 @@ public class Task extends Resource {
         this.taskStartTime = taskStartTime;
     }
 
-    public Long getTaskTimestamp() {
+    public String getTaskTimestamp() {
         return taskTimestamp;
     }
 
-    public void setTaskTimestamp(Long taskTimestamp) {
+    public void setTaskTimestamp(String taskTimestamp) {
         this.taskTimestamp = taskTimestamp;
     }
 

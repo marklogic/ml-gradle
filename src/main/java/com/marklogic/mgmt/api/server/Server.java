@@ -30,7 +30,7 @@ public class Server extends Resource {
     private Integer preCommitTriggerDepth;
     private Integer preCommitTriggerLimit;
     private String collation;
-    private String digest;
+    private String authentication;
     private Boolean internalSecurity;
     private Integer concurrentRequestLimit;
     private Boolean computeContentLength;
@@ -277,14 +277,6 @@ public class Server extends Resource {
 
     public void setCollation(String collation) {
         this.collation = collation;
-    }
-
-    public String getDigest() {
-        return digest;
-    }
-
-    public void setDigest(String digest) {
-        this.digest = digest;
     }
 
     public Boolean getInternalSecurity() {
@@ -615,4 +607,11 @@ public class Server extends Resource {
         this.defaultUser = defaultUser;
     }
 
+	public String getAuthentication() {
+		return authentication;
+	}
+
+	public void setAuthentication(String authentication) {
+		this.authentication = authentication;
+	}
 }

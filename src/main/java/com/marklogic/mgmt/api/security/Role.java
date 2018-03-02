@@ -1,6 +1,5 @@
 package com.marklogic.mgmt.api.security;
 
-import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.Resource;
 import com.marklogic.mgmt.resource.ResourceManager;
@@ -8,7 +7,6 @@ import com.marklogic.mgmt.resource.security.RoleManager;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @XmlRootElement(name = "role-properties")
@@ -36,16 +34,6 @@ public class Role extends Resource {
 
 	@XmlElementWrapper(name = "collections")
 	private List<String> collection;
-
-	public static void main(String[] args) {
-		API api = new API(new ManageClient());
-		Role r = new Role();
-		r.setRoleName("hi");
-		r.setObjectMapper(api.getObjectMapper());
-		r.setExternalName(Arrays.asList("name1", "name2"));
-		System.out.println(r.getJson());
-
-	}
 
 	public Role() {
 	}

@@ -278,17 +278,27 @@ public class API extends LoggingObject {
         return externalSecurity(null);
     }
 
-    public Privilege privilege(String name) {
+    public Privilege privilegeExecute(String name) {
         Privilege p = new Privilege(this, name);
-        return name != null && p.exists() ? getResource(name, new PrivilegeManager(getManageClient()), Privilege.class)
+        return name != null && p.exists() ? getResource(name, new PrivilegeManager(getManageClient()), Privilege.class, "kind", "execute")
                 : p;
     }
 
-    public Privilege getPrivilege() {
-        return privilege(null);
+    public Privilege getPrivilegeExecute() {
+        return privilegeExecute(null);
     }
 
-    public ProtectedCollection protectedCollection(String name) {
+	public Privilege privilegeUri(String name) {
+		Privilege p = new Privilege(this, name);
+		return name != null && p.exists() ? getResource(name, new PrivilegeManager(getManageClient()), Privilege.class, "kind", "uri")
+			: p;
+	}
+
+	public Privilege getPrivilegeUri() {
+		return privilegeUri(null);
+	}
+
+	public ProtectedCollection protectedCollection(String name) {
         ProtectedCollection pc = new ProtectedCollection(this, name);
         return name != null && pc.exists() ? getResource(name, new ProtectedCollectionsManager(getManageClient()),
                 ProtectedCollection.class) : pc;

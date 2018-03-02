@@ -11,6 +11,14 @@ public class Permission {
 	private String roleName;
 	private String capability;
 
+	public Permission() {
+	}
+
+	public Permission(String roleName, String capability) {
+		this.roleName = roleName;
+		this.capability = capability;
+	}
+
 	public String getRoleName() {
 		return roleName;
 	}

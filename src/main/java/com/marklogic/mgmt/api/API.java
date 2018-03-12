@@ -234,10 +234,15 @@ public class API extends LoggingObject {
     }
 
     public Server server(String name) {
-        return server(name, null);
+        return server(name, (Integer)null);
     }
 
-    public Server server(String name, Integer port) {
+	public Server server(String name, String groupName) {
+		Server s = new Server(this, name);
+		return name != null && s.exists() ? getResource(name, new ServerManager(getManageClient(), groupName), Server.class) : s;
+	}
+
+	public Server server(String name, Integer port) {
         Server s = new Server(this, name);
         s.setPort(port);
         return name != null && s.exists() ? getResource(name, new ServerManager(getManageClient()), Server.class) : s;

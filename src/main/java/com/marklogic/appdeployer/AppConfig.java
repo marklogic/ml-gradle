@@ -154,7 +154,8 @@ public class AppConfig {
 
     private Map<String, Set<String>> databaseHosts;
     private Map<String, Set<String>> databaseGroups;
-
+    private Map<String, String> hostGroups;
+    
     // Data/fast/large directories for default forests
     private String forestDataDirectory;
     private String forestFastDataDirectory;
@@ -1126,14 +1127,22 @@ public class AppConfig {
 
 	public String[] getIncludeProperties() {
     	return this.includeProperties;
-  }
+    }
 
-  public Map<String, Set<String>> getDatabaseGroups() {
+    public Map<String, Set<String>> getDatabaseGroups() {
 		return databaseGroups;
 	}
 
 	public void setDatabaseGroups(Map<String, Set<String>> databaseGroups) {
 		this.databaseGroups = databaseGroups;
+	}
+
+    public Map<String, String> getHostGroups() {
+		return hostGroups;
+	}
+
+	public void setHostGroups(Map<String, String> hostGroups) {
+		this.hostGroups = hostGroups;
 	}
 
 	public List<ConfigDir> getConfigDirs() {

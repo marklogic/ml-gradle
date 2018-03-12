@@ -74,6 +74,7 @@ public class Server extends Resource {
     private String contentDatabase;
     private String modulesDatabase;
     private String defaultUser;
+    private String privilege;
 
     public Server() {
         super();
@@ -613,5 +614,13 @@ public class Server extends Resource {
 
 	public void setAuthentication(String authentication) {
 		this.authentication = authentication;
+	}
+
+	public String getPrivilege() {
+		return privilege;
+	}
+
+	public void setPrivilege(String privilege) {
+		this.privilege = privilege;
 	}
 }

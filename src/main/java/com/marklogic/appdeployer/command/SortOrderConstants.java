@@ -3,7 +3,7 @@ package com.marklogic.appdeployer.command;
 public abstract class SortOrderConstants {
 
     public static Integer DEPLOY_GROUPS = 5;
-
+    
     public static Integer DEPLOY_PRIVILEGES = 10;
     public static Integer DEPLOY_ROLES = 20;
     public static Integer DEPLOY_USERS = 30;
@@ -15,6 +15,11 @@ public abstract class SortOrderConstants {
     public static Integer DEPLOY_MIMETYPES = 90;
 	public static Integer DEPLOY_PROTECTED_PATHS = 95;
 	public static Integer DEPLOY_QUERY_ROLESETS = 97;
+	
+	// Hosts need to be assigned to their group before databases are created.
+	// This is so that when forests are created based on the mlDatabaseGroups
+	// then the forests will be created on the correct hosts.
+    public static Integer ASSIGN_HOSTS_TO_GROUPS = 98;
 
     public static Integer DEPLOY_TRIGGERS_DATABASE = 100;
     public static Integer DEPLOY_SCHEMAS_DATABASE = 100;
@@ -79,6 +84,7 @@ public abstract class SortOrderConstants {
 	public static Integer DELETE_PROTECTED_PATHS = 9080;
 
 	public static Integer DELETE_GROUPS = 8600;
+    public static Integer UNASSIGN_HOSTS_FROM_GROUPS = 8590;
 
 	public static Integer DELETE_MIMETYPES = 8500;
 

@@ -188,6 +188,8 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    p.setProperty("mlDatabaseReplicaFastDataDirectories", "Documents,/fast/replicas,Security,/fast/security/replicas");
 	    p.setProperty("mlDatabaseReplicaLargeDataDirectories", "Documents,/large/replicas,Security,/large/security/replicas");
 
+	    p.setProperty("mlHostGroups", "host1,Default,host2,other-group");
+
 	    sut = new DefaultAppConfigFactory(new SimplePropertySource(p));
         AppConfig config = sut.newAppConfig();
 
@@ -328,6 +330,10 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    map = config.getDatabaseReplicaLargeDataDirectories();
 	    assertEquals("/large/replicas", map.get("Documents"));
 	    assertEquals("/large/security/replicas", map.get("Security"));
+
+	    map = config.getHostGroups();
+	    assertEquals("Default", map.get("host1"));
+	    assertEquals("other-group", map.get("host2"));
     }
 
 	/**

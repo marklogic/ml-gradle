@@ -28,6 +28,7 @@ import com.marklogic.gradle.task.forests.DeployCustomForestsTask
 import com.marklogic.gradle.task.forests.DeployForestReplicasTask
 import com.marklogic.gradle.task.groups.DeployGroupsTask
 import com.marklogic.gradle.task.groups.SetTraceEventsTask
+import com.marklogic.gradle.task.hosts.AssignHostsToGroupsTask
 import com.marklogic.gradle.task.mimetypes.DeployMimetypesTask
 import com.marklogic.gradle.task.qconsole.ExportWorkspacesTask
 import com.marklogic.gradle.task.qconsole.ImportWorkspacesTask
@@ -164,6 +165,9 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlNewTask", type: NewTaskTask, group: devGroup, description: "Generate a new task resource file. " + newResourceMessage)
 		project.task("mlNewUser", type: NewUserTask, group: devGroup, description: "Generate a new user resource file. " + newResourceMessage)
 		project.task("mlScaffold", type: GenerateScaffoldTask, group: devGroup, description: "Generate project scaffold for a new project")
+
+		String hostsGroup = "ml-gradle Host"
+		project.task("mlAssignHostsToGroups", type: AssignHostsToGroupsTask, group: hostsGroup, description: "Assign each specified host to its corresponding group, as defined by the mlHostGroups property")
 
 		String esGroup = "ml-gradle Entity Services"
 		project.task("mlGenerateModelArtifacts", type: GenerateModelArtifactsTask, group: esGroup, description: "Generate model artifacts for the Entity Services models in the default directory of ./data/entity-services")

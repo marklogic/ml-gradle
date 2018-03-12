@@ -3,9 +3,9 @@ package com.marklogic.mgmt;
 import com.marklogic.rest.util.RestConfig;
 
 /**
- * Defines the configuration data for talking to the Mgmt REST API. Also includes properties for the admin user, as this
+ * Defines the configuration data for talking to the Mgmt REST API. Also includes properties for the security user, as this
  * user is typically needed for creating an app-specific user (which may depend on app-specific roles and privileges)
- * which is then used for deploying every other resources. If adminUsername and adminPassword are not set, they default
+ * which is then used for deploying every other resources. If securityUsername and securityPassword are not set, they default
  * to the username/password attribute values.
  */
 public class ManageConfig extends RestConfig {

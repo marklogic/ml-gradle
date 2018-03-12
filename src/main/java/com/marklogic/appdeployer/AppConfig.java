@@ -37,13 +37,6 @@ public class AppConfig {
     public static final String DEFAULT_APP_NAME = "my-app";
 
     /**
-     * These are assumed as sensible defaults in a development environment, where teams often use admin/admin for the
-     * admin login. They are of course expected to change in a real environment.
-     */
-    public static final String DEFAULT_USERNAME = "admin";
-    public static final String DEFAULT_PASSWORD = "admin";
-
-    /**
      * This is set purely for development purposes so that an app can be configured without specifying a port. The
      * v1/rest-apis endpoint will select an open port if none is provided, but some work is then required to figure out
      * what that port is before modules are loaded.
@@ -60,7 +53,15 @@ public class AppConfig {
     public final static String DEFAULT_GROUP = "Default";
 
     private String name = DEFAULT_APP_NAME;
-    private String host = DEFAULT_HOST;
+
+	/**
+	 * These are assumed as sensible defaults in a development environment, where teams often use admin/admin for the
+	 * admin login. They are of course expected to change in a real environment.
+	 */
+	public static final String DEFAULT_USERNAME = "admin";
+	public static final String DEFAULT_PASSWORD = "admin";
+
+	private String host = DEFAULT_HOST;
 
     private boolean catchDeployExceptions = false;
     private boolean catchUndeployExceptions = false;
@@ -219,7 +220,7 @@ public class AppConfig {
     }
 
     public AppConfig(String defaultModulePath, String defaultSchemasPath) {
-        modulePaths = new ArrayList<String>();
+        modulePaths = new ArrayList<>();
         modulePaths.add(defaultModulePath);
         configDirs = new ArrayList<>();
         configDirs.add(new ConfigDir());

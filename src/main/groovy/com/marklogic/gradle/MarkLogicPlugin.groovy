@@ -152,6 +152,8 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlCreateTransform", type: CreateTransformTask, group: devGroup, description: "Create a new transform in the modules transforms directory; use -PtransformName and -PtransformType to set the transform name and type (xqy, xsl, or sjs)")
 		project.task("mlExportResources", type: ExportResourcesTask, group: devGroup, description: "Export resources based on a properties file specified via -PpropertiesFile, -Pprefix, or -Pregex; use -PincludeTypes to select resource types to export via a comma-delimited string; use -PexportPath to specify where to export resources to")
 		project.task("mlPrepareRestApiDependencies", type: PrepareRestApiDependenciesTask, group: devGroup, dependsOn: project.configurations["mlRestApi"], description: "Downloads (if necessary) and unzips in the build directory all mlRestApi dependencies")
+		project.task("mlPrintCommands", type: PrintCommandsTask, group: devGroup, description: "Print information about each command used by mlDeploy and mlUndeploy")
+		project.task("mlPrintProperties", type: PrintPropertiesTask, group: devGroup, description: "Print all of the properties supported by ml-gradle")
 		project.task("mlPrintTokens", type: PrintTokensTask, group: devGroup, description: "Print the customTokens map on the mlAppConfig object (typically for debugging purposes)")
 		project.task("mlNewProject", type: NewProjectTask, group: devGroup, description: "Run a wizard for creating a new project, which includes running mlScaffold")
 		project.task("mlNewAmp", type: NewAmpTask, group: devGroup, description: "Generate a new amp resource file. " + newResourceMessage)
@@ -253,9 +255,6 @@ class MarkLogicPlugin implements Plugin<Project> {
 		String triggerGroup = "ml-gradle Trigger"
 		project.task("mlDeployTriggers", type: DeployTriggersTask, group: triggerGroup, description: "Deploy each trigger, updating it if it exists, in the configuration directory")
 
-		String generalGroup = "ml-gradle General"
-		project.task("mlPrintCommands", type: PrintCommandsTask, group: generalGroup, description: "Print information about each command used by mlDeploy and mlUndeploy")
-
 		String shellGroup = "ml-gradle Shell"
 		project.task("mlShell", type: ShellTask, group: shellGroup, description: "Run groovysh with MarkLogic-specific support built in")
 
@@ -320,14 +319,20 @@ class MarkLogicPlugin implements Plugin<Project> {
 	}
 
 	void initializeAppDeployerObjects(Project project) {
-		AdminConfig adminConfig = new DefaultAdminConfigFactory(new ProjectPropertySource(project)).newAdminConfig()
+		DefaultAdminConfigFactory adminConfigFactory = new DefaultAdminConfigFactory(new ProjectPropertySource(project))
+		project.extensions.add("mlAdminConfigFactory", adminConfigFactory)
+		AdminConfig adminConfig = adminConfigFactory.newAdminConfig()
 		project.extensions.add("mlAdminConfig", adminConfig)
 
 		ProjectPropertySource propertySource = new ProjectPropertySource(project);
-		AppConfig appConfig = new DefaultAppConfigFactory(propertySource).newAppConfig()
+		DefaultAppConfigFactory appConfigFactory = new DefaultAppConfigFactory(propertySource)
+		project.extensions.add("mlAppConfigFactory", appConfigFactory)
+		AppConfig appConfig = appConfigFactory.newAppConfig()
 		project.extensions.add("mlAppConfig", appConfig)
 
-		ManageConfig manageConfig = new DefaultManageConfigFactory(new ProjectPropertySource(project)).newManageConfig()
+		DefaultManageConfigFactory manageConfigFactory = new DefaultManageConfigFactory(new ProjectPropertySource(project))
+		project.extensions.add("mlManageConfigFactory", manageConfigFactory)
+		ManageConfig manageConfig = manageConfigFactory.newManageConfig()
 		project.extensions.add("mlManageConfig", manageConfig)
 
 		ManageClient manageClient = new ManageClient(manageConfig)

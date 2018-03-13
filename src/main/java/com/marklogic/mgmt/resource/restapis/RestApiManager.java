@@ -6,10 +6,8 @@ import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
-import com.marklogic.rest.util.Fragment;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.HttpClientErrorException;
 
 /**
  * For /v1/rest-apis. Currently only supports JSON files.
@@ -34,25 +32,9 @@ public class RestApiManager extends LoggingObject {
 			return null;
 		} else {
 			logger.info("Creating REST API: " + json);
-			try {
-				ResponseEntity<String> re = client.postJson("/v1/rest-apis", json);
-				logger.info("Created REST API");
-				return re;
-			} catch (HttpClientErrorException ex) {
-				logWarningIfErrorIsDueToPortInUse(ex);
-				throw ex;
-			}
-		}
-	}
-
-	protected void logWarningIfErrorIsDueToPortInUse(HttpClientErrorException ex) {
-		String body = ex.getResponseBodyAsString();
-		if (body != null && body.contains("Invalid parameter") && body.contains("is in use")) {
-			logger.warn("Caught exception due to a port being in use; this may because the REST server already exists " +
-				"but is using a rewriter that the /v1/rest-apis endpoint does not recognize as a REST rewriter, and thus " +
-				"the /v1/rest-apis endpoint does not think that the REST server has been created yet. The error is then " +
-				"because an attempt is made to create the REST server but it fails because the port is already in use. " +
-				"To fix this, try modifying the URI of the rewriter module so it contains the string 'rest-api'.");
+			ResponseEntity<String> re = client.postJson("/v1/rest-apis", json);
+			logger.info("Created REST API");
+			return re;
 		}
 	}
 
@@ -61,9 +43,20 @@ public class RestApiManager extends LoggingObject {
 		return node.get("rest-api").get("name").textValue();
 	}
 
+	/**
+	 * Prior to ML 9.0-4, the /v1/rest-apis endpoint required that a server's url-rewriter have the string "rest-api"
+	 * somewhere in it. With 9.0-4, the url-rewriter must match the pattern:
+	 * <p>
+	 * ^/MarkLogic/rest-api/(8000-rewriter|rewriter|rewriter-noxdbc)\.xml$
+	 * <p>
+	 * It's not likely that a user's custom rewriter will fit that pattern, so this method no longer uses /v1/rest-apis,
+	 * opting to use ServerManager instead.
+	 *
+	 * @param name
+	 * @return
+	 */
 	public boolean restApiServerExists(String name) {
-		Fragment f = client.getXml("/v1/rest-apis?format=xml", "rapi", "http://marklogic.com/rest-api");
-		return f.elementExists(String.format("/rapi:rest-apis/rapi:rest-api[rapi:name = '%s']", name));
+		return new ServerManager(client).exists(name);
 	}
 
 	/**

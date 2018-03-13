@@ -32,7 +32,7 @@ public class ReplaceTokensTest extends AbstractAppDeployerTest {
 		loadModulesCommand.initializeDefaultModulesLoader(new CommandContext(appConfig, manageClient, adminManager));
 		((DefaultModulesLoader) loadModulesCommand.getModulesLoader()).setModulesManager(null);
 
-		initializeAppDeployer(new DeployRestApiServersCommand(), loadModulesCommand);
+		initializeAppDeployer(new DeployRestApiServersCommand(true), loadModulesCommand);
 		deploySampleApp();
 
 		// We know xdbcEnabled was replaced, otherwise the deployment of the REST API server would have failed

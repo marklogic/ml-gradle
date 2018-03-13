@@ -19,7 +19,8 @@ public class UpdateRestApiServersTest extends AbstractAppDeployerTest {
     @Test
     public void updateMainAndRestRestApiServers() {
         // Deploy a REST API server and a test one too
-        initializeAppDeployer();
+	    initializeAppDeployer(new DeployRestApiServersCommand(true));
+
         appConfig.setTestRestPort(SAMPLE_APP_TEST_REST_PORT);
         appDeployer.deploy(appConfig);
 

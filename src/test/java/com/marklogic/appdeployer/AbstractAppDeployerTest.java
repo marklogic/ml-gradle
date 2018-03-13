@@ -3,7 +3,6 @@ package com.marklogic.appdeployer;
 import com.marklogic.appdeployer.command.Command;
 import com.marklogic.appdeployer.command.modules.DefaultModulesLoaderFactory;
 import com.marklogic.appdeployer.command.modules.LoadModulesCommand;
-import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.appdeployer.impl.SimpleAppDeployer;
 import com.marklogic.client.ext.modulesloader.impl.DefaultModulesLoader;
 import com.marklogic.mgmt.AbstractMgmtTest;
@@ -43,10 +42,6 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
         // Assume that the manager user can also be used as the REST admin user
         appConfig.setRestAdminUsername(manageConfig.getUsername());
         appConfig.setRestAdminPassword(manageConfig.getPassword());
-    }
-
-    protected void initializeAppDeployer() {
-        initializeAppDeployer(new DeployRestApiServersCommand());
     }
 
     /**

@@ -1,4 +1,4 @@
 {
   "server-name": "%%NAME%%",
-  "url-rewriter": "/should/log/a-warning.xml"
+  "url-rewriter": "/my/custom/rewriter.xml"
 }

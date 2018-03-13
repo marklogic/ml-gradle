@@ -15,6 +15,8 @@ import com.marklogic.client.ext.modulesloader.*;
 import com.marklogic.client.ext.tokenreplacer.TokenReplacer;
 import com.marklogic.client.io.Format;
 import com.marklogic.client.io.StringHandle;
+import org.jdom2.Element;
+import org.jdom2.input.SAXBuilder;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.io.Resource;
 import org.springframework.core.task.SyncTaskExecutor;
@@ -181,31 +183,12 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		}
 
 		ServerConfigurationManager mgr = client.newServerConfigManager();
-		ObjectMapper m = new ObjectMapper();
-		JsonNode node = null;
-		try {
-			node = m.readTree(r.getInputStream());
-		} catch (IOException ex) {
-			throw new RuntimeException("Unable to read REST configuration from file: " + f.getAbsolutePath(), ex);
+		if (f.getName().endsWith("xml")) {
+			applyXmlProperties(mgr, r, f);
+		} else {
+			applyJsonProperties(mgr, r, f);
 		}
-		if (node.has("document-transform-all")) {
-			mgr.setDefaultDocumentReadTransformAll(node.get("document-transform-all").asBoolean());
-		}
-		if (node.has("document-transform-out")) {
-			mgr.setDefaultDocumentReadTransform(node.get("document-transform-out").asText());
-		}
-		if (node.has("update-policy")) {
-			mgr.setUpdatePolicy(UpdatePolicy.valueOf(node.get("update-policy").asText()));
-		}
-		if (node.has("validate-options")) {
-			mgr.setQueryOptionValidation(node.get("validate-options").asBoolean());
-		}
-		if (node.has("validate-queries")) {
-			mgr.setQueryValidation(node.get("validate-queries").asBoolean());
-		}
-		if (node.has("debug")) {
-			mgr.setServerRequestLogging(node.get("debug").asBoolean());
-		}
+
 		if (logger.isInfoEnabled()) {
 			logger.info("Writing REST server configuration");
 			logger.info("Default document read transform: " + mgr.getDefaultDocumentReadTransform());
@@ -224,6 +207,67 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		}
 
 		loadedModules.add(r);
+	}
+
+	protected void applyJsonProperties(ServerConfigurationManager mgr, Resource r, File file) {
+		ObjectMapper m = new ObjectMapper();
+		JsonNode node;
+		try {
+			node = m.readTree(r.getInputStream());
+		} catch (IOException ex) {
+			throw new RuntimeException("Unable to read JSON REST properties file: " + file.getAbsolutePath(), ex);
+		}
+
+		if (node.has("debug")) {
+			mgr.setServerRequestLogging(node.get("debug").asBoolean());
+		}
+		if (node.has("document-transform-all")) {
+			mgr.setDefaultDocumentReadTransformAll(node.get("document-transform-all").asBoolean());
+		}
+		if (node.has("document-transform-out")) {
+			mgr.setDefaultDocumentReadTransform(node.get("document-transform-out").asText());
+		}
+		if (node.has("update-policy")) {
+			mgr.setUpdatePolicy(UpdatePolicy.valueOf(node.get("update-policy").asText()));
+		}
+		if (node.has("validate-options")) {
+			mgr.setQueryOptionValidation(node.get("validate-options").asBoolean());
+		}
+		if (node.has("validate-queries")) {
+			mgr.setQueryValidation(node.get("validate-queries").asBoolean());
+		}
+	}
+
+	/**
+	 * @param mgr
+	 * @param r
+	 * @param file
+	 */
+	protected void applyXmlProperties(ServerConfigurationManager mgr, Resource r, File file) {
+		Element root;
+		try {
+			root = new SAXBuilder().build(r.getInputStream()).getRootElement();
+		} catch (Exception e) {
+			throw new RuntimeException("Unable to read XML REST properties file: " + file.getAbsolutePath(), e);
+		}
+
+		for (Element child : root.getChildren()) {
+			final String value = child.getValue();
+			final String name = child.getName();
+			if ("debug".equals(name)) {
+				mgr.setServerRequestLogging(Boolean.parseBoolean(value));
+			} else if ("document-transform-all".equals(name)) {
+				mgr.setDefaultDocumentReadTransformAll(Boolean.parseBoolean(value));
+			} else if ("document-transform-out".equals(name)) {
+				mgr.setDefaultDocumentReadTransform(value);
+			} else if ("update-policy".equals(name)) {
+				mgr.setUpdatePolicy(UpdatePolicy.valueOf(value));
+			} else if ("validate-options".equals(name)) {
+				mgr.setQueryOptionValidation(Boolean.parseBoolean(value));
+			} else if ("validate-queries".equals(name)) {
+				mgr.setQueryValidation(Boolean.parseBoolean(value));
+			}
+		}
 	}
 
 	protected File getFileFromResource(Resource r) {

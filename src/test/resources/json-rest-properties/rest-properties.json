@@ -1,0 +1,7 @@
+{
+	"debug" : true,
+	"document-transform-all" : true,
+	"update-policy": "OVERWRITE_METADATA",
+	"validate-options" : true,
+	"validate-queries" : true
+}

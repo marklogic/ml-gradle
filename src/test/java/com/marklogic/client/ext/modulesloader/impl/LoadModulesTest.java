@@ -1,6 +1,7 @@
 package com.marklogic.client.ext.modulesloader.impl;
 
 import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.admin.ServerConfigurationManager;
 import com.marklogic.client.ext.AbstractIntegrationTest;
 import com.marklogic.client.ext.modulesloader.Modules;
 import com.marklogic.client.ext.modulesloader.ModulesFinder;
@@ -10,6 +11,7 @@ import com.marklogic.client.io.StringHandle;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.core.io.Resource;
+import org.springframework.util.StringUtils;
 
 import java.nio.file.Paths;
 import java.util.List;
@@ -40,6 +42,65 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 
 		modulesLoader = new DefaultModulesLoader(new AssetFileLoader(modulesClient));
 		modulesLoader.setModulesManager(null);
+	}
+
+	@Test
+	public void jsonRestPropertiesFile() {
+		ServerConfigurationManager mgr = client.newServerConfigManager();
+		try {
+			String dir = Paths.get("src", "test", "resources", "json-rest-properties").toString();
+			ModulesFinder finder = new DefaultModulesFinder();
+			Modules modules = finder.findModules(dir);
+			assertTrue(modules.getPropertiesFile().exists());
+
+			// Now load the modules for real
+			modulesLoader.loadModules(dir, finder, client);
+
+			mgr.readConfiguration();
+			assertTrue(mgr.getQueryValidation());
+			assertTrue(mgr.getQueryOptionValidation());
+			assertEquals(ServerConfigurationManager.UpdatePolicy.OVERWRITE_METADATA, mgr.getUpdatePolicy());
+			assertTrue(mgr.getServerRequestLogging());
+			assertTrue(StringUtils.isEmpty(mgr.getDefaultDocumentReadTransform()));
+			assertTrue(mgr.getDefaultDocumentReadTransformAll());
+		} finally {
+			set8000RestPropertiesToMarkLogicDefaults();
+		}
+	}
+
+	@Test
+	public void xmlRestPropertiesFile() {
+		ServerConfigurationManager mgr = client.newServerConfigManager();
+		try {
+			String dir = Paths.get("src", "test", "resources", "xml-rest-properties").toString();
+			ModulesFinder finder = new DefaultModulesFinder();
+			Modules modules = finder.findModules(dir);
+			assertTrue(modules.getPropertiesFile().exists());
+
+			// Now load the modules for real
+			modulesLoader.loadModules(dir, finder, client);
+
+			mgr.readConfiguration();
+			assertTrue(mgr.getQueryValidation());
+			assertTrue(mgr.getQueryOptionValidation());
+			assertEquals(ServerConfigurationManager.UpdatePolicy.OVERWRITE_METADATA, mgr.getUpdatePolicy());
+			assertTrue(mgr.getServerRequestLogging());
+			assertTrue(StringUtils.isEmpty(mgr.getDefaultDocumentReadTransform()));
+			assertTrue(mgr.getDefaultDocumentReadTransformAll());
+		} finally {
+			set8000RestPropertiesToMarkLogicDefaults();
+		}
+	}
+
+	private void set8000RestPropertiesToMarkLogicDefaults() {
+		ServerConfigurationManager mgr = client.newServerConfigManager();
+		mgr.setQueryValidation(false);
+		mgr.setQueryOptionValidation(true);
+		mgr.setUpdatePolicy(ServerConfigurationManager.UpdatePolicy.MERGE_METADATA);
+		mgr.setDefaultDocumentReadTransform(null);
+		mgr.setDefaultDocumentReadTransformAll(true);
+		mgr.setServerRequestLogging(false);
+		mgr.writeConfiguration();
 	}
 
 	@Test

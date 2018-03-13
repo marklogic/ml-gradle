@@ -1,0 +1,8 @@
+<properties xmlns="http://marklogic.com/rest-api">
+	<debug>true</debug>
+	<document-transform-all>true</document-transform-all>
+	<document-transform-out/>
+	<update-policy>OVERWRITE_METADATA</update-policy>
+	<validate-options>true</validate-options>
+	<validate-queries>true</validate-queries>
+</properties>

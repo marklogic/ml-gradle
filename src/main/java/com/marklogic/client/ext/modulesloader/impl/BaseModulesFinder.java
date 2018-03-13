@@ -47,9 +47,13 @@ public abstract class BaseModulesFinder extends LoggingObject implements Modules
      * @param baseDir
      */
     protected void addPropertiesFile(Modules modules, String baseDir) {
-		List<Resource> properties = findResources("REST properties file", baseDir, "rest-properties.json");
-		if (properties.size() == 1) {
-			modules.setPropertiesFile(properties.get(0));
+		List<Resource> resources = findResources("REST properties file", baseDir, "rest-properties.json", "rest-properties.xml");
+		for (Resource r : resources) {
+			if (r.exists()) {
+				modules.setPropertiesFile(r);
+				// Only one should exist, so use the first one that exists
+				break;
+			}
 		}
     }
 

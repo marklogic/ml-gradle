@@ -17,6 +17,13 @@ public class DefaultAppConfigFactoryTest extends Assert {
     private DefaultAppConfigFactory sut;
 
     @Test
+    public void trimProperties() {
+    	sut = new DefaultAppConfigFactory(new SimplePropertySource("mlHost", "  has-spaces   ", "mlUsername", "has spaces"));
+    	AppConfig config = sut.newAppConfig();
+    	assertEquals("has-spaces", config.getHost());
+    	assertEquals("has spaces", config.getRestAdminUsername());
+    }
+    @Test
     public void gradleStyleProperties() {
         sut = new DefaultAppConfigFactory(new SimplePropertySource("mlHost", "somehost", "mlUsername", "someuser"));
         AppConfig config = sut.newAppConfig();

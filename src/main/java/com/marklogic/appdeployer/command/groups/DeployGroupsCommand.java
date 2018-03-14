@@ -61,19 +61,21 @@ public class DeployGroupsCommand extends AbstractResourceCommand {
                 }
                 context.getAdminManager().waitForRestart();
         	}
+        }
 
-			// When new groups are created, an Admin server is automatically created in that group.
-			// However, the Admin server's rewrite property is empty - causing problems with reading the timestamp
+        if (receipt.hasLocationHeader()) {
+	        // When new groups are created, an Admin server is automatically created in that group.
+	        // However, the Admin server's rewrite property is empty - causing problems with reading the timestamp
 	        String groupName = new PayloadParser().getPayloadFieldValue(payload, "group-name", true);
 	        ServerManager serverMgr = new ServerManager(context.getManageClient(), groupName);
 	        if (fixAdminServerRewriter) {
-	        	if (logger.isInfoEnabled()) {
-	        		logger.info(format("Updating admin server in group %s to ensure that its url-rewriter is correct", groupName));
+		        if (logger.isInfoEnabled()) {
+			        logger.info(format("Updating admin server in group %s to ensure that its url-rewriter is correct", groupName));
 		        }
 		        serverMgr.save(adminServerTemplate.getJson());
 	        }
 
-			ensureGroupServersExist(serverMgr, groupName);
+	        ensureGroupServersExist(serverMgr, groupName);
         }
     }
 

@@ -2,24 +2,24 @@ package com.marklogic.appdeployer.command;
 
 public abstract class SortOrderConstants {
 
-    public static Integer DEPLOY_GROUPS = 5;
-    
-    public static Integer DEPLOY_PRIVILEGES = 10;
-    public static Integer DEPLOY_ROLES = 20;
-    public static Integer DEPLOY_USERS = 30;
-    public static Integer DEPLOY_CERTIFICATE_TEMPLATES = 50;
-    public static Integer GENERATE_TEMPORARY_CERTIFICATE = 55;
-    public static Integer DEPLOY_CERTIFICATE_AUTHORITIES = 60;
-    public static Integer DEPLOY_EXTERNAL_SECURITY = 70;
-    public static Integer DEPLOY_PROTECTED_COLLECTIONS = 80;
-    public static Integer DEPLOY_MIMETYPES = 90;
-	public static Integer DEPLOY_PROTECTED_PATHS = 95;
-	public static Integer DEPLOY_QUERY_ROLESETS = 97;
-	
+    public static Integer DEPLOY_PRIVILEGES = 5;
+    public static Integer DEPLOY_ROLES = 10;
+    public static Integer DEPLOY_USERS = 15;
+    public static Integer DEPLOY_CERTIFICATE_TEMPLATES = 20;
+    public static Integer GENERATE_TEMPORARY_CERTIFICATE = 25;
+    public static Integer DEPLOY_CERTIFICATE_AUTHORITIES = 30;
+    public static Integer DEPLOY_EXTERNAL_SECURITY = 35;
+    public static Integer DEPLOY_PROTECTED_COLLECTIONS = 40;
+    public static Integer DEPLOY_MIMETYPES = 45;
+	public static Integer DEPLOY_PROTECTED_PATHS = 50;
+	public static Integer DEPLOY_QUERY_ROLESETS = 55;
+
+	public static Integer DEPLOY_GROUPS = 90;
+
 	// Hosts need to be assigned to their group before databases are created.
 	// This is so that when forests are created based on the mlDatabaseGroups
 	// then the forests will be created on the correct hosts.
-    public static Integer ASSIGN_HOSTS_TO_GROUPS = 98;
+    public static Integer ASSIGN_HOSTS_TO_GROUPS = 95;
 
     public static Integer DEPLOY_TRIGGERS_DATABASE = 100;
     public static Integer DEPLOY_SCHEMAS_DATABASE = 100;
@@ -69,7 +69,10 @@ public abstract class SortOrderConstants {
 
     public static Integer DEPLOY_FOREST_REPLICAS = 1200;
 
-    // Undo constants
+	public static Integer DELETE_MIMETYPES = 8500;
+
+	public static Integer UNASSIGN_HOSTS_FROM_GROUPS = 8590;
+	public static Integer DELETE_GROUPS = 8600;
 
     public static Integer DELETE_USERS = 9000;
     public static Integer DELETE_CERTIFICATE_TEMPLATES = 9010;
@@ -83,10 +86,6 @@ public abstract class SortOrderConstants {
     // Protected paths reference roles
 	public static Integer DELETE_PROTECTED_PATHS = 9080;
 
-	public static Integer DELETE_GROUPS = 8600;
-    public static Integer UNASSIGN_HOSTS_FROM_GROUPS = 8590;
-
-	public static Integer DELETE_MIMETYPES = 8500;
 
 	/*
      * This executes before databases are deleted, as deleting databases normally deletes the primary forests, so we

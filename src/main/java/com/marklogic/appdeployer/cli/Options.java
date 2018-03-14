@@ -12,11 +12,14 @@ public class Options {
 	@Parameter(names = {"-f"}, description = "Path to properties file")
 	private String propertiesFilePath;
 
-	@Parameter(names = {"-u"}, description = "Undo the given command (i.e. undeploy instead of deploy)")
-	private boolean undo;
-
 	@Parameter(names = {"-l"}, description = "Log level, as defined by Logback")
 	private String logLevel = Level.INFO.levelStr;
+
+	@Parameter(names = {"-p"}, description = "Print a list of all supported properties")
+	private boolean printProperties;
+
+	@Parameter(names = {"-u"}, description = "Undo the given command (i.e. undeploy instead of deploy)")
+	private boolean undo;
 
 	@DynamicParameter(names = "-P", description = "Use this argument to include any property defined by the ml-gradle Property Reference; e.g. -PmlAppName=example")
 	private Map<String, String> params = new HashMap<>();
@@ -51,6 +54,14 @@ public class Options {
 
 	public void setLogLevel(String logLevel) {
 		this.logLevel = logLevel;
+	}
+
+	public boolean isPrintProperties() {
+		return printProperties;
+	}
+
+	public void setPrintProperties(boolean printProperties) {
+		this.printProperties = printProperties;
 	}
 }
 

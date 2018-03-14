@@ -20,10 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.TreeMap;
+import java.util.*;
 
 public class Main {
 
@@ -46,7 +43,11 @@ public class Main {
 
 		String parsedCommand = commander.getParsedCommand();
 		if (parsedCommand == null) {
-			commander.usage();
+			if (options.isPrintProperties()) {
+				printProperties();
+			} else {
+				commander.usage();
+			}
 		} else {
 			ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 			root.setLevel(Level.toLevel(options.getLogLevel()));
@@ -118,6 +119,23 @@ public class Main {
 			return new SimplePropertySource(props);
 		} else {
 			return (name) -> options.getParams().get(name);
+		}
+	}
+
+	private static void printProperties() {
+		System.out.println("\nManage server connection properties");
+		for (String name : new TreeSet<>(new DefaultManageConfigFactory().getPropertyConsumerMap().keySet())) {
+			System.out.println(" - " + name);
+		}
+
+		System.out.println("\nAdmin server connection properties");
+		for (String name : new TreeSet<>(new DefaultAdminConfigFactory().getPropertyConsumerMap().keySet())) {
+			System.out.println(" - " + name);
+		}
+
+		System.out.println("\nApplication properties");
+		for (String name : new TreeSet<>(new DefaultAppConfigFactory().getPropertyConsumerMap().keySet())) {
+			System.out.println(" - " + name);
 		}
 	}
 

@@ -6,7 +6,7 @@ buildscript {
 	}
 	dependencies {
 		classpath "com.marklogic:marklogic-contentpump:9.0.3"
-		classpath "com.marklogic:ml-gradle:3.0.0"
+		classpath "com.marklogic:ml-gradle:3.6.0"
 	}
 }
 

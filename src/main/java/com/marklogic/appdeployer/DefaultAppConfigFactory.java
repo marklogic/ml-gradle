@@ -298,6 +298,11 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			config.setDatabaseGroups(buildSetMapFromDelimitedString(prop));
 		});
 
+		propertyConsumerMap.put("mlHostGroups", (config, prop) -> {
+			logger.info("Hosts will be assigned to groups: " + prop);
+			config.setHostGroups(buildMapFromCommaDelimitedString(prop));
+		});
+
 		propertyConsumerMap.put("mlDatabaseHosts", (config, prop) -> {
 			logger.info("Databases and the hosts that their forests will be created on: " + prop);
 			config.setDatabaseHosts(buildSetMapFromDelimitedString(prop));

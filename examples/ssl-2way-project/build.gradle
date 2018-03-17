@@ -1,0 +1,94 @@
+plugins {
+  id "com.marklogic.ml-gradle" version "3.2.1"
+}
+
+
+/*
+You can use the Java keytool utility to import a MarkLogic certificate into a keystore.
+See the Java JSSE documentation for details on the use of the keytool and your keystore options.
+
+You can explicitly specify a keystore, as shown in this example, or you can specify a null
+keystore. Specifying a null keystore causes the TrustManagerFactory to locate your default
+keystore, as described in the Java Secure Socket Extension (JSSE) Reference Guide.
+*/
+
+import java.io.FileInputStream;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.sslContext;
+import java.security.KeyStore;
+import java.security.cert.X509Certificate;
+import java.security.cert.CertificateException;
+import com.marklogic.client.DatabaseClientFactory;
+
+if (project.hasProperty("mlKeystore")) {
+
+  ext {
+    // mlAppConfig is an instance of com.marklogic.appdeployer.AppConfig
+    mlAppConfig {
+
+      // This uses the same keystore for server cert validation as well as the client cert
+      // These could be different though
+      KeyStore trustedKeyStore = KeyStore.getInstance("JKS")
+      trustedKeyStore.load(new FileInputStream(mlKeystore), mlKeystorePassword.toCharArray())
+
+      TrustManager[] trust = null
+
+      // This doesn't validate the server cert unless you set mlValidateServerCert=true
+      if (project.hasProperty("mlValidateServerCert") && mlValidateServerCert.toBoolean()) {
+        // Build trust manager to validate server certificates using the specified key store.
+        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance("SunX509")
+        trustManagerFactory.init(trustedKeyStore)
+
+        trust = trustManagerFactory.getTrustManagers()
+      } else {
+        trust =  [
+          new X509TrustManager() {
+            public X509Certificate[] getAcceptedIssuers() {
+              return [];
+            }
+
+            public void checkClientTrusted(X509Certificate[] chain,
+                            String authType) throws CertificateException {
+            }
+
+            public void checkServerTrusted(X509Certificate[] chain,
+                            String authType) throws CertificateException {
+            }
+          }
+        ]
+      }
+
+      // Load key store with client certificates.
+      KeyStore clientKeyStore = KeyStore.getInstance("JKS")
+      clientKeyStore.load(new FileInputStream(mlKeystore), mlKeystorePassword.toCharArray())
+
+      if (! project.hasProperty("mlKeystoreCertPassword")) {
+        mlKeystoreCertPassword = mlKeystorePassword
+      }
+
+      // Get key manager to provide client certificate
+      KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509")
+      keyManagerFactory.init(clientKeyStore, mlKeystoreCertPassword.toCharArray())
+
+      KeyManager[] key = keyManagerFactory.getKeyManagers()
+
+      // Initialize the SSL context with key and trust managers.
+      SSLContext sslContext = SSLContext.getInstance("SSLv3")
+      sslContext.init(key, trust, null)
+
+      restSslContext = sslContext
+
+      // This turns off hostname verification unless mlVerifyServerHostname=true
+      if (project.hasProperty("mlVerifyServerHostname") && mlVerifyServerHostname.toBoolean()) {
+        restSslHostnameVerifier = DatabaseClientFactory.SSLHostnameVerifier.COMMON // change to STRICT if needed
+      } else {
+        restSslHostnameVerifier = DatabaseClientFactory.SSLHostnameVerifier.ANY
+      }
+    }
+  }
+
+}

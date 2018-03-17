@@ -17,6 +17,11 @@ public class QueryRolesetsManager extends AbstractResourceManager {
 	}
 
 	@Override
+	protected boolean useSecurityUser() {
+		return true;
+	}
+
+	@Override
 	public String getResourcesPath() {
 		return "/manage/v2/query-rolesets";
 	}

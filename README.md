@@ -24,11 +24,11 @@ First, [install Gradle](https://gradle.org/install/).
 
 Then, in an empty directory, create a file named "build.gradle" with your favorite text editor and enter the following:
 
-    plugins { id "com.marklogic.ml-gradle" version "3.4.0" }
+    plugins { id "com.marklogic.ml-gradle" version "3.6.1" }
     
 Then run:
 
-    gradle mlNew
+    gradle mlNewProject
 
 This starts a project wizard to stub out files for your new application. You can accept all the defaults, but be sure to
 enter a valid port number for the "REST API port" question. ml-gradle will then print the following logging:

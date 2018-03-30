@@ -25,8 +25,20 @@ public class DeployDatabasesInOrderTest extends AbstractAppDeployerTest {
 	 * doesn't sort them correctly.
 	 */
 	@Test
-	public void test() {
+	public void jsonResourceFiles() {
 		appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/databases-in-order")));
+		initializeAppDeployer(new DeployOtherDatabasesCommand(1));
+		deploySampleApp();
+
+		DatabaseManager mgr = new DatabaseManager(manageClient);
+		assertTrue(mgr.exists("sample-app-A"));
+		assertTrue(mgr.exists("sample-app-B"));
+		assertTrue(mgr.exists("sample-app-C"));
+	}
+
+	@Test
+	public void xmlResourceFiles() {
+		appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/databases-in-order-xml")));
 		initializeAppDeployer(new DeployOtherDatabasesCommand(1));
 		deploySampleApp();
 

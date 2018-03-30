@@ -1,26 +1,34 @@
 package com.marklogic.mgmt.api.database;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.List;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Element {
 
-    private String namespaceUri;
-    private List<String> localname;
+	@XmlElement(name = "namespace-uri")
+	private String namespaceUri;
 
-    public String getNamespaceUri() {
-        return namespaceUri;
-    }
+	@XmlElementWrapper(name = "localnames")
+	private List<String> localname;
 
-    public void setNamespaceUri(String namespaceUri) {
-        this.namespaceUri = namespaceUri;
-    }
+	public String getNamespaceUri() {
+		return namespaceUri;
+	}
 
-    public List<String> getLocalname() {
-        return localname;
-    }
+	public void setNamespaceUri(String namespaceUri) {
+		this.namespaceUri = namespaceUri;
+	}
 
-    public void setLocalname(List<String> localname) {
-        this.localname = localname;
-    }
+	public List<String> getLocalname() {
+		return localname;
+	}
+
+	public void setLocalname(List<String> localname) {
+		this.localname = localname;
+	}
 
 }

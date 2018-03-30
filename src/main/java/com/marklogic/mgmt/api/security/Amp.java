@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@XmlRootElement(name = "role-properties")
+@XmlRootElement(name = "amp-properties")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Amp extends Resource {
 

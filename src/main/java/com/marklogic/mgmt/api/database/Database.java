@@ -1,800 +1,955 @@
 package com.marklogic.mgmt.api.database;
 
-import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.Resource;
 import com.marklogic.mgmt.api.forest.Forest;
+import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@XmlRootElement(name = "database-properties")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Database extends Resource {
 
-    private String databaseName;
-    private List<String> forest;
-    private String securityDatabase;
-    private String schemaDatabase;
-    private String triggersDatabase;
-    private Boolean enabled;
-    private Integer retiredForestCount;
-    private String language;
-    private String stemmedSearches;
-    private Boolean wordSearches;
-    private Boolean wordPositions;
-    private Boolean fastPhraseSearches;
-    private Boolean fastReverseSearches;
-    private Boolean tripleIndex;
-    private Boolean triplePositions;
-    private Boolean fastCaseSensitiveSearches;
-    private Boolean fastDiacriticSensitiveSearches;
-    private Boolean fastElementWordSearches;
-    private Boolean elementWordPositions;
-    private Boolean fastElementPhraseSearches;
-    private Boolean elementValuePositions;
-    private Boolean attributeValuePositions;
-    private Boolean fieldValueSearches;
-    private Boolean fieldValuePositions;
-    private Boolean threeCharacterSearches;
-    private Boolean threeCharacterWordPositions;
-    private Boolean fastElementCharacterSearches;
-    private Boolean trailingWildcardSearches;
-    private Boolean trailingWildcardWordPositions;
-    private Boolean fastElementTrailingWildcardSearches;
-    private Boolean twoCharacterSearches;
-    private Boolean oneCharacterSearches;
-    private Boolean uriLexicon;
-    private Boolean collectionLexicon;
-    private Boolean reindexerEnable;
-    private Integer reindexerThrottle;
-    private Long reindexerTimestamp;
-    private String directoryCreation;
-    private Boolean maintainLastModified;
-    private Boolean maintainDirectoryLastModified;
-    private Boolean inheritPermissions;
-    private Boolean inheritCollections;
-    private Boolean inheritQuality;
-    private Long inMemoryLimit;
-    private Long inMemoryListSize;
-    private Long inMemoryTreeSize;
-    private Long inMemoryRangeIndexSize;
-    private Long inMemoryReverseIndexSize;
-    private Long inMemoryTripleIndexSize;
-    private Long largeSizeThreshold;
-    private String locking;
-    private String journaling;
-    private Long journalSize;
-    private Integer journalCount;
-    private Boolean preallocateJournals;
-    private Boolean preloadMappedData;
-    private Boolean preloadReplicaMappedData;
-    private String rangeIndexOptimize;
-    private Long positionsListMaxSize;
-    private String formatCompatibility;
-    private String indexDetection;
-    private String expungeLocks;
-    private String tfNormalization;
-    private String mergePriority;
-    private Long mergeMaxSize;
-    private Long mergeMinSize;
-    private Integer mergeMinRatio;
-    private Long mergeTimestamp;
-    private Boolean retainUntilBackup;
-    private List<Element> elementWordQueryThrough;
-    private List<Element> phraseThrough;
-    private List<Element> phraseAround;
-    private List<ElementIndex> rangeElementIndex;
-    private List<Field> field;
-    private Boolean rebalancerEnable;
-    private Integer rebalancerThrottle;
-    private AssignmentPolicy assignmentPolicy;
+	@XmlElement(name = "database-name")
+	private String databaseName;
 
-    public Database() {
-        super();
-    }
+	@XmlElementWrapper(name = "forests")
+	private List<String> forest;
 
-    public Database(API api, String databaseName) {
-        super(api);
-        this.databaseName = databaseName;
-    }
+	@XmlElement(name = "security-database")
+	private String securityDatabase;
 
-    @Override
-    protected String getResourceLabel() {
-        return getDatabaseName();
-    }
+	@XmlElement(name = "schema-database")
+	private String schemaDatabase;
 
-    @Override
-    protected ResourceManager getResourceManager() {
-        return new DatabaseManager(getClient());
-    }
+	@XmlElement(name = "triggers-database")
+	private String triggersDatabase;
+	private Boolean enabled;
 
-    @Override
-    protected String getResourceId() {
-        return databaseName;
-    }
+	@XmlElement(name = "retired-forest-count")
+	private Integer retiredForestCount;
+	private String language;
 
-    public void addForest(Forest f) {
-        addForest(f.getForestName());
-    }
+	@XmlElement(name = "stemmed-searches")
+	private String stemmedSearches;
 
-    public void addForest(String forestName) {
-        if (forest == null) {
-            forest = new ArrayList<>();
-        }
-        forest.add(forestName);
-    }
+	@XmlElement(name = "word-searches")
+	private Boolean wordSearches;
 
-    public void clear() {
-        new DatabaseManager(getClient()).clearDatabase(databaseName);
-    }
+	@XmlElement(name = "word-positions")
+	private Boolean wordPositions;
 
-    public void attach(Forest f) {
-        attach(f.getForestName());
-    }
+	@XmlElement(name = "fast-phrase-searches")
+	private Boolean fastPhraseSearches;
 
-    /**
-     * TODO In the event this is a new forest with no host set, add a parameter to specify an index of the set of hosts
-     * returned by /manage/v2/hosts (I think the order is guaranteed).
-     *
-     * @param f
-     */
-    public void attach(String forestName) {
-        if (forest == null) {
-            forest = new ArrayList<>();
-        }
-        forest.add(forestName);
-        save();
-    }
+	@XmlElement(name = "fast-reverse-searches")
+	private Boolean fastReverseSearches;
 
-    public Forest attachNewForest(String forestName) {
-        Forest f = getApi().forest(forestName);
-        f.save();
-        attach(f);
-        return f;
-    }
+	@XmlElement(name = "triple-index")
+	private Boolean tripleIndex;
 
-    public void detach(Forest f) {
-        detach(f.getForestName());
-    }
+	@XmlElement(name = "triple-positions")
+	private Boolean triplePositions;
 
-    public void detach(String forestName) {
-        if (forest == null || !forest.contains(forestName)) {
-            getLogger().warn(format("Forest %s not in list of known forests for database, so not detaching"));
-        } else {
-            forest.remove(forestName);
-            save();
-        }
-    }
+	@XmlElement(name = "fast-case-sensitive-searches")
+	private Boolean fastCaseSensitiveSearches;
+
+	@XmlElement(name = "fast-diacritic-sensitive-searches")
+	private Boolean fastDiacriticSensitiveSearches;
+
+	@XmlElement(name = "fast-element-word-searches")
+	private Boolean fastElementWordSearches;
+
+	@XmlElement(name = "element-word-positions")
+	private Boolean elementWordPositions;
+
+	@XmlElement(name = "fast-element-phrase-searches")
+	private Boolean fastElementPhraseSearches;
+
+	@XmlElement(name = "element-value-positions")
+	private Boolean elementValuePositions;
+
+	@XmlElement(name = "attribute-value-positions")
+	private Boolean attributeValuePositions;
+
+	@XmlElement(name = "field-value-searches")
+	private Boolean fieldValueSearches;
+
+	@XmlElement(name = "field-value-positions")
+	private Boolean fieldValuePositions;
+
+	@XmlElement(name = "three-character-searches")
+	private Boolean threeCharacterSearches;
+
+	@XmlElement(name = "three-character-word-positions")
+	private Boolean threeCharacterWordPositions;
+
+	@XmlElement(name = "fast-element-character-searches")
+	private Boolean fastElementCharacterSearches;
+
+	@XmlElement(name = "trailing-wildcard-searches")
+	private Boolean trailingWildcardSearches;
+
+	@XmlElement(name = "trailing-wildcard-word-positions")
+	private Boolean trailingWildcardWordPositions;
+
+	@XmlElement(name = "fast-element-trailing-wildcard-searches")
+	private Boolean fastElementTrailingWildcardSearches;
+
+	@XmlElement(name = "two-character-searches")
+	private Boolean twoCharacterSearches;
+
+	@XmlElement(name = "one-character-searches")
+	private Boolean oneCharacterSearches;
+
+	@XmlElement(name = "uri-lexicon")
+	private Boolean uriLexicon;
+
+	@XmlElement(name = "collection-lexicon")
+	private Boolean collectionLexicon;
+
+	@XmlElement(name = "reindexer-enable")
+	private Boolean reindexerEnable;
+
+	@XmlElement(name = "reindexer-throttle")
+	private Integer reindexerThrottle;
+
+	@XmlElement(name = "reindexer-timestamp")
+	private Long reindexerTimestamp;
+
+	@XmlElement(name = "directory-creation")
+	private String directoryCreation;
+
+	@XmlElement(name = "maintain-last-modified")
+	private Boolean maintainLastModified;
+
+	@XmlElement(name = "maintain-directory-last-modified")
+	private Boolean maintainDirectoryLastModified;
+
+	@XmlElement(name = "inherit-permissions")
+	private Boolean inheritPermissions;
+
+	@XmlElement(name = "inherit-collections")
+	private Boolean inheritCollections;
+
+	@XmlElement(name = "inherit-quality")
+	private Boolean inheritQuality;
+
+	@XmlElement(name = "in-memory-limit")
+	private Long inMemoryLimit;
+
+	@XmlElement(name = "in-memory-list-size")
+	private Long inMemoryListSize;
+
+	@XmlElement(name = "in-memory-tree-size")
+	private Long inMemoryTreeSize;
+
+	@XmlElement(name = "in-memory-range-index-size")
+	private Long inMemoryRangeIndexSize;
+
+	@XmlElement(name = "in-memory-reverse-index-size")
+	private Long inMemoryReverseIndexSize;
+
+	@XmlElement(name = "in-memory-triple-index-size")
+	private Long inMemoryTripleIndexSize;
+
+	@XmlElement(name = "large-size-threshold")
+	private Long largeSizeThreshold;
+
+	@XmlElement(name = "locking")
+	private String locking;
+
+	@XmlElement(name = "journaling")
+	private String journaling;
+
+	@XmlElement(name = "journal-size")
+	private Long journalSize;
+
+	@XmlElement(name = "journal-count")
+	private Integer journalCount;
+
+	@XmlElement(name = "preallocate-journals")
+	private Boolean preallocateJournals;
+
+	@XmlElement(name = "preload-mapped-data")
+	private Boolean preloadMappedData;
+
+	@XmlElement(name = "preload-replica-mapped-data")
+	private Boolean preloadReplicaMappedData;
+
+	@XmlElement(name = "range-index-optimize")
+	private String rangeIndexOptimize;
+
+	@XmlElement(name = "positions-list-max-size")
+	private Long positionsListMaxSize;
+
+	@XmlElement(name = "format-compatibility")
+	private String formatCompatibility;
+
+	@XmlElement(name = "index-detection")
+	private String indexDetection;
+
+	@XmlElement(name = "expunge-locks")
+	private String expungeLocks;
+
+	@XmlElement(name = "tf-normalization")
+	private String tfNormalization;
+
+	@XmlElement(name = "merge-priority")
+	private String mergePriority;
+
+	@XmlElement(name = "merge-max-size")
+	private Long mergeMaxSize;
+
+	@XmlElement(name = "merge-min-size")
+	private Long mergeMinSize;
+
+	@XmlElement(name = "merge-min-ratio")
+	private Integer mergeMinRatio;
+
+	@XmlElement(name = "merge-timestamp")
+	private Long mergeTimestamp;
+
+	@XmlElement(name = "retain-until-backup")
+	private Boolean retainUntilBackup;
+
+	@XmlElementWrapper(name = "element-word-query-throughs")
+	@XmlElement(name = "element-word-query-through")
+	private List<Element> elementWordQueryThrough;
+
+	@XmlElementWrapper(name = "phrase-throughs")
+	@XmlElement(name = "phrase-through")
+	private List<Element> phraseThrough;
+
+	@XmlElementWrapper(name = "phrase-arounds")
+	@XmlElement(name = "phrase-around")
+	private List<Element> phraseAround;
+
+	@XmlElementWrapper(name = "range-element-indexes")
+	@XmlElement(name = "range-element-index")
+	private List<ElementIndex> rangeElementIndex;
+
+	@XmlElementWrapper(name = "fields")
+	private List<Field> field;
+
+	@XmlElement(name = "rebalancer-enable")
+	private Boolean rebalancerEnable;
+
+	@XmlElement(name = "rebalancer-throttle")
+	private Integer rebalancerThrottle;
+
+	@XmlElement(name = "assignment-policy")
+	private AssignmentPolicy assignmentPolicy;
+
+	public Database() {
+		super();
+	}
+
+	public Database(API api, String databaseName) {
+		super(api);
+		this.databaseName = databaseName;
+	}
+
+	@Override
+	protected String getResourceLabel() {
+		return getDatabaseName();
+	}
+
+	@Override
+	protected ResourceManager getResourceManager() {
+		return new DatabaseManager(getClient());
+	}
+
+	@Override
+	protected String getResourceId() {
+		return databaseName;
+	}
+
+	public void addForest(Forest f) {
+		addForest(f.getForestName());
+	}
+
+	public void addForest(String forestName) {
+		if (forest == null) {
+			forest = new ArrayList<>();
+		}
+		forest.add(forestName);
+	}
+
+	public void clear() {
+		new DatabaseManager(getClient()).clearDatabase(databaseName);
+	}
+
+	public void attach(Forest f) {
+		attach(f.getForestName());
+	}
 
 	/**
+	 * TODO In the event this is a new forest with no host set, add a parameter to specify an index of the set of hosts
+	 * returned by /manage/v2/hosts (I think the order is guaranteed).
 	 *
+	 * @param forestName
+	 */
+	public void attach(String forestName) {
+		if (forest == null) {
+			forest = new ArrayList<>();
+		}
+		forest.add(forestName);
+		save();
+	}
+
+	public Forest attachNewForest(String forestName) {
+		Forest f = getApi().forest(forestName);
+		f.save();
+		attach(f);
+		return f;
+	}
+
+	public void detach(Forest f) {
+		detach(f.getForestName());
+	}
+
+	public void detach(String forestName) {
+		if (forest == null || !forest.contains(forestName)) {
+			getLogger().warn(format("Forest %s not in list of known forests for database, so not detaching"));
+		} else {
+			forest.remove(forestName);
+			save();
+		}
+	}
+
+	/**
 	 * @param other
 	 * @return true if the name of the other database equals the name of this database object's schema database,
 	 * triggers database, or security database
 	 */
 	public boolean dependsOnDatabase(Database other) {
-    	String otherName = other.getDatabaseName();
+		String otherName = other.getDatabaseName();
 
-    	if (otherName == null) {
-    		return false;
-	    }
+		if (otherName == null) {
+			return false;
+		}
 
-	    return otherName.equals(schemaDatabase) || otherName.equals(triggersDatabase) || otherName.equals(securityDatabase);
-    }
+		return otherName.equals(schemaDatabase) || otherName.equals(triggersDatabase) || otherName.equals(securityDatabase);
+	}
 
-    public String getDatabaseName() {
-        return databaseName;
-    }
+	public String getDatabaseName() {
+		return databaseName;
+	}
 
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
-    }
+	public void setDatabaseName(String databaseName) {
+		this.databaseName = databaseName;
+	}
 
-    public List<String> getForest() {
-        return forest;
-    }
+	public List<String> getForest() {
+		return forest;
+	}
 
-    public void setForest(List<String> forest) {
-        this.forest = forest;
-    }
+	public void setForest(List<String> forest) {
+		this.forest = forest;
+	}
 
-    public List<ElementIndex> getRangeElementIndex() {
-        return rangeElementIndex;
-    }
+	public List<ElementIndex> getRangeElementIndex() {
+		return rangeElementIndex;
+	}
 
-    public void setRangeElementIndex(List<ElementIndex> elementIndexes) {
-        this.rangeElementIndex = elementIndexes;
-    }
+	public void setRangeElementIndex(List<ElementIndex> elementIndexes) {
+		this.rangeElementIndex = elementIndexes;
+	}
 
-    public String getSecurityDatabase() {
-        return securityDatabase;
-    }
+	public String getSecurityDatabase() {
+		return securityDatabase;
+	}
 
-    public void setSecurityDatabase(String securityDatabase) {
-        this.securityDatabase = securityDatabase;
-    }
+	public void setSecurityDatabase(String securityDatabase) {
+		this.securityDatabase = securityDatabase;
+	}
 
-    public String getSchemaDatabase() {
-        return schemaDatabase;
-    }
+	public String getSchemaDatabase() {
+		return schemaDatabase;
+	}
 
-    public void setSchemaDatabase(String schemaDatabase) {
-        this.schemaDatabase = schemaDatabase;
-    }
+	public void setSchemaDatabase(String schemaDatabase) {
+		this.schemaDatabase = schemaDatabase;
+	}
 
-    public String getTriggersDatabase() {
-        return triggersDatabase;
-    }
+	public String getTriggersDatabase() {
+		return triggersDatabase;
+	}
 
-    public void setTriggersDatabase(String triggersDatabase) {
-        this.triggersDatabase = triggersDatabase;
-    }
+	public void setTriggersDatabase(String triggersDatabase) {
+		this.triggersDatabase = triggersDatabase;
+	}
 
-    public Boolean getEnabled() {
-        return enabled;
-    }
+	public Boolean getEnabled() {
+		return enabled;
+	}
 
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
-    }
+	public void setEnabled(Boolean enabled) {
+		this.enabled = enabled;
+	}
 
-    public Integer getRetiredForestCount() {
-        return retiredForestCount;
-    }
+	public Integer getRetiredForestCount() {
+		return retiredForestCount;
+	}
 
-    public void setRetiredForestCount(Integer retiredForestCount) {
-        this.retiredForestCount = retiredForestCount;
-    }
+	public void setRetiredForestCount(Integer retiredForestCount) {
+		this.retiredForestCount = retiredForestCount;
+	}
 
-    public String getLanguage() {
-        return language;
-    }
+	public String getLanguage() {
+		return language;
+	}
 
-    public void setLanguage(String language) {
-        this.language = language;
-    }
+	public void setLanguage(String language) {
+		this.language = language;
+	}
 
-    public String getStemmedSearches() {
-        return stemmedSearches;
-    }
+	public String getStemmedSearches() {
+		return stemmedSearches;
+	}
 
-    public void setStemmedSearches(String stemmedSearches) {
-        this.stemmedSearches = stemmedSearches;
-    }
+	public void setStemmedSearches(String stemmedSearches) {
+		this.stemmedSearches = stemmedSearches;
+	}
 
-    public Boolean getWordSearches() {
-        return wordSearches;
-    }
+	public Boolean getWordSearches() {
+		return wordSearches;
+	}
 
-    public void setWordSearches(Boolean wordSearches) {
-        this.wordSearches = wordSearches;
-    }
+	public void setWordSearches(Boolean wordSearches) {
+		this.wordSearches = wordSearches;
+	}
 
-    public Boolean getWordPositions() {
-        return wordPositions;
-    }
+	public Boolean getWordPositions() {
+		return wordPositions;
+	}
 
-    public void setWordPositions(Boolean wordPositions) {
-        this.wordPositions = wordPositions;
-    }
+	public void setWordPositions(Boolean wordPositions) {
+		this.wordPositions = wordPositions;
+	}
 
-    public Boolean getFastPhraseSearches() {
-        return fastPhraseSearches;
-    }
+	public Boolean getFastPhraseSearches() {
+		return fastPhraseSearches;
+	}
 
-    public void setFastPhraseSearches(Boolean fastPhraseSearches) {
-        this.fastPhraseSearches = fastPhraseSearches;
-    }
+	public void setFastPhraseSearches(Boolean fastPhraseSearches) {
+		this.fastPhraseSearches = fastPhraseSearches;
+	}
 
-    public Boolean getFastReverseSearches() {
-        return fastReverseSearches;
-    }
+	public Boolean getFastReverseSearches() {
+		return fastReverseSearches;
+	}
 
-    public void setFastReverseSearches(Boolean fastReverseSearches) {
-        this.fastReverseSearches = fastReverseSearches;
-    }
+	public void setFastReverseSearches(Boolean fastReverseSearches) {
+		this.fastReverseSearches = fastReverseSearches;
+	}
 
-    public Boolean getTripleIndex() {
-        return tripleIndex;
-    }
+	public Boolean getTripleIndex() {
+		return tripleIndex;
+	}
 
-    public void setTripleIndex(Boolean tripleIndex) {
-        this.tripleIndex = tripleIndex;
-    }
+	public void setTripleIndex(Boolean tripleIndex) {
+		this.tripleIndex = tripleIndex;
+	}
 
-    public Boolean getTriplePositions() {
-        return triplePositions;
-    }
+	public Boolean getTriplePositions() {
+		return triplePositions;
+	}
 
-    public void setTriplePositions(Boolean triplePositions) {
-        this.triplePositions = triplePositions;
-    }
+	public void setTriplePositions(Boolean triplePositions) {
+		this.triplePositions = triplePositions;
+	}
 
-    public Boolean getFastCaseSensitiveSearches() {
-        return fastCaseSensitiveSearches;
-    }
+	public Boolean getFastCaseSensitiveSearches() {
+		return fastCaseSensitiveSearches;
+	}
 
-    public void setFastCaseSensitiveSearches(Boolean fastCaseSensitiveSearches) {
-        this.fastCaseSensitiveSearches = fastCaseSensitiveSearches;
-    }
+	public void setFastCaseSensitiveSearches(Boolean fastCaseSensitiveSearches) {
+		this.fastCaseSensitiveSearches = fastCaseSensitiveSearches;
+	}
 
-    public Boolean getFastDiacriticSensitiveSearches() {
-        return fastDiacriticSensitiveSearches;
-    }
+	public Boolean getFastDiacriticSensitiveSearches() {
+		return fastDiacriticSensitiveSearches;
+	}
 
-    public void setFastDiacriticSensitiveSearches(Boolean fastDiacriticSensitiveSearches) {
-        this.fastDiacriticSensitiveSearches = fastDiacriticSensitiveSearches;
-    }
+	public void setFastDiacriticSensitiveSearches(Boolean fastDiacriticSensitiveSearches) {
+		this.fastDiacriticSensitiveSearches = fastDiacriticSensitiveSearches;
+	}
 
-    public Boolean getFastElementWordSearches() {
-        return fastElementWordSearches;
-    }
+	public Boolean getFastElementWordSearches() {
+		return fastElementWordSearches;
+	}
 
-    public void setFastElementWordSearches(Boolean fastElementWordSearches) {
-        this.fastElementWordSearches = fastElementWordSearches;
-    }
+	public void setFastElementWordSearches(Boolean fastElementWordSearches) {
+		this.fastElementWordSearches = fastElementWordSearches;
+	}
 
-    public Boolean getElementWordPositions() {
-        return elementWordPositions;
-    }
+	public Boolean getElementWordPositions() {
+		return elementWordPositions;
+	}
 
-    public void setElementWordPositions(Boolean elementWordPositions) {
-        this.elementWordPositions = elementWordPositions;
-    }
+	public void setElementWordPositions(Boolean elementWordPositions) {
+		this.elementWordPositions = elementWordPositions;
+	}
 
-    public Boolean getFastElementPhraseSearches() {
-        return fastElementPhraseSearches;
-    }
+	public Boolean getFastElementPhraseSearches() {
+		return fastElementPhraseSearches;
+	}
 
-    public void setFastElementPhraseSearches(Boolean fastElementPhraseSearches) {
-        this.fastElementPhraseSearches = fastElementPhraseSearches;
-    }
+	public void setFastElementPhraseSearches(Boolean fastElementPhraseSearches) {
+		this.fastElementPhraseSearches = fastElementPhraseSearches;
+	}
 
-    public Boolean getElementValuePositions() {
-        return elementValuePositions;
-    }
+	public Boolean getElementValuePositions() {
+		return elementValuePositions;
+	}
 
-    public void setElementValuePositions(Boolean elementValuePositions) {
-        this.elementValuePositions = elementValuePositions;
-    }
+	public void setElementValuePositions(Boolean elementValuePositions) {
+		this.elementValuePositions = elementValuePositions;
+	}
 
-    public Boolean getAttributeValuePositions() {
-        return attributeValuePositions;
-    }
+	public Boolean getAttributeValuePositions() {
+		return attributeValuePositions;
+	}
 
-    public void setAttributeValuePositions(Boolean attributeValuePositions) {
-        this.attributeValuePositions = attributeValuePositions;
-    }
+	public void setAttributeValuePositions(Boolean attributeValuePositions) {
+		this.attributeValuePositions = attributeValuePositions;
+	}
 
-    public Boolean getFieldValueSearches() {
-        return fieldValueSearches;
-    }
+	public Boolean getFieldValueSearches() {
+		return fieldValueSearches;
+	}
 
-    public void setFieldValueSearches(Boolean fieldValueSearches) {
-        this.fieldValueSearches = fieldValueSearches;
-    }
+	public void setFieldValueSearches(Boolean fieldValueSearches) {
+		this.fieldValueSearches = fieldValueSearches;
+	}
 
-    public Boolean getFieldValuePositions() {
-        return fieldValuePositions;
-    }
+	public Boolean getFieldValuePositions() {
+		return fieldValuePositions;
+	}
 
-    public void setFieldValuePositions(Boolean fieldValuePositions) {
-        this.fieldValuePositions = fieldValuePositions;
-    }
+	public void setFieldValuePositions(Boolean fieldValuePositions) {
+		this.fieldValuePositions = fieldValuePositions;
+	}
 
-    public Boolean getThreeCharacterSearches() {
-        return threeCharacterSearches;
-    }
+	public Boolean getThreeCharacterSearches() {
+		return threeCharacterSearches;
+	}
 
-    public void setThreeCharacterSearches(Boolean threeCharacterSearches) {
-        this.threeCharacterSearches = threeCharacterSearches;
-    }
+	public void setThreeCharacterSearches(Boolean threeCharacterSearches) {
+		this.threeCharacterSearches = threeCharacterSearches;
+	}
 
-    public Boolean getThreeCharacterWordPositions() {
-        return threeCharacterWordPositions;
-    }
+	public Boolean getThreeCharacterWordPositions() {
+		return threeCharacterWordPositions;
+	}
 
-    public void setThreeCharacterWordPositions(Boolean threeCharacterWordPositions) {
-        this.threeCharacterWordPositions = threeCharacterWordPositions;
-    }
+	public void setThreeCharacterWordPositions(Boolean threeCharacterWordPositions) {
+		this.threeCharacterWordPositions = threeCharacterWordPositions;
+	}
 
-    public Boolean getFastElementCharacterSearches() {
-        return fastElementCharacterSearches;
-    }
+	public Boolean getFastElementCharacterSearches() {
+		return fastElementCharacterSearches;
+	}
 
-    public void setFastElementCharacterSearches(Boolean fastElementCharacterSearches) {
-        this.fastElementCharacterSearches = fastElementCharacterSearches;
-    }
+	public void setFastElementCharacterSearches(Boolean fastElementCharacterSearches) {
+		this.fastElementCharacterSearches = fastElementCharacterSearches;
+	}
 
-    public Boolean getTrailingWildcardSearches() {
-        return trailingWildcardSearches;
-    }
+	public Boolean getTrailingWildcardSearches() {
+		return trailingWildcardSearches;
+	}
 
-    public void setTrailingWildcardSearches(Boolean trailingWildcardSearches) {
-        this.trailingWildcardSearches = trailingWildcardSearches;
-    }
+	public void setTrailingWildcardSearches(Boolean trailingWildcardSearches) {
+		this.trailingWildcardSearches = trailingWildcardSearches;
+	}
 
-    public Boolean getTrailingWildcardWordPositions() {
-        return trailingWildcardWordPositions;
-    }
+	public Boolean getTrailingWildcardWordPositions() {
+		return trailingWildcardWordPositions;
+	}
 
-    public void setTrailingWildcardWordPositions(Boolean trailingWildcardWordPositions) {
-        this.trailingWildcardWordPositions = trailingWildcardWordPositions;
-    }
+	public void setTrailingWildcardWordPositions(Boolean trailingWildcardWordPositions) {
+		this.trailingWildcardWordPositions = trailingWildcardWordPositions;
+	}
 
-    public Boolean getFastElementTrailingWildcardSearches() {
-        return fastElementTrailingWildcardSearches;
-    }
+	public Boolean getFastElementTrailingWildcardSearches() {
+		return fastElementTrailingWildcardSearches;
+	}
 
-    public void setFastElementTrailingWildcardSearches(Boolean fastElementTrailingWildcardSearches) {
-        this.fastElementTrailingWildcardSearches = fastElementTrailingWildcardSearches;
-    }
+	public void setFastElementTrailingWildcardSearches(Boolean fastElementTrailingWildcardSearches) {
+		this.fastElementTrailingWildcardSearches = fastElementTrailingWildcardSearches;
+	}
 
-    public Boolean getTwoCharacterSearches() {
-        return twoCharacterSearches;
-    }
+	public Boolean getTwoCharacterSearches() {
+		return twoCharacterSearches;
+	}
 
-    public void setTwoCharacterSearches(Boolean twoCharacterSearches) {
-        this.twoCharacterSearches = twoCharacterSearches;
-    }
+	public void setTwoCharacterSearches(Boolean twoCharacterSearches) {
+		this.twoCharacterSearches = twoCharacterSearches;
+	}
 
-    public Boolean getOneCharacterSearches() {
-        return oneCharacterSearches;
-    }
+	public Boolean getOneCharacterSearches() {
+		return oneCharacterSearches;
+	}
 
-    public void setOneCharacterSearches(Boolean oneCharacterSearches) {
-        this.oneCharacterSearches = oneCharacterSearches;
-    }
+	public void setOneCharacterSearches(Boolean oneCharacterSearches) {
+		this.oneCharacterSearches = oneCharacterSearches;
+	}
 
-    public Boolean getUriLexicon() {
-        return uriLexicon;
-    }
+	public Boolean getUriLexicon() {
+		return uriLexicon;
+	}
 
-    public void setUriLexicon(Boolean uriLexicon) {
-        this.uriLexicon = uriLexicon;
-    }
+	public void setUriLexicon(Boolean uriLexicon) {
+		this.uriLexicon = uriLexicon;
+	}
 
-    public Boolean getCollectionLexicon() {
-        return collectionLexicon;
-    }
+	public Boolean getCollectionLexicon() {
+		return collectionLexicon;
+	}
 
-    public void setCollectionLexicon(Boolean collectionLexicon) {
-        this.collectionLexicon = collectionLexicon;
-    }
+	public void setCollectionLexicon(Boolean collectionLexicon) {
+		this.collectionLexicon = collectionLexicon;
+	}
 
-    public Boolean getReindexerEnable() {
-        return reindexerEnable;
-    }
+	public Boolean getReindexerEnable() {
+		return reindexerEnable;
+	}
 
-    public void setReindexerEnable(Boolean reindexerEnable) {
-        this.reindexerEnable = reindexerEnable;
-    }
+	public void setReindexerEnable(Boolean reindexerEnable) {
+		this.reindexerEnable = reindexerEnable;
+	}
 
-    public Integer getReindexerThrottle() {
-        return reindexerThrottle;
-    }
+	public Integer getReindexerThrottle() {
+		return reindexerThrottle;
+	}
 
-    public void setReindexerThrottle(Integer reindexerThrottle) {
-        this.reindexerThrottle = reindexerThrottle;
-    }
+	public void setReindexerThrottle(Integer reindexerThrottle) {
+		this.reindexerThrottle = reindexerThrottle;
+	}
 
-    public Long getReindexerTimestamp() {
-        return reindexerTimestamp;
-    }
+	public Long getReindexerTimestamp() {
+		return reindexerTimestamp;
+	}
 
-    public void setReindexerTimestamp(Long reindexerTimestamp) {
-        this.reindexerTimestamp = reindexerTimestamp;
-    }
+	public void setReindexerTimestamp(Long reindexerTimestamp) {
+		this.reindexerTimestamp = reindexerTimestamp;
+	}
 
-    public String getDirectoryCreation() {
-        return directoryCreation;
-    }
+	public String getDirectoryCreation() {
+		return directoryCreation;
+	}
 
-    public void setDirectoryCreation(String directoryCreation) {
-        this.directoryCreation = directoryCreation;
-    }
+	public void setDirectoryCreation(String directoryCreation) {
+		this.directoryCreation = directoryCreation;
+	}
 
-    public Boolean getMaintainLastModified() {
-        return maintainLastModified;
-    }
+	public Boolean getMaintainLastModified() {
+		return maintainLastModified;
+	}
 
-    public void setMaintainLastModified(Boolean maintainLastModified) {
-        this.maintainLastModified = maintainLastModified;
-    }
+	public void setMaintainLastModified(Boolean maintainLastModified) {
+		this.maintainLastModified = maintainLastModified;
+	}
 
-    public Boolean getMaintainDirectoryLastModified() {
-        return maintainDirectoryLastModified;
-    }
+	public Boolean getMaintainDirectoryLastModified() {
+		return maintainDirectoryLastModified;
+	}
 
-    public void setMaintainDirectoryLastModified(Boolean maintainDirectoryLastModified) {
-        this.maintainDirectoryLastModified = maintainDirectoryLastModified;
-    }
+	public void setMaintainDirectoryLastModified(Boolean maintainDirectoryLastModified) {
+		this.maintainDirectoryLastModified = maintainDirectoryLastModified;
+	}
 
-    public Boolean getInheritPermissions() {
-        return inheritPermissions;
-    }
+	public Boolean getInheritPermissions() {
+		return inheritPermissions;
+	}
 
-    public void setInheritPermissions(Boolean inheritPermissions) {
-        this.inheritPermissions = inheritPermissions;
-    }
+	public void setInheritPermissions(Boolean inheritPermissions) {
+		this.inheritPermissions = inheritPermissions;
+	}
 
-    public Boolean getInheritCollections() {
-        return inheritCollections;
-    }
+	public Boolean getInheritCollections() {
+		return inheritCollections;
+	}
 
-    public void setInheritCollections(Boolean inheritCollections) {
-        this.inheritCollections = inheritCollections;
-    }
+	public void setInheritCollections(Boolean inheritCollections) {
+		this.inheritCollections = inheritCollections;
+	}
 
-    public Boolean getInheritQuality() {
-        return inheritQuality;
-    }
+	public Boolean getInheritQuality() {
+		return inheritQuality;
+	}
 
-    public void setInheritQuality(Boolean inheritQuality) {
-        this.inheritQuality = inheritQuality;
-    }
+	public void setInheritQuality(Boolean inheritQuality) {
+		this.inheritQuality = inheritQuality;
+	}
 
-    public Long getInMemoryLimit() {
-        return inMemoryLimit;
-    }
+	public Long getInMemoryLimit() {
+		return inMemoryLimit;
+	}
 
-    public void setInMemoryLimit(Long inMemoryLimit) {
-        this.inMemoryLimit = inMemoryLimit;
-    }
+	public void setInMemoryLimit(Long inMemoryLimit) {
+		this.inMemoryLimit = inMemoryLimit;
+	}
 
-    public Long getInMemoryListSize() {
-        return inMemoryListSize;
-    }
+	public Long getInMemoryListSize() {
+		return inMemoryListSize;
+	}
 
-    public void setInMemoryListSize(Long inMemoryListSize) {
-        this.inMemoryListSize = inMemoryListSize;
-    }
+	public void setInMemoryListSize(Long inMemoryListSize) {
+		this.inMemoryListSize = inMemoryListSize;
+	}
 
-    public Long getInMemoryTreeSize() {
-        return inMemoryTreeSize;
-    }
+	public Long getInMemoryTreeSize() {
+		return inMemoryTreeSize;
+	}
 
-    public void setInMemoryTreeSize(Long inMemoryTreeSize) {
-        this.inMemoryTreeSize = inMemoryTreeSize;
-    }
+	public void setInMemoryTreeSize(Long inMemoryTreeSize) {
+		this.inMemoryTreeSize = inMemoryTreeSize;
+	}
 
-    public Long getInMemoryRangeIndexSize() {
-        return inMemoryRangeIndexSize;
-    }
+	public Long getInMemoryRangeIndexSize() {
+		return inMemoryRangeIndexSize;
+	}
 
-    public void setInMemoryRangeIndexSize(Long inMemoryRangeIndexSize) {
-        this.inMemoryRangeIndexSize = inMemoryRangeIndexSize;
-    }
+	public void setInMemoryRangeIndexSize(Long inMemoryRangeIndexSize) {
+		this.inMemoryRangeIndexSize = inMemoryRangeIndexSize;
+	}
 
-    public Long getInMemoryReverseIndexSize() {
-        return inMemoryReverseIndexSize;
-    }
+	public Long getInMemoryReverseIndexSize() {
+		return inMemoryReverseIndexSize;
+	}
 
-    public void setInMemoryReverseIndexSize(Long inMemoryReverseIndexSize) {
-        this.inMemoryReverseIndexSize = inMemoryReverseIndexSize;
-    }
+	public void setInMemoryReverseIndexSize(Long inMemoryReverseIndexSize) {
+		this.inMemoryReverseIndexSize = inMemoryReverseIndexSize;
+	}
 
-    public Long getInMemoryTripleIndexSize() {
-        return inMemoryTripleIndexSize;
-    }
+	public Long getInMemoryTripleIndexSize() {
+		return inMemoryTripleIndexSize;
+	}
 
-    public void setInMemoryTripleIndexSize(Long inMemoryTripleIndexSize) {
-        this.inMemoryTripleIndexSize = inMemoryTripleIndexSize;
-    }
+	public void setInMemoryTripleIndexSize(Long inMemoryTripleIndexSize) {
+		this.inMemoryTripleIndexSize = inMemoryTripleIndexSize;
+	}
 
-    public Long getLargeSizeThreshold() {
-        return largeSizeThreshold;
-    }
+	public Long getLargeSizeThreshold() {
+		return largeSizeThreshold;
+	}
 
-    public void setLargeSizeThreshold(Long largeSizeThreshold) {
-        this.largeSizeThreshold = largeSizeThreshold;
-    }
+	public void setLargeSizeThreshold(Long largeSizeThreshold) {
+		this.largeSizeThreshold = largeSizeThreshold;
+	}
 
-    public String getLocking() {
-        return locking;
-    }
+	public String getLocking() {
+		return locking;
+	}
 
-    public void setLocking(String locking) {
-        this.locking = locking;
-    }
+	public void setLocking(String locking) {
+		this.locking = locking;
+	}
 
-    public String getJournaling() {
-        return journaling;
-    }
+	public String getJournaling() {
+		return journaling;
+	}
 
-    public void setJournaling(String journaling) {
-        this.journaling = journaling;
-    }
+	public void setJournaling(String journaling) {
+		this.journaling = journaling;
+	}
 
-    public Long getJournalSize() {
-        return journalSize;
-    }
+	public Long getJournalSize() {
+		return journalSize;
+	}
 
-    public void setJournalSize(Long journalSize) {
-        this.journalSize = journalSize;
-    }
+	public void setJournalSize(Long journalSize) {
+		this.journalSize = journalSize;
+	}
 
-    public Integer getJournalCount() {
-        return journalCount;
-    }
+	public Integer getJournalCount() {
+		return journalCount;
+	}
 
-    public void setJournalCount(Integer journalCount) {
-        this.journalCount = journalCount;
-    }
+	public void setJournalCount(Integer journalCount) {
+		this.journalCount = journalCount;
+	}
 
-    public Boolean getPreallocateJournals() {
-        return preallocateJournals;
-    }
+	public Boolean getPreallocateJournals() {
+		return preallocateJournals;
+	}
 
-    public void setPreallocateJournals(Boolean preallocateJournals) {
-        this.preallocateJournals = preallocateJournals;
-    }
+	public void setPreallocateJournals(Boolean preallocateJournals) {
+		this.preallocateJournals = preallocateJournals;
+	}
 
-    public Boolean getPreloadMappedData() {
-        return preloadMappedData;
-    }
+	public Boolean getPreloadMappedData() {
+		return preloadMappedData;
+	}
 
-    public void setPreloadMappedData(Boolean preloadMappedData) {
-        this.preloadMappedData = preloadMappedData;
-    }
+	public void setPreloadMappedData(Boolean preloadMappedData) {
+		this.preloadMappedData = preloadMappedData;
+	}
 
-    public Boolean getPreloadReplicaMappedData() {
-        return preloadReplicaMappedData;
-    }
+	public Boolean getPreloadReplicaMappedData() {
+		return preloadReplicaMappedData;
+	}
 
-    public void setPreloadReplicaMappedData(Boolean preloadReplicaMappedData) {
-        this.preloadReplicaMappedData = preloadReplicaMappedData;
-    }
+	public void setPreloadReplicaMappedData(Boolean preloadReplicaMappedData) {
+		this.preloadReplicaMappedData = preloadReplicaMappedData;
+	}
 
-    public String getRangeIndexOptimize() {
-        return rangeIndexOptimize;
-    }
+	public String getRangeIndexOptimize() {
+		return rangeIndexOptimize;
+	}
 
-    public void setRangeIndexOptimize(String rangeIndexOptimize) {
-        this.rangeIndexOptimize = rangeIndexOptimize;
-    }
+	public void setRangeIndexOptimize(String rangeIndexOptimize) {
+		this.rangeIndexOptimize = rangeIndexOptimize;
+	}
 
-    public Long getPositionsListMaxSize() {
-        return positionsListMaxSize;
-    }
+	public Long getPositionsListMaxSize() {
+		return positionsListMaxSize;
+	}
 
-    public void setPositionsListMaxSize(Long positionsListMaxSize) {
-        this.positionsListMaxSize = positionsListMaxSize;
-    }
+	public void setPositionsListMaxSize(Long positionsListMaxSize) {
+		this.positionsListMaxSize = positionsListMaxSize;
+	}
 
-    public String getFormatCompatibility() {
-        return formatCompatibility;
-    }
+	public String getFormatCompatibility() {
+		return formatCompatibility;
+	}
 
-    public void setFormatCompatibility(String formatCompatibility) {
-        this.formatCompatibility = formatCompatibility;
-    }
+	public void setFormatCompatibility(String formatCompatibility) {
+		this.formatCompatibility = formatCompatibility;
+	}
 
-    public String getIndexDetection() {
-        return indexDetection;
-    }
+	public String getIndexDetection() {
+		return indexDetection;
+	}
 
-    public void setIndexDetection(String indexDetection) {
-        this.indexDetection = indexDetection;
-    }
+	public void setIndexDetection(String indexDetection) {
+		this.indexDetection = indexDetection;
+	}
 
-    public String getExpungeLocks() {
-        return expungeLocks;
-    }
+	public String getExpungeLocks() {
+		return expungeLocks;
+	}
 
-    public void setExpungeLocks(String expungeLocks) {
-        this.expungeLocks = expungeLocks;
-    }
+	public void setExpungeLocks(String expungeLocks) {
+		this.expungeLocks = expungeLocks;
+	}
 
-    public String getTfNormalization() {
-        return tfNormalization;
-    }
+	public String getTfNormalization() {
+		return tfNormalization;
+	}
 
-    public void setTfNormalization(String tfNormalization) {
-        this.tfNormalization = tfNormalization;
-    }
+	public void setTfNormalization(String tfNormalization) {
+		this.tfNormalization = tfNormalization;
+	}
 
-    public String getMergePriority() {
-        return mergePriority;
-    }
+	public String getMergePriority() {
+		return mergePriority;
+	}
 
-    public void setMergePriority(String mergePriority) {
-        this.mergePriority = mergePriority;
-    }
+	public void setMergePriority(String mergePriority) {
+		this.mergePriority = mergePriority;
+	}
 
-    public Long getMergeMaxSize() {
-        return mergeMaxSize;
-    }
+	public Long getMergeMaxSize() {
+		return mergeMaxSize;
+	}
 
-    public void setMergeMaxSize(Long mergeMaxSize) {
-        this.mergeMaxSize = mergeMaxSize;
-    }
+	public void setMergeMaxSize(Long mergeMaxSize) {
+		this.mergeMaxSize = mergeMaxSize;
+	}
 
-    public Long getMergeMinSize() {
-        return mergeMinSize;
-    }
+	public Long getMergeMinSize() {
+		return mergeMinSize;
+	}
 
-    public void setMergeMinSize(Long mergeMinSize) {
-        this.mergeMinSize = mergeMinSize;
-    }
+	public void setMergeMinSize(Long mergeMinSize) {
+		this.mergeMinSize = mergeMinSize;
+	}
 
-    public Integer getMergeMinRatio() {
-        return mergeMinRatio;
-    }
+	public Integer getMergeMinRatio() {
+		return mergeMinRatio;
+	}
 
-    public void setMergeMinRatio(Integer mergeMinRatio) {
-        this.mergeMinRatio = mergeMinRatio;
-    }
+	public void setMergeMinRatio(Integer mergeMinRatio) {
+		this.mergeMinRatio = mergeMinRatio;
+	}
 
-    public Long getMergeTimestamp() {
-        return mergeTimestamp;
-    }
+	public Long getMergeTimestamp() {
+		return mergeTimestamp;
+	}
 
-    public void setMergeTimestamp(Long mergeTimestamp) {
-        this.mergeTimestamp = mergeTimestamp;
-    }
+	public void setMergeTimestamp(Long mergeTimestamp) {
+		this.mergeTimestamp = mergeTimestamp;
+	}
 
-    public Boolean getRetainUntilBackup() {
-        return retainUntilBackup;
-    }
+	public Boolean getRetainUntilBackup() {
+		return retainUntilBackup;
+	}
 
-    public void setRetainUntilBackup(Boolean retainUntilBackup) {
-        this.retainUntilBackup = retainUntilBackup;
-    }
+	public void setRetainUntilBackup(Boolean retainUntilBackup) {
+		this.retainUntilBackup = retainUntilBackup;
+	}
 
-    public List<Element> getElementWordQueryThrough() {
-        return elementWordQueryThrough;
-    }
+	public List<Element> getElementWordQueryThrough() {
+		return elementWordQueryThrough;
+	}
 
-    public void setElementWordQueryThrough(List<Element> elementWordQueryThrough) {
-        this.elementWordQueryThrough = elementWordQueryThrough;
-    }
+	public void setElementWordQueryThrough(List<Element> elementWordQueryThrough) {
+		this.elementWordQueryThrough = elementWordQueryThrough;
+	}
 
-    public List<Element> getPhraseThrough() {
-        return phraseThrough;
-    }
+	public List<Element> getPhraseThrough() {
+		return phraseThrough;
+	}
 
-    public void setPhraseThrough(List<Element> phraseThrough) {
-        this.phraseThrough = phraseThrough;
-    }
+	public void setPhraseThrough(List<Element> phraseThrough) {
+		this.phraseThrough = phraseThrough;
+	}
 
-    public List<Element> getPhraseAround() {
-        return phraseAround;
-    }
+	public List<Element> getPhraseAround() {
+		return phraseAround;
+	}
 
-    public void setPhraseAround(List<Element> phraseAround) {
-        this.phraseAround = phraseAround;
-    }
+	public void setPhraseAround(List<Element> phraseAround) {
+		this.phraseAround = phraseAround;
+	}
 
-    public List<Field> getField() {
-        return field;
-    }
+	public List<Field> getField() {
+		return field;
+	}
 
-    public void setField(List<Field> field) {
-        this.field = field;
-    }
+	public void setField(List<Field> field) {
+		this.field = field;
+	}
 
-    public Boolean getRebalancerEnable() {
-        return rebalancerEnable;
-    }
+	public Boolean getRebalancerEnable() {
+		return rebalancerEnable;
+	}
 
-    public void setRebalancerEnable(Boolean rebalancerEnable) {
-        this.rebalancerEnable = rebalancerEnable;
-    }
+	public void setRebalancerEnable(Boolean rebalancerEnable) {
+		this.rebalancerEnable = rebalancerEnable;
+	}
 
-    public Integer getRebalancerThrottle() {
-        return rebalancerThrottle;
-    }
+	public Integer getRebalancerThrottle() {
+		return rebalancerThrottle;
+	}
 
-    public void setRebalancerThrottle(Integer rebalancerThrottle) {
-        this.rebalancerThrottle = rebalancerThrottle;
-    }
+	public void setRebalancerThrottle(Integer rebalancerThrottle) {
+		this.rebalancerThrottle = rebalancerThrottle;
+	}
 
-    public AssignmentPolicy getAssignmentPolicy() {
-        return assignmentPolicy;
-    }
+	public AssignmentPolicy getAssignmentPolicy() {
+		return assignmentPolicy;
+	}
 
-    public void setAssignmentPolicy(AssignmentPolicy assignmentPolicy) {
-        this.assignmentPolicy = assignmentPolicy;
-    }
+	public void setAssignmentPolicy(AssignmentPolicy assignmentPolicy) {
+		this.assignmentPolicy = assignmentPolicy;
+	}
 }

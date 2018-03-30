@@ -33,7 +33,7 @@ public class DeployDatabaseCommandComparator extends LoggingObject implements Co
 			return 0;
 		}
 
-		Database db1 = null, db2 = null;
+		Database db1, db2;
 		try {
 			db1 = resourceMapper.readResource(p1, Database.class);
 			db2 = resourceMapper.readResource(p2, Database.class);

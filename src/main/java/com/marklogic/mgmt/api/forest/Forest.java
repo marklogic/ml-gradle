@@ -52,7 +52,7 @@ public class Forest extends Resource {
 	@XmlElementWrapper(name = "forest-backups")
 	private List<ForestBackup> forestBackup;
 
-	@XmlElementWrapper(name = "database-replication")
+	@XmlElement(name = "database-replication")
 	private DatabaseReplication databaseReplication;
 
 	@XmlElementWrapper(name = "forest-replicas")

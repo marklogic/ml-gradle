@@ -1,187 +1,232 @@
 package com.marklogic.mgmt.api.database;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.ArrayList;
 import java.util.List;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Field {
 
-    private String fieldName;
-    private List<FieldPath> fieldPath;
-    private Boolean includeRoot;
-    private List<String> wordLexicon;
-    private List<IncludedElement> includedElement;
-    private List<ExcludedElement> excludedElement;
+	@XmlElement(name = "field-name")
+	private String fieldName;
 
-    private Boolean stemmedSearches;
-    private Boolean wordSearches;
-    private Boolean fieldValueSearches;
-    private Boolean fieldValuePositions;
-    private Boolean fastPhraseSearches;
-    private Boolean fastCaseSensitiveSearches;
-    private Boolean fastDiacriticSensitiveSearches;
-    private Boolean trailingWildcardSearches;
-    private Boolean trailingWildcardWordPositions;
-    private Boolean threeCharacterSearches;
-    private Boolean threeCharacterWordPositions;
-    private Boolean twoCharacterSearches;
-    private Boolean oneCharacterSearches;
+	@XmlElementWrapper(name = "field-paths")
+	@XmlElement(name = "field-path")
+	private List<FieldPath> fieldPath;
 
-    public void addFieldPath(FieldPath path) {
-        if (fieldPath == null) {
-            fieldPath = new ArrayList<>();
-        }
-        fieldPath.add(path);
-    }
-    
-    public String getFieldName() {
-        return fieldName;
-    }
+	@XmlElement(name = "include-root")
+	private Boolean includeRoot;
 
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
-    }
+	@XmlElementWrapper(name = "word-lexicons")
+	@XmlElement(name = "word-lexicon")
+	private List<String> wordLexicon;
 
-    public Boolean getIncludeRoot() {
-        return includeRoot;
-    }
+	@XmlElementWrapper(name = "included-elements")
+	@XmlElement(name = "included-element")
+	private List<IncludedElement> includedElement;
 
-    public void setIncludeRoot(Boolean includeRoot) {
-        this.includeRoot = includeRoot;
-    }
+	@XmlElementWrapper(name = "excluded-elements")
+	@XmlElement(name = "excluded-element")
+	private List<ExcludedElement> excludedElement;
 
-    public List<ExcludedElement> getExcludedElement() {
-        return excludedElement;
-    }
+	@XmlElement(name = "stemmed-searches")
+	private Boolean stemmedSearches;
 
-    public void setExcludedElement(List<ExcludedElement> excludedElement) {
-        this.excludedElement = excludedElement;
-    }
+	@XmlElement(name = "word-searches")
+	private Boolean wordSearches;
 
-    public List<FieldPath> getFieldPath() {
-        return fieldPath;
-    }
+	@XmlElement(name = "field-value-searches")
+	private Boolean fieldValueSearches;
 
-    public void setFieldPath(List<FieldPath> fieldPath) {
-        this.fieldPath = fieldPath;
-    }
+	@XmlElement(name = "field-value-positions")
+	private Boolean fieldValuePositions;
 
-    public List<String> getWordLexicon() {
-        return wordLexicon;
-    }
+	@XmlElement(name = "fast-phrase-searches")
+	private Boolean fastPhraseSearches;
 
-    public void setWordLexicon(List<String> wordLexicon) {
-        this.wordLexicon = wordLexicon;
-    }
+	@XmlElement(name = "fast-case-sensitive-searches")
+	private Boolean fastCaseSensitiveSearches;
 
-    public List<IncludedElement> getIncludedElement() {
-        return includedElement;
-    }
+	@XmlElement(name = "fast-diacritic-sensitive-searches")
+	private Boolean fastDiacriticSensitiveSearches;
 
-    public void setIncludedElement(List<IncludedElement> includedElement) {
-        this.includedElement = includedElement;
-    }
+	@XmlElement(name = "trailing-wildcard-searches")
+	private Boolean trailingWildcardSearches;
 
-    public Boolean getStemmedSearches() {
-        return stemmedSearches;
-    }
+	@XmlElement(name = "trailing-wildcard-word-positions")
+	private Boolean trailingWildcardWordPositions;
 
-    public void setStemmedSearches(Boolean stemmedSearches) {
-        this.stemmedSearches = stemmedSearches;
-    }
+	@XmlElement(name = "three-character-searches")
+	private Boolean threeCharacterSearches;
 
-    public Boolean getWordSearches() {
-        return wordSearches;
-    }
+	@XmlElement(name = "three-character-word-positions")
+	private Boolean threeCharacterWordPositions;
 
-    public void setWordSearches(Boolean wordSearches) {
-        this.wordSearches = wordSearches;
-    }
+	@XmlElement(name = "two-character-searches")
+	private Boolean twoCharacterSearches;
 
-    public Boolean getFieldValueSearches() {
-        return fieldValueSearches;
-    }
+	@XmlElement(name = "one-character-searches")
+	private Boolean oneCharacterSearches;
 
-    public void setFieldValueSearches(Boolean fieldValueSearches) {
-        this.fieldValueSearches = fieldValueSearches;
-    }
+	public void addFieldPath(FieldPath path) {
+		if (fieldPath == null) {
+			fieldPath = new ArrayList<>();
+		}
+		fieldPath.add(path);
+	}
 
-    public Boolean getFieldValuePositions() {
-        return fieldValuePositions;
-    }
+	public String getFieldName() {
+		return fieldName;
+	}
 
-    public void setFieldValuePositions(Boolean fieldValuePositions) {
-        this.fieldValuePositions = fieldValuePositions;
-    }
+	public void setFieldName(String fieldName) {
+		this.fieldName = fieldName;
+	}
 
-    public Boolean getFastPhraseSearches() {
-        return fastPhraseSearches;
-    }
+	public Boolean getIncludeRoot() {
+		return includeRoot;
+	}
 
-    public void setFastPhraseSearches(Boolean fastPhraseSearches) {
-        this.fastPhraseSearches = fastPhraseSearches;
-    }
+	public void setIncludeRoot(Boolean includeRoot) {
+		this.includeRoot = includeRoot;
+	}
 
-    public Boolean getFastCaseSensitiveSearches() {
-        return fastCaseSensitiveSearches;
-    }
+	public List<ExcludedElement> getExcludedElement() {
+		return excludedElement;
+	}
 
-    public void setFastCaseSensitiveSearches(Boolean fastCaseSensitiveSearches) {
-        this.fastCaseSensitiveSearches = fastCaseSensitiveSearches;
-    }
+	public void setExcludedElement(List<ExcludedElement> excludedElement) {
+		this.excludedElement = excludedElement;
+	}
 
-    public Boolean getFastDiacriticSensitiveSearches() {
-        return fastDiacriticSensitiveSearches;
-    }
+	public List<FieldPath> getFieldPath() {
+		return fieldPath;
+	}
 
-    public void setFastDiacriticSensitiveSearches(Boolean fastDiacriticSensitiveSearches) {
-        this.fastDiacriticSensitiveSearches = fastDiacriticSensitiveSearches;
-    }
+	public void setFieldPath(List<FieldPath> fieldPath) {
+		this.fieldPath = fieldPath;
+	}
 
-    public Boolean getTrailingWildcardSearches() {
-        return trailingWildcardSearches;
-    }
+	public List<String> getWordLexicon() {
+		return wordLexicon;
+	}
 
-    public void setTrailingWildcardSearches(Boolean trailingWildcardSearches) {
-        this.trailingWildcardSearches = trailingWildcardSearches;
-    }
+	public void setWordLexicon(List<String> wordLexicon) {
+		this.wordLexicon = wordLexicon;
+	}
 
-    public Boolean getTrailingWildcardWordPositions() {
-        return trailingWildcardWordPositions;
-    }
+	public List<IncludedElement> getIncludedElement() {
+		return includedElement;
+	}
 
-    public void setTrailingWildcardWordPositions(Boolean trailingWildcardWordPositions) {
-        this.trailingWildcardWordPositions = trailingWildcardWordPositions;
-    }
+	public void setIncludedElement(List<IncludedElement> includedElement) {
+		this.includedElement = includedElement;
+	}
 
-    public Boolean getThreeCharacterSearches() {
-        return threeCharacterSearches;
-    }
+	public Boolean getStemmedSearches() {
+		return stemmedSearches;
+	}
 
-    public void setThreeCharacterSearches(Boolean threeCharacterSearches) {
-        this.threeCharacterSearches = threeCharacterSearches;
-    }
+	public void setStemmedSearches(Boolean stemmedSearches) {
+		this.stemmedSearches = stemmedSearches;
+	}
 
-    public Boolean getThreeCharacterWordPositions() {
-        return threeCharacterWordPositions;
-    }
+	public Boolean getWordSearches() {
+		return wordSearches;
+	}
 
-    public void setThreeCharacterWordPositions(Boolean threeCharacterWordPositions) {
-        this.threeCharacterWordPositions = threeCharacterWordPositions;
-    }
+	public void setWordSearches(Boolean wordSearches) {
+		this.wordSearches = wordSearches;
+	}
 
-    public Boolean getTwoCharacterSearches() {
-        return twoCharacterSearches;
-    }
+	public Boolean getFieldValueSearches() {
+		return fieldValueSearches;
+	}
 
-    public void setTwoCharacterSearches(Boolean twoCharacterSearches) {
-        this.twoCharacterSearches = twoCharacterSearches;
-    }
+	public void setFieldValueSearches(Boolean fieldValueSearches) {
+		this.fieldValueSearches = fieldValueSearches;
+	}
 
-    public Boolean getOneCharacterSearches() {
-        return oneCharacterSearches;
-    }
+	public Boolean getFieldValuePositions() {
+		return fieldValuePositions;
+	}
 
-    public void setOneCharacterSearches(Boolean oneCharacterSearches) {
-        this.oneCharacterSearches = oneCharacterSearches;
-    }
+	public void setFieldValuePositions(Boolean fieldValuePositions) {
+		this.fieldValuePositions = fieldValuePositions;
+	}
+
+	public Boolean getFastPhraseSearches() {
+		return fastPhraseSearches;
+	}
+
+	public void setFastPhraseSearches(Boolean fastPhraseSearches) {
+		this.fastPhraseSearches = fastPhraseSearches;
+	}
+
+	public Boolean getFastCaseSensitiveSearches() {
+		return fastCaseSensitiveSearches;
+	}
+
+	public void setFastCaseSensitiveSearches(Boolean fastCaseSensitiveSearches) {
+		this.fastCaseSensitiveSearches = fastCaseSensitiveSearches;
+	}
+
+	public Boolean getFastDiacriticSensitiveSearches() {
+		return fastDiacriticSensitiveSearches;
+	}
+
+	public void setFastDiacriticSensitiveSearches(Boolean fastDiacriticSensitiveSearches) {
+		this.fastDiacriticSensitiveSearches = fastDiacriticSensitiveSearches;
+	}
+
+	public Boolean getTrailingWildcardSearches() {
+		return trailingWildcardSearches;
+	}
+
+	public void setTrailingWildcardSearches(Boolean trailingWildcardSearches) {
+		this.trailingWildcardSearches = trailingWildcardSearches;
+	}
+
+	public Boolean getTrailingWildcardWordPositions() {
+		return trailingWildcardWordPositions;
+	}
+
+	public void setTrailingWildcardWordPositions(Boolean trailingWildcardWordPositions) {
+		this.trailingWildcardWordPositions = trailingWildcardWordPositions;
+	}
+
+	public Boolean getThreeCharacterSearches() {
+		return threeCharacterSearches;
+	}
+
+	public void setThreeCharacterSearches(Boolean threeCharacterSearches) {
+		this.threeCharacterSearches = threeCharacterSearches;
+	}
+
+	public Boolean getThreeCharacterWordPositions() {
+		return threeCharacterWordPositions;
+	}
+
+	public void setThreeCharacterWordPositions(Boolean threeCharacterWordPositions) {
+		this.threeCharacterWordPositions = threeCharacterWordPositions;
+	}
+
+	public Boolean getTwoCharacterSearches() {
+		return twoCharacterSearches;
+	}
+
+	public void setTwoCharacterSearches(Boolean twoCharacterSearches) {
+		this.twoCharacterSearches = twoCharacterSearches;
+	}
+
+	public Boolean getOneCharacterSearches() {
+		return oneCharacterSearches;
+	}
+
+	public void setOneCharacterSearches(Boolean oneCharacterSearches) {
+		this.oneCharacterSearches = oneCharacterSearches;
+	}
 }

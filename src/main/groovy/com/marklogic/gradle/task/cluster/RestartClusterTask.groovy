@@ -2,7 +2,7 @@ package com.marklogic.gradle.task.cluster
 
 import com.marklogic.gradle.task.MarkLogicTask
 import com.marklogic.mgmt.ManageClient
-import com.marklogic.mgmt.admin.ActionRequiringRestart
+import com.marklogic.mgmt.resource.clusters.ClusterManager
 import org.gradle.api.tasks.TaskAction
 
 class RestartClusterTask extends MarkLogicTask {
@@ -10,11 +10,7 @@ class RestartClusterTask extends MarkLogicTask {
 	@TaskAction
 	void restartCluster() {
 		final ManageClient client = getManageClient();
-		getAdminManager().invokeActionRequiringRestart(new ActionRequiringRestart() {
-			public boolean execute() {
-				client.postForm("/manage/v2", "state", "restart")
-				return true;
-			}
-		});
+		println "Restarting local cluster"
+		new ClusterManager(client).restartLocalCluster(getAdminManager())
 	}
 }

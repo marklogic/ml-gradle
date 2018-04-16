@@ -30,6 +30,7 @@ import com.marklogic.gradle.task.groups.DeployGroupsTask
 import com.marklogic.gradle.task.groups.SetTraceEventsTask
 import com.marklogic.gradle.task.hosts.AssignHostsToGroupsTask
 import com.marklogic.gradle.task.mimetypes.DeployMimetypesTask
+import com.marklogic.gradle.task.mimetypes.UndeployMimetypesTask
 import com.marklogic.gradle.task.qconsole.ExportWorkspacesTask
 import com.marklogic.gradle.task.qconsole.ImportWorkspacesTask
 import com.marklogic.gradle.task.roxy.RoxyMigrateBuildStepsTask
@@ -193,6 +194,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 
 		String mimetypesGroup = "ml-gradle Mimetypes"
 		project.task("mlDeployMimetypes", type: DeployMimetypesTask, group: mimetypesGroup, description: "Deploy each mimetype, updating it if it exists, in the configuration directory")
+		project.task("mlUndeployMimetypes", type: UndeployMimetypesTask, group: mimetypesGroup, description: "Undeploy each mimetype defined in the configuration directory")
 
 		String modulesGroup = "ml-gradle Modules"
 		project.task("mlLoadModules", type: LoadModulesTask, group: modulesGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Loads modules from directories defined by mlAppConfig or via a property on this task").mustRunAfter(["mlClearModulesDatabase"])

@@ -1,19 +1,18 @@
 package com.marklogic.gradle.task
 
-import com.marklogic.client.ext.modulesloader.impl.PropertiesModuleManager
-import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 
-class DeleteModuleTimestampsFileTask extends DefaultTask {
-
-    String filePath = PropertiesModuleManager.DEFAULT_FILE_PATH
+class DeleteModuleTimestampsFileTask extends MarkLogicTask {
 
     @TaskAction
     void deleteFile() {
+	    String filePath = getAppConfig().getModuleTimestampsPath()
         File f = new File(filePath)
         if (f.exists()) {
             println "Deleting " + f.getAbsolutePath() + "\n"
             f.delete()
+        } else {
+	        println "Module timestamps file " + filePath + " does not exist, so not deleting"
         }
     }
 }

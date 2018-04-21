@@ -104,7 +104,7 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
      */
     protected String copyFileToString(File f) {
         try {
-            return new String(FileCopyUtils.copyToByteArray(f));
+            return new String(FileCopyUtils.copyToByteArray(f.getAbsoluteFile()));
         } catch (IOException ie) {
             throw new RuntimeException(
                     "Unable to copy file to string from path: " + f.getAbsolutePath() + "; cause: " + ie.getMessage(),

@@ -25,7 +25,22 @@ class UnitTestTask extends MarkLogicTask {
 		def client = appConfig.getTestRestPort() != null ? appConfig.newTestDatabaseClient() : appConfig.newDatabaseClient()
 		try {
 			def testManager = new TestManager(client)
-			def suites = testManager.runAllSuites()
+
+			boolean runTeardown = true
+			boolean runSuiteTeardown = true
+			if (project.hasProperty("runTeardown")) {
+				runTeardown = Boolean.parseBoolean(project.property("runTeardown"))
+			}
+			if (project.hasProperty("runSuiteTeardown")) {
+				runSuiteTeardown = Boolean.parseBoolean(project.property("runSuiteTeardown"))
+			}
+
+			println "Run teardown scripts: " + runTeardown
+			println "Run suite teardown scripts: " + runSuiteTeardown
+			println "Running all suites..."
+			long start = System.currentTimeMillis()
+			def suites = testManager.runAllSuites(runTeardown, runSuiteTeardown)
+			println "Done running all suites; time: " + (System.currentTimeMillis() - start) + "ms"
 			def report = new DefaultJUnitTestReporter().reportOnJUnitTestSuites(suites)
 			println report
 

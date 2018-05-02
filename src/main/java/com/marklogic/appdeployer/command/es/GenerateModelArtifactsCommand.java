@@ -281,11 +281,11 @@ public class GenerateModelArtifactsCommand extends AbstractCommand {
 	 */
 	protected boolean fileHasDifferentContent(File existingFile, String content) {
 		try {
-			String fileContent = new String(FileCopyUtils.copyToByteArray(existingFile));
+			String fileContent = copyFileToString(existingFile);
 			fileContent = removeGeneratedAtTimestamp(fileContent);
 			content = removeGeneratedAtTimestamp(content);
 			return !fileContent.equals(content);
-		} catch (IOException e) {
+		} catch (RuntimeException e) {
 			// Shouldn't occur, but if it does, treat it as the file having different content
 			return true;
 		}

@@ -30,7 +30,7 @@ dependencies {
 	compile mlDataMovementDependency
   compile group: 'commons-io', name: 'commons-io', version: '2.5'
 
-	compileOnly "com.marklogic:ml-unit-test-client:0.9.1"
+	compileOnly mlUnitTestDependency
 
 	testCompile localGroovy()
 	testCompile gradleTestKit()

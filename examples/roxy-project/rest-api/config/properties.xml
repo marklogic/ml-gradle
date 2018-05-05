@@ -1,0 +1,3 @@
+<properties xmlns="http://marklogic.com/rest-api">
+	<debug>false</debug>
+</properties>

@@ -1,58 +1,27 @@
 /*
  * This buildscript shows how mlcp dependencies can be easily declared and then uses in a Gradle configuration named
  * "mlcp". This configuration is then used as the classpath for MlcpTask, which is a simple extension of Gradle's
- * JavaExec task that exposes a number of mlcp arguments as task attributes.
+ * JavaExec task that exposes mlcp arguments as task attributes.
  */
 
-buildscript {
-	repositories {
-		jcenter()
-		mavenLocal()
-	}
-	dependencies {
-		classpath "com.marklogic:ml-gradle:3.0.0"
-	}
+plugins {
+	id "com.marklogic.ml-gradle" version "3.6.0"
 }
-
-apply plugin: "com.marklogic.ml-gradle"
 
 repositories {
 	jcenter()
 
-	// Needed for mlcp dependencies
+	// Needed for some mlcp dependencies, such as commons-csv:1.5.1-marklogic
 	maven { url "https://developer.marklogic.com/maven2/" }
-
-	// Needed for hadoop dependencies for mlcp
-	maven { url "http://repository.cloudera.com/artifactory/cloudera-repos/" }
 }
 
 
 configurations {
-	// This configuration captures the dependencies for running mlcp (Content Pump). This is only needed if you want
-	// to run mlcp via Gradle tasks. If you do, using com.marklogic.gradle.task.MlcpTask is a useful starting point, as
-	// shown below.  Need to force to use certain version of xml-apis library.
-	mlcp {
-      resolutionStrategy {
-        force "xml-apis:xml-apis:1.4.01"
-      }
-    }
+	mlcp
 }
 
-/**
- * ML 8.0-5 and 7.0-6 introduced a single mlcp dependency - see http://developer.marklogic.com/maven2/com/marklogic/mlcp/.
- * The 8.0-5 mlcp may very well work on ML versions prior to 8.0-5. If it doesn't, try the mlcp-Hadoop2
- * and marklogic-mapreduce2 dependencies that are commented out by default instead of the mlcp dependency.
- *
- * Note that at least with version 8.0-5 of mlcp, mlcp will complain on Windows that it cannot find
- * bin/winutils.exe. This does not appear to have any impact on mlcp behavior though.
- */
 dependencies {
-	mlcp "com.marklogic:mlcp:8.0.6.3"
-
-	/**
-	 * If you need to import delimited text, be sure to include this dependency as well.
-	 */
-	mlcp "org.apache.commons:commons-csv:1.2"
+	mlcp "com.marklogic:mlcp:9.0.4"
 
 	/**
 	 * mlcp uses Log4j for logging, and if Log4j can't find a configuration file, it will complain and you'll
@@ -77,7 +46,7 @@ task importSampleData(type: com.marklogic.gradle.task.MlcpTask) {
 	 * New in ml-gradle 2.6.0 - set this to define a URI in your content database for mlcp's log output to be written to
 	 * as a text document. This can also be a variable, Gradle property, etc.
 	 */
-	logOutputUri = "/slappy.txt"
+	logOutputUri = "/mlcp-log.txt"
 
 	/**
 	 * The args array can be used for any MLCP parameters that are not supported by the MlcpBean class that MlcpTask
@@ -104,7 +73,7 @@ task importRdf(type: com.marklogic.gradle.task.MlcpTask) {
 
 /**
  * Example of importing semicolon-delimited text, in reference to:
- * https://github.com/rjrudin/ml-gradle/issues/90
+ * https://github.com/marklogic-community/ml-gradle/issues/90
  */
 task importSemicolonDelimitedText(type: com.marklogic.gradle.task.MlcpTask) {
 	classpath = configurations.mlcp

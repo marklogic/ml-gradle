@@ -30,6 +30,7 @@ import com.marklogic.gradle.task.groups.DeployGroupsTask
 import com.marklogic.gradle.task.groups.SetTraceEventsTask
 import com.marklogic.gradle.task.hosts.AssignHostsToGroupsTask
 import com.marklogic.gradle.task.mimetypes.DeployMimetypesTask
+import com.marklogic.gradle.task.mimetypes.UndeployMimetypesTask
 import com.marklogic.gradle.task.qconsole.ExportWorkspacesTask
 import com.marklogic.gradle.task.qconsole.ImportWorkspacesTask
 import com.marklogic.gradle.task.roxy.RoxyMigrateBuildStepsTask
@@ -193,6 +194,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 
 		String mimetypesGroup = "ml-gradle Mimetypes"
 		project.task("mlDeployMimetypes", type: DeployMimetypesTask, group: mimetypesGroup, description: "Deploy each mimetype, updating it if it exists, in the configuration directory")
+		project.task("mlUndeployMimetypes", type: UndeployMimetypesTask, group: mimetypesGroup, description: "Undeploy each mimetype defined in the configuration directory")
 
 		String modulesGroup = "ml-gradle Modules"
 		project.task("mlLoadModules", type: LoadModulesTask, group: modulesGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Loads modules from directories defined by mlAppConfig or via a property on this task").mustRunAfter(["mlClearModulesDatabase"])
@@ -274,7 +276,8 @@ class MarkLogicPlugin implements Plugin<Project> {
 				"Can use -PsuiteName to override the name of the test suite, and -PtestName to override the name of the test module.")
 		project.task("mlUnitTest", type: UnitTestTask, group: unitTestGroup, description: "Run tests found under /test/suites in the modules database. " +
 			"Connects to MarkLogic via the REST API server defined by mlTestRestPort (or by mlRestPort if mlTestRestPort is not set), and uses mlRest* properties for authentication. " +
-			"Use -PunitTestResultPath to override where test result files are written, which defaults to build/test-results/marklogic-unit-test.")
+			"Use -PunitTestResultPath to override where test result files are written, which defaults to build/test-results/marklogic-unit-test. " +
+			"Use -PrunTeardown and -PrunSuiteTeardown to control whether teardown and suite teardown scripts are run; these default to 'true' and can be set to 'false' instead. ")
 
 		logger.info("Finished initializing ml-gradle\n")
 	}

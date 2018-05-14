@@ -7,6 +7,30 @@
 	<artifactId>ml-javaclient-util</artifactId>
 	<version>3.6.0</version>
 
+	<name>ml-javaclient-util</name>
+	<description>Helper classes for using the MarkLogic Java Client API</description>
+	<url>https://github.com/marklogic-community/ml-javaclient-util</url>
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<scm>
+		<url>https://github.com/marklogic-community/ml-javaclient-util.git</url>
+	</scm>
+
+	<developers>
+		<developer>
+			<id>rjrudin</id>
+			<url>https://github.com/rjrudin</url>
+			<organization>MarkLogic</organization>
+		</developer>
+	</developers>
+
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>

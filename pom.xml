@@ -36,7 +36,7 @@
 			<name>MarkLogic Github Contributors</name>
 			<email>general@developer.marklogic.com</email>
 			<organization>Github Contributors</organization>
-			<organizationUrl>https://github.com/marklogic/marklogic-app-deployer/graphs/contributors</organizationUrl>
+			<organizationUrl>https://github.com/marklogic-community/ml-app-deployer/graphs/contributors</organizationUrl>
 		</developer>
 	</developers>
 

@@ -46,6 +46,11 @@ task sourcesJar(type: Jar, dependsOn: classes) {
   from sourceSets.main.allGroovy
 }
 
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	classifier "javadoc"
+	from file(javadocsDir + "/" + project.name)
+}
+
 publishing {
   publications {
     mainJava(MavenPublication) {
@@ -55,6 +60,9 @@ publishing {
       from components.java
       artifact sourcesJar
     }
+	  mavenJavadoc(MavenPublication) {
+		  artifact javadocJar
+	  }
   }
 }
 
@@ -62,7 +70,7 @@ if (project.hasProperty("myBintrayUser")) {
   bintray {
     user = myBintrayUser
     key = myBintrayKey
-    publications = ['mainJava', 'sourcesJava']
+    publications = ['mainJava', 'sourcesJava', 'mavenJavadoc']
     pkg {
       repo = 'maven'
       name = project.name

@@ -23,13 +23,20 @@
 		<url>https://github.com/marklogic-community/ml-javaclient-util.git</url>
 	</scm>
 
-	<developers>
-		<developer>
-			<id>rjrudin</id>
-			<url>https://github.com/rjrudin</url>
-			<organization>MarkLogic</organization>
-		</developer>
-	</developers>
+	<<developers>
+	<developer>
+		<name>MarkLogic</name>
+		<email>java-sig@marklogic.com</email>
+		<organization>MarkLogic</organization>
+		<organizationUrl>https://www.marklogic.com</organizationUrl>
+	</developer>
+	<developer>
+		<name>MarkLogic Github Contributors</name>
+		<email>general@developer.marklogic.com</email>
+		<organization>Github Contributors</organization>
+		<organizationUrl>https://github.com/marklogic-community/ml-javaclient-util/graphs/contributors</organizationUrl>
+	</developer>
+</developers>
 
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>

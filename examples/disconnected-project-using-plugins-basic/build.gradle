@@ -1,0 +1,52 @@
+plugins {
+    id 'net.saliman.properties' version '1.4.6'
+    id 'com.marklogic.ml-gradle' version '3.6.3'
+}
+
+repositories {
+    // To use gradle in disconnected mode, you just need to set the 'disconnected' property. E.g. gradle compileJava -Pdisconnected 
+    if ( project.hasProperty("disconnected") && !"FALSE".equalsIgnoreCase(this.properties['disconnected'])) {
+        println "Using offline repositories"
+        maven {url uri( 'project-maven-repo' ) }
+    } else {
+        println "Using online repositories"
+        jcenter()
+        maven { url "https://developer.marklogic.com/maven2/" }
+    }
+}
+
+
+
+/**
+ * START: Disconnected gradle tasks
+ */
+ 
+gradle.taskGraph.whenReady { graph ->
+    if (graph.hasTask(downloadToProjectMavenRepo)) {
+        if (!project.gradle.gradleUserHomeDir.equals(new File(rootDir,"project-gradle-cache"))) {
+            throw new GradleException("Please set the gradle user home property to 'project-gradle-cache' on the gradle command line - e.g. \n " +
+            "gradle -Dgradle.user.home=project-gradle-cache downloadToProjectMavenRepo")
+        }
+    }
+}
+
+task downloadToProjectMavenRepo(type: Copy) {
+    /* 
+     * Include any configuration dependencies here that you want to copy the dependencies for. 
+     * These are defined in the 'dependencies' block. E.g. you need to include 
+     * configurations.compile.files if you want your java 'compile' dependencies downloaded
+     */  
+    //configurations.compile.files
+    
+    from new File(gradle.gradleUserHomeDir, 'caches/modules-2/files-2.1') // correct as of gradle 4.7
+    into 'project-maven-repo'
+    eachFile {
+        List<String> parts = it.path.split('/')
+        it.path = (parts[0].replace('.','/') + '/' + parts[1]) + '/' + parts[2] + '/' + parts[4]
+    }
+    includeEmptyDirs false
+}
+
+/**
+ * END: Disconnected gradle tasks
+ */

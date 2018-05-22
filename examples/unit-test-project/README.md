@@ -22,7 +22,7 @@ is a feature of ml-gradle for depending on packages of MarkLogic modules):
     }
       
     dependencies {
-      mlRestApi "com.marklogic:ml-unit-test:0.11"
+      mlRestApi "com.marklogic:ml-unit-test-modules:0.11"
     }
 
 With those additions in place, the "mlUnitTest" task can be run. This task will use the value of mlTestRestPort to 

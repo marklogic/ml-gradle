@@ -1,16 +1,6 @@
 {
 	"server-type": "http",
-  	"root": "/",
-  	"group-name": "%%GROUP%%",
-  	"port": "5432",
-	"server-name": "example-servers",
-	"modules-database": "%%mlModulesDbName%%",
-    "content-database": "documents",
+	"server-name": "%%NAME%%",
 	"authentication": "basic",
-	"default-error-format": "json",
-  	"error-handler": "/MarkLogic/rest-api/error-handler.xqy",
-  	"url-rewriter": "/MarkLogic/rest-api/rewriter.xml",
-  	"rewrite-resolves-globally": true,
-
-  	"external-security":["%%cpExternalSecurity%%"]
+  "external-security":["%%cpExternalSecurity%%"]
 }

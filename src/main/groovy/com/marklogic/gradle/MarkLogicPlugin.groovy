@@ -26,6 +26,7 @@ import com.marklogic.gradle.task.forests.ConfigureForestReplicasTask
 import com.marklogic.gradle.task.forests.DeleteForestReplicasTask
 import com.marklogic.gradle.task.forests.DeployCustomForestsTask
 import com.marklogic.gradle.task.forests.DeployForestReplicasTask
+import com.marklogic.gradle.task.forests.PrintForestPlanTask
 import com.marklogic.gradle.task.groups.DeployGroupsTask
 import com.marklogic.gradle.task.groups.SetTraceEventsTask
 import com.marklogic.gradle.task.hosts.AssignHostsToGroupsTask
@@ -187,6 +188,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlDeleteForestReplicas", type: DeleteForestReplicasTask, group: forestGroup, description: "Deprecated - delete forest replicas via the command.forestNamesAndReplicaCounts map")
 		project.task("mlDeployCustomForests", type: DeployCustomForestsTask, group: forestGroup, description: "Deploy custom forests as defined in subdirectories of the forests configuration directory")
 		project.task("mlDeployForestReplicas", type: DeployForestReplicasTask, group: forestGroup, description: "Prefer this over mlConfigureForestReplicas; it does the same thing, but uses the ConfigureForestReplicasCommand that is used by mlDeploy")
+		project.task("mlPrintForestPlan", type: PrintForestPlanTask, group: forestGroup, description: "Print a list of primary forests to be created for a database specified by -Pdatabase=(name of database) when the database is next deployed")
 
 		String groupsGroup = "ml-gradle Group"
 		project.task("mlDeployGroups", type: DeployGroupsTask, group: groupsGroup, description: "Deploy each group, updating it if it exists, in the configuration directory")

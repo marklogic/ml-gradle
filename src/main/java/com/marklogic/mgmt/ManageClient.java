@@ -258,7 +258,7 @@ public class ManageClient extends LoggingObject {
     public String getJson(String path) {
         logRequest(path, "JSON", "GET");
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
+        headers.set("Accept", MediaType.APPLICATION_JSON_UTF8_VALUE);
         return getRestTemplate().exchange(buildUri(path), HttpMethod.GET, new HttpEntity<>(headers), String.class)
                 .getBody();
     }
@@ -266,7 +266,7 @@ public class ManageClient extends LoggingObject {
     public String getJson(URI uri) {
         logRequest(uri.toString(), "JSON", "GET");
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
+        headers.set("Accept", MediaType.APPLICATION_JSON_UTF8_VALUE);
         return getRestTemplate().exchange(uri, HttpMethod.GET, new HttpEntity<>(headers), String.class).getBody();
     }
 
@@ -284,7 +284,7 @@ public class ManageClient extends LoggingObject {
 	public String getJsonAsSecurityUser(String path) {
 		logSecurityUserRequest(path, "JSON", "GET");
 		HttpHeaders headers = new HttpHeaders();
-		headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
+		headers.set("Accept", MediaType.APPLICATION_JSON_UTF8_VALUE);
 		return securityUserRestTemplate.exchange(buildUri(path), HttpMethod.GET, new HttpEntity<>(headers), String.class)
 			.getBody();
 	}
@@ -319,7 +319,7 @@ public class ManageClient extends LoggingObject {
 	 */
 	public HttpEntity<String> buildJsonEntity(String json) {
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         if (manageConfig != null && manageConfig.isCleanJsonPayloads()) {
         	json = cleanJsonPayload(json);
         }

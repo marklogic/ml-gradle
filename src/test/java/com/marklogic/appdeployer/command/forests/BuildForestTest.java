@@ -15,18 +15,38 @@ public class BuildForestTest extends Assert {
 	private ForestBuilder builder = new ForestBuilder();
 
 	@Test
+	public void customNamingStrategy() {
+		AppConfig appConfig = new AppConfig();
+		appConfig.getForestNamingStrategies().put("testdb", new ForestNamingStrategy() {
+			@Override
+			public String getForestName(String databaseName, int forestNumber, AppConfig appConfig) {
+				return "custom-" + databaseName + "-" + forestNumber;
+			}
+
+			@Override
+			public String getReplicaName(String databaseName, String forestName, int forestReplicaNumber, AppConfig appConfig) {
+				return null;
+			}
+		});
+		appConfig.getForestNamingStrategies().put("shouldn't be used", new DefaultForestNamingStrategy());
+
+		ForestPlan plan = new ForestPlan("testdb", "host1", "host2");
+		List<Forest> forests = builder.buildForests(plan, appConfig);
+		verifyNameAndHost(forests.get(0), "custom-testdb-1", "host1");
+		verifyNameAndHost(forests.get(1), "custom-testdb-2", "host2");
+	}
+
+	@Test
 	public void withTemplate() {
 		ForestPlan plan = new ForestPlan("testdb", "host1", "host2");
 		plan.withTemplate("{\"rebalancer-enable\":false, \"failover-enable\":true}");
 
 		List<Forest> forests = builder.buildForests(plan, new AppConfig());
-		assertEquals("testdb-1", forests.get(0).getForestName());
-		assertEquals("host1", forests.get(0).getHost());
+		verifyNameAndHost(forests.get(0), "testdb-1", "host1");
 		assertFalse(forests.get(0).isRebalancerEnable());
 		assertTrue(forests.get(0).getFailoverEnable());
 
-		assertEquals("testdb-2", forests.get(1).getForestName());
-		assertEquals("host2", forests.get(1).getHost());
+		verifyNameAndHost(forests.get(1), "testdb-2", "host2");
 		assertFalse(forests.get(1).isRebalancerEnable());
 		assertTrue(forests.get(1).getFailoverEnable());
 	}

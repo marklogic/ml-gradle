@@ -8,7 +8,46 @@ import com.marklogic.mgmt.util.SimplePropertySource;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.List;
+
 public class BuildForestReplicaTest extends Assert {
+
+	@Test
+	public void customNamingStrategy() {
+		AppConfig appConfig = newAppConfig();
+		appConfig.getForestNamingStrategies().put("my-database", new ForestNamingStrategy() {
+			@Override
+			public String getForestName(String databaseName, int forestNumber, AppConfig appConfig) {
+				return "forest-" + forestNumber;
+			}
+
+			@Override
+			public String getReplicaName(String databaseName, String forestName, int forestReplicaNumber, AppConfig appConfig) {
+				return "my-replica-" + forestName + "-" + forestReplicaNumber;
+			}
+		});
+
+		List<Forest> forests = new ForestBuilder().buildForests(
+			new ForestPlan("my-database", "host1", "host2", "host3").withReplicaCount(2), appConfig);
+
+		Forest f1 = forests.get(0);
+		assertEquals("forest-1", f1.getForestName());
+		assertEquals("host1", f1.getHost());
+		assertEquals("my-replica-forest-1-1", f1.getForestReplica().get(0).getReplicaName());
+		assertEquals("my-replica-forest-1-2", f1.getForestReplica().get(1).getReplicaName());
+
+		Forest f2 = forests.get(1);
+		assertEquals("forest-2", f2.getForestName());
+		assertEquals("host2", f2.getHost());
+		assertEquals("my-replica-forest-2-1", f2.getForestReplica().get(0).getReplicaName());
+		assertEquals("my-replica-forest-2-2", f2.getForestReplica().get(1).getReplicaName());
+
+		Forest f3 = forests.get(2);
+		assertEquals("forest-3", f3.getForestName());
+		assertEquals("host3", f3.getHost());
+		assertEquals("my-replica-forest-3-1", f3.getForestReplica().get(0).getReplicaName());
+		assertEquals("my-replica-forest-3-2", f3.getForestReplica().get(1).getReplicaName());
+	}
 
 	@Test
 	public void databaseAgnosticDirectories() {
@@ -81,9 +120,7 @@ public class BuildForestReplicaTest extends Assert {
 	}
 
 	private ForestReplica buildForestReplica(String... propertyNamesAndValues) {
-		SimplePropertySource source = new SimplePropertySource(propertyNamesAndValues);
-		DefaultAppConfigFactory f = new DefaultAppConfigFactory(source);
-		AppConfig config = f.newAppConfig();
+		AppConfig config = newAppConfig(propertyNamesAndValues);
 
 		Forest forest = new ForestBuilder().buildForests(
 			new ForestPlan("my-database", "host1", "host2").withReplicaCount(1), config).get(0);
@@ -91,5 +128,11 @@ public class BuildForestReplicaTest extends Assert {
 		assertEquals("my-database-1-replica-1", replica.getReplicaName());
 		assertEquals("host2", replica.getHost());
 		return replica;
+	}
+
+	protected AppConfig newAppConfig(String... propertyNamesAndValues) {
+		SimplePropertySource source = new SimplePropertySource(propertyNamesAndValues);
+		DefaultAppConfigFactory f = new DefaultAppConfigFactory(source);
+		return f.newAppConfig();
 	}
 }

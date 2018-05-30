@@ -1,5 +1,6 @@
 package com.marklogic.appdeployer;
 
+import com.marklogic.appdeployer.command.forests.ForestNamingStrategy;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.DatabaseClientFactory.Authentication;
@@ -174,6 +175,8 @@ public class AppConfig {
     private String replicaForestDataDirectory;
     private String replicaForestLargeDataDirectory;
     private String replicaForestFastDataDirectory;
+
+    private Map<String, ForestNamingStrategy> forestNamingStrategies = new HashMap<>();
 
     // Path to use for DeployFlexrepCommand
     private String flexrepPath;
@@ -1192,5 +1195,13 @@ public class AppConfig {
 
 	public void setDatabaseNamesAndReplicaCounts(Map<String, Integer> databaseNamesAndReplicaCounts) {
 		this.databaseNamesAndReplicaCounts = databaseNamesAndReplicaCounts;
+	}
+
+	public Map<String, ForestNamingStrategy> getForestNamingStrategies() {
+		return forestNamingStrategies;
+	}
+
+	public void setForestNamingStrategies(Map<String, ForestNamingStrategy> forestNamingStrategies) {
+		this.forestNamingStrategies = forestNamingStrategies;
 	}
 }

@@ -18,6 +18,16 @@ import java.util.Map;
  */
 public class ForestBuilder extends LoggingObject {
 
+	private ForestNamingStrategy forestNamingStrategy;
+
+	public ForestBuilder() {
+		this(new DefaultForestNamingStrategy());
+	}
+
+	public ForestBuilder(ForestNamingStrategy forestNamingStrategy) {
+		this.forestNamingStrategy = forestNamingStrategy;
+	}
+
 	/**
 	 * Builds a list of Forest objects based on the given ForestPlan and AppConfig. If replicaCount on the ForestPlan
 	 * is greater than zero, then ForestReplica objects are added to each Forest as well.
@@ -52,7 +62,7 @@ public class ForestBuilder extends LoggingObject {
 				for (int i = 0; i < forestsPerDataDirectory; i++) {
 					if (forestCounter <= numberToBuild) {
 						Forest forest = newForest(forestPlan);
-						forest.setForestName(getForestName(databaseName, appConfig, forestCounter));
+						forest.setForestName(getForestName(databaseName, forestCounter, appConfig));
 						forest.setHost(hostName);
 						forest.setDatabase(databaseName);
 
@@ -130,7 +140,7 @@ public class ForestBuilder extends LoggingObject {
 			int dataDirectoryPointer = dataDirectories.indexOf(f.getDataDirectory());
 			for (int i = 1; i <= replicaCount; i++) {
 				ForestReplica replica = new ForestReplica();
-				replica.setReplicaName(f.getForestName() + "-replica-" + i);
+				replica.setReplicaName(getForestReplicaName(databaseName, f.getForestName(), i, appConfig));
 				replicas.add(replica);
 
 				hostPointer++;
@@ -268,15 +278,40 @@ public class ForestBuilder extends LoggingObject {
 	}
 
 	/**
-	 * Construct the name of a forest. Protected so it can be overridden. Could eventually have a strategy interface here
-	 * for allowing for easy customization.
+	 *
+	 * @param databaseName
+	 * @param forestNumber
+	 * @param appConfig
+	 * @return
+	 */
+	protected String getForestName(String databaseName, int forestNumber, AppConfig appConfig) {
+		return determineForestNamingStrategy(databaseName, appConfig).getForestName(databaseName, forestNumber, appConfig);
+	}
+
+	/**
+	 *
+	 * @param databaseName
+	 * @param forestName
+	 * @param forestReplicaNumber
+	 * @param appConfig
+	 * @return
+	 */
+	protected String getForestReplicaName(String databaseName, String forestName, int forestReplicaNumber, AppConfig appConfig) {
+		return determineForestNamingStrategy(databaseName, appConfig).getReplicaName(databaseName, forestName, forestReplicaNumber, appConfig);
+	}
+
+	/**
 	 *
 	 * @param databaseName
 	 * @param appConfig
-	 * @param forestNumber
 	 * @return
 	 */
-	protected String getForestName(String databaseName, AppConfig appConfig, int forestNumber) {
-		return databaseName + "-" + forestNumber;
+	protected ForestNamingStrategy determineForestNamingStrategy(String databaseName, AppConfig appConfig) {
+		ForestNamingStrategy fns = null;
+		Map<String, ForestNamingStrategy> map = appConfig.getForestNamingStrategies();
+		if (map != null) {
+			fns = map.get(databaseName);
+		}
+		return fns != null ? fns : this.forestNamingStrategy;
 	}
 }

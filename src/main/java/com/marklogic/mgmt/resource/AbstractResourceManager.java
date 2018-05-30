@@ -40,6 +40,9 @@ public abstract class AbstractResourceManager extends AbstractManager implements
      * TODO Not sure yet whether we need to account for resourceUrlParams when doing an existence check.
      */
     public boolean exists(String resourceNameOrId, String... resourceUrlParams) {
+    	if (logger.isInfoEnabled()) {
+    		logger.info("Checking for existence of resource: " + resourceNameOrId);
+	    }
         return getAsXml().resourceExists(resourceNameOrId);
     }
 

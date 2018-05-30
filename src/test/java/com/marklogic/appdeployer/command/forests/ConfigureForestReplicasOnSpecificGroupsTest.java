@@ -7,10 +7,7 @@ import com.marklogic.mgmt.util.SimplePropertySource;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 public class ConfigureForestReplicasOnSpecificGroupsTest extends Assert {
 
@@ -23,26 +20,21 @@ public class ConfigureForestReplicasOnSpecificGroupsTest extends Assert {
 
 		ConfigureForestReplicasCommand command = new ConfigureForestReplicasCommand();
 
-		Map<String, String> fakeHostMap = new LinkedHashMap<>();
-		fakeHostMap.put("id1", "name1");
-		fakeHostMap.put("id2", "name2");
-		fakeHostMap.put("id3", "name3");
-		fakeHostMap.put("id4", "name4");
-		fakeHostMap.put("id5", "name5");
+		List<String> fakeHostNames = Arrays.asList("name1", "name2", "name3", "name4", "name5");
 
-		command.setGroupHostMapProvider(groupName -> {
+		command.setGroupHostNamesProvider(groupName -> {
 			if ("group2".equals(groupName)) {
-				return buildHostMap("id3,name3");
+				return Arrays.asList("name3");
 			}
 			if ("group3".equals(groupName)) {
-				return buildHostMap("id4,name4,id5,name5");
+				return Arrays.asList("name4","name5");
 			}
-			return buildHostMap("id1,name1,id2,name2");
+			return Arrays.asList("name1","name2");
 		});
 
 		// Verify we get all 5 hosts back when nothing special is configured
-		List<String> hostIds = command.getHostIdsForDatabaseForests(dbName, fakeHostMap, context);
-		assertEquals(5, hostIds.size());
+		List<String> hostNames = command.getHostNamesForDatabaseForests(dbName, fakeHostNames, context);
+		assertEquals(5, hostNames.size());
 
 		// Select 2 of the 3 hosts for test-db
 		Properties props = new Properties();
@@ -51,27 +43,18 @@ public class ConfigureForestReplicasOnSpecificGroupsTest extends Assert {
 		appConfig = factory.newAppConfig();
 		context = new CommandContext(appConfig, null, null);
 
-		hostIds = command.getHostIdsForDatabaseForests(dbName, fakeHostMap, context);
-		assertEquals(3, hostIds.size());
-		assertTrue(hostIds.contains("id1"));
-		assertTrue(hostIds.contains("id2"));
-		assertTrue(hostIds.contains("id3"));
+		hostNames = command.getHostNamesForDatabaseForests(dbName, fakeHostNames, context);
+		assertEquals(3, hostNames.size());
+		assertTrue(hostNames.contains("name1"));
+		assertTrue(hostNames.contains("name2"));
+		assertTrue(hostNames.contains("name3"));
 
 		props.setProperty("mlDatabaseGroups", "test-db,group3");
 		appConfig = factory.newAppConfig();
 		context = new CommandContext(appConfig, null, null);
-		hostIds = command.getHostIdsForDatabaseForests(dbName, fakeHostMap, context);
-		assertEquals(2, hostIds.size());
-		assertTrue(hostIds.contains("id4"));
-		assertTrue(hostIds.contains("id5"));
-	}
-
-	private Map<String, String> buildHostMap(String str) {
-		String[] strings = str.split(",");
-		Map<String, String> map = new LinkedHashMap<>();
-		for (int i = 0; i < strings.length; i += 2) {
-			map.put(strings[i], strings[i + 1]);
-		}
-		return map;
+		hostNames = command.getHostNamesForDatabaseForests(dbName, fakeHostNames, context);
+		assertEquals(2, hostNames.size());
+		assertTrue(hostNames.contains("name4"));
+		assertTrue(hostNames.contains("name5"));
 	}
 }

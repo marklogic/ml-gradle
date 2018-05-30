@@ -1,16 +1,15 @@
 package com.marklogic.appdeployer;
 
+import com.marklogic.client.DatabaseClientFactory;
+import com.marklogic.client.ext.SecurityContextType;
+import com.marklogic.mgmt.util.SimplePropertySource;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
-import com.marklogic.client.DatabaseClientFactory;
-import com.marklogic.client.ext.SecurityContextType;
-import org.junit.Assert;
-import org.junit.Test;
-
-import com.marklogic.mgmt.util.SimplePropertySource;
 
 public class DefaultAppConfigFactoryTest extends Assert {
 
@@ -285,14 +284,15 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    assertEquals("dev-.*", config.getResourceFilenamesExcludePattern().pattern());
 	    assertEquals("qa-.*", config.getResourceFilenamesIncludePattern().pattern());
 
-	    assertEquals("Documents,1,Security,2", config.getDatabaseNamesAndReplicaCounts());
+	    assertEquals(new Integer(1), config.getDatabaseNamesAndReplicaCounts().get("Documents"));
+	    assertEquals(new Integer(2), config.getDatabaseNamesAndReplicaCounts().get("Security"));
 
 	    Set<String> set = config.getDatabasesWithForestsOnOneHost();
 	    assertEquals(2, set.size());
 	    assertTrue(set.contains("Documents"));
 	    assertTrue(set.contains("Security"));
 
-	    Map<String, Set<String>> databaseHosts = config.getDatabaseHosts();
+	    Map<String, List<String>> databaseHosts = config.getDatabaseHosts();
 	    assertEquals(2, databaseHosts.size());
 	    assertEquals(3, databaseHosts.get("Documents").size());
 	    assertTrue(databaseHosts.get("Documents").contains("host1"));
@@ -302,7 +302,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    assertTrue(databaseHosts.get("Security").contains("host1"));
 	    assertTrue(databaseHosts.get("Security").contains("host2"));
 
-	    Map<String, Set<String>> databaseGroups = config.getDatabaseGroups();
+	    Map<String, List<String>> databaseGroups = config.getDatabaseGroups();
 	    assertEquals(2, databaseGroups.size());
 	    assertEquals(2, databaseGroups.get("Documents").size());
 	    assertTrue(databaseGroups.get("Documents").contains("group1"));
@@ -318,10 +318,11 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    assertEquals("/var/fast", config.getReplicaForestFastDataDirectory());
 	    assertEquals("/var/large", config.getReplicaForestLargeDataDirectory());
 
-	    Map<String, String> map = config.getDatabaseDataDirectories();
-	    assertEquals("/data/documents", map.get("Documents"));
-	    assertEquals("/data/security", map.get("Security"));
-	    map = config.getDatabaseFastDataDirectories();
+	    Map<String, List<String>> mapOfLists = config.getDatabaseDataDirectories();
+	    assertEquals("/data/documents", mapOfLists.get("Documents").get(0));
+	    assertEquals("/data/security", mapOfLists.get("Security").get(0));
+
+	    Map<String, String> map = config.getDatabaseFastDataDirectories();
 	    assertEquals("/fast/documents", map.get("Documents"));
 	    assertEquals("/fast/security", map.get("Security"));
 	    map = config.getDatabaseLargeDataDirectories();

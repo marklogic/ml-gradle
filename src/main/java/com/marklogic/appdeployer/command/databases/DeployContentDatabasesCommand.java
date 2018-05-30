@@ -5,6 +5,7 @@ import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
+import com.marklogic.appdeployer.command.forests.DeployForestsCommand;
 import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.rest.util.JsonNodeUtil;
@@ -39,13 +40,10 @@ public class DeployContentDatabasesCommand extends DeployDatabaseCommand {
      */
     @Override
     public void execute(CommandContext context) {
-        Integer count = context.getAppConfig().getContentForestsPerHost();
-        if (count != null) {
-            this.setForestsPerHost(count);
-        }
-
+    	// Construct the "main" content database first
         super.execute(context);
 
+        // And now check to see if we need to build a "test" content database
         AppConfig appConfig = context.getAppConfig();
         if (appConfig.isTestPortSet()) {
 	        if (logger.isInfoEnabled()) {
@@ -58,7 +56,7 @@ public class DeployContentDatabasesCommand extends DeployDatabaseCommand {
                 String json = payloadTokenReplacer.replaceTokens(payload, appConfig, true);
                 SaveReceipt receipt = dbMgr.save(json);
 	            if (shouldCreateForests(context, payload)) {
-		            buildDeployForestsCommand(payload, receipt, context).execute(context);
+		            buildDeployForestsCommand(receipt.getResourceId(), context).execute(context);
 	            }
             } else {
             	logger.warn(format("Could not determine what payload to use for creating/updating test content database '%s'",
@@ -67,7 +65,24 @@ public class DeployContentDatabasesCommand extends DeployDatabaseCommand {
         }
     }
 
-    /**
+	/**
+	 * Method is overridden to apply the content-database-specific property in AppConfig for number of forests per host.
+	 *
+	 * @param databaseName
+	 * @param context
+	 * @return
+	 */
+	@Override
+	public DeployForestsCommand buildDeployForestsCommand(String databaseName, CommandContext context) {
+		Integer count = context.getAppConfig().getContentForestsPerHost();
+		if (count != null) {
+			this.setForestsPerHost(count);
+		}
+
+		return super.buildDeployForestsCommand(databaseName, context);
+	}
+
+	/**
      * Just because there's not a content database file doesn't mean that one wasn't created via the command for
      * creating a REST API server. If the REST API server command didn't delete the content database, we'd still want
      * this command to attempt to do so in the event that no content database files exist.

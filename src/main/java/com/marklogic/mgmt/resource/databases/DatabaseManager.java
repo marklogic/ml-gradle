@@ -5,6 +5,7 @@ import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.resource.forests.ForestManager;
 import com.marklogic.rest.util.Fragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseManager extends AbstractResourceManager {
@@ -55,11 +56,11 @@ public class DatabaseManager extends AbstractResourceManager {
         getManageClient().postJson(path, format("{\"operation\":\"%s\"}", operation));
         logger.info(format("Finished invoking operation %s on database %s", operation, databaseIdOrName));
     }
-    
+
     public String getResourceId(String payload){
     	return super.getResourceId(payload);
     }
-    
+
     /**
      * Detaches or disassociates any sub-databases from this database
      * @param databaseIdOrName
@@ -69,11 +70,11 @@ public class DatabaseManager extends AbstractResourceManager {
     	save(format("{\"database-name\":\"%s\", \"subdatabase\": []}", databaseIdOrName));
     	logger.info("Finished detaching sub-databases from database: " + databaseIdOrName);
     }
-    
+
     /**
      * Attaches/associates the specified databases with this database, making it a super-database.
      * Note: that the databases listed in subDbNames must have already been created.
-     * 
+     *
      * @param databaseIdOrName
      * @param subDbNames
      */
@@ -87,9 +88,9 @@ public class DatabaseManager extends AbstractResourceManager {
     	logger.info("Attaching sub-databases to database: " + databaseIdOrName + ", using configured payload: " + payload);
     	save(payload);
     	logger.info("Finished attaching sub-databases to database: " + databaseIdOrName);
-    	
+
     }
-    
+
     public List<String> getSubDatabases(String databaseNameOrId) {
     	return getPropertiesAsXml(databaseNameOrId).getElementValues("/node()/m:subdatabases/m:subdatabase/m:database-name");
     }
@@ -154,7 +155,11 @@ public class DatabaseManager extends AbstractResourceManager {
      *         primary forest IDs, but not replica forest IDs.
      */
     public List<String> getPrimaryForestIds(String databaseNameOrId) {
-        return getPropertiesAsXml(databaseNameOrId).getElementValues("/node()/m:forests/m:forest");
+    	if (exists(databaseNameOrId)) {
+		    return getPropertiesAsXml(databaseNameOrId).getElementValues("/node()/m:forests/m:forest");
+	    } else {
+    		return new ArrayList<>();
+	    }
     }
 
 	/**

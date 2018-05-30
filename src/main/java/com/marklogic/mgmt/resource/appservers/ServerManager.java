@@ -29,6 +29,9 @@ public class ServerManager extends AbstractResourceManager {
 	 */
 	@Override
 	public boolean exists(String resourceNameOrId, String... resourceUrlParams) {
+		if (logger.isInfoEnabled()) {
+			logger.info("Checking for existence of resource: " + resourceNameOrId);
+		}
 		String path = getResourcesPath();
 		if (groupName != null) {
 			path += "?group-id=" + groupName;

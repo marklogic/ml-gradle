@@ -32,7 +32,7 @@ public class GenerateModelArtifactsTest extends AbstractAppDeployerTest {
 		appConfig.getModulePaths().clear();
 		appConfig.getModulePaths().add(projectPath + "/src/main/ml-modules");
 		appConfig.setSchemasPath(projectPath + "/src/main/ml-schemas");
-		appConfig.setModelsDatabase(appConfig.getContentDatabaseName() + "-other");
+		appConfig.setModelsDatabase(appConfig.getContentDatabaseName());
 
 		initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeploySchemasDatabaseCommand(),
 			new DeployOtherDatabasesCommand(1),
@@ -47,7 +47,7 @@ public class GenerateModelArtifactsTest extends AbstractAppDeployerTest {
 		assertTrue("A schemas db file needs to be created since the ES content-database.json file refers to one",
 			new File(projectPath, "src/main/ml-config/databases/schemas-database.json").exists());
 
-		// Verify the model was loaded into the "other" database
+		// Verify the model was loaded into the database
 		DatabaseClient modelsClient = appConfig.newAppServicesDatabaseClient(appConfig.getModelsDatabase());
 		try {
 			String raceModel = modelsClient.newDocumentManager().read("/marklogic.com/entity-services/models/race.json").nextContent(new StringHandle()).get();

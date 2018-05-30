@@ -280,7 +280,12 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		 */
 		propertyConsumerMap.put("mlDatabaseNamesAndReplicaCounts", (config, prop) -> {
 			logger.info("Database names and replica counts: " + prop);
-			config.setDatabaseNamesAndReplicaCounts(prop);
+			String[] tokens = prop.split(",");
+			Map<String, Integer> map = new HashMap<>();
+			for (int i = 0; i < tokens.length; i += 2) {
+				map.put(tokens[i], Integer.parseInt(tokens[i + 1]));
+			}
+			config.setDatabaseNamesAndReplicaCounts(map);
 		});
 
 		propertyConsumerMap.put("mlDatabasesWithForestsOnOneHost", (config, prop) -> {
@@ -295,7 +300,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 
 		propertyConsumerMap.put("mlDatabaseGroups", (config, prop) -> {
 			logger.info("Databases and the groups containing the hosts that their forests will be created on: " + prop);
-			config.setDatabaseGroups(buildSetMapFromDelimitedString(prop));
+			config.setDatabaseGroups(buildMapOfListsFromDelimitedString(prop));
 		});
 
 		propertyConsumerMap.put("mlHostGroups", (config, prop) -> {
@@ -305,7 +310,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 
 		propertyConsumerMap.put("mlDatabaseHosts", (config, prop) -> {
 			logger.info("Databases and the hosts that their forests will be created on: " + prop);
-			config.setDatabaseHosts(buildSetMapFromDelimitedString(prop));
+			config.setDatabaseHosts(buildMapOfListsFromDelimitedString(prop));
 		});
 
 		propertyConsumerMap.put("mlForestDataDirectory", (config, prop) -> {
@@ -340,7 +345,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 
 		propertyConsumerMap.put("mlDatabaseDataDirectories", (config, prop) -> {
 			logger.info("Databases and forest data directories: " + prop);
-			config.setDatabaseDataDirectories(buildMapFromCommaDelimitedString(prop));
+			config.setDatabaseDataDirectories(buildMapOfListsFromDelimitedString(prop));
 		});
 
 		propertyConsumerMap.put("mlDatabaseFastDataDirectories", (config, prop) -> {
@@ -638,13 +643,13 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		return map;
 	}
 
-	protected Map<String, Set<String>> buildSetMapFromDelimitedString(String str) {
+	protected Map<String, List<String>> buildMapOfListsFromDelimitedString(String str) {
 		String[] tokens = str.split(",");
-		Map<String, Set<String>> map = new LinkedHashMap<>();
+		Map<String, List<String>> map = new LinkedHashMap<>();
 		for (int i = 0; i < tokens.length; i += 2) {
 			String dbName = tokens[i];
 			String[] hostNames = tokens[i + 1].split("\\|");
-			Set<String> names = new LinkedHashSet<>();
+			List<String> names = new ArrayList<>();
 			for (String name : hostNames) {
 				names.add(name);
 			}

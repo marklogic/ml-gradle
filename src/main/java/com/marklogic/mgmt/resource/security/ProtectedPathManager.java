@@ -52,6 +52,9 @@ public class ProtectedPathManager extends AbstractResourceManager {
 
 	@Override
 	public boolean exists(String resourceNameOrId, String... resourceUrlParams) {
+		if (logger.isInfoEnabled()) {
+			logger.info("Checking for existence of resource: " + resourceNameOrId);
+		}
 		Fragment f = getAsXml();
 		return f.elementExists(format(
 			"/node()/*[local-name(.) = 'list-items']/node()[*[local-name(.) = 'nameref'] = '%s']",

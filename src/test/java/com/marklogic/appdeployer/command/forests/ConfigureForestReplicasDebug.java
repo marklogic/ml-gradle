@@ -6,10 +6,7 @@ import com.marklogic.appdeployer.command.databases.DeployDatabaseCommand;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.ManageConfig;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Not an actual test, as this depends on an environment with multiple hosts, which is normally not the case on a
@@ -27,15 +24,17 @@ public class ConfigureForestReplicasDebug {
 		ManageClient manageClient = new ManageClient(config);
 		AppConfig appConfig = new AppConfig();
 
-		appConfig.setDatabaseNamesAndReplicaCounts(dbName + ",1");
+		Map<String, Integer> map = new HashMap<>();
+		map.put(dbName, 1);
+		appConfig.setDatabaseNamesAndReplicaCounts(map);
 
-		Map<String, Set<String>> databaseHosts = new LinkedHashMap<>();
-		Set<String> hosts = new LinkedHashSet<>();
+		Map<String, List<String>> databaseHosts = new LinkedHashMap<>();
+		List<String> hosts = new ArrayList<>();
 		databaseHosts.put(dbName, hosts);
 		appConfig.setDatabaseHosts(databaseHosts);
 
-		Map<String, Set<String>> databaseGroups = new LinkedHashMap<>();
-		Set<String> groups = new LinkedHashSet<>();
+		Map<String, List<String>> databaseGroups = new LinkedHashMap<>();
+		List<String> groups = new ArrayList<>();
 		groups.add("Default");
 		databaseGroups.put(dbName, groups);
 		appConfig.setDatabaseGroups(databaseGroups);

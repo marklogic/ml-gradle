@@ -7,7 +7,9 @@ import com.marklogic.rest.util.Fragment;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GroupManager extends AbstractResourceManager {
@@ -28,6 +30,20 @@ public class GroupManager extends AbstractResourceManager {
 			return new DeleteReceipt(resourceId, null, false);
 		}
 		return super.delete(payload);
+	}
+
+	public List<String> getHostNames(String groupName) {
+		String path = super.getResourcePath(groupName);
+		Fragment xml = getManageClient().getXml(path);
+
+		List<String> hostNames = new ArrayList<>();
+		Namespace ns = Namespace.getNamespace("http://marklogic.com/manage/groups");
+		for (Element el : xml.getElements("/g:group-default/g:relations/g:relation-group[g:typeref = 'hosts']/g:relation")) {
+			String hostName = el.getChildText("nameref", ns);
+			hostNames.add(hostName);
+		}
+
+		return hostNames;
 	}
 
 	public Map<String, String> getHostIdsAndNames(String groupName) {

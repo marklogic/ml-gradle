@@ -17,14 +17,14 @@ public class CreateForestsOnSpecificHostsTest extends Assert {
 		AppConfig appConfig = new AppConfig();
 		CommandContext context = new CommandContext(appConfig, null, null);
 
-		DeployForestsCommand command = new DeployForestsCommand();
-		command.setDatabaseName("test-db");
+		DeployForestsCommand command = new DeployForestsCommand("test-db");
 
 		List<String> fakeHostNames = new ArrayList<>();
 		fakeHostNames.add("host1");
 		fakeHostNames.add("host2");
 		fakeHostNames.add("host3");
 
+		command.setHostCalculator(new DefaultHostCalculator(new TestHostNameProvider(fakeHostNames.toArray(new String[]{}))));
 		// Verify we get all 3 hosts back when nothing special is configured
 		List<String> hostNames = command.determineHostNamesForForest(context, fakeHostNames);
 		assertEquals(3, hostNames.size());

@@ -148,22 +148,22 @@ public class AppConfig {
     private Integer contentForestsPerHost;
 
     // Comma-delimited string used for configuring forest replicas
-    private String databaseNamesAndReplicaCounts;
+    private Map<String, Integer> databaseNamesAndReplicaCounts;
 
     // Comma-delimited string of database names that should only have forests (most likely just one) created on one host
     private Set<String> databasesWithForestsOnOneHost;
 
-    private Map<String, Set<String>> databaseHosts;
-    private Map<String, Set<String>> databaseGroups;
+    private Map<String, List<String>> databaseHosts;
+    private Map<String, List<String>> databaseGroups;
     private Map<String, String> hostGroups;
-    
+
     // Data/fast/large directories for default forests
     private String forestDataDirectory;
     private String forestFastDataDirectory;
     private String forestLargeDataDirectory;
 
     // Comma-delimited string of database names and data directories
-    private Map<String, String> databaseDataDirectories;
+    private Map<String, List<String>> databaseDataDirectories;
     private Map<String, String> databaseFastDataDirectories;
     private Map<String, String> databaseLargeDataDirectories;
     private Map<String, String> databaseReplicaDataDirectories;
@@ -619,14 +619,6 @@ public class AppConfig {
         this.contentForestsPerHost = contentForestsPerHost;
     }
 
-    public String getDatabaseNamesAndReplicaCounts() {
-        return databaseNamesAndReplicaCounts;
-    }
-
-    public void setDatabaseNamesAndReplicaCounts(String databaseNamesAndReplicaCounts) {
-        this.databaseNamesAndReplicaCounts = databaseNamesAndReplicaCounts;
-    }
-
     public String getModulePermissions() {
         return modulePermissions;
     }
@@ -1004,11 +996,11 @@ public class AppConfig {
 		this.modulesLoaderThreadCount = modulesLoaderThreadCount;
 	}
 
-	public Map<String, String> getDatabaseDataDirectories() {
+	public Map<String, List<String>> getDatabaseDataDirectories() {
 		return databaseDataDirectories;
 	}
 
-	public void setDatabaseDataDirectories(Map<String, String> databaseDataDirectories) {
+	public void setDatabaseDataDirectories(Map<String, List<String>> databaseDataDirectories) {
 		this.databaseDataDirectories = databaseDataDirectories;
 	}
 
@@ -1100,11 +1092,11 @@ public class AppConfig {
 		this.databasesWithForestsOnOneHost = databasesWithForestsOnOneHost;
 	}
 
-	public Map<String, Set<String>> getDatabaseHosts() {
+	public Map<String, List<String>> getDatabaseHosts() {
 		return databaseHosts;
 	}
 
-	public void setDatabaseHosts(Map<String, Set<String>> databaseHosts) {
+	public void setDatabaseHosts(Map<String, List<String>> databaseHosts) {
 		this.databaseHosts = databaseHosts;
 	}
 
@@ -1130,11 +1122,11 @@ public class AppConfig {
     	return this.includeProperties;
     }
 
-    public Map<String, Set<String>> getDatabaseGroups() {
+    public Map<String, List<String>> getDatabaseGroups() {
 		return databaseGroups;
 	}
 
-	public void setDatabaseGroups(Map<String, Set<String>> databaseGroups) {
+	public void setDatabaseGroups(Map<String, List<String>> databaseGroups) {
 		this.databaseGroups = databaseGroups;
 	}
 
@@ -1192,5 +1184,13 @@ public class AppConfig {
 
 	public void setCpfDatabaseName(String cpfDatabaseName) {
 		this.cpfDatabaseName = cpfDatabaseName;
+	}
+
+	public Map<String, Integer> getDatabaseNamesAndReplicaCounts() {
+		return databaseNamesAndReplicaCounts;
+	}
+
+	public void setDatabaseNamesAndReplicaCounts(Map<String, Integer> databaseNamesAndReplicaCounts) {
+		this.databaseNamesAndReplicaCounts = databaseNamesAndReplicaCounts;
 	}
 }

@@ -7,37 +7,25 @@ import com.marklogic.mgmt.util.SimplePropertySource;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.List;
+import java.util.Properties;
 
-public class CreateForestsOnSpecificGroupsTest extends Assert {
+public class CalculateForestHostsTest extends Assert {
 
 	@Test
 	public void test() {
 		AppConfig appConfig = new AppConfig();
 		CommandContext context = new CommandContext(appConfig, null, null);
 
-		DeployForestsCommand command = new DeployForestsCommand();
-		command.setDatabaseName("test-db");
+		TestHostNameProvider hostNameProvider = new TestHostNameProvider("name1", "name2", "name3", "name4", "name5");
+		hostNameProvider.addGroupHostNames("group1", "name1", "name2");
+		hostNameProvider.addGroupHostNames("group2", "name3");
+		hostNameProvider.addGroupHostNames("group3", "name4", "name5");
 
-		List<String> fakeHostNames = new ArrayList<>();
-		fakeHostNames.add("name1");
-		fakeHostNames.add("name2");
-		fakeHostNames.add("name3");
-		fakeHostNames.add("name4");
-		fakeHostNames.add("name5");
-
-		command.setHostMapProvider(groupName -> {
-			if ("group2".equals(groupName)) {
-				return buildHostMap("id3,name3");
-			}
-			if ("group3".equals(groupName)) {
-				return buildHostMap("id4,name4,id5,name5");
-			}
-			return buildHostMap("id1,name1,id2,name2");
-		});
+		DefaultHostCalculator hostCalculator = new DefaultHostCalculator(hostNameProvider);
 
 		// Verify we get all 5 hosts back when nothing special is configured
-		List<String> hostNames = command.determineHostNamesForForest(context, fakeHostNames);
+		List<String> hostNames = hostCalculator.calculateHostNames("test-db", context);
 		assertEquals(5, hostNames.size());
 
 		// Select 2 of the 3 hosts for test-db
@@ -47,7 +35,7 @@ public class CreateForestsOnSpecificGroupsTest extends Assert {
 		appConfig = factory.newAppConfig();
 		context = new CommandContext(appConfig, null, null);
 
-		hostNames = command.determineHostNamesForForest(context, fakeHostNames);
+		hostNames = hostCalculator.calculateHostNames("test-db", context);
 		assertEquals(3, hostNames.size());
 		assertTrue(hostNames.contains("name1"));
 		assertTrue(hostNames.contains("name2"));
@@ -56,18 +44,9 @@ public class CreateForestsOnSpecificGroupsTest extends Assert {
 		props.setProperty("mlDatabaseGroups", "test-db,group3");
 		appConfig = factory.newAppConfig();
 		context = new CommandContext(appConfig, null, null);
-		hostNames = command.determineHostNamesForForest(context, fakeHostNames);
+		hostNames = hostCalculator.calculateHostNames("test-db", context);
 		assertEquals(2, hostNames.size());
 		assertTrue(hostNames.contains("name4"));
 		assertTrue(hostNames.contains("name5"));
-	}
-
-	private Map<String, String> buildHostMap(String str) {
-		String[] strings = str.split(",");
-		Map<String, String> map = new LinkedHashMap<>();
-		for (int i = 0; i < strings.length; i += 2) {
-			map.put(strings[i], strings[i + 1]);
-		}
-		return map;
 	}
 }

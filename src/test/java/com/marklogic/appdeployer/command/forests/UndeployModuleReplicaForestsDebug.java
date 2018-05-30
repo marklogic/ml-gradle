@@ -8,6 +8,9 @@ import com.marklogic.mgmt.ManageConfig;
 import com.marklogic.mgmt.admin.AdminConfig;
 import com.marklogic.mgmt.admin.AdminManager;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * This program is used to verify that when a REST API server is deleted, the replica forests for both the content
  * and modules databases are deleted first if the command is configured to delete the content/modules databases. It
@@ -28,7 +31,11 @@ public class UndeployModuleReplicaForestsDebug {
 
 		AppConfig appConfig = new AppConfig();
 		appConfig.setName("testapp");
-		appConfig.setDatabaseNamesAndReplicaCounts("testapp-modules,1,testapp-content,1");
+
+		Map<String, Integer> map = new HashMap<>();
+		map.put("testapp-modules", 1);
+		map.put("testapp-content", 1);
+		appConfig.setDatabaseNamesAndReplicaCounts(map);
 
 		DeployRestApiServersCommand restApiCommand = new DeployRestApiServersCommand();
 		// Command is assumed to delete the modules database by default

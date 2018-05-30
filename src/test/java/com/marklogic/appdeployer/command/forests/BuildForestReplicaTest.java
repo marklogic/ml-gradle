@@ -2,6 +2,7 @@ package com.marklogic.appdeployer.command.forests;
 
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.DefaultAppConfigFactory;
+import com.marklogic.mgmt.api.forest.Forest;
 import com.marklogic.mgmt.api.forest.ForestReplica;
 import com.marklogic.mgmt.util.SimplePropertySource;
 import org.junit.Assert;
@@ -84,10 +85,11 @@ public class BuildForestReplicaTest extends Assert {
 		DefaultAppConfigFactory f = new DefaultAppConfigFactory(source);
 		AppConfig config = f.newAppConfig();
 
-		ConfigureForestReplicasCommand command = new ConfigureForestReplicasCommand();
-		ForestReplica replica = command.buildForestReplica("my-database", "test-name", "host-1", config);
-		assertEquals("test-name", replica.getReplicaName());
-		assertEquals("host-1", replica.getHost());
+		Forest forest = new ForestBuilder().buildForests(
+			new ForestPlan("my-database", "host1", "host2").withReplicaCount(1), config).get(0);
+		ForestReplica replica = forest.getForestReplica().get(0);
+		assertEquals("my-database-1-replica-1", replica.getReplicaName());
+		assertEquals("host2", replica.getHost());
 		return replica;
 	}
 }

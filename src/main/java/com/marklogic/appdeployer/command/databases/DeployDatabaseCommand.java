@@ -117,7 +117,7 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 
             databaseName = receipt.getResourceId();
             if (shouldCreateForests(context, payload)) {
-	            buildDeployForestsCommand(payload, receipt, context).execute(context);
+	            buildDeployForestsCommand(databaseName, context).execute(context);
             }
 
             if(!isSubDatabase()){
@@ -324,89 +324,19 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
     }
 
     /**
-     * Allows for how an instance of DeployForestsCommand is built to be overridden by a subclass.
+     * Initializes an instance of DeployForestsCommand. Public so that it can be accessed by a client that wishes to call
+     * buildForests on the command.
      *
-     * @param dbPayload
-     *            Needed so we can look up forest counts based on the database name
-     * @param receipt
+     * @param databaseName
      * @param context
      * @return
      */
-    protected DeployForestsCommand buildDeployForestsCommand(String dbPayload, SaveReceipt receipt,
-            CommandContext context) {
-    	final String databaseName = receipt.getResourceId();
-
-        DeployForestsCommand c = new DeployForestsCommand();
+    public DeployForestsCommand buildDeployForestsCommand(String databaseName, CommandContext context) {
+        DeployForestsCommand c = new DeployForestsCommand(databaseName);
+        c.setForestsPerHost(getForestsPerHost());
         c.setCreateForestsOnEachHost(createForestsOnEachHost);
-        c.setForestsPerHost(determineForestCountPerHost(dbPayload, context));
         c.setForestFilename(forestFilename);
-        c.setDatabaseName(databaseName);
-
-        Forest forest = buildForest(context.getAppConfig());
-        forest.setObjectMapper(ObjectMapperFactory.getObjectMapper());
-	    c.setForestPayload(forest.getJson());
         return c;
-    }
-
-    protected Forest buildForest(AppConfig config) {
-	    Forest forest = new Forest();
-	    forest.setForestName("%%FOREST_NAME%%");
-	    forest.setHost("%%FOREST_HOST%%");
-	    forest.setDatabase("%%FOREST_DATABASE%%");
-
-	    // First see if we have any database-agnostic forest directories
-	    if (config.getForestDataDirectory() != null) {
-	    	forest.setDataDirectory(config.getForestDataDirectory());
-	    }
-	    if (config.getForestFastDataDirectory() != null) {
-	    	forest.setFastDataDirectory(config.getForestFastDataDirectory());
-	    }
-	    if (config.getForestLargeDataDirectory() != null) {
-	    	forest.setLargeDataDirectory(config.getForestLargeDataDirectory());
-	    }
-
-	    // Now check for database-specific forest directories
-	    Map<String, String> map = config.getDatabaseDataDirectories();
-	    if (map != null && map.containsKey(databaseName)) {
-		    forest.setDataDirectory(map.get(databaseName));
-	    }
-	    map = config.getDatabaseFastDataDirectories();
-	    if (map != null && map.containsKey(databaseName)) {
-		    forest.setFastDataDirectory(map.get(databaseName));
-	    }
-	    map = config.getDatabaseLargeDataDirectories();
-	    if (map != null && map.containsKey(databaseName)) {
-		    forest.setLargeDataDirectory(map.get(databaseName));
-	    }
-
-	    return forest;
-    }
-
-    /**
-     * Checks the forestCounts map in AppConfig to see if the client has specified a number of forests per host for this
-     * database.
-     *
-     * @param dbPayload
-     * @param context
-     * @return
-     */
-    protected int determineForestCountPerHost(String dbPayload, CommandContext context) {
-        int forestCount = forestsPerHost;
-        if (dbPayload != null) {
-            try {
-                String dbName = new PayloadParser().getPayloadFieldValue(dbPayload, "database-name");
-                Map<String, Integer> forestCounts = context.getAppConfig().getForestCounts();
-                if (forestCounts != null && forestCounts.containsKey(dbName)) {
-                    Integer i = forestCounts.get(dbName);
-                    if (i != null) {
-                        forestCount = i;
-                    }
-                }
-            } catch (Exception ex) {
-                logger.warn("Unable to determine forest counts, cause: " + ex.getMessage(), ex);
-            }
-        }
-        return forestCount;
     }
 
     protected String buildDefaultDatabasePayload(CommandContext context) {

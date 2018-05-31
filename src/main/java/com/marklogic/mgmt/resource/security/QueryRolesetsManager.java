@@ -75,7 +75,7 @@ public class QueryRolesetsManager extends AbstractResourceManager {
 		for(String id : f.getElementValues(xpath)) {
 			String response =
 				payloadParser.getPayloadFieldValue(
-                    getManageClient().getJson(getResourcesPath() + "/" + id + "/properties"),
+                    getManageClient().getJsonAsSecurityUser(getResourcesPath() + "/" + id + "/properties"),
                     getIdFieldName()
 				);
 

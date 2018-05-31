@@ -83,12 +83,12 @@ public class ProtectedPathManager extends AbstractResourceManager {
 	@Override
 	public ResourcesFragment getAsXml() {
 		try {
-			return new ResourcesFragment(getManageClient().getXml(getResourcesPath()));
+			return new ResourcesFragment(getManageClient().getXmlAsSecurityUser(getResourcesPath()));
 		} catch (ResourceAccessException ex) {
 			if (logger.isWarnEnabled()) {
 				logger.warn("Unable to get list of protected paths, retrying; cause: " + ex.getMessage());
 			}
-			return new ResourcesFragment(getManageClient().getXml(getResourcesPath()));
+			return new ResourcesFragment(getManageClient().getXmlAsSecurityUser(getResourcesPath()));
 		}
 	}
 

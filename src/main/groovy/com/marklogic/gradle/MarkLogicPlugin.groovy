@@ -15,6 +15,7 @@ import com.marklogic.gradle.task.alert.DeleteAllAlertConfigsTask
 import com.marklogic.gradle.task.alert.DeployAlertingTask
 import com.marklogic.gradle.task.client.*
 import com.marklogic.gradle.task.cluster.*
+import com.marklogic.gradle.task.configuration.DeployConfigurationsTask
 import com.marklogic.gradle.task.cpf.DeployCpfTask
 import com.marklogic.gradle.task.cpf.LoadDefaultPipelinesTask
 import com.marklogic.gradle.task.databases.*
@@ -106,6 +107,9 @@ class MarkLogicPlugin implements Plugin<Project> {
 		String alertGroup = "ml-gradle Alert"
 		project.task("mlDeleteAllAlertConfigs", type: DeleteAllAlertConfigsTask, group: alertGroup, description: "Delete all alert configs, which also deletes all of the actions rules associated with them")
 		project.task("mlDeployAlerting", type: DeployAlertingTask, group: alertGroup, description: "Deploy each alerting resource - configs, actions, and rules - in the configuration directory")
+
+		String configurationGroup = "ml-gradle Configuration"
+		project.task("mlDeployConfigurations", type: DeployConfigurationsTask, group: configurationGroup, description: "Deploy each configuration (requires at least MarkLogic 9.0-5) in the configuration directory")
 
 		String cpfGroup = "ml-gradle CPF"
 		project.task("mlDeployCpf", type: DeployCpfTask, group: cpfGroup, description: "Deploy each CPF resource - domains, pipelines, and CPF configs - in the configuration directory").mustRunAfter("mlClearTriggersDatabase")

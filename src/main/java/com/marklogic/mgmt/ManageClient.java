@@ -319,7 +319,7 @@ public class ManageClient extends LoggingObject {
 	 */
 	public HttpEntity<String> buildJsonEntity(String json) {
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         if (manageConfig != null && manageConfig.isCleanJsonPayloads()) {
         	json = cleanJsonPayload(json);
         }

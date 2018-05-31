@@ -28,11 +28,27 @@ import org.springframework.util.FileCopyUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 /**
- * Default implementation of ModulesLoader. Loads everything except assets via the REST API. Assets are either loaded
- * via an XccAssetLoader (faster) or via a RestApiAssetLoader (slower, but doesn't require additional privileges).
+ * Default implementation of ModulesLoader.
+ * <p>
+ * REST modules and non-REST modules are handled in different ways. Non-REST modules are loaded via an instance of
+ * AssetFileLoader, which most likely loads modules via port 8000, directly into the desired modules database.
+ * </p>
+ * <p>
+ * REST modules however have to be loaded via the REST server that they're targeted for. This class also loads them
+ * by default via multiple threads to increase performance, as it can take a couple seconds to load each set of
+ * search options, service, and transform.
+ * </p>
+ * <p>
+ * To handle errors while loading REST modules in parallel, an implementation of LoadModulesFailureListener can be
+ * added to this class (ideally would have just been a Consumer that receives a Throwable). By default, an instance of
+ * SimpleLoadModulesFailureListener is added. Also by default, any Throwable caught by this class will be rethrown
+ * after all REST modules have been loaded. This behavior can be disabled by setting rethrowRestModulesFailure to
+ * false, in which case the failures are just logged.
+ * </p>
  */
 public class DefaultModulesLoader extends LoggingObject implements ModulesLoader {
 
@@ -52,6 +68,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	private TokenReplacer tokenReplacer;
 
 	private List<LoadModulesFailureListener> failureListeners = new ArrayList<>();
+	private boolean rethrowRestModulesFailure = true;
 
 	/**
 	 * When set to true, exceptions thrown while loading transforms and resources will be caught and logged, and the
@@ -136,12 +153,27 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		loadResources(modules, loadedModules);
 
 		waitForTaskExecutorToFinish();
+		rethrowRestModulesFailureIfOneExists();
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("Finished loading modules from base directory: " + baseDir);
 		}
 
 		return loadedModules;
+	}
+
+	protected void rethrowRestModulesFailureIfOneExists() {
+		if (failureListeners != null && rethrowRestModulesFailure) {
+			for (LoadModulesFailureListener listener : failureListeners) {
+				if (listener instanceof Supplier) {
+					Object o = ((Supplier) listener).get();
+					if (o instanceof Throwable) {
+						Throwable t = (Throwable) o;
+						throw new RuntimeException("Error occurred while loading REST modules: " + t.getMessage(), t);
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -273,12 +305,12 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	protected File getFileFromResource(Resource r) {
 		try {
 			return r.getFile();
-		} catch (IOException ex) {}
+		} catch (IOException ex) {
+		}
 		return null;
 	}
 
 	/**
-	 *
 	 * @param modules
 	 * @param loadedModules
 	 */
@@ -306,7 +338,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 			assetFileLoader.initializeDocumentFileReader();
 			DocumentFileReader dfr = assetFileLoader.getDocumentFileReader();
 			if (dfr instanceof DefaultDocumentFileReader) {
-				DefaultDocumentFileReader reader = (DefaultDocumentFileReader)dfr;
+				DefaultDocumentFileReader reader = (DefaultDocumentFileReader) dfr;
 				reader.addDocumentFileProcessor(documentFile -> {
 					File f = documentFile.getFile();
 					if (f == null) {
@@ -339,7 +371,6 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	}
 
 	/**
-	 *
 	 * @param modules
 	 * @param loadedModules
 	 */
@@ -356,7 +387,6 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	}
 
 	/**
-	 *
 	 * @param modules
 	 * @param loadedModules
 	 */
@@ -385,7 +415,6 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	}
 
 	/**
-	 *
 	 * @param modules
 	 * @param loadedModules
 	 */
@@ -414,7 +443,6 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	}
 
 	/**
-	 *
 	 * @param modules
 	 * @param loadedModules
 	 */
@@ -431,7 +459,6 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	}
 
 	/**
-	 *
 	 * @param r
 	 * @param metadata
 	 * @param methodParams
@@ -456,7 +483,6 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	}
 
 	/**
-	 *
 	 * @param r
 	 * @param metadata
 	 * @return
@@ -472,21 +498,20 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 
 		StringHandle h = new StringHandle(readAndReplaceTokens(r));
 		executeTask(() -> {
-            if (FilenameUtil.isXslFile(filename)) {
-                mgr.writeXSLTransform(transformName, h, metadata);
-            } else if (FilenameUtil.isJavascriptFile(filename)) {
-                mgr.writeJavascriptTransform(transformName, h, metadata);
-            } else {
-                mgr.writeXQueryTransform(transformName, h, metadata);
-            }
-        });
+			if (FilenameUtil.isXslFile(filename)) {
+				mgr.writeXSLTransform(transformName, h, metadata);
+			} else if (FilenameUtil.isJavascriptFile(filename)) {
+				mgr.writeJavascriptTransform(transformName, h, metadata);
+			} else {
+				mgr.writeXQueryTransform(transformName, h, metadata);
+			}
+		});
 		updateTimestamp(r);
 
 		return r;
 	}
 
 	/**
-	 *
 	 * @param r
 	 * @return
 	 */
@@ -502,12 +527,12 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 
 		StringHandle h = new StringHandle(readAndReplaceTokens(r));
 		executeTask(() -> {
-            if (filename.endsWith(".json")) {
-                mgr.writeOptions(name, h.withFormat(Format.JSON));
-            } else {
-                mgr.writeOptions(name, h);
-            }
-        });
+			if (filename.endsWith(".json")) {
+				mgr.writeOptions(name, h.withFormat(Format.JSON));
+			} else {
+				mgr.writeOptions(name, h);
+			}
+		});
 		updateTimestamp(r);
 		return r;
 	}
@@ -543,15 +568,13 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		taskExecutor.execute(() -> {
 			try {
 				r.run();
-			}
-			catch(Exception e) {
+			} catch (Exception e) {
 				failureListeners.forEach(listener -> listener.processFailure(e));
 			}
 		});
 	}
 
 	/**
-	 *
 	 * @param r
 	 * @return
 	 */
@@ -582,7 +605,6 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	}
 
 	/**
-	 *
 	 * @param r
 	 * @return
 	 */
@@ -685,7 +707,8 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 			try {
 				File file = resource.getFile();
 				modified = modulesManager.hasFileBeenModifiedSinceLastLoaded(file);
-			} catch (IOException e) {}
+			} catch (IOException e) {
+			}
 		}
 		return modified;
 	}
@@ -695,7 +718,8 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 			try {
 				File file = resource.getFile();
 				modulesManager.saveLastLoadedTimestamp(file, new Date());
-			} catch (IOException e) {}
+			} catch (IOException e) {
+			}
 		}
 	}
 
@@ -717,5 +741,9 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 
 	public void setIncludeFilenamePattern(Pattern includeFilenamePattern) {
 		this.includeFilenamePattern = includeFilenamePattern;
+	}
+
+	public void setRethrowRestModulesFailure(boolean rethrowRestModulesFailure) {
+		this.rethrowRestModulesFailure = rethrowRestModulesFailure;
 	}
 }

@@ -117,6 +117,22 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 		assertEquals("<example/>", moduleXml.trim());
 	}
 
+	@Test
+	public void invalidRestModule() {
+		String dir = Paths.get("src", "test", "resources", "invalid-rest-modules").toString();
+
+		try {
+			modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
+			fail("Loading modules should have failed because of an invalid REST options file");
+		} catch (RuntimeException re) {
+			assertTrue(re.getMessage().contains("Unexpected character"));
+		}
+
+		// This should now succeed since DefaultModulesLoader won't rethrow the REST module failure
+		modulesLoader.setRethrowRestModulesFailure(false);
+		modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
+	}
+
 	/**
 	 * This test is a little brittle because it assumes the URI of options/services/transforms that are loaded
 	 * into the Modules database.

@@ -72,6 +72,10 @@ public class ConfigDir {
 		return new File(getServersDir(), "rest-api-server.json");
 	}
 
+	public File getConfigurationsDir() {
+		return new File(baseDir, "configurations");
+	}
+
 	public File getSecurityDir() {
 		return new File(baseDir, "security");
 	}

@@ -2,8 +2,11 @@ package com.marklogic.appdeployer.command;
 
 import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.mgmt.PayloadParser;
+import com.marklogic.mgmt.admin.AdminManager;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.SaveReceipt;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
@@ -153,6 +156,38 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
         }
         return receipt;
     }
+
+	/**
+	 * Subclasses can override this to add functionality after a resource has been saved.
+	 *
+	 * Starting in version 3.0 of ml-app-deployer, this will always check if the Location header is
+	 * /admin/v1/timestamp, and if so, it will wait for ML to restart.
+	 *
+	 * @param mgr
+	 * @param context
+	 * @param resourceFile
+	 * @param receipt
+	 */
+	protected void afterResourceSaved(ResourceManager mgr, CommandContext context, File resourceFile, SaveReceipt receipt) {
+		if (receipt == null) {
+			return;
+		}
+		ResponseEntity<String> response = receipt.getResponse();
+		if (response != null) {
+			HttpHeaders headers = response.getHeaders();
+			if (headers != null) {
+				URI uri = headers.getLocation();
+				if (uri != null && "/admin/v1/timestamp".equals(uri.getPath())) {
+					AdminManager adminManager = context.getAdminManager();
+					if (adminManager != null) {
+						adminManager.waitForRestart();
+					} else {
+						logger.warn("Location header indicates ML is restarting, but no AdminManager available to support waiting for a restart");
+					}
+				}
+			}
+		}
+	}
 
 	/**
 	 * Allow subclass to override this in order to fiddle with the payload before it's saved; called by saveResource.

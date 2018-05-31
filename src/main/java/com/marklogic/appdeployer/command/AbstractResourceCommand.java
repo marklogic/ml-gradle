@@ -97,39 +97,6 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
     	return listFilesInDirectory(resourceDir);
     }
 
-    /**
-     * Subclasses can override this to add functionality after a resource has been saved.
-     *
-     * Starting in version 3.0 of ml-app-deployer, this will always check if the Location header is
-     * /admin/v1/timestamp, and if so, it will wait for ML to restart.
-     *
-     * @param mgr
-     * @param context
-     * @param resourceFile
-     * @param receipt
-     */
-    protected void afterResourceSaved(ResourceManager mgr, CommandContext context, File resourceFile,
-            SaveReceipt receipt) {
-    	if (receipt == null) {
-    		return;
-	    }
-    	ResponseEntity<String> response = receipt.getResponse();
-    	if (response != null) {
-    		HttpHeaders headers = response.getHeaders();
-    		if (headers != null) {
-			    URI uri = headers.getLocation();
-			    if (uri != null && "/admin/v1/timestamp".equals(uri.getPath())) {
-				    AdminManager adminManager = context.getAdminManager();
-				    if (adminManager != null) {
-					    adminManager.waitForRestart();
-				    } else {
-					    logger.warn("Location header indicates ML is restarting, but no AdminManager available to support waiting for a restart");
-				    }
-			    }
-		    }
-	    }
-    }
-
     @Override
     public void undo(CommandContext context) {
         if (deleteResourcesOnUndo) {

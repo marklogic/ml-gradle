@@ -62,7 +62,7 @@ public class AdminManager extends AbstractManager {
             @Override
             public boolean execute() {
                 HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+                headers.setContentType(MediaType.APPLICATION_JSON);
                 HttpEntity<String> entity = new HttpEntity<String>(payload, headers);
                 try {
                     ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.POST, entity, String.class);
@@ -108,7 +108,7 @@ public class AdminManager extends AbstractManager {
             @Override
             public boolean execute() {
                 HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+                headers.setContentType(MediaType.APPLICATION_JSON);
                 HttpEntity<String> entity = new HttpEntity<String>(payload, headers);
                 try {
                     ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.POST, entity, String.class);

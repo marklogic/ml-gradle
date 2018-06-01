@@ -11,8 +11,8 @@ sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
 
 repositories {
+	mavenLocal()
   jcenter()
-  mavenLocal()
 }
 
 dependencies {
@@ -68,7 +68,7 @@ if (project.hasProperty("myBintrayUser")) {
   bintray {
     user = myBintrayUser
     key = myBintrayKey
-    publications = ['mainJava', 'sourcesJava', 'mavenJavadoc']
+    publications = ['mainJava', 'sourcesJava']
     pkg {
       repo = 'maven'
       name = project.name

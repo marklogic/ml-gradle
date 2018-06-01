@@ -11,6 +11,7 @@ import com.marklogic.appdeployer.command.alert.DeployAlertRulesCommand;
 import com.marklogic.appdeployer.command.appservers.DeployOtherServersCommand;
 import com.marklogic.appdeployer.command.appservers.UpdateRestApiServersCommand;
 import com.marklogic.appdeployer.command.clusters.ModifyLocalClusterCommand;
+import com.marklogic.appdeployer.command.cma.DeployConfigurationsCommand;
 import com.marklogic.appdeployer.command.cpf.DeployCpfConfigsCommand;
 import com.marklogic.appdeployer.command.cpf.DeployDomainsCommand;
 import com.marklogic.appdeployer.command.cpf.DeployPipelinesCommand;
@@ -79,6 +80,11 @@ public class CommandMapBuilder {
 		List<Command> clusterCommands = new ArrayList<Command>();
 		clusterCommands.add(new ModifyLocalClusterCommand());
 		map.put("mlClusterCommands", clusterCommands);
+
+		// Configurations
+		List<Command> configurationCommands = new ArrayList<>();
+		configurationCommands.add(new DeployConfigurationsCommand());
+		map.put("mlConfigurationCommands", configurationCommands);
 
 		// Databases
 		List<Command> dbCommands = new ArrayList<Command>();

@@ -28,18 +28,23 @@ class UnitTestTask extends MarkLogicTask {
 
 			boolean runTeardown = true
 			boolean runSuiteTeardown = true
+			boolean runCoverage = false
 			if (project.hasProperty("runTeardown")) {
 				runTeardown = Boolean.parseBoolean(project.property("runTeardown"))
 			}
 			if (project.hasProperty("runSuiteTeardown")) {
 				runSuiteTeardown = Boolean.parseBoolean(project.property("runSuiteTeardown"))
 			}
+			if (project.hasProperty("runCodeCoverage")) {
+				runCoverage = Boolean.parseBoolean(project.property("runCodeCoverage"))
+			}
 
 			println "Run teardown scripts: " + runTeardown
 			println "Run suite teardown scripts: " + runSuiteTeardown
+			println "Run code coverage: " + runCoverage
 			println "Running all suites..."
 			long start = System.currentTimeMillis()
-			def suites = testManager.runAllSuites(runTeardown, runSuiteTeardown)
+			def suites = testManager.runAllSuites(runTeardown, runSuiteTeardown, runCoverage)
 			println "Done running all suites; time: " + (System.currentTimeMillis() - start) + "ms"
 			def report = new DefaultJUnitTestReporter().reportOnJUnitTestSuites(suites)
 			println report

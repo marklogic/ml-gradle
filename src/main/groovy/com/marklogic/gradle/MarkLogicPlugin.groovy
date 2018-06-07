@@ -283,6 +283,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlUnitTest", type: UnitTestTask, group: unitTestGroup, description: "Run tests found under /test/suites in the modules database. " +
 			"Connects to MarkLogic via the REST API server defined by mlTestRestPort (or by mlRestPort if mlTestRestPort is not set), and uses mlRest* properties for authentication. " +
 			"Use -PunitTestResultPath to override where test result files are written, which defaults to build/test-results/marklogic-unit-test. " +
+			"Use -PrunCodeCoverage to enable code coverage support when running the tests. " + 
 			"Use -PrunTeardown and -PrunSuiteTeardown to control whether teardown and suite teardown scripts are run; these default to 'true' and can be set to 'false' instead. ")
 
 		logger.info("Finished initializing ml-gradle\n")

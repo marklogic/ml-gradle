@@ -189,7 +189,7 @@ public class ConfigDir {
 	}
 
 	public File getTemporalCollectionsLsqtDir() {
-		return new File(getTemporalCollectionsDir(), "lqst");
+		return new File(getTemporalCollectionsDir(), "lsqt");
 	}
 
 	public File getTasksDir() {

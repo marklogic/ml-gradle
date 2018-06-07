@@ -10,7 +10,7 @@ include this by default (not every ml-gradle user will use ml-unit-test), so it 
         jcenter()
       }
       dependencies {
-        classpath "com.marklogic:ml-unit-test-client:0.11"
+        classpath "com.marklogic:ml-unit-test-client:0.11.1"
       }
     }
 
@@ -22,7 +22,7 @@ is a feature of ml-gradle for depending on packages of MarkLogic modules):
     }
       
     dependencies {
-      mlRestApi "com.marklogic:ml-unit-test-modules:0.11"
+      mlRestApi "com.marklogic:ml-unit-test-modules:0.11.1"
     }
 
 With those additions in place, the "mlUnitTest" task can be run. This task will use the value of mlTestRestPort to 

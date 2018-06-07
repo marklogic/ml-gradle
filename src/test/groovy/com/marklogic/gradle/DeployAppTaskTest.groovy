@@ -8,7 +8,7 @@ class DeployAppTaskTest extends BaseTest {
 
 	def "deploy barebones app"() {
 		setup:
-		print(runTask('mlUnDeploy').output)
+		print(runTask('mlUnDeploy',  '-Pconfirm=true').output)
 
 		expect:
 		def srf = getServerConfig()
@@ -31,7 +31,7 @@ class DeployAppTaskTest extends BaseTest {
 		drf2.resourceExists("my-app-modules")
 
 		cleanup:
-		runTask('mlUndeploy')
+		runTask('mlUndeploy',  '-Pconfirm=true')
 	}
 
 }

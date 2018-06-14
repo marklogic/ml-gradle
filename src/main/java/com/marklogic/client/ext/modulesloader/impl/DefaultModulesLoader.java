@@ -94,7 +94,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	}
 
 	/**
-	 * Use this when you don't need to load asset modules.
+	 * Use this when you don't need to load asset modules - i.e. only need to load REST modules.
 	 */
 	public DefaultModulesLoader() {
 		this.extensionMetadataProvider = new DefaultExtensionMetadataProvider();
@@ -124,8 +124,8 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	/**
 	 * Load modules from the given base directory, selecting modules via the given ModulesFinder, and loading them via
 	 * the given DatabaseClient. Note that asset modules will not be loaded by the DatabaseClient that's passed in here,
-	 * because the /v1/ext endpoint is so slow - load assets instead via a RestApiAssetLoader or an XccAssetLoader
-	 * passed into a constructor for this class.
+	 * because the /v1/ext endpoint is too slow when there are e.g. hundreds of modules or more - asset modules are
+	 * instead loaded via AssetFileLoader.
 	 */
 	public Set<Resource> loadModules(String baseDir, ModulesFinder modulesFinder, DatabaseClient client) {
 		if (logger.isDebugEnabled()) {
@@ -330,7 +330,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		}
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("Loading asset modules from paths: " + Arrays.asList(paths));
+			logger.debug("Loading non-REST modules from paths: " + Arrays.asList(paths));
 		}
 
 		if (includeFilenamePattern != null) {

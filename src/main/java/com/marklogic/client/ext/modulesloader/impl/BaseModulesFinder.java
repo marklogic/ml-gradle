@@ -63,11 +63,11 @@ public abstract class BaseModulesFinder extends LoggingObject implements Modules
 		List<String> recognizedPaths = getRecognizedPaths();
 
 		// classpath needs the trailing / to find child dirs
-		findResources("asset module directories", baseDir, "*", "*/").stream().forEach(resource -> {
+		findResources("non-REST module directories", baseDir, "*", "*/").stream().forEach(resource -> {
 			try {
 				String resourceFile = resource.getURL().getFile();
 				if (logger.isDebugEnabled()) {
-					logger.debug("Checking resource to see if it's a valid asset directory: " + resourceFile);
+					logger.debug("Checking resource to see if it's a valid non-REST module directory: " + resourceFile);
 				}
 
 				resourceFile = decodeAssetDirectoryResource(resourceFile);
@@ -107,7 +107,7 @@ public abstract class BaseModulesFinder extends LoggingObject implements Modules
 	    if (resourceFile.contains("%20")) {
 		    resourceFile = resourceFile.replaceAll("%20", " ");
 		    if (logger.isDebugEnabled()) {
-			    logger.debug("Replaced occurrences of %20 with a space in potential asset directory: " + resourceFile);
+			    logger.debug("Replaced occurrences of %20 with a space in potential non-REST module directory: " + resourceFile);
 		    }
 	    }
 	    return resourceFile;

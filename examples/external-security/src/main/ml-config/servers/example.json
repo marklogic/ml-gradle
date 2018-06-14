@@ -1,0 +1,6 @@
+{
+	"server-type": "http",
+	"server-name": "%%NAME%%",
+	"authentication": "basic",
+  "external-security":["%%cpExternalSecurity%%"]
+}

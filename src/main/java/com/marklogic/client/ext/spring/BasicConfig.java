@@ -1,14 +1,13 @@
 package com.marklogic.client.ext.spring;
 
+import com.marklogic.client.ext.DatabaseClientConfig;
+import com.marklogic.client.ext.helper.DatabaseClientProvider;
+import com.marklogic.xcc.template.XccTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-
-import com.marklogic.client.ext.DatabaseClientConfig;
-import com.marklogic.client.ext.helper.DatabaseClientProvider;
-import com.marklogic.xcc.template.XccTemplate;
 
 /**
  * Provides a basic configuration for Spring-based applications. Assumes that properties can be found in the
@@ -55,8 +54,7 @@ public class BasicConfig {
 
     @Bean
     public XccTemplate xccTemplate() {
-        return new XccTemplate(String.format("xcc://%s:%s@%s:8000/%s", getMlUsername(), getMlPassword(), getMlHost(),
-                buildContentDatabaseName(mlAppName)));
+    	return new XccTemplate(getMlHost(), 8000, getMlUsername(), getMlPassword(), buildContentDatabaseName(mlAppName));
     }
 
     /**

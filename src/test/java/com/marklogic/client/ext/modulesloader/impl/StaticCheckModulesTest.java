@@ -6,7 +6,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.core.io.Resource;
 
-import java.io.File;
 import java.nio.file.Paths;
 import java.util.Set;
 
@@ -27,8 +26,8 @@ public class StaticCheckModulesTest extends AbstractIntegrationTest {
 		client = newClient(database);
 		client.newServerEval().xquery("cts:uris((), (), cts:true-query()) ! xdmp:document-delete(.)").eval();
 
-		xccTemplate = new XccTemplate("xcc://" + clientConfig.getUsername() + ":" + clientConfig.getPassword()
-			+ "@" + clientConfig.getHost() + ":" + clientConfig.getPort() + "/" + database);
+		xccTemplate = new XccTemplate(clientConfig.getHost(), clientConfig.getPort(), clientConfig.getUsername(),
+			clientConfig.getPassword(), database);
 
 		staticChecker = new XccStaticChecker(xccTemplate);
 

@@ -21,6 +21,7 @@ public class XccTemplate {
     private ContentSource contentSource;
 
     public XccTemplate(String uri) {
+    	logger.info("uri: " + uri);
         try {
             contentSource = ContentSourceFactory.newContentSource(new URI(uri));
             if (logger.isInfoEnabled()) {
@@ -33,6 +34,21 @@ public class XccTemplate {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public XccTemplate(String host, int port, String username, String password, String contentDatabaseName) {
+	    char[] charPassword;
+	    if (password != null) {
+		    charPassword = password.toCharArray();
+	    } else {
+		    charPassword = new char[]{};
+	    }
+
+	    if (contentDatabaseName != null) {
+		    this.contentSource = ContentSourceFactory.newContentSource(host, port, username, charPassword, contentDatabaseName);
+	    } else {
+		    this.contentSource = ContentSourceFactory.newContentSource(host, port, username, charPassword);
+	    }
     }
 
     public XccTemplate(ContentSource contentSource) {

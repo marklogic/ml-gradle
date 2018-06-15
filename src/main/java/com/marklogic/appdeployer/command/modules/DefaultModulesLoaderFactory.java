@@ -14,7 +14,6 @@ import com.marklogic.client.ext.tokenreplacer.TokenReplacer;
 import com.marklogic.xcc.template.XccTemplate;
 
 import java.util.Map;
-import java.util.Properties;
 import java.util.regex.Pattern;
 
 public class DefaultModulesLoaderFactory extends LoggingObject implements ModulesLoaderFactory {
@@ -81,10 +80,9 @@ public class DefaultModulesLoaderFactory extends LoggingObject implements Module
 	 * @return
 	 */
 	protected StaticChecker newStaticChecker(AppConfig appConfig) {
-		String xccUri = "xcc://%s:%s@%s:%d";
-		xccUri = String.format(xccUri, appConfig.getRestAdminUsername(), appConfig.getRestAdminPassword(),
-			appConfig.getHost(), appConfig.getRestPort());
-		XccStaticChecker checker = new XccStaticChecker(new XccTemplate(xccUri));
+		XccTemplate t = new XccTemplate(appConfig.getHost(), appConfig.getRestPort(), appConfig.getRestAdminUsername(),
+			appConfig.getRestAdminPassword(), null);
+		XccStaticChecker checker = new XccStaticChecker(t);
 		checker.setBulkCheck(appConfig.isBulkLoadAssets());
 		checker.setCheckLibraryModules(appConfig.isStaticCheckLibraryAssets());
 		return checker;

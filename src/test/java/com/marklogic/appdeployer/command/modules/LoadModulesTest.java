@@ -19,8 +19,8 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 
 	@Before
 	public void setup() {
-		xccTemplate = new XccTemplate(format("xcc://%s:%s@%s:8000/%s", appConfig.getRestAdminUsername(),
-			appConfig.getRestAdminPassword(), appConfig.getHost(), appConfig.getModulesDatabaseName()));
+		xccTemplate = new XccTemplate(appConfig.getHost(), appConfig.getAppServicesPort(), appConfig.getRestAdminUsername(),
+			appConfig.getRestAdminPassword(), appConfig.getModulesDatabaseName());
 	}
 
 	@After

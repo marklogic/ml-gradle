@@ -66,8 +66,8 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
     }
 
     protected XccTemplate newModulesXccTemplate() {
-        return new XccTemplate(format("xcc://%s:%s@%s:8000/%s", appConfig.getRestAdminUsername(),
-                appConfig.getRestAdminPassword(), appConfig.getHost(), appConfig.getModulesDatabaseName()));
+    	return new XccTemplate(appConfig.getHost(), appConfig.getAppServicesPort(), appConfig.getRestAdminUsername(),
+		    appConfig.getRestAdminPassword(), appConfig.getModulesDatabaseName());
     }
 
     /**

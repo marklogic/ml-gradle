@@ -42,8 +42,19 @@ class WatchTask extends MarkLogicTask {
 
 		if (loader instanceof DefaultModulesLoader) {
 			DefaultModulesLoader dml = (DefaultModulesLoader) loader
+
+			/**
+			 * This is unfortunately more complicated than it should be. catchExceptions doesn't really apply to
+			 * REST modules because REST modules are loaded async - unless DefaultModulesLoader's thread count is set
+			 * to 1, in which case catchExceptions suffices. rethrowRestModulesFailure was added in 3.7.0 of
+			 * ml-javaclient-util to cause deployments to fail when REST modules fail to load, which is good default
+			 * behavior but isn't good for this task. 
+			 */
 			dml.setCatchExceptions(true)
+			dml.setRethrowRestModulesFailure(false)
+
 			dml.setShutdownTaskExecutorAfterLoadingModules(false)
+
 			if (project.hasProperty("ignoreDirty") && "true".equals(project.property("ignoreDirty"))) {
 				ModulesManager mgr = dml.getModulesManager()
 				if (mgr instanceof PropertiesModuleManager) {

@@ -1,0 +1,3 @@
+plugins {
+	id "com.marklogic.ml-gradle" version "3.6.0"
+}

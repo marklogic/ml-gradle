@@ -15,6 +15,7 @@ import com.marklogic.gradle.task.alert.DeleteAllAlertConfigsTask
 import com.marklogic.gradle.task.alert.DeployAlertingTask
 import com.marklogic.gradle.task.client.*
 import com.marklogic.gradle.task.cluster.*
+import com.marklogic.gradle.task.configuration.DeployConfigurationsTask
 import com.marklogic.gradle.task.cpf.DeployCpfTask
 import com.marklogic.gradle.task.cpf.LoadDefaultPipelinesTask
 import com.marklogic.gradle.task.databases.*
@@ -26,6 +27,7 @@ import com.marklogic.gradle.task.forests.ConfigureForestReplicasTask
 import com.marklogic.gradle.task.forests.DeleteForestReplicasTask
 import com.marklogic.gradle.task.forests.DeployCustomForestsTask
 import com.marklogic.gradle.task.forests.DeployForestReplicasTask
+import com.marklogic.gradle.task.forests.PrintForestPlanTask
 import com.marklogic.gradle.task.groups.DeployGroupsTask
 import com.marklogic.gradle.task.groups.SetTraceEventsTask
 import com.marklogic.gradle.task.hosts.AssignHostsToGroupsTask
@@ -105,6 +107,9 @@ class MarkLogicPlugin implements Plugin<Project> {
 		String alertGroup = "ml-gradle Alert"
 		project.task("mlDeleteAllAlertConfigs", type: DeleteAllAlertConfigsTask, group: alertGroup, description: "Delete all alert configs, which also deletes all of the actions rules associated with them")
 		project.task("mlDeployAlerting", type: DeployAlertingTask, group: alertGroup, description: "Deploy each alerting resource - configs, actions, and rules - in the configuration directory")
+
+		String configurationGroup = "ml-gradle Configuration"
+		project.task("mlDeployConfigurations", type: DeployConfigurationsTask, group: configurationGroup, description: "Deploy each configuration (requires at least MarkLogic 9.0-5) in the configuration directory")
 
 		String cpfGroup = "ml-gradle CPF"
 		project.task("mlDeployCpf", type: DeployCpfTask, group: cpfGroup, description: "Deploy each CPF resource - domains, pipelines, and CPF configs - in the configuration directory").mustRunAfter("mlClearTriggersDatabase")
@@ -187,6 +192,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlDeleteForestReplicas", type: DeleteForestReplicasTask, group: forestGroup, description: "Deprecated - delete forest replicas via the command.forestNamesAndReplicaCounts map")
 		project.task("mlDeployCustomForests", type: DeployCustomForestsTask, group: forestGroup, description: "Deploy custom forests as defined in subdirectories of the forests configuration directory")
 		project.task("mlDeployForestReplicas", type: DeployForestReplicasTask, group: forestGroup, description: "Prefer this over mlConfigureForestReplicas; it does the same thing, but uses the ConfigureForestReplicasCommand that is used by mlDeploy")
+		project.task("mlPrintForestPlan", type: PrintForestPlanTask, group: forestGroup, description: "Print a list of primary forests to be created for a database specified by -Pdatabase=(name of database) when the database is next deployed")
 
 		String groupsGroup = "ml-gradle Group"
 		project.task("mlDeployGroups", type: DeployGroupsTask, group: groupsGroup, description: "Deploy each group, updating it if it exists, in the configuration directory")
@@ -277,6 +283,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlUnitTest", type: UnitTestTask, group: unitTestGroup, description: "Run tests found under /test/suites in the modules database. " +
 			"Connects to MarkLogic via the REST API server defined by mlTestRestPort (or by mlRestPort if mlTestRestPort is not set), and uses mlRest* properties for authentication. " +
 			"Use -PunitTestResultPath to override where test result files are written, which defaults to build/test-results/marklogic-unit-test. " +
+			"Use -PrunCodeCoverage to enable code coverage support when running the tests. " + 
 			"Use -PrunTeardown and -PrunSuiteTeardown to control whether teardown and suite teardown scripts are run; these default to 'true' and can be set to 'false' instead. ")
 
 		logger.info("Finished initializing ml-gradle\n")

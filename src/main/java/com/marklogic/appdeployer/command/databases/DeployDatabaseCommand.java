@@ -141,7 +141,7 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 
     /**
      * Creates and attaches sub-databases to a the specified database, making it a super-database.
-     * Note: Sub-databases are expected to have a configuration files in databases/subdatabases/<super-database-name>
+     * Note: Sub-databases are expected to have a configuration files in databases/subdatabases/super-database-name
      * @param dbMgr
      * @param context
      * @param superDatabaseName Name of the database the sub-databases are to be associated with

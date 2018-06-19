@@ -1,10 +1,12 @@
 package com.marklogic.mgmt.resource.security;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.resource.AbstractResourceManager;
 import com.marklogic.mgmt.util.ObjectMapperFactory;
 import com.marklogic.rest.util.Fragment;
+
 import org.springframework.http.ResponseEntity;
 
 /**
@@ -72,10 +74,60 @@ public class CertificateTemplateManager extends AbstractResourceManager {
                     json));
         }
         return postPayload(getManageClient(), getResourcePath(templateIdOrName), json);
-    }
+	 }
+
+	/**
+	 * Inserts a host certificate for a given template.
+	 *
+	 * Even though service allows multiple inserts in one call, this only inserts one host cert at a time.
+	 *
+	 * Note that the docs as of ML 9.0-5 are not correct for this operation - this method submits the correct JSON
+	 * structure.
+	 *
+	 * @param templateIdOrName The template name to insert the host certificates
+	 * @param pubCert the Public PEM formatted certificate
+	 * @param privateKey the Private PEM formatted certificate
+	 */
+	public ResponseEntity<String> insertHostCertificate(String templateIdOrName, String pubCert, String privateKey) {
+		ObjectNode command = ObjectMapperFactory.getObjectMapper().createObjectNode();
+		command.put("operation", "insert-host-certificates");
+		ArrayNode certs = ObjectMapperFactory.getObjectMapper().createArrayNode();
+
+		ObjectNode certificate = ObjectMapperFactory.getObjectMapper().createObjectNode();
+		ObjectNode cert = ObjectMapperFactory.getObjectMapper().createObjectNode();
+
+		certificate.put("cert", pubCert);
+		certificate.put("pkey", privateKey);
+		cert.set("certificate", certificate);
+		certs.add(cert);
+
+		command.set("certificates", certs);
+
+		String json = command.toString();
+		if (logger.isInfoEnabled()) {
+			// NOTE - should NOT print out private key - EVER
+			logger.info(format("Inserting host certificate for template %s", templateIdOrName));
+		}
+		return postPayload(getManageClient(), getResourcePath(templateIdOrName), json);
+	}
+
+	/**
+	 * Utility service to determine if certificates exist for a template.
+	 *
+	 * Used because ML9.0-5 (and prior) has bug for "needs-certificate" call
+	 */
+	public boolean certificateExists(String templateIdOrName) {
+		Fragment response = getCertificatesForTemplate(templateIdOrName);
+		if (logger.isDebugEnabled()) {
+			logger.debug(format("Checking if %s template has certificates --> for template: %s", templateIdOrName, response.getPrettyXml()));
+		}
+
+		return response.elementExists("/msec:certificate-list/msec:certificate");
+	}
 
     public Fragment getCertificatesForTemplate(String templateIdOrName) {
         ObjectNode node = ObjectMapperFactory.getObjectMapper().createObjectNode();
+        // Note the docs in ML 9.0-5 have a typo - it's "certificates", not "certificate"
         node.put("operation", "get-certificates-for-template");
 
         String json = node.toString();

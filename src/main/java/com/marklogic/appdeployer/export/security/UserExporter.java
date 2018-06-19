@@ -45,7 +45,6 @@ public class UserExporter extends AbstractNamedResourceExporter {
 	 * allows the user to be immediately deployed, and the developer can then change the password to a real one at a
 	 * later date.
 	 *
-	 * @param resourceName
 	 * @param payload
 	 * @return
 	 */

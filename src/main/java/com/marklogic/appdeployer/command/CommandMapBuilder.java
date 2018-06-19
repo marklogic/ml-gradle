@@ -34,6 +34,7 @@ import com.marklogic.appdeployer.command.schemas.LoadSchemasCommand;
 import com.marklogic.appdeployer.command.security.DeployAmpsCommand;
 import com.marklogic.appdeployer.command.security.DeployCertificateAuthoritiesCommand;
 import com.marklogic.appdeployer.command.security.DeployCertificateTemplatesCommand;
+import com.marklogic.appdeployer.command.security.InsertCertificateHostsTemplateCommand;
 import com.marklogic.appdeployer.command.security.DeployExternalSecurityCommand;
 import com.marklogic.appdeployer.command.security.DeployPrivilegesCommand;
 import com.marklogic.appdeployer.command.security.DeployProtectedCollectionsCommand;
@@ -69,6 +70,7 @@ public class CommandMapBuilder {
 		securityCommands.add(new DeployAmpsCommand());
 		securityCommands.add(new DeployCertificateTemplatesCommand());
 		securityCommands.add(new DeployCertificateAuthoritiesCommand());
+		securityCommands.add(new InsertCertificateHostsTemplateCommand());
 		securityCommands.add(new DeployExternalSecurityCommand());
 		securityCommands.add(new DeployPrivilegesCommand());
 		securityCommands.add(new DeployProtectedCollectionsCommand());

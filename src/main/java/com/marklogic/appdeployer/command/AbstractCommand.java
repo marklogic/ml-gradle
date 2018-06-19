@@ -3,6 +3,7 @@ package com.marklogic.appdeployer.command;
 import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.admin.AdminManager;
+import com.marklogic.mgmt.cma.ConfigurationManager;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.SaveReceipt;
 import org.springframework.http.HttpHeaders;
@@ -272,6 +273,13 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
     	 if (dir != null && logger.isInfoEnabled()) {
 		    logger.info("No resource directory found at: " + dir.getAbsolutePath());
 	    }
+    }
+
+    protected boolean shouldOptimizeWithCma(CommandContext context) {
+    	if (context.getAppConfig().isOptimizeWithCma()) {
+		    return new ConfigurationManager(context.getManageClient()).endpointExists();
+	    }
+	    return false;
     }
 
     public void setPayloadTokenReplacer(PayloadTokenReplacer payloadTokenReplacer) {

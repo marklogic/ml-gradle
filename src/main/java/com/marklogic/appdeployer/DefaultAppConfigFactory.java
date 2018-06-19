@@ -40,6 +40,11 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			config.setCatchUndeployExceptions(Boolean.parseBoolean(prop));
 		});
 
+		propertyConsumerMap.put("mlOptimizeWithCma", (config, prop) -> {
+			logger.info("Optimize with the Configuration Management API (CMA): " + prop);
+			config.setOptimizeWithCma(Boolean.parseBoolean(prop));
+		});
+
 		/**
 		 * The application name is used as a prefix for default names for a variety of resources, such as REST API servers
 		 * and databases.

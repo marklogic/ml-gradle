@@ -107,6 +107,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 
         p.setProperty("mlCatchDeployExceptions", "true");
 	    p.setProperty("mlCatchUndeployExceptions", "true");
+	    p.setProperty("mlOptimizeWithCma", "true");
 
 	    p.setProperty("mlHost", "prophost");
         p.setProperty("mlAppName", "propname");
@@ -201,6 +202,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 
         assertTrue(config.isCatchDeployExceptions());
         assertTrue(config.isCatchUndeployExceptions());
+        assertTrue(config.isOptimizeWithCma());
 
         assertEquals("prophost", config.getHost());
         assertEquals("propname", config.getName());

@@ -3,7 +3,6 @@ package com.marklogic.appdeployer;
 import com.marklogic.appdeployer.command.forests.ForestNamingStrategy;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
-import com.marklogic.client.DatabaseClientFactory.Authentication;
 import com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier;
 import com.marklogic.client.ext.ConfiguredDatabaseClientFactory;
 import com.marklogic.client.ext.DatabaseClientConfig;
@@ -66,6 +65,11 @@ public class AppConfig {
 
     private boolean catchDeployExceptions = false;
     private boolean catchUndeployExceptions = false;
+
+    // Whether to optimize certain operations with the Configuration Management API (CMA) if it's available
+	// For version 3.8.0, defaulting this to false as it's a new feature.
+	// Will default it to true once we have more experience with CMA under our belts.
+    private boolean optimizeWithCma = false;
 
     // Used to construct DatabaseClient instances based on inputs defined in this class
     private ConfiguredDatabaseClientFactory configuredDatabaseClientFactory = new DefaultConfiguredDatabaseClientFactory();
@@ -1203,5 +1207,13 @@ public class AppConfig {
 
 	public void setForestNamingStrategies(Map<String, ForestNamingStrategy> forestNamingStrategies) {
 		this.forestNamingStrategies = forestNamingStrategies;
+	}
+
+	public boolean isOptimizeWithCma() {
+		return optimizeWithCma;
+	}
+
+	public void setOptimizeWithCma(boolean optimizeWithCma) {
+		this.optimizeWithCma = optimizeWithCma;
 	}
 }

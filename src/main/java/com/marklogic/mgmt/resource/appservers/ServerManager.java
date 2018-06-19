@@ -1,5 +1,6 @@
 package com.marklogic.mgmt.resource.appservers;
 
+import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.resource.AbstractResourceManager;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.rest.util.Fragment;
@@ -19,6 +20,24 @@ public class ServerManager extends AbstractResourceManager {
         super(manageClient);
         this.groupName = groupName != null ? groupName : DEFAULT_GROUP;
     }
+
+	/**
+	 * This is hacky, but it should be close to 100% reliable. Worst case is that the payload has the string
+	 * "external-security" in some other field and we unnecessarily use the security user.
+	 *
+	 * Public so that it can be unit-tested easily.
+	 *
+	 * @param payload
+	 * @return
+	 */
+	@Override
+	public boolean useSecurityUser(String payload) {
+		boolean b = payload != null && payload.contains("external-security");
+		if (b && logger.isInfoEnabled()) {
+			logger.info("Server payload contains external-security, so using the security user");
+		}
+		return b;
+	}
 
 	/**
 	 * When doing an existence check, have to take the group name into account.

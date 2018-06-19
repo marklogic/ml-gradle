@@ -22,6 +22,17 @@ public class AbstractManager extends LoggingObject {
         return false;
     }
 
+	/**
+	 * Some payloads - such as a server payload that uses external security - require a condition to determine if the
+	 * security user should be used or not.
+	 *
+	 * @param payload
+	 * @return
+	 */
+	protected boolean useSecurityUser(String payload) {
+    	return useSecurityUser();
+    }
+
     /**
      * Assumes the resource name is based on the class name - e.g. RoleManager would have a resource name of "role".
      *
@@ -48,7 +59,7 @@ public class AbstractManager extends LoggingObject {
     }
 
     protected ResponseEntity<String> putPayload(ManageClient client, String path, String payload) {
-        boolean requiresSecurityUser = useSecurityUser();
+        boolean requiresSecurityUser = useSecurityUser(payload);
         if (payloadParser.isJsonPayload(payload)) {
             return requiresSecurityUser ? client.putJsonAsSecurityUser(path, payload) : client.putJson(path, payload);
         }
@@ -56,7 +67,7 @@ public class AbstractManager extends LoggingObject {
     }
 
     protected ResponseEntity<String> postPayload(ManageClient client, String path, String payload) {
-        boolean requiresSecurityUser = useSecurityUser();
+        boolean requiresSecurityUser = useSecurityUser(payload);
         if (payloadParser.isJsonPayload(payload)) {
             return requiresSecurityUser ? client.postJsonAsSecurityUser(path, payload) : client.postJson(path, payload);
         }

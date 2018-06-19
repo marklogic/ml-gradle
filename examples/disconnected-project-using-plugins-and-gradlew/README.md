@@ -98,3 +98,20 @@ task downloadToProjectMavenRepo(type: Copy) {
     configurations.runtime.files
      ...
 ```
+
+## Use own gradle instance (rather than gradlew)
+
+If you want to install gradle instead of bundling gradle wrapper (gradlew) with the offline.zip, you can do that too using the following steps
+
+1. Remove build directory (to ensure that no gradlew zip exists in the build dir)
+
+2. Create deployer zip
+```
+gradle -Dgradle.user.home=build/gradle-home makeOfflineZip 
+```
+3. Copy zip (build/distributions/offline.zip) to desired location / server and unzip
+
+4. Run  disconnected tasks from unzip location
+```
+gradle mlDeploy -Pdisconnected=true
+```

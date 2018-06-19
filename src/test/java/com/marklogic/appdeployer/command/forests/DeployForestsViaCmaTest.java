@@ -19,7 +19,7 @@ public class DeployForestsViaCmaTest extends AbstractAppDeployerTest {
 	 */
 	@Test
 	public void test() {
-		//appConfig.setOptimizeWithCma(true);
+		appConfig.setOptimizeWithCma(true);
 		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/db-only-config"));
 
 		initializeAppDeployer(new DeployContentDatabasesCommand(6));

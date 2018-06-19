@@ -569,7 +569,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 			try {
 				r.run();
 			} catch (Exception e) {
-				failureListeners.forEach(listener -> listener.processFailure(e));
+				failureListeners.forEach(listener -> listener.processFailure(e, this.client));
 			}
 		});
 	}

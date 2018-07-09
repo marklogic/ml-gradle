@@ -1,5 +1,7 @@
 This project shows an example of using the ml-unit-test framework to run server-side tests within MarkLogic.
 
+## Enabling ml-unit-test in an ml-gradle project 
+
 Using ml-unit-test requires two additions to the build.gradle file, as described below.
 
 First, ml-gradle includes an "mlUnitTest" task, which depends on the ml-unit-test-client JAR file. ml-gradle does not
@@ -25,8 +27,10 @@ is a feature of ml-gradle for depending on packages of MarkLogic modules):
       mlRestApi "com.marklogic:ml-unit-test-modules:0.11.1"
     }
 
-With those additions in place, the "mlUnitTest" task can be run. This task will use the value of mlTestRestPort to 
-determine which MarkLogic app server to connect to. 
+## Running unit tests
+
+With the above additions in place, the "mlUnitTest" task can be run. This task will use the value of mlTestRestPort to 
+determine which MarkLogic app server to connect to - see below for how to customize this. 
 
 First, deploy the application:
 
@@ -56,3 +60,28 @@ You can also access the ml-unit-test REST endpoints directly:
 And you can run the original UI test runner by going to:
 
 - http://localhost:8135/test/default.xqy
+
+## Configuring which server mlUnitTest connects to 
+
+Prior to ml-gradle 3.8.1, the mlUnitTest task will connect to mlTestRestPort if it's set, else mlRestPort. 
+
+Starting in release 3.8.1, you can configure which REST API server mlUnitTest will connect to. The mlUnitTest task now
+exposes a property of type [DatabaseClientConfig](https://github.com/marklogic-community/ml-javaclient-util/blob/master/src/main/java/com/marklogic/client/ext/DatabaseClientConfig.java). 
+You can configure the properties of this object, and mlUnitTest will use it for creating a connection to MarkLogic. 
+
+Below is an example - note that you need to configure every property necessary for the type of connection you want, as 
+none of the properties of the DatabaseClientConfig have any default value:
+
+    mlUnitTest.databaseClientConfig.host = mlHost
+    mlUnitTest.databaseClientConfig.port = 8880 // probably a port that differs from mlRestPort and mlTestRestPort
+    mlUnitTest.databaseClientConfig.username = mlUsername
+    mlUnitTest.databaseClientConfig.password = mlPassword
+    // Other properties that can be set
+    // mlUnitTest.databaseClientConfig.securityContextType
+    // mlUnitTest.databaseClientConfig.database
+    // mlUnitTest.databaseClientConfig.sslContext
+    // mlUnitTest.databaseClientConfig.sslHostnameVerifier
+    // mlUnitTest.databaseClientConfig.certFile
+    // mlUnitTest.databaseClientConfig.certPassword 
+    // mlUnitTest.databaseClientConfig.externalName
+    // mlUnitTest.databaseClientConfig.trustManager

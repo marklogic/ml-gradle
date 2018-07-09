@@ -24,17 +24,27 @@ public class DeployMimetypesCommand extends AbstractResourceCommand {
 
     @Override
     protected ResourceManager getResourceManager(CommandContext context) {
-        return new MimetypeManager(context.getManageClient());
+        MimetypeManager mgr = new MimetypeManager(context.getManageClient());
+        if (context.getAppConfig().isUpdateMimetypeWhenPropertiesAreEqual()) {
+        	mgr.setUpdateWhenPropertiesAreEqual(true);
+        } else {
+        	mgr.setUpdateWhenPropertiesAreEqual(false);
+        }
+        return mgr;
     }
 
     /**
      * As of ML 8.0-4, any time a mimetype is created or updated, ML must be restarted.
+     *
+     * In ml-app-deployer 3.8.1 though, a restart won't occur on an update if the mimetype properties have not changed.
      */
     @Override
     protected void afterResourceSaved(ResourceManager mgr, CommandContext context, File resourceFile,
             SaveReceipt receipt) {
-        logger.info("Waiting for restart after saving mimetype");
-        context.getAdminManager().waitForRestart();
+    	if (receipt != null && receipt.hasLocationHeader()) {
+		    logger.info("Waiting for restart after saving mimetype");
+		    context.getAdminManager().waitForRestart();
+	    }
     }
 
 }

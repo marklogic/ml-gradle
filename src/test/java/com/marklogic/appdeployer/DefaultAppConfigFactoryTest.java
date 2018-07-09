@@ -197,6 +197,8 @@ public class DefaultAppConfigFactoryTest extends Assert {
 
 	    p.setProperty("mlHostGroups", "host1,Default,host2,other-group");
 
+	    p.setProperty("mlUpdateMimetypeWhenPropertiesAreEqual", "true");
+
 	    sut = new DefaultAppConfigFactory(new SimplePropertySource(p));
         AppConfig config = sut.newAppConfig();
 
@@ -344,6 +346,8 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    map = config.getHostGroups();
 	    assertEquals("Default", map.get("host1"));
 	    assertEquals("other-group", map.get("host2"));
+
+	    assertTrue(config.isUpdateMimetypeWhenPropertiesAreEqual());
     }
 
 	/**

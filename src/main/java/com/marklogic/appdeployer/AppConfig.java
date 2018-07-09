@@ -216,6 +216,8 @@ public class AppConfig {
 	// Properties to include in resource payloads
 	private String[] includeProperties;
 
+	private boolean updateMimetypeWhenPropertiesAreEqual = false;
+
 	private Map<String, Object> additionalProperties = new HashMap<>();
 
 	public AppConfig() {
@@ -1215,5 +1217,13 @@ public class AppConfig {
 
 	public void setOptimizeWithCma(boolean optimizeWithCma) {
 		this.optimizeWithCma = optimizeWithCma;
+	}
+
+	public boolean isUpdateMimetypeWhenPropertiesAreEqual() {
+		return updateMimetypeWhenPropertiesAreEqual;
+	}
+
+	public void setUpdateMimetypeWhenPropertiesAreEqual(boolean updateMimetypeWhenPropertiesAreEqual) {
+		this.updateMimetypeWhenPropertiesAreEqual = updateMimetypeWhenPropertiesAreEqual;
 	}
 }

@@ -625,6 +625,11 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			logger.info("Will include only these properties in all resource payloads: " + Arrays.asList(values));
 			config.setIncludeProperties(values);
 		});
+
+		propertyConsumerMap.put("mlUpdateMimetypeWhenPropertiesAreEqual", (config, prop) -> {
+			logger.info("Update mimetype when properties are equal (defaults to false to avoid unnecessary ML restarts): " + prop);
+			config.setUpdateMimetypeWhenPropertiesAreEqual(Boolean.parseBoolean(prop));
+		});
 	}
 
 	@Override

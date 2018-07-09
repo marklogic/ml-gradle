@@ -21,6 +21,9 @@ dependencies {
   compile 'org.apache.httpcomponents:httpclient:4.3.5'
   compile 'org.springframework:spring-web:4.3.5.RELEASE'
 
+	// For EqualsBuilder; added in 3.8.1 to support detecting if a mimetype's properties have changed or not
+	compile "org.apache.commons:commons-lang3:3.7"
+
 	// Don't want to include this in the published jar, just the executable jar
 	compileOnly "com.beust:jcommander:1.72"
 

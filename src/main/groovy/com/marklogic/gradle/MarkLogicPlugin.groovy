@@ -35,6 +35,7 @@ import com.marklogic.gradle.task.mimetypes.DeployMimetypesTask
 import com.marklogic.gradle.task.mimetypes.UndeployMimetypesTask
 import com.marklogic.gradle.task.qconsole.ExportWorkspacesTask
 import com.marklogic.gradle.task.qconsole.ImportWorkspacesTask
+import com.marklogic.gradle.task.restapis.DeployRestApisTask
 import com.marklogic.gradle.task.roxy.RoxyMigrateBuildStepsTask
 import com.marklogic.gradle.task.roxy.RoxyMigrateFilesTask
 import com.marklogic.gradle.task.roxy.RoxyMigratePropertiesTask
@@ -214,6 +215,9 @@ class MarkLogicPlugin implements Plugin<Project> {
 		String qconsoleGroup = "ml-gradle qconsole"
 		project.task("mlImportWorkspaces", type: ImportWorkspacesTask, group: qconsoleGroup, description: "Import workspaces into qconsole")
 		project.task("mlExportWorkspaces", type: ExportWorkspacesTask, group: qconsoleGroup, description: "Export workspaces from qconsole")
+
+		String restApisGroup = "ml-gradle REST API"
+		project.task("mlDeployRestApis", type: DeployRestApisTask, group: restApisGroup, description: "Deploy the REST API instances defined by a resource file or the mlRestPort/mlTestRestPort properties")
 
 		String schemasGroup = "ml-gradle Schemas"
 		project.task("mlLoadSchemas", type: LoadSchemasTask, group: schemasGroup, description: "Loads special-purpose data into the schemas database (XSD schemas, Inference rules, and [MarkLogic 9] Extraction Templates)").mustRunAfter("mlClearSchemasDatabase")

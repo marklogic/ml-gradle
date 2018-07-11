@@ -2,6 +2,7 @@ package com.marklogic.mgmt.resource.flexrep;
 
 import com.marklogic.mgmt.resource.AbstractResourceManager;
 import com.marklogic.mgmt.ManageClient;
+import com.marklogic.rest.util.Fragment;
 
 public class TargetManager extends AbstractResourceManager {
 
@@ -37,5 +38,10 @@ public class TargetManager extends AbstractResourceManager {
 
     public void enableTarget(String targetIdOrName) {
         getManageClient().putJson(getPropertiesPath(targetIdOrName), "{\"enabled\":true}");
+    }
+
+    public String getTargetId(String targetName) {
+		Fragment f =  getManageClient().getXml(getResourcesPath() +"/" + targetName);
+	    return f.getElementValue("/node()/db:id");
     }
 }

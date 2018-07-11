@@ -2,6 +2,7 @@ package com.marklogic.mgmt.resource.flexrep;
 
 import com.marklogic.mgmt.resource.AbstractResourceManager;
 import com.marklogic.mgmt.ManageClient;
+import com.marklogic.rest.util.Fragment;
 
 public class ConfigManager extends AbstractResourceManager {
 
@@ -45,6 +46,11 @@ public class ConfigManager extends AbstractResourceManager {
         for (String nameref : getAsXml().getListItemNameRefs()) {
             new TargetManager(getManageClient(), this.databaseIdOrName, nameref).enableAllTargets();
         }
+    }
+
+    public String getDomainID(String configName) {
+	    Fragment f =  getManageClient().getXml(getResourcesPath() +"/" + configName);
+	    return f.getElementValue("/node()/db:id");
     }
 
 }

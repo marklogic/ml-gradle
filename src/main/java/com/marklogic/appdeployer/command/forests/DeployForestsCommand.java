@@ -31,6 +31,12 @@ import java.util.Set;
  */
 public class DeployForestsCommand extends AbstractCommand {
 
+	/**
+	 * This was added back in 3.8.2 to preserve backwards compatibility, as it was removed in 3.7.0.
+	 */
+	public static final String DEFAULT_FOREST_PAYLOAD = "{\"forest-name\": \"%%FOREST_NAME%%\", \"host\": \"%%FOREST_HOST%%\", "
+		+ "\"database\": \"%%FOREST_DATABASE%%\"}";
+
 	private int forestsPerHost = 1;
 	private String databaseName;
 	private String forestFilename;
@@ -38,8 +44,22 @@ public class DeployForestsCommand extends AbstractCommand {
 	private boolean createForestsOnEachHost = true;
 	private HostCalculator hostCalculator;
 
-	public DeployForestsCommand(String databaseName) {
+	/**
+	 * This was added back in 3.8.2 to preserve backwards compatibility, as it was removed in 3.7.0. If you use this
+	 * constructor, be sure to call setDatabaseName.
+	 */
+	public DeployForestsCommand() {
 		setExecuteSortOrder(SortOrderConstants.DEPLOY_FORESTS);
+	}
+
+	/**
+	 * This is the preferred constructor to use for this class, as it requires a database name, which is required for
+	 * this command to execute correctly.
+	 *
+	 * @param databaseName
+	 */
+	public DeployForestsCommand(String databaseName) {
+		this();
 		this.databaseName = databaseName;
 	}
 
@@ -216,5 +236,14 @@ public class DeployForestsCommand extends AbstractCommand {
 
 	public void setHostCalculator(HostCalculator hostCalculator) {
 		this.hostCalculator = hostCalculator;
+	}
+
+	/**
+	 * This was added back in 3.8.2 to preserve backwards compatibility, as it was removed in 3.7.0.
+	 *
+	 * @param databaseName
+	 */
+	public void setDatabaseName(String databaseName) {
+		this.databaseName = databaseName;
 	}
 }

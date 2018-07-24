@@ -1,0 +1,21 @@
+version: '3'
+services:
+  node1:
+    build: "./src/main/docker/marklogic"
+    image: "marklogic:latest"
+    #image: "mlregistry.marklogic.com/marklogic/ml-9.0-5"
+    ports:
+    # choose what ports you want to expose (at least 8000 8001 8002)
+      - "8000-8050:8000-8050"
+    hostname: "node1.single"
+    container_name: "node1.single"
+    volumes:
+       - ./logs/node1:/var/opt/MarkLogic/Logs
+
+# optionally specify the subnet
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.68.0.0/16

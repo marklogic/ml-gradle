@@ -1,0 +1,33 @@
+plugins {
+    // gradle -PenvironmentName=x ...
+    id 'net.saliman.properties' version '1.4.6'
+    id "com.marklogic.ml-gradle" version "3.8.1"
+    id 'com.avast.gradle.docker-compose' version "0.6.11"
+}
+dockerCompose {
+    waitForTcpPorts = false
+}
+
+task mlDockerSetupNode(dependsOn:composeUp)  {
+  doLast {
+    sleep(5 * 1000) //ensure node is up
+    exec {
+      commandLine 'docker', 'exec', 'node1.single', 'init-marklogic' 
+    }
+  }
+}
+
+mlDeploy.shouldRunAfter mlDockerSetupNode
+
+task mlDockerDeploy(dependsOn:[mlDockerSetupNode,mlDeploy])
+
+task mlDockerStart(dependsOn:composeUp)
+
+task mlDockerStop(type:Exec) {
+  commandLine "docker-compose", "stop"
+}
+
+task mlDockerTeardown(type: Delete, dependsOn:composeDown) {
+  //remove logs directory
+  delete 'logs'
+}

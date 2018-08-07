@@ -11,6 +11,9 @@ import com.marklogic.client.ext.modulesloader.impl.DefaultModulesLoader
 import com.marklogic.client.ext.modulesloader.impl.PropertiesModuleManager
 import com.marklogic.gradle.task.MarkLogicTask
 import org.gradle.api.tasks.TaskAction
+import org.springframework.core.io.Resource
+
+import java.util.function.Consumer
 
 /**
  * Runs an infinite loop, and each second, it loads any new/modified modules. Often useful to run with the Gradle "-i" flag
@@ -22,6 +25,8 @@ import org.gradle.api.tasks.TaskAction
 class WatchTask extends MarkLogicTask {
 
 	long sleepTime = 1000
+
+	Consumer<Set<Resource>> onModulesLoaded
 
 	@TaskAction
 	void watchModules() {
@@ -72,7 +77,10 @@ class WatchTask extends MarkLogicTask {
 		DatabaseClient client = newClient()
 		while (true) {
 			for (String path : paths) {
-				loader.loadModules(path, new DefaultModulesFinder(), client);
+				Set<Resource> loadedModules = loader.loadModules(path, new DefaultModulesFinder(), client);
+				if (onModulesLoaded != null && loadedModules != null && !loadedModules.isEmpty()) {
+					onModulesLoaded.accept(loadedModules)
+				}
 			}
 			try {
 				Thread.sleep(sleepTime);

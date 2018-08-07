@@ -13,6 +13,7 @@ import com.marklogic.client.ext.modulesloader.ssl.SimpleX509TrustManager;
 import com.marklogic.client.ext.tokenreplacer.PropertiesSource;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.X509TrustManager;
 import java.io.FileFilter;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -83,6 +84,7 @@ public class AppConfig {
     private String restCertFile;
     private String restCertPassword;
     private String restExternalName;
+    private X509TrustManager restTrustManager;
     private Integer restPort = DEFAULT_PORT;
     private Integer testRestPort;
 
@@ -96,6 +98,7 @@ public class AppConfig {
 	private String appServicesCertFile;
 	private String appServicesCertPassword;
 	private String appServicesExternalName;
+	private X509TrustManager appServicesTrustManager;
 
     // These can all be set to override the default names that are generated off of the "name" attribute.
     private String groupName = DEFAULT_GROUP;
@@ -300,12 +303,13 @@ public class AppConfig {
 
     public DatabaseClientConfig newRestDatabaseClientConfig(int port) {
 	    DatabaseClientConfig config = new DatabaseClientConfig(getHost(), port, getRestAdminUsername(), getRestAdminPassword());
-	    config.setSecurityContextType(restSecurityContextType);
-	    config.setSslHostnameVerifier(getRestSslHostnameVerifier());
-	    config.setSslContext(getRestSslContext());
 	    config.setCertFile(getRestCertFile());
 	    config.setCertPassword(getRestCertPassword());
 	    config.setExternalName(getRestExternalName());
+	    config.setSecurityContextType(restSecurityContextType);
+	    config.setSslContext(getRestSslContext());
+	    config.setSslHostnameVerifier(getRestSslHostnameVerifier());
+	    config.setTrustManager(restTrustManager);
 	    return config;
     }
 
@@ -328,13 +332,14 @@ public class AppConfig {
 
     public DatabaseClient newAppServicesDatabaseClient(String databaseName) {
 	    DatabaseClientConfig config = new DatabaseClientConfig(getHost(), getAppServicesPort(), getAppServicesUsername(), getAppServicesPassword());
-	    config.setDatabase(databaseName);
-	    config.setSecurityContextType(appServicesSecurityContextType);
-	    config.setSslHostnameVerifier(getAppServicesSslHostnameVerifier());
-	    config.setSslContext(getAppServicesSslContext());
 	    config.setCertFile(getAppServicesCertFile());
 	    config.setCertPassword(getAppServicesCertPassword());
+	    config.setDatabase(databaseName);
 	    config.setExternalName(getAppServicesExternalName());
+	    config.setSecurityContextType(appServicesSecurityContextType);
+	    config.setSslContext(getAppServicesSslContext());
+	    config.setSslHostnameVerifier(getAppServicesSslHostnameVerifier());
+	    config.setTrustManager(appServicesTrustManager);
 	    return configuredDatabaseClientFactory.newDatabaseClient(config);
     }
 
@@ -1225,5 +1230,21 @@ public class AppConfig {
 
 	public void setUpdateMimetypeWhenPropertiesAreEqual(boolean updateMimetypeWhenPropertiesAreEqual) {
 		this.updateMimetypeWhenPropertiesAreEqual = updateMimetypeWhenPropertiesAreEqual;
+	}
+
+	public X509TrustManager getRestTrustManager() {
+		return restTrustManager;
+	}
+
+	public void setRestTrustManager(X509TrustManager restTrustManager) {
+		this.restTrustManager = restTrustManager;
+	}
+
+	public X509TrustManager getAppServicesTrustManager() {
+		return appServicesTrustManager;
+	}
+
+	public void setAppServicesTrustManager(X509TrustManager appServicesTrustManager) {
+		this.appServicesTrustManager = appServicesTrustManager;
 	}
 }

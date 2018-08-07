@@ -39,6 +39,12 @@ public class RestBatchWriter extends BatchWriterSupport {
 		this.databaseClients = databaseClients;
 	}
 
+	public RestBatchWriter(List<DatabaseClient> databaseClients, boolean releaseDatabaseClients, BatchHandler batchHandler) {
+		this(databaseClients);
+		this.releaseDatabaseClients = releaseDatabaseClients;
+		this.batchHandler = batchHandler;
+	}
+
 	@Override
 	public void write(List<? extends DocumentWriteOperation> items) {
 		initialize();
@@ -115,5 +121,9 @@ public class RestBatchWriter extends BatchWriterSupport {
 
 	public void setContentFormat(Format contentFormat) {
 		this.contentFormat = contentFormat;
+	}
+
+	public void setBatchHandler(BatchHandler batchHandler) {
+		this.batchHandler = batchHandler;
 	}
 }

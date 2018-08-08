@@ -2,11 +2,16 @@ package com.marklogic.mgmt;
 
 import com.marklogic.rest.util.RestConfig;
 
+import javax.net.ssl.SSLContext;
+
 /**
  * Defines the configuration data for talking to the Mgmt REST API. Also includes properties for the security user, as this
  * user is typically needed for creating an app-specific user (which may depend on app-specific roles and privileges)
- * which is then used for deploying every other resources. If securityUsername and securityPassword are not set, they default
- * to the username/password attribute values.
+ * which is then used for deploying every other resources.
+ *
+ * If securityUsername and securityPassword are not set, they default to the username/password attribute values.
+ * Additionally, as of version 3.8.3, setSecuritySslContext can be called to provide an SSLContext for the connection
+ * made using securityUsername and securityPassword.
  */
 public class ManageConfig extends RestConfig {
 
@@ -19,6 +24,7 @@ public class ManageConfig extends RestConfig {
 
 	private String securityUsername;
 	private String securityPassword;
+	private SSLContext securitySslContext;
 
 	private boolean cleanJsonPayloads = false;
 
@@ -104,5 +110,13 @@ public class ManageConfig extends RestConfig {
 
 	public void setSecurityPassword(String securityPassword) {
 		this.securityPassword = securityPassword;
+	}
+
+	public SSLContext getSecuritySslContext() {
+		return securitySslContext;
+	}
+
+	public void setSecuritySslContext(SSLContext securitySslContext) {
+		this.securitySslContext = securitySslContext;
 	}
 }

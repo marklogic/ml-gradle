@@ -60,8 +60,8 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
 	public void execute(CommandContext context) {
 		String payload = getRestApiPayload(context);
 		if (payload != null) {
-			RestApiManager mgr = new RestApiManager(context.getManageClient());
 			AppConfig appConfig = context.getAppConfig();
+			RestApiManager mgr = new RestApiManager(context.getManageClient(), appConfig.getGroupName());
 
 			mgr.createRestApi(payloadTokenReplacer.replaceTokens(payload, appConfig, false));
 
@@ -194,7 +194,7 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
 		request.setIncludeModules(includeModules);
 		request.setDeleteContentReplicaForests(isDeleteContentReplicaForests());
 		request.setDeleteModulesReplicaForests(isDeleteModulesReplicaForests());
-		return new RestApiManager(manageClient).deleteRestApi(request);
+		return new RestApiManager(manageClient, groupName).deleteRestApi(request);
 	}
 
 	public boolean isDeleteModulesDatabase() {

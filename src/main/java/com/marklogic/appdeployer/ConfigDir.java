@@ -164,6 +164,10 @@ public class ConfigDir {
 		return new File(getFlexrepDir(), "configs");
 	}
 
+	public File getFlexrepPullsDir() {
+		return new File(getFlexrepDir(), "pulls");
+	}
+
 	public File getGroupsDir() {
 		return new File(baseDir, "groups");
 	}

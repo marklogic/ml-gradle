@@ -66,6 +66,7 @@ public abstract class SortOrderConstants {
 
     public static Integer DEPLOY_FLEXREP_CONFIGS = 1000;
     public static Integer DEPLOY_FLEXREP_TARGETS = 1010;
+	public static Integer DEPLOY_FLEXREP_PULLS = 1020;
 
     public static Integer DEPLOY_SQL_VIEWS = 1100;
 

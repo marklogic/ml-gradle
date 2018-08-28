@@ -11,8 +11,6 @@ import com.marklogic.mgmt.resource.flexrep.ConfigManager;
 
 import java.io.File;
 
-import java.io.File;
-
 /**
  * Defaults to the content database name in the AppConfig instance. Can be overridden via the databaseNameOrId property.
  */
@@ -46,7 +44,7 @@ public class DeployConfigsCommand extends AbstractResourceCommand {
 
 	@Override
 	protected void storeTokenForResourceId(SaveReceipt receipt, CommandContext context) {
-		String targetId = currentConfigManager.getDomainID(receipt.getResourceId());
+		String targetId = currentConfigManager.getDomainId(receipt.getResourceId());
 		String key = "%%flexrep-domains-id-" + receipt.getResourceId() + "%%";
 		if (logger.isInfoEnabled()) {
 			logger.info(format("Storing token with key '%s' and value '%s'", key, targetId));

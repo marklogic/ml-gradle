@@ -7,7 +7,7 @@ import com.marklogic.mgmt.resource.appservers.ServerManager;
 import com.marklogic.mgmt.resource.cpf.CpfConfigManager;
 import com.marklogic.mgmt.resource.cpf.DomainManager;
 import com.marklogic.mgmt.resource.cpf.PipelineManager;
-import com.marklogic.mgmt.resource.flexrep.PullsManager;
+import com.marklogic.mgmt.resource.flexrep.PullManager;
 import org.junit.After;
 import org.junit.Test;
 
@@ -107,31 +107,34 @@ public class DeployFlexrepTest extends AbstractAppDeployerTest {
     }
 
 	@Test
-	public void flexPull() {
-
+	public void deployPullConfiguration() {
 		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/flexrep-config"));
 
 		initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployTriggersDatabaseCommand(),
 			new DeployCpfConfigsCommand(), new DeployDomainsCommand(), new DeployPipelinesCommand(),
 			new DeployConfigsCommand(), new DeployTargetsCommand(), new DeployOtherDatabasesCommand(), new DeployPullsCommand());
 
-		appDeployer.deploy(appConfig);
-		assertConfigAndTargetAreDeployed();
+		try {
+			appDeployer.deploy(appConfig);
 
-		final String pullName = "docs2go";
-		PullsManager pullsMangager = new PullsManager(manageClient, "other-sample-app-content");
-		assertTrue(pullsMangager.exists(pullName));
+			assertConfigAndTargetAreDeployed();
 
-		// Run deploy again to make sure nothing blows up
-		appDeployer.deploy(appConfig);
+			final String pullName = "docs2go";
+			PullManager pullManager = new PullManager(manageClient, "other-sample-app-content");
+			assertTrue(pullManager.exists(pullName));
 
-		ConfigManager mgr = new ConfigManager(manageClient, appConfig.getContentDatabaseName());
-		mgr.deleteAllConfigs();
-		assertTrue("All of the configs should have been deleted, including their targets", mgr.getAsXml()
-			.getListItemIdRefs().isEmpty());
+			// Run deploy again to make sure nothing blows up
+			appDeployer.deploy(appConfig);
 
-		undeploySampleApp();
-		assertFalse(new ServerManager(manageClient).exists("master-flexrep-server"));
+			ConfigManager mgr = new ConfigManager(manageClient, appConfig.getContentDatabaseName());
+			mgr.deleteAllConfigs();
+			assertTrue("All of the configs should have been deleted, including their targets", mgr.getAsXml()
+				.getListItemIdRefs().isEmpty());
+
+		} finally {
+			undeploySampleApp();
+			assertFalse(new ServerManager(manageClient).exists("master-flexrep-server"));
+		}
 	}
 
     private void assertConfigAndTargetAreDeployed() {

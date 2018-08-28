@@ -3,10 +3,11 @@ package com.marklogic.mgmt.resource.flexrep;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.resource.AbstractResourceManager;
 
-public class PullsManager  extends AbstractResourceManager {
+public class PullManager extends AbstractResourceManager {
+
 	private String databaseIdOrName;
 
-	public PullsManager(ManageClient client, String databaseIdOrName) {
+	public PullManager(ManageClient client, String databaseIdOrName) {
 		super(client);
 		this.databaseIdOrName = databaseIdOrName;
 	}

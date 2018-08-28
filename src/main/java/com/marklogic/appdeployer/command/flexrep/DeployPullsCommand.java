@@ -6,13 +6,13 @@ import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.resource.ResourceManager;
-import com.marklogic.mgmt.resource.flexrep.PullsManager;
+import com.marklogic.mgmt.resource.flexrep.PullManager;
 
 import java.io.File;
 
 public class DeployPullsCommand extends AbstractResourceCommand {
 
-	ResourceManager pullsManager;
+	private ResourceManager pullManager;
 
 	public DeployPullsCommand() {
 		setExecuteSortOrder(SortOrderConstants.DEPLOY_FLEXREP_PULLS);
@@ -25,7 +25,7 @@ public class DeployPullsCommand extends AbstractResourceCommand {
 
 	@Override
 	protected ResourceManager getResourceManager(CommandContext context) {
-		return pullsManager;
+		return pullManager;
 	}
 
 	@Override
@@ -40,7 +40,7 @@ public class DeployPullsCommand extends AbstractResourceCommand {
 	}
 
 	protected void deployFlexRepPulls(CommandContext context, ConfigDir configDir, String databaseIdOrName) {
-		pullsManager = new PullsManager(context.getManageClient(), databaseIdOrName);
+		pullManager = new PullManager(context.getManageClient(), databaseIdOrName);
 		processExecuteOnResourceDir(context, configDir.getFlexrepPullsDir());
 	}
 

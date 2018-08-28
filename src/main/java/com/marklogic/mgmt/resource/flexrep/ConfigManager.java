@@ -48,7 +48,7 @@ public class ConfigManager extends AbstractResourceManager {
         }
     }
 
-    public String getDomainID(String configName) {
+    public String getDomainId(String configName) {
 	    Fragment f =  getManageClient().getXml(getResourcesPath() +"/" + configName);
 	    return f.getElementValue("/node()/db:id");
     }

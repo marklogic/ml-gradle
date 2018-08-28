@@ -1,0 +1,33 @@
+version: '3'
+services:
+  node1:
+    build: "./src/main/docker/marklogic"
+    image: "marklogic:latest"
+    ports:
+    # choose what ports you want to expose (at least 8000 8001 8002)
+      - "8000-8050:8000-8050"
+    hostname: "node1.single"
+    container_name: "node1.single"
+    volumes:
+      - ./logs/node1:/var/opt/MarkLogic/Logs
+
+  nifi:
+    build: "./src/main/docker/nifi"
+    image: "marklogic-nifi:latest"
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+      - "10000:10000"
+    hostname: "nifi.single"
+    container_name: "nifi.single"
+    volumes:
+      - ./data:/data
+      - ./logs/nifi:/opt/nifi/nifi-1.7.0/logs
+
+# optionally specify the subnet
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.66.0.0/16

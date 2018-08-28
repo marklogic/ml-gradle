@@ -1,0 +1,51 @@
+version: '3'
+services:
+  
+  node1:
+    #first service will build the image, the other services can use it
+    build: "./src/main/docker/marklogic"
+    image: "marklogic:latest"
+    ports:
+      - "18000-18010:8000-8010"
+    hostname: "node1.cluster"
+    container_name: "node1.cluster"
+    volumes:
+      - ./logs/node1:/var/opt/MarkLogic/Logs
+
+  node2:
+    image: "marklogic:latest"
+    ports:
+      - "28000-28010:8000-8010"
+    hostname: "node2.cluster"
+    container_name: "node2.cluster"
+    volumes:
+      - ./logs/node2:/var/opt/MarkLogic/Logs
+
+  node3:
+    image: "marklogic:latest"
+    ports:
+      - "38000-38010:8000-8010"
+    hostname: "node3.cluster"
+    container_name: "node3.cluster"
+    volumes:
+      - ./logs/node3:/var/opt/MarkLogic/Logs
+
+  haproxy:
+    image: haproxy:1.5.18
+    #restart: always
+    hostname: "haproxy.cluster"
+    container_name: "haproxy.cluster"
+    volumes:
+      - ./src/main/haproxy:/usr/local/etc/haproxy/
+    ports:
+      - "8000-8003:8000-8003"
+    expose:
+      - "8000-8003"
+
+# optionally specify the subnet
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.61.0.0/16

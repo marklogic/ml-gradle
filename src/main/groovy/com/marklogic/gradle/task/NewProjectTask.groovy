@@ -75,6 +75,8 @@ class NewProjectTask extends MarkLogicTask {
 				if (ant.mlTestRestPort) {
 					appConfig.setTestRestPort(Integer.parseInt(ant.mlTestRestPort))
 				}
+			} else {
+				appConfig.setNoRestServer(true)
 			}
 			new ScaffoldGenerator().generateScaffold(".", appConfig)
 		}

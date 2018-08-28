@@ -75,7 +75,13 @@ public class ManageClient extends LoggingObject {
 		    rc.setScheme(config.getScheme());
 		    rc.setConfigureSimpleSsl(config.isConfigureSimpleSsl());
 		    rc.setHostnameVerifier(config.getHostnameVerifier());
-		    rc.setSslContext(config.getSslContext());
+
+		    if (config.getSecuritySslContext() != null) {
+		    	rc.setSslContext(config.getSecuritySslContext());
+		    } else {
+		    	rc.setSslContext(config.getSslContext());
+		    }
+
 		    this.securityUserRestTemplate = RestTemplateUtil.newRestTemplate(rc);
 	    } else {
 		    this.securityUserRestTemplate = restTemplate;

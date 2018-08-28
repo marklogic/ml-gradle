@@ -29,7 +29,7 @@ public class RestApi extends ApiObject {
     }
 
     public String save() {
-        ResponseEntity<String> re = new RestApiManager(api.getManageClient()).createRestApi(name, getJson());
+        ResponseEntity<String> re = new RestApiManager(api.getManageClient(), this.group).createRestApi(name, getJson());
         if (re == null) {
             return String.format("REST API with name %s already exists", name);
         } else {

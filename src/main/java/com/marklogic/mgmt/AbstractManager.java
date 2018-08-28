@@ -60,17 +60,27 @@ public class AbstractManager extends LoggingObject {
 
     protected ResponseEntity<String> putPayload(ManageClient client, String path, String payload) {
         boolean requiresSecurityUser = useSecurityUser(payload);
-        if (payloadParser.isJsonPayload(payload)) {
-            return requiresSecurityUser ? client.putJsonAsSecurityUser(path, payload) : client.putJson(path, payload);
+        try {
+	        if (payloadParser.isJsonPayload(payload)) {
+		        return requiresSecurityUser ? client.putJsonAsSecurityUser(path, payload) : client.putJson(path, payload);
+	        }
+	        return requiresSecurityUser ? client.putXmlAsSecurityUser(path, payload) : client.putXml(path, payload);
+        } catch (RuntimeException ex) {
+	        logger.error(format("Error occurred while sending PUT request to %s; logging request body to assist with debugging: %s", path, payload));
+	        throw ex;
         }
-        return requiresSecurityUser ? client.putXmlAsSecurityUser(path, payload) : client.putXml(path, payload);
     }
 
     protected ResponseEntity<String> postPayload(ManageClient client, String path, String payload) {
         boolean requiresSecurityUser = useSecurityUser(payload);
-        if (payloadParser.isJsonPayload(payload)) {
-            return requiresSecurityUser ? client.postJsonAsSecurityUser(path, payload) : client.postJson(path, payload);
+        try {
+	        if (payloadParser.isJsonPayload(payload)) {
+		        return requiresSecurityUser ? client.postJsonAsSecurityUser(path, payload) : client.postJson(path, payload);
+	        }
+	        return requiresSecurityUser ? client.postXmlAsSecurityUser(path, payload) : client.postXml(path, payload);
+        } catch (RuntimeException ex) {
+        	logger.error(format("Error occurred while sending POST request to %s; logging request body to assist with debugging: %s", path, payload));
+        	throw ex;
         }
-        return requiresSecurityUser ? client.postXmlAsSecurityUser(path, payload) : client.postXml(path, payload);
     }
 }

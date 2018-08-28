@@ -69,7 +69,7 @@ public class SslConfigurer extends LoggingObject implements HttpClientBuilderCon
 
 			@Override
 			public boolean verify(String s, SSLSession sslSession) {
-				return false;
+				return true;
 			}
 		});
 	}

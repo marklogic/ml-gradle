@@ -16,9 +16,15 @@ public class RestApiManager extends LoggingObject {
 
 	private PayloadParser payloadParser = new PayloadParser();
 	private ManageClient client;
+	private String groupName;
 
 	public RestApiManager(ManageClient client) {
+		this(client, ServerManager.DEFAULT_GROUP);
+	}
+
+	public RestApiManager(ManageClient client, String groupName) {
 		this.client = client;
+		this.groupName = groupName;
 	}
 
 	public ResponseEntity<String> createRestApi(String json) {
@@ -48,15 +54,20 @@ public class RestApiManager extends LoggingObject {
 	 * somewhere in it. With 9.0-4, the url-rewriter must match the pattern:
 	 * <p>
 	 * ^/MarkLogic/rest-api/(8000-rewriter|rewriter|rewriter-noxdbc)\.xml$
+	 * </p>
 	 * <p>
 	 * It's not likely that a user's custom rewriter will fit that pattern, so this method no longer uses /v1/rest-apis,
 	 * opting to use ServerManager instead.
-	 *
+	 * </p>
+	 * <p>
+	 * As of ml-app-deployer version 3.8.4, this now properly accounts for a group name.
+	 * </p>
 	 * @param name
 	 * @return
 	 */
 	public boolean restApiServerExists(String name) {
-		return new ServerManager(client).exists(name);
+		final String group = this.groupName != null ? this.groupName : ServerManager.DEFAULT_GROUP;
+		return new ServerManager(this.client, group).exists(name);
 	}
 
 	/**

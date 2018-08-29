@@ -129,7 +129,8 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlClearContentDatabase", type: ClearContentDatabaseTask, group: dbGroup, description: "Deletes all documents in the content database; requires -Pconfirm=true to be set so this isn't accidentally executed")
 		project.task("mlClearDatabase", type: ClearDatabaseTask, group: dbGroup, description: "Deletes all documents in a database specified by -Pdatabase=(name); requires -Pconfirm=true to be set so this isn't accidentally executed")
 		project.task("mlClearModulesDatabase", type: ClearModulesDatabaseTask, group: dbGroup, dependsOn: "mlDeleteModuleTimestampsFile", description: "Deletes potentially all of the documents in the modules database; has a property for excluding documents from deletion")
-		project.task("mlClearSchemasDatabase", type: ClearSchemasDatabaseTask, group: dbGroup, description: "Deletes all documents in the schemas database")
+		project.task("mlClearSchemasDatabase", type: ClearSchemasDatabaseTask, group: dbGroup, description: "Deletes all documents in the schemas database. " +
+			"Note that this includes those created via the deployment of resources such as temporal collections and view schemas. You may want to use mlDeleteUserSchemas instead.")
 		project.task("mlClearTriggersDatabase", type: ClearTriggersDatabaseTask, group: dbGroup, description: "Deletes all documents in the triggers database")
 		project.task("mlDeployDatabases", type: DeployDatabasesTask, group: dbGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Deploy each database, updating it if it exists, in the configuration directory")
 		project.task("mlMergeContentDatabase", type: MergeContentDatabaseTask, group: dbGroup, description: "Merge the database named by mlAppConfig.contentDatabaseName")
@@ -220,8 +221,9 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlDeployRestApis", type: DeployRestApisTask, group: restApisGroup, description: "Deploy the REST API instances defined by a resource file or the mlRestPort/mlTestRestPort properties")
 
 		String schemasGroup = "ml-gradle Schemas"
-		project.task("mlLoadSchemas", type: LoadSchemasTask, group: schemasGroup, description: "Loads special-purpose data into the schemas database (XSD schemas, Inference rules, and [MarkLogic 9] Extraction Templates)").mustRunAfter("mlClearSchemasDatabase")
-		project.task("mlReloadSchemas", dependsOn: ["mlClearSchemasDatabase", "mlLoadSchemas"], group: schemasGroup, description: "Clears schemas database then loads special-purpose data into the schemas database (XSD schemas, Inference rules, and [MarkLogic 9] Extraction Templates)")
+		project.task("mlDeleteUserSchemas", type: DeleteUserSchemasTask, group: schemasGroup, description: "Delete documents in a schemas database that were not created via the deployment of resources such as temporal collections or view schemas")
+		project.task("mlLoadSchemas", type: LoadSchemasTask, group: schemasGroup, description: "Loads special-purpose data into the schemas database (XSD schemas, Inference rules, and [MarkLogic 9] Extraction Templates)").mustRunAfter("mlDeleteUserSchemas")
+		project.task("mlReloadSchemas", dependsOn: ["mlDeleteUserSchemas", "mlLoadSchemas"], group: schemasGroup, description: "Deletes user schemas via mlDeleteUserSchemas and then loads schemas via mlLoadSchemas")
 
 		String serverGroup = "ml-gradle Server"
 		project.task("mlDeployServers", type: DeployServersTask, group: serverGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the REST API server (if it exists) and deploys each other server, updating it if it exists, in the configuration directory ")

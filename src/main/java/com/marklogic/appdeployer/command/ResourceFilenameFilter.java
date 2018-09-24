@@ -3,7 +3,6 @@ package com.marklogic.appdeployer.command;
 import com.marklogic.client.ext.helper.LoggingObject;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -11,14 +10,22 @@ import java.util.regex.Pattern;
 /**
  * Simple filter implementation that returns true for .json and .xml files.
  */
-public class ResourceFilenameFilter extends LoggingObject implements FilenameFilter {
+public class ResourceFilenameFilter extends LoggingObject implements IncrementalFilenameFilter {
 
     private Set<String> filenamesToIgnore;
     private Pattern excludePattern;
     private Pattern includePattern;
+    private ResourceFileManager resourceFileManager = new ResourceFileManagerImpl();
+	private Set<String> filenamesToIgnoreHashValues = new HashSet<>();
+	private boolean incrementalMode = false;
 
-    public ResourceFilenameFilter() {
+
+	public ResourceFilenameFilter() {
     }
+
+	public ResourceFilenameFilter(ResourceFileManager resourceFileManager) {
+    	this.resourceFileManager = resourceFileManager;
+	}
 
     public ResourceFilenameFilter(String... filenamesToIgnore) {
         this.filenamesToIgnore = new HashSet<>();
@@ -62,7 +69,33 @@ public class ResourceFilenameFilter extends LoggingObject implements FilenameFil
             return false;
         }
 
-        return filename.endsWith(".json") || filename.endsWith(".xml");
+        if (filename.endsWith(".json") || filename.endsWith(".xml")) {
+			File f = new File(dir.getAbsolutePath()+File.separatorChar+filename);
+			if (filenamesToIgnoreHashValues.contains(f.getAbsolutePath())) {
+				if (logger.isInfoEnabled()) {
+					logger.info("Ignoring hash for file: " + f.getAbsolutePath());
+				}
+				return true;
+			}
+			if (incrementalMode) {
+				if (resourceFileManager.hasFileBeenModifiedSinceLastDeployed(f)) {
+					if (logger.isInfoEnabled()) {
+						logger.info("File has been modified: " + f.getAbsolutePath());
+					}
+					resourceFileManager.saveLastDeployedHash(f);
+					return true;
+				} else {
+					if (logger.isInfoEnabled()) {
+						logger.info("File has NOT been modified: " + f.getAbsolutePath());
+					}
+					return false;
+				}
+			} else {
+				return true;
+			}
+		} else {
+			return false;
+		}
     }
 
     public void setFilenamesToIgnore(Set<String> ignoreFilenames) {
@@ -88,4 +121,17 @@ public class ResourceFilenameFilter extends LoggingObject implements FilenameFil
 	public void setIncludePattern(Pattern includePattern) {
 		this.includePattern = includePattern;
 	}
+
+	@Override
+	public void addFilenameToIgnoreHash(String filename) {
+		filenamesToIgnoreHashValues.add(filename);
+	}
+
+	@Override
+	public void clearFilenamesToIgnoreHash() {
+		filenamesToIgnoreHashValues = new HashSet<String>();
+	}
+
+	@Override
+	public void setIncrementalMode(boolean incrementalMode) { this.incrementalMode = incrementalMode; }
 }

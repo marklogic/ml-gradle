@@ -3,6 +3,7 @@ package com.marklogic.appdeployer.command.security;
 import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
+import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.security.Role;
 import com.marklogic.mgmt.mapper.DefaultResourceMapper;
@@ -18,6 +19,7 @@ public class DeployRolesCommand extends AbstractResourceCommand {
 
 	// Used internally
 	private boolean removeRolesAndPermissionsDuringDeployment = false;
+	private boolean secondPass = false;
 	private ResourceMapper resourceMapper;
 	private Set<String> roleNamesThatDontNeedToBeRedeployed;
 
@@ -36,6 +38,7 @@ public class DeployRolesCommand extends AbstractResourceCommand {
 	@Override
 	public void execute(CommandContext context) {
 		removeRolesAndPermissionsDuringDeployment = true;
+		secondPass = false;
 		if (logger.isInfoEnabled()) {
 			logger.info("Deploying roles minus their default permissions and references to roles");
 		}
@@ -45,7 +48,20 @@ public class DeployRolesCommand extends AbstractResourceCommand {
 			logger.info("Redeploying roles that have default permissions and/or references to roles");
 		}
 		removeRolesAndPermissionsDuringDeployment = false;
+		secondPass = true;
 		super.execute(context);
+	}
+
+	/**
+	 * Any file deployed in the first pass, must be a candidate for deployment in the second phase.
+	 * We need to ignore the hashes for these files during the second phase.
+	 */
+	@Override
+	protected void afterResourceSaved(ResourceManager mgr, CommandContext context, File resourceFile, SaveReceipt receipt) {
+		if (!secondPass) {
+			ignoreHashForFilename(resourceFile.getAbsolutePath());
+		}
+		super.afterResourceSaved(mgr, context, resourceFile, receipt);
 	}
 
 	/**

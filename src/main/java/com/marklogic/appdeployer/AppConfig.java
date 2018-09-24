@@ -121,6 +121,7 @@ public class AppConfig {
 	private String deleteTestModulesPattern = "/test/**";
 	private int modulesLoaderThreadCount = 4;
 	private Integer modulesLoaderBatchSize;
+	private boolean incrementalDeploy = false;
 
     private String schemasPath;
 
@@ -1182,6 +1183,14 @@ public class AppConfig {
 
 	public void setModulesLoaderBatchSize(Integer modulesLoaderBatchSize) {
 		this.modulesLoaderBatchSize = modulesLoaderBatchSize;
+	}
+
+	public boolean isIncrementalDeploy() {
+		return incrementalDeploy;
+	}
+
+	public void setIncrementalDeploy(boolean incrementalDeploy) {
+		this.incrementalDeploy = incrementalDeploy;
 	}
 
 	public String getModelsDatabase() {

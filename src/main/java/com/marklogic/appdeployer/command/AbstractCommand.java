@@ -11,12 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -30,7 +28,7 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
     private boolean storeResourceIdsAsCustomTokens = false;
 
     protected PayloadTokenReplacer payloadTokenReplacer = new DefaultPayloadTokenReplacer();
-    private FilenameFilter resourceFilenameFilter = new ResourceFilenameFilter();
+    private IncrementalFilenameFilter resourceFilenameFilter = new ResourceFilenameFilter();
     private PayloadParser payloadParser = new PayloadParser();
 
     /**
@@ -294,7 +292,15 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
         this.storeResourceIdsAsCustomTokens = storeResourceIdsAsCustomTokens;
     }
 
-    public void setResourceFilenameFilter(FilenameFilter resourceFilenameFilter) {
+    public void setResourceFilenameFilter(IncrementalFilenameFilter resourceFilenameFilter) {
         this.resourceFilenameFilter = resourceFilenameFilter;
     }
+
+    protected void ignoreHashForFilename(String filename) {
+		((ResourceFilenameFilter) resourceFilenameFilter).addFilenameToIgnoreHash(filename);
+	}
+
+	protected void setIncrementalMode(Boolean incrementalMode) {
+		resourceFilenameFilter.setIncrementalMode(incrementalMode);
+	}
 }

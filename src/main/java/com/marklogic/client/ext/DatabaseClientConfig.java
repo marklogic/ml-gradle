@@ -1,5 +1,6 @@
 package com.marklogic.client.ext;
 
+import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier;
 
 import javax.net.ssl.SSLContext;
@@ -12,92 +13,93 @@ public class DatabaseClientConfig {
 
 	private SecurityContextType securityContextType = SecurityContextType.DIGEST;
 	private String host;
-    private int port;
-    private String username;
-    private String password;
-    private String database;
-    private SSLContext sslContext;
-    private SSLHostnameVerifier sslHostnameVerifier;
-    private String certFile;
-    private String certPassword;
-    private String externalName;
-    private X509TrustManager trustManager;
+	private int port;
+	private String username;
+	private String password;
+	private String database;
+	private SSLContext sslContext;
+	private SSLHostnameVerifier sslHostnameVerifier;
+	private String certFile;
+	private String certPassword;
+	private String externalName;
+	private X509TrustManager trustManager;
+	private DatabaseClient.ConnectionType connectionType;
 
 	public DatabaseClientConfig() {
-    }
+	}
 
-    public DatabaseClientConfig(String host, int port) {
-    	this.host = host;
-    	this.port = port;
-    }
+	public DatabaseClientConfig(String host, int port) {
+		this.host = host;
+		this.port = port;
+	}
 
-    public DatabaseClientConfig(String host, int port, String username, String password) {
-        this.host = host;
-        this.port = port;
-        this.username = username;
-        this.password = password;
-    }
+	public DatabaseClientConfig(String host, int port, String username, String password) {
+		this.host = host;
+		this.port = port;
+		this.username = username;
+		this.password = password;
+	}
 
-    @Override
-    public String toString() {
-        return String.format("[%s@%s:%d]", username, host, port, username);
-    }
+	@Override
+	public String toString() {
+		return String.format("[%s@%s:%d]", username, host, port, username);
+	}
 
-    public String getHost() {
-        return host;
-    }
+	public String getHost() {
+		return host;
+	}
 
-    public int getPort() {
-        return port;
-    }
+	public int getPort() {
+		return port;
+	}
 
-    public String getUsername() {
-        return username;
-    }
+	public String getUsername() {
+		return username;
+	}
 
-    public String getPassword() {
-        return password;
-    }
+	public String getPassword() {
+		return password;
+	}
 
-    public void setHost(String host) {
-        this.host = host;
-    }
+	public void setHost(String host) {
+		this.host = host;
+	}
 
-    public void setPort(int port) {
-        this.port = port;
-    }
+	public void setPort(int port) {
+		this.port = port;
+	}
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+	public void setUsername(String username) {
+		this.username = username;
+	}
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+	public void setPassword(String password) {
+		this.password = password;
+	}
 
-    public SSLContext getSslContext() {
-        return sslContext;
-    }
+	public SSLContext getSslContext() {
+		return sslContext;
+	}
 
-    public void setSslContext(SSLContext sslContext) {
-        this.sslContext = sslContext;
-    }
+	public void setSslContext(SSLContext sslContext) {
+		this.sslContext = sslContext;
+	}
 
-    public SSLHostnameVerifier getSslHostnameVerifier() {
-        return sslHostnameVerifier;
-    }
+	public SSLHostnameVerifier getSslHostnameVerifier() {
+		return sslHostnameVerifier;
+	}
 
-    public void setSslHostnameVerifier(SSLHostnameVerifier sslHostnameVerifier) {
-        this.sslHostnameVerifier = sslHostnameVerifier;
-    }
+	public void setSslHostnameVerifier(SSLHostnameVerifier sslHostnameVerifier) {
+		this.sslHostnameVerifier = sslHostnameVerifier;
+	}
 
-    public String getDatabase() {
-        return database;
-    }
+	public String getDatabase() {
+		return database;
+	}
 
-    public void setDatabase(String database) {
-        this.database = database;
-    }
+	public void setDatabase(String database) {
+		this.database = database;
+	}
 
 	public SecurityContextType getSecurityContextType() {
 		return securityContextType;
@@ -137,5 +139,13 @@ public class DatabaseClientConfig {
 
 	public void setTrustManager(X509TrustManager trustManager) {
 		this.trustManager = trustManager;
+	}
+
+	public DatabaseClient.ConnectionType getConnectionType() {
+		return connectionType;
+	}
+
+	public void setConnectionType(DatabaseClient.ConnectionType connectionType) {
+		this.connectionType = connectionType;
 	}
 }

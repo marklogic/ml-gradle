@@ -19,6 +19,7 @@ public class DefaultConfiguredDatabaseClientFactory implements ConfiguredDatabas
 		DatabaseClientFactory.SecurityContext securityContext;
 
 		SecurityContextType securityContextType = config.getSecurityContextType();
+		DatabaseClient.ConnectionType connectionType = config.getConnectionType();
 
 		if (SecurityContextType.BASIC.equals(securityContextType)) {
 			securityContext = new DatabaseClientFactory.BasicAuthContext(config.getUsername(), config.getPassword());
@@ -50,16 +51,30 @@ public class DefaultConfiguredDatabaseClientFactory implements ConfiguredDatabas
 		int port = config.getPort();
 		String database = config.getDatabase();
 
-		if (securityContext == null) {
-			if (database == null) {
-				return DatabaseClientFactory.newClient(host, port);
+		if (connectionType == null) {
+			if (securityContext == null) {
+				if (database == null) {
+					return DatabaseClientFactory.newClient(host, port);
+				}
+				return DatabaseClientFactory.newClient(host, port, database);
 			}
-			return DatabaseClientFactory.newClient(host, port, database);
+			if (database == null) {
+				return DatabaseClientFactory.newClient(host, port, securityContext);
+			}
+			return DatabaseClientFactory.newClient(host, port, database, securityContext);
 		}
-		if (database == null) {
-			return DatabaseClientFactory.newClient(host, port, securityContext);
+		else {
+			if (securityContext == null) {
+				if (database == null) {
+					return DatabaseClientFactory.newClient(host, port, null, connectionType);
+				}
+				return DatabaseClientFactory.newClient(host, port, database, null, connectionType);
+			}
+			if (database == null) {
+				return DatabaseClientFactory.newClient(host, port, securityContext, connectionType);
+			}
+			return DatabaseClientFactory.newClient(host, port, database, securityContext, connectionType);
 		}
-		return DatabaseClientFactory.newClient(host, port, database, securityContext);
 	}
 
 

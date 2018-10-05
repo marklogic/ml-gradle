@@ -1,12 +1,26 @@
 package com.marklogic.appdeployer.command;
 
+import java.io.File;
 import java.io.FilenameFilter;
 
+/**
+ * Extends FilenameFilter to add support for incremental deployments, where only resources that are new or modified since
+ * a previous deployment will be deployed.
+ */
 public interface IncrementalFilenameFilter extends FilenameFilter {
 
-	public void addFilenameToIgnoreHash(String filename);
+	/**
+	 * If the given File is processed during a deployment, do not perform an incremental check on it - i.e. essentially
+	 * act as though incremental mode is disabled.
+	 *
+	 * @param resourceFile
+	 */
+	void ignoreIncrementalCheckForFile(File resourceFile);
 
-	public void clearFilenamesToIgnoreHash();
-
-	public void setIncrementalMode(boolean incrementalMode);
+	/**
+	 * Toggle whether this file performs any incremental check.
+	 *
+	 * @param incrementalMode
+	 */
+	void setIncrementalMode(boolean incrementalMode);
 }

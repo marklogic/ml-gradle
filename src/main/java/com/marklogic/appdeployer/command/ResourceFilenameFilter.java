@@ -9,102 +9,132 @@ import java.util.regex.Pattern;
 
 /**
  * Simple filter implementation that returns true for .json and .xml files.
+ * <p>
+ * As of 3.10.0, now implements IncrementalFilenameFilter to include support for incremental deployments - i.e. only
+ * accepting a file if it is new or hasn't been modified since the last deployment.
  */
 public class ResourceFilenameFilter extends LoggingObject implements IncrementalFilenameFilter {
 
-    private Set<String> filenamesToIgnore;
-    private Pattern excludePattern;
-    private Pattern includePattern;
-    private ResourceFileManager resourceFileManager = new ResourceFileManagerImpl();
-	private Set<String> filenamesToIgnoreHashValues = new HashSet<>();
+	private Set<String> filenamesToIgnore;
+	private Pattern excludePattern;
+	private Pattern includePattern;
+	private ResourceFileManager resourceFileManager;
+
+	private Set<File> filesToIgnoreIncrementalCheck = new HashSet<>();
 	private boolean incrementalMode = false;
 
+	private Set<String> supportedFilenameExtensions = new HashSet<>();
 
 	public ResourceFilenameFilter() {
-    }
-
-	public ResourceFilenameFilter(ResourceFileManager resourceFileManager) {
-    	this.resourceFileManager = resourceFileManager;
+		this(new ResourceFileManagerImpl());
 	}
 
-    public ResourceFilenameFilter(String... filenamesToIgnore) {
-        this.filenamesToIgnore = new HashSet<>();
-        for (String f : filenamesToIgnore) {
-            this.filenamesToIgnore.add(f);
-        }
-    }
+	public ResourceFilenameFilter(ResourceFileManager resourceFileManager) {
+		this.resourceFileManager = resourceFileManager;
+		this.resourceFileManager.initialize();
+		supportedFilenameExtensions.add(".xml");
+		supportedFilenameExtensions.add(".json");
+	}
 
-    public ResourceFilenameFilter(Set<String> filenamesToIgnore) {
-        this.filenamesToIgnore = filenamesToIgnore;
-    }
+	public ResourceFilenameFilter(String... filenamesToIgnore) {
+		this();
+		this.filenamesToIgnore = new HashSet<>();
+		for (String f : filenamesToIgnore) {
+			this.filenamesToIgnore.add(f);
+		}
+	}
 
-    @Override
-    public boolean accept(File dir, String filename) {
-    	if (excludePattern != null && includePattern != null) {
-    		throw new IllegalStateException("Both excludePattern and includePattern cannot be specified");
-	    }
+	public ResourceFilenameFilter(Set<String> filenamesToIgnore) {
+		this();
+		this.filenamesToIgnore = filenamesToIgnore;
+	}
 
-	    if (excludePattern != null) {
-    		if (excludePattern.matcher(filename).matches()) {
-    			if (logger.isInfoEnabled()) {
-    				logger.info(format("Filename %s matches excludePattern, so ignoring", filename));
-			    }
-			    return false;
-		    }
-	    }
+	@Override
+	public boolean accept(File dir, String filename) {
+		if (excludePattern != null && includePattern != null) {
+			throw new IllegalStateException("Both excludePattern and includePattern cannot be specified");
+		}
 
-	    if (includePattern != null) {
-    		if (!includePattern.matcher(filename).matches()) {
-    			if (logger.isInfoEnabled()) {
-    				logger.info(format("Filename %s doesn't match includePattern, so ignoring", filename));
-			    }
-			    return false;
-		    }
-	    }
-
-        if (filenamesToIgnore != null && filenamesToIgnore.contains(filename)) {
-            if (logger.isInfoEnabled()) {
-                logger.info("Ignoring filename: " + filename);
-            }
-            return false;
-        }
-
-        if (filename.endsWith(".json") || filename.endsWith(".xml")) {
-			File f = new File(dir.getAbsolutePath()+File.separatorChar+filename);
-			if (filenamesToIgnoreHashValues.contains(f.getAbsolutePath())) {
+		if (excludePattern != null) {
+			if (excludePattern.matcher(filename).matches()) {
 				if (logger.isInfoEnabled()) {
-					logger.info("Ignoring hash for file: " + f.getAbsolutePath());
+					logger.info(format("Filename %s matches excludePattern, so ignoring", filename));
 				}
-				return true;
+				return false;
 			}
-			if (incrementalMode) {
-				if (resourceFileManager.hasFileBeenModifiedSinceLastDeployed(f)) {
-					if (logger.isInfoEnabled()) {
-						logger.info("File has been modified: " + f.getAbsolutePath());
-					}
-					resourceFileManager.saveLastDeployedHash(f);
-					return true;
-				} else {
-					if (logger.isInfoEnabled()) {
-						logger.info("File has NOT been modified: " + f.getAbsolutePath());
-					}
-					return false;
+		}
+
+		if (includePattern != null) {
+			if (!includePattern.matcher(filename).matches()) {
+				if (logger.isInfoEnabled()) {
+					logger.info(format("Filename %s doesn't match includePattern, so ignoring", filename));
 				}
-			} else {
-				return true;
+				return false;
 			}
-		} else {
+		}
+
+		if (filenamesToIgnore != null && filenamesToIgnore.contains(filename)) {
+			if (logger.isInfoEnabled()) {
+				logger.info("Ignoring filename: " + filename);
+			}
 			return false;
 		}
-    }
 
-    public void setFilenamesToIgnore(Set<String> ignoreFilenames) {
-        this.filenamesToIgnore = ignoreFilenames;
-    }
+		if (filenameHasSupportedExtension(filename)) {
+			if (incrementalMode) {
+				return acceptFileBasedOnIncrementalCheck(dir, filename);
+			}
+			return true;
+		}
 
-    public Set<String> getFilenamesToIgnore() {
-        return filenamesToIgnore;
-    }
+		return false;
+	}
+
+	/**
+	 * Determines whether the filename should be accepted based on the extension. Defaults to accepting anything with
+	 * an extension of ".xml" or ".json".
+	 *
+	 * @param filename
+	 * @return
+	 */
+	protected boolean filenameHasSupportedExtension(String filename) {
+		if (filename == null) {
+			return false;
+		}
+		for (String extension : supportedFilenameExtensions) {
+			if (filename.endsWith(extension)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Determines if the file should be accepted based on an incremental deployment check.
+	 *
+	 * @param dir
+	 * @param filename
+	 * @return
+	 */
+	protected boolean acceptFileBasedOnIncrementalCheck(File dir, String filename) {
+		File resourceFile = new File(dir, filename);
+		if (filesToIgnoreIncrementalCheck.contains(resourceFile)) {
+			if (logger.isInfoEnabled()) {
+				logger.info("Ignoring incremental check for file: " + resourceFile.getAbsolutePath());
+			}
+			return true;
+		} else {
+			return resourceFileManager.shouldResourceFileBeProcessed(resourceFile);
+		}
+	}
+
+	public void setFilenamesToIgnore(Set<String> ignoreFilenames) {
+		this.filenamesToIgnore = ignoreFilenames;
+	}
+
+	public Set<String> getFilenamesToIgnore() {
+		return filenamesToIgnore;
+	}
 
 	public Pattern getExcludePattern() {
 		return excludePattern;
@@ -123,15 +153,28 @@ public class ResourceFilenameFilter extends LoggingObject implements Incremental
 	}
 
 	@Override
-	public void addFilenameToIgnoreHash(String filename) {
-		filenamesToIgnoreHashValues.add(filename);
+	public void setIncrementalMode(boolean incrementalMode) {
+		this.incrementalMode = incrementalMode;
 	}
 
 	@Override
-	public void clearFilenamesToIgnoreHash() {
-		filenamesToIgnoreHashValues = new HashSet<String>();
+	public void ignoreIncrementalCheckForFile(File resourceFile) {
+		this.filesToIgnoreIncrementalCheck.add(resourceFile);
 	}
 
-	@Override
-	public void setIncrementalMode(boolean incrementalMode) { this.incrementalMode = incrementalMode; }
+	public void setResourceFileManager(ResourceFileManager resourceFileManager) {
+		this.resourceFileManager = resourceFileManager;
+	}
+
+	public Set<String> getSupportedFilenameExtensions() {
+		return supportedFilenameExtensions;
+	}
+
+	public void setSupportedFilenameExtensions(Set<String> supportedFilenameExtensions) {
+		this.supportedFilenameExtensions = supportedFilenameExtensions;
+	}
+
+	public ResourceFileManager getResourceFileManager() {
+		return resourceFileManager;
+	}
 }

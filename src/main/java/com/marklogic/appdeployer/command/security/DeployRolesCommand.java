@@ -19,7 +19,6 @@ public class DeployRolesCommand extends AbstractResourceCommand {
 
 	// Used internally
 	private boolean removeRolesAndPermissionsDuringDeployment = false;
-	private boolean secondPass = false;
 	private ResourceMapper resourceMapper;
 	private Set<String> roleNamesThatDontNeedToBeRedeployed;
 
@@ -38,7 +37,6 @@ public class DeployRolesCommand extends AbstractResourceCommand {
 	@Override
 	public void execute(CommandContext context) {
 		removeRolesAndPermissionsDuringDeployment = true;
-		secondPass = false;
 		if (logger.isInfoEnabled()) {
 			logger.info("Deploying roles minus their default permissions and references to roles");
 		}
@@ -48,18 +46,18 @@ public class DeployRolesCommand extends AbstractResourceCommand {
 			logger.info("Redeploying roles that have default permissions and/or references to roles");
 		}
 		removeRolesAndPermissionsDuringDeployment = false;
-		secondPass = true;
 		super.execute(context);
 	}
 
 	/**
-	 * Any file deployed in the first pass, must be a candidate for deployment in the second phase.
-	 * We need to ignore the hashes for these files during the second phase.
+	 * If the resource was saved during the first pass - i.e. when roles and permissions have been removed from the role
+	 * - then it must be processed during the second pass so that those roles/permissions can be added back. Thus, the
+	 * incremental check on the file must be ignored.
 	 */
 	@Override
 	protected void afterResourceSaved(ResourceManager mgr, CommandContext context, File resourceFile, SaveReceipt receipt) {
-		if (!secondPass) {
-			ignoreHashForFilename(resourceFile.getAbsolutePath());
+		if (removeRolesAndPermissionsDuringDeployment) {
+			ignoreIncrementalCheckForFile(resourceFile);
 		}
 		super.afterResourceSaved(mgr, context, resourceFile, receipt);
 	}
@@ -68,7 +66,7 @@ public class DeployRolesCommand extends AbstractResourceCommand {
 	 * If this is the first time roles are being deployed by this command - indicated by the removeRolesAndPermissionsDuringDeployment
 	 * class variable - then each payload is modified so that default permissions and role references are not included,
 	 * thus ensuring that the role can be created successfully.
-	 *
+	 * <p>
 	 * If this is the second time that roles are being deployed by this command, then the entire payload is sent. However,
 	 * if the role doesn't have any default permissions or role references, it will not be deployed a second time, as
 	 * there was nothing missing from the first deployment of the role.

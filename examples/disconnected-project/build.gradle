@@ -13,20 +13,26 @@
  * against a file tree. 
  */
 buildscript {
-    if (project.hasProperty("disconnected")) {
+    if (project.findProperty("disconnected") == "true") {
         dependencies {
             classpath fileTree(dir: "ml-gradle-dependencies", include: "*.jar")
         }
-    }
-    else {
+    } else {
         repositories {
             jcenter()
+            maven {
+                url "https://plugins.gradle.org/m2/"
+            }
         }
-        dependencies { classpath mlGradleDependency }
+        dependencies {
+            classpath mlGradleDependency
+            classpath mlSalimanDependency
+        }
     }
 }
 
 apply plugin: "com.marklogic.ml-gradle"
+apply plugin: "net.saliman.properties"
 
 configurations {
     mlcp
@@ -43,19 +49,17 @@ ext {
  * If the project has the "disconnected" property defined, then we look for mlcp dependencies in a directory
  * instead of retrieving them from a repository.
  */
-if (project.hasProperty("disconnected")) {
+if (project.findProperty("disconnected") == "true") {
     println "\nRUNNING IN DISCONNECTED MODE"
 
     dependencies {
         mlcp fileTree(dir: "mlcp-dependencies", include: "*.jar")
     }
-}
-
-/*
- * If we're not in disconnected mode, then we grab dependencies from repositories, and we define a set of tasks
- * for creating the "mlDeployer" zip file that can be used in a disconnected environment.
- */
-else {
+} else {
+    /*
+     * If we're not in disconnected mode, then we grab dependencies from repositories, and we define a set of tasks
+     * for creating the "mlDeployer" zip file that can be used in a disconnected environment.
+     */
     repositories {
         jcenter()
         maven {url "http://developer.marklogic.com/maven2/"}
@@ -69,6 +73,7 @@ else {
         mlcp "com.marklogic:marklogic-mapreduce2:2.1.2"
 
         mlgradle mlGradleDependency
+        mlgradle mlSalimanDependency
     }
 
     task copyGradleFiles(type: Copy, group: mlDeployerGroup) {

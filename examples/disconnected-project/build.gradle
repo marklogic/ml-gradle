@@ -13,36 +13,36 @@
  * against a file tree. 
  */
 buildscript {
-	if (project.findProperty("disconnected") == "true") {
-		dependencies {
-			classpath fileTree(dir: "ml-gradle-dependencies", include: "*.jar")
-		}
-	} else {
-		repositories {
-			jcenter()
-			maven {
-				url "https://plugins.gradle.org/m2/"
-			}
-		}
-		dependencies {
-			classpath mlGradleDependency
-			classpath mlSalimanDependency
-		}
-	}
+    if (project.findProperty("disconnected") == "true") {
+        dependencies {
+            classpath fileTree(dir: "ml-gradle-dependencies", include: "*.jar")
+        }
+    } else {
+        repositories {
+            jcenter()
+            maven {
+                url "https://plugins.gradle.org/m2/"
+            }
+        }
+        dependencies {
+            classpath mlGradleDependency
+            classpath mlSalimanDependency
+        }
+    }
 }
 
 apply plugin: "com.marklogic.ml-gradle"
 apply plugin: "net.saliman.properties"
 
 configurations {
-	mlcp
-	mlDeployer
+    mlcp
+    mlDeployer
 }
 
 ext {
-	mlDeployerDir = "build/ml-deployer"
-	mlDeployerGroup = "ML Deployer"
-	mlDeployerZipFilename = "ml-deployer.zip"
+    mlDeployerDir = "build/ml-deployer"
+    mlDeployerGroup = "ML Deployer"
+    mlDeployerZipFilename = "ml-deployer.zip"
 }
 
 /*
@@ -50,90 +50,90 @@ ext {
  * instead of retrieving them from a repository.
  */
 if (project.findProperty("disconnected") == "true") {
-	println "\nRUNNING IN DISCONNECTED MODE"
+    println "\nRUNNING IN DISCONNECTED MODE"
 
-	dependencies {
-		mlcp fileTree(dir: "mlcp-dependencies", include: "*.jar")
-	}
+    dependencies {
+        mlcp fileTree(dir: "mlcp-dependencies", include: "*.jar")
+    }
 } else {
-	/*
-	 * If we're not in disconnected mode, then we grab dependencies from repositories, and we define a set of tasks
-	 * for creating the "mlDeployer" zip file that can be used in a disconnected environment.
-	 */
-	repositories {
-		jcenter()
-		maven {url "http://developer.marklogic.com/maven2/"}
-		maven {url "http://repository.cloudera.com/artifactory/cloudera-repos/" }
-	}
+    /*
+     * If we're not in disconnected mode, then we grab dependencies from repositories, and we define a set of tasks
+     * for creating the "mlDeployer" zip file that can be used in a disconnected environment.
+     */
+    repositories {
+        jcenter()
+        maven {url "http://developer.marklogic.com/maven2/"}
+        maven {url "http://repository.cloudera.com/artifactory/cloudera-repos/" }
+    }
 
-	configurations { mlgradle }
+    configurations { mlgradle }
 
-	dependencies {
-		mlcp "com.marklogic:mlcp-Hadoop2:1.3-2"
-		mlcp "com.marklogic:marklogic-mapreduce2:2.1.2"
+    dependencies {
+        mlcp "com.marklogic:mlcp-Hadoop2:1.3-2"
+        mlcp "com.marklogic:marklogic-mapreduce2:2.1.2"
 
-		mlgradle mlGradleDependency
-		mlgradle mlSalimanDependency
-	}
+        mlgradle mlGradleDependency
+        mlgradle mlSalimanDependency
+    }
 
-	task copyGradleFiles(type: Copy, group: mlDeployerGroup) {
-		from "build.gradle", "gradle.properties"
-		into mlDeployerDir
-	}
+    task copyGradleFiles(type: Copy, group: mlDeployerGroup) {
+        from "build.gradle", "gradle.properties"
+        into mlDeployerDir
+    }
 
-	task copyAppModules(type: Copy, group: mlDeployerGroup) {
-		from "src/main/ml-modules"
-		into mlDeployerDir + "/src/main/ml-modules"
-	}
+    task copyAppModules(type: Copy, group: mlDeployerGroup) {
+        from "src/main/ml-modules"
+        into mlDeployerDir + "/src/main/ml-modules"
+    }
 
-	task copyAppConfig(type: Copy, group: mlDeployerGroup) {
-		from "src/main/ml-config"
-		into mlDeployerDir + "/src/main/ml-config"
-	}
+    task copyAppConfig(type: Copy, group: mlDeployerGroup) {
+        from "src/main/ml-config"
+        into mlDeployerDir + "/src/main/ml-config"
+    }
 
-	task copyMlGradleDependencies(type: Copy, group: mlDeployerGroup) {
-		from configurations.mlgradle
-		into mlDeployerDir + "/ml-gradle-dependencies"
-	}
+    task copyMlGradleDependencies(type: Copy, group: mlDeployerGroup) {
+        from configurations.mlgradle
+        into mlDeployerDir + "/ml-gradle-dependencies"
+    }
 
-	task copyMlcpDependencies(type: Copy, group: mlDeployerGroup) {
-		from configurations.mlcp
-		into mlDeployerDir + "/mlcp-dependencies"
-	}
+    task copyMlcpDependencies(type: Copy, group: mlDeployerGroup) {
+        from configurations.mlcp
+        into mlDeployerDir + "/mlcp-dependencies"
+    }
 
-	task addDisconnectedToGradleProperties {
-		doLast {
-			ant.propertyfile(file: "build/ml-deployer/gradle.properties") {
-				entry(key: "disconnected", value: "true")
-			}
-		}
-	}
+    task addDisconnectedToGradleProperties {
+        doLast {
+            ant.propertyfile(file: "build/ml-deployer/gradle.properties") {
+                entry(key: "disconnected", value: "true")
+            }
+        }
+    }
 
-	addDisconnectedToGradleProperties.mustRunAfter copyGradleFiles
+    addDisconnectedToGradleProperties.mustRunAfter copyGradleFiles
 
-	task copyMlDeployerFiles(group: mlDeployerGroup) {
-		dependsOn = [
-			"copyGradleFiles",
-			"copyAppModules",
-			"copyAppConfig",
-			"copyMlGradleDependencies",
-			"copyMlcpDependencies",
-			"addDisconnectedToGradleProperties"
-		]
-	}
+    task copyMlDeployerFiles(group: mlDeployerGroup) {
+        dependsOn = [
+            "copyGradleFiles",
+            "copyAppModules",
+            "copyAppConfig",
+            "copyMlGradleDependencies",
+            "copyMlcpDependencies",
+            "addDisconnectedToGradleProperties"
+        ]
+    }
 
-	task deleteMlDeployer(type: Delete, group: mlDeployerGroup) { delete mlDeployerDir, "build/${mlDeployerZipFilename}" }
+    task deleteMlDeployer(type: Delete, group: mlDeployerGroup) { delete mlDeployerDir, "build/${mlDeployerZipFilename}" }
 
-	task buildMlDeployer (type: Zip, group: mlDeployerGroup) {
-		description "Create a zip of this project's Gradle dependencies and source code so that it can be deployer without Internet access"
-		dependsOn = ["deleteMlDeployer", "copyMlDeployerFiles"]
-		from mlDeployerDir
-		into 'ml-deployer'
-		destinationDir file('build')
-		archiveName mlDeployerZipFilename
-	}
+    task buildMlDeployer (type: Zip, group: mlDeployerGroup) {
+        description "Create a zip of this project's Gradle dependencies and source code so that it can be deployer without Internet access"
+        dependsOn = ["deleteMlDeployer", "copyMlDeployerFiles"]
+        from mlDeployerDir
+        into 'ml-deployer'
+        destinationDir file('build')
+        archiveName mlDeployerZipFilename
+    }
 
-	copyMlDeployerFiles.mustRunAfter deleteMlDeployer
+    copyMlDeployerFiles.mustRunAfter deleteMlDeployer
 }
 
 /*

@@ -4,6 +4,7 @@ import com.marklogic.mgmt.resource.AbstractResourceManager;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.resource.forests.ForestManager;
 import com.marklogic.rest.util.Fragment;
+import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,28 @@ public class DatabaseManager extends AbstractResourceManager {
         super(manageClient);
     }
 
-    /**
+	/**
+	 * This is being added in 3.9.1 to add support for when a database is updated by a user that only has privileges
+	 * to update indexes. In such a scenario, the database-name property cannot exist, even if it's not changing. It's
+	 * also not needed, because the URL for the request specifies the database to update.
+	 *
+	 * It may be safe to make this change for all resource property updates, but it's only being applied for databases
+	 * since that's the immediate need for the Data Hub Framework.
+	 *
+	 * @param client
+	 * @param path
+	 * @param payload
+	 * @return
+	 */
+	@Override
+	protected ResponseEntity<String> putPayload(ManageClient client, String path, String payload) {
+		if (payloadParser.isJsonPayload(payload)) {
+			payload = payloadParser.excludeProperties(payload, getIdFieldName());
+		}
+		return super.putPayload(client, path, payload);
+	}
+
+	/**
      * This will catch and log any exception by default, as the most frequent reason why this fails is because the
      * database doesn't exist yet.
      *

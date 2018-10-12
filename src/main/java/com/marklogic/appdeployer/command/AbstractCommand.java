@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -282,6 +281,24 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 	    return false;
     }
 
+	protected void ignoreIncrementalCheckForFile(File file) {
+    	if (resourceFilenameFilter instanceof IncrementalFilenameFilter) {
+		    ((IncrementalFilenameFilter) resourceFilenameFilter).ignoreIncrementalCheckForFile(file);
+	    } else {
+    		logger.warn("resourceFilenameFilter does not implement " + IncrementalFilenameFilter.class.getName() + ", and thus " +
+			    "ignoreIncrementalCheckForFile for file " + file.getAbsolutePath() + " cannot be invoked");
+	    }
+	}
+
+	protected void setIncrementalMode(boolean incrementalMode) {
+		if (resourceFilenameFilter instanceof IncrementalFilenameFilter) {
+			((IncrementalFilenameFilter) resourceFilenameFilter).setIncrementalMode(incrementalMode);
+		} else {
+			logger.warn("resourceFilenameFilter does not implement " + IncrementalFilenameFilter.class.getName() + ", and thus " +
+				"setIncrementalMode cannot be invoked");
+		}
+	}
+
     public void setPayloadTokenReplacer(PayloadTokenReplacer payloadTokenReplacer) {
         this.payloadTokenReplacer = payloadTokenReplacer;
     }
@@ -297,4 +314,8 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
     public void setResourceFilenameFilter(FilenameFilter resourceFilenameFilter) {
         this.resourceFilenameFilter = resourceFilenameFilter;
     }
+
+	public FilenameFilter getResourceFilenameFilter() {
+		return resourceFilenameFilter;
+	}
 }

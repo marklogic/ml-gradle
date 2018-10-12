@@ -626,6 +626,11 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			config.setIncludeProperties(values);
 		});
 
+		propertyConsumerMap.put("mlIncremental", (config, prop) -> {
+			logger.info("Supported resources will only be deployed if their resource files are new or have been modified since the last deployment: " + prop);
+			config.setIncrementalDeploy(Boolean.parseBoolean(prop));
+		});
+    
 		propertyConsumerMap.put("mlUpdateMimetypeWhenPropertiesAreEqual", (config, prop) -> {
 			logger.info("Update mimetype when properties are equal (defaults to false to avoid unnecessary ML restarts): " + prop);
 			config.setUpdateMimetypeWhenPropertiesAreEqual(Boolean.parseBoolean(prop));

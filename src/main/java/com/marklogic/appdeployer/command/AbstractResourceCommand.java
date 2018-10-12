@@ -2,15 +2,11 @@ package com.marklogic.appdeployer.command;
 
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.ConfigDir;
-import com.marklogic.mgmt.admin.AdminManager;
-import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.admin.ActionRequiringRestart;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
+import com.marklogic.mgmt.resource.ResourceManager;
 
 import java.io.File;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +26,7 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 
     @Override
     public void execute(CommandContext context) {
+    	setIncrementalMode(context.getAppConfig().isIncrementalDeploy());
         for (File resourceDir : getResourceDirs(context)) {
             processExecuteOnResourceDir(context, resourceDir);
         }
@@ -100,6 +97,7 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
     @Override
     public void undo(CommandContext context) {
         if (deleteResourcesOnUndo) {
+        	setIncrementalMode(false);
             for (File resourceDir : getResourceDirs(context)) {
                 processUndoOnResourceDir(context, resourceDir);
             }

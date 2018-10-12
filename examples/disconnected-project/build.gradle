@@ -22,7 +22,10 @@ buildscript {
         repositories {
             jcenter()
         }
-        dependencies { classpath mlGradleDependency }
+        dependencies {
+            classpath mlGradleDependency
+            classpath mlSalimanDependency
+        }
     }
 }
 

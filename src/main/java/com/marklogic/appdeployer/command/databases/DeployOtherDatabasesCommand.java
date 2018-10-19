@@ -36,6 +36,7 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
     }
 
     public DeployOtherDatabasesCommand(int forestsPerHost) {
+    	setForestsPerHost(forestsPerHost);
 	    setExecuteSortOrder(SortOrderConstants.DEPLOY_OTHER_DATABASES);
 	    setUndoSortOrder(SortOrderConstants.DELETE_OTHER_DATABASES);
     }

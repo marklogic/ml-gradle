@@ -7,27 +7,63 @@ import com.marklogic.mgmt.api.Resource;
 import com.marklogic.mgmt.api.group.Group;
 import com.marklogic.mgmt.resource.tasks.TaskManager;
 
+import javax.xml.bind.annotation.*;
 import java.util.List;
 
+@XmlRootElement(name = "task-properties")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Task extends Resource {
 
+	@XmlElement(name = "group-name")
     private String groupName = Group.DEFAULT_GROUP_NAME;
 
+	@XmlElement(name = "task-id")
     private String taskId;
+
+	@XmlElement(name = "task-enabled")
     private Boolean taskEnabled;
+
+	@XmlElement(name = "task-path")
     private String taskPath;
+
+	@XmlElement(name = "task-root")
     private String taskRoot;
+
+	@XmlElement(name = "task-type")
     private String taskType;
+
+	@XmlElement(name = "task-period")
     private Integer taskPeriod;
+
+	@XmlElement(name = "task-month-day")
     private Integer taskMonthDay;
+
+	@XmlElementWrapper(name = "task-days")
+	@XmlElement(name = "task-day")
     private List<String> taskDay;
+
+	@XmlElement(name = "task-start-date")
     private String taskStartDate;
+
+	@XmlElement(name = "task-start-time")
     private String taskStartTime;
+
+	@XmlElement(name = "task-timestamp")
     private String taskTimestamp;
+
+	@XmlElement(name = "task-database")
     private String taskDatabase;
+
+	@XmlElement(name = "task-modules")
     private String taskModules;
+
+	@XmlElement(name = "task-user")
     private String taskUser;
+
+	@XmlElement(name = "task-host")
     private String taskHost;
+
+	@XmlElement(name = "task-priority")
     private String taskPriority;
 
     public Task() {

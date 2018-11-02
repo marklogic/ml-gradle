@@ -222,8 +222,6 @@ public class AppConfig {
 
 	private boolean updateMimetypeWhenPropertiesAreEqual = false;
 
-	private String[] serversToNotUndeploy;
-
 	private Map<String, Object> additionalProperties = new HashMap<>();
 
 	public AppConfig() {
@@ -1257,13 +1255,5 @@ public class AppConfig {
 
 	public void setAppServicesTrustManager(X509TrustManager appServicesTrustManager) {
 		this.appServicesTrustManager = appServicesTrustManager;
-	}
-
-	public String[] getServersToNotUndeploy() {
-		return serversToNotUndeploy;
-	}
-
-	public void setServersToNotUndeploy(String... serversToNotUndeploy) {
-		this.serversToNotUndeploy = serversToNotUndeploy;
 	}
 }

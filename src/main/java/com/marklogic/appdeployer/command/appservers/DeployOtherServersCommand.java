@@ -78,26 +78,17 @@ public class DeployOtherServersCommand extends AbstractResourceCommand {
 	@Override
 	protected String adjustPayloadBeforeDeletingResource(ResourceManager mgr, CommandContext context, File f, String payload) {
 		String serverName = new PayloadParser().getPayloadFieldValue(payload, "server-name", false);
-		if (serverName != null) {
-			if (!shouldUndeployServer(serverName, context)) {
-				logger.info(format("Not undeploying server %s because it's in the list of server names to not undeploy", serverName));
-				return null;
-			}
+
+		if (serverName != null && !shouldUndeployServer(serverName, context)) {
+			logger.info(format("Not undeploying server %s because it's in the list of server names to not undeploy", serverName));
+			return null;
 		}
 
 		return super.adjustPayloadBeforeDeletingResource(mgr, context, f, payload);
 	}
 
 	public boolean shouldUndeployServer(String serverName, CommandContext context) {
-		if (defaultServersToNotUndeploy != null && defaultServersToNotUndeploy.contains(serverName)) {
-			return false;
-		}
-
-		String[] names = null;
-		if (context != null && context.getAppConfig() != null) {
-			names = context.getAppConfig().getServersToNotUndeploy();
-		}
-		return names != null ? !Arrays.asList(names).contains(serverName) : true;
+		return defaultServersToNotUndeploy == null || !defaultServersToNotUndeploy.contains(serverName);
 	}
 
 	public Set<String> getDefaultServersToNotUndeploy() {

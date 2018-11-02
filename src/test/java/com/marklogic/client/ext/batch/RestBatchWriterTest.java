@@ -1,6 +1,5 @@
 package com.marklogic.client.ext.batch;
 
-import com.marklogic.client.ext.AbstractIntegrationTest;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.FailedRequestException;
 import com.marklogic.client.admin.TransformExtensionsManager;
@@ -8,6 +7,7 @@ import com.marklogic.client.document.DocumentPage;
 import com.marklogic.client.document.DocumentWriteOperation;
 import com.marklogic.client.document.ServerTransform;
 import com.marklogic.client.document.XMLDocumentManager;
+import com.marklogic.client.ext.AbstractIntegrationTest;
 import com.marklogic.client.impl.DocumentWriteOperationImpl;
 import com.marklogic.client.io.FileHandle;
 import com.marklogic.client.io.Format;
@@ -54,7 +54,6 @@ public class RestBatchWriterTest extends AbstractIntegrationTest {
 		DocumentWriteOperation op = new DocumentWriteOperationImpl(DocumentWriteOperation.OperationType.DOCUMENT_WRITE,
 			"/test.xml", null, new StringHandle("<hello>world</hello>"));
 
-		client = newClient("Documents");
 		RestBatchWriter writer = new RestBatchWriter(client);
 		writer.setServerTransform(new ServerTransform("simple"));
 		writer.setContentFormat(Format.XML);

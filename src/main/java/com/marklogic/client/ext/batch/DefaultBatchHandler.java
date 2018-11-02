@@ -38,9 +38,15 @@ public class DefaultBatchHandler extends LoggingObject implements BatchHandler {
 		for (DocumentWriteOperation item : items) {
 			set.add(item);
 		}
+
 		int count = set.size();
-		if (logger.isDebugEnabled()) {
-			logger.debug("Writing " + count + " documents to MarkLogic");
+		String connectionInfo = format("port: %d", client.getPort());
+		if (client.getDatabase() != null) {
+			connectionInfo += format("; database: %s", client.getDatabase());
+		}
+
+		if (logger.isInfoEnabled()) {
+			logger.info("Writing " + count + " documents to MarkLogic; " + connectionInfo);
 		}
 		if (serverTransform != null) {
 			mgr.write(set, serverTransform);
@@ -48,7 +54,7 @@ public class DefaultBatchHandler extends LoggingObject implements BatchHandler {
 			mgr.write(set);
 		}
 		if (logger.isInfoEnabled()) {
-			logger.info("Wrote " + count + " documents to MarkLogic");
+			logger.info("Wrote " + count + " documents to MarkLogic; " + connectionInfo);
 		}
 	}
 

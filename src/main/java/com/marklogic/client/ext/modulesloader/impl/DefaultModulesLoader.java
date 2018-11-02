@@ -222,7 +222,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		}
 
 		if (logger.isInfoEnabled()) {
-			logger.info("Writing REST server configuration");
+			logger.info("Writing REST server configuration to MarkLogic; " + getDatabaseClientInfo(client));
 			logger.info("Default document read transform: " + mgr.getDefaultDocumentReadTransform());
 			logger.info("Transform all documents on read: " + mgr.getDefaultDocumentReadTransformAll());
 			logger.info("Validate query options: " + mgr.getQueryOptionValidation());
@@ -232,6 +232,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 				logger.info("Update policy: " + mgr.getUpdatePolicy().name());
 			}
 		}
+
 		mgr.writeConfiguration();
 
 		if (f != null && modulesManager != null) {
@@ -476,7 +477,13 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		logger.info(String.format("Loading %s resource extension from file %s", resourceName, r.getFilename()));
 
 		StringHandle h = new StringHandle(readAndReplaceTokens(r));
-		executeTask(() -> extMgr.writeServices(resourceName, h, metadata, methodParams));
+
+		executeTask(() -> {
+			if (logger.isInfoEnabled()) {
+				logger.info(format("Writing %s resource extension to MarkLogic; %s", resourceName, getDatabaseClientInfo(client)));
+			}
+			extMgr.writeServices(resourceName, h, metadata, methodParams);
+		});
 
 		updateTimestamp(r);
 		return r;
@@ -494,10 +501,13 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		final String filename = r.getFilename();
 		final TransformExtensionsManager mgr = client.newServerConfigManager().newTransformExtensionsManager();
 		final String transformName = getExtensionNameFromFile(r);
-		logger.info(String.format("Loading %s transform from resource %s", transformName, filename));
+		logger.info(format("Loading %s transform from resource %s", transformName, filename));
 
 		StringHandle h = new StringHandle(readAndReplaceTokens(r));
 		executeTask(() -> {
+			if (logger.isInfoEnabled()) {
+				logger.info(format("Writing %s transform to MarkLogic; %s", transformName, getDatabaseClientInfo(client)));
+			}
 			if (FilenameUtil.isXslFile(filename)) {
 				mgr.writeXSLTransform(transformName, h, metadata);
 			} else if (FilenameUtil.isJavascriptFile(filename)) {
@@ -527,6 +537,9 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 
 		StringHandle h = new StringHandle(readAndReplaceTokens(r));
 		executeTask(() -> {
+			if (logger.isInfoEnabled()) {
+				logger.info(format("Writing %s query options to MarkLogic; %s", name, getDatabaseClientInfo(client)));
+			}
 			if (filename.endsWith(".json")) {
 				mgr.writeOptions(name, h.withFormat(Format.JSON));
 			} else {
@@ -721,6 +734,21 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 			} catch (IOException e) {
 			}
 		}
+	}
+
+	/**
+	 * Returns a string that is useful for logging information about the DatabaseClient connection before a call is
+	 * made to load a REST extension.
+	 *
+	 * @param client
+	 * @return
+	 */
+	protected String getDatabaseClientInfo(DatabaseClient client) {
+		String info = format("port: %d", client.getPort());
+		if (client.getDatabase() != null) {
+			info += format("; database: %s", client.getDatabase());
+		}
+		return info;
 	}
 
 	public AssetFileLoader getAssetFileLoader() {

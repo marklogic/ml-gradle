@@ -31,6 +31,11 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 	private String forestFilename;
 	private boolean createForestsOnEachHost = true;
 
+	/**
+	 * Defines database names that, by default, this command will never undeploy.
+	 */
+	private Set<String> defaultDatabasesToNotUndeploy = new HashSet<>();
+
     public DeployOtherDatabasesCommand() {
         this(1);
     }
@@ -39,7 +44,22 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
     	setForestsPerHost(forestsPerHost);
 	    setExecuteSortOrder(SortOrderConstants.DEPLOY_OTHER_DATABASES);
 	    setUndoSortOrder(SortOrderConstants.DELETE_OTHER_DATABASES);
+	    initializeDefaultDatabasesToNotUndeploy();
     }
+
+	protected void initializeDefaultDatabasesToNotUndeploy() {
+		defaultDatabasesToNotUndeploy = new HashSet<>();
+		defaultDatabasesToNotUndeploy.add("App-Services");
+		defaultDatabasesToNotUndeploy.add("Documents");
+		defaultDatabasesToNotUndeploy.add("Extensions");
+		defaultDatabasesToNotUndeploy.add("Fab");
+		defaultDatabasesToNotUndeploy.add("Last-Login");
+		defaultDatabasesToNotUndeploy.add("Meters");
+		defaultDatabasesToNotUndeploy.add("Modules");
+		defaultDatabasesToNotUndeploy.add("Schemas");
+		defaultDatabasesToNotUndeploy.add("Security");
+		defaultDatabasesToNotUndeploy.add("Triggers");
+	}
 
     @Override
     public void execute(CommandContext context) {
@@ -67,6 +87,7 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
             c.undo(context);
         }
     }
+
 
     protected void sortCommandsBeforeUndo(List<DeployDatabaseCommand> list, CommandContext context) {
         Collections.sort(list, new DeployDatabaseCommandComparator(context, true));
@@ -97,6 +118,7 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 	    c.setCheckForCustomForests(isCheckForCustomForests());
 	    c.setForestFilename(getForestFilename());
 	    c.setCreateForestsOnEachHost(isCreateForestsOnEachHost());
+	    c.setDatabasesToNotUndeploy(this.getDefaultDatabasesToNotUndeploy());
 	    return c;
     }
 
@@ -150,5 +172,13 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 
 	public void setCreateForestsOnEachHost(boolean createForestsOnEachHost) {
 		this.createForestsOnEachHost = createForestsOnEachHost;
+	}
+
+	public Set<String> getDefaultDatabasesToNotUndeploy() {
+		return defaultDatabasesToNotUndeploy;
+	}
+
+	public void setDefaultDatabasesToNotUndeploy(Set<String> defaultDatabasesToNotUndeploy) {
+		this.defaultDatabasesToNotUndeploy = defaultDatabasesToNotUndeploy;
 	}
 }

@@ -17,6 +17,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Can be used for creating any kind of database with any sorts of forests. Specifying a config file for the database or
@@ -77,6 +78,11 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
     private boolean subDatabase = false;
     private String superDatabaseName;
 
+	/**
+	 * Expected to be set by DeployOtherDatabasesCommand; a list of database names (should default to the ones MarkLogic
+	 * provides out-of-the-box) that won't be undeployed during an "undo" operation.
+	 */
+	private Set<String> databasesToNotUndeploy;
 
     public DeployDatabaseCommand() {
         setExecuteSortOrder(SortOrderConstants.DEPLOY_OTHER_DATABASES);
@@ -129,6 +135,15 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
     @Override
     public void undo(CommandContext context) {
         String payload = buildPayload(context);
+
+        if (databasesToNotUndeploy != null) {
+        	final String dbName = new PayloadParser().getPayloadFieldValue(payload, "database-name", false);
+        	if (dbName != null && databasesToNotUndeploy.contains(dbName)) {
+        		logger.info(format("Not undeploying database %s because it is in the list of database names to not undeploy.", dbName));
+        		return;
+	        }
+        }
+
         if (payload != null) {
         	DatabaseManager dbMgr = newDatabaseManageForDeleting(context);
         	// if this has subdatabases, detach/delete them first
@@ -421,5 +436,13 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 
 	public void setDatabaseFile(File databaseFile) {
 		this.databaseFile = databaseFile;
+	}
+
+	public Set<String> getDatabasesToNotUndeploy() {
+		return databasesToNotUndeploy;
+	}
+
+	public void setDatabasesToNotUndeploy(Set<String> databasesToNotUndeploy) {
+		this.databasesToNotUndeploy = databasesToNotUndeploy;
 	}
 }

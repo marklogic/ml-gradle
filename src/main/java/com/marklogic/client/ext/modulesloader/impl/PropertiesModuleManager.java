@@ -29,8 +29,12 @@ public class PropertiesModuleManager extends LoggingObject implements ModulesMan
     @Override
     public void initialize() {
     	File propertiesFile = new File(propertiesFilePath);
-        propertiesFile.getParentFile().mkdirs();
-        if (propertiesFile.exists()) {
+
+    	if (propertiesFile.getParentFile() != null) {
+		    propertiesFile.getParentFile().mkdirs();
+	    }
+
+	    if (propertiesFile.exists()) {
             FileInputStream fis = null;
             try {
                 fis = new FileInputStream(propertiesFile);
@@ -47,7 +51,9 @@ public class PropertiesModuleManager extends LoggingObject implements ModulesMan
                     logger.warn(e.getMessage());
                 }
             }
-        }
+	    } else {
+		    logger.warn("File path does not exist, so will not save timestamps to it: " + propertiesFile);
+	    }
     }
 
     public void deletePropertiesFile() {

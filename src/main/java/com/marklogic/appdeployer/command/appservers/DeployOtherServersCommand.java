@@ -5,12 +5,13 @@ import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.ResourceFilenameFilter;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.PayloadParser;
-import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
-import com.marklogic.mgmt.util.ObjectMapperFactory;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * "Other" = non-REST-API servers. This will process every JSON/XML file that's not named "rest-api-server.*" in the
@@ -18,28 +19,43 @@ import java.io.File;
  */
 public class DeployOtherServersCommand extends AbstractResourceCommand {
 
-    public DeployOtherServersCommand() {
-        setExecuteSortOrder(SortOrderConstants.DEPLOY_OTHER_SERVERS);
-        setUndoSortOrder(SortOrderConstants.DELETE_OTHER_SERVERS);
-        setRestartAfterDelete(true);
-        setCatchExceptionOnDeleteFailure(true);
-        setResourceFilenameFilter(new ResourceFilenameFilter("rest-api-server.xml", "rest-api-server.json"));
-    }
+	/**
+	 * Defines the server names that, by default, this command will never undeploy.
+	 */
+	private Set<String> defaultServersToNotUndeploy = new HashSet<>();
 
-    @Override
-    protected File[] getResourceDirs(CommandContext context) {
-    	return findResourceDirs(context.getAppConfig(), configDir -> configDir.getServersDir());
-    }
+	public DeployOtherServersCommand() {
+		setExecuteSortOrder(SortOrderConstants.DEPLOY_OTHER_SERVERS);
+		setUndoSortOrder(SortOrderConstants.DELETE_OTHER_SERVERS);
+		setRestartAfterDelete(true);
+		setCatchExceptionOnDeleteFailure(true);
+		setResourceFilenameFilter(new ResourceFilenameFilter("rest-api-server.xml", "rest-api-server.json"));
 
-    @Override
-    protected ResourceManager getResourceManager(CommandContext context) {
-        return new ServerManager(context.getManageClient(), context.getAppConfig().getGroupName());
-    }
+		initializeDefaultServersToNotUndeploy();
+	}
 
-    @Override
-    public Integer getUndoSortOrder() {
-        return 0;
-    }
+	protected void initializeDefaultServersToNotUndeploy() {
+		defaultServersToNotUndeploy = new HashSet<>();
+		defaultServersToNotUndeploy.add("Admin");
+		defaultServersToNotUndeploy.add("App-Services");
+		defaultServersToNotUndeploy.add("HealthCheck");
+		defaultServersToNotUndeploy.add("Manage");
+	}
+
+	@Override
+	protected File[] getResourceDirs(CommandContext context) {
+		return findResourceDirs(context.getAppConfig(), configDir -> configDir.getServersDir());
+	}
+
+	@Override
+	protected ResourceManager getResourceManager(CommandContext context) {
+		return new ServerManager(context.getManageClient(), context.getAppConfig().getGroupName());
+	}
+
+	@Override
+	public Integer getUndoSortOrder() {
+		return 0;
+	}
 
 	/**
 	 * If the payload has a group-name that differs from the group name in the AppConfig, then this returns a new
@@ -57,5 +73,38 @@ public class DeployOtherServersCommand extends AbstractResourceCommand {
 			return new ServerManager(context.getManageClient(), groupName);
 		}
 		return mgr;
+	}
+
+	@Override
+	protected String adjustPayloadBeforeDeletingResource(ResourceManager mgr, CommandContext context, File f, String payload) {
+		String serverName = new PayloadParser().getPayloadFieldValue(payload, "server-name", false);
+		if (serverName != null) {
+			if (!shouldUndeployServer(serverName, context)) {
+				logger.info(format("Not undeploying server %s because it's in the list of server names to not undeploy", serverName));
+				return null;
+			}
+		}
+
+		return super.adjustPayloadBeforeDeletingResource(mgr, context, f, payload);
+	}
+
+	public boolean shouldUndeployServer(String serverName, CommandContext context) {
+		if (defaultServersToNotUndeploy != null && defaultServersToNotUndeploy.contains(serverName)) {
+			return false;
+		}
+
+		String[] names = null;
+		if (context != null && context.getAppConfig() != null) {
+			names = context.getAppConfig().getServersToNotUndeploy();
+		}
+		return names != null ? !Arrays.asList(names).contains(serverName) : true;
+	}
+
+	public Set<String> getDefaultServersToNotUndeploy() {
+		return defaultServersToNotUndeploy;
+	}
+
+	public void setDefaultServersToNotUndeploy(Set<String> defaultServersToNotUndeploy) {
+		this.defaultServersToNotUndeploy = defaultServersToNotUndeploy;
 	}
 }

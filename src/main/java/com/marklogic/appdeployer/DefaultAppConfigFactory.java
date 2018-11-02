@@ -635,6 +635,12 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			logger.info("Update mimetype when properties are equal (defaults to false to avoid unnecessary ML restarts): " + prop);
 			config.setUpdateMimetypeWhenPropertiesAreEqual(Boolean.parseBoolean(prop));
 		});
+
+		propertyConsumerMap.put("mlServersToNotUndeploy", (config, prop) -> {
+			String[] values = prop.split(",");
+			logger.info("Servers that will not be undeployed: " + Arrays.asList(values));
+			config.setServersToNotUndeploy(values);
+		});
 	}
 
 	@Override

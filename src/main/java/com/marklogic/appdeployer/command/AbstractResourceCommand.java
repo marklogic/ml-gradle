@@ -130,18 +130,19 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
      * @param f
      */
     protected void deleteResource(ResourceManager mgr, CommandContext context, File f) {
-        final String payload = copyFileToString(f, context);
+        String payload = copyFileToString(f, context);
         final ResourceManager resourceManager = adjustResourceManagerForPayload(mgr, context, payload);
+
+        final String finalPayload = adjustPayloadBeforeDeletingResource(resourceManager, context, f, payload);
+        if (finalPayload == null) {
+        	return;
+        }
+
         try {
             if (restartAfterDelete) {
-                context.getAdminManager().invokeActionRequiringRestart(new ActionRequiringRestart() {
-                    @Override
-                    public boolean execute() {
-                        return resourceManager.delete(payload).isDeleted();
-                    }
-                });
+            	context.getAdminManager().invokeActionRequiringRestart(() -> resourceManager.delete(finalPayload).isDeleted());
             } else {
-	            resourceManager.delete(payload);
+	            resourceManager.delete(finalPayload);
             }
         } catch (RuntimeException e) {
             if (catchExceptionOnDeleteFailure) {
@@ -153,6 +154,20 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
                 throw e;
             }
         }
+    }
+
+	/**
+	 * A subclass can override this to e.g. determine that, based on the payload, the resource should not be undeployed,
+	 * in which case null should be returned.
+	 *
+	 * @param mgr
+	 * @param context
+	 * @param f
+	 * @param payload
+	 * @return
+	 */
+    protected String adjustPayloadBeforeDeletingResource(ResourceManager mgr, CommandContext context, File f, String payload) {
+    	return payload;
     }
 
     public void setDeleteResourcesOnUndo(boolean deleteResourceOnUndo) {

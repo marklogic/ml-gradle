@@ -199,6 +199,8 @@ public class DefaultAppConfigFactoryTest extends Assert {
 
 	    p.setProperty("mlUpdateMimetypeWhenPropertiesAreEqual", "true");
 
+	    p.setProperty("mlServersToNotUndeploy", "server1,server2");
+
 	    sut = new DefaultAppConfigFactory(new SimplePropertySource(p));
         AppConfig config = sut.newAppConfig();
 
@@ -348,6 +350,10 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	    assertEquals("other-group", map.get("host2"));
 
 	    assertTrue(config.isUpdateMimetypeWhenPropertiesAreEqual());
+
+	    assertEquals(2, config.getServersToNotUndeploy().length);
+	    assertEquals("server1", config.getServersToNotUndeploy()[0]);
+	    assertEquals("server2", config.getServersToNotUndeploy()[1]);
     }
 
 	/**

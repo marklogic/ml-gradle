@@ -1,13 +1,13 @@
 package com.marklogic.client.ext.modulesloader.impl;
 
+import com.marklogic.client.ext.helper.LoggingObject;
+import com.marklogic.client.ext.modulesloader.ModulesManager;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.util.Date;
 import java.util.Properties;
-
-import com.marklogic.client.ext.helper.LoggingObject;
-import com.marklogic.client.ext.modulesloader.ModulesManager;
 
 public class PropertiesModuleManager extends LoggingObject implements ModulesManager {
 
@@ -51,8 +51,6 @@ public class PropertiesModuleManager extends LoggingObject implements ModulesMan
                     logger.warn(e.getMessage());
                 }
             }
-	    } else {
-		    logger.warn("File path does not exist, so will not save timestamps to it: " + propertiesFile);
 	    }
     }
 

@@ -119,7 +119,7 @@ public class AppConfig {
 	private String moduleTimestampsPath = PropertiesModuleManager.DEFAULT_FILE_PATH;
 	private boolean deleteTestModules = false;
 	private String deleteTestModulesPattern = "/test/**";
-	private int modulesLoaderThreadCount = 4;
+	private int modulesLoaderThreadCount = 1;
 	private Integer modulesLoaderBatchSize;
 	private boolean incrementalDeploy = false;
 

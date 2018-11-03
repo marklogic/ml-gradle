@@ -1,9 +1,10 @@
 buildscript {
   repositories {
     jcenter()
+	  mavenLocal()
   }
   dependencies {
-	  classpath "com.marklogic:ml-unit-test-client:${mlUnitTestVersion}"
+	  classpath "com.marklogic:marklogic-unit-test-client:${marklogicUnitTestVersion}"
     classpath "com.marklogic:ml-gradle:${mlGradleVersion}"
   }
 }
@@ -16,9 +17,9 @@ repositories {
 }
 
 dependencies {
-	mlRestApi "com.marklogic:ml-unit-test-modules:${mlUnitTestVersion}"
+	mlRestApi "com.marklogic:marklogic-unit-test-modules:${marklogicUnitTestVersion}"
 
-	// For running ml-unit-test tests via JUnit
-	testCompile "com.marklogic:ml-unit-test-client:${mlUnitTestVersion}"
+	// For running marklogic-unit-test tests via JUnit
+	testCompile "com.marklogic:marklogic-unit-test-client:${marklogicUnitTestVersion}"
 	testCompile "junit:junit:4.12"
 }

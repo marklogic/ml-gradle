@@ -36,6 +36,9 @@ public class ResourceFileManagerImpl extends PropertiesModuleManager implements 
 	 */
 	@Override
 	public boolean shouldResourceFileBeProcessed(File file) {
+		// Need to initialize this on every check because the properties file may have been updated by
+		// some other command
+		this.initialize();
 		boolean shouldBeProcessed = hasFileBeenModifiedSinceLastLoaded(file);
 		if (shouldBeProcessed) {
 			if (logger.isDebugEnabled()) {

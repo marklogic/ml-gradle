@@ -1,9 +1,6 @@
 package com.marklogic.appdeployer.command.security;
 
-import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.appdeployer.command.ResourceFileManagerImpl;
-import com.marklogic.appdeployer.command.ResourceFilenameFilter;
-import com.marklogic.mgmt.ManageClient;
+import com.marklogic.appdeployer.command.AbstractIncrementalDeployTest;
 import com.marklogic.mgmt.resource.security.RoleManager;
 import org.junit.After;
 import org.junit.Before;
@@ -11,25 +8,18 @@ import org.junit.Test;
 
 import java.io.File;
 
-public class IncrementallyDeployRolesTest extends AbstractAppDeployerTest {
+public class IncrementallyDeployRolesTest extends AbstractIncrementalDeployTest {
 
 	private final static String ROLE_INSTALL = "sampleapp-install";
 	private final static String ROLE_MODULES = "sampleapp-modules";
 
 	private RoleManager roleManager;
-	private DeployRolesCommand deployRolesCommand;
-	private ManageClient originalManageClient;
 
 	@Before
 	public void setup() {
-		appConfig.setIncrementalDeploy(true);
 		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/roles-with-permissions"));
-
 		roleManager = new RoleManager(manageClient);
 		assertRolesDontExist();
-
-		originalManageClient = this.manageClient;
-		deployRolesCommand = new DeployRolesCommand();
 	}
 
 	@After
@@ -42,7 +32,7 @@ public class IncrementallyDeployRolesTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void filesShouldNotBeDeployedDuringSecondDeployment() {
-		initializeAppDeployer(deployRolesCommand);
+		initializeAppDeployer(new DeployRolesCommand());
 		deleteResourceTimestampsFile();
 		deploySampleApp();
 		assertRolesExist();
@@ -57,7 +47,7 @@ public class IncrementallyDeployRolesTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void filesShouldBeDeployedDuringSecondDeployment() {
-		initializeAppDeployer(deployRolesCommand);
+		initializeAppDeployer(new DeployRolesCommand());
 		deleteResourceTimestampsFile();
 		deploySampleApp();
 		assertRolesExist();
@@ -73,15 +63,6 @@ public class IncrementallyDeployRolesTest extends AbstractAppDeployerTest {
 			logger.info("Caught expected NullPointerException, as manageClient was set to be null: " + ex.getMessage());
 			assertRolesExist();
 		}
-	}
-
-	/**
-	 * The properties file may exist from a previous run of the test, so this is used to delete it.
-	 */
-	private void deleteResourceTimestampsFile() {
-		ResourceFilenameFilter filter = (ResourceFilenameFilter) deployRolesCommand.getResourceFilenameFilter();
-		ResourceFileManagerImpl manager = (ResourceFileManagerImpl) filter.getResourceFileManager();
-		manager.deletePropertiesFile();
 	}
 
 	private void assertRolesExist() {

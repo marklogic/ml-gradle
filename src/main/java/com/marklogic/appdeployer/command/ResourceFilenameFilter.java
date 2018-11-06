@@ -119,8 +119,8 @@ public class ResourceFilenameFilter extends LoggingObject implements Incremental
 	protected boolean acceptFileBasedOnIncrementalCheck(File dir, String filename) {
 		File resourceFile = new File(dir, filename);
 		if (filesToIgnoreIncrementalCheck.contains(resourceFile)) {
-			if (logger.isInfoEnabled()) {
-				logger.info("Ignoring incremental check for file: " + resourceFile.getAbsolutePath());
+			if (logger.isDebugEnabled()) {
+				logger.debug("Ignoring incremental check for file: " + resourceFile.getAbsolutePath());
 			}
 			return true;
 		} else {

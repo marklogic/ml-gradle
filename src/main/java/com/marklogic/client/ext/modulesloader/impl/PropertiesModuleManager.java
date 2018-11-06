@@ -28,6 +28,8 @@ public class PropertiesModuleManager extends LoggingObject implements ModulesMan
 
     @Override
     public void initialize() {
+    	this.props = new Properties();
+
     	File propertiesFile = new File(propertiesFilePath);
 
     	if (propertiesFile.getParentFile() != null) {

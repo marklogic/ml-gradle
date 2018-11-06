@@ -53,8 +53,8 @@ public class DefaultBatchHandler extends LoggingObject implements BatchHandler {
 		} else {
 			mgr.write(set);
 		}
-		if (logger.isInfoEnabled()) {
-			logger.info("Wrote " + count + " documents to MarkLogic; " + connectionInfo);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Wrote " + count + " documents to MarkLogic; " + connectionInfo);
 		}
 	}
 

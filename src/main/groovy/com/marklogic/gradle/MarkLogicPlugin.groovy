@@ -97,9 +97,11 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlPostDeploy", group: deployGroup, description: "Add dependsOn to this task to add tasks at the end of mlDeploy").mustRunAfter(["mlDeployApp"])
 		project.task("mlPostUndeploy", group: deployGroup, description: "Add dependsOn to this task to add tasks at the end of mlUndeploy").mustRunAfter(["mlUndeployApp"])
 		project.task("mlDeploy", group: deployGroup, dependsOn: ["mlDeployApp", "mlPostDeploy"],
-			description: "Deploys all application resources in the configuration directory and allows for additional steps via mlPostDeploy.dependsOn. Use -Pignore to specify a comma-delimited list of short class names of ml-app-deployer command classes to ignore while deploying.").mustRunAfter("mlClearModulesDatabase")
-		project.task("mlUndeploy", group: deployGroup, dependsOn: ["mlUndeployApp", "mlPostUndeploy"], description: "Undeploys all application resources in the configuration directory and allows for additional steps via mlPostUndeploy.dependsOn; requires -Pconfirm=true to be set so this isn't accidentally executed")
-		project.task("mlRedeploy", group: deployGroup, dependsOn: ["mlClearModulesDatabase", "mlDeploy"], description: "Clears the modules database and then deploys the application")
+			description: "Deploys all application resources in the configuration directory and allows for additional steps via mlPostDeploy.dependsOn. Use -Pignore to specify a comma-delimited list of short class names of ml-app-deployer command classes to ignore while deploying.")
+			.mustRunAfter("mlClearModulesDatabase", "mlDeleteResourceTimestampsFile")
+		project.task("mlUndeploy", group: deployGroup, dependsOn: ["mlUndeployApp", "mlPostUndeploy", "mlDeleteResourceTimestampsFile"], description: "Undeploys all application resources in the configuration directory and allows for additional steps via mlPostUndeploy.dependsOn; requires -Pconfirm=true to be set so this isn't accidentally executed")
+		project.task("mlRedeploy", group: deployGroup, dependsOn: ["mlClearModulesDatabase", "mlDeploy", "mlDeleteResourceTimestampsFile"], description: "Clears the modules database and then deploys the application")
+		project.task("mlDeleteResourceTimestampsFile", type: DeleteResourceTimestampsFileTask, group: deployGroup, description: "Delete the properties file in the build directory (stored there by default) that keeps track of when each resource was last deployed; the file path can be overridden by setting the filePath property of this class")
 
 		String adminGroup = "ml-gradle Admin"
 		project.task("mlInit", type: InitTask, group: adminGroup, description: "Perform a one-time initialization of a MarkLogic server; uses the properties 'mlLicenseKey' and 'mlLicensee'")

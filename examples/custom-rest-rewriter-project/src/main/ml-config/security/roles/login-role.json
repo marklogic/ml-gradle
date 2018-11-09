@@ -1,0 +1,15 @@
+{
+	"role-name": "custom-rest-server-login",
+	"privilege": [
+		{
+			"privilege-name": "xdmp:login",
+			"action": "http://marklogic.com/xdmp/privileges/xdmp-login",
+			"kind": "execute"
+		},
+		{
+			"privilege-name": "xdmp:invoke",
+			"action": "http://marklogic.com/xdmp/privileges/xdmp-invoke",
+			"kind": "execute"
+		}
+	]
+}

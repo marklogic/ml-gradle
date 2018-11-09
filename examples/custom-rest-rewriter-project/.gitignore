@@ -1,0 +1,6 @@
+.gradle
+build
+.idea
+*.iml
+src/main/ml-modules/root/custom-rest-rewriter
+src/main/ml-modules/root/noauth-rewriter.xml

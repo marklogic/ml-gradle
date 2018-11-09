@@ -1,0 +1,46 @@
+plugins {
+	id "com.marklogic.ml-gradle" version "3.9.0"
+}
+
+task generateCustomRewriterModules {
+	description = "Uses XSL transforms to modify the default REST rewriter so that it uses custom endpoints that perform an xdmp.login. " +
+		"This should only be run at development time to generate code; it is not run as part of a deployment."
+	doLast {
+		def modifiedRewriterPath = "src/main/ml-modules/root/noauth-rewriter.xml"
+		def transformerFactory = javax.xml.transform.TransformerFactory.newInstance()
+
+		def transform = file("rewriter-modify-dispatches.xsl").text
+		def originalRewriter = file("rewriter-original.xml").text
+		def transformer = transformerFactory.newTransformer(new javax.xml.transform.stream.StreamSource(new StringReader(transform)))
+		transformer.setParameter("restModulePrefix", restModulePrefix)
+		def outputStream = new FileOutputStream(modifiedRewriterPath)
+		transformer.transform(new javax.xml.transform.stream.StreamSource(new StringReader(originalRewriter)), new javax.xml.transform.stream.StreamResult(outputStream))
+		outputStream.close()
+
+		transform = file("rewriter-extract-dispatches.xsl").text
+		transformer = transformerFactory.newTransformer(new javax.xml.transform.stream.StreamSource(new StringReader(transform)))
+		outputStream = new ByteArrayOutputStream()
+		def modifiedRewriter = file(modifiedRewriterPath).text
+		transformer.transform(new javax.xml.transform.stream.StreamSource(new StringReader(modifiedRewriter)), new javax.xml.transform.stream.StreamResult(outputStream))
+
+		def xml = new XmlSlurper().parseText(new String(outputStream.toByteArray()))
+		xml.dispatch.each {
+			def modifiedModule = it.text()
+			def originalModule = modifiedModule.replace(restModulePrefix, "")
+
+			/**
+			 * When adapting this for your own project, modify the generated code here to invoke whatever function you want.
+			 * The login-lib.xqy module is just an example for a common use case.
+			 */
+			def moduleFile = new File("src/main/ml-modules/root" + modifiedModule)
+			def content = "xquery version '1.0-ml';\nimport module namespace login = 'org:example' at '/login-lib.xqy';\nlogin:login-noauth-user(),\nxdmp:invoke('" + originalModule + "')"
+			if (modifiedModule.endsWith(".sjs")) {
+				content = "const login = require('/login-lib.xqy');\nlogin.loginNoauthUser();\nxdmp.invoke('" + originalModule + "')"
+			}
+			def file = file(moduleFile)
+			file.getParentFile().mkdirs()
+			println "Writing modified endpoint: " + file
+			file.write content
+		}
+	}
+}

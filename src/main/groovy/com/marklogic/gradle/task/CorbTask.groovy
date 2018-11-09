@@ -153,11 +153,11 @@ XQUERY-MODULE".tokenize(',')
     this.metaClass.getProperties().collectEntries {
       String corbOptionKey = CORB_PROPERTY_PREFIX + it.name.capitalize()
       //evaluate whether a value is set and the name matches the corbOptions key pattern
-      if (this[it.name] && corbOptions[corbOptionKey]) {
-        [(corbOptions[corbOptionKey]): this[it.name] ]
-      } else {
-        [:]
-      }
+	  if (corbOptions[corbOptionKey] && this[it.name]) {
+	    [(corbOptions[corbOptionKey]): this[it.name] ]
+	  } else {
+	    [:]
+	  }
     }
   }
 

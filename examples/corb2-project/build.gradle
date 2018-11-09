@@ -18,12 +18,12 @@ buildscript {
   }
   dependencies {
     //Needed for CorbTask to dynamicaly generate properties from CORB Options class
-    classpath 'com.marklogic:marklogic-corb:2.3.2'
+    classpath 'com.marklogic:marklogic-corb:2.4.1'
   }
 }
 
 plugins {
-    id "com.marklogic.ml-gradle" version "3.6.0"
+    id "com.marklogic.ml-gradle" version "3.9.0"
 }
 
 repositories {
@@ -42,7 +42,7 @@ configurations {
 
 dependencies {
     // required to run CoRB2
-    corb 'com.marklogic:marklogic-corb:2.3.2'
+    corb 'com.marklogic:marklogic-corb:2.4.1'
     // optional
     //corb 'org.jasypt:jasypt:1.9.2' // would be necessary to leverage JasyptDecrypter
 }
@@ -97,7 +97,7 @@ task corb(type: com.marklogic.gradle.task.CorbTask) {
  * the transform.xqy module to perform any action that you would like - this is just to show how to invoke corb from Gradle.
  */
 task corbAdhoc(type: com.marklogic.gradle.task.CorbTask) {
-    xccConnectionUri = contentXccUrl
+		xccConnectionUri = contentXccUrl
     urisModule = "src/main/ml-modules/ext/corb2-project/corb/uris.xqy|ADHOC"
     processModule = "src/main/ml-modules/ext/corb2-project/corb/transform.xqy|ADHOC"
 }

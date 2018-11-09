@@ -15,11 +15,6 @@ targetCompatibility = "1.8"
 repositories {
   mavenLocal() // Used for local development only
   jcenter()
-
-	// Needed until ml-unit-test is available via jcenter()
-	maven {
-		url {"https://dl.bintray.com/rjrudin/maven/"}
-	}
 }
 
 dependencies {

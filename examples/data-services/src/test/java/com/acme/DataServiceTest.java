@@ -10,7 +10,13 @@ import com.marklogic.client.DatabaseClientFactory.SecurityContext;
 
 public class DataServiceTest {
   @Test
-  public void testRuleDefinitions() {
+  public void testMockWhatsUp() {
+    DatabaseClient db = null;
+    assertEquals("Hey! Hey!", HelloWorldMock.on(db).whatsUp("Hey!", 2L));
+  }
+
+  @Test
+  public void testWhatsUp() {
     // Note: The user must have the `rest-extension-user` role to be able to
     // access Data Service endpoints, by default.
     // This example does not include the security set-up in order to focus
@@ -23,4 +29,5 @@ public class DataServiceTest {
         auth);
     assertEquals("Hey! Hey!", HelloWorld.on(db).whatsUp("Hey!", 2L));
   }
+
 }

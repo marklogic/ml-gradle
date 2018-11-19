@@ -1,0 +1,16 @@
+{
+  "functionName": "whatsUp",
+  "params": [
+    {
+      "name": "greeting",
+      "datatype": "string"
+    },
+    {
+      "name": "frequency",
+      "datatype": "unsignedLong"
+    }
+  ],
+  "return": {
+    "datatype": "string"
+  }
+}

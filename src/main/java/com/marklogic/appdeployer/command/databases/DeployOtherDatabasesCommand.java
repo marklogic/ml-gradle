@@ -36,6 +36,8 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 	 */
 	private Set<String> defaultDatabasesToNotUndeploy = new HashSet<>();
 
+	private DeployDatabaseCommandFactory deployDatabaseCommandFactory = new DefaultDeployDatabaseCommandFactory();
+
     public DeployOtherDatabasesCommand() {
         this(1);
     }
@@ -113,7 +115,7 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
     }
 
     protected DeployDatabaseCommand buildDeployDatabaseCommand(File file) {
-	    DeployDatabaseCommand c = new DeployDatabaseCommand(file);
+	    DeployDatabaseCommand c = this.deployDatabaseCommandFactory.newDeployDatabaseCommand(file);
 	    c.setForestsPerHost(getForestsPerHost());
 	    c.setCheckForCustomForests(isCheckForCustomForests());
 	    c.setForestFilename(getForestFilename());
@@ -180,5 +182,9 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 
 	public void setDefaultDatabasesToNotUndeploy(Set<String> defaultDatabasesToNotUndeploy) {
 		this.defaultDatabasesToNotUndeploy = defaultDatabasesToNotUndeploy;
+	}
+
+	public void setDeployDatabaseCommandFactory(DeployDatabaseCommandFactory deployDatabaseCommandFactory) {
+		this.deployDatabaseCommandFactory = deployDatabaseCommandFactory;
 	}
 }

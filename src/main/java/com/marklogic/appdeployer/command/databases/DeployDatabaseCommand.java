@@ -84,6 +84,8 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 	 */
 	private Set<String> databasesToNotUndeploy;
 
+	private DeployDatabaseCommandFactory deployDatabaseCommandFactory = new DefaultDeployDatabaseCommandFactory();
+
     public DeployDatabaseCommand() {
         setExecuteSortOrder(SortOrderConstants.DEPLOY_OTHER_DATABASES);
         setUndoSortOrder(SortOrderConstants.DELETE_OTHER_DATABASES);
@@ -169,7 +171,7 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 			    List<String> subDbNames = new ArrayList<String>();
 			    for (File f : listFilesInDirectory(subdbDir)) {
 				    logger.info(format("Will process sub database for %s found in file: %s", superDatabaseName, f.getAbsolutePath()));
-				    DeployDatabaseCommand subDbCommand = new DeployDatabaseCommand();
+				    DeployDatabaseCommand subDbCommand = this.deployDatabaseCommandFactory.newDeployDatabaseCommand(null);
 				    subDbCommand.setDatabaseFile(f);
 				    subDbCommand.setSuperDatabaseName(superDatabaseName);
 				    subDbCommand.setSubDatabase(true);
@@ -198,7 +200,7 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 			    logger.info("Removing all subdatabases from database: " + superDatabaseName);
 			    dbMgr.detachSubDatabases(superDatabaseName);
 			    for (File f : listFilesInDirectory(subdbDir)) {
-				    DeployDatabaseCommand subDbCommand = new DeployDatabaseCommand();
+				    DeployDatabaseCommand subDbCommand = this.deployDatabaseCommandFactory.newDeployDatabaseCommand(null);
 				    subDbCommand.setDatabaseFile(f);
 				    subDbCommand.setSuperDatabaseName(superDatabaseName);
 				    subDbCommand.setSubDatabase(true);
@@ -444,5 +446,9 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 
 	public void setDatabasesToNotUndeploy(Set<String> databasesToNotUndeploy) {
 		this.databasesToNotUndeploy = databasesToNotUndeploy;
+	}
+
+	public void setDeployDatabaseCommandFactory(DeployDatabaseCommandFactory deployDatabaseCommandFactory) {
+		this.deployDatabaseCommandFactory = deployDatabaseCommandFactory;
 	}
 }

@@ -3,7 +3,7 @@ plugins {
   id "maven-publish"
   id "eclipse"
   id "idea"
-  id "com.jfrog.bintray" version "1.5"
+  id "com.jfrog.bintray" version "1.8.4"
   id "com.github.jk1.dependency-license-report" version "0.3.11"
 }
 

@@ -82,11 +82,21 @@ class WatchTask extends MarkLogicTask {
 					onModulesLoaded.accept(loadedModules)
 				}
 			}
+
+			afterModulesLoaded()
+
 			try {
 				Thread.sleep(sleepTime);
 			} catch (InterruptedException ie) {
 				// Ignore
 			}
 		}
+	}
+
+	/**
+	 * Exists primarily so that DHF's extension of this class can invoke DHF-specific logic for loading modules.
+	 */
+	void afterModulesLoaded() {
+
 	}
 }

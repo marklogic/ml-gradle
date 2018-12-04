@@ -5,14 +5,14 @@
  */
 
 plugins {
-	id "com.marklogic.ml-gradle" version "3.6.0"
+	id "com.marklogic.ml-gradle" version "3.10.0"
 }
 
 repositories {
 	jcenter()
 
 	// Needed for some mlcp dependencies, such as commons-csv:1.5.1-marklogic
-	maven { url "https://developer.marklogic.com/maven2/" }
+	maven { url "http://developer.marklogic.com/maven2/" }
 }
 
 
@@ -21,7 +21,7 @@ configurations {
 }
 
 dependencies {
-	mlcp "com.marklogic:mlcp:9.0.4"
+	mlcp "com.marklogic:mlcp:9.0.7"
 
 	/**
 	 * mlcp uses Log4j for logging, and if Log4j can't find a configuration file, it will complain and you'll

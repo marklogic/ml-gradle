@@ -203,13 +203,13 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
     protected String adjustPayloadBeforeSavingResource(ResourceManager mgr, CommandContext context, File f, String payload) {
 	    String[] props = context.getAppConfig().getExcludeProperties();
 	    if (props != null && props.length > 0) {
-		    logger.info("Excluding properties %s from payload", Arrays.asList(props));
+		    logger.info(format("Excluding properties %s from payload", Arrays.asList(props).toString()));
 		    payload = payloadParser.excludeProperties(payload, props);
 	    }
 
 	    props = context.getAppConfig().getIncludeProperties();
 	    if (props != null && props.length > 0) {
-		    logger.info("Including only properties %s from payload", Arrays.asList(props));
+		    logger.info(format("Including only properties %s from payload", Arrays.asList(props).toString()));
 		    payload = payloadParser.includeProperties(payload, props);
 	    }
 

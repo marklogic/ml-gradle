@@ -87,4 +87,24 @@ public class DeployRolesWithDependenciesTest extends AbstractAppDeployerTest {
 			undeploySampleApp();
 		}
 	}
+
+	@Test
+	public void twoPhasesDisabled() {
+		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/roles-with-dependencies"));
+
+		DeployRolesCommand command = new DeployRolesCommand();
+		command.setDeployRolesInTwoPhases(false);
+		initializeAppDeployer(command);
+
+		try {
+			deploySampleApp();
+			fail("Deployment should have failed because deploying roles in two phases was disabled");
+		} catch (Exception ex) {
+			String message = ex.getMessage();
+			logger.info("Caught expected message: " + message);
+			assertTrue(message.contains("400 Bad Request"));
+		} finally {
+			undeploySampleApp();
+		}
+	}
 }

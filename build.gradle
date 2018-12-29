@@ -24,6 +24,9 @@ dependencies {
 	// For EqualsBuilder; added in 3.8.1 to support detecting if a mimetype's properties have changed or not
 	compile "org.apache.commons:commons-lang3:3.7"
 
+	// For PreviewInterceptor; can be excluded if that feature is not used
+	compile "com.flipkart.zjsonpatch:zjsonpatch:0.4.6"
+
 	// Don't want to include this in the published jar, just the executable jar
 	compileOnly "com.beust:jcommander:1.72"
 

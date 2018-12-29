@@ -1,4 +1,4 @@
-package com.marklogic.mgmt.rest.util;
+package com.marklogic.rest.util;
 
 import com.marklogic.mgmt.AbstractMgmtTest;
 import com.marklogic.mgmt.ManageClient;

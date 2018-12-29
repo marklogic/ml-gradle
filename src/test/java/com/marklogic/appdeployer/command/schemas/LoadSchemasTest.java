@@ -58,6 +58,14 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 		}
 	}
 
+	@Test
+	public void nullSchemaPath() {
+		initializeAppDeployer(newCommand());
+		appConfig.setSchemasPath(null);
+		deploySampleApp();
+		logger.info("Verifies that no error occurs when the schemas path is null");
+	}
+
 	@After
 	public void cleanup() {
 		undeploySampleApp();

@@ -31,6 +31,12 @@ public class JsonNodeUtil {
 		return mergeObjectNodes(nodes.toArray(new ObjectNode[]{}));
 	}
 
+	/**
+	 * Merges each node into the next node in the sequence.
+	 *
+	 * @param nodes
+	 * @return
+	 */
 	public static ObjectNode mergeObjectNodes(ObjectNode... nodes) {
 		List<ObjectNode> nodeList = new ArrayList<>();
 		Set<String> fieldNames = new HashSet<>();
@@ -60,11 +66,34 @@ public class JsonNodeUtil {
 				} else if (sourceField.isArray()) {
 					ArrayNode sourceArray = (ArrayNode) sourceField;
 					ArrayNode targetArray = (ArrayNode) targetField;
-					targetArray.addAll(sourceArray);
+
+					sourceArray.forEach(node -> {
+						if (!arrayContains(targetArray, node)) {
+							targetArray.add(node);
+						}
+					});
 				}
 			}
 		}
 
 		return nodeList.get(nodeList.size() - 1);
+	}
+
+	/**
+	 * Prevents the addition of duplicate nodes into an array while merging two arrays together.
+	 *
+	 * @param array
+	 * @param jsonNode
+	 * @return
+	 */
+	private static boolean arrayContains(ArrayNode array, JsonNode jsonNode) {
+		Iterator<JsonNode> iter = array.elements();
+		while (iter.hasNext()) {
+			JsonNode node = iter.next();
+			if (node.equals(jsonNode)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

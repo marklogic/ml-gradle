@@ -28,9 +28,14 @@ public class LoadSchemasCommand extends AbstractCommand {
 		SchemasLoader schemasLoader = buildSchemasLoader(context, client);
 		try {
 			String schemasPath = config.getSchemasPath();
-			logger.info("Loading schemas from path: " + schemasPath);
-			schemasLoader.loadSchemas(schemasPath);
-			logger.info("Finished loading schemas from: " + schemasPath);
+			if (schemasPath != null && schemasPath.trim().length() > 0) {
+				logger.info("Loading schemas from path: " + schemasPath);
+				schemasLoader.loadSchemas(schemasPath);
+				logger.info("Finished loading schemas from: " + schemasPath);
+			}
+			else {
+				logger.info("Schemas path is empty, so not attempting to load any schemas");
+			}
 		} catch (FailedRequestException fre) {
 			if (fre.getMessage().contains("NOSUCHDB")) {
 				logger.warn("Unable to load schemas because no schemas database exists; cause: " + fre.getMessage());

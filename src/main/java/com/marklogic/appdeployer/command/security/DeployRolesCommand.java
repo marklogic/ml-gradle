@@ -22,6 +22,8 @@ public class DeployRolesCommand extends AbstractResourceCommand {
 	private ResourceMapper resourceMapper;
 	private Set<String> roleNamesThatDontNeedToBeRedeployed;
 
+	private boolean deployRolesInTwoPhases = true;
+
 	public DeployRolesCommand() {
 		setExecuteSortOrder(SortOrderConstants.DEPLOY_ROLES);
 		setUndoSortOrder(SortOrderConstants.DELETE_ROLES);
@@ -32,20 +34,26 @@ public class DeployRolesCommand extends AbstractResourceCommand {
 	 * This is to avoid issues where the roles refer to each other or to themselves (via default permissions). The second time, the roles are
 	 * saved with permissions and references to other roles, which is guaranteed to work now that the roles have all been created.
 	 *
+	 * For 3.11.0, as part of the new preview feature, the boolean deployRolesInTwoPhases has been added so that the
+	 * process of deploying roles in two phases can be disabled during a preview.
+	 *
 	 * @param context
 	 */
 	@Override
 	public void execute(CommandContext context) {
-		removeRolesAndPermissionsDuringDeployment = true;
-		if (logger.isInfoEnabled()) {
-			logger.info("Deploying roles minus their default permissions and references to roles");
-		}
 		roleNamesThatDontNeedToBeRedeployed = new HashSet<>();
-		super.execute(context);
-		if (logger.isInfoEnabled()) {
-			logger.info("Redeploying roles that have default permissions and/or references to roles");
+		if (deployRolesInTwoPhases) {
+			removeRolesAndPermissionsDuringDeployment = true;
+			if (logger.isInfoEnabled()) {
+				logger.info("Deploying roles minus their default permissions and references to roles");
+			}
+			super.execute(context);
+			if (logger.isInfoEnabled()) {
+				logger.info("Redeploying roles that have default permissions and/or references to roles");
+			}
+			removeRolesAndPermissionsDuringDeployment = false;
 		}
-		removeRolesAndPermissionsDuringDeployment = false;
+
 		super.execute(context);
 	}
 
@@ -120,6 +128,10 @@ public class DeployRolesCommand extends AbstractResourceCommand {
 	@Override
 	protected ResourceManager getResourceManager(CommandContext context) {
 		return new RoleManager(context.getManageClient());
+	}
+
+	public void setDeployRolesInTwoPhases(boolean deployRolesInTwoPhases) {
+		this.deployRolesInTwoPhases = deployRolesInTwoPhases;
 	}
 }
 

@@ -33,7 +33,7 @@ public class Field {
 	private List<ExcludedElement> excludedElement;
 
 	@XmlElement(name = "stemmed-searches")
-	private Boolean stemmedSearches;
+	private String stemmedSearches;
 
 	@XmlElement(name = "word-searches")
 	private Boolean wordSearches;
@@ -126,11 +126,11 @@ public class Field {
 		this.includedElement = includedElement;
 	}
 
-	public Boolean getStemmedSearches() {
+	public String getStemmedSearches() {
 		return stemmedSearches;
 	}
 
-	public void setStemmedSearches(Boolean stemmedSearches) {
+	public void setStemmedSearches(String stemmedSearches) {
 		this.stemmedSearches = stemmedSearches;
 	}
 

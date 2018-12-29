@@ -47,7 +47,7 @@ public class PayloadPropertiesTest extends AbstractAppDeployerTest {
 		assertEquals("true", db.getElementValue("//m:triple-index"));
 		assertEquals("Triggers", db.getElementValue("//m:triggers-database"));
 
-		appConfig.setExcludeProperties(null);
+		appConfig.setExcludeProperties((String[])null);
 		appConfig.setIncludeProperties(new String[] {"triple-index", "database-name"});
 		appDeployer.deploy(appConfig);
 

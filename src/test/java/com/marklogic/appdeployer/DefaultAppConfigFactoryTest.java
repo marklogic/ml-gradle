@@ -145,6 +145,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
         p.setProperty("mlConfigPaths", "src/test/resources/sample-app/custom-forests,src/test/resources/sample-app/alert-config");
         p.setProperty("mlSimpleSsl", "true");
         p.setProperty("mlContentDatabaseName", "my-content-db");
+        p.setProperty("mlTestContentDatabaseName", "my-test-db");
         p.setProperty("mlModulesDatabaseName", "my-modules");
         p.setProperty("mlSchemasDatabaseName", "my-schemas-db");
         p.setProperty("mlTriggersDatabaseName", "my-triggers-db");
@@ -253,6 +254,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
         assertNotNull(config.getRestSslContext());
         assertNotNull(config.getRestSslHostnameVerifier());
         assertEquals("my-content-db", config.getContentDatabaseName());
+        assertEquals("my-test-db", config.getTestContentDatabaseName());
         assertEquals("my-modules", config.getModulesDatabaseName());
         assertEquals("my-schemas-db", config.getSchemasDatabaseName());
         assertEquals("my-triggers-db", config.getTriggersDatabaseName());

@@ -235,6 +235,11 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			config.setTestRestServerName(prop);
 		});
 
+		propertyConsumerMap.put("mlTestContentDatabaseName", (config, prop) -> {
+			logger.info("Test content database name: " + prop);
+			config.setTestContentDatabaseName(prop);
+		});
+
 		/**
 		 * Defines the path to files that should be loaded into a schemas database. Defaults to src/main/ml-schemas.
 		 */

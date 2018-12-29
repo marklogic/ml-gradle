@@ -11,12 +11,17 @@ import com.marklogic.client.ext.datamovement.listener.SimpleBatchLoggingListener
 import com.marklogic.gradle.task.MarkLogicTask
 import org.gradle.api.GradleException
 
+/**
+ * The "client" field in this task allows a user to provide a custom DatabaseClient while declaring an instance of
+ * this task in a Gradle build file.
+ */
 class DataMovementTask extends MarkLogicTask {
+
+	DatabaseClient client
 
 	void runQueryBatcherJob(QueryBatcherJob job) {
 		if (project.hasProperty("jobProperties")) {
 			if (job instanceof ConfigurableJob) {
-				ConfigurableJob cjob = (ConfigurableJob) job
 				printJobProperties(job)
 			} else {
 				println "Job does not implement ConfigurableJob, cannot show its properties"
@@ -50,11 +55,16 @@ class DataMovementTask extends MarkLogicTask {
 				}
 			}
 
-			DatabaseClient client = newClient()
+			DatabaseClient databaseClient = client
+			if (databaseClient == null) {
+				databaseClient = newClient()
+			}
 			try {
-				job.run(client)
+				job.run(databaseClient)
 			} finally {
-				client.release()
+				if (databaseClient != null) {
+					databaseClient.release()
+				}
 			}
 		}
 	}

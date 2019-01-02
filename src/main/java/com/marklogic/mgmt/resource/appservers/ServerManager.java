@@ -61,6 +61,15 @@ public class ServerManager extends AbstractResourceManager {
 	}
 
 	@Override
+	protected String getCreateResourcePath(String payload) {
+		String path = super.getCreateResourcePath(payload);
+		if (groupName != null) {
+			path += "?group-id=" + groupName;
+		}
+		return path;
+	}
+
+	@Override
     public String getResourcePath(String resourceNameOrId, String... resourceUrlParams) {
         return format("%s/%s?group-id=%s", getResourcesPath(), resourceNameOrId, groupName);
     }

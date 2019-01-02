@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import java.io.File;
 
-public class DeployForestsViaCmaTest extends AbstractAppDeployerTest {
+public class DeployForestsWithCmaTest extends AbstractAppDeployerTest {
 
 	/**
 	 * We don't really know that the forests were created via CMA, as if the ML cluster isn't 9.0-5, the call to
@@ -19,7 +19,7 @@ public class DeployForestsViaCmaTest extends AbstractAppDeployerTest {
 	 */
 	@Test
 	public void test() {
-		appConfig.setOptimizeWithCma(true);
+		appConfig.setDeployForestsWithCma(true);
 		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/db-only-config"));
 
 		initializeAppDeployer(new DeployContentDatabasesCommand(6));

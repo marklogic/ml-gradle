@@ -3,7 +3,7 @@
   "server-type": "odbc",
   "root": "/",
   "group-name": "%%GROUP%%",
-  "port": %%ODBC_PORT%%,
+  "port": 8048,
   "modules-database": "Modules",
   "content-database": "Documents"
 }

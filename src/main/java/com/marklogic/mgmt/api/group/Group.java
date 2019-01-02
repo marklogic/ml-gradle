@@ -48,7 +48,7 @@ public class Group extends Resource {
     private String xdqpSslCiphers;
     private List<Schema> schema;
     private List<Namespace> namespace;
-    private List<UsingNamespace> usingNamespace;
+    private List<String> usingNamespace;
     private List<ModuleLocation> moduleLocation;
     private Boolean eventsActivated;
     private List<String> event;
@@ -427,11 +427,11 @@ public class Group extends Resource {
         this.namespace = namespace;
     }
 
-    public List<UsingNamespace> getUsingNamespace() {
+    public List<String> getUsingNamespace() {
         return usingNamespace;
     }
 
-    public void setUsingNamespace(List<UsingNamespace> usingNamespace) {
+    public void setUsingNamespace(List<String> usingNamespace) {
         this.usingNamespace = usingNamespace;
     }
 

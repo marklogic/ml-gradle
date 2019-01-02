@@ -23,7 +23,6 @@ public class ManageOtherServerTest extends AbstractAppDeployerTest {
         // server
         initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployTriggersDatabaseCommand(),
                 new DeploySchemasDatabaseCommand(), new DeployOtherServersCommand());
-        appConfig.getCustomTokens().put("%%ODBC_PORT%%", "8048");
         try {
             appDeployer.deploy(appConfig);
         } finally {
@@ -38,8 +37,6 @@ public class ManageOtherServerTest extends AbstractAppDeployerTest {
         ServerManager mgr = new ServerManager(manageClient);
 
         initializeAppDeployer(new DeployOtherServersCommand());
-        appConfig.getCustomTokens().put("%%ODBC_PORT%%", "8048");
-        appConfig.getCustomTokens().put("%%XDBC_PORT%%", "8049");
         appDeployer.deploy(appConfig);
 
         assertTrue(mgr.exists("sample-app-xdbc"));
@@ -65,8 +62,6 @@ public class ManageOtherServerTest extends AbstractAppDeployerTest {
         c.setFilenamesToIgnore("odbc-server.json");
         initializeAppDeployer(c);
 
-        appConfig.getCustomTokens().put("%%ODBC_PORT%%", "8048");
-        appConfig.getCustomTokens().put("%%XDBC_PORT%%", "8049");
         appDeployer.deploy(appConfig);
 
         final String message = "Both the ODBC and REST API server files should have been ignored";

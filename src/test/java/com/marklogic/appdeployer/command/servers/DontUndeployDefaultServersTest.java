@@ -21,8 +21,6 @@ public class DontUndeployDefaultServersTest extends AbstractAppDeployerTest {
 		DeployOtherServersCommand c = new DeployOtherServersCommand();
 		initializeAppDeployer(c);
 
-		appConfig.getCustomTokens().put("%%XDBC_PORT%%", "8049");
-
 		deploySampleApp();
 
 		assertTrue(mgr.exists("sample-app-xdbc"));

@@ -289,17 +289,11 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
     }
 
 	/**
-	 * Determines if the CMA - Configuration Management API - endpoint can be used to optimize the deployment of
-	 * resources via a CMA configuration.
-	 *
 	 * @param context
-	 * @return
+	 * @return true if the ML server has the CMA endpoint - /manage/v3
 	 */
-	protected boolean shouldOptimizeWithCma(CommandContext context) {
-    	if (context.getAppConfig().isOptimizeWithCma()) {
-		    return new ConfigurationManager(context.getManageClient()).endpointExists();
-	    }
-	    return false;
+	protected boolean cmaEndpointExists(CommandContext context) {
+	    return new ConfigurationManager(context.getManageClient()).endpointExists();
     }
 
 	protected void ignoreIncrementalCheckForFile(File file) {

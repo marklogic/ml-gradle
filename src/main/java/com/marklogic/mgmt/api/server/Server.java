@@ -1,21 +1,30 @@
 package com.marklogic.mgmt.api.server;
 
-import com.marklogic.mgmt.resource.ResourceManager;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.Resource;
+import com.marklogic.mgmt.api.group.ModuleLocation;
+import com.marklogic.mgmt.api.group.Namespace;
+import com.marklogic.mgmt.api.group.Schema;
+import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
+
+import java.util.List;
 
 public class Server extends Resource {
 
     private String serverName;
+	private String serverType;
     private String groupName;
-    private String serverType;
     private Boolean enabled;
     private String root;
     private Integer port;
     private Boolean webDAV;
     private Boolean execute;
-    private Boolean displayLastLogin;
+	private String modulesDatabase;
+	private String contentDatabase;
+	private String lastLoginDatabase;
+	private Boolean displayLastLogin;
     private String address;
     private Integer backlog;
     private Integer threads;
@@ -30,9 +39,13 @@ public class Server extends Resource {
     private Integer preCommitTriggerDepth;
     private Integer preCommitTriggerLimit;
     private String collation;
+    private String coordinateSystem;
     private String authentication;
     private Boolean internalSecurity;
-    private Integer concurrentRequestLimit;
+    private List<String> externalSecurity;
+	private String defaultUser;
+	private String privilege;
+	private Integer concurrentRequestLimit;
     private Boolean computeContentLength;
     private Boolean logErrors;
     private Boolean debugAllow;
@@ -62,19 +75,29 @@ public class Server extends Resource {
     private String outputIncludeDefaultAttributes;
     private String defaultErrorFormat;
     private String errorHandler;
-    // TODO schemas, namespaces, module-locations, request-blackouts
+    private List<Schema> schema;
+    private List<Namespace> namespace;
+    private List<String> usingNamespace;
+    private List<ModuleLocation> moduleLocation;
+    private List<RequestBlackout> requestBlackout;
     private String urlRewriter;
     private Boolean rewriteResolvesGlobally;
     private Boolean sslAllowSslv3;
     private Boolean sslAllowTls;
+    private Boolean sslDisableSslv3;
+    private Boolean sslDisableTlsv1;
+
+    @JsonProperty("ssl-disable-tlsv1-1")
+    private Boolean sslDisableTlsv11;
+
+	@JsonProperty("ssl-disable-tlsv1-2")
+    private Boolean sslDisableTlsv12;
+
     private String sslHostname;
     private String sslCiphers;
     private Boolean sslRequireClientCertificate;
-    // TODO ssl-client-certificate-authorities
-    private String contentDatabase;
-    private String modulesDatabase;
-    private String defaultUser;
-    private String privilege;
+    private List<String> sslClientCertificateAuthority;
+    private List<String> sslClientCertificatePem;
 
     public Server() {
         super();
@@ -622,5 +645,117 @@ public class Server extends Resource {
 
 	public void setPrivilege(String privilege) {
 		this.privilege = privilege;
+	}
+
+	public String getLastLoginDatabase() {
+		return lastLoginDatabase;
+	}
+
+	public void setLastLoginDatabase(String lastLoginDatabase) {
+		this.lastLoginDatabase = lastLoginDatabase;
+	}
+
+	public String getCoordinateSystem() {
+		return coordinateSystem;
+	}
+
+	public void setCoordinateSystem(String coordinateSystem) {
+		this.coordinateSystem = coordinateSystem;
+	}
+
+	public List<String> getExternalSecurity() {
+		return externalSecurity;
+	}
+
+	public void setExternalSecurity(List<String> externalSecurity) {
+		this.externalSecurity = externalSecurity;
+	}
+
+	public List<Schema> getSchema() {
+		return schema;
+	}
+
+	public void setSchema(List<Schema> schema) {
+		this.schema = schema;
+	}
+
+	public List<Namespace> getNamespace() {
+		return namespace;
+	}
+
+	public void setNamespace(List<Namespace> namespace) {
+		this.namespace = namespace;
+	}
+
+	public List<String> getUsingNamespace() {
+		return usingNamespace;
+	}
+
+	public void setUsingNamespace(List<String> usingNamespace) {
+		this.usingNamespace = usingNamespace;
+	}
+
+	public List<ModuleLocation> getModuleLocation() {
+		return moduleLocation;
+	}
+
+	public void setModuleLocation(List<ModuleLocation> moduleLocation) {
+		this.moduleLocation = moduleLocation;
+	}
+
+	public List<RequestBlackout> getRequestBlackout() {
+		return requestBlackout;
+	}
+
+	public void setRequestBlackout(List<RequestBlackout> requestBlackout) {
+		this.requestBlackout = requestBlackout;
+	}
+
+	public Boolean getSslDisableSslv3() {
+		return sslDisableSslv3;
+	}
+
+	public void setSslDisableSslv3(Boolean sslDisableSslv3) {
+		this.sslDisableSslv3 = sslDisableSslv3;
+	}
+
+	public Boolean getSslDisableTlsv1() {
+		return sslDisableTlsv1;
+	}
+
+	public void setSslDisableTlsv1(Boolean sslDisableTlsv1) {
+		this.sslDisableTlsv1 = sslDisableTlsv1;
+	}
+
+	public Boolean getSslDisableTlsv11() {
+		return sslDisableTlsv11;
+	}
+
+	public void setSslDisableTlsv11(Boolean sslDisableTlsv11) {
+		this.sslDisableTlsv11 = sslDisableTlsv11;
+	}
+
+	public Boolean getSslDisableTlsv12() {
+		return sslDisableTlsv12;
+	}
+
+	public void setSslDisableTlsv12(Boolean sslDisableTlsv12) {
+		this.sslDisableTlsv12 = sslDisableTlsv12;
+	}
+
+	public List<String> getSslClientCertificateAuthority() {
+		return sslClientCertificateAuthority;
+	}
+
+	public void setSslClientCertificateAuthority(List<String> sslClientCertificateAuthority) {
+		this.sslClientCertificateAuthority = sslClientCertificateAuthority;
+	}
+
+	public List<String> getSslClientCertificatePem() {
+		return sslClientCertificatePem;
+	}
+
+	public void setSslClientCertificatePem(List<String> sslClientCertificatePem) {
+		this.sslClientCertificatePem = sslClientCertificatePem;
 	}
 }

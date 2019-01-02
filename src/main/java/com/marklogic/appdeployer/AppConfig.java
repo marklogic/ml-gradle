@@ -67,10 +67,10 @@ public class AppConfig {
     private boolean catchDeployExceptions = false;
     private boolean catchUndeployExceptions = false;
 
-    // Whether to optimize certain operations with the Configuration Management API (CMA) if it's available
-	// For version 3.8.0, defaulting this to false as it's a new feature.
-	// Will default it to true once we have more experience with CMA under our belts.
-    private boolean optimizeWithCma = false;
+    private boolean deployAmpsWithCma = false;
+    private boolean deployServersWithCma = false;
+    private boolean deployForestsWithCma = false;
+    private boolean deployUsersWithCma = false;
 
     // Used to construct DatabaseClient instances based on inputs defined in this class
     private ConfiguredDatabaseClientFactory configuredDatabaseClientFactory = new DefaultConfiguredDatabaseClientFactory();
@@ -1225,14 +1225,6 @@ public class AppConfig {
 		this.forestNamingStrategies = forestNamingStrategies;
 	}
 
-	public boolean isOptimizeWithCma() {
-		return optimizeWithCma;
-	}
-
-	public void setOptimizeWithCma(boolean optimizeWithCma) {
-		this.optimizeWithCma = optimizeWithCma;
-	}
-
 	public boolean isUpdateMimetypeWhenPropertiesAreEqual() {
 		return updateMimetypeWhenPropertiesAreEqual;
 	}
@@ -1255,5 +1247,37 @@ public class AppConfig {
 
 	public void setAppServicesTrustManager(X509TrustManager appServicesTrustManager) {
 		this.appServicesTrustManager = appServicesTrustManager;
+	}
+
+	public boolean isDeployAmpsWithCma() {
+		return deployAmpsWithCma;
+	}
+
+	public void setDeployAmpsWithCma(boolean deployAmpsWithCma) {
+		this.deployAmpsWithCma = deployAmpsWithCma;
+	}
+
+	public boolean isDeployServersWithCma() {
+		return deployServersWithCma;
+	}
+
+	public void setDeployServersWithCma(boolean deployServersWithCma) {
+		this.deployServersWithCma = deployServersWithCma;
+	}
+
+	public boolean isDeployForestsWithCma() {
+		return deployForestsWithCma;
+	}
+
+	public void setDeployForestsWithCma(boolean deployForestsWithCma) {
+		this.deployForestsWithCma = deployForestsWithCma;
+	}
+
+	public boolean isDeployUsersWithCma() {
+		return deployUsersWithCma;
+	}
+
+	public void setDeployUsersWithCma(boolean deployUsersWithCma) {
+		this.deployUsersWithCma = deployUsersWithCma;
 	}
 }

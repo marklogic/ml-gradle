@@ -43,8 +43,13 @@ public class Configurations extends ApiObject {
 	public void submit(ManageClient manageClient) {
 		final String json = getJson();
 		final Logger logger = LoggerFactory.getLogger(getClass());
+
 		if (logger.isInfoEnabled()) {
-			logger.info("Submitting configuration: " + json);
+			if (json.contains("password")) {
+				logger.info("Submitting configuration (not logging because it contains the word 'password')");
+			} else {
+				logger.info("Submitting configuration: " + json);
+			}
 		}
 		manageClient.postJson("/manage/v3", json);
 		if (logger.isInfoEnabled()) {

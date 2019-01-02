@@ -10,7 +10,7 @@ import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
 
-public class DeployAmpsViaCmaTest extends AbstractAppDeployerTest {
+public class DeployAmpsWithCmaTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void test() throws Exception {
@@ -23,10 +23,14 @@ public class DeployAmpsViaCmaTest extends AbstractAppDeployerTest {
 
 		AmpManager mgr = new AmpManager(manageClient);
 
-		appConfig.setOptimizeWithCma(true);
+		appConfig.setDeployAmpsWithCma(true);
 		deploySampleApp();
 
 		try {
+			assertTrue(mgr.ampExists(amp1));
+			assertTrue(mgr.ampExists(amp2));
+
+			deploySampleApp();
 			assertTrue(mgr.ampExists(amp1));
 			assertTrue(mgr.ampExists(amp2));
 		} finally {

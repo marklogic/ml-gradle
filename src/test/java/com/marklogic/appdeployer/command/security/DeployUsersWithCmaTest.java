@@ -1,22 +1,20 @@
 package com.marklogic.appdeployer.command.security;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
+import com.marklogic.appdeployer.command.CommandContext;
+import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.security.UserManager;
 import org.junit.Test;
 
-public class DeployUsersViaCmaTest extends AbstractAppDeployerTest {
+public class DeployUsersWithCmaTest extends AbstractAppDeployerTest {
 
-	/**
-	 * Can't really verify that CMA was used other than looking at the logging. Can still verify that the users were
-	 * created.
-	 */
 	@Test
 	public void test() {
 		UserManager userManager = new UserManager(manageClient);
 
-		appConfig.setOptimizeWithCma(true);
+		appConfig.setDeployUsersWithCma(true);
 
-		initializeAppDeployer(new DeployUsersCommand());
+		initializeAppDeployer(new TestDeployUsersCommand());
 
 		try {
 			deploySampleApp();
@@ -24,10 +22,19 @@ public class DeployUsersViaCmaTest extends AbstractAppDeployerTest {
 			assertTrue(userManager.exists("sample-app-jane"));
 			assertTrue(userManager.exists("sample-app-john"));
 		} finally {
+			initializeAppDeployer(new DeployUsersCommand());
 			undeploySampleApp();
 
 			assertFalse(userManager.exists("sample-app-jane"));
 			assertFalse(userManager.exists("sample-app-john"));
 		}
+	}
+}
+
+class TestDeployUsersCommand extends DeployUsersCommand {
+
+	@Override
+	protected ResourceManager getResourceManager(CommandContext context) {
+		throw new RuntimeException("This shouldn't be called when CMA is used");
 	}
 }

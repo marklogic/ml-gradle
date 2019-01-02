@@ -3,7 +3,11 @@ package com.marklogic.appdeployer.command;
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.mgmt.SaveReceipt;
-import com.marklogic.mgmt.admin.ActionRequiringRestart;
+import com.marklogic.mgmt.api.API;
+import com.marklogic.mgmt.api.configuration.Configuration;
+import com.marklogic.mgmt.api.configuration.Configurations;
+import com.marklogic.mgmt.mapper.DefaultResourceMapper;
+import com.marklogic.mgmt.mapper.ResourceMapper;
 import com.marklogic.mgmt.resource.ResourceManager;
 
 import java.io.File;
@@ -16,21 +20,21 @@ import java.util.List;
  */
 public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 
-    private boolean deleteResourcesOnUndo = true;
-    private boolean restartAfterDelete = false;
-    private boolean catchExceptionOnDeleteFailure = false;
+	private boolean deleteResourcesOnUndo = true;
+	private boolean restartAfterDelete = false;
+	private boolean catchExceptionOnDeleteFailure = false;
 
-    protected abstract File[] getResourceDirs(CommandContext context);
+	protected abstract File[] getResourceDirs(CommandContext context);
 
-    protected abstract ResourceManager getResourceManager(CommandContext context);
+	protected abstract ResourceManager getResourceManager(CommandContext context);
 
-    @Override
-    public void execute(CommandContext context) {
-    	setIncrementalMode(context.getAppConfig().isIncrementalDeploy());
-        for (File resourceDir : getResourceDirs(context)) {
-            processExecuteOnResourceDir(context, resourceDir);
-        }
-    }
+	@Override
+	public void execute(CommandContext context) {
+		setIncrementalMode(context.getAppConfig().isIncrementalDeploy());
+		for (File resourceDir : getResourceDirs(context)) {
+			processExecuteOnResourceDir(context, resourceDir);
+		}
+	}
 
 	protected File[] findResourceDirs(CommandContext context, ResourceDirFinder resourceDirFinder) {
 		return findResourceDirs(context.getAppConfig(), resourceDirFinder);
@@ -56,29 +60,81 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 					logResourceDirectoryNotFound(dir);
 				}
 			}
-		}
-		else {
+		} else {
 			logger.warn("No ConfigDir objects found in AppConfig, unable to find resource directories");
 		}
 		return list.toArray(new File[]{});
 	}
 
+	/**
+	 * Processes every valid file found in the given resource directory.
+	 * <p>
+	 * Starting in 3.11.0, if the subclass implements SupportsCmaCommand and CMA optimization is enabled in the
+	 * AppConfig in the CommandContext, this method will deploy resources via a single CMA configuration.
+	 *
+	 * @param context
+	 * @param resourceDir
+	 */
 	protected void processExecuteOnResourceDir(CommandContext context, File resourceDir) {
 		if (resourceDir.exists()) {
-			ResourceManager mgr = getResourceManager(context);
 			if (logger.isInfoEnabled()) {
 				logger.info("Processing files in directory: " + resourceDir.getAbsolutePath());
 			}
-			for (File f : listFilesInDirectory(resourceDir, context)) {
+			if (useCmaForDeployingResources(context)) {
 				if (logger.isInfoEnabled()) {
-					logger.info("Processing file: " + f.getAbsolutePath());
+					logger.info("Command supports deployment via CMA, so will submit all resources via a single CMA configuration for directory: " + resourceDir);
 				}
-				SaveReceipt receipt = saveResource(mgr, context, f);
-				afterResourceSaved(mgr, context, f, receipt);
+				deployResourcesViaCma(context, resourceDir);
+			} else {
+				ResourceManager mgr = getResourceManager(context);
+				for (File f : listFilesInDirectory(resourceDir, context)) {
+					if (logger.isInfoEnabled()) {
+						logger.info("Processing file: " + f.getAbsolutePath());
+					}
+					SaveReceipt receipt = saveResource(mgr, context, f);
+					afterResourceSaved(mgr, context, f, receipt);
+				}
 			}
 		} else {
 			logResourceDirectoryNotFound(resourceDir);
 		}
+	}
+
+	/**
+	 * If this command is an instance of SupportsCmaCommand, it first needs to specify whether CMA should be used - it
+	 * is expected that a property is available in AppConfig to configure whether CMA should actually be used. If CMA
+	 * should be used, a quick check is then made to ensure that the CMA endpoint exists.
+	 *
+	 * @param context
+	 * @return
+	 */
+	protected boolean useCmaForDeployingResources(CommandContext context) {
+		if (this instanceof SupportsCmaCommand) {
+			SupportsCmaCommand command = (SupportsCmaCommand)this;
+			if (command.cmaShouldBeUsed(context)) {
+				return cmaEndpointExists(context);
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Depends on the subclass implementing SupportsCmaCommand.
+	 *
+	 * @param context
+	 * @param resourceDir
+	 */
+	protected void deployResourcesViaCma(CommandContext context, File resourceDir) {
+		ResourceMapper resourceMapper = new DefaultResourceMapper(new API(context.getManageClient()));
+		Configuration config = new Configuration();
+		for (File f : listFilesInDirectory(resourceDir, context)) {
+			if (logger.isInfoEnabled()) {
+				logger.info("Processing file: " + f.getAbsolutePath());
+			}
+			String payload = readResourceFromFile(null, context, f);
+			((SupportsCmaCommand) this).addResourceToConfiguration(payload, resourceMapper, config);
+		}
+		new Configurations(config).submit(context.getManageClient());
 	}
 
 	/**
@@ -91,70 +147,70 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 	 * @return
 	 */
 	protected File[] listFilesInDirectory(File resourceDir, CommandContext context) {
-    	return listFilesInDirectory(resourceDir);
-    }
+		return listFilesInDirectory(resourceDir);
+	}
 
-    @Override
-    public void undo(CommandContext context) {
-        if (deleteResourcesOnUndo) {
-        	setIncrementalMode(false);
-            for (File resourceDir : getResourceDirs(context)) {
-                processUndoOnResourceDir(context, resourceDir);
-            }
-        }
-    }
+	@Override
+	public void undo(CommandContext context) {
+		if (deleteResourcesOnUndo) {
+			setIncrementalMode(false);
+			for (File resourceDir : getResourceDirs(context)) {
+				processUndoOnResourceDir(context, resourceDir);
+			}
+		}
+	}
 
-    protected void processUndoOnResourceDir(CommandContext context, File resourceDir) {
-        if (resourceDir.exists()) {
-            if (logger.isInfoEnabled()) {
-                logger.info("Processing files in directory: " + resourceDir.getAbsolutePath());
-            }
-            final ResourceManager mgr = getResourceManager(context);
-            for (File f : listFilesInDirectory(resourceDir)) {
-                if (logger.isInfoEnabled()) {
-                    logger.info("Processing file: " + f.getAbsolutePath());
-                }
-                deleteResource(mgr, context, f);
-            }
-        }
-    }
+	protected void processUndoOnResourceDir(CommandContext context, File resourceDir) {
+		if (resourceDir.exists()) {
+			if (logger.isInfoEnabled()) {
+				logger.info("Processing files in directory: " + resourceDir.getAbsolutePath());
+			}
+			final ResourceManager mgr = getResourceManager(context);
+			for (File f : listFilesInDirectory(resourceDir)) {
+				if (logger.isInfoEnabled()) {
+					logger.info("Processing file: " + f.getAbsolutePath());
+				}
+				deleteResource(mgr, context, f);
+			}
+		}
+	}
 
-    /**
-     * If catchExceptionOnDeleteFailure is set to true, this will catch and log any exception that occurs when trying to
-     * delete the resource. This has been necessary when deleting two app servers in a row - for some reason, the 2nd
-     * delete will intermittently fail with a connection reset error, but the app server is in fact deleted
-     * successfully.
-     *
-     * @param mgr
-     * @param context
-     * @param f
-     */
-    protected void deleteResource(ResourceManager mgr, CommandContext context, File f) {
-        String payload = copyFileToString(f, context);
-        final ResourceManager resourceManager = adjustResourceManagerForPayload(mgr, context, payload);
+	/**
+	 * If catchExceptionOnDeleteFailure is set to true, this will catch and log any exception that occurs when trying to
+	 * delete the resource. This has been necessary when deleting two app servers in a row - for some reason, the 2nd
+	 * delete will intermittently fail with a connection reset error, but the app server is in fact deleted
+	 * successfully.
+	 *
+	 * @param mgr
+	 * @param context
+	 * @param f
+	 */
+	protected void deleteResource(ResourceManager mgr, CommandContext context, File f) {
+		String payload = copyFileToString(f, context);
+		final ResourceManager resourceManager = adjustResourceManagerForPayload(mgr, context, payload);
 
-        final String finalPayload = adjustPayloadBeforeDeletingResource(resourceManager, context, f, payload);
-        if (finalPayload == null) {
-        	return;
-        }
+		final String finalPayload = adjustPayloadBeforeDeletingResource(resourceManager, context, f, payload);
+		if (finalPayload == null) {
+			return;
+		}
 
-        try {
-            if (restartAfterDelete) {
-            	context.getAdminManager().invokeActionRequiringRestart(() -> resourceManager.delete(finalPayload).isDeleted());
-            } else {
-	            resourceManager.delete(finalPayload);
-            }
-        } catch (RuntimeException e) {
-            if (catchExceptionOnDeleteFailure) {
-                logger.warn("Caught exception while trying to delete resource; cause: " + e.getMessage());
-                if (restartAfterDelete) {
-                    context.getAdminManager().waitForRestart();
-                }
-            } else {
-                throw e;
-            }
-        }
-    }
+		try {
+			if (restartAfterDelete) {
+				context.getAdminManager().invokeActionRequiringRestart(() -> resourceManager.delete(finalPayload).isDeleted());
+			} else {
+				resourceManager.delete(finalPayload);
+			}
+		} catch (RuntimeException e) {
+			if (catchExceptionOnDeleteFailure) {
+				logger.warn("Caught exception while trying to delete resource; cause: " + e.getMessage());
+				if (restartAfterDelete) {
+					context.getAdminManager().waitForRestart();
+				}
+			} else {
+				throw e;
+			}
+		}
+	}
 
 	/**
 	 * A subclass can override this to e.g. determine that, based on the payload, the resource should not be undeployed,
@@ -166,27 +222,27 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 	 * @param payload
 	 * @return
 	 */
-    protected String adjustPayloadBeforeDeletingResource(ResourceManager mgr, CommandContext context, File f, String payload) {
-    	return payload;
-    }
+	protected String adjustPayloadBeforeDeletingResource(ResourceManager mgr, CommandContext context, File f, String payload) {
+		return payload;
+	}
 
-    public void setDeleteResourcesOnUndo(boolean deleteResourceOnUndo) {
-        this.deleteResourcesOnUndo = deleteResourceOnUndo;
-    }
+	public void setDeleteResourcesOnUndo(boolean deleteResourceOnUndo) {
+		this.deleteResourcesOnUndo = deleteResourceOnUndo;
+	}
 
-    public void setRestartAfterDelete(boolean restartAfterDelete) {
-        this.restartAfterDelete = restartAfterDelete;
-    }
+	public void setRestartAfterDelete(boolean restartAfterDelete) {
+		this.restartAfterDelete = restartAfterDelete;
+	}
 
-    public boolean isDeleteResourcesOnUndo() {
-        return deleteResourcesOnUndo;
-    }
+	public boolean isDeleteResourcesOnUndo() {
+		return deleteResourcesOnUndo;
+	}
 
-    public boolean isRestartAfterDelete() {
-        return restartAfterDelete;
-    }
+	public boolean isRestartAfterDelete() {
+		return restartAfterDelete;
+	}
 
-    public void setCatchExceptionOnDeleteFailure(boolean catchExceptionOnDeleteFailure) {
-        this.catchExceptionOnDeleteFailure = catchExceptionOnDeleteFailure;
-    }
+	public void setCatchExceptionOnDeleteFailure(boolean catchExceptionOnDeleteFailure) {
+		this.catchExceptionOnDeleteFailure = catchExceptionOnDeleteFailure;
+	}
 }

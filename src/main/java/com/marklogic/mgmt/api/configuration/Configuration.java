@@ -9,6 +9,7 @@ import com.marklogic.mgmt.api.security.Role;
 import com.marklogic.mgmt.api.security.User;
 import com.marklogic.mgmt.api.server.Server;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,6 +38,41 @@ public class Configuration {
 	@JsonProperty("user")
 	private List<User> users;
 
+	public void addAmp(Amp amp) {
+		if (amps == null) amps = new ArrayList<>();
+		amps.add(amp);
+	}
+
+	public void addDatabase(Database d) {
+		if (databases == null) databases = new ArrayList<>();
+		databases.add(d);
+	}
+
+	public void addForest(Forest f) {
+		if (forests == null) forests = new ArrayList<>();
+		forests.add(f);
+	}
+
+	public void addGroup(Group g) {
+		if (groups == null) groups = new ArrayList<>();
+		groups.add(g);
+	}
+
+	public void addRole(Role r) {
+		if (roles == null) roles = new ArrayList<>();
+		roles.add(r);
+	}
+
+	public void addServer(Server s) {
+		if (servers == null) servers = new ArrayList<>();
+		servers.add(s);
+	}
+
+	public void addUser(User u) {
+		if (users == null) users = new ArrayList<>();
+		users.add(u);
+	}
+	
 	public List<Amp> getAmps() {
 		return amps;
 	}

@@ -7,7 +7,6 @@ import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.api.configuration.Configuration;
 import com.marklogic.mgmt.api.configuration.Configurations;
 import com.marklogic.mgmt.api.forest.Forest;
-import com.marklogic.mgmt.cma.ConfigurationManager;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.forests.ForestManager;
 import com.marklogic.mgmt.resource.hosts.DefaultHostNameProvider;
@@ -75,12 +74,9 @@ public class DeployForestsCommand extends AbstractCommand {
 		// Replicas are currently handled by ConfigureForestReplicasCommand
 		List<Forest> forests = buildForests(context, false);
 
-		if (shouldOptimizeWithCma(context) && !forests.isEmpty()) {
+		if (context.getAppConfig().isDeployForestsWithCma() && !forests.isEmpty() && cmaEndpointExists(context)) {
 			createForestsViaCma(context, forests);
 		} else {
-			if (logger.isInfoEnabled()) {
-				logger.info("Configuration Management API is not available at " + ConfigurationManager.PATH + ", so forests will be created one at a time via the forests endpoint");
-			}
 			createForestsViaForestEndpoint(context, forests);
 		}
 	}

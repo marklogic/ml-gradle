@@ -28,8 +28,7 @@ public class DeployConfigurationsCommand extends AbstractCommand {
 					if (logger.isInfoEnabled()) {
 						logger.info("Processing file: " + f.getAbsolutePath());
 					}
-					String payload = copyFileToString(f, context);
-					payload = adjustPayloadBeforeSavingResource(null, context, f, payload);
+					String payload = readResourceFromFile(null, context, f);
 					SaveReceipt receipt = mgr.save(payload);
 					afterResourceSaved(null, context, f, receipt);
 				}

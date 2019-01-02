@@ -4,13 +4,14 @@ import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
+import com.marklogic.mgmt.api.configuration.Configuration;
+import com.marklogic.mgmt.api.configuration.Configurations;
 import com.marklogic.mgmt.api.forest.Forest;
 import com.marklogic.mgmt.cma.ConfigurationManager;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.forests.ForestManager;
 import com.marklogic.mgmt.resource.hosts.DefaultHostNameProvider;
 import com.marklogic.mgmt.resource.hosts.HostManager;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
@@ -85,24 +86,9 @@ public class DeployForestsCommand extends AbstractCommand {
 	}
 
 	protected void createForestsViaCma(CommandContext context, List<Forest> forests) {
-		StringBuilder sb = new StringBuilder("{\"config\":[{\"forest\":[");
-		for (int i = 0; i < forests.size(); i++) {
-			if (i > 0) {
-				sb.append(",");
-			}
-			sb.append(forests.get(i).getJson());
-		}
-		sb.append("]}]}");
-
-		// For version 3.8.0, logging the configuration package at the info level for better visibility and
-		// easier debugging of this new feature
-		if (logger.isInfoEnabled()) {
-			logger.info("Submitting configuration with forests: " + sb);
-		}
-		context.getManageClient().postJson("/manage/v3", sb.toString());
-		if (logger.isInfoEnabled()) {
-			logger.info("Successfully submitted configuration with forests");
-		}
+		Configuration config = new Configuration();
+		config.setForests(forests);
+		new Configurations(config).submit(context.getManageClient());
 	}
 
 	protected void createForestsViaForestEndpoint(CommandContext context, List<Forest> forests) {

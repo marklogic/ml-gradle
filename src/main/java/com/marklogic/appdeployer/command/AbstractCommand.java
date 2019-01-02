@@ -141,9 +141,8 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
      * @return
      */
     protected SaveReceipt saveResource(ResourceManager mgr, CommandContext context, File f) {
-		String payload = copyFileToString(f, context);
+		String payload = readResourceFromFile(mgr, context, f);
 		mgr = adjustResourceManagerForPayload(mgr, context, payload);
-		payload = adjustPayloadBeforeSavingResource(mgr, context, f, payload);
 
 		// A subclass may decide that the resource shouldn't be saved by returning a null payload
 		if (payload == null) {
@@ -155,6 +154,21 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
             storeTokenForResourceId(receipt, context);
         }
         return receipt;
+    }
+
+	/**
+	 * Handles reading the contents of a resource file into a String and adjusting it via
+	 * adjustPayloadBeforeSavingResource. This is in a separate method for subclasses to use that needs to read in the
+	 * contents of a file but don't wish to use saveResource.
+	 *
+	 * @param mgr
+	 * @param context
+	 * @param f
+	 * @return
+	 */
+	protected String readResourceFromFile(ResourceManager mgr, CommandContext context, File f) {
+	    String payload = copyFileToString(f, context);
+	    return adjustPayloadBeforeSavingResource(mgr, context, f, payload);
     }
 
 	/**
@@ -274,7 +288,14 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 	    }
     }
 
-    protected boolean shouldOptimizeWithCma(CommandContext context) {
+	/**
+	 * Determines if the CMA - Configuration Management API - endpoint can be used to optimize the deployment of
+	 * resources via a CMA configuration.
+	 *
+	 * @param context
+	 * @return
+	 */
+	protected boolean shouldOptimizeWithCma(CommandContext context) {
     	if (context.getAppConfig().isOptimizeWithCma()) {
 		    return new ConfigurationManager(context.getManageClient()).endpointExists();
 	    }

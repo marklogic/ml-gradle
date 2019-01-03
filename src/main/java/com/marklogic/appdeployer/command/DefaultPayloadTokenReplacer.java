@@ -26,12 +26,19 @@ public class DefaultPayloadTokenReplacer implements PayloadTokenReplacer {
     }
 
     protected String replaceCustomTokens(String payload, AppConfig appConfig, boolean isTestResource) {
-        Map<String, String> customTokens = appConfig.getCustomTokens();
-        if (customTokens != null) {
-            for (String key : customTokens.keySet()) {
-                payload = payload.replace(key, customTokens.get(key));
-            }
-        }
+    	if (payload != null) {
+		    Map<String, String> customTokens = appConfig.getCustomTokens();
+		    if (customTokens != null) {
+			    for (String key : customTokens.keySet()) {
+			    	if (key != null) {
+			    		String value = customTokens.get(key);
+			    		if (value != null) {
+						    payload = payload.replace(key, value);
+					    }
+				    }
+			    }
+		    }
+	    }
         return payload;
     }
 }

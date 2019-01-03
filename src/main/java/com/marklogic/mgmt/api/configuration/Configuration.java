@@ -5,6 +5,7 @@ import com.marklogic.mgmt.api.database.Database;
 import com.marklogic.mgmt.api.forest.Forest;
 import com.marklogic.mgmt.api.group.Group;
 import com.marklogic.mgmt.api.security.Amp;
+import com.marklogic.mgmt.api.security.Privilege;
 import com.marklogic.mgmt.api.security.Role;
 import com.marklogic.mgmt.api.security.User;
 import com.marklogic.mgmt.api.server.Server;
@@ -28,6 +29,9 @@ public class Configuration {
 
 	@JsonProperty("group")
 	private List<Group> groups;
+
+	@JsonProperty("privilege")
+	private List<Privilege> privileges;
 
 	@JsonProperty("role")
 	private List<Role> roles;
@@ -72,7 +76,12 @@ public class Configuration {
 		if (users == null) users = new ArrayList<>();
 		users.add(u);
 	}
-	
+
+	public void addPrivilege(Privilege p) {
+		if (privileges == null) privileges = new ArrayList<>();
+		privileges.add(p);
+	}
+
 	public List<Amp> getAmps() {
 		return amps;
 	}
@@ -127,5 +136,13 @@ public class Configuration {
 
 	public void setUsers(List<User> users) {
 		this.users = users;
+	}
+
+	public List<Privilege> getPrivileges() {
+		return privileges;
+	}
+
+	public void setPrivileges(List<Privilege> privileges) {
+		this.privileges = privileges;
 	}
 }

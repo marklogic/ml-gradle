@@ -3,6 +3,7 @@ package com.marklogic.mgmt.api.configuration;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.api.ApiObject;
+import com.marklogic.mgmt.cma.ConfigurationManager;
 import com.marklogic.mgmt.util.ObjectMapperFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +52,7 @@ public class Configurations extends ApiObject {
 				logger.info("Submitting configuration: " + json);
 			}
 		}
-		manageClient.postJson("/manage/v3", json);
+		new ConfigurationManager(manageClient).submit(json);
 		if (logger.isInfoEnabled()) {
 			logger.info("Successfully submitted configuration");
 		}

@@ -110,6 +110,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 
 	    p.setProperty("mlDeployAmpsWithCma", "true");
 	    p.setProperty("mlDeployForestsWithCma", "true");
+	    p.setProperty("mlDeployPrivilegesWithCma", "true");
 	    p.setProperty("mlDeployRolesWithCma", "true");
 
 	    p.setProperty("mlHost", "prophost");
@@ -211,6 +212,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 
         assertTrue(config.isDeployAmpsWithCma());
 	    assertTrue(config.isDeployForestsWithCma());
+	    assertTrue(config.isDeployPrivilegesWithCma());
 	    assertTrue(config.isDeployRolesWithCma());
 
         assertEquals("prophost", config.getHost());

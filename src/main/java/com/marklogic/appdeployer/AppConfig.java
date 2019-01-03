@@ -70,6 +70,7 @@ public class AppConfig {
     private boolean deployAmpsWithCma = false;
     private boolean deployForestsWithCma = false;
     private boolean deployRolesWithCma = false;
+    private boolean deployPrivilegesWithCma = false;
 
     // Used to construct DatabaseClient instances based on inputs defined in this class
     private ConfiguredDatabaseClientFactory configuredDatabaseClientFactory = new DefaultConfiguredDatabaseClientFactory();
@@ -1268,5 +1269,13 @@ public class AppConfig {
 
 	public void setDeployRolesWithCma(boolean deployRolesWithCma) {
 		this.deployRolesWithCma = deployRolesWithCma;
+	}
+
+	public boolean isDeployPrivilegesWithCma() {
+		return deployPrivilegesWithCma;
+	}
+
+	public void setDeployPrivilegesWithCma(boolean deployPrivilegesWithCma) {
+		this.deployPrivilegesWithCma = deployPrivilegesWithCma;
 	}
 }

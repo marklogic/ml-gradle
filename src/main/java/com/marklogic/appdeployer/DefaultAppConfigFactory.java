@@ -58,6 +58,11 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			config.setDeployForestsWithCma(Boolean.parseBoolean(prop));
 		});
 
+		propertyConsumerMap.put("mlDeployPrivilegesWithCma", (config, prop) -> {
+			logger.info("Deploy privileges" + cmaMessage + prop);
+			config.setDeployPrivilegesWithCma(Boolean.parseBoolean(prop));
+		});
+
 		propertyConsumerMap.put("mlDeployRolesWithCma", (config, prop) -> {
 			logger.info("Deploy roles" + cmaMessage + prop);
 			config.setDeployRolesWithCma(Boolean.parseBoolean(prop));

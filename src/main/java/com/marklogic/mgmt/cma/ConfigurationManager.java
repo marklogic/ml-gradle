@@ -25,6 +25,11 @@ public class ConfigurationManager extends AbstractManager {
 		this.manageClient = manageClient;
 	}
 
+	@Override
+	protected boolean useSecurityUser() {
+		return true;
+	}
+
 	/**
 	 * Returns true if the CMA endpoint exists. This temporarily disables logging in MgmtResponseErrorHandler so that
 	 * a client doesn't see the 404 error being logged, which could be mistakenly perceived as a real error.
@@ -36,7 +41,8 @@ public class ConfigurationManager extends AbstractManager {
 			if (logger.isInfoEnabled()) {
 				logger.info("Checking to see if Configuration Management API is available at: " + PATH);
 			}
-			manageClient.postJson(PATH, "{}");
+			final String emptyPayload = "{}";
+			submit(emptyPayload);
 			return true;
 		} catch (HttpClientErrorException ex) {
 			return false;
@@ -45,6 +51,12 @@ public class ConfigurationManager extends AbstractManager {
 		}
 	}
 
+	/**
+	 * Submits the configuration, with some logging before and after.
+	 *
+	 * @param payload
+	 * @return
+	 */
 	public SaveReceipt save(String payload) {
 		String configurationName = payloadParser.getPayloadFieldValue(payload, "name", false);
 		if (configurationName == null) {
@@ -55,12 +67,17 @@ public class ConfigurationManager extends AbstractManager {
 			logger.info("Applying configuration " + configurationName);
 		}
 
-		ResponseEntity<String> response = postPayload(manageClient, PATH, payload);
+		SaveReceipt receipt = submit(payload);
 
 		if (logger.isInfoEnabled()) {
 			logger.info("Applied configuration " + configurationName);
 		}
 
+		return receipt;
+	}
+
+	public SaveReceipt submit(String payload) {
+		ResponseEntity<String> response = postPayload(manageClient, PATH, payload);
 		return new SaveReceipt(null, payload, PATH, response);
 	}
 

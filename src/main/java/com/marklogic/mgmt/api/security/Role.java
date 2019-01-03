@@ -50,9 +50,11 @@ public class Role extends Resource {
 	public void clearPermissionsAndRoles() {
 		if (role != null) {
 			role.clear();
+			role = null;
 		}
 		if (permission != null) {
 			permission.clear();
+			permission = null;
 		}
 	}
 

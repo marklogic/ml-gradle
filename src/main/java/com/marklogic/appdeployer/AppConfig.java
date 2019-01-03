@@ -69,6 +69,7 @@ public class AppConfig {
 
     private boolean deployAmpsWithCma = false;
     private boolean deployForestsWithCma = false;
+    private boolean deployRolesWithCma = false;
 
     // Used to construct DatabaseClient instances based on inputs defined in this class
     private ConfiguredDatabaseClientFactory configuredDatabaseClientFactory = new DefaultConfiguredDatabaseClientFactory();
@@ -1259,5 +1260,13 @@ public class AppConfig {
 	@Deprecated
 	public void setCreateTriggersDatabase(boolean createTriggerDatabase) {
 		this.createTriggersDatabase = createTriggerDatabase;
+	}
+
+	public boolean isDeployRolesWithCma() {
+		return deployRolesWithCma;
+	}
+
+	public void setDeployRolesWithCma(boolean deployRolesWithCma) {
+		this.deployRolesWithCma = deployRolesWithCma;
 	}
 }

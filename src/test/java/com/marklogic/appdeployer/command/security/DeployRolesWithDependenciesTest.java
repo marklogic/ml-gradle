@@ -1,6 +1,8 @@
 package com.marklogic.appdeployer.command.security;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
+import com.marklogic.appdeployer.command.CommandContext;
+import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.security.RoleManager;
 import org.junit.Test;
 
@@ -51,6 +53,20 @@ public class DeployRolesWithDependenciesTest extends AbstractAppDeployerTest {
 		try {
 			deploySampleApp();
 		} finally {
+			undeploySampleApp();
+		}
+	}
+
+	@Test
+	public void testEvenMoreRolesWithCma() {
+		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/even-more-roles-with-dependencies"));
+		appConfig.setDeployRolesWithCma(true);
+
+		initializeAppDeployer(new TestDeployRolesCommand());
+		try {
+			deploySampleApp();
+		} finally {
+			initializeAppDeployer(new DeployRolesCommand());
 			undeploySampleApp();
 		}
 	}
@@ -106,5 +122,13 @@ public class DeployRolesWithDependenciesTest extends AbstractAppDeployerTest {
 		} finally {
 			undeploySampleApp();
 		}
+	}
+}
+
+class TestDeployRolesCommand extends DeployRolesCommand {
+
+	@Override
+	protected ResourceManager getResourceManager(CommandContext context) {
+		throw new RuntimeException("This should not be called when deploying with CMA");
 	}
 }

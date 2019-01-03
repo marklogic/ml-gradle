@@ -132,7 +132,9 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 				logger.info("Processing file: " + f.getAbsolutePath());
 			}
 			String payload = readResourceFromFile(null, context, f);
-			((SupportsCmaCommand) this).addResourceToConfiguration(payload, resourceMapper, config);
+			if (payload != null && payload.trim().length() > 0) {
+				((SupportsCmaCommand) this).addResourceToConfiguration(payload, resourceMapper, config);
+			}
 		}
 		new Configurations(config).submit(context.getManageClient());
 	}

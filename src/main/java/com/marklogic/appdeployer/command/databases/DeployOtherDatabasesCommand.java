@@ -4,6 +4,10 @@ import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractUndoableCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
+import com.marklogic.appdeployer.command.forests.DeployForestsCommand;
+import com.marklogic.mgmt.api.configuration.Configuration;
+import com.marklogic.mgmt.api.configuration.Configurations;
+import com.marklogic.mgmt.api.forest.Forest;
 
 import java.io.File;
 import java.util.*;
@@ -65,14 +69,58 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 
     @Override
     public void execute(CommandContext context) {
-        List<DeployDatabaseCommand> list = buildDatabaseCommands(context);
-        sortCommandsBeforeExecute(list, context);
-        for (DeployDatabaseCommand c : list) {
+        List<DeployDatabaseCommand> deployDatabaseCommands = buildDatabaseCommands(context);
+        sortCommandsBeforeExecute(deployDatabaseCommands, context);
+
+        boolean deployForestsWithCma = context.getAppConfig().isDeployForestsWithCma();
+
+        for (DeployDatabaseCommand c : deployDatabaseCommands) {
+        	if (deployForestsWithCma) {
+		        c.setPostponeForestCreation(true);
+	        }
             c.execute(context);
+        }
+
+        if (context.getAppConfig().isDeployForestsWithCma()) {
+        	deployAllForestsInSingleCmaRequest(context, deployDatabaseCommands);
         }
     }
 
-    protected void sortCommandsBeforeExecute(List<DeployDatabaseCommand> list, CommandContext context) {
+	/**
+	 * Each DeployDatabaseCommand is expected to have constructed a DeployForestCommand, but not executed it. Each
+	 * DeployForestCommand can then be used to build a list of forests. All of those forests can be combined into a
+	 * single list and then submitted to CMA, thereby greatly speeding up the creation of the forests.
+	 *
+	 * @param context
+	 * @param deployDatabaseCommands
+	 */
+	protected void deployAllForestsInSingleCmaRequest(CommandContext context, List<DeployDatabaseCommand> deployDatabaseCommands) {
+	    List<Forest> allForests = new ArrayList<>();
+	    for (DeployDatabaseCommand c : deployDatabaseCommands) {
+		    DeployForestsCommand deployForestsCommand = c.getDeployForestsCommand();
+		    if (deployForestsCommand != null) {
+			    allForests.addAll(deployForestsCommand.buildForests(context, false));
+		    }
+	    }
+	    if (!allForests.isEmpty()) {
+		    Configuration config = new Configuration();
+		    config.setForests(allForests);
+		    new Configurations(config).submit(context.getManageClient());
+	    }
+    }
+
+	/**
+	 * Databases have dependencies on each other - they can be the schema or triggers databases for other databases. So
+	 * they need to be deployed in an order that ensures any schema/triggers databases exist before a database is
+	 * created.
+	 *
+	 * Once support exists for deploying databases via CMA, this shouldn't be needed (except for supporting clients on
+	 * ML that don't yet have CMA).
+	 *
+	 * @param list
+	 * @param context
+	 */
+	protected void sortCommandsBeforeExecute(List<DeployDatabaseCommand> list, CommandContext context) {
     	if (context.getAppConfig().isSortOtherDatabaseByDependencies()) {
 		    Collections.sort(list, new DeployDatabaseCommandComparator(context, false));
 	    }
@@ -139,8 +187,6 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 		        }
 	        }
         }
-        ignore.add(DeploySchemasDatabaseCommand.DATABASE_FILENAME);
-        ignore.add(DeployTriggersDatabaseCommand.DATABASE_FILENAME);
         setFilenamesToIgnore(ignore.toArray(new String[]{}));
     }
 

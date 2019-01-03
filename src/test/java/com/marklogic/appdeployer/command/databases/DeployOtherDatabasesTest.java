@@ -1,14 +1,12 @@
 package com.marklogic.appdeployer.command.databases;
 
-import java.io.File;
-import java.util.regex.Pattern;
-
-import org.junit.Test;
-
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
-import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
+import org.junit.Test;
+
+import java.io.File;
+import java.util.regex.Pattern;
 
 public class DeployOtherDatabasesTest extends AbstractAppDeployerTest {
 
@@ -39,15 +37,16 @@ public class DeployOtherDatabasesTest extends AbstractAppDeployerTest {
     public void test() {
         ConfigDir configDir = appConfig.getFirstConfigDir();
         configDir.setBaseDir(new File("src/test/resources/sample-app/lots-of-databases"));
-        configDir.getContentDatabaseFiles().add(new File(configDir.getDatabasesDir(), "more-content-db-config.json"));
+        configDir.getContentDatabaseFiles().add(new File(configDir.getBaseDir(), "other-database-files/more-content-db-config.json"));
 
         appConfig.getForestCounts().put("other-sample-app-content", 2);
         appConfig.getForestCounts().put("other-sample-app-schemas", 3);
         appConfig.setResourceFilenamesToIgnore("ignored-database.json");
 
-        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployContentDatabasesCommand(2),
-                new DeployTriggersDatabaseCommand(), new DeploySchemasDatabaseCommand(),
-                new DeployOtherDatabasesCommand());
+        // Speed up this test and ensure that all the forests still get created correctly
+        appConfig.setDeployForestsWithCma(true);
+
+        initializeAppDeployer(new DeployContentDatabasesCommand(2), new DeployOtherDatabasesCommand());
 
         DatabaseManager dbMgr = new DatabaseManager(manageClient);
 

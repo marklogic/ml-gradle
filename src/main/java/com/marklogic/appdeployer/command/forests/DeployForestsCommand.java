@@ -97,6 +97,9 @@ public class DeployForestsCommand extends AbstractCommand {
 	/**
 	 * Public so that it can be reused without actually saving any of the forests.
 	 *
+	 * This also facilitates the creation of forests for many databases at one time. A client can call this on a set of
+	 * these commands to construct a list of many forests that can be created via CMA in one request.
+	 *
 	 * @param context
 	 * @param includeReplicas This command currently doesn't make use of this feature; it's here so that other clients
 	 *                        can get a preview of the forests to be created, including replicas.

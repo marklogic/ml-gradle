@@ -17,8 +17,6 @@ import com.marklogic.appdeployer.command.cpf.DeployDomainsCommand;
 import com.marklogic.appdeployer.command.cpf.DeployPipelinesCommand;
 import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
-import com.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand;
-import com.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
 import com.marklogic.appdeployer.command.flexrep.DeployConfigsCommand;
 import com.marklogic.appdeployer.command.flexrep.DeployFlexrepCommand;
 import com.marklogic.appdeployer.command.flexrep.DeployTargetsCommand;
@@ -91,8 +89,6 @@ public class CommandMapBuilder {
 		// Databases
 		List<Command> dbCommands = new ArrayList<Command>();
 		dbCommands.add(new DeployContentDatabasesCommand());
-		dbCommands.add(new DeployTriggersDatabaseCommand());
-		dbCommands.add(new DeploySchemasDatabaseCommand());
 		dbCommands.add(new DeployOtherDatabasesCommand());
 		map.put("mlDatabaseCommands", dbCommands);
 

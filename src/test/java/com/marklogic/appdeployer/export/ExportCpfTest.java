@@ -5,8 +5,7 @@ import com.marklogic.appdeployer.command.cpf.DeployCpfConfigsCommand;
 import com.marklogic.appdeployer.command.cpf.DeployDomainsCommand;
 import com.marklogic.appdeployer.command.cpf.DeployPipelinesCommand;
 import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
-import com.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand;
-import com.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
+import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.mgmt.selector.PropertiesResourceSelector;
 import org.junit.After;
@@ -27,7 +26,7 @@ public class ExportCpfTest extends AbstractExportTest {
 	public void exportViaProps() {
 		// Need a modules database, so a REST API is deployed
 		initializeAppDeployer(new DeployRestApiServersCommand(), new DeployContentDatabasesCommand(1),
-			new DeploySchemasDatabaseCommand(), new DeployTriggersDatabaseCommand(), new DeployDomainsCommand(),
+			new DeployOtherDatabasesCommand(), new DeployDomainsCommand(),
 			new DeployCpfConfigsCommand(), new DeployPipelinesCommand());
 
 		appDeployer.deploy(appConfig);

@@ -31,8 +31,8 @@ public class UpdateContentDatabasesTest extends AbstractAppDeployerTest {
         // We want both a main and a test app server in this test
         appConfig.setTestRestPort(SAMPLE_APP_TEST_REST_PORT);
 
-        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployTriggersDatabaseCommand(),
-                new DeployContentDatabasesCommand(), new DeploySchemasDatabaseCommand());
+        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployOtherDatabasesCommand(),
+                new DeployContentDatabasesCommand());
 
         appDeployer.deploy(appConfig);
 
@@ -46,10 +46,10 @@ public class UpdateContentDatabasesTest extends AbstractAppDeployerTest {
     @Test
     public void multipleDatabaseConfigFiles() {
         ConfigDir dir = appConfig.getFirstConfigDir();
-        dir.getContentDatabaseFiles().add(new File(dir.getDatabasesDir(), "more-content-db-config.json"));
+        dir.getContentDatabaseFiles().add(new File(dir.getBaseDir(), "other-database-files/more-content-db-config.json"));
 
-        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployTriggersDatabaseCommand(),
-                new DeployContentDatabasesCommand(), new DeploySchemasDatabaseCommand());
+        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployOtherDatabasesCommand(),
+                new DeployContentDatabasesCommand());
 
         appDeployer.deploy(appConfig);
 

@@ -583,18 +583,6 @@ public class AppConfig {
     }
 
     /**
-     * @return whether a triggers database should be created by default; as of version 2.9.0, this defaults to false;
-     * defaulted to true prior to that.
-     */
-    public boolean isCreateTriggersDatabase() {
-        return createTriggersDatabase;
-    }
-
-    public void setCreateTriggersDatabase(boolean createTriggerDatabase) {
-        this.createTriggersDatabase = createTriggerDatabase;
-    }
-
-    /**
      * @return a Java {@code SSLContext} for making an SSL connection with the REST API server for loading modules; null
      * if an SSL connection is not required
      */

@@ -3,8 +3,7 @@ package com.marklogic.appdeployer.command.schemas;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.Command;
 import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
-import com.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand;
-import com.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
+import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.document.GenericDocumentManager;
 import com.marklogic.client.io.DocumentMetadataHandle;
@@ -18,7 +17,7 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void testSchemaLoading() {
-		initializeAppDeployer(new DeploySchemasDatabaseCommand(), new DeployTriggersDatabaseCommand(),
+		initializeAppDeployer(new DeployOtherDatabasesCommand(),
 			new DeployContentDatabasesCommand(1), newCommand());
 		appDeployer.deploy(appConfig);
 
@@ -35,8 +34,7 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void testCustomSchemasPathWithCustomFileFilter() {
-		initializeAppDeployer(new DeploySchemasDatabaseCommand(), new DeployTriggersDatabaseCommand(),
-			new DeployContentDatabasesCommand(1), newCommand());
+		initializeAppDeployer(new DeployOtherDatabasesCommand(), new DeployContentDatabasesCommand(1), newCommand());
 
 		appConfig.setSchemasPath("src/test/resources/schemas-marklogic9");
 		appConfig.setSchemasFileFilter(new CustomFileFilter());

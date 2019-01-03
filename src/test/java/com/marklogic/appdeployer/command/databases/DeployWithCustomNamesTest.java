@@ -33,12 +33,10 @@ public class DeployWithCustomNamesTest extends AbstractAppDeployerTest {
 
         DeployContentDatabasesCommand dcdc = new DeployContentDatabasesCommand();
         dcdc.setForestsPerHost(2);
-        DeployTriggersDatabaseCommand dtdc = new DeployTriggersDatabaseCommand();
-        dtdc.setForestsPerHost(1);
-        DeploySchemasDatabaseCommand dsdc = new DeploySchemasDatabaseCommand();
-        dsdc.setForestsPerHost(1);
+        DeployOtherDatabasesCommand dodc = new DeployOtherDatabasesCommand();
+        dodc.setForestsPerHost(1);
 
-        initializeAppDeployer(new DeployRestApiServersCommand(), dcdc, dtdc, dsdc);
+        initializeAppDeployer(new DeployRestApiServersCommand(), dcdc, dodc);
 
         dbMgr = new DatabaseManager(manageClient);
         forestMgr = new ForestManager(manageClient);

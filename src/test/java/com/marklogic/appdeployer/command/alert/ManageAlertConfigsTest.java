@@ -6,7 +6,6 @@ import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
 import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
-import com.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.alert.AlertConfigManager;
 
@@ -15,8 +14,7 @@ public class ManageAlertConfigsTest extends AbstractManageResourceTest {
 	@Override
 	protected void initializeAndDeploy() {
 		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/alert-config"));
-		initializeAppDeployer(new DeployTriggersDatabaseCommand(), new DeployContentDatabasesCommand(1),
-			new DeployOtherDatabasesCommand(), newCommand());
+		initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployOtherDatabasesCommand(), newCommand());
 		appDeployer.deploy(appConfig);
 	}
 

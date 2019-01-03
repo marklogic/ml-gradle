@@ -2,13 +2,12 @@ package com.marklogic.appdeployer.command.restapis;
 
 import java.io.File;
 
+import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import org.junit.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
-import com.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand;
-import com.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.restapis.RestApiManager;
@@ -43,7 +42,7 @@ public class DeleteRestApiTest extends AbstractAppDeployerTest {
         DeployRestApiServersCommand command = new DeployRestApiServersCommand();
         command.setDeleteContentDatabase(true);
         initializeAppDeployer(new DeployRestApiServersCommand(), new DeployContentDatabasesCommand(),
-                new DeployTriggersDatabaseCommand(), new DeploySchemasDatabaseCommand());
+                new DeployOtherDatabasesCommand());
 
         appDeployer.deploy(appConfig);
         assertTrue("The content database should have been created by the REST API command", dbMgr.exists(dbName));

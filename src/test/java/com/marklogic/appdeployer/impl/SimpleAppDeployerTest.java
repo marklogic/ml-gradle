@@ -1,12 +1,11 @@
 package com.marklogic.appdeployer.impl;
 
+import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
+import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
+import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
-import com.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand;
-import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 
 public class SimpleAppDeployerTest extends Assert {
 
@@ -25,7 +24,7 @@ public class SimpleAppDeployerTest extends Assert {
     public void getCommandOfType() {
         assertEquals(restApiCommand, deployer.getCommandOfType(DeployRestApiServersCommand.class));
         assertEquals(dbCommand, deployer.getCommandOfType(DeployContentDatabasesCommand.class));
-        assertNull(deployer.getCommandOfType(DeployTriggersDatabaseCommand.class));
+        assertNull(deployer.getCommandOfType(DeployOtherDatabasesCommand.class));
     }
 
     @Test

@@ -4,7 +4,6 @@ import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
-import com.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.ext.es.CodeGenerationRequest;
 import com.marklogic.client.ext.es.EntityServicesManager;
@@ -198,7 +197,7 @@ public class GenerateModelArtifactsCommand extends AbstractCommand {
 				}
 
 				// Makes some assumptions about the schemas file
-				File schemasFile = new File(dbDir, DeploySchemasDatabaseCommand.DATABASE_FILENAME);
+				File schemasFile = new File(dbDir, "schemas-database.json");
 				if (!schemasFile.exists()) {
 					String payload = "{\"database-name\": \"%%SCHEMAS_DATABASE%%\"}";
 					try {

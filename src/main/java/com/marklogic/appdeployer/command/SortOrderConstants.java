@@ -23,10 +23,8 @@ public abstract class SortOrderConstants {
 	// then the forests will be created on the correct hosts.
     public static Integer ASSIGN_HOSTS_TO_GROUPS = 95;
 
-    public static Integer DEPLOY_TRIGGERS_DATABASE = 100;
-    public static Integer DEPLOY_SCHEMAS_DATABASE = 100;
-    public static Integer DEPLOY_CONTENT_DATABASES = 120;
-    public static Integer DEPLOY_OTHER_DATABASES = 130;
+	public static Integer DEPLOY_OTHER_DATABASES = 120;
+    public static Integer DEPLOY_CONTENT_DATABASES = 130;
     public static Integer DEPLOY_FORESTS = 150;
 
     public static Integer DEPLOY_REST_API_SERVERS = 200;

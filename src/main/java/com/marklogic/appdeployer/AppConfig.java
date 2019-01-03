@@ -68,7 +68,6 @@ public class AppConfig {
     private boolean catchUndeployExceptions = false;
 
     private boolean deployAmpsWithCma = false;
-    private boolean deployServersWithCma = false;
     private boolean deployForestsWithCma = false;
 
     // Used to construct DatabaseClient instances based on inputs defined in this class
@@ -1242,14 +1241,6 @@ public class AppConfig {
 
 	public void setDeployAmpsWithCma(boolean deployAmpsWithCma) {
 		this.deployAmpsWithCma = deployAmpsWithCma;
-	}
-
-	public boolean isDeployServersWithCma() {
-		return deployServersWithCma;
-	}
-
-	public void setDeployServersWithCma(boolean deployServersWithCma) {
-		this.deployServersWithCma = deployServersWithCma;
 	}
 
 	public boolean isDeployForestsWithCma() {

@@ -58,11 +58,6 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			config.setDeployForestsWithCma(Boolean.parseBoolean(prop));
 		});
 
-		propertyConsumerMap.put("mlDeployServersWithCma", (config, prop) -> {
-			logger.info("Deploy servers" + cmaMessage + prop);
-			config.setDeployServersWithCma(Boolean.parseBoolean(prop));
-		});
-
 		/**
 		 * The application name is used as a prefix for default names for a variety of resources, such as REST API servers
 		 * and databases.

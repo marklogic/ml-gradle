@@ -23,6 +23,11 @@ public abstract class SortOrderConstants {
 	// then the forests will be created on the correct hosts.
     public static Integer ASSIGN_HOSTS_TO_GROUPS = 95;
 
+    @Deprecated
+	public static Integer DEPLOY_TRIGGERS_DATABASE = 100;
+    @Deprecated
+	public static Integer DEPLOY_SCHEMAS_DATABASE = 100;
+
 	public static Integer DEPLOY_OTHER_DATABASES = 120;
     public static Integer DEPLOY_CONTENT_DATABASES = 130;
     public static Integer DEPLOY_FORESTS = 150;
@@ -96,7 +101,10 @@ public abstract class SortOrderConstants {
 
     public static Integer DELETE_CONTENT_DATABASES = 8100;
     public static Integer DELETE_OTHER_DATABASES = 8120;
+
+    @Deprecated
     public static Integer DELETE_TRIGGERS_DATABASE = 8140;
+    @Deprecated
     public static Integer DELETE_SCHEMAS_DATABASE = 8160;
 
     public static Integer DELETE_REST_API_SERVERS = 7000;

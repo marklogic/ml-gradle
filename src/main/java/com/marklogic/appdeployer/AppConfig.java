@@ -128,7 +128,7 @@ public class AppConfig {
     // Passed into the PayloadTokenReplacer that subclasses of AbstractCommand use
     private Map<String, String> customTokens = new HashMap<>();
 
-    // Allows for creating a triggers database without a config file for one
+	@Deprecated
     private boolean createTriggersDatabase = false;
 
     // Controls whether forests are created when a database is created
@@ -1249,5 +1249,15 @@ public class AppConfig {
 
 	public void setDeployForestsWithCma(boolean deployForestsWithCma) {
 		this.deployForestsWithCma = deployForestsWithCma;
+	}
+
+	@Deprecated
+	public boolean isCreateTriggersDatabase() {
+		return createTriggersDatabase;
+	}
+
+	@Deprecated
+	public void setCreateTriggersDatabase(boolean createTriggerDatabase) {
+		this.createTriggersDatabase = createTriggerDatabase;
 	}
 }

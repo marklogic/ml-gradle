@@ -16,6 +16,31 @@ import java.io.FileFilter;
 public class LoadSchemasTest extends AbstractAppDeployerTest {
 
 	@Test
+	public void databaseSpecificPaths() {
+		initializeAppDeployer(new DeployOtherDatabasesCommand(), newCommand());
+
+		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/multiple-schema-databases/ml-config"));
+		appConfig.setSchemasDatabaseName("sample-app-schemas1");
+		appConfig.setSchemasPath("src/test/resources/sample-app/multiple-schema-databases/ml-schemas");
+
+		deploySampleApp();
+
+		DatabaseClient client = appConfig.newSchemasDatabaseClient();
+		GenericDocumentManager mgr = client.newDocumentManager();
+		assertNotNull(mgr.exists("/default-schema.xsd"));
+		assertNotNull(mgr.exists("/schema1.xsd"));
+		assertNull(mgr.exists("/schema2.xsd"));
+		client.release();
+
+		client = appConfig.newAppServicesDatabaseClient("sample-app-schemas2");
+		mgr = client.newDocumentManager();
+		assertNull(mgr.exists("/default-schema.xsd"));
+		assertNull(mgr.exists("/schema1.xsd"));
+		assertNotNull(mgr.exists("/schema2.xsd"));
+		client.release();
+	}
+
+	@Test
 	public void testSchemaLoading() {
 		initializeAppDeployer(new DeployOtherDatabasesCommand(),
 			new DeployContentDatabasesCommand(1), newCommand());

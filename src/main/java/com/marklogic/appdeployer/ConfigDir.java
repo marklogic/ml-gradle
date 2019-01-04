@@ -48,15 +48,10 @@ public class ConfigDir {
 	public List<File> getDatabaseResourceDirectories() {
 		File dbDir = getDatabasesDir();
 		if (dbDir != null && dbDir.exists()) {
-			File[] dirs = dbDir.listFiles(new FileFilter() {
-				@Override
-				public boolean accept(File pathname) {
-					return pathname.isDirectory();
-				}
-			});
+			File[] dirs = dbDir.listFiles(pathname -> pathname.isDirectory());
 			return Arrays.asList(dirs);
 		}
-		return new ArrayList<File>();
+		return new ArrayList<>();
 	}
 
 	protected void initializeContentDatabaseFiles() {

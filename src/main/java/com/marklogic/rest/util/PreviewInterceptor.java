@@ -21,6 +21,7 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.EnumSet;
@@ -117,11 +118,11 @@ public class PreviewInterceptor extends DefaultResponseErrorHandler implements C
 		modifyPayloadBeforePreview(payloadResource);
 
 		ObjectNode merged = JsonNodeUtil.mergeObjectNodes(existingResource, payloadResource);
-		EnumSet<DiffFlags> flags = DiffFlags.dontNormalizeOpIntoMoveAndCopy().clone();
+		EnumSet<DiffFlags> flags = EnumSet.of(DiffFlags.OMIT_VALUE_ON_REMOVE, DiffFlags.OMIT_MOVE_OPERATION, DiffFlags.OMIT_COPY_OPERATION, DiffFlags.ADD_ORIGINAL_VALUE_ON_REPLACE);
 		return JsonDiff.asJson(existingResource, merged, flags);
 	}
 
-	protected void includeJsonPatchInReport(HttpRequest request, ObjectNode existingResource, JsonNode jsonPatch) throws IOException {
+	protected void includeJsonPatchInReport(HttpRequest request, ObjectNode existingResource, JsonNode jsonPatch) {
 		ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
 		if (jsonPatch instanceof ArrayNode && jsonPatch.size() > 0) {
 			ObjectNode result = mapper.createObjectNode();
@@ -179,6 +180,15 @@ public class PreviewInterceptor extends DefaultResponseErrorHandler implements C
 	protected ClientHttpResponse previewPost(HttpRequest request, byte[] bytes) throws IOException {
 		ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
 		ObjectNode result = mapper.createObjectNode();
+
+		if (request.getURI() != null && request.getURI().toString().endsWith("/manage/v3")) {
+			String message = "Previewing POST calls to /manage/v3 are not yet supported";
+			result.set("message", new TextNode(message));
+			results.add(result);
+			logger.info(message);
+			return newFakeResponse();
+		}
+
 		result.set("message", new TextNode("Will create new resource at: " + request.getURI()));
 
 		String payload = new String(bytes).trim();
@@ -228,7 +238,8 @@ public class PreviewInterceptor extends DefaultResponseErrorHandler implements C
 
 			@Override
 			public InputStream getBody() {
-				return null;
+				// Need to return something besides null, which can cause null pointer exceptions
+				return new ByteArrayInputStream(new byte[]{});
 			}
 
 			@Override

@@ -213,7 +213,6 @@ public class DefaultAppConfigFactoryTest extends Assert {
         assertTrue(config.isDeployAmpsWithCma());
 	    assertTrue(config.isDeployForestsWithCma());
 	    assertTrue(config.isDeployPrivilegesWithCma());
-	    assertTrue(config.isDeployRolesWithCma());
 
         assertEquals("prophost", config.getHost());
         assertEquals("propname", config.getName());

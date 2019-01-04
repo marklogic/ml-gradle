@@ -3,22 +3,19 @@ package com.marklogic.appdeployer.command.security;
 import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
-import com.marklogic.appdeployer.command.SupportsCmaCommand;
 import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.api.API;
-import com.marklogic.mgmt.api.configuration.Configuration;
 import com.marklogic.mgmt.api.security.Role;
 import com.marklogic.mgmt.mapper.DefaultResourceMapper;
 import com.marklogic.mgmt.mapper.ResourceMapper;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.security.RoleManager;
-import org.springframework.http.ResponseEntity;
 
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-public class DeployRolesCommand extends AbstractResourceCommand implements SupportsCmaCommand {
+public class DeployRolesCommand extends AbstractResourceCommand {
 
 	// Used internally
 	private boolean removeRolesAndPermissionsDuringDeployment = false;
@@ -30,16 +27,6 @@ public class DeployRolesCommand extends AbstractResourceCommand implements Suppo
 	public DeployRolesCommand() {
 		setExecuteSortOrder(SortOrderConstants.DEPLOY_ROLES);
 		setUndoSortOrder(SortOrderConstants.DELETE_ROLES);
-	}
-
-	@Override
-	public boolean cmaShouldBeUsed(CommandContext context) {
-		return context.getAppConfig().isDeployRolesWithCma();
-	}
-
-	@Override
-	public void addResourceToConfiguration(String payload, ResourceMapper resourceMapper, Configuration configuration) {
-		configuration.addRole(resourceMapper.readResource(payload, Role.class));
 	}
 
 	/**

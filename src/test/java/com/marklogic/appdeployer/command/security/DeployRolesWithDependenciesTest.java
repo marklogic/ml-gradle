@@ -57,20 +57,6 @@ public class DeployRolesWithDependenciesTest extends AbstractAppDeployerTest {
 		}
 	}
 
-	@Test
-	public void testEvenMoreRolesWithCma() {
-		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/even-more-roles-with-dependencies"));
-		appConfig.setDeployRolesWithCma(true);
-
-		initializeAppDeployer(new TestDeployRolesCommand());
-		try {
-			deploySampleApp();
-		} finally {
-			initializeAppDeployer(new DeployRolesCommand());
-			undeploySampleApp();
-		}
-	}
-
 	/**
 	 * This scenario tests that when two roles are next to each other with different dependencies - role1 and role2 -
 	 * that we figure out that role1 has a dependency on a role closest to the end of the current list of files.

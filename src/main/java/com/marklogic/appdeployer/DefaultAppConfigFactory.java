@@ -669,7 +669,28 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 				propertyConsumerMap.get(propertyName).accept(appConfig, value);
 			}
 		}
+
+		setDefaultsForDatabasesWithForestsOnOneHost(appConfig);
+
 		return appConfig;
+	}
+
+	protected void setDefaultsForDatabasesWithForestsOnOneHost(AppConfig appConfig) {
+		Set<String> set = appConfig.getDatabasesWithForestsOnOneHost();
+		if (set == null || set.isEmpty()) {
+			set = new HashSet<>();
+			final String triggersName = appConfig.getTriggersDatabaseName();
+			if (triggersName != null) {
+				set.add(triggersName);
+			}
+			final String schemasName = appConfig.getSchemasDatabaseName();
+			if (schemasName != null) {
+				set.add(schemasName);
+			}
+			if (!set.isEmpty()) {
+				appConfig.setDatabasesWithForestsOnOneHost(set);
+			}
+		}
 	}
 
 	protected Map<String, String> buildMapFromCommaDelimitedString(String str) {

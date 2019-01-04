@@ -386,4 +386,32 @@ public class DefaultAppConfigFactoryTest extends Assert {
         assertNull("SSL context should be null by default", config.getRestSslContext());
         assertNull("SSL hostname verifier should be null by default", config.getRestSslHostnameVerifier());
     }
+
+    @Test
+	public void schemasAndTriggerDatabaseNamesShouldBeInSetOfDatabasesWithForestsOnOneHost() {
+	    sut = new DefaultAppConfigFactory(new SimplePropertySource("mlAppName", "example"));
+	    AppConfig config = sut.newAppConfig();
+	    assertEquals("example-triggers", config.getTriggersDatabaseName());
+	    assertEquals("example-schemas", config.getSchemasDatabaseName());
+
+	    Set<String> set = config.getDatabasesWithForestsOnOneHost();
+	    assertTrue(set.contains("example-triggers"));
+	    assertTrue(set.contains("example-schemas"));
+    }
+
+    @Test
+	public void dontModifySetOfDatabasesWithForestsOnOneHostIfItsBeenConfigured() {
+	    sut = new DefaultAppConfigFactory(new SimplePropertySource("mlAppName", "example", "mlDatabasesWithForestsOnOneHost", "db1,db2"));
+	    AppConfig config = sut.newAppConfig();
+
+	    Set<String> set = config.getDatabasesWithForestsOnOneHost();
+	    assertEquals(2, set.size());
+	    assertTrue(set.contains("db1"));
+	    assertTrue(set.contains("db2"));
+
+	    final String message = "If the user has configured the set of databases, then the default schema and trigger databases names should not be added automatically";
+	    assertFalse(message, set.contains("example-triggers"));
+	    assertFalse(message, set.contains("example-schemas"));
+
+    }
 }

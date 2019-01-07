@@ -31,7 +31,7 @@ class DeleteUserSchemasTask extends MarkLogicTask {
 		String fullQuery = "cts:uris((), (), " + xquery + ") ! xdmp:document-delete(.)"
 		println "Deleting user schemas in database '" + database + "' via : " + fullQuery
 
-		def client = newClient()
+		def client = newClient(database)
 		try {
 			client.newServerEval().xquery(fullQuery).eval()
 		} finally {

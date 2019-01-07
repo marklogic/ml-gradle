@@ -55,13 +55,13 @@ class MarkLogicTask extends DefaultTask {
 	 * @return
 	 */
 	DatabaseClient newClient(String database) {
-		if (project.hasProperty("database")) {
-			println "Connecting via the App-Services port to database: " + project.property("database")
-			return getAppConfig().newAppServicesDatabaseClient(project.property("database"))
-		}
-		else if (database != null){
+		if (database != null){
 			println "Connecting via the App-Services port to database: " + database
 			return getAppConfig().newAppServicesDatabaseClient(database)
+		}
+		else if (project.hasProperty("database")) {
+			println "Connecting via the App-Services port to database: " + project.property("database")
+			return getAppConfig().newAppServicesDatabaseClient(project.property("database"))
 		}
 		else {
 			getAppConfig().newDatabaseClient()

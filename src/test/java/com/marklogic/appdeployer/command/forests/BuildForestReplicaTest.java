@@ -14,7 +14,7 @@ public class BuildForestReplicaTest extends Assert {
 
 	@Test
 	public void customNamingStrategy() {
-		AppConfig appConfig = newAppConfig();
+		AppConfig appConfig = newAppConfig("mlForestsPerHost", "my-database,2");
 		appConfig.getForestNamingStrategies().put("my-database", new ForestNamingStrategy() {
 			@Override
 			public String getForestName(String databaseName, int forestNumber, AppConfig appConfig) {
@@ -35,18 +35,32 @@ public class BuildForestReplicaTest extends Assert {
 		assertEquals("host1", f1.getHost());
 		assertEquals("my-replica-forest-1-1", f1.getForestReplica().get(0).getReplicaName());
 		assertEquals("my-replica-forest-1-2", f1.getForestReplica().get(1).getReplicaName());
+		assertEquals("host2", f1.getForestReplica().get(0).getHost());
+		assertEquals("host3", f1.getForestReplica().get(1).getHost());
 
 		Forest f2 = forests.get(1);
 		assertEquals("forest-2", f2.getForestName());
-		assertEquals("host2", f2.getHost());
+		assertEquals("host1", f2.getHost());
 		assertEquals("my-replica-forest-2-1", f2.getForestReplica().get(0).getReplicaName());
 		assertEquals("my-replica-forest-2-2", f2.getForestReplica().get(1).getReplicaName());
+		assertEquals("host3", f2.getForestReplica().get(0).getHost());
+		assertEquals("host2", f2.getForestReplica().get(1).getHost());
 
 		Forest f3 = forests.get(2);
 		assertEquals("forest-3", f3.getForestName());
-		assertEquals("host3", f3.getHost());
+		assertEquals("host2", f3.getHost());
 		assertEquals("my-replica-forest-3-1", f3.getForestReplica().get(0).getReplicaName());
 		assertEquals("my-replica-forest-3-2", f3.getForestReplica().get(1).getReplicaName());
+		assertEquals("host3", f3.getForestReplica().get(0).getHost());
+		assertEquals("host1", f3.getForestReplica().get(1).getHost());
+
+		Forest f5 = forests.get(4);
+		assertEquals("forest-5", f5.getForestName());
+		assertEquals("host3", f5.getHost());
+		assertEquals("my-replica-forest-5-1", f5.getForestReplica().get(0).getReplicaName());
+		assertEquals("my-replica-forest-5-2", f5.getForestReplica().get(1).getReplicaName());
+		assertEquals("host1", f5.getForestReplica().get(0).getHost());
+		assertEquals("host2", f5.getForestReplica().get(1).getHost());
 	}
 
 	@Test

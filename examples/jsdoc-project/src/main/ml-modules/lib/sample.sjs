@@ -7,7 +7,6 @@ function internalHello(str) {
  * Sample Module
  * 
  * @module "/sample.sjs"
- * @exports hello
  */
 module.exports = {
     /**

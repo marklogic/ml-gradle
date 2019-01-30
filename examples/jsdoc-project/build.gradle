@@ -1,0 +1,21 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'commons-io:commons-io:2.6'
+    }
+}
+
+plugins {
+  id "com.marklogic.ml-gradle" version "3.11.0"
+  id "com.liferay.app.jsdoc" version "2.0.19"
+}
+
+
+task mlJsDoc(type:com.liferay.gradle.plugins.jsdoc.JSDocTask) {
+    configuration = project.resources.text.fromFile(file("jsdoc.json"))
+    destinationDir = "build/docs/jsdoc"
+    sourceDirs = file("src/main/ml-modules/lib")
+} 

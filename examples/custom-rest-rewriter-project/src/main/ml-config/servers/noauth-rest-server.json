@@ -1,0 +1,15 @@
+{
+	"server-name": "%%NAME%%-noauth",
+	"server-type": "http",
+	"root": "/",
+	"group-name": "%%GROUP%%",
+	"port": %%mlNoauthRestPort%%,
+	"modules-database": "%%MODULES_DATABASE%%",
+	"content-database": "%%DATABASE%%",
+	"authentication": "application-level",
+	"default-user": "%%noauthUsername%%",
+	"default-error-format": "json",
+	"error-handler": "/MarkLogic/rest-api/error-handler.xqy",
+	"url-rewriter": "/noauth-rewriter.xml",
+	"rewrite-resolves-globally": true
+}

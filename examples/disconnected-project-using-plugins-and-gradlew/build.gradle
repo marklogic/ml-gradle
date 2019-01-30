@@ -12,7 +12,7 @@ repositories {
 	} else {
 		println "Using online repositories"
 		jcenter()
-		maven { url "https://developer.marklogic.com/maven2/" }
+		maven { url "http://developer.marklogic.com/maven2/" }
 	}
 }
 
@@ -22,10 +22,10 @@ configurations {
 
 dependencies {
 	// sample java compile dependency. Remove if not required
-	compile 'com.marklogic:marklogic-xcc:9.0.4'
+	compile 'com.marklogic:marklogic-xcc:9.0.7'
 
 	//sample mlcp dependency. Remove if not required
-	mlcp "com.marklogic:mlcp:9.0.5"
+	mlcp "com.marklogic:mlcp:9.0.7"
 }
 
 /**

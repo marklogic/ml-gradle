@@ -42,7 +42,7 @@ class NewProjectTask extends MarkLogicTask {
 		if (ant.mlPropertiesPlugin == "y") {
 			def text = 'plugins {' +
 				'\n  id "net.saliman.properties" version "1.4.6"' +
-				'\n  id "com.marklogic.ml-gradle" version "3.3.0"' +
+				'\n  id "com.marklogic.ml-gradle" version "3.11.0"' +
 				'\n}'
 			println "Updating build.gradle so that the Gradle properties plugin can be applied"
 			writeFile("build.gradle", text)
@@ -75,6 +75,8 @@ class NewProjectTask extends MarkLogicTask {
 				if (ant.mlTestRestPort) {
 					appConfig.setTestRestPort(Integer.parseInt(ant.mlTestRestPort))
 				}
+			} else {
+				appConfig.setNoRestServer(true)
 			}
 			new ScaffoldGenerator().generateScaffold(".", appConfig)
 		}

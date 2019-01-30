@@ -1,0 +1,7 @@
+{
+	"namespace": "org:example",
+	"local-name": "login-noauth-user",
+	"document-uri": "/login-lib.xqy",
+	"modules-database": "%%MODULES_DATABASE%%",
+	"role": ["custom-rest-server-login"]
+}

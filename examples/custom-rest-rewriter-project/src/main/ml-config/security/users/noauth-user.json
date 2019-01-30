@@ -1,0 +1,8 @@
+{
+	"user-name": "%%noauthUsername%%",
+	"role": [
+		"custom-rest-server-login",
+		"rest-extension-user"
+	],
+	"password": "%%noauthPassword%%"
+}

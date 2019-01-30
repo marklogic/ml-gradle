@@ -8,12 +8,14 @@ buildscript {
 		jcenter()
 	}
 	dependencies {
-		classpath "com.marklogic:ml-gradle:3.8.0"
+		classpath "com.marklogic:ml-gradle:3.10.0"
 	}
 }
 
 plugins {
 	// The following plugins are optional
+
+	id "net.saliman.properties" version "1.4.6"
 
 	// The Java plugin is used to compile and run JUnit tests
 	id "java"

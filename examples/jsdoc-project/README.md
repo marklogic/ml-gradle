@@ -10,7 +10,7 @@ This project uses the [JSDoc Gradle Plugin](https://github.com/liferay/liferay-p
 All of the configuration is captured in the __build.gradle__ file and the __jsdoc.json__ file. To test this, clone this repoitory and execute the command below in this directory 
 
 ```
-gradle mlJsdoc
+gradle mlJsDoc
 ```
 
 This will generate jsdoc for the code in __src/main/ml-modules/lib__

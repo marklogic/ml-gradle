@@ -1,8 +1,3 @@
-
-function internalHello(str) {
-    return `Hello ${str}` 
-}
-
 /**
  * Sample Module
  * 
@@ -19,5 +14,7 @@ module.exports = {
      * 
      * @param {string} str the string to say hello to
      */
-    hello: internalHello
+    hello: function(str) {
+        return `Hello ${str}` 
+    }
 }

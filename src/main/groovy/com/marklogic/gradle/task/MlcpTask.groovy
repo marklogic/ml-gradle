@@ -28,6 +28,9 @@ class MlcpTask extends JavaExec {
 	// Set this to define a URI in your content database for mlcp output to be written to as a text document
 	String logOutputUri
 
+	// Allow the user to provide a custom DatabaseClient for logging mlcp output
+	DatabaseClient logClient
+
 	Logger getLogger() {
 		return Logging.getLogger(MlcpTask.class)
 	}
@@ -109,9 +112,13 @@ class MlcpTask extends JavaExec {
 		super.exec()
 
 		if (logOutputFile != null) {
-			AppConfig appConfig = project.property("mlAppConfig")
-			DatabaseClient client = appConfig.newDatabaseClient()
-			client.newDocumentManager().write(logOutputUri, new FileHandle(logOutputFile))
+			DatabaseClient databaseClient
+			if (logClient != null) {
+				databaseClient = logClient
+			} else {
+				databaseClient = project.property("mlAppConfig").newDatabaseClient()
+			}
+			databaseClient.newDocumentManager().write(logOutputUri, new FileHandle(logOutputFile))
 			println "Wrote mlcp log output to URI: " + logOutputUri
 		}
 	}

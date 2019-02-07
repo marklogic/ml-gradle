@@ -78,24 +78,33 @@ class UnitTestTask extends MarkLogicTask {
 					println "Unable to delete test results directory: " + resultsPath
 				}
 			}
-			resultsDir.mkdirs()
+			
+			String resultsPathPassed = resultsPath + "/passed"
+			String resultsPathFailed = resultsPath + "/failed"
+			File resultsDirPassed = new File(resultsPathPassed)
+			File resultsDirFailed = new File(resultsPathFailed)
+			resultsDirPassed.mkdirs()
+			resultsDirFailed.mkdirs()
 
 			int fileCount = 0;
 			boolean testsFailed = false
 			for (JUnitTestSuite suite : suites) {
-				if (suite.hasTestFailures()) {
-					testsFailed = true
-				}
 				String xml = suite.getXml()
 				String filename = "TEST-" + suite.getName() + ".xml"
-				org.springframework.util.FileCopyUtils.copy(xml.getBytes(), new File(resultsDir, filename))
+				if (suite.hasTestFailures()) {
+					testsFailed = true
+					org.springframework.util.FileCopyUtils.copy(xml.getBytes(), new File(resultsDirFailed, filename))
+				}
+				else {
+					org.springframework.util.FileCopyUtils.copy(xml.getBytes(), new File(resultsDirPassed, filename))
+				}
 				fileCount++;
 			}
 
 			println "\n" + fileCount + " test result files were written to: " + resultsPath
 
 			if (testsFailed) {
-				throw new GradleException("There were failing tests. See the test results at: " + resultsPath)
+				throw new GradleException("There were failing tests. See the test results at: " + resultsPathFailed)
 			}
 
 		} finally {

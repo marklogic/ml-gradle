@@ -9,24 +9,35 @@ import com.marklogic.mgmt.util.ObjectMapperFactory;
 public abstract class RestApiUtil {
 
 	public static String buildDefaultRestApiJson() {
-        ObjectMapper m = ObjectMapperFactory.getObjectMapper();
-        ObjectNode node = m.createObjectNode();
-        ObjectNode n = node.putObject("rest-api");
-        n.put("name", "%%NAME%%");
-        n.put("group", "%%GROUP%%");
-        n.put("database", "%%DATABASE%%");
-        n.put("modules-database", "%%MODULES_DATABASE%%");
-        n.put("port", "%%PORT%%");
-        n.put("xdbc-enabled", true);
-		// n.put("forests-per-host", 3);
-        n.put("error-format", "json");
+		return buildDefaultRestApiJson(0);
+	}
 
-        try {
-            String json = m.writer(new DefaultPrettyPrinter()).writeValueAsString(node);
-            json = json.replace("\"%%PORT%%\"", "%%PORT%%");
-            return json;
-        } catch (JsonProcessingException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
+	/**
+	 * @param forestsPerHost if greater than zero, than will be used to set the "forests-per-host" property in the
+	 *                       payload
+	 * @return
+	 */
+	public static String buildDefaultRestApiJson(int forestsPerHost) {
+		ObjectMapper m = ObjectMapperFactory.getObjectMapper();
+		ObjectNode node = m.createObjectNode();
+		ObjectNode n = node.putObject("rest-api");
+		n.put("name", "%%NAME%%");
+		n.put("group", "%%GROUP%%");
+		n.put("database", "%%DATABASE%%");
+		n.put("modules-database", "%%MODULES_DATABASE%%");
+		n.put("port", "%%PORT%%");
+		n.put("xdbc-enabled", true);
+		if (forestsPerHost > 0) {
+			n.put("forests-per-host", forestsPerHost);
+		}
+		n.put("error-format", "json");
+
+		try {
+			String json = m.writer(new DefaultPrettyPrinter()).writeValueAsString(node);
+			json = json.replace("\"%%PORT%%\"", "%%PORT%%");
+			return json;
+		} catch (JsonProcessingException ex) {
+			throw new RuntimeException(ex);
+		}
+	}
 }

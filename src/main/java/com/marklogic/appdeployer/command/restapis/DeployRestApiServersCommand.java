@@ -80,7 +80,7 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
 			return null;
 		} else {
 			logger.info(format("Could not find REST API file at %s, will use default payload", f.getAbsolutePath()));
-			return getDefaultRestApiPayload();
+			return getDefaultRestApiPayload(context);
 		}
 	}
 
@@ -104,8 +104,7 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
 				restApiFile = new File(context.getAppConfig().getFirstConfigDir().getBaseDir(), restApiFilename);
 			}
 			return restApiFile;
-		}
-		else {
+		} else {
 			File restApiFile = null;
 			// Check each ConfigDir for the file, with the last one winning
 			for (ConfigDir configDir : context.getAppConfig().getConfigDirs()) {
@@ -173,8 +172,12 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
 		}
 	}
 
-	protected String getDefaultRestApiPayload() {
-		return RestApiUtil.buildDefaultRestApiJson();
+	protected String getDefaultRestApiPayload(CommandContext context) {
+		// Use contentForestsPerHost in case the user does not have a database file for the content database that would
+		// otherwise control the number of forests created (as it would be created before the REST API instance is
+		// created)
+		Integer count = context.getAppConfig().getContentForestsPerHost();
+		return count != null ? RestApiUtil.buildDefaultRestApiJson(count) : RestApiUtil.buildDefaultRestApiJson();
 	}
 
 	/**
@@ -188,7 +191,7 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
 	 * @return
 	 */
 	protected boolean deleteRestApi(String serverName, String groupName, ManageClient manageClient,
-									boolean includeModules, boolean includeContent) {
+	                                boolean includeModules, boolean includeContent) {
 		RestApiDeletionRequest request = new RestApiDeletionRequest(serverName, groupName);
 		request.setIncludeContent(includeContent);
 		request.setIncludeModules(includeModules);

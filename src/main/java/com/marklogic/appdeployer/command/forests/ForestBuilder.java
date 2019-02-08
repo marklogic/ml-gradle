@@ -19,6 +19,7 @@ import java.util.Map;
 public class ForestBuilder extends LoggingObject {
 
 	private ForestNamingStrategy forestNamingStrategy;
+	private ReplicaBuilderStrategy replicaBuilderStrategy;
 
 	public ForestBuilder() {
 		this(new DefaultForestNamingStrategy());
@@ -26,6 +27,12 @@ public class ForestBuilder extends LoggingObject {
 
 	public ForestBuilder(ForestNamingStrategy forestNamingStrategy) {
 		this.forestNamingStrategy = forestNamingStrategy;
+		this.replicaBuilderStrategy = new DistributedReplicaBuilderStrategy();
+	}
+
+	public ForestBuilder(ForestNamingStrategy forestNamingStrategy, ReplicaBuilderStrategy replicaBuilderStrategy) {
+		this.forestNamingStrategy = forestNamingStrategy;
+		this.replicaBuilderStrategy = replicaBuilderStrategy;
 	}
 
 	/**
@@ -122,97 +129,11 @@ public class ForestBuilder extends LoggingObject {
 				replicaCount, databaseName, hostNames));
 		}
 
-		List<String> dataDirectories = determineDataDirectories(forestPlan.getDatabaseName(), appConfig);
+		List<String> dataDirectories = determineDataDirectories(databaseName, appConfig);
 
-		if (appConfig.getReplicaForestDataDirectory() != null) {
-			dataDirectories = new ArrayList<>();
-			dataDirectories.add(appConfig.getReplicaForestDataDirectory());
-		}
-		Map<String, String> replicaDataDirectoryMap = appConfig.getDatabaseReplicaDataDirectories();
-		if (replicaDataDirectoryMap != null && replicaDataDirectoryMap.containsKey(databaseName)) {
-			dataDirectories = new ArrayList<>();
-			dataDirectories.add(replicaDataDirectoryMap.get(databaseName));
-		}
+		replicaBuilderStrategy.buildReplicas(forests, forestPlan, appConfig, dataDirectories, determineForestNamingStrategy(databaseName, appConfig));
 
-		for (Forest f : forests) {
-			List<ForestReplica> replicas = new ArrayList<>();
-			int hostPointer = hostNames.indexOf(f.getHost());
-			int dataDirectoryPointer = dataDirectories.indexOf(f.getDataDirectory());
-			for (int i = 1; i <= replicaCount; i++) {
-				ForestReplica replica = new ForestReplica();
-				replica.setReplicaName(getForestReplicaName(databaseName, f.getForestName(), i, appConfig));
-				replicas.add(replica);
-
-				hostPointer++;
-				if (hostPointer == hostNames.size()) {
-					hostPointer = 0;
-				}
-
-				dataDirectoryPointer++;
-				if (dataDirectoryPointer == dataDirectories.size()) {
-					dataDirectoryPointer = 0;
-				}
-
-				replica.setHost(hostNames.get(hostPointer));
-
-				final String dataDir = dataDirectories.get(dataDirectoryPointer);
-				if (dataDir != null && dataDir.trim().length() > 0) {
-					replica.setDataDirectory(dataDir);
-				}
-
-				configureReplica(replica, databaseName, appConfig);
-			}
-
-			f.setForestReplica(replicas);
-		}
 	}
-
-	/**
-	 * Configures the fast and large data directories for a replica based on what's in AppConfig for the given
-	 * database.
-	 *
-	 * @param replica
-	 * @param databaseName
-	 * @param appConfig
-	 */
-	protected void configureReplica(ForestReplica replica, String databaseName, AppConfig appConfig) {
-		// First set to the database-agnostic forest directories
-		replica.setFastDataDirectory(appConfig.getForestFastDataDirectory());
-		replica.setLargeDataDirectory(appConfig.getForestLargeDataDirectory());
-
-		// Now set to the database-specific forest directories if set
-		if (databaseName != null) {
-			Map<String, String> map = appConfig.getDatabaseFastDataDirectories();
-			if (map != null && map.containsKey(databaseName)) {
-				replica.setFastDataDirectory(map.get(databaseName));
-			}
-			map = appConfig.getDatabaseLargeDataDirectories();
-			if (map != null && map.containsKey(databaseName)) {
-				replica.setLargeDataDirectory(map.get(databaseName));
-			}
-		}
-
-		// Now set to the replica forest directories if set
-		if (appConfig.getReplicaForestFastDataDirectory() != null) {
-			replica.setFastDataDirectory(appConfig.getReplicaForestFastDataDirectory());
-		}
-		if (appConfig.getReplicaForestLargeDataDirectory() != null) {
-			replica.setLargeDataDirectory(appConfig.getReplicaForestLargeDataDirectory());
-		}
-
-		// And now set to the database-specific replica forest directories if set
-		if (databaseName != null) {
-			Map<String, String> map = appConfig.getDatabaseReplicaFastDataDirectories();
-			if (map != null && map.containsKey(databaseName)) {
-				replica.setFastDataDirectory(map.get(databaseName));
-			}
-			map = appConfig.getDatabaseReplicaLargeDataDirectories();
-			if (map != null && map.containsKey(databaseName)) {
-				replica.setLargeDataDirectory(map.get(databaseName));
-			}
-		}
-	}
-
 
 	protected Forest newForest(ForestPlan forestPlan) {
 		String template = forestPlan.getTemplate();
@@ -286,18 +207,6 @@ public class ForestBuilder extends LoggingObject {
 	 */
 	protected String getForestName(String databaseName, int forestNumber, AppConfig appConfig) {
 		return determineForestNamingStrategy(databaseName, appConfig).getForestName(databaseName, forestNumber, appConfig);
-	}
-
-	/**
-	 *
-	 * @param databaseName
-	 * @param forestName
-	 * @param forestReplicaNumber
-	 * @param appConfig
-	 * @return
-	 */
-	protected String getForestReplicaName(String databaseName, String forestName, int forestReplicaNumber, AppConfig appConfig) {
-		return determineForestNamingStrategy(databaseName, appConfig).getReplicaName(databaseName, forestName, forestReplicaNumber, appConfig);
 	}
 
 	/**

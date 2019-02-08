@@ -135,6 +135,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlClearSchemasDatabase", type: ClearSchemasDatabaseTask, group: dbGroup, description: "Deletes all documents in the schemas database. " +
 			"Note that this includes those created via the deployment of resources such as temporal collections and view schemas. You may want to use mlDeleteUserSchemas instead.")
 		project.task("mlClearTriggersDatabase", type: ClearTriggersDatabaseTask, group: dbGroup, description: "Deletes all documents in the triggers database")
+		project.task("mlDeleteDatabase", type: DeleteDatabaseTask, group: dbGroup, description: "Delete a database along with all of its forests and any replicas; requires -Pconfirm=true to be set so this isn't accidentally executed")
 		project.task("mlDeployDatabases", type: DeployDatabasesTask, group: dbGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Deploy each database, updating it if it exists, in the configuration directory")
 		project.task("mlMergeContentDatabase", type: MergeContentDatabaseTask, group: dbGroup, description: "Merge the database named by mlAppConfig.contentDatabaseName")
 		project.task("mlMergeDatabase", type: MergeDatabaseTask, group: dbGroup, description: "Merge the database named by the project property dbName; e.g. gradle mlMergeDatabase -PdbName=my-database")
@@ -344,8 +345,17 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.extensions.add("mlAdminConfig", adminConfig)
 
 		ProjectPropertySource propertySource = new ProjectPropertySource(project);
+
 		DefaultAppConfigFactory appConfigFactory = new DefaultAppConfigFactory(propertySource)
+		// The ConfigDir objects constructed by AppConfig must all be relative to the project directory
+		// when using Java 11. In case this causes problems, a user can disable this via the below property
+		if (project.hasProperty("mlIgnoreProjectDir") && "true".equals(project.property("mlIgnoreProjectDir"))) {
+			println "The Gradle projectDir will not be used to resolve file paths"
+		} else {
+			appConfigFactory.setProjectDir(project.getProjectDir())
+		}
 		project.extensions.add("mlAppConfigFactory", appConfigFactory)
+
 		AppConfig appConfig = appConfigFactory.newAppConfig()
 		project.extensions.add("mlAppConfig", appConfig)
 

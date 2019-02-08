@@ -90,8 +90,15 @@ declare function delete(
     void createResource() {
         String propName = "resourceName"
         if (getProject().hasProperty(propName)) {
-            servicesDir = servicesDir ? servicesDir : getAppConfig().getModulePaths().get(0) + "/services"
-            
+	        String servicesPath = servicesDir
+	        if (!servicesPath) {
+		        List<String> modulePaths = getAppConfig().getModulePaths()
+		        if (modulePaths != null && !modulePaths.isEmpty()) {
+			        // Use the last path so modules aren't written to e.g. mlRestApi paths
+			        servicesPath = modulePaths.get(modulePaths.size() - 1) + "/services"
+		        }
+	        }
+
             String name = getProject().getProperties().get(propName)
 
             String template = RESOURCE_TEMPLATE
@@ -102,12 +109,12 @@ declare function delete(
             }
 
             String resource = template.replace("%%RESOURCE_NAME%%", name)
-            new File(servicesDir).mkdirs()
-            def resourceFile = new File(servicesDir, name + fileExtension)
+            new File(servicesPath).mkdirs()
+            def resourceFile = new File(servicesPath, name + fileExtension)
             println "Creating new resource at " + resourceFile.getAbsolutePath()
             resourceFile.write(resource)
 
-            def metadataDir = new File(servicesDir, "metadata")
+            def metadataDir = new File(servicesPath, "metadata")
             metadataDir.mkdirs()
             String metadata = METADATA_TEMPLATE.replace("%%RESOURCE_NAME%%", name)
             def metadataFile = new File(metadataDir, name + ".xml")

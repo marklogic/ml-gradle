@@ -1,9 +1,7 @@
 package com.marklogic.gradle.task.client
 
-import org.gradle.api.DefaultTask;
-import org.gradle.api.tasks.TaskAction;
-
-import com.marklogic.gradle.task.MarkLogicTask;
+import com.marklogic.gradle.task.MarkLogicTask
+import org.gradle.api.tasks.TaskAction
 
 class CreateTransformTask extends MarkLogicTask {
 
@@ -54,7 +52,14 @@ exports.transform = transform;
     void createResource() {
         String propName = "transformName"
         if (getProject().hasProperty(propName)) {
-            transformsDir = transformsDir ? transformsDir : getAppConfig().getModulePaths().get(0) + "/transforms"
+	        String transformsPath = transformsDir
+	        if (!transformsPath) {
+		        List<String> modulePaths = getAppConfig().getModulePaths()
+		        if (modulePaths != null && !modulePaths.isEmpty()) {
+			        // Use the last path so modules aren't written to e.g. mlRestApi paths
+			        transformsPath = modulePaths.get(modulePaths.size() - 1) + "/transforms"
+		        }
+	        }
 
             String name = getProject().getProperties().get(propName)
 
@@ -76,12 +81,12 @@ exports.transform = transform;
 
             String transform = template.replace("%%TRANSFORM_NAME%%", name)
 
-            new File(transformsDir).mkdirs()
-            def transformFile = new File(transformsDir, name + fileExtension)
+            new File(transformsPath).mkdirs()
+            def transformFile = new File(transformsPath, name + fileExtension)
             println "Creating new transform at " + transformFile.getAbsolutePath()
             transformFile.write(transform)
 
-			def metadataDir = new File(transformsDir, "metadata")
+			def metadataDir = new File(transformsPath, "metadata")
 			metadataDir.mkdirs()
 			String metadata = METADATA_TEMPLATE.replace("%%TRANSFORM_NAME%%", name)
 			def metadataFile = new File(metadataDir, name + ".xml")

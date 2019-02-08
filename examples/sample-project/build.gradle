@@ -58,6 +58,11 @@ dependencies {
 	testCompile "com.marklogic:ml-junit:3.0.0"
 	testCompile "com.jayway.restassured:rest-assured:2.4.1"
 
+	// Required for Java 11
+	testRuntime "javax.xml.bind:jaxb-api:2.3.1"
+	testRuntime "com.sun.xml.bind:jaxb-core:2.3.0.1"
+	testRuntime "com.sun.xml.bind:jaxb-impl:2.3.2"
+
 	// corb jar available from jcenter
 	corb "com.marklogic:marklogic-corb:2.3.2"
 }

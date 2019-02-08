@@ -349,7 +349,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 		DefaultAppConfigFactory appConfigFactory = new DefaultAppConfigFactory(propertySource)
 		// The ConfigDir objects constructed by AppConfig must all be relative to the project directory
 		// when using Java 11. In case this causes problems, a user can disable this via the below property
-		if ("true".equals(project.property("mlIgnoreProjectDir"))) {
+		if (project.hasProperty("mlIgnoreProjectDir") && "true".equals(project.property("mlIgnoreProjectDir"))) {
 			println "The Gradle projectDir will not be used to resolve file paths"
 		} else {
 			appConfigFactory.setProjectDir(project.getProjectDir())

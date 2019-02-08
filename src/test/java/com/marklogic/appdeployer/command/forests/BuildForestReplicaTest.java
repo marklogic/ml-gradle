@@ -13,19 +13,9 @@ import java.util.List;
 public class BuildForestReplicaTest extends Assert {
 
 	@Test
-	public void customNamingStrategy() {
+	public void customNamingStrategyWithDistributedStrategy() {
 		AppConfig appConfig = newAppConfig("mlForestsPerHost", "my-database,2");
-		appConfig.getForestNamingStrategies().put("my-database", new ForestNamingStrategy() {
-			@Override
-			public String getForestName(String databaseName, int forestNumber, AppConfig appConfig) {
-				return "forest-" + forestNumber;
-			}
-
-			@Override
-			public String getReplicaName(String databaseName, String forestName, int forestReplicaNumber, AppConfig appConfig) {
-				return "my-replica-" + forestName + "-" + forestReplicaNumber;
-			}
-		});
+		addCustomNamingStrategy(appConfig);
 
 		List<Forest> forests = new ForestBuilder().buildForests(
 			new ForestPlan("my-database", "host1", "host2", "host3").withReplicaCount(2), appConfig);
@@ -61,6 +51,37 @@ public class BuildForestReplicaTest extends Assert {
 		assertEquals("my-replica-forest-5-2", f5.getForestReplica().get(1).getReplicaName());
 		assertEquals("host1", f5.getForestReplica().get(0).getHost());
 		assertEquals("host2", f5.getForestReplica().get(1).getHost());
+	}
+
+	/**
+	 * This shows how replicas for host 1 all end up on host 2. The distributed strategy above is preferred, and
+	 * the grouped one is deprecated, but this test exists to show how the grouped one differs while it still exists.
+	 */
+	@SuppressWarnings("deprecation")
+	@Test
+	public void customNamingStrategyWithGroupedStrategy() {
+		AppConfig appConfig = newAppConfig("mlForestsPerHost", "my-database,2");
+		addCustomNamingStrategy(appConfig);
+		appConfig.setReplicaBuilderStrategy(new GroupedReplicaBuilderStrategy());
+
+		List<Forest> forests = new ForestBuilder().buildForests(
+			new ForestPlan("my-database", "host1", "host2", "host3").withReplicaCount(2), appConfig);
+
+		Forest f1 = forests.get(0);
+		assertEquals("forest-1", f1.getForestName());
+		assertEquals("host1", f1.getHost());
+		assertEquals("my-replica-forest-1-1", f1.getForestReplica().get(0).getReplicaName());
+		assertEquals("my-replica-forest-1-2", f1.getForestReplica().get(1).getReplicaName());
+		assertEquals("host2", f1.getForestReplica().get(0).getHost());
+		assertEquals("host3", f1.getForestReplica().get(1).getHost());
+
+		Forest f2 = forests.get(1);
+		assertEquals("forest-2", f2.getForestName());
+		assertEquals("host1", f2.getHost());
+		assertEquals("my-replica-forest-2-1", f2.getForestReplica().get(0).getReplicaName());
+		assertEquals("my-replica-forest-2-2", f2.getForestReplica().get(1).getReplicaName());
+		assertEquals("host2", f2.getForestReplica().get(0).getHost());
+		assertEquals("host3", f2.getForestReplica().get(1).getHost());
 	}
 
 	@Test
@@ -131,6 +152,20 @@ public class BuildForestReplicaTest extends Assert {
 		assertEquals("/my/replica/data", replica.getDataDirectory());
 		assertEquals("/my/replica/fast", replica.getFastDataDirectory());
 		assertEquals("/my/replica/large", replica.getLargeDataDirectory());
+	}
+
+	private void addCustomNamingStrategy(AppConfig appConfig) {
+		appConfig.getForestNamingStrategies().put("my-database", new ForestNamingStrategy() {
+			@Override
+			public String getForestName(String databaseName, int forestNumber, AppConfig appConfig) {
+				return "forest-" + forestNumber;
+			}
+
+			@Override
+			public String getReplicaName(String databaseName, String forestName, int forestReplicaNumber, AppConfig appConfig) {
+				return "my-replica-" + forestName + "-" + forestReplicaNumber;
+			}
+		});
 	}
 
 	private ForestReplica buildForestReplica(String... propertyNamesAndValues) {

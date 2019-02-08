@@ -44,6 +44,8 @@ public class DeployForestsCommand extends AbstractCommand {
 	private boolean createForestsOnEachHost = true;
 	private HostCalculator hostCalculator;
 
+	private ForestBuilder forestBuilder = new ForestBuilder();
+
 	/**
 	 * This was added back in 3.8.2 to preserve backwards compatibility, as it was removed in 3.7.0. If you use this
 	 * constructor, be sure to call setDatabaseName.
@@ -128,7 +130,7 @@ public class DeployForestsCommand extends AbstractCommand {
 			}
 		}
 
-		return new ForestBuilder().buildForests(forestPlan, context.getAppConfig());
+		return forestBuilder.buildForests(forestPlan, context.getAppConfig());
 	}
 
 	protected String buildForestTemplate(CommandContext context, ForestManager forestManager) {
@@ -230,5 +232,9 @@ public class DeployForestsCommand extends AbstractCommand {
 	 */
 	public void setDatabaseName(String databaseName) {
 		this.databaseName = databaseName;
+	}
+
+	public void setForestBuilder(ForestBuilder forestBuilder) {
+		this.forestBuilder = forestBuilder;
 	}
 }

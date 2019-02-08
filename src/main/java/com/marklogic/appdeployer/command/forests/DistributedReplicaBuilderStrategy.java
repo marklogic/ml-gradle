@@ -7,29 +7,18 @@ import com.marklogic.mgmt.api.forest.ForestReplica;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class DistributedReplicaBuilderStrategy extends ReplicaBuilderStrategy {
+public class DistributedReplicaBuilderStrategy extends AbstractReplicaBuilderStrategy {
 
 	/**
 	 * Distributes the replicas throughout the cluster.
 	 */
 	public void buildReplicas(List<Forest> forests, ForestPlan forestPlan, AppConfig appConfig,
-		List<String> dataDirectories, ForestNamingStrategy fns)
+		List<String> replicaDataDirectories, ForestNamingStrategy fns)
 	{
 		final String databaseName = forestPlan.getDatabaseName();
 		final List<String> hostNames = forestPlan.getHostNames();
 		final int replicaCount = forestPlan.getReplicaCount();
-
-		if (appConfig.getReplicaForestDataDirectory() != null) {
-			dataDirectories = new ArrayList<>();
-			dataDirectories.add(appConfig.getReplicaForestDataDirectory());
-		}
-		Map<String, String> replicaDataDirectoryMap = appConfig.getDatabaseReplicaDataDirectories();
-		if (replicaDataDirectoryMap != null && replicaDataDirectoryMap.containsKey(databaseName)) {
-			dataDirectories = new ArrayList<>();
-			dataDirectories.add(replicaDataDirectoryMap.get(databaseName));
-		}
 
 		HashMap<String, List<Forest>> hostToForests = new HashMap<String, List<Forest>>();
 
@@ -62,7 +51,7 @@ public class DistributedReplicaBuilderStrategy extends ReplicaBuilderStrategy {
 
 			for (Forest currForest : hostToForests.get(host)) {
 				List<ForestReplica> replicas = new ArrayList<>();
-				int dataDirectoryPointer = dataDirectories.indexOf(currForest.getDataDirectory());
+				int dataDirectoryPointer = replicaDataDirectories.indexOf(currForest.getDataDirectory());
 
 				for (int i = 1; i <= replicaCount; i++) {
 					ForestReplica replica = new ForestReplica();
@@ -77,11 +66,11 @@ public class DistributedReplicaBuilderStrategy extends ReplicaBuilderStrategy {
 					replica.setHost(availableHosts.get(replicaHostPointer));
 
 					dataDirectoryPointer++;
-					if (dataDirectoryPointer == dataDirectories.size()) {
+					if (dataDirectoryPointer == replicaDataDirectories.size()) {
 						dataDirectoryPointer = 0;
 					}
 
-					final String dataDir = dataDirectories.get(dataDirectoryPointer);
+					final String dataDir = replicaDataDirectories.get(dataDirectoryPointer);
 					if (dataDir != null && dataDir.trim().length() > 0) {
 						replica.setDataDirectory(dataDir);
 					}

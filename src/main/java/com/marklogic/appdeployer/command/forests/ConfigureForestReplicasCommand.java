@@ -134,7 +134,8 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 
 			ForestBuilder forestBuilder = new ForestBuilder();
 			ForestPlan forestPlan = new ForestPlan(databaseName, selectedHostNames).withReplicaCount(replicaCount);
-			forestBuilder.addReplicasToForests(Arrays.asList(forest), forestPlan, context.getAppConfig());
+			List<String> dataDirectories = forestBuilder.determineDataDirectories(databaseName, context.getAppConfig());
+			forestBuilder.addReplicasToForests(Arrays.asList(forest), forestPlan, context.getAppConfig(), dataDirectories);
 
 			Forest forestWithOnlyReplicas = new Forest();
 			forestWithOnlyReplicas.setForestReplica(forest.getForestReplica());

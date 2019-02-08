@@ -4,7 +4,6 @@ import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.forest.Forest;
-import com.marklogic.mgmt.api.forest.ForestReplica;
 import com.marklogic.mgmt.mapper.DefaultResourceMapper;
 import com.marklogic.mgmt.mapper.ResourceMapper;
 
@@ -28,11 +27,6 @@ public class ForestBuilder extends LoggingObject {
 	public ForestBuilder(ForestNamingStrategy forestNamingStrategy) {
 		this.forestNamingStrategy = forestNamingStrategy;
 		this.replicaBuilderStrategy = new DistributedReplicaBuilderStrategy();
-	}
-
-	public ForestBuilder(ForestNamingStrategy forestNamingStrategy, ReplicaBuilderStrategy replicaBuilderStrategy) {
-		this.forestNamingStrategy = forestNamingStrategy;
-		this.replicaBuilderStrategy = replicaBuilderStrategy;
 	}
 
 	/**
@@ -104,7 +98,7 @@ public class ForestBuilder extends LoggingObject {
 		}
 
 		if (forestPlan.getReplicaCount() > 0) {
-			addReplicasToForests(forests, forestPlan, appConfig);
+			addReplicasToForests(forests, forestPlan, appConfig, dataDirectories);
 		}
 
 		return forests;
@@ -118,7 +112,7 @@ public class ForestBuilder extends LoggingObject {
 	 * @param forestPlan
 	 * @param appConfig
 	 */
-	public void addReplicasToForests(List<Forest> forests, ForestPlan forestPlan, AppConfig appConfig) {
+	public void addReplicasToForests(List<Forest> forests, ForestPlan forestPlan, AppConfig appConfig, List<String> dataDirectories) {
 		final String databaseName = forestPlan.getDatabaseName();
 		final List<String> hostNames = forestPlan.getHostNames();
 		final int replicaCount = forestPlan.getReplicaCount();
@@ -129,10 +123,21 @@ public class ForestBuilder extends LoggingObject {
 				replicaCount, databaseName, hostNames));
 		}
 
-		List<String> dataDirectories = determineDataDirectories(databaseName, appConfig);
+		// Determine if there are replica-specific data directories. If not, use the primary ones.
+		List<String> replicaDataDirectories = determineReplicaDataDirectories(forestPlan, appConfig);
+		if (replicaDataDirectories == null) {
+			replicaDataDirectories = dataDirectories;
+		}
 
-		replicaBuilderStrategy.buildReplicas(forests, forestPlan, appConfig, dataDirectories, determineForestNamingStrategy(databaseName, appConfig));
+		ReplicaBuilderStrategy strategyToUse = replicaBuilderStrategy;
+		if (appConfig.getReplicaBuilderStrategy() != null) {
+			if (logger.isInfoEnabled()) {
+				logger.info("Using ReplicaBuilderStrategy defined in AppConfig");
+			}
+			strategyToUse = appConfig.getReplicaBuilderStrategy();
+		}
 
+		strategyToUse.buildReplicas(forests, forestPlan, appConfig, replicaDataDirectories, determineForestNamingStrategy(databaseName, appConfig));
 	}
 
 	protected Forest newForest(ForestPlan forestPlan) {
@@ -175,6 +180,31 @@ public class ForestBuilder extends LoggingObject {
 		}
 
 		return dataDirectories;
+	}
+
+	/**
+	 * Determines if there are replica-specific data directories for the database associated with the ForestPlan. If
+	 * not, then null will be returned.
+	 *
+	 * @param forestPlan
+	 * @param appConfig
+	 * @return
+	 */
+	protected List<String> determineReplicaDataDirectories(ForestPlan forestPlan, AppConfig appConfig) {
+		List<String> replicaDataDirectories = null;
+		if (appConfig.getReplicaForestDataDirectory() != null) {
+			replicaDataDirectories = new ArrayList<>();
+			replicaDataDirectories.add(appConfig.getReplicaForestDataDirectory());
+		}
+
+		Map<String, String> replicaDataDirectoryMap = appConfig.getDatabaseReplicaDataDirectories();
+		final String databaseName = forestPlan.getDatabaseName();
+		if (replicaDataDirectoryMap != null && replicaDataDirectoryMap.containsKey(databaseName)) {
+			replicaDataDirectories = new ArrayList<>();
+			replicaDataDirectories.add(replicaDataDirectoryMap.get(databaseName));
+		}
+
+		return replicaDataDirectories;
 	}
 
 	/**
@@ -222,5 +252,17 @@ public class ForestBuilder extends LoggingObject {
 			fns = map.get(databaseName);
 		}
 		return fns != null ? fns : this.forestNamingStrategy;
+	}
+
+	public void setReplicaBuilderStrategy(ReplicaBuilderStrategy replicaBuilderStrategy) {
+		this.replicaBuilderStrategy = replicaBuilderStrategy;
+	}
+
+	public ReplicaBuilderStrategy getReplicaBuilderStrategy() {
+		return replicaBuilderStrategy;
+	}
+
+	public ForestNamingStrategy getForestNamingStrategy() {
+		return forestNamingStrategy;
 	}
 }

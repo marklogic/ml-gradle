@@ -1,6 +1,7 @@
 package com.marklogic.appdeployer;
 
 import com.marklogic.appdeployer.command.forests.ForestNamingStrategy;
+import com.marklogic.appdeployer.command.forests.ReplicaBuilderStrategy;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier;
@@ -184,7 +185,11 @@ public class AppConfig {
     private String replicaForestLargeDataDirectory;
     private String replicaForestFastDataDirectory;
 
+    // Allows for customizing how forests are named per database
     private Map<String, ForestNamingStrategy> forestNamingStrategies = new HashMap<>();
+
+    // Allows for customizing how replicas are built for all databases
+    private ReplicaBuilderStrategy replicaBuilderStrategy;
 
     // Path to use for DeployFlexrepCommand
     private String flexrepPath;
@@ -1274,7 +1279,11 @@ public class AppConfig {
 		this.deployPrivilegesWithCma = deployPrivilegesWithCma;
 	}
 
-	public File getProjectDir() {
-		return projectDir;
+	public ReplicaBuilderStrategy getReplicaBuilderStrategy() {
+		return replicaBuilderStrategy;
+	}
+
+	public void setReplicaBuilderStrategy(ReplicaBuilderStrategy replicaBuilderStrategy) {
+		this.replicaBuilderStrategy = replicaBuilderStrategy;
 	}
 }

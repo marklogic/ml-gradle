@@ -2,61 +2,21 @@ package com.marklogic.appdeployer.command.forests;
 
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.mgmt.api.forest.Forest;
-import com.marklogic.mgmt.api.forest.ForestReplica;
 
 import java.util.List;
-import java.util.Map;
 
-public abstract class ReplicaBuilderStrategy {
-
-	public abstract void buildReplicas(List<Forest> forests, ForestPlan forestPlan, AppConfig appConfig,
-		List<String> dataDirectories, ForestNamingStrategy fns);
+public interface ReplicaBuilderStrategy {
 
 	/**
-	 * Configures the fast and large data directories for a replica based on what's in AppConfig for the given
-	 * database.
+	 * Defines how replica forests should be constructed for a particular database.
 	 *
-	 * @param replica
-	 * @param databaseName
+	 * @param forests                the list of forests that have already been determined for the database
+	 * @param forestPlan             captures inputs for what forests and replicas should be built
 	 * @param appConfig
+	 * @param replicaDataDirectories the list of data directories to use for the replica forests
+	 * @param forestNamingStrategy   a strategy for how the replica forests are named
 	 */
-	protected void configureReplica(ForestReplica replica, String databaseName, AppConfig appConfig) {
-		// First set to the database-agnostic forest directories
-		replica.setFastDataDirectory(appConfig.getForestFastDataDirectory());
-		replica.setLargeDataDirectory(appConfig.getForestLargeDataDirectory());
-
-		// Now set to the database-specific forest directories if set
-		if (databaseName != null) {
-			Map<String, String> map = appConfig.getDatabaseFastDataDirectories();
-			if (map != null && map.containsKey(databaseName)) {
-				replica.setFastDataDirectory(map.get(databaseName));
-			}
-			map = appConfig.getDatabaseLargeDataDirectories();
-			if (map != null && map.containsKey(databaseName)) {
-				replica.setLargeDataDirectory(map.get(databaseName));
-			}
-		}
-
-		// Now set to the replica forest directories if set
-		if (appConfig.getReplicaForestFastDataDirectory() != null) {
-			replica.setFastDataDirectory(appConfig.getReplicaForestFastDataDirectory());
-		}
-		if (appConfig.getReplicaForestLargeDataDirectory() != null) {
-			replica.setLargeDataDirectory(appConfig.getReplicaForestLargeDataDirectory());
-		}
-
-		// And now set to the database-specific replica forest directories if set
-		if (databaseName != null) {
-			Map<String, String> map = appConfig.getDatabaseReplicaFastDataDirectories();
-			if (map != null && map.containsKey(databaseName)) {
-				replica.setFastDataDirectory(map.get(databaseName));
-			}
-			map = appConfig.getDatabaseReplicaLargeDataDirectories();
-			if (map != null && map.containsKey(databaseName)) {
-				replica.setLargeDataDirectory(map.get(databaseName));
-			}
-		}
-	}
-
+	void buildReplicas(List<Forest> forests, ForestPlan forestPlan, AppConfig appConfig,
+	                   List<String> replicaDataDirectories, ForestNamingStrategy forestNamingStrategy);
 
 }

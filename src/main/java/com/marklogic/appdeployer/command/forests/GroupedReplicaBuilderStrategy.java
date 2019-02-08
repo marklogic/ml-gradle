@@ -6,35 +6,25 @@ import com.marklogic.mgmt.api.forest.ForestReplica;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-public class GroupedReplicaBuilderStrategy extends ReplicaBuilderStrategy {
+/**
+ * This is the original ReplicaBuilderStrategy. The first replica for forest n on host h will be on host
+ * (h+1)%hostCount. The distributed strategy is preferred so that replicas for host h are distributed across all of the
+ * hosts instead of all being on one other host.
+ */
+@Deprecated
+public class GroupedReplicaBuilderStrategy extends AbstractReplicaBuilderStrategy {
 
-	/**
-	 * This is the original ReplicaBuilderStrategy. The first replica for forest n on host h will be on host
-	 * (h+1)%hostCount.
-	 */
 	public void buildReplicas(List<Forest> forests, ForestPlan forestPlan, AppConfig appConfig,
-		List<String> dataDirectories, ForestNamingStrategy fns)
-	{
+	                          List<String> replicaDataDirectories, ForestNamingStrategy fns) {
 		final String databaseName = forestPlan.getDatabaseName();
 		final List<String> hostNames = forestPlan.getHostNames();
 		final int replicaCount = forestPlan.getReplicaCount();
 
-		if (appConfig.getReplicaForestDataDirectory() != null) {
-			dataDirectories = new ArrayList<>();
-			dataDirectories.add(appConfig.getReplicaForestDataDirectory());
-		}
-		Map<String, String> replicaDataDirectoryMap = appConfig.getDatabaseReplicaDataDirectories();
-		if (replicaDataDirectoryMap != null && replicaDataDirectoryMap.containsKey(databaseName)) {
-			dataDirectories = new ArrayList<>();
-			dataDirectories.add(replicaDataDirectoryMap.get(databaseName));
-		}
-
 		for (Forest f : forests) {
 			List<ForestReplica> replicas = new ArrayList<>();
 			int hostPointer = hostNames.indexOf(f.getHost());
-			int dataDirectoryPointer = dataDirectories.indexOf(f.getDataDirectory());
+			int dataDirectoryPointer = replicaDataDirectories.indexOf(f.getDataDirectory());
 			for (int i = 1; i <= replicaCount; i++) {
 				ForestReplica replica = new ForestReplica();
 				replica.setReplicaName(fns.getReplicaName(databaseName, f.getForestName(), i, appConfig));
@@ -46,13 +36,13 @@ public class GroupedReplicaBuilderStrategy extends ReplicaBuilderStrategy {
 				}
 
 				dataDirectoryPointer++;
-				if (dataDirectoryPointer == dataDirectories.size()) {
+				if (dataDirectoryPointer == replicaDataDirectories.size()) {
 					dataDirectoryPointer = 0;
 				}
 
 				replica.setHost(hostNames.get(hostPointer));
 
-				final String dataDir = dataDirectories.get(dataDirectoryPointer);
+				final String dataDir = replicaDataDirectories.get(dataDirectoryPointer);
 				if (dataDir != null && dataDir.trim().length() > 0) {
 					replica.setDataDirectory(dataDir);
 				}

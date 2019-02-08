@@ -34,6 +34,7 @@ public class CreateRestApiAsNonAdminUserTest extends AbstractAppDeployerTest {
     }
 
     @Test
+    @SuppressWarnings("deprecation")
     public void test() {
         // Use config specific to this test
         appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/non-admin-test/ml-config")));

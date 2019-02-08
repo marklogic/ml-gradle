@@ -14,6 +14,7 @@ import com.marklogic.client.ext.tokenreplacer.PropertiesSource;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.X509TrustManager;
+import java.io.File;
 import java.io.FileFilter;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -223,20 +224,23 @@ public class AppConfig {
 
 	private Map<String, Object> additionalProperties = new HashMap<>();
 
+	private File projectDir;
+
 	public AppConfig() {
-        this(DEFAULT_MODULES_PATH, DEFAULT_SCHEMAS_PATH);
+        this(null);
     }
 
-    public AppConfig(String defaultModulePath) {
-        this(defaultModulePath, DEFAULT_SCHEMAS_PATH);
-    }
+    public AppConfig(File projectDir) {
+		this.projectDir = projectDir;
 
-    public AppConfig(String defaultModulePath, String defaultSchemasPath) {
-        modulePaths = new ArrayList<>();
-        modulePaths.add(defaultModulePath);
-        configDirs = new ArrayList<>();
-        configDirs.add(new ConfigDir());
-        schemasPath = defaultSchemasPath;
+		modulePaths = new ArrayList<>();
+		String path = projectDir != null ? new File(projectDir, DEFAULT_MODULES_PATH).getAbsolutePath() : DEFAULT_MODULES_PATH;
+		modulePaths.add(path);
+
+	    schemasPath = projectDir != null ? new File(projectDir, DEFAULT_SCHEMAS_PATH).getAbsolutePath() : DEFAULT_SCHEMAS_PATH;
+
+	    configDirs = new ArrayList<>();
+	    configDirs.add(ConfigDir.withProjectDir(projectDir));
     }
 
 	public void populateCustomTokens(PropertiesSource propertiesSource) {
@@ -552,7 +556,7 @@ public class AppConfig {
 	public ConfigDir getFirstConfigDir() {
 	    if (configDirs == null || configDirs.isEmpty()) {
 		    this.configDirs = new ArrayList<>();
-		    this.configDirs.add(new ConfigDir());
+		    this.configDirs.add(ConfigDir.withProjectDir(this.projectDir));
 	    }
 	    return configDirs.get(0);
     }
@@ -1268,5 +1272,9 @@ public class AppConfig {
 
 	public void setDeployPrivilegesWithCma(boolean deployPrivilegesWithCma) {
 		this.deployPrivilegesWithCma = deployPrivilegesWithCma;
+	}
+
+	public File getProjectDir() {
+		return projectDir;
 	}
 }

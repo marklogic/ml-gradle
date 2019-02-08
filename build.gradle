@@ -13,6 +13,7 @@ targetCompatibility = "1.8"
 repositories {
 	mavenLocal()
   jcenter()
+	mavenCentral()
 }
 
 dependencies {
@@ -26,6 +27,11 @@ dependencies {
 
 	// For PreviewInterceptor; can be excluded if that feature is not used
 	compile "com.flipkart.zjsonpatch:zjsonpatch:0.4.6"
+
+	// Required for Java 11
+	compile "javax.xml.bind:jaxb-api:2.3.1"
+	compile "com.sun.xml.bind:jaxb-core:2.3.0.1"
+	compile "com.sun.xml.bind:jaxb-impl:2.3.2"
 
 	// Don't want to include this in the published jar, just the executable jar
 	compileOnly "com.beust:jcommander:1.72"

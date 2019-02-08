@@ -1,7 +1,6 @@
 package com.marklogic.appdeployer;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,6 +12,8 @@ import java.util.List;
  */
 public class ConfigDir {
 
+	public final static String DEFAULT_PATH = "src/main/ml-config";
+
 	private File baseDir;
 
 	private String databasesPath = "databases";
@@ -22,8 +23,17 @@ public class ConfigDir {
 
 	private List<File> contentDatabaseFiles;
 
+	private File projectDir;
+
+	public static ConfigDir withProjectDir(File projectDir) {
+		File baseDir = projectDir != null ? new File(projectDir, DEFAULT_PATH) : new File(DEFAULT_PATH);
+		ConfigDir configDir = new ConfigDir(baseDir);
+		configDir.projectDir = projectDir;
+		return configDir;
+	}
+
 	public ConfigDir() {
-		this(new File("src/main/ml-config"));
+		new File(DEFAULT_PATH);
 	}
 
 	public ConfigDir(File baseDir) {
@@ -225,5 +235,9 @@ public class ConfigDir {
 
 	public void setDefaultContentDatabaseFilename(String contentDatabaseFilename) {
 		this.defaultContentDatabaseFilename = contentDatabaseFilename;
+	}
+
+	public File getProjectDir() {
+		return projectDir;
 	}
 }

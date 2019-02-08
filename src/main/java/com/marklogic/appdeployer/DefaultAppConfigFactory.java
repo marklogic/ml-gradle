@@ -11,6 +11,8 @@ import java.util.regex.Pattern;
 
 public class DefaultAppConfigFactory extends PropertySourceFactory implements AppConfigFactory {
 
+	private File projectDir;
+
 	public DefaultAppConfigFactory() {
 		super();
 		initialize();
@@ -84,18 +86,19 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			logger.info("Config paths: " + prop);
 			List<ConfigDir> list = new ArrayList<>();
 			for (String path : prop.split(",")) {
-				list.add(new ConfigDir(new File(path)));
+				list.add(buildConfigDir(path));
 			}
 			config.setConfigDirs(list);
 		});
+
 		// TODO Only process if mlConfigPaths not set?
 		propertyConsumerMap.put("mlConfigDir", (config, prop) -> {
 			logger.info("mlConfigDir is deprecated; please use mlConfigPath; Config dir: " + prop);
-			config.setConfigDir(new ConfigDir(new File(prop)));
+			config.setConfigDir(buildConfigDir(prop));
 		});
 		propertyConsumerMap.put("mlConfigPath", (config, prop) -> {
 			logger.info("Config path: " + prop);
-			config.setConfigDir(new ConfigDir(new File(prop)));
+			config.setConfigDir(buildConfigDir(prop));
 		});
 
 		/**
@@ -263,7 +266,8 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		 */
 		propertyConsumerMap.put("mlSchemasPath", (config, prop) -> {
 			logger.info("Schemas path: " + prop);
-			config.setSchemasPath(prop);
+			String path = this.projectDir != null ? new File(this.projectDir, prop).getAbsolutePath() : prop;
+			config.setSchemasPath(path);
 		});
 
 		propertyConsumerMap.put("mlSchemasDatabaseName", (config, prop) -> {
@@ -502,7 +506,8 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			// Ensure we have a modifiable list
 			List<String> list = new ArrayList<>();
 			for (String s : paths) {
-				list.add(s);
+				String path = this.projectDir != null ? new File(projectDir, s).getAbsolutePath() : s;
+				list.add(path);
 			}
 			config.setModulePaths(list);
 		});
@@ -662,7 +667,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 
 	@Override
 	public AppConfig newAppConfig() {
-		final AppConfig appConfig = new AppConfig();
+		final AppConfig appConfig = new AppConfig(this.projectDir);
 		for (String propertyName : propertyConsumerMap.keySet()) {
 			String value = getProperty(propertyName);
 			if (value != null) {
@@ -673,6 +678,11 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		setDefaultsForDatabasesWithForestsOnOneHost(appConfig);
 
 		return appConfig;
+	}
+
+	protected ConfigDir buildConfigDir(String path) {
+		File baseDir = this.projectDir != null ? new File(this.projectDir, path) : new File(path);
+		return new ConfigDir(baseDir);
 	}
 
 	protected void setDefaultsForDatabasesWithForestsOnOneHost(AppConfig appConfig) {
@@ -724,5 +734,9 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 	 */
 	public Map<String, BiConsumer<AppConfig, String>> getPropertyConsumerMap() {
 		return propertyConsumerMap;
+	}
+
+	public void setProjectDir(File projectDir) {
+		this.projectDir = projectDir;
 	}
 }

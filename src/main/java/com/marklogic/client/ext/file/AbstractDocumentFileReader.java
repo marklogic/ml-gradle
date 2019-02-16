@@ -13,6 +13,7 @@ public abstract class AbstractDocumentFileReader extends LoggingObject {
 
 	private List<DocumentFileProcessor> documentFileProcessors = new ArrayList<>();
 	private FormatDocumentFileProcessor formatDocumentFileProcessor = new FormatDocumentFileProcessor();
+	private boolean catchProcessingError = false;
 
 	protected AbstractDocumentFileReader() {
 		documentFileProcessors.add(formatDocumentFileProcessor);
@@ -41,6 +42,13 @@ public abstract class AbstractDocumentFileReader extends LoggingObject {
 		documentFileProcessors.add(processor);
 	}
 
+	/**
+	 * The catchProcessingError field controls whether an exception thrown by a processor will be caught or not. Starting
+	 * in 3.11.0, it defaults to false, as an exception typically indicates that the processing should stop.
+	 *
+	 * @param documentFile
+	 * @return
+	 */
 	protected DocumentFile processDocumentFile(DocumentFile documentFile) {
 		for (DocumentFileProcessor processor : documentFileProcessors) {
 			try {
@@ -49,8 +57,12 @@ public abstract class AbstractDocumentFileReader extends LoggingObject {
 				}
 				documentFile = processor.processDocumentFile(documentFile);
 			} catch (Exception e) {
-				logger.error("Error while processing document file; file: " + documentFile.getFile().getAbsolutePath()
-					+ "; cause: " + e.getMessage(), e);
+				final String message = "Error while processing document file: " + documentFile.getFile();
+				if (catchProcessingError) {
+					logger.error(message, e);
+				} else {
+					throw new RuntimeException(message, e);
+				}
 			}
 			if (documentFile == null) {
 				break;
@@ -73,5 +85,13 @@ public abstract class AbstractDocumentFileReader extends LoggingObject {
 
 	public void setFormatDocumentFileProcessor(FormatDocumentFileProcessor formatDocumentFileProcessor) {
 		this.formatDocumentFileProcessor = formatDocumentFileProcessor;
+	}
+
+	public boolean isCatchProcessingError() {
+		return catchProcessingError;
+	}
+
+	public void setCatchProcessingError(boolean catchProcessingError) {
+		this.catchProcessingError = catchProcessingError;
 	}
 }

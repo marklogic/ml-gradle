@@ -271,4 +271,8 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 	public void setBatchSize(Integer batchSize) {
 		this.batchSize = batchSize;
 	}
+
+	public void setBatchWriter(BatchWriter batchWriter) {
+		this.batchWriter = batchWriter;
+	}
 }

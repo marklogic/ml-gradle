@@ -1,0 +1,31 @@
+{
+	"template": {
+		"context": "/example",
+		"collections": [
+			"example"
+		],
+		"rows": [
+			{
+				"schemaName": "Example",
+				"viewName": "default",
+				"columns": [
+					{
+						"name": "Id",
+						"scalarType": "string",
+						"val": "Id"
+					},
+					{
+						"name": "DuplicateColumn",
+						"scalarType": "string",
+						"val": "DuplicateColumn"
+					},
+					{
+						"name": "DuplicateColumn",
+						"scalarType": "string",
+						"val": "DuplicateColumn"
+					}
+				]
+			}
+		]
+	}
+}

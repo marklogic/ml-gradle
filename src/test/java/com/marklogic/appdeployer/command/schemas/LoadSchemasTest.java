@@ -63,6 +63,7 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 
 		appConfig.setSchemasPath("src/test/resources/schemas-marklogic9");
 		appConfig.setSchemasFileFilter(new CustomFileFilter());
+		appConfig.setTdeValidationEnabled(false);
 		appDeployer.deploy(appConfig);
 
 		DatabaseClient client = appConfig.newSchemasDatabaseClient();
@@ -87,6 +88,20 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 		appConfig.setSchemasPath(null);
 		deploySampleApp();
 		logger.info("Verifies that no error occurs when the schemas path is null");
+	}
+
+	@Test
+	public void tdeValidationEnabled() {
+		initializeAppDeployer(new DeployOtherDatabasesCommand(), new DeployContentDatabasesCommand(1), newCommand());
+		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/tde-validation"));
+		try {
+			deploySampleApp();
+			fail("The deploy should have failed because of a bad TDE template");
+		} catch (Exception ex) {
+			String message = ex.getCause().getMessage();
+			assertTrue(message.startsWith("TDE template failed validation"));
+			assertTrue(message.contains("TDE-REPEATEDCOLUMN"));
+		}
 	}
 
 	@After

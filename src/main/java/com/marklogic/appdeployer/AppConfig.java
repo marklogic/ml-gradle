@@ -125,6 +125,7 @@ public class AppConfig {
 	private boolean incrementalDeploy = false;
 
     private String schemasPath;
+    private boolean tdeValidationEnabled = true;
 
     private List<ConfigDir> configDirs;
 
@@ -1285,5 +1286,13 @@ public class AppConfig {
 
 	public void setReplicaBuilderStrategy(ReplicaBuilderStrategy replicaBuilderStrategy) {
 		this.replicaBuilderStrategy = replicaBuilderStrategy;
+	}
+
+	public boolean isTdeValidationEnabled() {
+		return tdeValidationEnabled;
+	}
+
+	public void setTdeValidationEnabled(boolean tdeValidationEnabled) {
+		this.tdeValidationEnabled = tdeValidationEnabled;
 	}
 }

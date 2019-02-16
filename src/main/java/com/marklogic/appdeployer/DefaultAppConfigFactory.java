@@ -270,6 +270,11 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			config.setSchemasPath(path);
 		});
 
+		propertyConsumerMap.put("mlTdeValidationEnabled", (config, prop) -> {
+			logger.info("TDE validation enabled: " + prop);
+			config.setTdeValidationEnabled(Boolean.parseBoolean(prop));
+		});
+
 		propertyConsumerMap.put("mlSchemasDatabaseName", (config, prop) -> {
 			logger.info("Schemas database name: " + prop);
 			config.setSchemasDatabaseName(prop);

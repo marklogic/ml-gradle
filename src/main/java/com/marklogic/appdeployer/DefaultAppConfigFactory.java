@@ -65,6 +65,11 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			config.setDeployPrivilegesWithCma(Boolean.parseBoolean(prop));
 		});
 
+		propertyConsumerMap.put("mlAddHostNameTokens", (config, prop) -> {
+			logger.info("Add host names to the custom tokens map: " + prop);
+			config.setAddHostNameTokens(Boolean.parseBoolean(prop));
+		});
+
 		/**
 		 * The application name is used as a prefix for default names for a variety of resources, such as REST API servers
 		 * and databases.

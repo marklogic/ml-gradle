@@ -73,6 +73,8 @@ public class AppConfig {
     private boolean deployForestsWithCma = false;
     private boolean deployPrivilegesWithCma = false;
 
+    private boolean addHostNameTokens = false;
+
     // Used to construct DatabaseClient instances based on inputs defined in this class
     private ConfiguredDatabaseClientFactory configuredDatabaseClientFactory = new DefaultConfiguredDatabaseClientFactory();
 
@@ -1294,5 +1296,13 @@ public class AppConfig {
 
 	public void setTdeValidationEnabled(boolean tdeValidationEnabled) {
 		this.tdeValidationEnabled = tdeValidationEnabled;
+	}
+
+	public boolean isAddHostNameTokens() {
+		return addHostNameTokens;
+	}
+
+	public void setAddHostNameTokens(boolean addHostNameTokens) {
+		this.addHostNameTokens = addHostNameTokens;
 	}
 }

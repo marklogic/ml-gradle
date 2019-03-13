@@ -162,6 +162,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	public void allProperties() {
 		Properties p = new Properties();
 
+		p.setProperty("mlAddHostNameTokens", "true");
 		p.setProperty("mlCatchDeployExceptions", "true");
 		p.setProperty("mlCatchUndeployExceptions", "true");
 
@@ -265,6 +266,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		sut = new DefaultAppConfigFactory(new SimplePropertySource(p));
 		AppConfig config = sut.newAppConfig();
 
+		assertTrue(config.isAddHostNameTokens());
 		assertTrue(config.isCatchDeployExceptions());
 		assertTrue(config.isCatchUndeployExceptions());
 

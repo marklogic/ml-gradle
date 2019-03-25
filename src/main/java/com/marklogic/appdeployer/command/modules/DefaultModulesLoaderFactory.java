@@ -1,19 +1,14 @@
 package com.marklogic.appdeployer.command.modules;
 
 import com.marklogic.appdeployer.AppConfig;
-import com.marklogic.appdeployer.util.MapPropertiesSource;
 import com.marklogic.client.ext.batch.RestBatchWriter;
 import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.client.ext.modulesloader.ModulesLoader;
 import com.marklogic.client.ext.modulesloader.ModulesManager;
 import com.marklogic.client.ext.modulesloader.impl.*;
-import com.marklogic.client.ext.tokenreplacer.DefaultTokenReplacer;
-import com.marklogic.client.ext.tokenreplacer.PropertiesSource;
-import com.marklogic.client.ext.tokenreplacer.RoxyTokenReplacer;
 import com.marklogic.client.ext.tokenreplacer.TokenReplacer;
 import com.marklogic.xcc.template.XccTemplate;
 
-import java.util.Map;
 import java.util.regex.Pattern;
 
 public class DefaultModulesLoaderFactory extends LoggingObject implements ModulesLoaderFactory {
@@ -52,7 +47,7 @@ public class DefaultModulesLoaderFactory extends LoggingObject implements Module
 		DefaultModulesLoader modulesLoader = new DefaultModulesLoader(assetFileLoader);
 
 		if (appConfig.isReplaceTokensInModules()) {
-			TokenReplacer tokenReplacer = buildModuleTokenReplacer(appConfig);
+			TokenReplacer tokenReplacer = appConfig.buildTokenReplacer();
 			assetFileLoader.setTokenReplacer(tokenReplacer);
 			modulesLoader.setTokenReplacer(tokenReplacer);
 		}
@@ -86,21 +81,5 @@ public class DefaultModulesLoaderFactory extends LoggingObject implements Module
 		checker.setBulkCheck(appConfig.isBulkLoadAssets());
 		checker.setCheckLibraryModules(appConfig.isStaticCheckLibraryAssets());
 		return checker;
-	}
-
-	protected TokenReplacer buildModuleTokenReplacer(AppConfig appConfig) {
-		DefaultTokenReplacer r = appConfig.isUseRoxyTokenPrefix() ? new RoxyTokenReplacer() : new DefaultTokenReplacer();
-		final Map<String, String> customTokens = appConfig.getCustomTokens();
-		if (customTokens != null) {
-			r.addPropertiesSource(new MapPropertiesSource(customTokens));
-		}
-
-		if (appConfig.getModuleTokensPropertiesSources() != null) {
-			for (PropertiesSource ps : appConfig.getModuleTokensPropertiesSources()) {
-				r.addPropertiesSource(ps);
-			}
-		}
-
-		return r;
 	}
 }

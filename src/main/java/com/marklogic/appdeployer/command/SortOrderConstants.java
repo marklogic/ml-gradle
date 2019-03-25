@@ -75,6 +75,8 @@ public abstract class SortOrderConstants {
 
     public static Integer DEPLOY_FOREST_REPLICAS = 1200;
 
+    public static Integer LOAD_DATA = 1300;
+
 	public static Integer DELETE_MIMETYPES = 8500;
 
 	public static Integer UNASSIGN_HOSTS_FROM_GROUPS = 8590;

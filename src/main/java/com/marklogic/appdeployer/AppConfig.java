@@ -2,6 +2,7 @@ package com.marklogic.appdeployer;
 
 import com.marklogic.appdeployer.command.forests.ForestNamingStrategy;
 import com.marklogic.appdeployer.command.forests.ReplicaBuilderStrategy;
+import com.marklogic.appdeployer.util.MapPropertiesSource;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier;
@@ -11,7 +12,10 @@ import com.marklogic.client.ext.DefaultConfiguredDatabaseClientFactory;
 import com.marklogic.client.ext.SecurityContextType;
 import com.marklogic.client.ext.modulesloader.impl.PropertiesModuleManager;
 import com.marklogic.client.ext.modulesloader.ssl.SimpleX509TrustManager;
+import com.marklogic.client.ext.tokenreplacer.DefaultTokenReplacer;
 import com.marklogic.client.ext.tokenreplacer.PropertiesSource;
+import com.marklogic.client.ext.tokenreplacer.RoxyTokenReplacer;
+import com.marklogic.client.ext.tokenreplacer.TokenReplacer;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.X509TrustManager;
@@ -201,8 +205,6 @@ public class AppConfig {
     private boolean replaceTokensInModules = true;
     // Whether or not to prefix each module token with "@ml."
     private boolean useRoxyTokenPrefix = false;
-    // Additional PropertiesSources instance to use for replacing module tokens
-    private List<PropertiesSource> moduleTokensPropertiesSources = new ArrayList<>();
 
 	private Pattern moduleFilenamesIncludePattern;
 
@@ -234,12 +236,16 @@ public class AppConfig {
 
 	private File projectDir;
 
+	private DataConfig dataConfig;
+
 	public AppConfig() {
         this(null);
     }
 
     public AppConfig(File projectDir) {
 		this.projectDir = projectDir;
+
+		dataConfig = new DataConfig(projectDir);
 
 		modulePaths = new ArrayList<>();
 		String path = projectDir != null ? new File(projectDir, DEFAULT_MODULES_PATH).getAbsolutePath() : DEFAULT_MODULES_PATH;
@@ -282,6 +288,20 @@ public class AppConfig {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Builds a TokenReplacer based on the customTokens map held by this class.
+	 *
+	 * @return
+	 */
+	public TokenReplacer buildTokenReplacer() {
+		DefaultTokenReplacer r = isUseRoxyTokenPrefix() ? new RoxyTokenReplacer() : new DefaultTokenReplacer();
+		final Map<String, String> customTokens = getCustomTokens();
+		if (customTokens != null) {
+			r.addPropertiesSource(new MapPropertiesSource(customTokens));
+		}
+		return r;
 	}
 
     public void setSimpleSslConfig() {
@@ -695,14 +715,6 @@ public class AppConfig {
 
     public void setUseRoxyTokenPrefix(boolean useRoxyTokenPrefix) {
         this.useRoxyTokenPrefix = useRoxyTokenPrefix;
-    }
-
-    public List<PropertiesSource> getModuleTokensPropertiesSources() {
-        return moduleTokensPropertiesSources;
-    }
-
-    public void setModuleTokensPropertiesSources(List<PropertiesSource> moduleTokensPropertiesSources) {
-        this.moduleTokensPropertiesSources = moduleTokensPropertiesSources;
     }
 
 	public boolean isStaticCheckAssets() {
@@ -1304,5 +1316,13 @@ public class AppConfig {
 
 	public void setAddHostNameTokens(boolean addHostNameTokens) {
 		this.addHostNameTokens = addHostNameTokens;
+	}
+
+	public DataConfig getDataConfig() {
+		return dataConfig;
+	}
+
+	public void setDataConfig(DataConfig dataConfig) {
+		this.dataConfig = dataConfig;
 	}
 }

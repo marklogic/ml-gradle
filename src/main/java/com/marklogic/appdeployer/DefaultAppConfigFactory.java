@@ -25,6 +25,21 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 
 	private Map<String, BiConsumer<AppConfig, String>> propertyConsumerMap;
 
+	@Override
+	public AppConfig newAppConfig() {
+		final AppConfig appConfig = new AppConfig(this.projectDir);
+		for (String propertyName : propertyConsumerMap.keySet()) {
+			String value = getProperty(propertyName);
+			if (value != null) {
+				propertyConsumerMap.get(propertyName).accept(appConfig, value);
+			}
+		}
+
+		setDefaultsForDatabasesWithForestsOnOneHost(appConfig);
+
+		return appConfig;
+	}
+
 	/**
 	 * Registers all of the property handlers.
 	 */
@@ -673,21 +688,55 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			logger.info("Update mimetype when properties are equal (defaults to false to avoid unnecessary ML restarts): " + prop);
 			config.setUpdateMimetypeWhenPropertiesAreEqual(Boolean.parseBoolean(prop));
 		});
+
+		registerDataLoadingProperties();
 	}
 
-	@Override
-	public AppConfig newAppConfig() {
-		final AppConfig appConfig = new AppConfig(this.projectDir);
-		for (String propertyName : propertyConsumerMap.keySet()) {
-			String value = getProperty(propertyName);
-			if (value != null) {
-				propertyConsumerMap.get(propertyName).accept(appConfig, value);
+	protected void registerDataLoadingProperties() {
+		propertyConsumerMap.put("mlDataBatchSize", (config, prop) -> {
+			logger.info("Batch size for loading data: " + prop);
+			config.getDataConfig().setBatchSize(Integer.parseInt(prop));
+		});
+
+		propertyConsumerMap.put("mlDataCollections", (config, prop) -> {
+			logger.info("Collections that data will be loaded into: " + prop);
+			config.getDataConfig().setCollections(prop.split(","));
+		});
+
+		propertyConsumerMap.put("mlDataDatabaseName", (config, prop) -> {
+			logger.info("Database that data will be loaded into: " + prop);
+			config.getDataConfig().setDatabaseName(prop);
+		});
+
+		propertyConsumerMap.put("mlDataPaths", (config, prop) -> {
+			logger.info("Paths that data will be loaded from: " + prop);
+			List<String> paths = new ArrayList<>();
+			for (String s : prop.split(",")) {
+				String path = this.projectDir != null ? new File(projectDir, s).getAbsolutePath() : s;
+				paths.add(path);
 			}
-		}
+			config.getDataConfig().setDataPaths(paths);
+		});
 
-		setDefaultsForDatabasesWithForestsOnOneHost(appConfig);
+		propertyConsumerMap.put("mlDataLoadingEnabled", (config, prop) -> {
+			logger.info("Whether data loading is enabled: " + prop);
+			config.getDataConfig().setDataLoadingEnabled(Boolean.parseBoolean(prop));
+		});
 
-		return appConfig;
+		propertyConsumerMap.put("mlDataLogUris", (config, prop) -> {
+			logger.info("Log URIs when loading data: " + prop);
+			config.getDataConfig().setLogUris(Boolean.parseBoolean(prop));
+		});
+
+		propertyConsumerMap.put("mlDataPermissions", (config, prop) -> {
+			logger.info("Permissions to be applied to loaded data: " + prop);
+			config.getDataConfig().setPermissions(prop);
+		});
+
+		propertyConsumerMap.put("mlDataReplaceTokens", (config, prop) -> {
+			logger.info("Whether tokens will be replaced when loading data: " + prop);
+			config.getDataConfig().setReplaceTokensInData(Boolean.parseBoolean(prop));
+		});
 	}
 
 	protected ConfigDir buildConfigDir(String path) {

@@ -159,7 +159,36 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	}
 
 	@Test
-	public void allProperties() {
+	public void dataConfigProperties() {
+		Properties p = new Properties();
+		p.setProperty("mlDataPaths", "src/main/ml-data,src/main/more-data");
+		p.setProperty("mlDataCollections", "apple,banana");
+		p.setProperty("mlDataBatchSize", "123");
+		p.setProperty("mlDataDatabaseName", "Documents");
+		p.setProperty("mlDataPermissions", "manage-user,read,manage-user,update");
+		p.setProperty("mlDataReplaceTokens", "false");
+		p.setProperty("mlDataLoadingEnabled", "false");
+		p.setProperty("mlDataLogUris", "false");
+
+		sut = new DefaultAppConfigFactory(new SimplePropertySource(p));
+		final File projectDir = new File("src/test/resources/sample-app");
+		sut.setProjectDir(projectDir);
+
+		DataConfig config = sut.newAppConfig().getDataConfig();
+		assertEquals(new File(projectDir, "src/main/ml-data").getAbsolutePath(), config.getDataPaths().get(0));
+		assertEquals(new File(projectDir, "src/main/more-data").getAbsolutePath(), config.getDataPaths().get(1));
+		assertEquals("apple", config.getCollections()[0]);
+		assertEquals("banana", config.getCollections()[1]);
+		assertEquals(new Integer(123), config.getBatchSize());
+		assertEquals("Documents", config.getDatabaseName());
+		assertEquals("manage-user,read,manage-user,update", config.getPermissions());
+		assertFalse(config.isReplaceTokensInData());
+		assertFalse(config.isDataLoadingEnabled());
+		assertFalse(config.isLogUris());
+	}
+
+	@Test
+	public void mostProperties() {
 		Properties p = new Properties();
 
 		p.setProperty("mlAddHostNameTokens", "true");

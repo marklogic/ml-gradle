@@ -77,6 +77,8 @@ public abstract class SortOrderConstants {
 
     public static Integer LOAD_DATA = 1300;
 
+    public static Integer INSTALL_PLUGINS = 1400;
+
 	public static Integer DELETE_MIMETYPES = 8500;
 
 	public static Integer UNASSIGN_HOSTS_FROM_GROUPS = 8590;
@@ -117,4 +119,6 @@ public abstract class SortOrderConstants {
 	public static Integer DELETE_AMPS = 2000;
 
 	public static Integer DELETE_SCHEDULED_TASKS = 1000;
+
+	public static Integer UNINSTALL_PLUGINS = 500;
 }

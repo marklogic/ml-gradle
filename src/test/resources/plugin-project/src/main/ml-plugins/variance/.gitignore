@@ -1,0 +1,4 @@
+*.dylib
+*.o
+*.zip
+manifest.xml

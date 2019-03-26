@@ -188,6 +188,26 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	}
 
 	@Test
+	public void pluginConfigProperties() {
+		Properties p = new Properties();
+		p.setProperty("mlPluginPaths", "src/main/ml-plugins,src/main/more-plugins");
+		p.setProperty("mlPluginInstallationEnabled", "false");
+		p.setProperty("mlPluginDatabaseName", "Documents");
+		p.setProperty("mlPluginUriPrefix", "/some/prefix/");
+
+		sut = new DefaultAppConfigFactory(new SimplePropertySource(p));
+		final File projectDir = new File("src/test/resources/plugin-project");
+		sut.setProjectDir(projectDir);
+
+		PluginConfig config = sut.newAppConfig().getPluginConfig();
+		assertEquals(new File(projectDir, "src/main/ml-plugins").getAbsolutePath(), config.getPluginPaths().get(0));
+		assertEquals(new File(projectDir, "src/main/more-plugins").getAbsolutePath(), config.getPluginPaths().get(1));
+		assertFalse(config.isEnabled());
+		assertEquals("Documents", config.getDatabaseName());
+		assertEquals("/some/prefix/", config.getUriPrefix());
+	}
+
+	@Test
 	public void mostProperties() {
 		Properties p = new Properties();
 

@@ -33,16 +33,18 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
     }
 
     protected void initializeAppConfig() {
-        appConfig = new AppConfig(new File("src/test/resources/sample-app"));
+    	initializeAppConfig(new File("src/test/resources/sample-app"));
+    }
 
-        appConfig.setName(SAMPLE_APP_NAME);
-        appConfig.setRestPort(SAMPLE_APP_REST_PORT);
-        ConfigDir configDir = new ConfigDir(new File("src/test/resources/sample-app/src/main/ml-config"));
-        appConfig.setConfigDir(configDir);
+    protected void initializeAppConfig(File projectDir) {
+	    appConfig = new AppConfig(projectDir);
 
-        // Assume that the manager user can also be used as the REST admin user
-        appConfig.setRestAdminUsername(manageConfig.getUsername());
-        appConfig.setRestAdminPassword(manageConfig.getPassword());
+	    appConfig.setName(SAMPLE_APP_NAME);
+	    appConfig.setRestPort(SAMPLE_APP_REST_PORT);
+
+	    // Assume that the manager user can also be used as the REST admin user
+	    appConfig.setRestAdminUsername(manageConfig.getUsername());
+	    appConfig.setRestAdminPassword(manageConfig.getPassword());
     }
 
     /**

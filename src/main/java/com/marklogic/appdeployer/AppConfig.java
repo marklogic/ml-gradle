@@ -237,6 +237,7 @@ public class AppConfig {
 	private File projectDir;
 
 	private DataConfig dataConfig;
+	private PluginConfig pluginConfig;
 
 	public AppConfig() {
         this(null);
@@ -246,6 +247,7 @@ public class AppConfig {
 		this.projectDir = projectDir;
 
 		dataConfig = new DataConfig(projectDir);
+		pluginConfig = new PluginConfig(projectDir);
 
 		modulePaths = new ArrayList<>();
 		String path = projectDir != null ? new File(projectDir, DEFAULT_MODULES_PATH).getAbsolutePath() : DEFAULT_MODULES_PATH;
@@ -1324,5 +1326,13 @@ public class AppConfig {
 
 	public void setDataConfig(DataConfig dataConfig) {
 		this.dataConfig = dataConfig;
+	}
+
+	public PluginConfig getPluginConfig() {
+		return pluginConfig;
+	}
+
+	public void setPluginConfig(PluginConfig pluginConfig) {
+		this.pluginConfig = pluginConfig;
 	}
 }

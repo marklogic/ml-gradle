@@ -690,6 +690,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		});
 
 		registerDataLoadingProperties();
+		registerPluginProperties();
 	}
 
 	protected void registerDataLoadingProperties() {
@@ -736,6 +737,33 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		propertyConsumerMap.put("mlDataReplaceTokens", (config, prop) -> {
 			logger.info("Whether tokens will be replaced when loading data: " + prop);
 			config.getDataConfig().setReplaceTokensInData(Boolean.parseBoolean(prop));
+		});
+	}
+
+	protected void registerPluginProperties() {
+		propertyConsumerMap.put("mlPluginDatabaseName", (config, prop) -> {
+			logger.info("Database that plugins will be loaded into and installed from: " + prop);
+			config.getPluginConfig().setDatabaseName(prop);
+		});
+
+		propertyConsumerMap.put("mlPluginInstallationEnabled", (config, prop) -> {
+			logger.info("Whether plugins will be installed: " + prop);
+			config.getPluginConfig().setEnabled(Boolean.parseBoolean(prop));
+		});
+
+		propertyConsumerMap.put("mlPluginPaths", (config, prop) -> {
+			logger.info("Paths that plugins will be installed from: " + prop);
+			List<String> paths = new ArrayList<>();
+			for (String s : prop.split(",")) {
+				String path = this.projectDir != null ? new File(projectDir, s).getAbsolutePath() : s;
+				paths.add(path);
+			}
+			config.getPluginConfig().setPluginPaths(paths);
+		});
+
+		propertyConsumerMap.put("mlPluginUriPrefix", (config, prop) -> {
+			logger.info("URI prefix for plugins: " + prop);
+			config.getPluginConfig().setUriPrefix(prop);
 		});
 	}
 

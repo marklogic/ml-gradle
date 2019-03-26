@@ -15,13 +15,19 @@ import java.io.FileFilter;
 
 public class LoadSchemasTest extends AbstractAppDeployerTest {
 
+	@After
+	public void cleanup() {
+		undeploySampleApp();
+	}
+
 	@Test
 	public void databaseSpecificPaths() {
 		initializeAppDeployer(new DeployOtherDatabasesCommand(), newCommand());
 
 		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/multiple-schema-databases/ml-config"));
 		appConfig.setSchemasDatabaseName("sample-app-schemas1");
-		appConfig.setSchemasPath("src/test/resources/sample-app/multiple-schema-databases/ml-schemas");
+		appConfig.getSchemaPaths().clear();
+		appConfig.getSchemaPaths().add("src/test/resources/sample-app/multiple-schema-databases/ml-schemas");
 
 		deploySampleApp();
 
@@ -61,7 +67,8 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 	public void testCustomSchemasPathWithCustomFileFilter() {
 		initializeAppDeployer(new DeployOtherDatabasesCommand(), new DeployContentDatabasesCommand(1), newCommand());
 
-		appConfig.setSchemasPath("src/test/resources/schemas-marklogic9");
+		appConfig.getSchemaPaths().clear();
+		appConfig.getSchemaPaths().add("src/test/resources/schemas-marklogic9");
 		appConfig.setSchemasFileFilter(new CustomFileFilter());
 		appConfig.setTdeValidationEnabled(false);
 		appDeployer.deploy(appConfig);
@@ -85,7 +92,7 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 	@Test
 	public void nullSchemaPath() {
 		initializeAppDeployer(newCommand());
-		appConfig.setSchemasPath(null);
+		appConfig.setSchemaPaths(null);
 		deploySampleApp();
 		logger.info("Verifies that no error occurs when the schemas path is null");
 	}
@@ -104,9 +111,24 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 		}
 	}
 
-	@After
-	public void cleanup() {
-		undeploySampleApp();
+	@Test
+	public void multipleSchemaPaths() {
+		File projectDir = new File("src/test/resources/schemas-project");
+
+		initializeAppConfig(projectDir);
+		appConfig.getSchemaPaths().add(new File(projectDir, "src/main/more-schemas").getAbsolutePath());
+
+		initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployOtherDatabasesCommand(),
+			new LoadSchemasCommand());
+		deploySampleApp();
+
+		DatabaseClient client = appConfig.newSchemasDatabaseClient();
+		GenericDocumentManager docMgr = client.newDocumentManager();
+		assertNotNull(docMgr.exists("/tde/template1.json"));
+		assertNotNull(docMgr.exists("/tde/template2.json"));
+
+		assertTrue(docMgr.readMetadata("/tde/template1.json", new DocumentMetadataHandle()).getCollections().contains("http://marklogic.com/xdmp/tde"));
+		assertTrue(docMgr.readMetadata("/tde/template2.json", new DocumentMetadataHandle()).getCollections().contains("http://marklogic.com/xdmp/tde"));
 	}
 
 	private Command newCommand() {

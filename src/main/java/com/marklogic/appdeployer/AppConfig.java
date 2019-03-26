@@ -130,7 +130,7 @@ public class AppConfig {
 	private Integer modulesLoaderBatchSize;
 	private boolean incrementalDeploy = false;
 
-    private String schemasPath;
+    private List<String> schemaPaths;
     private boolean tdeValidationEnabled = true;
 
     private List<ConfigDir> configDirs;
@@ -253,7 +253,9 @@ public class AppConfig {
 		String path = projectDir != null ? new File(projectDir, DEFAULT_MODULES_PATH).getAbsolutePath() : DEFAULT_MODULES_PATH;
 		modulePaths.add(path);
 
-	    schemasPath = projectDir != null ? new File(projectDir, DEFAULT_SCHEMAS_PATH).getAbsolutePath() : DEFAULT_SCHEMAS_PATH;
+	    String defaultSchemasPath = projectDir != null ? new File(projectDir, DEFAULT_SCHEMAS_PATH).getAbsolutePath() : DEFAULT_SCHEMAS_PATH;
+	    schemaPaths = new ArrayList<>();
+	    schemaPaths.add(defaultSchemasPath);
 
 	    configDirs = new ArrayList<>();
 	    configDirs.add(ConfigDir.withProjectDir(projectDir));
@@ -529,17 +531,6 @@ public class AppConfig {
 
     public void setTestRestPort(Integer testRestPort) {
         this.testRestPort = testRestPort;
-    }
-
-    /**
-     * @return a list of all the paths from which modules should be loaded into a REST API server modules database
-     */
-    public String getSchemasPath() {
-        return schemasPath;
-    }
-
-    public void setSchemasPath(String schemasPath) {
-        this.schemasPath = schemasPath;
     }
 
     /**
@@ -1334,5 +1325,13 @@ public class AppConfig {
 
 	public void setPluginConfig(PluginConfig pluginConfig) {
 		this.pluginConfig = pluginConfig;
+	}
+
+	public List<String> getSchemaPaths() {
+		return schemaPaths;
+	}
+
+	public void setSchemaPaths(List<String> schemaPaths) {
+		this.schemaPaths = schemaPaths;
 	}
 }

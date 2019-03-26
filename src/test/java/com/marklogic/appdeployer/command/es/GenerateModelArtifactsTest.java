@@ -30,7 +30,8 @@ public class GenerateModelArtifactsTest extends AbstractAppDeployerTest {
 		appConfig.setModelsPath(projectPath + "/data/entity-services");
 		appConfig.getModulePaths().clear();
 		appConfig.getModulePaths().add(projectPath + "/src/main/ml-modules");
-		appConfig.setSchemasPath(projectPath + "/src/main/ml-schemas");
+		appConfig.getSchemaPaths().clear();
+		appConfig.getSchemaPaths().add(projectPath + "/src/main/ml-schemas");
 		appConfig.setModelsDatabase(appConfig.getContentDatabaseName());
 
 		initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployOtherDatabasesCommand(1),

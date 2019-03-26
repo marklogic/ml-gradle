@@ -281,13 +281,15 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			config.setTestContentDatabaseName(prop);
 		});
 
-		/**
-		 * Defines the path to files that should be loaded into a schemas database. Defaults to src/main/ml-schemas.
-		 */
+		// Deprecated - use mlSchemaPaths instead
 		propertyConsumerMap.put("mlSchemasPath", (config, prop) -> {
-			logger.info("Schemas path: " + prop);
-			String path = this.projectDir != null ? new File(this.projectDir, prop).getAbsolutePath() : prop;
-			config.setSchemasPath(path);
+			logger.info("mlSchemasPath is deprecated as of version 3.13.0; please use mlSchemaPaths instead; schemas path: " + prop);
+			config.setSchemaPaths(buildPathListFromCommaDelimitedString(prop));
+		});
+
+		propertyConsumerMap.put("mlSchemaPaths", (config, prop) -> {
+			logger.info("Schema paths: " + prop);
+			config.setSchemaPaths(buildPathListFromCommaDelimitedString(prop));
 		});
 
 		propertyConsumerMap.put("mlTdeValidationEnabled", (config, prop) -> {
@@ -527,14 +529,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		 */
 		propertyConsumerMap.put("mlModulePaths", (config, prop) -> {
 			logger.info("Module paths: " + prop);
-			String[] paths = prop.split(",");
-			// Ensure we have a modifiable list
-			List<String> list = new ArrayList<>();
-			for (String s : paths) {
-				String path = this.projectDir != null ? new File(projectDir, s).getAbsolutePath() : s;
-				list.add(path);
-			}
-			config.setModulePaths(list);
+			config.setModulePaths(buildPathListFromCommaDelimitedString(prop));
 		});
 
 		propertyConsumerMap.put("mlModuleTimestampsPath", (config, prop) -> {
@@ -753,12 +748,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 
 		propertyConsumerMap.put("mlPluginPaths", (config, prop) -> {
 			logger.info("Paths that plugins will be installed from: " + prop);
-			List<String> paths = new ArrayList<>();
-			for (String s : prop.split(",")) {
-				String path = this.projectDir != null ? new File(projectDir, s).getAbsolutePath() : s;
-				paths.add(path);
-			}
-			config.getPluginConfig().setPluginPaths(paths);
+			config.getPluginConfig().setPluginPaths(buildPathListFromCommaDelimitedString(prop));
 		});
 
 		propertyConsumerMap.put("mlPluginUriPrefix", (config, prop) -> {
@@ -788,6 +778,16 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 				appConfig.setDatabasesWithForestsOnOneHost(set);
 			}
 		}
+	}
+
+	protected List<String> buildPathListFromCommaDelimitedString(String prop) {
+		String[] paths = prop.split(",");
+		List<String> list = new ArrayList<>();
+		for (String s : paths) {
+			String path = this.projectDir != null ? new File(projectDir, s).getAbsolutePath() : s;
+			list.add(path);
+		}
+		return list;
 	}
 
 	protected Map<String, String> buildMapFromCommaDelimitedString(String str) {

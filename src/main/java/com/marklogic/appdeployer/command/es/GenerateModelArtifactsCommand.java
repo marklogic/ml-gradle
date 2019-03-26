@@ -215,7 +215,7 @@ public class GenerateModelArtifactsCommand extends AbstractCommand {
 	protected void generateSchema(AppConfig appConfig, GeneratedCode code) {
 		String schema = code.getSchema();
 		if (schema != null) {
-			File dir = new File(appConfig.getSchemasPath());
+			File dir = new File(appConfig.getSchemaPaths().get(0));
 			dir.mkdirs();
 			File out = new File(dir, code.getTitle() + "-" + code.getVersion() + ".xsd");
 			String logMessage = "Wrote schema to: ";
@@ -243,7 +243,7 @@ public class GenerateModelArtifactsCommand extends AbstractCommand {
 	protected void generateExtractionTemplate(AppConfig appConfig, GeneratedCode code) {
 		String template = code.getExtractionTemplate();
 		if (template != null) {
-			File dir = new File(appConfig.getSchemasPath());
+			File dir = new File(appConfig.getSchemaPaths().get(0));
 			dir.mkdirs();
 			dir = new File(dir, "tde");
 			dir.mkdirs();

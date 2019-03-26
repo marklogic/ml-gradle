@@ -34,7 +34,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		assertEquals("modulesPath2", appConfig.getModulePaths().get(1));
 		assertEquals(testPath + "/path1", appConfig.getConfigDirs().get(0).getBaseDir().getAbsolutePath());
 		assertEquals(testPath + "/path2", appConfig.getConfigDirs().get(1).getBaseDir().getAbsolutePath());
-		assertEquals("schemasPath", appConfig.getSchemasPath());
+		assertEquals("schemasPath", appConfig.getSchemaPaths().get(0));
 
 		File projectDir = new File("src/test/resources/sample-app");
 		final String projectPath = projectDir.getAbsolutePath();
@@ -44,7 +44,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		assertEquals(projectPath + "/modulesPath2", appConfig.getModulePaths().get(1));
 		assertEquals(projectPath + "/path1", appConfig.getConfigDirs().get(0).getBaseDir().getAbsolutePath());
 		assertEquals(projectPath + "/path2", appConfig.getConfigDirs().get(1).getBaseDir().getAbsolutePath());
-		assertEquals(projectPath + "/schemasPath", appConfig.getSchemasPath());
+		assertEquals(projectPath + "/schemasPath", appConfig.getSchemaPaths().get(0));
 	}
 
 	/**
@@ -60,7 +60,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		AppConfig appConfig = sut.newAppConfig();
 		assertEquals("src/main/ml-modules", appConfig.getModulePaths().get(0));
 		assertEquals(testPath + "/src/main/ml-config", appConfig.getConfigDirs().get(0).getBaseDir().getAbsolutePath());
-		assertEquals("src/main/ml-schemas", appConfig.getSchemasPath());
+		assertEquals("src/main/ml-schemas", appConfig.getSchemaPaths().get(0));
 
 		File projectDir = new File("src/test/resources/sample-app");
 		final String projectPath = projectDir.getAbsolutePath();
@@ -68,7 +68,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		appConfig = sut.newAppConfig();
 		assertEquals(projectPath + "/src/main/ml-modules", appConfig.getModulePaths().get(0));
 		assertEquals(projectPath + "/src/main/ml-config", appConfig.getConfigDirs().get(0).getBaseDir().getAbsolutePath());
-		assertEquals(projectPath + "/src/main/ml-schemas", appConfig.getSchemasPath());
+		assertEquals(projectPath + "/src/main/ml-schemas", appConfig.getSchemaPaths().get(0));
 	}
 
 	@Test
@@ -260,7 +260,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		p.setProperty("mlModulesDatabaseName", "my-modules");
 		p.setProperty("mlSchemasDatabaseName", "my-schemas-db");
 		p.setProperty("mlTriggersDatabaseName", "my-triggers-db");
-		p.setProperty("mlSchemasPath", "/my/schemas");
+		p.setProperty("mlSchemaPaths", "/my/schemas,/my/other/schemas");
 		p.setProperty("mlTdeValidationEnabled", "false");
 		p.setProperty("mlDeleteForests", "false");
 		p.setProperty("mlDeleteReplicas", "false");
@@ -374,7 +374,8 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		assertEquals("my-modules", config.getModulesDatabaseName());
 		assertEquals("my-schemas-db", config.getSchemasDatabaseName());
 		assertEquals("my-triggers-db", config.getTriggersDatabaseName());
-		assertEquals("/my/schemas", config.getSchemasPath());
+		assertEquals("/my/schemas", config.getSchemaPaths().get(0));
+		assertEquals("/my/other/schemas", config.getSchemaPaths().get(1));
 		assertFalse(config.isTdeValidationEnabled());
 		assertFalse(config.isDeleteForests());
 		assertFalse(config.isDeleteReplicas());

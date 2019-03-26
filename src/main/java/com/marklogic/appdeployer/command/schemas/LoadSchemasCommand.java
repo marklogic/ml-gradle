@@ -16,6 +16,7 @@ import com.marklogic.mgmt.mapper.ResourceMapper;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.List;
 
 public class LoadSchemasCommand extends AbstractCommand {
 
@@ -25,23 +26,20 @@ public class LoadSchemasCommand extends AbstractCommand {
 
 	@Override
 	public void execute(CommandContext context) {
-		loadSchemasFromSchemasPath(context);
+		loadSchemasFromSchemaPaths(context);
 		loadSchemasFromDatabaseSpecificPaths(context);
 	}
 
 	/**
-	 * This expects a single path to be defined in the AppConfig object. If set, then any files at that path are loaded
-	 * into the schemas database defined by the AppConfig object.
-	 *
 	 * @param context
 	 */
-	protected void loadSchemasFromSchemasPath(CommandContext context) {
+	protected void loadSchemasFromSchemaPaths(CommandContext context) {
 		AppConfig config = context.getAppConfig();
-		final String schemasPath = config.getSchemasPath();
-		if (schemasPath != null && schemasPath.trim().length() > 0) {
-			loadSchemas(config.getSchemasPath(), config.getSchemasDatabaseName(), context);
-		} else {
-			logger.info("Schemas path is empty, so not attempting to load any schemas");
+		List<String> schemaPaths = config.getSchemaPaths();
+		if (schemaPaths != null && !schemaPaths.isEmpty()) {
+			for (String path : schemaPaths) {
+				loadSchemas(path, config.getSchemasDatabaseName(), context);
+			}
 		}
 	}
 

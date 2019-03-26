@@ -51,6 +51,9 @@ class PrepareBundlesTask extends MarkLogicTask {
 				List<String> dataPaths = getAppConfig().getDataConfig().getDataPaths()
 				List<String> newDataPaths = new ArrayList<>()
 
+				List<String> pluginPaths = getAppConfig().getPluginConfig().getPluginPaths()
+				List<String> newPluginPaths = new ArrayList<>()
+
 				for (dir in buildDir.listFiles()) {
 					if (dir.isDirectory()) {
 						File modulesDir = new File(dir, "ml-modules")
@@ -61,6 +64,11 @@ class PrepareBundlesTask extends MarkLogicTask {
 						File dataDir = new File(dir, "ml-data")
 						if (dataDir != null && dataDir.exists()) {
 							newDataPaths.add(dataDir.getAbsolutePath())
+						}
+
+						File pluginsDir = new File(dir, "ml-plugins")
+						if (pluginsDir != null && pluginsDir.exists()) {
+							newPluginPaths.add(pluginsDir.getAbsolutePath())
 						}
 					}
 				}
@@ -78,6 +86,12 @@ class PrepareBundlesTask extends MarkLogicTask {
 					newDataPaths.addAll(dataPaths)
 					getAppConfig().getDataConfig().setDataPaths(newDataPaths)
 					println "Data paths including mlBundle paths: " + getAppConfig().getDataConfig().getDataPaths()
+				}
+
+				if (!newPluginPaths.isEmpty()) {
+					newPluginPaths.addAll(pluginPaths)
+					getAppConfig().getPluginConfig().setPluginPaths(newPluginPaths)
+					println "Plugin paths include mlBundle paths: " + getAppConfig().getPluginConfig().getPluginPaths()
 				}
 			}
 		}

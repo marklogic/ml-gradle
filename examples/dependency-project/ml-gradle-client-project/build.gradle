@@ -21,3 +21,8 @@ repositories {
 dependencies {
 	mlBundle "com.marklogic:example-dependency:1.0.0"
 }
+
+task testPlugin(type: com.marklogic.gradle.task.ServerEvalTask) {
+	description = "Run this to verify that the plugin from the example-dependency bundle was installed correctly; should get 66.67 as a result"
+	javascript = "cts.aggregate('native/varianceplugin', 'variance', cts.elementReference(xs.QName('amount')))"
+}

@@ -34,6 +34,8 @@ import com.marklogic.gradle.task.groups.SetTraceEventsTask
 import com.marklogic.gradle.task.hosts.AssignHostsToGroupsTask
 import com.marklogic.gradle.task.mimetypes.DeployMimetypesTask
 import com.marklogic.gradle.task.mimetypes.UndeployMimetypesTask
+import com.marklogic.gradle.task.plugins.InstallPluginsTask
+import com.marklogic.gradle.task.plugins.UninstallPluginsTask
 import com.marklogic.gradle.task.qconsole.ExportWorkspacesTask
 import com.marklogic.gradle.task.qconsole.ImportWorkspacesTask
 import com.marklogic.gradle.task.restapis.DeployRestApisTask
@@ -224,6 +226,12 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlExportModules", type: ExportModulesTask, group: modulesGroup, description: "Export modules matching a URI pattern of ** (can be overridden via -PuriPattern) from the database " +
 			"defined by mlModulesDatabaseName (can be overridden via -PdatabaseName) to the last path defined by mlModulePaths (can be overridden via -PexportPath). For each module that cannot be exported, " +
 			"an error will be logged; an error will be thrown instead by setting -PlogErrors to false.")
+
+		String pluginsGroup = "ml-gradle Plugin"
+		project.task("mlInstallPlugins", type: InstallPluginsTask, group: pluginsGroup, dependsOn: "mlPrepareBundles",
+			description: "Makes, inserts, and installs system plugins defined in the project and by mlBundle dependencies")
+		project.task("mlUninstallPlugins", type: UninstallPluginsTask, group: pluginsGroup, dependsOn: "mlPrepareBundles",
+			description: "Makes and uninstalls system plugins defined in the project and by mlBundle dependencies")
 
 		String qconsoleGroup = "ml-gradle qconsole"
 		project.task("mlImportWorkspaces", type: ImportWorkspacesTask, group: qconsoleGroup, description: "Import workspaces into qconsole")

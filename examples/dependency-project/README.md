@@ -27,12 +27,12 @@ will be included when the application is deployed:
 
 ```
 Found mlBundle configuration, will extract all of its dependencies to build/mlBundle
-Extracting file: /Users/rrudin/.m2/repository/com/marklogic/example-dependency/1.0.0/example-dependency-1.0.0.jar
     [unzip] Expanding: /Users/rrudin/.m2/repository/com/marklogic/example-dependency/1.0.0/example-dependency-1.0.0.jar into /Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/build/mlBundle
 Finished extracting mlBundle dependencies
-Module paths: [/Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/build/mlBundle/example-dependency/ml-modules, /Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/src/main/ml-modules]
-Data paths: [/Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/build/mlBundle/example-dependency/ml-data, /Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/src/main/ml-data]
-:mlPrepareBundles (Thread[Task worker for ':' Thread 4,5,main]) completed. Took 0.165 secs.
+Module paths including mlBundle paths: [/Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/build/mlBundle/example-dependency/ml-modules, /Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/src/main/ml-modules]
+Data paths including mlBundle paths: [/Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/build/mlBundle/example-dependency/ml-data, /Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/src/main/ml-data]
+Plugin paths include mlBundle paths: [/Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/build/mlBundle/example-dependency/ml-plugins, /Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/src/main/ml-plugins]
+:mlPrepareBundles (Thread[Task worker for ':',5,main]) completed. Took 0.059 secs.
 ```
 
 And you'll see logging like this that indicates that the example-dependency modules were loaded:
@@ -58,10 +58,37 @@ Shutting down ExecutorService
 Writing 2 documents to MarkLogic; port: 8030
 ```
 
+And also some logging like this that indicates that a system plugin was installed:
+
+```
+Writing plugin zip file to URI: /com.marklogic/plugins/varianceplugin.zip
+Writing content for /com.marklogic/plugins/varianceplugin.zip
+Installing plugin with scope 'native' from URI: /com.marklogic/plugins/varianceplugin.zip
+Installed plugin with scope 'native', result: 1
+Finished executing command [com.marklogic.appdeployer.command.plugins.InstallPluginsCommand]
+```
+
 You can then use qconsole to verify that the following documents were inserted:
 
 - In ml-gradle-client-modules: /example.sjs
-- In ml-gradle-client-content: /example/data1.json and /example/data2.json
+- In ml-gradle-client-content: /example/data1.json and /example/data2.json (in addition to the data files including 
+in this project: /testdata/test1.json, /testdata/test2.json, and /testdata/test3.json)
+- In Extensions: /native/scope.xml, /native/varianceplugin/libvarianceplugin.dylib, and /native/varianceplugin/manifest.xml 
+
+Note that ml-gradle-client-content also contains the plugin zip file at /com.marklogic/plugins/varianceplugin.zip . If 
+you don't want that to remain, you can use a custom Gradle task to delete it after the deployment, or use the 
+mlPluginDatabaseName property to store the zip file in a different database.
+
+You can also verify that the plugin was installed correctly by running the following task:
+
+    gradle testPlugin
+    
+Which should return:
+
+```
+> Task :testPlugin
+66.6666666666667
+```
 
 See [Loading data](https://github.com/marklogic-community/ml-app-deployer/wiki/Loading-data) for more
 information on configuring how data is loaded during a deployment.

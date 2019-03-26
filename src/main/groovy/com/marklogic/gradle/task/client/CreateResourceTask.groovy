@@ -94,7 +94,7 @@ declare function delete(
 	        if (!servicesPath) {
 		        List<String> modulePaths = getAppConfig().getModulePaths()
 		        if (modulePaths != null && !modulePaths.isEmpty()) {
-			        // Use the last path so modules aren't written to e.g. mlRestApi paths
+			        // Use the last path so modules aren't written to e.g. mlBundle paths
 			        servicesPath = modulePaths.get(modulePaths.size() - 1) + "/services"
 		        }
 	        }

@@ -16,7 +16,7 @@ include this by default (not every ml-gradle user will use marklogic-unit-test),
       }
     }
 
-Next, the marklogic-unit-test framework is depended on and installed as an "mlRestApi" dependency (the "mlRestApi" configuration
+Next, the marklogic-unit-test framework is depended on and installed as an "mlBundle" dependency (the "mlBundle" configuration
 is a feature of ml-gradle for depending on packages of MarkLogic modules):
 
     repositories {
@@ -24,7 +24,7 @@ is a feature of ml-gradle for depending on packages of MarkLogic modules):
     }
       
     dependencies {
-      mlRestApi "com.marklogic:marklogic-unit-test-modules:0.12.0"
+      mlBundle "com.marklogic:marklogic-unit-test-modules:0.12.0"
     }
 
 ## Running unit tests

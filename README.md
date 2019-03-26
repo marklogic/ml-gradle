@@ -54,7 +54,7 @@ Now deploy it!
 And you should see more ml-gradle logging like this:
 
     :mlDeleteModuleTimestampsFile
-    :mlPrepareRestApiDependencies
+    :mlPrepareBundles
     :mlDeployApp
     :mlPostDeploy UP-TO-DATE
     :mlDeploy

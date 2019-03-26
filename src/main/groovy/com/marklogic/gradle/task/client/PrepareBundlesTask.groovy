@@ -10,17 +10,24 @@ import org.gradle.api.tasks.TaskAction
  * Purpose of this task is to unzip each restApi dependency to the build directory and then register the path of each
  * unzipped directory in AppConfig.modulePaths.
  */
-class PrepareRestApiDependenciesTask extends MarkLogicTask {
+class PrepareBundlesTask extends MarkLogicTask {
 
 	@TaskAction
-	void prepareRestApiDependencies() {
-		String configurationName = "mlRestApi"
+	void prepareBundles() {
+		prepareBundlesForConfiguration("mlRestApi")
+		prepareBundlesForConfiguration("mlBundle")
+	}
+
+	void prepareBundlesForConfiguration(configurationName) {
 		if (getProject().configurations.find { it.name == configurationName }) {
 			Configuration config = getProject().getConfigurations().getAt(configurationName)
 			if (config.files) {
-				println "Found " + configurationName + " configuration, will extract all of its dependencies to build/mlRestApi"
+				println "Found " + configurationName + " configuration, will extract all of its dependencies to build/" + configurationName
 
-				def buildDir = new File("build/mlRestApi")
+				if ("mlRestApi".equals(configurationName)) {
+					println "\nWARNING: mlRestApi is deprecated as of release 3.13.0, please use mlBundle instead, which is a drop-in replacement.\n"
+				}
+				def buildDir = new File("build/" + configurationName)
 				buildDir.delete()
 				buildDir.mkdirs()
 
@@ -59,20 +66,21 @@ class PrepareRestApiDependenciesTask extends MarkLogicTask {
 				}
 
 				// The config paths of the dependencies should be before the original config paths
-				println "Finished extracting mlRestApi dependencies"
+				println "Finished extracting " + configurationName + " dependencies"
 
 				if (!newModulePaths.isEmpty()) {
 					newModulePaths.addAll(modulePaths)
 					getAppConfig().setModulePaths(newModulePaths)
-					println "Module paths: " + getAppConfig().getModulePaths()
+					println "Module paths including mlBundle paths: " + getAppConfig().getModulePaths()
 				}
 
 				if (!newDataPaths.isEmpty()) {
 					newDataPaths.addAll(dataPaths)
 					getAppConfig().getDataConfig().setDataPaths(newDataPaths)
-					println "Data paths: " + getAppConfig().getDataConfig().getDataPaths()
+					println "Data paths including mlBundle paths: " + getAppConfig().getDataConfig().getDataPaths()
 				}
 			}
 		}
 	}
+
 }

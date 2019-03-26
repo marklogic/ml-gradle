@@ -26,13 +26,13 @@ You'll see logging like this that lets you know that the modules and data from t
 will be included when the application is deployed:
 
 ```
-Found mlRestApi configuration, will extract all of its dependencies to build/mlRestApi
+Found mlBundle configuration, will extract all of its dependencies to build/mlBundle
 Extracting file: /Users/rrudin/.m2/repository/com/marklogic/example-dependency/1.0.0/example-dependency-1.0.0.jar
-    [unzip] Expanding: /Users/rrudin/.m2/repository/com/marklogic/example-dependency/1.0.0/example-dependency-1.0.0.jar into /Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/build/mlRestApi
-Finished extracting mlRestApi dependencies
-Module paths: [/Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/build/mlRestApi/example-dependency/ml-modules, /Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/src/main/ml-modules]
-Data paths: [/Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/build/mlRestApi/example-dependency/ml-data, /Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/src/main/ml-data]
-:mlPrepareRestApiDependencies (Thread[Task worker for ':' Thread 4,5,main]) completed. Took 0.165 secs.
+    [unzip] Expanding: /Users/rrudin/.m2/repository/com/marklogic/example-dependency/1.0.0/example-dependency-1.0.0.jar into /Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/build/mlBundle
+Finished extracting mlBundle dependencies
+Module paths: [/Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/build/mlBundle/example-dependency/ml-modules, /Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/src/main/ml-modules]
+Data paths: [/Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/build/mlBundle/example-dependency/ml-data, /Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/src/main/ml-data]
+:mlPrepareBundles (Thread[Task worker for ':' Thread 4,5,main]) completed. Took 0.165 secs.
 ```
 
 And you'll see logging like this that indicates that the example-dependency modules were loaded:
@@ -40,7 +40,7 @@ And you'll see logging like this that indicates that the example-dependency modu
 ```
 Executing command [com.marklogic.appdeployer.command.modules.LoadModulesCommand] with sort order [400]
 Initializing new instance of ModulesLoader
-Loading asset modules from dir: /Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/build/mlRestApi/example-dependency/ml-modules
+Loading asset modules from dir: /Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/build/mlBundle/example-dependency/ml-modules
 Writing 1 files
 Writing: /example.sjs
 Writing 1 documents to MarkLogic; port: 8000; database: ml-gradle-client-modules

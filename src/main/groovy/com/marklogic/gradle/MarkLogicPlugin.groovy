@@ -88,10 +88,12 @@ class MarkLogicPlugin implements Plugin<Project> {
 
 		copyGradlePropertiesToCustomTokensIfRequested(project)
 
+		project.getConfigurations().create("mlBundle")
+		// Per #420, this is deprecated, but still need to create it
 		project.getConfigurations().create("mlRestApi")
 
 		// No group or description on these so they don't show up in "gradle tasks"
-		project.task("mlDeployApp", type: DeployAppTask, dependsOn: ["mlDeleteModuleTimestampsFile", "mlPrepareRestApiDependencies"])
+		project.task("mlDeployApp", type: DeployAppTask, dependsOn: ["mlDeleteModuleTimestampsFile", "mlPrepareBundles"])
 		project.task("mlUndeployApp", type: UndeployAppTask)
 
 		String deployGroup = "ml-gradle Deploy"
@@ -130,7 +132,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlRestartCluster", type: RestartClusterTask, group: clusterGroup, description: "Restart the local cluster")
 
 		String dataGroup = "ml-gradle Data"
-		project.task("mlLoadData", type: LoadDataTask, group: dataGroup, dependsOn: "mlPrepareRestApiDependencies",
+		project.task("mlLoadData", type: LoadDataTask, group: dataGroup, dependsOn: "mlPrepareBundles",
 			description: "Load files as documents into a content database (or on a DHF project, the final database)")
 
 		String dbGroup = "ml-gradle Database"
@@ -141,7 +143,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 			"Note that this includes those created via the deployment of resources such as temporal collections and view schemas. You may want to use mlDeleteUserSchemas instead.")
 		project.task("mlClearTriggersDatabase", type: ClearTriggersDatabaseTask, group: dbGroup, description: "Deletes all documents in the triggers database")
 		project.task("mlDeleteDatabase", type: DeleteDatabaseTask, group: dbGroup, description: "Delete a database along with all of its forests and any replicas; requires -Pconfirm=true to be set so this isn't accidentally executed")
-		project.task("mlDeployDatabases", type: DeployDatabasesTask, group: dbGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Deploy each database, updating it if it exists, in the configuration directory")
+		project.task("mlDeployDatabases", type: DeployDatabasesTask, group: dbGroup, dependsOn: "mlPrepareBundles", description: "Deploy each database, updating it if it exists, in the configuration directory")
 		project.task("mlMergeContentDatabase", type: MergeContentDatabaseTask, group: dbGroup, description: "Merge the database named by mlAppConfig.contentDatabaseName")
 		project.task("mlMergeDatabase", type: MergeDatabaseTask, group: dbGroup, description: "Merge the database named by the project property dbName; e.g. gradle mlMergeDatabase -PdbName=my-database")
 		project.task("mlReindexContentDatabase", type: ReindexContentDatabaseTask, group: dbGroup, description: "Reindex the database named by mlAppConfig.contentDatabaseName")
@@ -168,7 +170,8 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlCreateResource", type: CreateResourceTask, group: devGroup, description: "Create a new resource extension in the modules services directory; use -PresourceName and -PresourceType to set the resource name and type (either xqy or sjs)")
 		project.task("mlCreateTransform", type: CreateTransformTask, group: devGroup, description: "Create a new transform in the modules transforms directory; use -PtransformName and -PtransformType to set the transform name and type (xqy, xsl, or sjs)")
 		project.task("mlExportResources", type: ExportResourcesTask, group: devGroup, description: "Export resources based on a properties file specified via -PpropertiesFile, -Pprefix, or -Pregex; use -PincludeTypes to select resource types to export via a comma-delimited string; use -PexportPath to specify where to export resources to")
-		project.task("mlPrepareRestApiDependencies", type: PrepareRestApiDependenciesTask, group: devGroup, dependsOn: project.configurations["mlRestApi"], description: "Downloads (if necessary) and unzips in the build directory all mlRestApi dependencies")
+		project.task("mlPrepareBundles", type: PrepareBundlesTask, group: devGroup, dependsOn: project.configurations["mlBundle"], description: "Downloads (if necessary) and unzips in the build directory all mlBundle dependencies")
+		project.task("mlPrepareRestApiDependencies", type: PrepareBundlesTask, group: devGroup, dependsOn: project.configurations["mlBundle"], description: "Deprecated in 3.13.0; please use mlPrepareBundles instead")
 		project.task("mlPrintCommands", type: PrintCommandsTask, group: devGroup, description: "Print information about each command used by mlDeploy and mlUndeploy")
 		project.task("mlPrintProperties", type: PrintPropertiesTask, group: devGroup, description: "Print all of the properties supported by ml-gradle")
 		project.task("mlPrintTokens", type: PrintTokensTask, group: devGroup, description: "Print the customTokens map on the mlAppConfig object (typically for debugging purposes)")
@@ -214,7 +217,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlUndeployMimetypes", type: UndeployMimetypesTask, group: mimetypesGroup, description: "Undeploy each mimetype defined in the configuration directory")
 
 		String modulesGroup = "ml-gradle Modules"
-		project.task("mlLoadModules", type: LoadModulesTask, group: modulesGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Loads modules from directories defined by mlAppConfig or via a property on this task").mustRunAfter(["mlClearModulesDatabase"])
+		project.task("mlLoadModules", type: LoadModulesTask, group: modulesGroup, dependsOn: "mlPrepareBundles", description: "Loads modules from directories defined by mlAppConfig or via a property on this task").mustRunAfter(["mlClearModulesDatabase"])
 		project.task("mlReloadModules", group: modulesGroup, dependsOn: ["mlClearModulesDatabase", "mlLoadModules"], description: "Reloads modules by first clearing the modules database and then loading modules")
 		project.task("mlWatch", type: WatchTask, group: modulesGroup, description: "Run a loop that checks for new/modified modules every second and loads any that it finds. To ignore files that are already dirty and only process new changes, include -PignoreDirty=true . ")
 		project.task("mlDeleteModuleTimestampsFile", type: DeleteModuleTimestampsFileTask, group: modulesGroup, description: "Delete the properties file in the build directory that keeps track of when each module was last loaded")
@@ -235,7 +238,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlReloadSchemas", dependsOn: ["mlDeleteUserSchemas", "mlLoadSchemas"], group: schemasGroup, description: "Deletes user schemas via mlDeleteUserSchemas and then loads schemas via mlLoadSchemas")
 
 		String serverGroup = "ml-gradle Server"
-		project.task("mlDeployServers", type: DeployServersTask, group: serverGroup, dependsOn: "mlPrepareRestApiDependencies", description: "Updates the REST API server (if it exists) and deploys each other server, updating it if it exists, in the configuration directory ")
+		project.task("mlDeployServers", type: DeployServersTask, group: serverGroup, dependsOn: "mlPrepareBundles", description: "Updates the REST API server (if it exists) and deploys each other server, updating it if it exists, in the configuration directory ")
 		project.task("mlUndeployOtherServers", type: UndeployOtherServersTask, group: serverGroup, description: "Delete any non-REST API servers (e.g. ODBC and XBC servers) defined by server files in the configuration directory")
 
 		String securityGroup = "ml-gradle Security"

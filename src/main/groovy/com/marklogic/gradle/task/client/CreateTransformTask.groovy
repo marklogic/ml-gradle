@@ -56,7 +56,7 @@ exports.transform = transform;
 	        if (!transformsPath) {
 		        List<String> modulePaths = getAppConfig().getModulePaths()
 		        if (modulePaths != null && !modulePaths.isEmpty()) {
-			        // Use the last path so modules aren't written to e.g. mlRestApi paths
+			        // Use the last path so modules aren't written to e.g. mlBundle paths
 			        transformsPath = modulePaths.get(modulePaths.size() - 1) + "/transforms"
 		        }
 	        }

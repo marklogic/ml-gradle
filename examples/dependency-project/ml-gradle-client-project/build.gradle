@@ -19,5 +19,5 @@ repositories {
 }
 
 dependencies {
-	mlRestApi "com.marklogic:example-dependency:1.0.0"
+	mlBundle "com.marklogic:example-dependency:1.0.0"
 }

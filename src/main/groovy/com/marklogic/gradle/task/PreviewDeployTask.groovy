@@ -34,9 +34,15 @@ class PreviewDeployTask extends DeployAppTask {
 		// Disable loading of any modules
 		getAppConfig().setModulePaths(new ArrayList<String>())
 
-		// Disable loading of schemas from the default path
+		// Disable loading of schemas
 		// Database-specific schema paths are handled by removing instances of LoadSchemasCommand
-		getAppConfig().setSchemasPath(null)
+		getAppConfig().setSchemaPaths(null)
+
+		// Disable loading of data
+		getAppConfig().getDataConfig().setDataPaths(null)
+
+		// Disable installing of plugins
+		getAppConfig().getPluginConfig().setPluginPaths(null)
 	}
 
 	void modifyAppDeployerBeforePreview() {

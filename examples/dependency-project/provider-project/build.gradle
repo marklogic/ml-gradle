@@ -19,6 +19,9 @@ task bundleJar(type: Jar) {
 	from("src/main/ml-plugins") {
 		into("example-dependency/ml-plugins")
 	}
+	from("src/main/ml-schemas") {
+		into("example-dependency/ml-schemas")
+	}
 	destinationDir file("build/libs")
 	baseName "example-dependency"
 }

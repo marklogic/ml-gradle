@@ -1,7 +1,7 @@
 This set of projects demonstrates:
 
-- How a "provider" project can publish a zip of MarkLogic modules and data
-- How an ml-gradle or DHF project can depend on this zip so that the modules and data are automatically included 
+- How a "provider" project can publish a zip of MarkLogic files (modules, data, schemas, or system plugins)
+- How an ml-gradle or DHF project can depend on this zip so that the files are automatically included 
 in an application
 
 ## Publishing the provider 
@@ -31,7 +31,8 @@ Found mlBundle configuration, will extract all of its dependencies to build/mlBu
 Finished extracting mlBundle dependencies
 Module paths including mlBundle paths: [/Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/build/mlBundle/example-dependency/ml-modules, /Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/src/main/ml-modules]
 Data paths including mlBundle paths: [/Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/build/mlBundle/example-dependency/ml-data, /Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/src/main/ml-data]
-Plugin paths include mlBundle paths: [/Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/build/mlBundle/example-dependency/ml-plugins, /Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/src/main/ml-plugins]
+Plugin paths including mlBundle paths: [/Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/build/mlBundle/example-dependency/ml-plugins, /Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/src/main/ml-plugins]
+Schema paths including mlBundle paths: [/Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/build/mlBundle/example-dependency/ml-schemas, /Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/src/main/ml-schemas]
 :mlPrepareBundles (Thread[Task worker for ':',5,main]) completed. Took 0.059 secs.
 ```
 
@@ -68,9 +69,24 @@ Installed plugin with scope 'native', result: 1
 Finished executing command [com.marklogic.appdeployer.command.plugins.InstallPluginsCommand]
 ```
 
+And finally, some logging like this that indicates that schemas were loaded:
+
+```
+Executing command [com.marklogic.appdeployer.command.schemas.LoadSchemasCommand] with sort order [350]
+Loading schemas into database ml-gradle-client-schemas from: /Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/build/mlBundle/example-dependency/ml-schemas
+TDE templates loaded into ml-gradle-client-schemas will be validated against content database ml-gradle-client-content
+Initializing ExecutorService 
+TDE template passed validation: /Users/rrudin/dev/workspace/ml-gradle/examples/dependency-project/ml-gradle-client-project/build/mlBundle/example-dependency/ml-schemas/tde/template1.json
+Writing 1 files
+Writing: /tde/template1.json
+Shutting down ExecutorService
+Writing 1 documents to MarkLogic; port: 8000; database: ml-gradle-client-schemas
+```
+
 You can then use qconsole to verify that the following documents were inserted:
 
-- In ml-gradle-client-modules: /example.sjs
+- In ml-gradle-client-modules: /example.sjs (in addition to the modules included by this project: /my-lib.xqy and /Default/ml-gradle-client/rest-api/properties.xml)
+- In ml-gradle-client-schemas: /tde/template1.json (in addition to the schema file included in this project: /tde/my-template.json)
 - In ml-gradle-client-content: /example/data1.json and /example/data2.json (in addition to the data files including 
 in this project: /testdata/test1.json, /testdata/test2.json, and /testdata/test3.json)
 - In Extensions: /native/scope.xml, /native/varianceplugin/libvarianceplugin.dylib, and /native/varianceplugin/manifest.xml 

@@ -54,6 +54,9 @@ class PrepareBundlesTask extends MarkLogicTask {
 				List<String> pluginPaths = getAppConfig().getPluginConfig().getPluginPaths()
 				List<String> newPluginPaths = new ArrayList<>()
 
+				List<String> schemaPaths = getAppConfig().getSchemaPaths()
+				List<String> newSchemaPaths = new ArrayList<>()
+
 				for (dir in buildDir.listFiles()) {
 					if (dir.isDirectory()) {
 						File modulesDir = new File(dir, "ml-modules")
@@ -69,6 +72,11 @@ class PrepareBundlesTask extends MarkLogicTask {
 						File pluginsDir = new File(dir, "ml-plugins")
 						if (pluginsDir != null && pluginsDir.exists()) {
 							newPluginPaths.add(pluginsDir.getAbsolutePath())
+						}
+
+						File schemasDir = new File(dir, "ml-schemas")
+						if (schemasDir != null && schemasDir.exists()) {
+							newSchemaPaths.add(schemasDir.getAbsolutePath())
 						}
 					}
 				}
@@ -91,7 +99,13 @@ class PrepareBundlesTask extends MarkLogicTask {
 				if (!newPluginPaths.isEmpty()) {
 					newPluginPaths.addAll(pluginPaths)
 					getAppConfig().getPluginConfig().setPluginPaths(newPluginPaths)
-					println "Plugin paths include mlBundle paths: " + getAppConfig().getPluginConfig().getPluginPaths()
+					println "Plugin paths including mlBundle paths: " + getAppConfig().getPluginConfig().getPluginPaths()
+				}
+
+				if (!newSchemaPaths.isEmpty()) {
+					newSchemaPaths.addAll(schemaPaths)
+					getAppConfig().setSchemaPaths(newSchemaPaths)
+					println "Schema paths including mlBundle paths: " + getAppConfig().getSchemaPaths()
 				}
 			}
 		}

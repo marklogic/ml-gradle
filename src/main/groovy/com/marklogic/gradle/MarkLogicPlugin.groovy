@@ -242,7 +242,8 @@ class MarkLogicPlugin implements Plugin<Project> {
 
 		String schemasGroup = "ml-gradle Schemas"
 		project.task("mlDeleteUserSchemas", type: DeleteUserSchemasTask, group: schemasGroup, description: "Delete documents in a schemas database that were not created via the deployment of resources such as temporal collections or view schemas")
-		project.task("mlLoadSchemas", type: LoadSchemasTask, group: schemasGroup, description: "Loads special-purpose data into the schemas database (XSD schemas, Inference rules, and [MarkLogic 9] Extraction Templates)").mustRunAfter("mlDeleteUserSchemas")
+		project.task("mlLoadSchemas", type: LoadSchemasTask, group: schemasGroup, dependsOn: "mlPrepareBundles",
+			description: "Loads files into schema databases, including schema files that are part of mlBundle dependencies").mustRunAfter("mlDeleteUserSchemas")
 		project.task("mlReloadSchemas", dependsOn: ["mlDeleteUserSchemas", "mlLoadSchemas"], group: schemasGroup, description: "Deletes user schemas via mlDeleteUserSchemas and then loads schemas via mlLoadSchemas")
 
 		String serverGroup = "ml-gradle Server"

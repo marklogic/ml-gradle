@@ -18,7 +18,7 @@ class PrepareRestApiDependenciesTask extends MarkLogicTask {
 		if (getProject().configurations.find { it.name == configurationName }) {
 			Configuration config = getProject().getConfigurations().getAt(configurationName)
 			if (config.files) {
-				println "Found " + configurationName + " configuration, will unzip all of its dependencies to build/mlRestApi"
+				println "Found " + configurationName + " configuration, will extract all of its dependencies to build/mlRestApi"
 
 				def buildDir = new File("build/mlRestApi")
 				buildDir.delete()
@@ -35,24 +35,43 @@ class PrepareRestApiDependenciesTask extends MarkLogicTask {
 				}
 
 				for (f in config.files) {
-					println "Unzipping file: " + f.getAbsolutePath()
 					ant.unzip(src: f, dest: buildDir, overwrite: "true")
 				}
 
-				List<String> modulePaths = getAppConfig().modulePaths
-				List<String> newModulePaths = new ArrayList<String>()
+				List<String> modulePaths = getAppConfig().getModulePaths()
+				List<String> newModulePaths = new ArrayList<>()
+
+				List<String> dataPaths = getAppConfig().getDataConfig().getDataPaths()
+				List<String> newDataPaths = new ArrayList<>()
 
 				for (dir in buildDir.listFiles()) {
 					if (dir.isDirectory()) {
-						newModulePaths.add(new File(dir, "ml-modules").getAbsolutePath())
+						File modulesDir = new File(dir, "ml-modules")
+						if (modulesDir != null && modulesDir.exists()) {
+							newModulePaths.add(modulesDir.getAbsolutePath())
+						}
+
+						File dataDir = new File(dir, "ml-data")
+						if (dataDir != null && dataDir.exists()) {
+							newDataPaths.add(dataDir.getAbsolutePath())
+						}
 					}
 				}
 
 				// The config paths of the dependencies should be before the original config paths
-				newModulePaths.addAll(modulePaths)
-				getAppConfig().setModulePaths(newModulePaths)
+				println "Finished extracting mlRestApi dependencies"
 
-				println "Finished unzipping mlRestApi dependencies; will now include modules at " + getAppConfig().modulePaths + "\n"
+				if (!newModulePaths.isEmpty()) {
+					newModulePaths.addAll(modulePaths)
+					getAppConfig().setModulePaths(newModulePaths)
+					println "Module paths: " + getAppConfig().getModulePaths()
+				}
+
+				if (!newDataPaths.isEmpty()) {
+					newDataPaths.addAll(dataPaths)
+					getAppConfig().getDataConfig().setDataPaths(newDataPaths)
+					println "Data paths: " + getAppConfig().getDataConfig().getDataPaths()
+				}
 			}
 		}
 	}

@@ -18,6 +18,7 @@ import com.marklogic.gradle.task.cluster.*
 import com.marklogic.gradle.task.configuration.DeployConfigurationsTask
 import com.marklogic.gradle.task.cpf.DeployCpfTask
 import com.marklogic.gradle.task.cpf.LoadDefaultPipelinesTask
+import com.marklogic.gradle.task.data.LoadDataTask
 import com.marklogic.gradle.task.databases.*
 import com.marklogic.gradle.task.datamovement.*
 import com.marklogic.gradle.task.es.GenerateModelArtifactsTask
@@ -127,6 +128,10 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlEnableSslFips", type: EnableSslFipsTask, group: clusterGroup, description: "Enable SSL FIPS across the cluster")
 		project.task("mlRemoveHost", type: RemoveHostTask, group: clusterGroup, description: "Remove a host from the cluster; must define 'host' property")
 		project.task("mlRestartCluster", type: RestartClusterTask, group: clusterGroup, description: "Restart the local cluster")
+
+		String dataGroup = "ml-gradle Data"
+		project.task("mlLoadData", type: LoadDataTask, group: dataGroup, dependsOn: "mlPrepareRestApiDependencies",
+			description: "Load files as documents into a content database (or on a DHF project, the final database)")
 
 		String dbGroup = "ml-gradle Database"
 		project.task("mlClearContentDatabase", type: ClearContentDatabaseTask, group: dbGroup, description: "Deletes all documents in the content database; requires -Pconfirm=true to be set so this isn't accidentally executed")

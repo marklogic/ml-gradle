@@ -22,7 +22,8 @@ class PrepareBundlesTask extends MarkLogicTask {
 		if (getProject().configurations.find { it.name == configurationName }) {
 			Configuration config = getProject().getConfigurations().getAt(configurationName)
 			if (config.files) {
-				println "Found " + configurationName + " configuration, will extract all of its dependencies to build/" + configurationName
+
+				getLogger().info("Found " + configurationName + " configuration, will extract all of its dependencies to build/" + configurationName)
 
 				if ("mlRestApi".equals(configurationName)) {
 					println "\nWARNING: mlRestApi is deprecated as of release 3.13.0, please use mlBundle instead, which is a drop-in replacement.\n"
@@ -82,30 +83,30 @@ class PrepareBundlesTask extends MarkLogicTask {
 				}
 
 				// The config paths of the dependencies should be before the original config paths
-				println "Finished extracting " + configurationName + " dependencies"
+				getLogger().info("Finished extracting " + configurationName + " dependencies")
 
 				if (!newModulePaths.isEmpty()) {
 					newModulePaths.addAll(modulePaths)
 					getAppConfig().setModulePaths(newModulePaths)
-					println "Module paths including mlBundle paths: " + getAppConfig().getModulePaths()
+					getLogger().info("Module paths including mlBundle paths: " + getAppConfig().getModulePaths())
 				}
 
 				if (!newDataPaths.isEmpty()) {
 					newDataPaths.addAll(dataPaths)
 					getAppConfig().getDataConfig().setDataPaths(newDataPaths)
-					println "Data paths including mlBundle paths: " + getAppConfig().getDataConfig().getDataPaths()
+					getLogger().info("Data paths including mlBundle paths: " + getAppConfig().getDataConfig().getDataPaths())
 				}
 
 				if (!newPluginPaths.isEmpty()) {
 					newPluginPaths.addAll(pluginPaths)
 					getAppConfig().getPluginConfig().setPluginPaths(newPluginPaths)
-					println "Plugin paths including mlBundle paths: " + getAppConfig().getPluginConfig().getPluginPaths()
+					getLogger().info("Plugin paths including mlBundle paths: " + getAppConfig().getPluginConfig().getPluginPaths())
 				}
 
 				if (!newSchemaPaths.isEmpty()) {
 					newSchemaPaths.addAll(schemaPaths)
 					getAppConfig().setSchemaPaths(newSchemaPaths)
-					println "Schema paths including mlBundle paths: " + getAppConfig().getSchemaPaths()
+					getLogger().info("Schema paths including mlBundle paths: " + getAppConfig().getSchemaPaths())
 				}
 			}
 		}

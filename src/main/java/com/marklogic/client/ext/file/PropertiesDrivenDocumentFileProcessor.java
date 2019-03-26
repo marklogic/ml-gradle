@@ -16,6 +16,8 @@ import java.util.Properties;
  */
 public abstract class PropertiesDrivenDocumentFileProcessor extends LoggingObject implements DocumentFileProcessor, FileFilter {
 
+	protected final static String WILDCARD_KEY = "*";
+
 	private String propertiesFilename;
 
 	// Used to avoid checking for and loading the properties for every file in a directory

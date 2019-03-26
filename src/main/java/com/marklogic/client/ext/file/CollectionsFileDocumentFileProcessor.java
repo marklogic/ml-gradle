@@ -9,6 +9,8 @@ import java.util.Properties;
  */
 public class CollectionsFileDocumentFileProcessor extends PropertiesDrivenDocumentFileProcessor {
 
+	private String delimiter = ",";
+
 	public CollectionsFileDocumentFileProcessor() {
 		this("collections.properties");
 	}
@@ -22,7 +24,20 @@ public class CollectionsFileDocumentFileProcessor extends PropertiesDrivenDocume
 		String name = documentFile.getFile().getName();
 		if (properties.containsKey(name)) {
 			String value = properties.getProperty(name);
-			documentFile.getDocumentMetadata().withCollections(value.split(","));
+			documentFile.getDocumentMetadata().withCollections(value.split(delimiter));
 		}
+
+		if (properties.containsKey(WILDCARD_KEY)) {
+			String value = properties.getProperty(WILDCARD_KEY);
+			documentFile.getDocumentMetadata().withCollections(value.split(delimiter));
+		}
+	}
+
+	public String getDelimiter() {
+		return delimiter;
+	}
+
+	public void setDelimiter(String delimiter) {
+		this.delimiter = delimiter;
 	}
 }

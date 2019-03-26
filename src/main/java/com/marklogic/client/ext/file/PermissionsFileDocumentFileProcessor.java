@@ -33,6 +33,11 @@ public class PermissionsFileDocumentFileProcessor extends PropertiesDrivenDocume
 			String value = properties.getProperty(name);
 			documentPermissionsParser.parsePermissions(value, documentFile.getDocumentMetadata().getPermissions());
 		}
+
+		if (properties.containsKey(WILDCARD_KEY)) {
+			String value = properties.getProperty(WILDCARD_KEY);
+			documentPermissionsParser.parsePermissions(value, documentFile.getDocumentMetadata().getPermissions());
+		}
 	}
 
 	public void setDocumentPermissionsParser(DocumentPermissionsParser documentPermissionsParser) {

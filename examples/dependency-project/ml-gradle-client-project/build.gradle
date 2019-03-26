@@ -1,10 +1,9 @@
 buildscript {
 	repositories {
-		mavenLocal()
 		jcenter()
 	}
 	dependencies {
-		classpath "com.marklogic:ml-gradle:3.13.dev"
+		classpath "com.marklogic:ml-gradle:3.13.beta1"
 	}
 }
 

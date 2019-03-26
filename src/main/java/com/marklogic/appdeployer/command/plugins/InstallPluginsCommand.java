@@ -131,12 +131,13 @@ public class InstallPluginsCommand extends AbstractUndoableCommand {
 
 	protected void installPlugin(String uri, AppConfig appConfig, DatabaseClient client) {
 		final String scope = appConfig.getPluginConfig().getScope();
+		final String script = appConfig.getPluginConfig().getInstallScript();
 		ServerEvaluationCall eval = client
 			.newServerEval()
-			.xquery(appConfig.getPluginConfig().getInstallScript())
+			.xquery(script)
 			.addVariable("uri", uri)
 			.addVariable("scope", scope);
-		logger.info(format("Installing plugin with scope '%s' from URI: %s", scope, uri));
+		logger.info(format("Installing plugin with scope '%s' from URI '%s' via script: %s", scope, uri, script));
 		String result = eval.evalAs(String.class);
 		logger.info(format("Installed plugin with scope '%s', result: %s", scope, result));
 	}
@@ -179,13 +180,18 @@ public class InstallPluginsCommand extends AbstractUndoableCommand {
 
 	protected void uninstallPlugin(String pluginName, AppConfig appConfig, DatabaseClient client) {
 		final String scope = appConfig.getPluginConfig().getScope() + "/" + pluginName;
+		final String script = appConfig.getPluginConfig().getUninstallScript();
 		ServerEvaluationCall eval = client
 			.newServerEval()
-			.xquery(appConfig.getPluginConfig().getUninstallScript())
+			.xquery(script)
 			.addVariable("scope", scope);
-		logger.info(format("Uninstalling plugin with scope '%s'", scope));
+		logger.info(format("Uninstalling plugin with scope '%s' via script: %s", scope, script));
 		String result = eval.evalAs(String.class);
-		logger.info(format("Uninstalled plugin with scope '%s', result: %s", scope, result));
+		if (result != null && result.trim().length() > 0) {
+			logger.info(format("Uninstalled plugin with scope '%s', result: %s", scope, result));
+		} else {
+			logger.info(format("Uninstalled plugin with scope '%s'", scope));
+		}
 	}
 
 	/**

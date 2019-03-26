@@ -15,6 +15,7 @@ import com.marklogic.appdeployer.command.cma.DeployConfigurationsCommand;
 import com.marklogic.appdeployer.command.cpf.DeployCpfConfigsCommand;
 import com.marklogic.appdeployer.command.cpf.DeployDomainsCommand;
 import com.marklogic.appdeployer.command.cpf.DeployPipelinesCommand;
+import com.marklogic.appdeployer.command.data.LoadDataCommand;
 import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.flexrep.DeployConfigsCommand;
@@ -27,6 +28,7 @@ import com.marklogic.appdeployer.command.hosts.AssignHostsToGroupsCommand;
 import com.marklogic.appdeployer.command.mimetypes.DeployMimetypesCommand;
 import com.marklogic.appdeployer.command.modules.DeleteTestModulesCommand;
 import com.marklogic.appdeployer.command.modules.LoadModulesCommand;
+import com.marklogic.appdeployer.command.plugins.InstallPluginsCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.appdeployer.command.schemas.LoadSchemasCommand;
 import com.marklogic.appdeployer.command.security.DeployAmpsCommand;
@@ -128,6 +130,11 @@ public class CommandMapBuilder {
 		cpfCommands.add(new DeployPipelinesCommand());
 		map.put("mlCpfCommands", cpfCommands);
 
+		// Data
+		List<Command> dataCommands = new ArrayList<>();
+		dataCommands.add(new LoadDataCommand());
+		map.put("mlDataCommands", dataCommands);
+
 		// Flexrep
 		List<Command> flexrepCommands = new ArrayList<Command>();
 		flexrepCommands.add(new DeployConfigsCommand());
@@ -159,6 +166,11 @@ public class CommandMapBuilder {
 		replicaCommands.add(new ConfigureForestReplicasCommand());
 		map.put("mlForestReplicaCommands", replicaCommands);
 
+		// Plugins
+		List<Command> pluginCommands = new ArrayList<>();
+		pluginCommands.add(new InstallPluginsCommand());
+		map.put("mlPluginCommands", pluginCommands);
+		
 		// Tasks
 		List<Command> taskCommands = new ArrayList<Command>();
 		taskCommands.add(new DeployScheduledTasksCommand());

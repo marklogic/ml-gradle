@@ -1334,4 +1334,28 @@ public class AppConfig {
 	public void setSchemaPaths(List<String> schemaPaths) {
 		this.schemaPaths = schemaPaths;
 	}
+
+	/**
+	 * With the 3.13.0 release, this should no longer be used, as it necessarily has to clear out the current list
+	 * of schema paths in order to set the list to the single path passed in.
+	 *
+	 * @param path
+	 */
+	@Deprecated
+	public void setSchemasPath(String path) {
+    	List<String> paths = new ArrayList<>();
+    	paths.add(path);
+    	setSchemaPaths(paths);
+	}
+
+	/**
+	 * @return the last path in schemaPaths, if any exist
+	 */
+	@Deprecated
+	public String getSchemasPath() {
+		if (schemaPaths == null || schemaPaths.isEmpty()) {
+			return null;
+		}
+		return schemaPaths.get(schemaPaths.size() - 1);
+	}
 }

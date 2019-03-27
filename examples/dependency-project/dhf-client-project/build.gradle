@@ -6,7 +6,7 @@ buildscript {
 		}
 	}
 	dependencies {
-		classpath "com.marklogic:ml-gradle:3.13.beta1"
+		classpath "com.marklogic:ml-gradle:3.13.0"
 		classpath "gradle.plugin.com.marklogic:ml-data-hub:4.2.2"
 	}
 }

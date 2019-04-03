@@ -23,8 +23,6 @@ import java.util.List;
  */
 public abstract class BaseModulesFinder extends LoggingObject implements ModulesFinder {
 
-    private FilenameFilter transformFilenameFilter = new TransformFilenameFilter();
-    private FilenameFilter namespaceFilenameFilter = new NamespaceFilenameFilter();
 	private ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
     /**
@@ -122,20 +120,25 @@ public abstract class BaseModulesFinder extends LoggingObject implements Modules
 	}
 
 	protected void addOptions(Modules modules, String baseDir) {
-        modules.setOptions(findResources("options modules", baseDir, optionsPath + "/*.*"));
+        modules.setOptions(findResources("options modules", baseDir,
+	        optionsPath + "/*.xml",
+	        optionsPath + "/*.json"
+        ));
     }
 
 	protected void addServices(Modules modules, String baseDir) {
 		modules.setServices(findResources("service modules", baseDir,
 			servicesPath + "/*.xq*",
-			servicesPath + "/*.sjs"));
+			servicesPath + "/*.sjs"
+		));
 	}
 
 	protected void addTransforms(Modules modules, String baseDir) {
         modules.setTransforms(findResources("transform modules", baseDir,
 			transformsPath + "/*.xq*",
 	        transformsPath + "/*.xsl*",
-	        transformsPath + "/*.sjs"));
+	        transformsPath + "/*.sjs"
+        ));
     }
 
 	/**
@@ -164,23 +167,6 @@ public abstract class BaseModulesFinder extends LoggingObject implements Modules
 		}
 		return list;
 	}
-
-
-	public FilenameFilter getTransformFilenameFilter() {
-        return transformFilenameFilter;
-    }
-
-    public void setTransformFilenameFilter(FilenameFilter transformFilenameFilter) {
-        this.transformFilenameFilter = transformFilenameFilter;
-    }
-
-    public FilenameFilter getNamespaceFilenameFilter() {
-        return namespaceFilenameFilter;
-    }
-
-    public void setNamespaceFilenameFilter(FilenameFilter namespaceFilenameFilter) {
-        this.namespaceFilenameFilter = namespaceFilenameFilter;
-    }
 
     public void setServicesPath(String servicesPath) {
         this.servicesPath = servicesPath;
@@ -226,20 +212,4 @@ public abstract class BaseModulesFinder extends LoggingObject implements Modules
 	}
 
 	protected abstract Modules findModulesWithResolvedBaseDir(String resolvedBaseDir);
-}
-
-class TransformFilenameFilter implements FilenameFilter {
-
-    @Override
-    public boolean accept(File dir, String name) {
-        return FilenameUtil.isXslFile(name) || FilenameUtil.isXqueryFile(name) || FilenameUtil.isJavascriptFile(name);
-    }
-}
-
-class NamespaceFilenameFilter implements FilenameFilter {
-
-    @Override
-    public boolean accept(File dir, String name) {
-        return true;
-    }
 }

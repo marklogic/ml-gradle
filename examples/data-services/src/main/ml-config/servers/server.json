@@ -1,11 +1,11 @@
 {
-  "server-name" : "my-app",
+  "server-name" : "%%NAME%%",
   "group-name" : "Default",
   "server-type" : "http",
   "enabled" : true,
   "root" : "/",
   "port" : 8099,
   "authentication" : "digest",
-  "content-database" : "Documents",
-  "modules-database" : "my-app-modules"
+  "content-database" : "%%DATABASE%%",
+  "modules-database" : "%%MODULES_DATABASE%%"
 }

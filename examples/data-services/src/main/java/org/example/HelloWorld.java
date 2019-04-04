@@ -1,4 +1,4 @@
-package com.acme;
+package org.example;
 
 // IMPORTANT: Do not edit. This file is generated.
 

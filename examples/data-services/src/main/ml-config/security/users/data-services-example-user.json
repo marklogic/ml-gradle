@@ -1,0 +1,8 @@
+{
+	"user-name": "data-services-example-user",
+	"description": "Example of the minimum set of roles needed to invoke a Data Service",
+	"password": "password",
+	"role": [
+		"rest-extension-user"
+	]
+}

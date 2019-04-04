@@ -1,4 +1,4 @@
 {
   "endpointDirectory": "/helloWorld/",
-  "$javaClass": "com.acme.HelloWorld"
+  "$javaClass": "org.example.HelloWorld"
 }

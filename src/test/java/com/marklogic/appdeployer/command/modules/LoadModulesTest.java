@@ -15,11 +15,11 @@ import java.util.regex.Pattern;
 
 public class LoadModulesTest extends AbstractAppDeployerTest {
 
-	private XccTemplate xccTemplate;
+	private XccTemplate modulesXccTemplate;
 
 	@Before
 	public void setup() {
-		xccTemplate = new XccTemplate(appConfig.getHost(), appConfig.getAppServicesPort(), appConfig.getRestAdminUsername(),
+		modulesXccTemplate = new XccTemplate(appConfig.getHost(), appConfig.getAppServicesPort(), appConfig.getRestAdminUsername(),
 			appConfig.getRestAdminPassword(), appConfig.getModulesDatabaseName());
 	}
 
@@ -71,12 +71,11 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void loadModulesFromMultiplePaths() {
-		// Setting batch size to make sure nothing blows up
+		// Setting batch size just to verify that nothing blows up when doing so
 		appConfig.setModulesLoaderBatchSize(1);
 		appConfig.getModulePaths().add("src/test/resources/sample-app/build/mlRestApi/some-library/ml-modules");
 
 		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
-
 		appDeployer.deploy(appConfig);
 
 		assertModuleExistsWithDefaultPermissions("sample-lib is loaded from /ext in the default path",
@@ -93,7 +92,7 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 
 		appDeployer.deploy(appConfig);
 
-		PermissionsFragment perms = getDocumentPermissions("/ext/sample-lib.xqy", xccTemplate);
+		PermissionsFragment perms = getDocumentPermissions("/ext/sample-lib.xqy", modulesXccTemplate);
 		perms.assertPermissionCount(6);
 
 		// Default permissions set by AppConfig
@@ -126,10 +125,10 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
 		appDeployer.deploy(appConfig);
 
-		assertEquals("true", xccTemplate.executeAdhocQuery("doc-available('/ext/lib/test.xqy')"));
-		assertEquals("false", xccTemplate.executeAdhocQuery("doc-available('/ext/lib/test2.xqy')"));
+		assertEquals("true", modulesXccTemplate.executeAdhocQuery("doc-available('/ext/lib/test.xqy')"));
+		assertEquals("false", modulesXccTemplate.executeAdhocQuery("doc-available('/ext/lib/test2.xqy')"));
 
-		String xml = xccTemplate.executeAdhocQuery("doc('/ext/lib/test.xqy')");
+		String xml = modulesXccTemplate.executeAdhocQuery("doc('/ext/lib/test.xqy')");
 		Fragment f = parse(xml);
 		f.assertElementValue("/test/color", "red");
 		f.assertElementValue("/test/description", "red description");
@@ -146,7 +145,7 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 		String[] uris = new String[]{"/Default/sample-app/rest-api/options/sample-app-options.xml",
 			"/Default/sample-app/rest-api/options/sample-app-options.xml"};
 		for (String uri : uris) {
-			assertEquals("true", xccTemplate.executeAdhocQuery(format("doc-available('%s')", uri)));
+			assertEquals("true", modulesXccTemplate.executeAdhocQuery(format("doc-available('%s')", uri)));
 		}
 	}
 
@@ -160,7 +159,7 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 		appDeployer.deploy(appConfig);
 
 		String xquery = "fn:count(cts:uri-match('/ext/**.xqy'))";
-		assertEquals(1, Integer.parseInt(xccTemplate.executeAdhocQuery(xquery)));
+		assertEquals(1, Integer.parseInt(modulesXccTemplate.executeAdhocQuery(xquery)));
 	}
 
 	@Test
@@ -172,11 +171,11 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 
 		String xquery = "fn:count(cts:uris((), (), cts:true-query()))";
 		assertEquals("Should have the 3 /ext modules plus the REST API properties file, which was loaded when the REST server was created",
-			4, Integer.parseInt(xccTemplate.executeAdhocQuery(xquery)));
+			4, Integer.parseInt(modulesXccTemplate.executeAdhocQuery(xquery)));
 	}
 
 	private void assertModuleExistsWithDefaultPermissions(String message, String uri) {
-		assertEquals(message, "true", xccTemplate.executeAdhocQuery(format("fn:doc-available('%s')", uri)));
+		assertEquals(message, "true", modulesXccTemplate.executeAdhocQuery(format("fn:doc-available('%s')", uri)));
 		assertDefaultPermissionsExists(uri);
 	}
 
@@ -187,7 +186,7 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 	 * always present, at least on 8.0-6.3 and 9.0-1.1, which seems like a bug.
 	 */
 	private void assertDefaultPermissionsExists(String uri) {
-		PermissionsFragment perms = getDocumentPermissions(uri, xccTemplate);
+		PermissionsFragment perms = getDocumentPermissions(uri, modulesXccTemplate);
 		perms.assertPermissionCount(5);
 		perms.assertPermissionExists("rest-admin", "read");
 		perms.assertPermissionExists("rest-admin", "update");

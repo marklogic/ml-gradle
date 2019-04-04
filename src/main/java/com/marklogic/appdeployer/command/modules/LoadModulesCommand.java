@@ -6,10 +6,11 @@ import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.ext.modulesloader.ModulesLoader;
+import com.marklogic.client.ext.modulesloader.impl.DefaultModulesFinder;
 import com.marklogic.client.ext.modulesloader.impl.DefaultModulesLoader;
 import com.marklogic.client.ext.modulesloader.impl.TestServerModulesFinder;
 
-import java.io.File;
+import java.util.List;
 
 /**
  * Command for loading modules via an instance of DefaultModulesLoader, which depends on an instance of XccAssetLoader -
@@ -60,16 +61,12 @@ public class LoadModulesCommand extends AbstractCommand {
 		AppConfig config = context.getAppConfig();
 		DatabaseClient client = config.newDatabaseClient();
 
-		try {
-			for (String modulesPath : config.getModulePaths()) {
-				logger.info("Loading asset modules from dir: " + modulesPath);
-				modulesLoader.loadModules(modulesPath, new AssetModulesFinder(), client);
-			}
+		final List<String> pathsList = config.getModulePaths();
+		final String[] pathsArray = pathsList.toArray(new String[]{});
 
-			for (String modulesPath : config.getModulePaths()) {
-				logger.info("Loading all non-asset modules from dir: " + modulesPath);
-				modulesLoader.loadModules(modulesPath, new AllButAssetsModulesFinder(), client);
-			}
+		try {
+			logger.info("Loading modules from paths: " + pathsList);
+			modulesLoader.loadModules(client, new DefaultModulesFinder(), pathsArray);
 		} finally {
 			client.release();
 		}
@@ -86,10 +83,8 @@ public class LoadModulesCommand extends AbstractCommand {
 		DatabaseClient client = config.newTestDatabaseClient();
 		ModulesLoader testLoader = buildTestModulesLoader(context);
 		try {
-			for (String modulesPath : config.getModulePaths()) {
-				logger.info("Loading modules into test server from dir: " + modulesPath);
-				testLoader.loadModules(modulesPath, new TestServerModulesFinder(), client);
-			}
+			logger.info("Loading modules into test server from paths: " + config.getModulePaths());
+			testLoader.loadModules(client, new TestServerModulesFinder(), config.getModulePaths().toArray(new String[]{}));
 		} finally {
 			client.release();
 		}

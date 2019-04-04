@@ -127,18 +127,45 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	 * because the /v1/ext endpoint is too slow when there are e.g. hundreds of modules or more - asset modules are
 	 * instead loaded via AssetFileLoader.
 	 */
-	public Set<Resource> loadModules(String baseDir, ModulesFinder modulesFinder, DatabaseClient client) {
+	@Override
+	public Set<Resource> loadModules(DatabaseClient client, ModulesFinder modulesFinder, String... paths) {
+		List<String> pathsList = Arrays.asList(paths);
+
 		if (logger.isDebugEnabled()) {
-			logger.debug("Loading modules from base directory: " + baseDir);
+			logger.debug("Loading modules from paths: " + pathsList);
 		}
+
 		setDatabaseClient(client);
 
 		if (modulesManager != null) {
 			modulesManager.initialize();
 		}
 
-		Modules modules = modulesFinder.findModules(baseDir);
+		Modules allModules = new Modules();
+		for (String path : paths) {
+			allModules.addModules(modulesFinder.findModules(path));
+		}
 
+		if (logger.isDebugEnabled()) {
+			logger.debug("Finished loading modules from paths: " + pathsList);
+		}
+
+		return loadModules(allModules);
+	}
+
+	/**
+	 * Just delegates to the loadModules method that takes an array of paths.
+	 *
+	 * @param baseDir
+	 * @param modulesFinder
+	 * @param client
+	 * @return
+	 */
+	public Set<Resource> loadModules(String baseDir, ModulesFinder modulesFinder, DatabaseClient client) {
+		return loadModules(client, modulesFinder, baseDir);
+	}
+
+	protected Set<Resource> loadModules(Modules modules) {
 		if (taskExecutor == null) {
 			initializeDefaultTaskExecutor();
 		}
@@ -154,10 +181,6 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 
 		waitForTaskExecutorToFinish();
 		rethrowRestModulesFailureIfOneExists();
-
-		if (logger.isDebugEnabled()) {
-			logger.debug("Finished loading modules from base directory: " + baseDir);
-		}
 
 		return loadedModules;
 	}

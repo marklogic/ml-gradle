@@ -1,73 +1,87 @@
 package com.marklogic.client.ext.modulesloader;
 
-import java.util.List;
-
 import org.springframework.core.io.Resource;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Modules {
 
-    private List<Resource> assets;
-    private List<Resource> services;
-    private List<Resource> assetDirectories;
-    private List<Resource> transforms;
-    private List<Resource> options;
-    private List<Resource> namespaces;
-    private Resource propertiesFile;
+	private List<Resource> assetDirectories;
+	private List<Resource> namespaces;
+	private List<Resource> options;
+	private List<Resource> services;
+	private List<Resource> transforms;
+	private Resource propertiesFile;
 
-    public List<Resource> getServices() {
-        return services;
-    }
+	public void addModules(Modules modules) {
+		assetDirectories = addLists(assetDirectories, modules.getAssetDirectories());
+		namespaces = addLists(namespaces, modules.getNamespaces());
+		options = addLists(options, modules.getOptions());
+		services = addLists(services, modules.getServices());
+		transforms = addLists(transforms, modules.getTransforms());
+		if (modules.getPropertiesFile() != null) {
+			propertiesFile = modules.getPropertiesFile();
+		}
+	}
 
-    public List<Resource> getTransforms() {
-        return transforms;
-    }
+	protected List<Resource> addLists(List<Resource> myList, List<Resource> otherList) {
+		if (otherList == null) {
+			return myList;
+		}
+		if (myList == null) {
+			myList = new ArrayList<>();
+		}
+		myList.addAll(otherList);
+		return myList;
+	}
 
-    public List<Resource> getOptions() {
-        return options;
-    }
+	public List<Resource> getServices() {
+		return services;
+	}
 
-    public void setServices(List<Resource> resources) {
-        this.services = resources;
-    }
+	public List<Resource> getTransforms() {
+		return transforms;
+	}
 
-    public void setTransforms(List<Resource> transforms) {
-        this.transforms = transforms;
-    }
+	public List<Resource> getOptions() {
+		return options;
+	}
 
-    public void setOptions(List<Resource> queryOptions) {
-        this.options = queryOptions;
-    }
+	public void setServices(List<Resource> resources) {
+		this.services = resources;
+	}
 
-    public List<Resource> getNamespaces() {
-        return namespaces;
-    }
+	public void setTransforms(List<Resource> transforms) {
+		this.transforms = transforms;
+	}
 
-    public void setNamespaces(List<Resource> namespaces) {
-        this.namespaces = namespaces;
-    }
+	public void setOptions(List<Resource> queryOptions) {
+		this.options = queryOptions;
+	}
 
-    public Resource getPropertiesFile() {
-        return propertiesFile;
-    }
+	public List<Resource> getNamespaces() {
+		return namespaces;
+	}
 
-    public void setPropertiesFile(Resource propertiesFile) {
-        this.propertiesFile = propertiesFile;
-    }
+	public void setNamespaces(List<Resource> namespaces) {
+		this.namespaces = namespaces;
+	}
 
-    public List<Resource> getAssetDirectories() {
-        return assetDirectories;
-    }
+	public Resource getPropertiesFile() {
+		return propertiesFile;
+	}
 
-    public void setAssetDirectories(List<Resource> assetDirectories) {
-        this.assetDirectories = assetDirectories;
-    }
+	public void setPropertiesFile(Resource propertiesFile) {
+		this.propertiesFile = propertiesFile;
+	}
 
-    public List<Resource> getAssets() {
-        return assets;
-    }
+	public List<Resource> getAssetDirectories() {
+		return assetDirectories;
+	}
 
-    public void setAssets(List<Resource> assets) {
-        this.assets = assets;
-    }
+	public void setAssetDirectories(List<Resource> assetDirectories) {
+		this.assetDirectories = assetDirectories;
+	}
 
 }

@@ -337,6 +337,15 @@ public class Database extends Resource {
 		return otherName.equals(schemaDatabase) || otherName.equals(triggersDatabase) || otherName.equals(securityDatabase);
 	}
 
+	/**
+	 * @return true if this database depends on any other database
+	 */
+	public boolean hasDatabaseDependencies() {
+		return (schemaDatabase != null && schemaDatabase.trim().length() > 0) ||
+			(triggersDatabase != null && triggersDatabase.trim().length() > 0) ||
+			(securityDatabase != null && securityDatabase.trim().length() > 0);
+	}
+
 	public String getDatabaseName() {
 		return databaseName;
 	}

@@ -43,15 +43,45 @@ public class DeployDatabaseCommandComparator extends LoggingObject implements Co
 			return 0;
 		}
 
-		// This should never happen, but just in case
-		if (db1 == null || db2 == null) {
-			return 0;
+		// These should never happen, but just in case
+		if (db1 == null) {
+			return reverseOrder ? 1 : -1;
+		} else if (db2 == null) {
+			return reverseOrder ? -1 : 1;
 		}
 
+		final String dbName1 = db1.getDatabaseName();
+		final String dbName2 = db2.getDatabaseName();
+
 		if (db1.dependsOnDatabase(db2)) {
+			if (logger.isDebugEnabled()) {
+				logger.debug(format("%s depends on %s", dbName1, dbName2));
+			}
 			return reverseOrder ? -1 : 1;
 		} else if (db2.dependsOnDatabase(db1)) {
+			if (logger.isDebugEnabled()) {
+				logger.debug(format("%s depends on %s", dbName2, dbName1));
+			}
 			return reverseOrder ? 1 : -1;
+		} else if (db1.hasDatabaseDependencies() && db2.hasDatabaseDependencies()) {
+			if (logger.isDebugEnabled()) {
+				logger.debug(format("Both %s and %s have database dependencies, just not on each other", dbName1, dbName2));
+			}
+			return 0;
+		} else if (db1.hasDatabaseDependencies()) {
+			if (logger.isDebugEnabled()) {
+				logger.debug(format("%s has database dependencies and %s does not", dbName1, dbName2));
+			}
+			return reverseOrder ? -1 : 1;
+		} else if (db2.hasDatabaseDependencies()) {
+			if (logger.isDebugEnabled()) {
+				logger.debug(format("%s has database dependencies and %s does not", dbName2, dbName1));
+			}
+			return reverseOrder ? 1 : -1;
+		}
+
+		if (logger.isDebugEnabled()) {
+			logger.debug(format("%s and %s do not have any dependencies", dbName1, dbName2));
 		}
 		return 0;
 	}

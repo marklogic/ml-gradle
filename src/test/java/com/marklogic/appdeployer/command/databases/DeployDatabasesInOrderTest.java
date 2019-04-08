@@ -7,6 +7,8 @@ import org.junit.After;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DeployDatabasesInOrderTest extends AbstractAppDeployerTest {
 
@@ -18,6 +20,36 @@ public class DeployDatabasesInOrderTest extends AbstractAppDeployerTest {
 		assertFalse(mgr.exists("sample-app-A"));
 		assertFalse(mgr.exists("sample-app-B"));
 		assertFalse(mgr.exists("sample-app-C"));
+	}
+
+	@Test
+	public void test() {
+		appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/dhf-db-ordering")));
+
+		initializeAppDeployer(new DeployOtherDatabasesCommand());
+
+		appConfig.getCustomTokens().put("%%mlFinalDbName%%", "sample-data-hub-FINAL");
+		appConfig.getCustomTokens().put("%%mlFinalSchemasDbName%%", "sample-data-hub-final-SCHEMAS");
+		appConfig.getCustomTokens().put("%%mlFinalTriggersDbName%%", "sample-data-hub-final-TRIGGERS");
+		appConfig.getCustomTokens().put("%%mlModulesDbName%%", "sample-data-hub-MODULES");
+		appConfig.getCustomTokens().put("%%mlTestDbName%%", "sample-data-hub-TEST");
+
+		deploySampleApp();
+
+		DatabaseManager mgr = new DatabaseManager(manageClient);
+		assertTrue(mgr.exists("sample-data-hub-FINAL"));
+		assertTrue(mgr.exists("sample-data-hub-final-SCHEMAS"));
+		assertTrue(mgr.exists("sample-data-hub-final-TRIGGERS"));
+		assertTrue(mgr.exists("sample-data-hub-MODULES"));
+		assertTrue(mgr.exists("sample-data-hub-TEST"));
+
+		undeploySampleApp();
+
+		assertFalse(mgr.exists("sample-data-hub-FINAL"));
+		assertFalse(mgr.exists("sample-data-hub-final-SCHEMAS"));
+		assertFalse(mgr.exists("sample-data-hub-final-TRIGGERS"));
+		assertFalse(mgr.exists("sample-data-hub-MODULES"));
+		assertFalse(mgr.exists("sample-data-hub-TEST"));
 	}
 
 	/**

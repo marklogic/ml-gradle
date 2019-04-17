@@ -76,6 +76,7 @@ public class AppConfig {
     private boolean deployAmpsWithCma = false;
     private boolean deployForestsWithCma = false;
     private boolean deployPrivilegesWithCma = false;
+    private boolean mergeResources = true;
 
     private boolean addHostNameTokens = false;
 
@@ -1357,5 +1358,13 @@ public class AppConfig {
 			return null;
 		}
 		return schemaPaths.get(schemaPaths.size() - 1);
+	}
+
+	public boolean isMergeResources() {
+		return mergeResources;
+	}
+
+	public void setMergeResources(boolean mergeResources) {
+		this.mergeResources = mergeResources;
 	}
 }

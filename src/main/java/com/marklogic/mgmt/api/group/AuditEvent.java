@@ -1,23 +1,31 @@
 package com.marklogic.mgmt.api.group;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+
+@XmlAccessorType(XmlAccessType.FIELD)
 public class AuditEvent {
 
-    private String auditEventName;
-    private Boolean auditEventEnabled;
+	@XmlElement(name = "audit-event-name")
+	private String auditEventName;
 
-    public String getAuditEventName() {
-        return auditEventName;
-    }
+	@XmlElement(name = "audit-event-enabled")
+	private Boolean auditEventEnabled;
 
-    public void setAuditEventName(String auditEventName) {
-        this.auditEventName = auditEventName;
-    }
+	public String getAuditEventName() {
+		return auditEventName;
+	}
 
-    public Boolean getAuditEventEnabled() {
-        return auditEventEnabled;
-    }
+	public void setAuditEventName(String auditEventName) {
+		this.auditEventName = auditEventName;
+	}
 
-    public void setAuditEventEnabled(Boolean auditEventEnabled) {
-        this.auditEventEnabled = auditEventEnabled;
-    }
+	public Boolean getAuditEventEnabled() {
+		return auditEventEnabled;
+	}
+
+	public void setAuditEventEnabled(Boolean auditEventEnabled) {
+		this.auditEventEnabled = auditEventEnabled;
+	}
 }

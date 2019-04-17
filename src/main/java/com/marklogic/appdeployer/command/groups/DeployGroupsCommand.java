@@ -4,6 +4,7 @@ import java.io.File;
 
 import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
+import com.marklogic.appdeployer.command.ResourceReference;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.SaveReceipt;
@@ -46,12 +47,12 @@ public class DeployGroupsCommand extends AbstractResourceCommand {
     }
 
     /**
-     * Does a poor man's job of checking for a restart by checking for "cache-size" in the payload. This doesn't mean a
+     * Does a simple check for a restart by checking for "cache-size" in the payload. This doesn't mean a
      * restart has occurred - the cache size may not changed - but that's fine, as the waitForRestart method on
      * AdminManager will quickly exit.
      */
     @Override
-    protected void afterResourceSaved(ResourceManager mgr, CommandContext context, File resourceFile,
+    protected void afterResourceSaved(ResourceManager mgr, CommandContext context, ResourceReference resourceReference,
             SaveReceipt receipt) {
         String payload = receipt.getPayload();
         if (payload != null) {

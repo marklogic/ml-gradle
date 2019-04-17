@@ -36,6 +36,7 @@ public class DeployPrivilegesWithCmaTest extends AbstractAppDeployerTest {
 class TestDeployPrivilegesCommand extends DeployPrivilegesCommand {
 	@Override
 	protected ResourceManager getResourceManager(CommandContext context) {
-		throw new RuntimeException("This should not be called when deploying with CMA");
+		// Returning null to force an error in case this is used at all
+		return null;
 	}
 }

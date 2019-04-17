@@ -1,14 +1,30 @@
 package com.marklogic.mgmt.api.group;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.ArrayList;
 import java.util.List;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Audit {
 
+	@XmlElement(name = "audit-enabled")
     private Boolean auditEnabled;
+
+	@XmlElement(name = "rotate-audit-files")
     private String rotateAuditFiles;
+
+	@XmlElement(name = "keep-audit-files")
     private Integer keepAuditFiles;
+
+	@XmlElementWrapper(name = "audit-events")
+	@XmlElement(name = "audit-event")
     private List<AuditEvent> auditEvent;
+
+	@XmlElementWrapper(name = "audit-restrictions")
+	@XmlElement(name = "audit-restriction")
     private List<AuditRestriction> auditRestriction;
 
     public void addAuditEvent(AuditEvent event) {

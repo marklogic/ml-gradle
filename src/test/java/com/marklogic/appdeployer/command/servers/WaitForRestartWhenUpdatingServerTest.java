@@ -3,7 +3,6 @@ package com.marklogic.appdeployer.command.servers;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.appservers.DeployOtherServersCommand;
-import com.marklogic.mgmt.resource.appservers.ServerManager;
 import org.junit.After;
 import org.junit.Test;
 
@@ -19,7 +18,6 @@ public class WaitForRestartWhenUpdatingServerTest extends AbstractAppDeployerTes
 	@Test
 	public void test() {
 		appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/single-server")));
-		ServerManager mgr = new ServerManager(manageClient);
 		initializeAppDeployer(new DeployOtherServersCommand());
 		appConfig.getCustomTokens().put("%%HTTP_PORT%%", "8048");
 		appDeployer.deploy(appConfig);

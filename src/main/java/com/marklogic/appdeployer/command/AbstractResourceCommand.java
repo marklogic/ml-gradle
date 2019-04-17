@@ -1,5 +1,6 @@
 package com.marklogic.appdeployer.command;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.mgmt.SaveReceipt;
@@ -30,9 +31,33 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 
 	@Override
 	public void execute(CommandContext context) {
-		setIncrementalMode(context.getAppConfig().isIncrementalDeploy());
+		final boolean isIncrementalDeploy = context.getAppConfig().isIncrementalDeploy();
+		final boolean mergeResourcesBeforeSaving = resourceMergingIsSupported(context);
+
+		if (mergeResourcesBeforeSaving) {
+			logger.info("Will read and merge resource files in each config path before saving any resources");
+			setIncrementalMode(false);
+			if (isIncrementalDeploy) {
+				logger.info("Incremental deploy will not be enabled since files are being read and merged first");
+			}
+		} else {
+			setIncrementalMode(isIncrementalDeploy);
+		}
+
 		for (File resourceDir : getResourceDirs(context)) {
 			processExecuteOnResourceDir(context, resourceDir);
+		}
+
+		if (mergeResourcesBeforeSaving) {
+			List<ResourceReference> references = (List<ResourceReference>) context.getContextMap().get(getContextKeyForResourcesToSave());
+			if (references != null && !references.isEmpty()) {
+				List<ResourceReference> mergedReferences = mergeResources(references);
+				if (useCmaForDeployingResources(context)) {
+					saveMergedResourcesViaCma(context, mergedReferences);
+				} else {
+					saveMergedResources(context, getResourceManager(context), mergedReferences);
+				}
+			}
 		}
 	}
 
@@ -80,19 +105,21 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 			if (logger.isInfoEnabled()) {
 				logger.info("Processing files in directory: " + resourceDir.getAbsolutePath());
 			}
-			if (useCmaForDeployingResources(context)) {
+
+			// If resources should be merged, CMA will be used later to submit them all in one request, but not now
+			if (useCmaForDeployingResources(context) && !resourceMergingIsSupported(context)) {
 				if (logger.isInfoEnabled()) {
 					logger.info("Command supports deployment via CMA, so will submit all resources via a single CMA configuration for directory: " + resourceDir);
 				}
 				deployResourcesViaCma(context, resourceDir);
 			} else {
 				ResourceManager mgr = getResourceManager(context);
-				for (File f : listFilesInDirectory(resourceDir, context)) {
+				for (File resourceFile : listFilesInDirectory(resourceDir, context)) {
 					if (logger.isInfoEnabled()) {
-						logger.info("Processing file: " + f.getAbsolutePath());
+						logger.info("Processing file: " + resourceFile.getAbsolutePath());
 					}
-					SaveReceipt receipt = saveResource(mgr, context, f);
-					afterResourceSaved(mgr, context, f, receipt);
+					SaveReceipt receipt = saveResource(mgr, context, resourceFile);
+					afterResourceSaved(mgr, context, new ResourceReference(resourceFile, null), receipt);
 				}
 			}
 		} else {
@@ -110,7 +137,7 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 	 */
 	protected boolean useCmaForDeployingResources(CommandContext context) {
 		if (this instanceof SupportsCmaCommand) {
-			SupportsCmaCommand command = (SupportsCmaCommand)this;
+			SupportsCmaCommand command = (SupportsCmaCommand) this;
 			if (command.cmaShouldBeUsed(context)) {
 				return cmaEndpointExists(context);
 			}
@@ -140,6 +167,21 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 	}
 
 	/**
+	 *
+	 * @param context
+	 * @param mergedReferences
+	 */
+	protected void saveMergedResourcesViaCma(CommandContext context, List<ResourceReference> mergedReferences) {
+		Configuration config = new Configuration();
+		ResourceMapper resourceMapper = new DefaultResourceMapper(new API(context.getManageClient()));
+		for (ResourceReference reference : mergedReferences) {
+			String payload = reference.getObjectNode().toString();
+			((SupportsCmaCommand)this).addResourceToConfiguration(payload, resourceMapper, config);
+		}
+		new Configurations(config).submit(context.getManageClient());
+	}
+
+	/**
 	 * Defaults to the parent method. This was extracted so that a subclass can override it and have access to the
 	 * CommandContext, which allows for reading in the contents of each file and replacing tokens, which may impact the
 	 * order in which the files are processed.
@@ -152,6 +194,12 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 		return listFilesInDirectory(resourceDir);
 	}
 
+	/**
+	 * For 3.14.0, resources won't be merged during an undo. This should only result in some unnecessary delete calls
+	 * being made for resources that were already deleted.
+	 *
+	 * @param context
+	 */
 	@Override
 	public void undo(CommandContext context) {
 		if (deleteResourcesOnUndo) {

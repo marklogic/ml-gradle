@@ -19,7 +19,7 @@ public class LoadDefaultCpfPipelinesTest extends AbstractAppDeployerTest {
 
     @Test
     public void loadDefaultCpfPipelines() {
-        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployContentDatabasesCommand(),
+        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployContentDatabasesCommand(1),
                 new DeployOtherDatabasesCommand());
 
         appDeployer.deploy(appConfig);

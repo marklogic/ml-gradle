@@ -15,6 +15,9 @@ public class DeployRoleWithCommentsTest extends AbstractAppDeployerTest {
 		// We only want to process sample-app-role1.json
 		appConfig.setResourceFilenamesToIgnore("sample-app-role2.xml");
 
+		// As of 3.14.0, gotta turn off resource merging for this to be tested.
+		appConfig.setMergeResources(false);
+
 		initializeAppDeployer(new DeployRolesCommand());
 		try {
 			manageConfig.setCleanJsonPayloads(false);

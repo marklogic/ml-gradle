@@ -21,6 +21,9 @@ public class IncrementallyDeployUsersTest extends AbstractIncrementalDeployTest 
 	public void setup() {
 		userManager = new UserManager(manageClient);
 		roleManager = new RoleManager(manageClient);
+
+		// Have to turn resource merging off for this to work
+		appConfig.setMergeResources(false);
 	}
 
 	@After

@@ -9,11 +9,10 @@ import com.marklogic.appdeployer.command.UndoableCommand;
 import com.marklogic.appdeployer.command.forests.DeployForestsCommand;
 import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.SaveReceipt;
+import com.marklogic.mgmt.api.database.Database;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -82,6 +81,8 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 	 */
 	private boolean postponeForestCreation = false;
     private DeployForestsCommand deployForestsCommand;
+    private DeploySubDatabasesCommand deploySubDatabasesCommand;
+    private String payloadBeforeMerging;
 
 	/**
 	 * Expected to be set by DeployOtherDatabasesCommand; a list of database names (should default to the ones MarkLogic
@@ -92,8 +93,11 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 	private DeployDatabaseCommandFactory deployDatabaseCommandFactory = new DefaultDeployDatabaseCommandFactory();
 
     public DeployDatabaseCommand() {
-        setExecuteSortOrder(SortOrderConstants.DEPLOY_OTHER_DATABASES);
+	    setExecuteSortOrder(SortOrderConstants.DEPLOY_OTHER_DATABASES);
         setUndoSortOrder(SortOrderConstants.DELETE_OTHER_DATABASES);
+	    setResourceIdPropertyName("database-name");
+	    setResourceClassType(Database.class);
+	    setSupportsResourceMerging(true);
     }
 
     public DeployDatabaseCommand(File databaseFile) {
@@ -119,20 +123,27 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
         return undoSortOrder;
     }
 
-    @Override
+	@Override
     public void execute(CommandContext context) {
         String payload = buildPayload(context);
         if (payload != null) {
+        	final boolean mergeResourcesBeforeSaving = resourceMergingIsSupported(context);
+
             DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
+            databaseName = dbMgr.getResourceId(payload);
 
-            payload = adjustPayloadBeforeSavingResource(dbMgr, context, null, payload);
-            SaveReceipt receipt = dbMgr.save(payload);
-
-            databaseName = receipt.getResourceId();
+            // If resources should first be merged, then stash the payload and don't make a save call yet
+            if (mergeResourcesBeforeSaving) {
+            	this.payloadBeforeMerging = payload;
+            }
+            else {
+	            payload = adjustPayloadBeforeSavingResource(dbMgr, context, null, payload);
+	            dbMgr.save(payload);
+            }
 
             if (shouldCreateForests(context, payload)) {
 	            deployForestsCommand = buildDeployForestsCommand(databaseName, context);
-	            if (postponeForestCreation) {
+	            if (mergeResourcesBeforeSaving || postponeForestCreation) {
 		            logger.info("Postponing creation of forests for database: " + databaseName);
 	            } else {
 		            deployForestsCommand.execute(context);
@@ -140,12 +151,25 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
             }
 
             if (!isSubDatabase()) {
-	            this.addSubDatabases(dbMgr, context, databaseName);
+            	DeploySubDatabasesCommand command = new DeploySubDatabasesCommand(databaseName, deployDatabaseCommandFactory);
+            	// If resources should first be merged, stash this command so it can be executed after the resources
+	            // are merged and saved
+            	if (mergeResourcesBeforeSaving) {
+            		this.deploySubDatabasesCommand = command;
+	            } else {
+            		command.execute(context);
+	            }
             }
         }
     }
 
-    @Override
+	/**
+	 * When deleting databases, resource files are not yet merged together first. This should only mean that some
+	 * unnecessary delete calls are made.
+	 *
+	 * @param context
+	 */
+	@Override
     public void undo(CommandContext context) {
         String payload = buildPayload(context);
 
@@ -159,72 +183,16 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 
         if (payload != null) {
         	DatabaseManager dbMgr = newDatabaseManageForDeleting(context);
-        	// if this has sub-databases, detach/delete them first
-        	if(!isSubDatabase()){
-        		removeSubDatabases(dbMgr, context, dbMgr.getResourceId(payload));
-        	}
+
+	        // if this has sub-databases, detach/delete them first
+	        if (!isSubDatabase()) {
+	        	final String dbName = dbMgr.getResourceId(payload);
+	        	new DeploySubDatabasesCommand(dbName, deployDatabaseCommandFactory).undo(context);
+	        }
+
             dbMgr.delete(payload);
         }
     }
-
-    /**
-     * Creates and attaches sub-databases to a the specified database, making it a super-database.
-     * Note: Sub-databases are expected to have a configuration files in databases/subdatabases/super-database-name
-     * @param dbMgr
-     * @param context
-     * @param superDatabaseName Name of the database the sub-databases are to be associated with
-     */
-    protected void addSubDatabases(DatabaseManager dbMgr, CommandContext context, String superDatabaseName) {
-    	for (ConfigDir configDir : context.getAppConfig().getConfigDirs()) {
-		    File subdbDir = new File(configDir.getDatabasesDir() + File.separator + "subdatabases" + File.separator + superDatabaseName);
-		    if (logger.isDebugEnabled()) {
-			    logger.info(format("Checking for sub-databases in: %s for database: %s", subdbDir.getAbsolutePath(), superDatabaseName));
-		    }
-		    if(subdbDir.exists()){
-			    List<String> subDbNames = new ArrayList<String>();
-			    for (File f : listFilesInDirectory(subdbDir)) {
-				    logger.info(format("Processing sub-database for %s found in file: %s", superDatabaseName, f.getAbsolutePath()));
-				    DeployDatabaseCommand subDbCommand = this.deployDatabaseCommandFactory.newDeployDatabaseCommand(null);
-				    subDbCommand.setDatabaseFile(f);
-				    subDbCommand.setSuperDatabaseName(superDatabaseName);
-				    subDbCommand.setSubDatabase(true);
-				    subDbCommand.execute(context);
-				    subDbNames.add(subDbCommand.getDatabaseName());
-				    logger.info(format("Created sub-database %s for database %s", subDbCommand.getDatabaseName(), superDatabaseName));
-			    }
-			    if(subDbNames.size() > 0){
-				    dbMgr.attachSubDatabases(superDatabaseName, subDbNames);
-			    }
-		    }
-	    }
-    }
-
-    /**
-     * Detaches and deletes all sub-databases for the specified super-database
-     * @param dbMgr
-     * @param context
-     * @param superDatabaseName
-     */
-    protected void removeSubDatabases(DatabaseManager dbMgr, CommandContext context, String superDatabaseName) {
-    	for (ConfigDir configDir : context.getAppConfig().getConfigDirs()) {
-		    File subdbDir = new File(configDir.getDatabasesDir() + File.separator + "subdatabases" + File.separator + superDatabaseName);
-		    if (logger.isDebugEnabled()) {
-			    logger.debug(format("Checking to see if %s has sub-databases that need to be removed. Looking in: %s", superDatabaseName, subdbDir.getAbsolutePath()));
-		    }
-		    if(subdbDir.exists()){
-			    logger.info("Removing all sub-databases from database: " + superDatabaseName);
-			    dbMgr.detachSubDatabases(superDatabaseName);
-			    for (File f : listFilesInDirectory(subdbDir)) {
-				    DeployDatabaseCommand subDbCommand = this.deployDatabaseCommandFactory.newDeployDatabaseCommand(null);
-				    subDbCommand.setDatabaseFile(f);
-				    subDbCommand.setSuperDatabaseName(superDatabaseName);
-				    subDbCommand.setSubDatabase(true);
-				    subDbCommand.undo(context);
-			    }
-		    }
-	    }
-    }
-
 
     /**
      * Configures the DatabaseManager in terms of how it deletes forests based on properties in the AppConfig instance
@@ -476,5 +444,13 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 
 	public DeployForestsCommand getDeployForestsCommand() {
 		return deployForestsCommand;
+	}
+
+	public DeploySubDatabasesCommand getDeploySubDatabasesCommand() {
+		return deploySubDatabasesCommand;
+	}
+
+	public String getPayloadBeforeMerging() {
+		return payloadBeforeMerging;
 	}
 }

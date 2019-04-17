@@ -1,32 +1,42 @@
 package com.marklogic.mgmt.api.group;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+
+@XmlAccessorType(XmlAccessType.FIELD)
 public class AuditRestriction {
 
-    private String auditRestrictionName;
-    private String auditRestrictionType;
-    private String auditRestrictionItems;
+	@XmlElement(name = "audit-restriction-name")
+	private String auditRestrictionName;
 
-    public String getAuditRestrictionName() {
-        return auditRestrictionName;
-    }
+	@XmlElement(name = "audit-restriction-type")
+	private String auditRestrictionType;
 
-    public void setAuditRestrictionName(String auditRestrictionName) {
-        this.auditRestrictionName = auditRestrictionName;
-    }
+	@XmlElement(name = "audit-restriction-items")
+	private String auditRestrictionItems;
 
-    public String getAuditRestrictionType() {
-        return auditRestrictionType;
-    }
+	public String getAuditRestrictionName() {
+		return auditRestrictionName;
+	}
 
-    public void setAuditRestrictionType(String auditRestrictionType) {
-        this.auditRestrictionType = auditRestrictionType;
-    }
+	public void setAuditRestrictionName(String auditRestrictionName) {
+		this.auditRestrictionName = auditRestrictionName;
+	}
 
-    public String getAuditRestrictionItems() {
-        return auditRestrictionItems;
-    }
+	public String getAuditRestrictionType() {
+		return auditRestrictionType;
+	}
 
-    public void setAuditRestrictionItems(String auditRestrictionItems) {
-        this.auditRestrictionItems = auditRestrictionItems;
-    }
+	public void setAuditRestrictionType(String auditRestrictionType) {
+		this.auditRestrictionType = auditRestrictionType;
+	}
+
+	public String getAuditRestrictionItems() {
+		return auditRestrictionItems;
+	}
+
+	public void setAuditRestrictionItems(String auditRestrictionItems) {
+		this.auditRestrictionItems = auditRestrictionItems;
+	}
 }

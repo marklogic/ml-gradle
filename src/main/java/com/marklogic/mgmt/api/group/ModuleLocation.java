@@ -1,8 +1,15 @@
 package com.marklogic.mgmt.api.group;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ModuleLocation {
 
+	@XmlElement(name = "namespace-uri")
     private String namespaceUri;
+
     private String location;
 
     public String getNamespaceUri() {

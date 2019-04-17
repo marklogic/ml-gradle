@@ -3,6 +3,7 @@ package com.marklogic.appdeployer.command.security;
 import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
+import com.marklogic.mgmt.api.security.User;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.security.UserManager;
 
@@ -13,6 +14,10 @@ public class DeployUsersCommand extends AbstractResourceCommand {
 	public DeployUsersCommand() {
 		setExecuteSortOrder(SortOrderConstants.DEPLOY_USERS);
 		setUndoSortOrder(SortOrderConstants.DELETE_USERS);
+
+		setSupportsResourceMerging(true);
+		setResourceClassType(User.class);
+		setResourceIdPropertyName("user-name");
 	}
 
 	protected File[] getResourceDirs(CommandContext context) {
@@ -23,4 +28,5 @@ public class DeployUsersCommand extends AbstractResourceCommand {
 	protected ResourceManager getResourceManager(CommandContext context) {
 		return new UserManager(context.getManageClient());
 	}
+
 }

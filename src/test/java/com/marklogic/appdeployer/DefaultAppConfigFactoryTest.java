@@ -211,6 +211,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	public void mostProperties() {
 		Properties p = new Properties();
 
+		p.setProperty("mlMergeResources", "false");
 		p.setProperty("mlAddHostNameTokens", "true");
 		p.setProperty("mlCatchDeployExceptions", "true");
 		p.setProperty("mlCatchUndeployExceptions", "true");
@@ -315,6 +316,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		sut = new DefaultAppConfigFactory(new SimplePropertySource(p));
 		AppConfig config = sut.newAppConfig();
 
+		assertFalse(config.isMergeResources());
 		assertTrue(config.isAddHostNameTokens());
 		assertTrue(config.isCatchDeployExceptions());
 		assertTrue(config.isCatchUndeployExceptions());

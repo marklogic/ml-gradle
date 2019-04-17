@@ -1,16 +1,17 @@
 package com.marklogic.appdeployer.command.appservers;
 
-import com.marklogic.appdeployer.command.AbstractResourceCommand;
-import com.marklogic.appdeployer.command.CommandContext;
-import com.marklogic.appdeployer.command.ResourceFilenameFilter;
-import com.marklogic.appdeployer.command.SortOrderConstants;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.marklogic.appdeployer.command.*;
 import com.marklogic.mgmt.PayloadParser;
+import com.marklogic.mgmt.api.server.Server;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.BiPredicate;
 
 /**
  * "Other" = non-REST-API servers. This will process every JSON/XML file that's not named "rest-api-server.*" in the
@@ -31,6 +32,9 @@ public class DeployOtherServersCommand extends AbstractResourceCommand {
 		setResourceFilenameFilter(new ResourceFilenameFilter("rest-api-server.xml", "rest-api-server.json"));
 
 		initializeDefaultServersToNotUndeploy();
+
+		setSupportsResourceMerging(true);
+		setResourceClassType(Server.class);
 	}
 
 	protected void initializeDefaultServersToNotUndeploy() {
@@ -84,6 +88,27 @@ public class DeployOtherServersCommand extends AbstractResourceCommand {
 		}
 
 		return super.adjustPayloadBeforeDeletingResource(mgr, context, f, payload);
+	}
+
+	@Override
+	protected BiPredicate<ResourceReference, ResourceReference> getBiPredicateForMergingResources() {
+		return (reference1, reference2) -> {
+			final ObjectNode node1 = reference1.getObjectNode();
+			final ObjectNode node2 = reference2.getObjectNode();
+
+			EqualsBuilder b = new EqualsBuilder();
+			b.append(
+				node1.has("server-name") ? node1.get("server-name").asText() : null,
+				node2.has("server-name") ? node2.get("server-name").asText() : null
+			);
+
+			b.append(
+				node1.has("group-name") ? node1.get("group-name").asText() : ServerManager.DEFAULT_GROUP,
+				node2.has("group-name") ? node2.get("group-name").asText() : ServerManager.DEFAULT_GROUP
+			);
+
+			return b.isEquals();
+		};
 	}
 
 	public boolean shouldUndeployServer(String serverName, CommandContext context) {

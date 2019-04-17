@@ -3,10 +3,12 @@ package com.marklogic.rest.util;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.marklogic.appdeployer.command.ResourceReference;
 import com.marklogic.mgmt.util.ObjectMapperFactory;
 
 import java.io.File;
 import java.util.*;
+import java.util.function.BiPredicate;
 
 public class JsonNodeUtil {
 
@@ -32,6 +34,46 @@ public class JsonNodeUtil {
 	}
 
 	/**
+	 * Returns a new list containing the results of merging object nodes in the given list where the given
+	 * BiPredicate returns true for those object nodes equaling each other.
+	 *
+	 * @param list
+	 * @param objectNodeEqualityTester
+	 * @return
+	 */
+	public static List<ResourceReference> mergeObjectNodeList(List<ResourceReference> list,
+	                                                   BiPredicate<ResourceReference, ResourceReference> objectNodeEqualityTester) {
+		List<ResourceReference> listOfMergedReferences = new ArrayList<>();
+		for (ResourceReference resourceReference : list) {
+			if (listOfMergedReferences.isEmpty()) {
+				listOfMergedReferences.add(resourceReference);
+				continue;
+			}
+
+			int indexOfMatch = -1;
+			for (int i = 0; i < listOfMergedReferences.size(); i++) {
+				if (objectNodeEqualityTester.test(resourceReference, listOfMergedReferences.get(i))) {
+					indexOfMatch = i;
+					break;
+				}
+			}
+
+			if (indexOfMatch > -1) {
+				// Merge the current resource into the existing one so the current one overwrites common
+				// single-value properties
+				ResourceReference matchingReference = listOfMergedReferences.get(indexOfMatch);
+				ObjectNode merged = JsonNodeUtil.mergeObjectNodes(matchingReference.getObjectNode(), resourceReference.getObjectNode());
+				matchingReference.setObjectNode(merged);
+				matchingReference.getFiles().addAll(resourceReference.getFiles());
+			} else {
+				listOfMergedReferences.add(resourceReference);
+			}
+		}
+
+		return listOfMergedReferences;
+	}
+
+	/**
 	 * Merges each node into the next node in the sequence.
 	 *
 	 * @param nodes
@@ -39,7 +81,7 @@ public class JsonNodeUtil {
 	 */
 	public static ObjectNode mergeObjectNodes(ObjectNode... nodes) {
 		List<ObjectNode> nodeList = new ArrayList<>();
-		Set<String> fieldNames = new HashSet<>();
+		Set<String> fieldNames = new LinkedHashSet<>();
 		for (ObjectNode node : nodes) {
 			nodeList.add(node);
 			Iterator<String> names = node.fieldNames();
@@ -59,20 +101,37 @@ public class JsonNodeUtil {
 			for (String name : fieldNames) {
 				JsonNode targetField = target.get(name);
 				JsonNode sourceField = source.get(name);
+
 				if (sourceField == null) {
+					// If the source field doesn't exist, then the target field wins by default
 					continue;
 				} else if (targetField == null) {
+					// If the target field doesn't exist, the source field wins
 					target.set(name, sourceField);
-				} else if (sourceField.isArray()) {
+				} else if (sourceField.isArray() && targetField.isArray()) {
+					/**
+					 * For an array, values from the target array are added to the source array, and then the source
+					 * array is set on the target.
+					 */
 					ArrayNode sourceArray = (ArrayNode) sourceField;
 					ArrayNode targetArray = (ArrayNode) targetField;
 
-					sourceArray.forEach(node -> {
-						if (!arrayContains(targetArray, node)) {
-							targetArray.add(node);
+					// Need to make a new array so that the sourceArray isn't modified
+					ArrayNode newArray = ObjectMapperFactory.getObjectMapper().createArrayNode();
+					newArray.addAll(sourceArray);
+
+					targetArray.forEach(node -> {
+						if (!arrayContains(newArray, node)) {
+							newArray.add(node);
 						}
 					});
+					target.set(name, newArray);
 				}
+
+				/**
+				 * If none of the conditionals above are true, then the source and target fields both exist, and they're
+				 * not arrays, in which case we do nothing, which means the target field wins.
+				 */
 			}
 		}
 

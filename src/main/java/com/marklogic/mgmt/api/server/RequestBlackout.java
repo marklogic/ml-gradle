@@ -1,13 +1,29 @@
 package com.marklogic.mgmt.api.server;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.List;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class RequestBlackout {
 
+	@XmlElementWrapper(name = "users")
+	@XmlElement(name = "user")
 	private List<String> user;
+
+	@XmlElementWrapper(name = "roles")
+	@XmlElement(name = "role")
 	private List<String> role;
+
+	@XmlElement(name = "blackout-type")
 	private String blackoutType;
+
+	@XmlElementWrapper(name = "days")
+	@XmlElement(name = "day")
 	private List<String> day;
+
 	private String period;
 
 	public List<String> getUser() {

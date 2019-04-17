@@ -65,7 +65,7 @@ public class PreviewUserDeploymentTest extends AbstractAppDeployerTest {
 
 			ObjectNode secondChange = (ObjectNode)patch.get(1);
 			assertEquals("add", secondChange.get("op").asText());
-			assertEquals("/role/0", secondChange.get("path").asText());
+			assertEquals("/role/1", secondChange.get("path").asText());
 			assertEquals("rest-writer", secondChange.get("value").asText());
 
 		} finally {

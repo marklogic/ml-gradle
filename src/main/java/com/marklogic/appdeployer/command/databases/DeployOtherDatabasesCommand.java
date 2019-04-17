@@ -1,13 +1,19 @@
 package com.marklogic.appdeployer.command.databases;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractUndoableCommand;
 import com.marklogic.appdeployer.command.CommandContext;
+import com.marklogic.appdeployer.command.ResourceReference;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.appdeployer.command.forests.DeployForestsCommand;
+import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.api.configuration.Configuration;
 import com.marklogic.mgmt.api.configuration.Configurations;
+import com.marklogic.mgmt.api.database.Database;
 import com.marklogic.mgmt.api.forest.Forest;
+import com.marklogic.mgmt.resource.databases.DatabaseManager;
+import com.marklogic.mgmt.util.ObjectMapperFactory;
 
 import java.io.File;
 import java.util.*;
@@ -51,6 +57,10 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 	    setExecuteSortOrder(SortOrderConstants.DEPLOY_OTHER_DATABASES);
 	    setUndoSortOrder(SortOrderConstants.DELETE_OTHER_DATABASES);
 	    initializeDefaultDatabasesToNotUndeploy();
+
+	    setSupportsResourceMerging(true);
+	    setResourceIdPropertyName("database-name");
+	    setResourceClassType(Database.class);
     }
 
 	protected void initializeDefaultDatabasesToNotUndeploy() {
@@ -72,19 +82,69 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
         List<DeployDatabaseCommand> deployDatabaseCommands = buildDatabaseCommands(context);
         sortCommandsBeforeExecute(deployDatabaseCommands, context);
 
-        boolean deployForestsWithCma = context.getAppConfig().isDeployForestsWithCma();
+	    List<ResourceReference> resourceReferences = new ArrayList<>();
 
         for (DeployDatabaseCommand c : deployDatabaseCommands) {
-        	if (deployForestsWithCma) {
-		        c.setPostponeForestCreation(true);
-	        }
+        	c.setPostponeForestCreation(context.getAppConfig().isDeployForestsWithCma());
             c.execute(context);
+
+            String payload = c.getPayloadBeforeMerging();
+            if (payload != null) {
+	            resourceReferences.add(new ResourceReference(null, convertPayloadToObjectNode(context, payload)));
+            }
         }
 
-        if (context.getAppConfig().isDeployForestsWithCma()) {
-        	deployAllForestsInSingleCmaRequest(context, deployDatabaseCommands);
+	    /**
+	     * Reuse the parent class method for merging ResourceReference objects, but we don't need the files - we only
+	     * need ObjectNodes, so we build a new list containing those and then sort them as needed.
+	     */
+	    List<ResourceReference> mergedReferences = mergeResources(resourceReferences);
+        List<ObjectNode> mergedResources = new ArrayList<>();
+        mergedReferences.forEach(reference -> mergedResources.add(reference.getObjectNode()));
+
+        if (context.getAppConfig().isSortOtherDatabaseByDependencies()) {
+	        Collections.sort(mergedResources, new DatabaseObjectNodeComparator(ObjectMapperFactory.getObjectMapper()));
         }
+
+	    final DatabaseManager mgr = new DatabaseManager(context.getManageClient());
+	    for (ObjectNode resource : mergedResources) {
+		    saveResource(mgr, context, resource.toString());
+	    }
+
+	    // Either create forests in one bulk CMA request, or via a command per database
+	    if (context.getAppConfig().isDeployForestsWithCma()) {
+		    deployAllForestsInSingleCmaRequest(context, deployDatabaseCommands);
+	    }
+	    else {
+	    	deployDatabaseCommands.forEach(command -> {
+			    DeployForestsCommand dfc = command.getDeployForestsCommand();
+			    if (dfc != null) {
+			    	dfc.execute(context);
+			    }
+		    });
+	    }
+
+	    /**
+	     * In the event that a sub-database is defined for a database that has files in multiple config paths, the
+	     * sub-database will be saved multiple times, as the sub-database command iterates over every config paths.
+	     * That shouldn't cause any problems, though it's not as efficient as it could be.
+	     */
+	    deployDatabaseCommands.forEach(command -> {
+		    DeploySubDatabasesCommand subDatabasesCommand = command.getDeploySubDatabasesCommand();
+		    if (subDatabasesCommand != null) {
+			    subDatabasesCommand.execute(context);
+		    }
+	    });
     }
+
+	@Override
+	public void undo(CommandContext context) {
+		List<DeployDatabaseCommand> list = buildDatabaseCommands(context);
+		sortCommandsBeforeUndo(list, context);
+		for (DeployDatabaseCommand c : list) {
+			c.undo(context);
+		}
+	}
 
 	/**
 	 * Each DeployDatabaseCommand is expected to have constructed a DeployForestCommand, but not executed it. Each
@@ -128,16 +188,6 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
     		logger.info("Not sorting databases by dependencies; they will be sorted based on their filename instead");
 	    }
     }
-
-    @Override
-    public void undo(CommandContext context) {
-        List<DeployDatabaseCommand> list = buildDatabaseCommands(context);
-        sortCommandsBeforeUndo(list, context);
-        for (DeployDatabaseCommand c : list) {
-            c.undo(context);
-        }
-    }
-
 
     protected void sortCommandsBeforeUndo(List<DeployDatabaseCommand> list, CommandContext context) {
         Collections.sort(list, new DeployDatabaseCommandComparator(context, true));

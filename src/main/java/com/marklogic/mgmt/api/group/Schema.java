@@ -1,23 +1,31 @@
 package com.marklogic.mgmt.api.group;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Schema {
 
-    private String namespaceUri;
-    private String schemaLocation;
+	@XmlElement(name = "namespace-uri")
+	private String namespaceUri;
 
-    public String getNamespaceUri() {
-        return namespaceUri;
-    }
+	@XmlElement(name = "schema-location")
+	private String schemaLocation;
 
-    public void setNamespaceUri(String namespaceUri) {
-        this.namespaceUri = namespaceUri;
-    }
+	public String getNamespaceUri() {
+		return namespaceUri;
+	}
 
-    public String getSchemaLocation() {
-        return schemaLocation;
-    }
+	public void setNamespaceUri(String namespaceUri) {
+		this.namespaceUri = namespaceUri;
+	}
 
-    public void setSchemaLocation(String schemaLocation) {
-        this.schemaLocation = schemaLocation;
-    }
+	public String getSchemaLocation() {
+		return schemaLocation;
+	}
+
+	public void setSchemaLocation(String schemaLocation) {
+		this.schemaLocation = schemaLocation;
+	}
 }

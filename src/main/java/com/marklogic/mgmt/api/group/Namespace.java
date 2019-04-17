@@ -1,24 +1,31 @@
 package com.marklogic.mgmt.api.group;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Namespace {
 
-    private String prefix;
-    private String namespaceUri;
+	private String prefix;
 
-    public String getPrefix() {
-        return prefix;
-    }
+	@XmlElement(name = "namespace-uri")
+	private String namespaceUri;
 
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
-    }
+	public String getPrefix() {
+		return prefix;
+	}
 
-    public String getNamespaceUri() {
-        return namespaceUri;
-    }
+	public void setPrefix(String prefix) {
+		this.prefix = prefix;
+	}
 
-    public void setNamespaceUri(String namespaceUri) {
-        this.namespaceUri = namespaceUri;
-    }
+	public String getNamespaceUri() {
+		return namespaceUri;
+	}
+
+	public void setNamespaceUri(String namespaceUri) {
+		this.namespaceUri = namespaceUri;
+	}
 
 }

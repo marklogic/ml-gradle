@@ -3,6 +3,7 @@ package com.marklogic.appdeployer.command.cma;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
+import com.marklogic.appdeployer.command.ResourceReference;
 import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.cma.ConfigurationManager;
 
@@ -30,7 +31,7 @@ public class DeployConfigurationsCommand extends AbstractCommand {
 					}
 					String payload = readResourceFromFile(null, context, f);
 					SaveReceipt receipt = mgr.save(payload);
-					afterResourceSaved(null, context, f, receipt);
+					afterResourceSaved(null, context, new ResourceReference(f, null), receipt);
 				}
 			} else {
 				logResourceDirectoryNotFound(dir);

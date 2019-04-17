@@ -2,6 +2,7 @@ package com.marklogic.appdeployer.command.security;
 
 import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
+import com.marklogic.appdeployer.command.ResourceReference;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.api.API;
@@ -27,6 +28,10 @@ public class DeployRolesCommand extends AbstractResourceCommand {
 	public DeployRolesCommand() {
 		setExecuteSortOrder(SortOrderConstants.DEPLOY_ROLES);
 		setUndoSortOrder(SortOrderConstants.DELETE_ROLES);
+
+		setSupportsResourceMerging(true);
+		setResourceIdPropertyName("role-name");
+		setResourceClassType(Role.class);
 	}
 
 	/**
@@ -60,14 +65,15 @@ public class DeployRolesCommand extends AbstractResourceCommand {
 	/**
 	 * If the resource was saved during the first pass - i.e. when roles and permissions have been removed from the role
 	 * - then it must be processed during the second pass so that those roles/permissions can be added back. Thus, the
-	 * incremental check on the file must be ignored.
+	 * incremental check on the file must be ignored. Note that this only matters during an incremental deploy, which
+	 * means that the ResourceReference should have a single File in it.
 	 */
 	@Override
-	protected void afterResourceSaved(ResourceManager mgr, CommandContext context, File resourceFile, SaveReceipt receipt) {
-		if (removeRolesAndPermissionsDuringDeployment) {
-			ignoreIncrementalCheckForFile(resourceFile);
+	protected void afterResourceSaved(ResourceManager mgr, CommandContext context, ResourceReference resourceReference, SaveReceipt receipt) {
+		if (removeRolesAndPermissionsDuringDeployment && resourceReference != null) {
+			ignoreIncrementalCheckForFile(resourceReference.getLastFile());
 		}
-		super.afterResourceSaved(mgr, context, resourceFile, receipt);
+		super.afterResourceSaved(mgr, context, resourceReference, receipt);
 	}
 
 	/**

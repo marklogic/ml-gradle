@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Main intent of this class is to support the creation of a "test" database if a test port is set. The test database
+ * is identical to the content database, except for its name.
+ *
  * For ease of use, this command handles creating forests the the content database, either based on a file in the
  * forests directory, or based on the default payload in the DeployForestsCommand class. This allows a developer to only
  * have to define a content database file and not have to define a forest file as well. Note that if no content database
@@ -33,6 +36,7 @@ public class DeployContentDatabasesCommand extends DeployDatabaseCommand {
         setUndoSortOrder(SortOrderConstants.DELETE_CONTENT_DATABASES);
         setForestsPerHost(forestsPerHost);
         setForestFilename("content-forest.json");
+        setSupportsResourceMerging(false);
     }
 
     /**
@@ -99,7 +103,7 @@ public class DeployContentDatabasesCommand extends DeployDatabaseCommand {
             DatabaseManager dbMgr = newDatabaseManageForDeleting(context);
 
             // remove subdatabases if they exist
-            removeSubDatabases(dbMgr, context, dbMgr.getResourceId(json));
+	        new DeploySubDatabasesCommand(dbMgr.getResourceId(json), new DefaultDeployDatabaseCommandFactory()).undo(context);
 
             dbMgr.delete(json);
             if (appConfig.isTestPortSet()) {
@@ -127,7 +131,15 @@ public class DeployContentDatabasesCommand extends DeployDatabaseCommand {
         return node.toString();
     }
 
-    protected JsonNode mergeContentDatabaseFiles(AppConfig appConfig) {
+	/**
+	 * As of version 3.14.0, this is really an obsolete way of specifying multiple configuration files for the content
+	 * database, as DeployDatabaseCommand - which is used to create the content database and the test content database
+	 * - now handles merging multiple database files that have the same database-name.
+	 *
+	 * @param appConfig
+	 * @return
+	 */
+	protected JsonNode mergeContentDatabaseFiles(AppConfig appConfig) {
         List<File> files = new ArrayList<>();
         for (ConfigDir configDir : appConfig.getConfigDirs()) {
         	List<File> list = configDir.getContentDatabaseFiles();

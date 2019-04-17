@@ -20,6 +20,9 @@ public class IncrementallyDeployRolesTest extends AbstractIncrementalDeployTest 
 		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/roles-with-permissions"));
 		roleManager = new RoleManager(manageClient);
 		assertRolesDontExist();
+
+		// Have to turn resource merging off for this to work
+		appConfig.setMergeResources(false);
 	}
 
 	@After

@@ -6,6 +6,7 @@ import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
+import com.marklogic.appdeployer.command.ResourceReference;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.resource.ResourceManager;
@@ -67,15 +68,20 @@ public class DeployViewSchemasCommand extends AbstractResourceCommand {
 	}
 
 	@Override
-	protected void afterResourceSaved(ResourceManager mgr, CommandContext context, File resourceFile, SaveReceipt receipt) {
-		PayloadParser parser = new PayloadParser();
-		String viewSchemaName = parser.getPayloadFieldValue(receipt.getPayload(), "view-schema-name");
-		File viewDir = new File(resourceFile.getParentFile(), viewSchemaName + "-views");
-		if (viewDir.exists()) {
-			ViewManager viewMgr = new ViewManager(context.getManageClient(), currentDatabaseIdOrName, viewSchemaName);
-			for (File viewFile : listFilesInDirectory(viewDir)) {
-				saveResource(viewMgr, context, viewFile);
+	protected void afterResourceSaved(ResourceManager mgr, CommandContext context, ResourceReference reference, SaveReceipt receipt) {
+		if (reference != null) {
+			File resourceFile = reference.getLastFile();
+			PayloadParser parser = new PayloadParser();
+			String viewSchemaName = parser.getPayloadFieldValue(receipt.getPayload(), "view-schema-name");
+			File viewDir = new File(resourceFile.getParentFile(), viewSchemaName + "-views");
+			if (viewDir.exists()) {
+				ViewManager viewMgr = new ViewManager(context.getManageClient(), currentDatabaseIdOrName, viewSchemaName);
+				for (File viewFile : listFilesInDirectory(viewDir)) {
+					saveResource(viewMgr, context, viewFile);
+				}
 			}
+		} else {
+			logger.info("No ResourceReference provided in afterResourceSaved, so unable to create views associated with view schema");
 		}
 	}
 }

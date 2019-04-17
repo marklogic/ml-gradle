@@ -57,6 +57,11 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			config.setCatchUndeployExceptions(Boolean.parseBoolean(prop));
 		});
 
+		propertyConsumerMap.put("mlMergeResources", (config, prop) -> {
+			logger.info("Merge resources before saving them: " + prop);
+			config.setMergeResources(Boolean.parseBoolean(prop));
+		});
+
 		propertyConsumerMap.put("mlOptimizeWithCma", (config, prop) -> {
 			logger.info("mlOptimizeWithCma is DEPRECATED; please use a property specific to the resource that you want to deploy with CMA");
 			// mlOptimizeWithCma was deprecated in 3.11; it was only used for deploying forests, so if the

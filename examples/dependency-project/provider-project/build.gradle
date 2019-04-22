@@ -10,6 +10,9 @@ configurations {
 }
 
 task bundleJar(type: Jar) {
+	from("src/main/ml-config") {
+		into("example-dependency/ml-config")
+	}
 	from("src/main/ml-modules") {
 		into("example-dependency/ml-modules")
 	}

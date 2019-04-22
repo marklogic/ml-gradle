@@ -1,0 +1,13 @@
+{
+	"role-name": "provider-role1",
+	"role": [
+		"rest-reader"
+	],
+	"privilege": [
+		{
+			"privilege-name": "provider-privilege1",
+			"action": "provider-privilege1",
+			"kind": "execute"
+		}
+	]
+}

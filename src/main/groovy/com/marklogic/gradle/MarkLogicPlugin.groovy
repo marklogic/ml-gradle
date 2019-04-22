@@ -96,7 +96,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 
 		// No group or description on these so they don't show up in "gradle tasks"
 		project.task("mlDeployApp", type: DeployAppTask, dependsOn: ["mlDeleteModuleTimestampsFile", "mlPrepareBundles"])
-		project.task("mlUndeployApp", type: UndeployAppTask)
+		project.task("mlUndeployApp", type: UndeployAppTask, dependsOn: ["mlPrepareBundles"])
 
 		String deployGroup = "ml-gradle Deploy"
 		project.task("mlPostDeploy", group: deployGroup, description: "Add dependsOn to this task to add tasks at the end of mlDeploy").mustRunAfter(["mlDeployApp"])

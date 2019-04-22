@@ -1,15 +1,16 @@
-//buildscript {
-//	repositories {
-//		jcenter()
-//	}
-//	dependencies {
-//		classpath "com.marklogic:ml-gradle:3.13.0"
-//	}
-//}
+buildscript {
+	repositories {
+		jcenter()
+		mavenLocal()
+	}
+	dependencies {
+		classpath "com.marklogic:ml-gradle:3.14.develop"
+	}
+}
 
 plugins {
 	id "net.saliman.properties" version "1.4.6"
-	id "com.marklogic.ml-gradle" version "3.13.0"
+	//id "com.marklogic.ml-gradle" version "3.13.0"
 }
 
 apply plugin: "com.marklogic.ml-gradle"

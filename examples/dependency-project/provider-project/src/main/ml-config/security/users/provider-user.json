@@ -1,0 +1,7 @@
+{
+	"user-name": "provider-user1",
+	"password": "password",
+	"role": [
+		"provider-role1"
+	]
+}

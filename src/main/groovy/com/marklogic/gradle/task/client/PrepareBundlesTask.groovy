@@ -1,5 +1,6 @@
 package com.marklogic.gradle.task.client
 
+import com.marklogic.appdeployer.ConfigDir
 import com.marklogic.gradle.task.MarkLogicTask
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.internal.project.DefaultAntBuilder
@@ -46,6 +47,9 @@ class PrepareBundlesTask extends MarkLogicTask {
 					ant.unzip(src: f, dest: buildDir, overwrite: "true")
 				}
 
+				List<ConfigDir> configDirs = getAppConfig().getConfigDirs()
+				List<ConfigDir> newConfigDirs = new ArrayList<>()
+
 				List<String> modulePaths = getAppConfig().getModulePaths()
 				List<String> newModulePaths = new ArrayList<>()
 
@@ -60,6 +64,11 @@ class PrepareBundlesTask extends MarkLogicTask {
 
 				for (dir in buildDir.listFiles()) {
 					if (dir.isDirectory()) {
+						File configDir = new File(dir, "ml-config")
+						if (configDir != null && configDir.exists()) {
+							newConfigDirs.add(new ConfigDir(configDir))
+						}
+
 						File modulesDir = new File(dir, "ml-modules")
 						if (modulesDir != null && modulesDir.exists()) {
 							newModulePaths.add(modulesDir.getAbsolutePath())
@@ -84,6 +93,15 @@ class PrepareBundlesTask extends MarkLogicTask {
 
 				// The config paths of the dependencies should be before the original config paths
 				getLogger().info("Finished extracting " + configurationName + " dependencies")
+
+				if (!newConfigDirs.isEmpty()) {
+					newConfigDirs.addAll(configDirs)
+					getAppConfig().setConfigDirs(newConfigDirs)
+					getLogger().info("Config paths including mlBundle paths:")
+					for (ConfigDir configDir : getAppConfig().getConfigDirs()) {
+						getLogger().info(configDir.getBaseDir().getAbsolutePath())
+					}
+				}
 
 				if (!newModulePaths.isEmpty()) {
 					newModulePaths.addAll(modulePaths)

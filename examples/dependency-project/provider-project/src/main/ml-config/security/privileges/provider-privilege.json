@@ -1,0 +1,8 @@
+{
+	"privilege-name": "provider-privilege1",
+	"action": "provider-privilege1",
+	"kind": "execute",
+	"role": [
+		"manage-user"
+	]
+}

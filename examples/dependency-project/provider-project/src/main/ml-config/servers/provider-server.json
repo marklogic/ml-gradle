@@ -1,0 +1,9 @@
+{
+	"server-name": "provider-server",
+	"server-type": "http",
+	"root": "/",
+	"group-name": "Default",
+	"port": 8019,
+	"modules-database": "%%MODULES_DATABASE%%",
+	"content-database": "%%DATABASE%%"
+}

@@ -1,13 +1,12 @@
 package com.marklogic.gradle.task.forests
 
-import com.marklogic.appdeployer.AppConfig
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand
+import com.marklogic.appdeployer.command.databases.DatabasePlan
 import com.marklogic.appdeployer.command.databases.DeployDatabaseCommand
-import com.marklogic.appdeployer.command.databases.DeploySchemasDatabaseCommand
-import com.marklogic.appdeployer.command.databases.DeployTriggersDatabaseCommand
+import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand
 import com.marklogic.appdeployer.impl.SimpleAppDeployer
 import com.marklogic.gradle.task.MarkLogicTask
 import com.marklogic.mgmt.api.forest.Forest
+import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 
 class PrintForestPlanTask extends MarkLogicTask {
@@ -21,29 +20,28 @@ class PrintForestPlanTask extends MarkLogicTask {
 
 		String database = project.property("database")
 
-		/**
-		 * We unfortunately have to do a little work here to determine what command object to use based on the database
-		 * name. That's to account for the "special" stuff that's done for the content database (mlContentForestsPerHost)
-		 * and for the schema/triggers databases (those commands default to only having forests on one host).
-		 */
-		AppConfig appConfig = getAppConfig()
 		SimpleAppDeployer appDeployer = getAppDeployer()
-		DeployDatabaseCommand command
-		if (database.equals(appConfig.getContentDatabaseName()) || database.equals(appConfig.getTestContentDatabaseName())) {
-			command = appDeployer.getCommandOfType(DeployContentDatabasesCommand.class)
-		} else if (database.equals(appConfig.getSchemasDatabaseName())) {
-			command = appDeployer.getCommandOfType(DeploySchemasDatabaseCommand.class)
-		} else if (database.equals(appConfig.getTriggersDatabaseName())) {
-			command = appDeployer.getCommandOfType(DeployTriggersDatabaseCommand.class)
-		} else {
-			command = new DeployDatabaseCommand()
+		DeployOtherDatabasesCommand command = appDeployer.getCommandOfType(DeployOtherDatabasesCommand.class)
+		List<DatabasePlan> plans = command.buildDatabasePlans(getCommandContext())
+
+		DeployDatabaseCommand deployDatabaseCommand
+		for (DatabasePlan plan : plans) {
+			if (database.equals(plan.getDatabaseName())) {
+				deployDatabaseCommand = plan.getDeployDatabaseCommand()
+				break
+			}
+		}
+
+		if (deployDatabaseCommand == null) {
+			throw new GradleException("Did not find any database plan with a database name of: " + database)
 		}
 
 		/**
 		 * Now that we have a command, use it to build its command for deploying forests, and then use that to build
 		 * the list of forests that will be created.
 		 */
-		List<Forest> forests = command.buildDeployForestsCommand(database, getCommandContext()).buildForests(getCommandContext(), true)
+		List<Forest> forests = deployDatabaseCommand.buildDeployForestsCommand(
+			database, getCommandContext()).buildForests(getCommandContext(), true)
 
 
 		if (forests.isEmpty()) {

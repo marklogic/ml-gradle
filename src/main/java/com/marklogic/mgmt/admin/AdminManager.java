@@ -91,13 +91,17 @@ public class AdminManager extends AbstractManager {
         installAdmin(null, null);
     }
 
-    public void installAdmin(String username, String password) {
+	public void installAdmin(String username, String password) {
+		installAdmin(username, password, "public");
+	}
+
+    public void installAdmin(String username, String password, String realm) {
         final URI uri = adminConfig.buildUri("/admin/v1/instance-admin");
 
         String json = null;
         if (username != null && password != null) {
-            json = format("{\"admin-username\":\"%s\", \"admin-password\":\"%s\", \"realm\":\"public\"}", username,
-                    password);
+            json = format("{\"admin-username\":\"%s\", \"admin-password\":\"%s\", \"realm\":\"%s\"}",
+	            username, password, realm);
         } else {
             json = "{}";
         }

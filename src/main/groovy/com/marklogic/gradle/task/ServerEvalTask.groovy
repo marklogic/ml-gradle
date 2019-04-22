@@ -5,12 +5,16 @@ import org.gradle.api.tasks.TaskAction
 
 class ServerEvalTask extends MarkLogicTask {
 
+	DatabaseClient client
+
 	String xquery
 	String javascript
 
 	@TaskAction
 	void serverEval() {
-		DatabaseClient client = newClient()
+		if (client == null) {
+			client = newClient()
+		}
 		try {
 			String result
 			if (xquery != null) {

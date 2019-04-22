@@ -6,8 +6,17 @@ import com.marklogic.gradle.task.MarkLogicTask
 
 class InstallAdminTask extends MarkLogicTask {
 
+	String realm
+
     @TaskAction
     void installAdmin() {
-        getAdminManager().installAdmin(getAdminUsername(), getAdminPassword())
+	    if (getProject().hasProperty("realm")) {
+		    realm = project.property("realm")
+	    }
+	    if (realm != null) {
+		    getAdminManager().installAdmin(getAdminUsername(), getAdminPassword(), realm)
+	    } else {
+		    getAdminManager().installAdmin(getAdminUsername(), getAdminPassword())
+	    }
     }
 }

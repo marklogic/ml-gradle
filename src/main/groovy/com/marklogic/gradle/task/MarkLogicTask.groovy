@@ -36,10 +36,14 @@ class MarkLogicTask extends DefaultTask {
         getProject().property("mlAdminManager")
     }
 
+	// TODO Should remove this as "mlSecurityUsername" is preferred, and this is now specific to InstallAdminTask
+	@Deprecated
     String getAdminUsername() {
         project.hasProperty("mlAdminUsername") ? project.property("mlAdminUsername") : project.property("mlUsername")
     }
 
+	// TODO Should remove this as "mlSecurityUsername" is preferred, and this is now specific to InstallAdminTask
+	@Deprecated
 	String getAdminPassword() {
 		project.hasProperty("mlAdminPassword") ? project.property("mlAdminPassword") : project.property("mlPassword")
 	}

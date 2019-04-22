@@ -55,11 +55,6 @@ public class DeployOtherServersCommand extends AbstractResourceCommand {
 		return new ServerManager(context.getManageClient(), context.getAppConfig().getGroupName());
 	}
 
-	@Override
-	public Integer getUndoSortOrder() {
-		return 0;
-	}
-
 	/**
 	 * If the payload has a group-name that differs from the group name in the AppConfig, then this returns a new
 	 * ServerManager using the group-name in the payload.

@@ -81,8 +81,9 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 	 */
 	private boolean postponeForestCreation = false;
     private DeployForestsCommand deployForestsCommand;
-    private DeploySubDatabasesCommand deploySubDatabasesCommand;
-    private String payloadBeforeMerging;
+
+    // This is expected to be set via DeployOtherDatabasesCommand
+    private String payload;
 
 	/**
 	 * Expected to be set by DeployOtherDatabasesCommand; a list of database names (should default to the ones MarkLogic
@@ -95,9 +96,6 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
     public DeployDatabaseCommand() {
 	    setExecuteSortOrder(SortOrderConstants.DEPLOY_OTHER_DATABASES);
         setUndoSortOrder(SortOrderConstants.DELETE_OTHER_DATABASES);
-	    setResourceIdPropertyName("database-name");
-	    setResourceClassType(Database.class);
-	    setSupportsResourceMerging(true);
     }
 
     public DeployDatabaseCommand(File databaseFile) {
@@ -127,23 +125,15 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
     public void execute(CommandContext context) {
         String payload = buildPayload(context);
         if (payload != null) {
-        	final boolean mergeResourcesBeforeSaving = resourceMergingIsSupported(context);
-
             DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
             databaseName = dbMgr.getResourceId(payload);
 
-            // If resources should first be merged, then stash the payload and don't make a save call yet
-            if (mergeResourcesBeforeSaving) {
-            	this.payloadBeforeMerging = payload;
-            }
-            else {
-	            payload = adjustPayloadBeforeSavingResource(dbMgr, context, null, payload);
-	            dbMgr.save(payload);
-            }
+            payload = adjustPayloadBeforeSavingResource(dbMgr, context, null, payload);
+            dbMgr.save(payload);
 
             if (shouldCreateForests(context, payload)) {
 	            deployForestsCommand = buildDeployForestsCommand(databaseName, context);
-	            if (mergeResourcesBeforeSaving || postponeForestCreation) {
+	            if (postponeForestCreation) {
 		            logger.info("Postponing creation of forests for database: " + databaseName);
 	            } else {
 		            deployForestsCommand.execute(context);
@@ -151,14 +141,7 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
             }
 
             if (!isSubDatabase()) {
-            	DeploySubDatabasesCommand command = new DeploySubDatabasesCommand(databaseName, deployDatabaseCommandFactory);
-            	// If resources should first be merged, stash this command so it can be executed after the resources
-	            // are merged and saved
-            	if (mergeResourcesBeforeSaving) {
-            		this.deploySubDatabasesCommand = command;
-	            } else {
-            		command.execute(context);
-	            }
+            	new DeploySubDatabasesCommand(databaseName, deployDatabaseCommandFactory).execute(context);
             }
         }
     }
@@ -231,6 +214,10 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
      * @return
      */
     protected String getPayload(CommandContext context) {
+    	if (this.payload != null) {
+    		return payload;
+	    }
+
         File f = null;
         if (this.databaseFile != null) {
         	f = this.databaseFile;
@@ -446,11 +433,7 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 		return deployForestsCommand;
 	}
 
-	public DeploySubDatabasesCommand getDeploySubDatabasesCommand() {
-		return deploySubDatabasesCommand;
-	}
-
-	public String getPayloadBeforeMerging() {
-		return payloadBeforeMerging;
+	public void setPayload(String payload) {
+		this.payload = payload;
 	}
 }

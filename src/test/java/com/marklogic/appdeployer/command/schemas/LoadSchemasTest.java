@@ -2,7 +2,6 @@ package com.marklogic.appdeployer.command.schemas;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.Command;
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.document.GenericDocumentManager;
@@ -49,8 +48,7 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void testSchemaLoading() {
-		initializeAppDeployer(new DeployOtherDatabasesCommand(),
-			new DeployContentDatabasesCommand(1), newCommand());
+		initializeAppDeployer(new DeployOtherDatabasesCommand(1), newCommand());
 		appDeployer.deploy(appConfig);
 
 		DatabaseClient client = appConfig.newSchemasDatabaseClient();
@@ -66,7 +64,7 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void testCustomSchemasPathWithCustomFileFilter() {
-		initializeAppDeployer(new DeployOtherDatabasesCommand(), new DeployContentDatabasesCommand(1), newCommand());
+		initializeAppDeployer(new DeployOtherDatabasesCommand(1), newCommand());
 
 		appConfig.getSchemaPaths().clear();
 		appConfig.getSchemaPaths().add("src/test/resources/schemas-marklogic9");
@@ -100,7 +98,7 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void tdeValidationEnabled() {
-		initializeAppDeployer(new DeployOtherDatabasesCommand(), new DeployContentDatabasesCommand(1), newCommand());
+		initializeAppDeployer(new DeployOtherDatabasesCommand(1), newCommand());
 		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/tde-validation"));
 		try {
 			deploySampleApp();
@@ -119,8 +117,7 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 		initializeAppConfig(projectDir);
 		appConfig.getSchemaPaths().add(new File(projectDir, "src/main/more-schemas").getAbsolutePath());
 
-		initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployOtherDatabasesCommand(),
-			new LoadSchemasCommand());
+		initializeAppDeployer(new DeployOtherDatabasesCommand(1), new LoadSchemasCommand());
 		deploySampleApp();
 
 		DatabaseClient client = appConfig.newSchemasDatabaseClient();

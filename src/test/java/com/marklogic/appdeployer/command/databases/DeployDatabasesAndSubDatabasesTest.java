@@ -15,7 +15,7 @@ public class DeployDatabasesAndSubDatabasesTest extends AbstractAppDeployerTest 
 		ConfigDir configDir = appConfig.getFirstConfigDir();
 		configDir.setBaseDir(new File("src/test/resources/sample-app/subdatabases"));
 
-		initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployOtherDatabasesCommand());
+		initializeAppDeployer(new DeployOtherDatabasesCommand(1));
 
 		DatabaseManager dbMgr = new DatabaseManager(manageClient);
 

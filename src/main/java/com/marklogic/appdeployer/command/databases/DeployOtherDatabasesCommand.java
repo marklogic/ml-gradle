@@ -1,42 +1,37 @@
 package com.marklogic.appdeployer.command.databases;
 
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractUndoableCommand;
 import com.marklogic.appdeployer.command.CommandContext;
-import com.marklogic.appdeployer.command.ResourceReference;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.appdeployer.command.forests.DeployForestsCommand;
-import com.marklogic.mgmt.SaveReceipt;
+import com.marklogic.mgmt.PayloadParser;
+import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.configuration.Configuration;
 import com.marklogic.mgmt.api.configuration.Configurations;
 import com.marklogic.mgmt.api.database.Database;
 import com.marklogic.mgmt.api.forest.Forest;
+import com.marklogic.mgmt.mapper.DefaultResourceMapper;
+import com.marklogic.mgmt.mapper.ResourceMapper;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.util.ObjectMapperFactory;
+import com.marklogic.rest.util.JsonNodeUtil;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 /**
- * This commands handles deploying/undeploying every database file except the "default" ones of content-database.json,
- * triggers-database.json, and schemas-database.json. Those default ones are supported for ease-of-use, but it's not
- * uncommon to need to create additional databases (and perhaps REST API servers to go with them).
- * <p>
- * A key aspect of this class is its attempt to deploy/undeploy databases in the correct order. For each database file
- * that it finds that's not one of the default ones, a DeployDatabaseCommand will be created. These commands are then
- * sorted based on their dependencies between each other (a database can depend on another database for schemas, triggers,
- * or security).
- * <p>
- * If the above strategy doesn't work for you, you can always resort to naming your database files to control the order
- * that they're processed in. Be sure to set "setSortOtherDatabasesByDependencies" to false in the AppConfig object that
- * is passed in via a CommandContext to disable the sorting that this command will otherwise perform.
- * </p>
+ * As of release 3.14.0, this now handles all databases, not just "databases other than the default content database".
+ * Its name will be changed to DeployDatabasesCommand in a future release, which likely will also be when
+ * DeployContentDatabaseCommand is deleted (probably 4.0).
  */
 public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 
 	// Each of these is copied to the instances of DeployDatabaseCommand that are created
-    private int forestsPerHost = 1;
+	private Integer forestsPerHost;
 	private boolean checkForCustomForests = true;
 	private String forestFilename;
 	private boolean createForestsOnEachHost = true;
@@ -48,20 +43,20 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 
 	private DeployDatabaseCommandFactory deployDatabaseCommandFactory = new DefaultDeployDatabaseCommandFactory();
 
-    public DeployOtherDatabasesCommand() {
-        this(1);
-    }
+	private PayloadParser payloadParser = new PayloadParser();
 
-    public DeployOtherDatabasesCommand(int forestsPerHost) {
-    	setForestsPerHost(forestsPerHost);
-	    setExecuteSortOrder(SortOrderConstants.DEPLOY_OTHER_DATABASES);
-	    setUndoSortOrder(SortOrderConstants.DELETE_OTHER_DATABASES);
-	    initializeDefaultDatabasesToNotUndeploy();
+	public DeployOtherDatabasesCommand() {
+		setExecuteSortOrder(SortOrderConstants.DEPLOY_OTHER_DATABASES);
+		setUndoSortOrder(SortOrderConstants.DELETE_OTHER_DATABASES);
+		setExecuteSortOrder(SortOrderConstants.DEPLOY_OTHER_DATABASES);
+		setUndoSortOrder(SortOrderConstants.DELETE_OTHER_DATABASES);
+		initializeDefaultDatabasesToNotUndeploy();
+	}
 
-	    setSupportsResourceMerging(true);
-	    setResourceIdPropertyName("database-name");
-	    setResourceClassType(Database.class);
-    }
+	public DeployOtherDatabasesCommand(int forestsPerHost) {
+		this();
+		setForestsPerHost(forestsPerHost);
+	}
 
 	protected void initializeDefaultDatabasesToNotUndeploy() {
 		defaultDatabasesToNotUndeploy = new HashSet<>();
@@ -77,174 +72,306 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 		defaultDatabasesToNotUndeploy.add("Triggers");
 	}
 
-    @Override
-    public void execute(CommandContext context) {
-        List<DeployDatabaseCommand> deployDatabaseCommands = buildDatabaseCommands(context);
-        sortCommandsBeforeExecute(deployDatabaseCommands, context);
-
-	    List<ResourceReference> resourceReferences = new ArrayList<>();
-
-        for (DeployDatabaseCommand c : deployDatabaseCommands) {
-        	c.setPostponeForestCreation(context.getAppConfig().isDeployForestsWithCma());
-            c.execute(context);
-
-            String payload = c.getPayloadBeforeMerging();
-            if (payload != null) {
-	            resourceReferences.add(new ResourceReference(null, convertPayloadToObjectNode(context, payload)));
-            }
-        }
-
-	    /**
-	     * Reuse the parent class method for merging ResourceReference objects, but we don't need the files - we only
-	     * need ObjectNodes, so we build a new list containing those and then sort them as needed.
-	     */
-	    List<ResourceReference> mergedReferences = mergeResources(resourceReferences);
-        List<ObjectNode> mergedResources = new ArrayList<>();
-        mergedReferences.forEach(reference -> mergedResources.add(reference.getObjectNode()));
-
-        if (context.getAppConfig().isSortOtherDatabaseByDependencies()) {
-	        Collections.sort(mergedResources, new DatabaseObjectNodeComparator(ObjectMapperFactory.getObjectMapper()));
-        }
-
-	    final DatabaseManager mgr = new DatabaseManager(context.getManageClient());
-	    for (ObjectNode resource : mergedResources) {
-		    saveResource(mgr, context, resource.toString());
-	    }
-
-	    // Either create forests in one bulk CMA request, or via a command per database
-	    if (context.getAppConfig().isDeployForestsWithCma()) {
-		    deployAllForestsInSingleCmaRequest(context, deployDatabaseCommands);
-	    }
-	    else {
-	    	deployDatabaseCommands.forEach(command -> {
-			    DeployForestsCommand dfc = command.getDeployForestsCommand();
-			    if (dfc != null) {
-			    	dfc.execute(context);
-			    }
-		    });
-	    }
-
-	    /**
-	     * In the event that a sub-database is defined for a database that has files in multiple config paths, the
-	     * sub-database will be saved multiple times, as the sub-database command iterates over every config paths.
-	     * That shouldn't cause any problems, though it's not as efficient as it could be.
-	     */
-	    deployDatabaseCommands.forEach(command -> {
-		    DeploySubDatabasesCommand subDatabasesCommand = command.getDeploySubDatabasesCommand();
-		    if (subDatabasesCommand != null) {
-			    subDatabasesCommand.execute(context);
-		    }
-	    });
-    }
-
+	/**
+	 * Deploys each of the databases found via buildDatabasePlans.
+	 *
+	 * @param context
+	 */
 	@Override
-	public void undo(CommandContext context) {
-		List<DeployDatabaseCommand> list = buildDatabaseCommands(context);
-		sortCommandsBeforeUndo(list, context);
-		for (DeployDatabaseCommand c : list) {
-			c.undo(context);
+	public void execute(CommandContext context) {
+		List<DatabasePlan> databasePlans = buildDatabasePlans(context);
+
+		if (context.getAppConfig().isSortOtherDatabaseByDependencies()) {
+			Collections.sort(databasePlans, new DatabasePlanComparator(false));
+		} else {
+			logger.info("Not sorting databases by dependencies, will sort them by their filenames instead");
+		}
+
+		databasePlans.forEach(databasePlan -> {
+			databasePlan.getDeployDatabaseCommand().execute(context);
+		});
+
+		// Either create forests in one bulk CMA request, or via a command per database
+		if (context.getAppConfig().isDeployForestsWithCma()) {
+			deployAllForestsInSingleCmaRequest(context, databasePlans);
+		} else {
+			databasePlans.forEach(databasePlan -> {
+				DeployForestsCommand dfc = databasePlan.getDeployDatabaseCommand().getDeployForestsCommand();
+				if (dfc != null) {
+					dfc.execute(context);
+				}
+			});
 		}
 	}
 
 	/**
-	 * Each DeployDatabaseCommand is expected to have constructed a DeployForestCommand, but not executed it. Each
+	 * Undeploys each of the databases found via buildDatabasePlans.
+	 *
+	 * @param context
+	 */
+	@Override
+	public void undo(CommandContext context) {
+		List<DatabasePlan> databasePlans = buildDatabasePlans(context);
+
+		if (context.getAppConfig().isSortOtherDatabaseByDependencies()) {
+			Collections.sort(databasePlans, new DatabasePlanComparator(true));
+		} else {
+			logger.info("Not sorting databases by dependencies, will sort them by their filenames instead");
+		}
+
+		databasePlans.forEach(databasePlan -> {
+			databasePlan.getDeployDatabaseCommand().undo(context);
+		});
+
+		// If no databases were found, may still need to delete the content database in case no file exists for it.
+		// That's because the command for creating a REST API server will not delete the content database by default,
+		// though it will delete the test database by default
+		DatabaseManager dbMgr = new DeployDatabaseCommand().newDatabaseManageForDeleting(context);
+		dbMgr.deleteByName(context.getAppConfig().getContentDatabaseName());
+	}
+
+	/**
+	 * Performs all the work of finding all the database files across all the configuration paths; merging matching
+	 * database files together; and then building an instance of DeployDatabaseCommand for each database that needs
+	 * to be deployed. This method doesn't make any calls to deploy/undeploy databases though - it just builds up all
+	 * the data that is needed to do so.
+	 *
+	 * This is public so that ml-gradle can invoke it when previewing what forests will be created for a database.
+	 *
+	 * @param context
+	 * @return
+	 */
+	public List<DatabasePlan> buildDatabasePlans(CommandContext context) {
+		DatabasePlans databasePlan = new DatabasePlans();
+
+		for (ConfigDir configDir : context.getAppConfig().getConfigDirs()) {
+			addLegacyContentDatabaseFiles(context, configDir, databasePlan);
+			addDatabaseFiles(context, configDir, databasePlan);
+		}
+
+		List<DatabasePlan> databasePlans = mergeDatabasePlanFiles(context, databasePlan);
+		buildDeployDatabaseCommands(context, databasePlans);
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("Logging each DatabasePlan before any databases are created/updated:");
+			databasePlans.forEach(plan -> logger.debug(plan + "\n"));
+		}
+
+		return databasePlans;
+	}
+
+	/**
+	 * This processes the content database files as defined in the ConfigDir object. This approach dates back to the
+	 * 2.0 release of ml-app-deployer, where multiple files could be defined for the content database. Starting in
+	 * 3.14.0, multiple files will be detected and merged automatically for several resources, including database,
+	 * thus rendering this approach unnecessary. But it's being kept for backwards-compatibility purposes.
+	 *
+	 * @param context
+	 * @param configDir
+	 * @param databasePlans
+	 */
+	@Deprecated
+	protected void addLegacyContentDatabaseFiles(CommandContext context, ConfigDir configDir, DatabasePlans databasePlans) {
+		List<File> files = configDir.getContentDatabaseFiles();
+		if (files != null && !files.isEmpty()) {
+			for (File f : files) {
+				// We're not using listFilesInDirectory, but should still apply the filename filter
+				if (f != null && f.exists() && getResourceFilenameFilter().accept(f.getParentFile(), f.getName())) {
+					String payload = copyFileToString(f, context);
+					String databaseName = payloadParser.getPayloadFieldValue(payload, "database-name", false);
+					if (databaseName != null) {
+						if (databasePlans.getMainContentDatabaseName() == null) {
+							databasePlans.setMainContentDatabaseName(databaseName);
+						}
+						if (databasePlans.getDatabasePlanMap().containsKey(databaseName)) {
+							DatabasePlan ref = databasePlans.getDatabasePlanMap().get(databaseName);
+							ref.addFile(f);
+							ref.setMainContentDatabase(true);
+						} else {
+							databasePlans.getDatabasePlanMap().put(databaseName, new DatabasePlan(databaseName, f, true));
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param context
+	 * @param configDir
+	 * @param databasePlans
+	 */
+	protected void addDatabaseFiles(CommandContext context, ConfigDir configDir, DatabasePlans databasePlans) {
+		final String contentDatabaseFilename = configDir.getDefaultContentDatabaseFilename();
+		File dir = configDir.getDatabasesDir();
+		if (dir != null && dir.exists()) {
+			for (File f : listFilesInDirectory(dir)) {
+				String payload = copyFileToString(f, context);
+				String databaseName = payloadParser.getPayloadFieldValue(payload, "database-name", false);
+				if (databaseName != null) {
+					boolean isMainContentDatabase = false;
+					if (databasePlans.getMainContentDatabaseName() == null && f.getName().equals(contentDatabaseFilename)) {
+						databasePlans.setMainContentDatabaseName(databaseName);
+						isMainContentDatabase = true;
+					}
+					if (databasePlans.getDatabasePlanMap().containsKey(databaseName)) {
+						DatabasePlan reference = databasePlans.getDatabasePlanMap().get(databaseName);
+						reference.addFile(f);
+						if (!reference.isMainContentDatabase() && isMainContentDatabase) {
+							reference.setMainContentDatabase(isMainContentDatabase);
+						}
+					} else {
+						databasePlans.getDatabasePlanMap().put(databaseName, new DatabasePlan(databaseName, f, isMainContentDatabase));
+					}
+				}
+			}
+		} else {
+			logResourceDirectoryNotFound(dir);
+		}
+	}
+
+	/**
+	 * For each DatabasePlan in the DatabasePlan, the files (usually just one) are merged together if needed and
+	 * then stored as the payload on the given DatabasePlan. In addition, a check is made to see if a test
+	 * database should be created that mirrors the main content database.
+	 *
+	 * @param context
+	 * @param databasePlans
+	 * @return
+	 */
+	protected List<DatabasePlan> mergeDatabasePlanFiles(CommandContext context, DatabasePlans databasePlans) {
+		ResourceMapper resourceMapper = new DefaultResourceMapper(new API(context.getManageClient()));
+		ObjectReader objectReader = ObjectMapperFactory.getObjectMapper().readerFor(Database.class);
+
+		List<DatabasePlan> databasePlanList = new ArrayList<>();
+		databasePlans.getDatabasePlanMap().values().forEach(ref -> databasePlanList.add(ref));
+
+		DatabasePlan testDatabasePlan = null;
+
+		for (DatabasePlan reference : databasePlanList) {
+			boolean createTestDatabase = reference.isMainContentDatabase() && context.getAppConfig().isTestPortSet();
+			if (createTestDatabase) {
+				testDatabasePlan = new DatabasePlan(context.getAppConfig().getTestContentDatabaseName(), reference.getFiles());
+			}
+
+			List<File> files = reference.getFiles();
+			if (files.size() == 1) {
+				String payload = copyFileToString(files.get(0), context);
+				reference.setPayload(payload);
+				reference.setDatabaseForSorting(resourceMapper.readResource(payload, Database.class));
+				if (createTestDatabase) {
+					String testPayload = payloadTokenReplacer.replaceTokens(copyFileToString(files.get(0)), context.getAppConfig(), true);
+					testDatabasePlan.setPayload(testPayload);
+					testDatabasePlan.setDatabaseForSorting(resourceMapper.readResource(payload, Database.class));
+				}
+			} else {
+				List<ObjectNode> nodes = new ArrayList<>();
+				files.forEach(file -> {
+					String payload = copyFileToString(file, context);
+					nodes.add(convertPayloadToObjectNode(context, payload));
+				});
+				ObjectNode mergedNode = JsonNodeUtil.mergeObjectNodes(nodes.toArray(new ObjectNode[]{}));
+				reference.setMergedObjectNode(mergedNode);
+				try {
+					reference.setDatabaseForSorting(objectReader.readValue(mergedNode));
+				} catch (IOException e) {
+					throw new RuntimeException("Unable to read ObjectNode into Database class, cause: " + e.getMessage(), e);
+				}
+
+				if (createTestDatabase) {
+					List<ObjectNode> testNodes = new ArrayList<>();
+					files.forEach(file -> {
+						String testPayload = payloadTokenReplacer.replaceTokens(copyFileToString(file), context.getAppConfig(), true);
+						testNodes.add(convertPayloadToObjectNode(context, testPayload));
+					});
+					ObjectNode mergedTestNode = JsonNodeUtil.mergeObjectNodes(testNodes.toArray(new ObjectNode[]{}));
+					testDatabasePlan.setMergedObjectNode(mergedTestNode);
+					try {
+						testDatabasePlan.setDatabaseForSorting(objectReader.readValue(mergedTestNode));
+					} catch (IOException e) {
+						throw new RuntimeException("Unable to read ObjectNode into Database class, cause: " + e.getMessage(), e);
+					}
+				}
+			}
+		}
+
+		if (testDatabasePlan != null) {
+			databasePlanList.add(testDatabasePlan);
+			testDatabasePlan.setTestContentDatabase(true);
+		}
+
+		return databasePlanList;
+	}
+
+	/**
+	 * For each DatabasePlan, build a DeployDatabaseCommand that can later be executed for the database.
+	 *
+	 * @param databasePlans
+	 */
+	protected void buildDeployDatabaseCommands(CommandContext context, List<DatabasePlan> databasePlans) {
+		databasePlans.forEach(databasePlan -> {
+			DeployDatabaseCommand command = deployDatabaseCommandFactory.newDeployDatabaseCommand(databasePlan.getLastFile());
+			command.setCheckForCustomForests(isCheckForCustomForests());
+			command.setCreateForestsOnEachHost(isCreateForestsOnEachHost());
+			command.setDatabasesToNotUndeploy(this.getDefaultDatabasesToNotUndeploy());
+
+			if (databasePlan.isMainContentDatabase() || databasePlan.isTestContentDatabase()) {
+				Integer contentForestsPerHost = context.getAppConfig().getContentForestsPerHost();
+				if (contentForestsPerHost != null) {
+					command.setForestsPerHost(contentForestsPerHost);
+				} else if (this.forestsPerHost != null) {
+					command.setForestsPerHost(this.forestsPerHost);
+				} else {
+					command.setForestsPerHost(3); // default as defined by /v1/rest-apis
+				}
+				command.setForestFilename("content-forest.json");
+			} else {
+				if (this.forestsPerHost != null) {
+					command.setForestsPerHost(this.forestsPerHost);
+				}
+				command.setForestFilename(getForestFilename());
+			}
+
+			// Set the payload so the command doesn't try to generate it
+			command.setPayload(databasePlan.getPayload());
+
+			command.setPostponeForestCreation(context.getAppConfig().isDeployForestsWithCma());
+			databasePlan.setDeployDatabaseCommand(command);
+		});
+	}
+
+	/**
+	 * Each DatabasePlan is expected to have constructed a DeployForestCommand, but not executed it. Each
 	 * DeployForestCommand can then be used to build a list of forests. All of those forests can be combined into a
 	 * single list and then submitted to CMA, thereby greatly speeding up the creation of the forests.
 	 *
 	 * @param context
-	 * @param deployDatabaseCommands
+	 * @param databasePlans
 	 */
-	protected void deployAllForestsInSingleCmaRequest(CommandContext context, List<DeployDatabaseCommand> deployDatabaseCommands) {
-	    List<Forest> allForests = new ArrayList<>();
-	    for (DeployDatabaseCommand c : deployDatabaseCommands) {
-		    DeployForestsCommand deployForestsCommand = c.getDeployForestsCommand();
-		    if (deployForestsCommand != null) {
-			    allForests.addAll(deployForestsCommand.buildForests(context, false));
-		    }
-	    }
-	    if (!allForests.isEmpty()) {
-		    Configuration config = new Configuration();
-		    config.setForests(allForests);
-		    new Configurations(config).submit(context.getManageClient());
-	    }
-    }
+	protected void deployAllForestsInSingleCmaRequest(CommandContext context, List<DatabasePlan> databasePlans) {
+		List<Forest> allForests = new ArrayList<>();
+		for (DatabasePlan reference : databasePlans) {
+			DeployForestsCommand deployForestsCommand = reference.getDeployDatabaseCommand().getDeployForestsCommand();
+			if (deployForestsCommand != null) {
+				allForests.addAll(deployForestsCommand.buildForests(context, false));
+			}
+		}
+		if (!allForests.isEmpty()) {
+			Configuration config = new Configuration();
+			config.setForests(allForests);
+			new Configurations(config).submit(context.getManageClient());
+		}
+	}
 
-	/**
-	 * Databases have dependencies on each other - they can be the schema or triggers databases for other databases. So
-	 * they need to be deployed in an order that ensures any schema/triggers databases exist before a database is
-	 * created.
-	 *
-	 * Once support exists for deploying databases via CMA, this shouldn't be needed (except for supporting clients on
-	 * ML that don't yet have CMA).
-	 *
-	 * @param list
-	 * @param context
-	 */
-	protected void sortCommandsBeforeExecute(List<DeployDatabaseCommand> list, CommandContext context) {
-    	if (context.getAppConfig().isSortOtherDatabaseByDependencies()) {
-		    Collections.sort(list, new DeployDatabaseCommandComparator(context, false));
-	    }
-	    else {
-    		logger.info("Not sorting databases by dependencies; they will be sorted based on their filename instead");
-	    }
-    }
+	public void setDeployDatabaseCommandFactory(DeployDatabaseCommandFactory deployDatabaseCommandFactory) {
+		this.deployDatabaseCommandFactory = deployDatabaseCommandFactory;
+	}
 
-    protected void sortCommandsBeforeUndo(List<DeployDatabaseCommand> list, CommandContext context) {
-        Collections.sort(list, new DeployDatabaseCommandComparator(context, true));
-    }
-
-    protected List<DeployDatabaseCommand> buildDatabaseCommands(CommandContext context) {
-        List<DeployDatabaseCommand> dbCommands = new ArrayList<>();
-        for (ConfigDir configDir : context.getAppConfig().getConfigDirs()) {
-	        File dir = configDir.getDatabasesDir();
-	        if (dir != null && dir.exists()) {
-		        ignoreKnownDatabaseFilenames(context);
-		        for (File f : listFilesInDirectory(dir)) {
-			        if (logger.isDebugEnabled()) {
-				        logger.debug("Will process other database in file: " + f.getName());
-			        }
-			        dbCommands.add(buildDeployDatabaseCommand(f));
-		        }
-	        } else {
-	        	logResourceDirectoryNotFound(dir);
-	        }
-        }
-        return dbCommands;
-    }
-
-    protected DeployDatabaseCommand buildDeployDatabaseCommand(File file) {
-	    DeployDatabaseCommand c = this.deployDatabaseCommandFactory.newDeployDatabaseCommand(file);
-	    c.setForestsPerHost(getForestsPerHost());
-	    c.setCheckForCustomForests(isCheckForCustomForests());
-	    c.setForestFilename(getForestFilename());
-	    c.setCreateForestsOnEachHost(isCreateForestsOnEachHost());
-	    c.setDatabasesToNotUndeploy(this.getDefaultDatabasesToNotUndeploy());
-	    return c;
-    }
-
-    /**
-     * Adds to the list of resource filenames to ignore. Some may already have been set via the superclass method.
-     *
-     * @param context
-     */
-    protected void ignoreKnownDatabaseFilenames(CommandContext context) {
-        Set<String> ignore = new HashSet<>();
-        for (ConfigDir configDir : context.getAppConfig().getConfigDirs()) {
-        	List<File> list = configDir.getContentDatabaseFiles();
-        	if (list != null && !list.isEmpty()) {
-		        for (File f : list) {
-			        ignore.add(f.getName());
-		        }
-	        }
-        }
-        setFilenamesToIgnore(ignore.toArray(new String[]{}));
-    }
-
-	public int getForestsPerHost() {
+	public Integer getForestsPerHost() {
 		return forestsPerHost;
 	}
 
-	public void setForestsPerHost(int forestsPerHost) {
+	public void setForestsPerHost(Integer forestsPerHost) {
 		this.forestsPerHost = forestsPerHost;
 	}
 
@@ -279,8 +406,67 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 	public void setDefaultDatabasesToNotUndeploy(Set<String> defaultDatabasesToNotUndeploy) {
 		this.defaultDatabasesToNotUndeploy = defaultDatabasesToNotUndeploy;
 	}
+}
 
-	public void setDeployDatabaseCommandFactory(DeployDatabaseCommandFactory deployDatabaseCommandFactory) {
-		this.deployDatabaseCommandFactory = deployDatabaseCommandFactory;
+/**
+ * Defines a set of database plans, including capturing the name of the main content database and whether a test
+ * database mirroring that content database should be created.
+ */
+class DatabasePlans {
+
+	private String mainContentDatabaseName;
+
+	// Using a LinkedHashMap so that plans are first ordered by filename
+	private Map<String, DatabasePlan> databasePlanMap = new LinkedHashMap<>();
+
+	private DatabasePlan testDatabasePlan;
+
+	public String getMainContentDatabaseName() {
+		return mainContentDatabaseName;
+	}
+
+	public void setMainContentDatabaseName(String mainContentDatabaseName) {
+		this.mainContentDatabaseName = mainContentDatabaseName;
+	}
+
+	public Map<String, DatabasePlan> getDatabasePlanMap() {
+		return databasePlanMap;
+	}
+
+	public void setDatabasePlanMap(Map<String, DatabasePlan> databasePlanMap) {
+		this.databasePlanMap = databasePlanMap;
+	}
+
+	public DatabasePlan getTestDatabasePlan() {
+		return testDatabasePlan;
+	}
+
+	public void setTestDatabasePlan(DatabasePlan testDatabasePlan) {
+		this.testDatabasePlan = testDatabasePlan;
+	}
+}
+
+class DatabasePlanComparator implements Comparator<DatabasePlan> {
+
+	private boolean reverseOrder;
+
+	public DatabasePlanComparator(boolean reverseOrder) {
+		this.reverseOrder = reverseOrder;
+	}
+
+	@Override
+	public int compare(DatabasePlan o1, DatabasePlan o2) {
+		Database db1 = o1.getDatabaseForSorting();
+		Database db2 = o2.getDatabaseForSorting();
+
+		int result = db1.compareTo(db2);
+		if (result == 0) {
+			return 0;
+		}
+		if (reverseOrder) {
+			return result == 1 ? -1 : 1;
+		}
+		return result;
+
 	}
 }

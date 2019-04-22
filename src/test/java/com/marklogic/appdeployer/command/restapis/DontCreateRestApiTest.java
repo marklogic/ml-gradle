@@ -1,7 +1,7 @@
 package com.marklogic.appdeployer.command.restapis;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
+import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.mgmt.resource.restapis.RestApiManager;
 import org.junit.Test;
 
@@ -14,7 +14,7 @@ public class DontCreateRestApiTest extends AbstractAppDeployerTest {
 		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/db-only-config"));
 		appConfig.setNoRestServer(true);
 
-		initializeAppDeployer(new DeployRestApiServersCommand(), new DeployContentDatabasesCommand(1));
+		initializeAppDeployer(new DeployRestApiServersCommand(), new DeployOtherDatabasesCommand(1));
 
 		try {
 			appDeployer.deploy(appConfig);

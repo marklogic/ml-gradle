@@ -1,7 +1,6 @@
 package com.marklogic.appdeployer.export;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.triggers.DeployTriggersCommand;
 import com.marklogic.mgmt.selector.PrefixResourceSelector;
@@ -22,8 +21,7 @@ public class ExportTriggersTest extends AbstractExportTest {
 
 	@Test
 	public void test() throws Exception {
-		initializeAppDeployer(new DeployOtherDatabasesCommand(),
-			new DeployContentDatabasesCommand(1), new DeployTriggersCommand());
+		initializeAppDeployer(new DeployOtherDatabasesCommand(1), new DeployTriggersCommand());
 		appDeployer.deploy(appConfig);
 
 		Properties props = new Properties();

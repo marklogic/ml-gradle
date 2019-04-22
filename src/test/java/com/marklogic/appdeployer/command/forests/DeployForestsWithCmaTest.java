@@ -1,10 +1,7 @@
 package com.marklogic.appdeployer.command.forests;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
-import com.marklogic.mgmt.ManageClient;
-import com.marklogic.mgmt.cma.ConfigurationManager;
-import com.marklogic.mgmt.resource.clusters.ClusterManager;
+import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.mgmt.resource.forests.ForestManager;
 import org.junit.Test;
 
@@ -22,7 +19,7 @@ public class DeployForestsWithCmaTest extends AbstractAppDeployerTest {
 		appConfig.setDeployForestsWithCma(true);
 		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/db-only-config"));
 
-		initializeAppDeployer(new DeployContentDatabasesCommand(6));
+		initializeAppDeployer(new DeployOtherDatabasesCommand(6));
 
 		ForestManager mgr = new ForestManager(manageClient);
 

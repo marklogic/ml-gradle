@@ -2,7 +2,7 @@ package com.marklogic.appdeployer.command.modules;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.CommandContext;
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
+import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.client.ext.modulesloader.impl.DefaultModulesLoader;
 import org.junit.Test;
@@ -23,7 +23,7 @@ public class LoadInvalidRestModulesTest extends AbstractAppDeployerTest {
 		DefaultModulesLoader modulesLoader = (DefaultModulesLoader) loadModulesCommand.getModulesLoader();
 		modulesLoader.setModulesManager(null);
 
-		initializeAppDeployer(new DeployRestApiServersCommand(), new DeployContentDatabasesCommand(1), loadModulesCommand);
+		initializeAppDeployer(new DeployRestApiServersCommand(), new DeployOtherDatabasesCommand(1), loadModulesCommand);
 
 		try {
 			deploySampleApp();

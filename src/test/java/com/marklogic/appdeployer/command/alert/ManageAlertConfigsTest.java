@@ -1,20 +1,19 @@
 package com.marklogic.appdeployer.command.alert;
 
-import java.io.File;
-
 import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.alert.AlertConfigManager;
+
+import java.io.File;
 
 public class ManageAlertConfigsTest extends AbstractManageResourceTest {
 
 	@Override
 	protected void initializeAndDeploy() {
 		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/alert-config"));
-		initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployOtherDatabasesCommand(), newCommand());
+		initializeAppDeployer(new DeployOtherDatabasesCommand(1), newCommand());
 		appDeployer.deploy(appConfig);
 	}
 

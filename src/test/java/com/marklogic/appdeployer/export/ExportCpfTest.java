@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.marklogic.appdeployer.command.cpf.DeployCpfConfigsCommand;
 import com.marklogic.appdeployer.command.cpf.DeployDomainsCommand;
 import com.marklogic.appdeployer.command.cpf.DeployPipelinesCommand;
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.mgmt.selector.PropertiesResourceSelector;
@@ -25,8 +24,8 @@ public class ExportCpfTest extends AbstractExportTest {
 	@Test
 	public void exportViaProps() {
 		// Need a modules database, so a REST API is deployed
-		initializeAppDeployer(new DeployRestApiServersCommand(), new DeployContentDatabasesCommand(1),
-			new DeployOtherDatabasesCommand(), new DeployDomainsCommand(),
+		initializeAppDeployer(new DeployRestApiServersCommand(),
+			new DeployOtherDatabasesCommand(1), new DeployDomainsCommand(),
 			new DeployCpfConfigsCommand(), new DeployPipelinesCommand());
 
 		appDeployer.deploy(appConfig);

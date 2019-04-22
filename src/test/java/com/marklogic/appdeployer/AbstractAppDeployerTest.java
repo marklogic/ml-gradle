@@ -61,11 +61,13 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
     }
 
     protected void undeploySampleApp() {
-        try {
-            appDeployer.undeploy(appConfig);
-        } catch (Exception e) {
-            logger.warn("Unexpected error while undeploying sample app: " + e.getMessage());
-        }
+    	if (appDeployer != null) {
+		    try {
+			    appDeployer.undeploy(appConfig);
+		    } catch (Exception e) {
+			    throw new RuntimeException("Unexpected error while undeploying sample app: " + e.getMessage(), e);
+		    }
+	    }
     }
 
     protected XccTemplate newModulesXccTemplate() {

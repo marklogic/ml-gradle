@@ -1,13 +1,12 @@
 package com.marklogic.appdeployer.command.databases;
 
-import java.io.File;
-
-import org.junit.Test;
-
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.forests.ForestManager;
 import com.marklogic.rest.util.Fragment;
+import org.junit.Test;
+
+import java.io.File;
 
 /**
  * The REST API command can be used to create a server with a content database, but that doesn't give any control over
@@ -22,11 +21,11 @@ public class CreateDatabaseWithCustomForestsTest extends AbstractAppDeployerTest
 
         final int numberOfForests = 4;
 
-        DeployContentDatabasesCommand command = new DeployContentDatabasesCommand();
+        DeployOtherDatabasesCommand command = new DeployOtherDatabasesCommand();
         command.setForestsPerHost(numberOfForests);
         command.setForestFilename(null);
 
-        initializeAppDeployer(command, new DeployOtherDatabasesCommand());
+        initializeAppDeployer(command);
 
         ForestManager forestMgr = new ForestManager(manageClient);
         DatabaseManager dbMgr = new DatabaseManager(manageClient);
@@ -74,9 +73,7 @@ public class CreateDatabaseWithCustomForestsTest extends AbstractAppDeployerTest
 
         final int numberOfForests = 2;
 
-        DeployContentDatabasesCommand command = new DeployContentDatabasesCommand();
-        command.setForestsPerHost(numberOfForests);
-        initializeAppDeployer(command);
+        initializeAppDeployer(new DeployOtherDatabasesCommand(numberOfForests));
 
         ForestManager forestMgr = new ForestManager(manageClient);
         DatabaseManager dbMgr = new DatabaseManager(manageClient);

@@ -2,7 +2,7 @@ package com.marklogic.appdeployer.command.forests;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
+import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.mgmt.resource.forests.ForestManager;
 import org.junit.After;
 import org.junit.Test;
@@ -23,7 +23,7 @@ public class DeployCustomForestsTest extends AbstractAppDeployerTest {
 	public void test() {
 		appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/custom-forests")));
 
-		initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployCustomForestsCommand());
+		initializeAppDeployer(new DeployOtherDatabasesCommand(1), new DeployCustomForestsCommand());
 		deploySampleApp();
 
 		ForestManager mgr = new ForestManager(manageClient);

@@ -1,7 +1,6 @@
 package com.marklogic.appdeployer.command.cpf;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.mgmt.resource.cpf.CpfConfigManager;
@@ -19,8 +18,8 @@ public class ManageCpfTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void test() {
-		initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployRestApiServersCommand(),
-			new DeployOtherDatabasesCommand(), new DeployDomainsCommand(),
+		initializeAppDeployer(new DeployRestApiServersCommand(),
+			new DeployOtherDatabasesCommand(1), new DeployDomainsCommand(),
 			new DeployCpfConfigsCommand(), new DeployPipelinesCommand());
 
 		appDeployer.deploy(appConfig);

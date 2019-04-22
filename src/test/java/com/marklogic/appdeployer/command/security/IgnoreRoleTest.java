@@ -63,8 +63,6 @@ public class IgnoreRoleTest extends AbstractAppDeployerTest {
 			fail("Deployment should have failed because exclude and include patterns can't both be set");
 		} catch (Exception ex) {
 			assertEquals("Both excludePattern and includePattern cannot be specified", ex.getMessage());
-		} finally {
-			undeploySampleApp();
 		}
 	}
 }

@@ -2,7 +2,7 @@ package com.marklogic.appdeployer.command.plugins;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
+import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.document.GenericDocumentManager;
 import com.marklogic.client.document.JSONDocumentManager;
@@ -18,7 +18,7 @@ public class InstallPluginsTest extends AbstractAppDeployerTest {
 
 	@After
 	public void teardown() {
-		initializeAppDeployer(new DeployContentDatabasesCommand(1), new InstallPluginsCommand());
+		initializeAppDeployer(new DeployOtherDatabasesCommand(1), new InstallPluginsCommand());
 		undeploySampleApp();
 	}
 
@@ -29,7 +29,7 @@ public class InstallPluginsTest extends AbstractAppDeployerTest {
 
 		initializeAppConfig(projectDir);
 
-		initializeAppDeployer(new DeployContentDatabasesCommand(1), new InstallPluginsCommand());
+		initializeAppDeployer(new DeployOtherDatabasesCommand(1), new InstallPluginsCommand());
 		appConfig.getPluginConfig().setDatabaseName(appConfig.getContentDatabaseName());
 
 		deploySampleApp();

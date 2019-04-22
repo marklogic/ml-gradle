@@ -1,10 +1,7 @@
 package com.marklogic.appdeployer.command.alert;
 
-import java.io.File;
-
 import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.alert.AlertActionManager;
@@ -12,6 +9,8 @@ import com.marklogic.mgmt.resource.alert.AlertConfigManager;
 import com.marklogic.mgmt.resource.alert.AlertRuleManager;
 import com.marklogic.rest.util.Fragment;
 import com.marklogic.rest.util.ResourcesFragment;
+
+import java.io.File;
 
 public class ManageAlertActionsAndRulesTest extends AbstractManageResourceTest {
 
@@ -26,8 +25,7 @@ public class ManageAlertActionsAndRulesTest extends AbstractManageResourceTest {
     protected void initializeAndDeploy() {
         appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/alert-config"));
 
-        initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployOtherDatabasesCommand(),
-                new DeployAlertConfigsCommand(), newCommand(), new DeployAlertRulesCommand());
+        initializeAppDeployer(new DeployOtherDatabasesCommand(1), new DeployAlertConfigsCommand(), newCommand(), new DeployAlertRulesCommand());
         appDeployer.deploy(appConfig);
     }
 

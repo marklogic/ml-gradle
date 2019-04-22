@@ -2,7 +2,6 @@ package com.marklogic.appdeployer.command.viewschemas;
 
 import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.junit.Fragment;
@@ -22,8 +21,7 @@ public class ManageViewSchemasTest extends AbstractManageResourceTest {
 	protected void initializeAndDeploy() {
 		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/view-schemas"));
 
-		initializeAppDeployer(new DeployRestApiServersCommand(),
-			new DeployContentDatabasesCommand(1), new DeployOtherDatabasesCommand(),
+		initializeAppDeployer(new DeployRestApiServersCommand(), new DeployOtherDatabasesCommand(1),
 			newCommand(), buildLoadModulesCommand());
 
 		appDeployer.deploy(appConfig);

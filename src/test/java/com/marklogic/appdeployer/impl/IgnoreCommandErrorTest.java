@@ -1,11 +1,12 @@
 package com.marklogic.appdeployer.impl;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
+import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.regex.Pattern;
 
 public class IgnoreCommandErrorTest extends AbstractAppDeployerTest {
 
@@ -13,12 +14,12 @@ public class IgnoreCommandErrorTest extends AbstractAppDeployerTest {
 	public void ignoreErrorOnUndeploy() {
 		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/db-only-config"));
 
-		initializeAppDeployer(new DeployRestApiServersCommand(true), new DeployContentDatabasesCommand(1));
+		initializeAppDeployer(new DeployRestApiServersCommand(true), new DeployOtherDatabasesCommand(1));
 		deploySampleApp();
 
 		try {
 			try {
-				initializeAppDeployer(new DeployContentDatabasesCommand());
+				initializeAppDeployer(new DeployOtherDatabasesCommand(1));
 				appDeployer.undeploy(appConfig);
 				fail("Undeploying should have failed because the database is attached to the REST server");
 			} catch (RuntimeException ex) {
@@ -29,14 +30,15 @@ public class IgnoreCommandErrorTest extends AbstractAppDeployerTest {
 			// This should just log the error and not throw one
 			appDeployer.undeploy(appConfig);
 		} finally {
-			initializeAppDeployer(new DeployRestApiServersCommand(true), new DeployContentDatabasesCommand());
+			initializeAppDeployer(new DeployRestApiServersCommand(true), new DeployOtherDatabasesCommand());
 			appDeployer.undeploy(appConfig);
 		}
 	}
 
 	@Test
 	public void ignoreErrorOnDeploy() {
-		initializeAppDeployer(new DeployContentDatabasesCommand(1));
+		appConfig.setResourceFilenamesIncludePattern(Pattern.compile("content.*.json"));
+		initializeAppDeployer(new DeployOtherDatabasesCommand(1));
 
 		try {
 			deploySampleApp();

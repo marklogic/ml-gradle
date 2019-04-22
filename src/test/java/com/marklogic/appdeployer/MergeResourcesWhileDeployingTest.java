@@ -1,7 +1,6 @@
 package com.marklogic.appdeployer;
 
 import com.marklogic.appdeployer.command.appservers.DeployOtherServersCommand;
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.security.DeployPrivilegesCommand;
 import com.marklogic.appdeployer.command.security.DeployRolesCommand;
@@ -112,7 +111,10 @@ public class MergeResourcesWhileDeployingTest extends AbstractAppDeployerTest {
 	 */
 	@Test
 	public void databases() {
+		appConfig.setContentForestsPerHost(1);
+		appConfig.setTestRestPort(appConfig.getRestPort() + 1);
 		appConfig.setDeployForestsWithCma(true);
+
 		initializeAppDeployer(new DeployOtherDatabasesCommand());
 		deploySampleApp();
 
@@ -126,6 +128,18 @@ public class MergeResourcesWhileDeployingTest extends AbstractAppDeployerTest {
 			"file in the first path", db.getTripleIndex());
 		assertEquals("sample-app-schema-database", db.getSchemaDatabase());
 		assertEquals("sample-app-triggers-database", db.getTriggersDatabase());
+
+		// Verify the main content database was created
+		db = resourceMapper.readResource(mgr.getAsJson("sample-app-content"), Database.class);
+		assertEquals(2, db.getRangeElementIndex().size());
+		assertEquals("id", db.getRangeElementIndex().get(0).getLocalname());
+		assertEquals("otherId", db.getRangeElementIndex().get(1).getLocalname());
+
+		// Verify that the test content database was created
+		db = resourceMapper.readResource(mgr.getAsJson("sample-app-test-content"), Database.class);
+		assertEquals(2, db.getRangeElementIndex().size());
+		assertEquals("id", db.getRangeElementIndex().get(0).getLocalname());
+		assertEquals("otherId", db.getRangeElementIndex().get(1).getLocalname());
 
 		assertTrue(mgr.exists("sample-app-schema-database"));
 		assertTrue(mgr.exists("sample-app-triggers-database"));
@@ -141,33 +155,7 @@ public class MergeResourcesWhileDeployingTest extends AbstractAppDeployerTest {
 		assertTrue(forestManager.exists("sample-app-two-database-1"));
 		assertTrue(forestManager.exists("sample-app-one-database-subdb01-1"));
 		assertTrue(forestManager.exists("sample-app-one-database-subdb02-1"));
-	}
 
-	/**
-	 * This verifies that the special support for content-database.json just works. The contentDatabaseFiles
-	 * property on AppConfig remains as a legacy way to specify multiple files.
-	 */
-	@Test
-	public void contentDatabase() {
-		appConfig.setTestRestPort(appConfig.getRestPort() + 1);
-
-		initializeAppDeployer(new DeployContentDatabasesCommand(1));
-
-		deploySampleApp();
-
-		DatabaseManager mgr = new DatabaseManager(manageClient);
-
-		Database db = resourceMapper.readResource(mgr.getAsJson("sample-app-content"), Database.class);
-		assertEquals(2, db.getRangeElementIndex().size());
-		assertEquals("id", db.getRangeElementIndex().get(0).getLocalname());
-		assertEquals("otherId", db.getRangeElementIndex().get(1).getLocalname());
-
-		db = resourceMapper.readResource(mgr.getAsJson("sample-app-test-content"), Database.class);
-		assertEquals(2, db.getRangeElementIndex().size());
-		assertEquals("id", db.getRangeElementIndex().get(0).getLocalname());
-		assertEquals("otherId", db.getRangeElementIndex().get(1).getLocalname());
-
-		ForestManager forestManager = new ForestManager(manageClient);
 		assertTrue(forestManager.exists("sample-app-content-1"));
 		assertFalse(forestManager.exists("sample-app-content-2"));
 		assertTrue(forestManager.exists("sample-app-test-content-1"));

@@ -1,23 +1,21 @@
 package com.marklogic.appdeployer.command.flexrep;
 
-import java.io.File;
-
+import com.marklogic.appdeployer.AbstractAppDeployerTest;
+import com.marklogic.appdeployer.command.cpf.DeployCpfConfigsCommand;
+import com.marklogic.appdeployer.command.cpf.DeployDomainsCommand;
+import com.marklogic.appdeployer.command.cpf.DeployPipelinesCommand;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
 import com.marklogic.mgmt.resource.cpf.CpfConfigManager;
 import com.marklogic.mgmt.resource.cpf.DomainManager;
 import com.marklogic.mgmt.resource.cpf.PipelineManager;
+import com.marklogic.mgmt.resource.flexrep.ConfigManager;
 import com.marklogic.mgmt.resource.flexrep.PullManager;
+import com.marklogic.mgmt.resource.flexrep.TargetManager;
 import org.junit.After;
 import org.junit.Test;
 
-import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.appdeployer.command.cpf.DeployCpfConfigsCommand;
-import com.marklogic.appdeployer.command.cpf.DeployDomainsCommand;
-import com.marklogic.appdeployer.command.cpf.DeployPipelinesCommand;
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
-import com.marklogic.mgmt.resource.flexrep.ConfigManager;
-import com.marklogic.mgmt.resource.flexrep.TargetManager;
+import java.io.File;
 
 public class DeployFlexrepTest extends AbstractAppDeployerTest {
 
@@ -30,9 +28,9 @@ public class DeployFlexrepTest extends AbstractAppDeployerTest {
     public void configureMaster() {
         appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/flexrep-config"));
 
-        initializeAppDeployer(new DeployContentDatabasesCommand(1),
+        initializeAppDeployer(
                 new DeployCpfConfigsCommand(), new DeployDomainsCommand(), new DeployPipelinesCommand(),
-                new DeployConfigsCommand(), new DeployTargetsCommand(), new DeployOtherDatabasesCommand());
+                new DeployConfigsCommand(), new DeployTargetsCommand(), new DeployOtherDatabasesCommand(1));
 
         appDeployer.deploy(appConfig);
         assertConfigAndTargetAreDeployed();
@@ -62,7 +60,7 @@ public class DeployFlexrepTest extends AbstractAppDeployerTest {
         appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/flexrep-combined"));
 
         appConfig.setFlexrepPath("master");
-        initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployOtherDatabasesCommand(), new DeployFlexrepCommand());
+        initializeAppDeployer(new DeployOtherDatabasesCommand(1), new DeployFlexrepCommand());
 
         appDeployer.deploy(appConfig);
 
@@ -86,7 +84,7 @@ public class DeployFlexrepTest extends AbstractAppDeployerTest {
         appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/flexrep-combined"));
 
         appConfig.setFlexrepPath("replica");
-        initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployOtherDatabasesCommand(), new DeployFlexrepCommand());
+        initializeAppDeployer(new DeployOtherDatabasesCommand(1), new DeployFlexrepCommand());
 
         appDeployer.deploy(appConfig);
 
@@ -109,9 +107,9 @@ public class DeployFlexrepTest extends AbstractAppDeployerTest {
 	public void deployPullConfiguration() {
 		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/flexrep-config"));
 
-		initializeAppDeployer(new DeployContentDatabasesCommand(1),
+		initializeAppDeployer(
 			new DeployCpfConfigsCommand(), new DeployDomainsCommand(), new DeployPipelinesCommand(),
-			new DeployConfigsCommand(), new DeployTargetsCommand(), new DeployOtherDatabasesCommand(), new DeployPullsCommand());
+			new DeployConfigsCommand(), new DeployTargetsCommand(), new DeployOtherDatabasesCommand(1), new DeployPullsCommand());
 
 		try {
 			appDeployer.deploy(appConfig);

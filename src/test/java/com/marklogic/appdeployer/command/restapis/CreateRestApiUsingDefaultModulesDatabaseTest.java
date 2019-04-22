@@ -1,15 +1,14 @@
 package com.marklogic.appdeployer.command.restapis;
 
-import java.io.File;
-
+import com.marklogic.appdeployer.AbstractAppDeployerTest;
+import com.marklogic.appdeployer.ConfigDir;
+import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
+import com.marklogic.mgmt.resource.appservers.ServerManager;
+import com.marklogic.rest.util.Fragment;
 import org.junit.After;
 import org.junit.Test;
 
-import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.appdeployer.ConfigDir;
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
-import com.marklogic.mgmt.resource.appservers.ServerManager;
-import com.marklogic.rest.util.Fragment;
+import java.io.File;
 
 public class CreateRestApiUsingDefaultModulesDatabaseTest extends AbstractAppDeployerTest {
 
@@ -30,7 +29,7 @@ public class CreateRestApiUsingDefaultModulesDatabaseTest extends AbstractAppDep
         DeployRestApiServersCommand command = new DeployRestApiServersCommand();
         command.setDeleteModulesDatabase(false);
 
-        initializeAppDeployer(new DeployContentDatabasesCommand(1), command);
+        initializeAppDeployer(new DeployOtherDatabasesCommand(1), command);
         appDeployer.deploy(appConfig);
 
         // Verify that the Modules database is used and then a new modules database wasn't created

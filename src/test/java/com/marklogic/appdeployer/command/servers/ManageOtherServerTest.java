@@ -1,15 +1,13 @@
 package com.marklogic.appdeployer.command.servers;
 
-import java.io.File;
-
-import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
-import org.junit.Test;
-
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.appservers.DeployOtherServersCommand;
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
+import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
+import org.junit.Test;
+
+import java.io.File;
 
 /**
  * Main purpose of these tests is to ensure that we wait properly after deleting a server.
@@ -20,7 +18,7 @@ public class ManageOtherServerTest extends AbstractAppDeployerTest {
     public void updateMainAndRestRestApiServers() {
         // Create some other databases that have to be deleted to ensure we wait for a restart after deleting the ODBC
         // server
-        initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployOtherDatabasesCommand(), new DeployOtherServersCommand());
+        initializeAppDeployer(new DeployOtherDatabasesCommand(1), new DeployOtherServersCommand());
         try {
             appDeployer.deploy(appConfig);
         } finally {

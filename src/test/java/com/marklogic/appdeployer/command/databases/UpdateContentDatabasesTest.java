@@ -13,51 +13,49 @@ import java.io.File;
 
 public class UpdateContentDatabasesTest extends AbstractAppDeployerTest {
 
-    private DatabaseManager dbMgr;
-    private String idRangeIndexPath = "//m:range-element-index[m:scalar-type = 'string' and m:namespace-uri = 'urn:sampleapp' and m:localname='id' and m:collation='http://marklogic.com/collation/']";
+	private DatabaseManager dbMgr;
+	private String idRangeIndexPath = "//m:range-element-index[m:scalar-type = 'string' and m:namespace-uri = 'urn:sampleapp' and m:localname='id' and m:collation='http://marklogic.com/collation/']";
 
-    @Before
-    public void setup() {
-        dbMgr = new DatabaseManager(manageClient);
-    }
+	@Before
+	public void setup() {
+		dbMgr = new DatabaseManager(manageClient);
+	}
 
-    @After
-    public void teardown() {
-        undeploySampleApp();
-    }
+	@After
+	public void teardown() {
+		undeploySampleApp();
+	}
 
-    @Test
-    public void updateDatabase() {
-        // We want both a main and a test app server in this test
-        appConfig.setTestRestPort(SAMPLE_APP_TEST_REST_PORT);
+	@Test
+	public void updateDatabase() {
+		// We want both a main and a test app server in this test
+		appConfig.setTestRestPort(SAMPLE_APP_TEST_REST_PORT);
 
-        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployOtherDatabasesCommand(),
-                new DeployContentDatabasesCommand());
+		initializeAppDeployer(new DeployRestApiServersCommand(), new DeployOtherDatabasesCommand());
 
-        appDeployer.deploy(appConfig);
+		appDeployer.deploy(appConfig);
 
-        Fragment db = dbMgr.getPropertiesAsXml(appConfig.getContentDatabaseName());
-        assertTrue(db.elementExists(idRangeIndexPath));
+		Fragment db = dbMgr.getPropertiesAsXml(appConfig.getContentDatabaseName());
+		assertTrue(db.elementExists(idRangeIndexPath));
 
-        db = dbMgr.getPropertiesAsXml(appConfig.getTestContentDatabaseName());
-        assertTrue(db.elementExists(idRangeIndexPath));
-    }
+		db = dbMgr.getPropertiesAsXml(appConfig.getTestContentDatabaseName());
+		assertTrue(db.elementExists(idRangeIndexPath));
+	}
 
-    @Test
-    public void multipleDatabaseConfigFiles() {
-        ConfigDir dir = appConfig.getFirstConfigDir();
-        dir.getContentDatabaseFiles().add(new File(dir.getBaseDir(), "other-database-files/more-content-db-config.json"));
+	@Test
+	public void multipleDatabaseConfigFiles() {
+		ConfigDir dir = appConfig.getFirstConfigDir();
+		dir.getContentDatabaseFiles().add(new File(dir.getBaseDir(), "other-database-files/more-content-db-config.json"));
 
-        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployOtherDatabasesCommand(),
-                new DeployContentDatabasesCommand());
+		initializeAppDeployer(new DeployRestApiServersCommand(), new DeployOtherDatabasesCommand());
 
-        appDeployer.deploy(appConfig);
+		appDeployer.deploy(appConfig);
 
-        String rangeIndexXpath = "//m:range-element-index[m:namespace-uri = 'urn:sampleapp' and m:localname='anotherElement']";
+		String rangeIndexXpath = "//m:range-element-index[m:namespace-uri = 'urn:sampleapp' and m:localname='anotherElement']";
 
-        Fragment db = dbMgr.getPropertiesAsXml(appConfig.getContentDatabaseName());
-        assertTrue(db.elementExists("//m:maintain-last-modified[. = 'true']"));
-        assertTrue(db.elementExists(idRangeIndexPath));
-        assertTrue(db.elementExists(rangeIndexXpath));
-    }
+		Fragment db = dbMgr.getPropertiesAsXml(appConfig.getContentDatabaseName());
+		assertTrue(db.elementExists("//m:maintain-last-modified[. = 'true']"));
+		assertTrue(db.elementExists(idRangeIndexPath));
+		assertTrue(db.elementExists(rangeIndexXpath));
+	}
 }

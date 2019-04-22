@@ -1,12 +1,11 @@
 package com.marklogic.appdeployer.command.databases;
 
-import org.junit.Test;
-
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.forests.ForestManager;
+import org.junit.Test;
 
 /**
  * Verifies that all the default names in AppConfig can be overridden successfully.
@@ -30,13 +29,9 @@ public class DeployWithCustomNamesTest extends AbstractAppDeployerTest {
         appConfig.setModulesDatabaseName(prefix + "-modules");
         appConfig.setTriggersDatabaseName(prefix + "-triggers");
         appConfig.setSchemasDatabaseName(prefix + "-schemas");
+        appConfig.setContentForestsPerHost(2);
 
-        DeployContentDatabasesCommand dcdc = new DeployContentDatabasesCommand();
-        dcdc.setForestsPerHost(2);
-        DeployOtherDatabasesCommand dodc = new DeployOtherDatabasesCommand();
-        dodc.setForestsPerHost(1);
-
-        initializeAppDeployer(new DeployRestApiServersCommand(), dcdc, dodc);
+        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployOtherDatabasesCommand(1));
 
         dbMgr = new DatabaseManager(manageClient);
         forestMgr = new ForestManager(manageClient);

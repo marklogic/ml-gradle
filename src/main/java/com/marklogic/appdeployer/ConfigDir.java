@@ -21,6 +21,7 @@ public class ConfigDir {
 
 	private String restApiPath = "rest-api.json";
 
+	@Deprecated
 	private List<File> contentDatabaseFiles;
 
 	private File projectDir;
@@ -64,6 +65,7 @@ public class ConfigDir {
 		return new ArrayList<>();
 	}
 
+	@Deprecated
 	protected void initializeContentDatabaseFiles() {
 		contentDatabaseFiles = new ArrayList<>();
 		contentDatabaseFiles.add(new File(getDatabasesDir(), defaultContentDatabaseFilename));
@@ -221,10 +223,12 @@ public class ConfigDir {
 		return baseDir;
 	}
 
+	@Deprecated
 	public List<File> getContentDatabaseFiles() {
 		return contentDatabaseFiles;
 	}
 
+	@Deprecated
 	public void setContentDatabaseFiles(List<File> contentDatabaseFiles) {
 		this.contentDatabaseFiles = contentDatabaseFiles;
 	}

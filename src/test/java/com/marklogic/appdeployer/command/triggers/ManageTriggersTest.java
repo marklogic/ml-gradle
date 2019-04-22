@@ -2,7 +2,6 @@ package com.marklogic.appdeployer.command.triggers;
 
 import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.triggers.TriggerManager;
@@ -11,7 +10,7 @@ public class ManageTriggersTest extends AbstractManageResourceTest {
 
     @Override
     protected void initializeAndDeploy() {
-        initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployOtherDatabasesCommand(), newCommand());
+        initializeAppDeployer(new DeployOtherDatabasesCommand(1), newCommand());
         appDeployer.deploy(appConfig);
     }
 

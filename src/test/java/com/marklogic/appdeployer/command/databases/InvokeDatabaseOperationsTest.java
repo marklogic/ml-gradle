@@ -1,13 +1,12 @@
 package com.marklogic.appdeployer.command.databases;
 
+import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.database.Database;
 import com.marklogic.mgmt.mapper.DefaultResourceMapper;
+import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import org.junit.After;
 import org.junit.Test;
-
-import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.mgmt.resource.databases.DatabaseManager;
 
 public class InvokeDatabaseOperationsTest extends AbstractAppDeployerTest {
 
@@ -20,7 +19,7 @@ public class InvokeDatabaseOperationsTest extends AbstractAppDeployerTest {
     public void test() {
         setConfigBaseDir("sample-app/db-only-config");
 
-        initializeAppDeployer(new DeployContentDatabasesCommand(1));
+        initializeAppDeployer(new DeployOtherDatabasesCommand(1));
         deploySampleApp();
 
         DatabaseManager mgr = new DatabaseManager(manageClient);

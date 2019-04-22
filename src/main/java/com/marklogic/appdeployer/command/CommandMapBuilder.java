@@ -1,10 +1,5 @@
 package com.marklogic.appdeployer.command;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.marklogic.appdeployer.command.alert.DeployAlertActionsCommand;
 import com.marklogic.appdeployer.command.alert.DeployAlertConfigsCommand;
 import com.marklogic.appdeployer.command.alert.DeployAlertRulesCommand;
@@ -16,7 +11,6 @@ import com.marklogic.appdeployer.command.cpf.DeployCpfConfigsCommand;
 import com.marklogic.appdeployer.command.cpf.DeployDomainsCommand;
 import com.marklogic.appdeployer.command.cpf.DeployPipelinesCommand;
 import com.marklogic.appdeployer.command.data.LoadDataCommand;
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.flexrep.DeployConfigsCommand;
 import com.marklogic.appdeployer.command.flexrep.DeployFlexrepCommand;
@@ -31,17 +25,7 @@ import com.marklogic.appdeployer.command.modules.LoadModulesCommand;
 import com.marklogic.appdeployer.command.plugins.InstallPluginsCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.appdeployer.command.schemas.LoadSchemasCommand;
-import com.marklogic.appdeployer.command.security.DeployAmpsCommand;
-import com.marklogic.appdeployer.command.security.DeployCertificateAuthoritiesCommand;
-import com.marklogic.appdeployer.command.security.DeployCertificateTemplatesCommand;
-import com.marklogic.appdeployer.command.security.InsertCertificateHostsTemplateCommand;
-import com.marklogic.appdeployer.command.security.DeployExternalSecurityCommand;
-import com.marklogic.appdeployer.command.security.DeployPrivilegesCommand;
-import com.marklogic.appdeployer.command.security.DeployProtectedCollectionsCommand;
-import com.marklogic.appdeployer.command.security.DeployProtectedPathsCommand;
-import com.marklogic.appdeployer.command.security.DeployQueryRolesetsCommand;
-import com.marklogic.appdeployer.command.security.DeployRolesCommand;
-import com.marklogic.appdeployer.command.security.DeployUsersCommand;
+import com.marklogic.appdeployer.command.security.*;
 import com.marklogic.appdeployer.command.tasks.DeployScheduledTasksCommand;
 import com.marklogic.appdeployer.command.taskservers.UpdateTaskServerCommand;
 import com.marklogic.appdeployer.command.temporal.DeployTemporalAxesCommand;
@@ -49,6 +33,11 @@ import com.marklogic.appdeployer.command.temporal.DeployTemporalCollectionsComma
 import com.marklogic.appdeployer.command.temporal.DeployTemporalCollectionsLSQTCommand;
 import com.marklogic.appdeployer.command.triggers.DeployTriggersCommand;
 import com.marklogic.appdeployer.command.viewschemas.DeployViewSchemasCommand;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The intent of this class is to construct a map of commonly used commands that can used in a variety of contexts - i.e.
@@ -90,7 +79,6 @@ public class CommandMapBuilder {
 
 		// Databases
 		List<Command> dbCommands = new ArrayList<Command>();
-		dbCommands.add(new DeployContentDatabasesCommand());
 		dbCommands.add(new DeployOtherDatabasesCommand());
 		map.put("mlDatabaseCommands", dbCommands);
 

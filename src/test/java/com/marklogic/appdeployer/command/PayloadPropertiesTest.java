@@ -1,7 +1,7 @@
 package com.marklogic.appdeployer.command;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
+import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.rest.util.Fragment;
 import org.junit.After;
@@ -21,7 +21,7 @@ public class PayloadPropertiesTest extends AbstractAppDeployerTest {
 		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/payload-properties-test/json/ml-config"));
 		appConfig.setExcludeProperties(new String[] {"triggers-database"});
 
-		initializeAppDeployer(new DeployContentDatabasesCommand(2));
+		initializeAppDeployer(new DeployOtherDatabasesCommand(1));
 		appDeployer.deploy(appConfig);
 
 		DatabaseManager dbMgr = new DatabaseManager(this.manageClient);
@@ -38,7 +38,7 @@ public class PayloadPropertiesTest extends AbstractAppDeployerTest {
 		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/payload-properties-test/json/ml-config"));
 		appConfig.setExcludeProperties(new String[] {"triple-index"});
 
-		initializeAppDeployer(new DeployContentDatabasesCommand(2));
+		initializeAppDeployer(new DeployOtherDatabasesCommand(1));
 		appDeployer.deploy(appConfig);
 
 		DatabaseManager dbMgr = new DatabaseManager(this.manageClient);

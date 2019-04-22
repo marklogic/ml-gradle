@@ -1,7 +1,6 @@
 package com.marklogic.appdeployer.export;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.forests.DeployCustomForestsCommand;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
@@ -23,7 +22,7 @@ public class ExportDatabaseTest extends AbstractExportTest {
 	public void exportDatabaseWithTwoForests() throws Exception {
 		// Deploy our simple app
 		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/db-only-config"));
-		initializeAppDeployer(new DeployContentDatabasesCommand(2));
+		initializeAppDeployer(new DeployOtherDatabasesCommand(2));
 		deploySampleApp();
 
 		// Export the database, which by default will export the forests

@@ -1,16 +1,14 @@
 package com.marklogic.appdeployer.command.restapis;
 
-import java.io.File;
-
-import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
-import org.junit.Test;
-
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
+import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.restapis.RestApiManager;
+import org.junit.Test;
+
+import java.io.File;
 
 /**
  * This test ensures that the convenience methods for creating and deleting a sample application work properly, and thus
@@ -41,8 +39,7 @@ public class DeleteRestApiTest extends AbstractAppDeployerTest {
 
         DeployRestApiServersCommand command = new DeployRestApiServersCommand();
         command.setDeleteContentDatabase(true);
-        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployContentDatabasesCommand(),
-                new DeployOtherDatabasesCommand());
+        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployOtherDatabasesCommand(1));
 
         appDeployer.deploy(appConfig);
         assertTrue("The content database should have been created by the REST API command", dbMgr.exists(dbName));
@@ -60,7 +57,7 @@ public class DeleteRestApiTest extends AbstractAppDeployerTest {
 
         appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/empty-ml-config")));
 
-        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployContentDatabasesCommand());
+        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployOtherDatabasesCommand(1));
 
         appDeployer.deploy(appConfig);
         assertTrue("The content database should have been created by the REST API command", dbMgr.exists(dbName));

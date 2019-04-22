@@ -20,7 +20,7 @@ public class DeployTriggersToMultipleDatabasesTest extends AbstractAppDeployerTe
 	public void test() {
 		appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/multiple-triggers-databases")));
 
-		initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployOtherDatabasesCommand(), new DeployTriggersCommand());
+		initializeAppDeployer(new DeployOtherDatabasesCommand(1), new DeployTriggersCommand());
 
 		deploySampleApp();
 

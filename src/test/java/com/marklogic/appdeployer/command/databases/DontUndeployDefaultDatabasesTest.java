@@ -15,7 +15,7 @@ public class DontUndeployDefaultDatabasesTest extends AbstractAppDeployerTest {
 		DatabaseManager mgr = new DatabaseManager(manageClient);
 
 		appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/default-databases")));
-		initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployOtherDatabasesCommand());
+		initializeAppDeployer(new DeployOtherDatabasesCommand(1));
 
 		deploySampleApp();
 

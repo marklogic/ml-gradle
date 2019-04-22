@@ -1,12 +1,11 @@
 package com.marklogic.appdeployer.command.databases;
 
-import java.io.File;
-
+import com.marklogic.appdeployer.AbstractAppDeployerTest;
+import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import org.junit.After;
 import org.junit.Test;
 
-import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.mgmt.resource.databases.DatabaseManager;
+import java.io.File;
 
 /**
  * Verifies support for bumping up the number of content forests and then re-deploying. Does not yet support lowering
@@ -19,7 +18,7 @@ public class UpdateForestCountTest extends AbstractAppDeployerTest {
         appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/db-only-config"));
         DatabaseManager mgr = new DatabaseManager(manageClient);
 
-        initializeAppDeployer(new DeployContentDatabasesCommand());
+        initializeAppDeployer(new DeployOtherDatabasesCommand());
 
         appConfig.setContentForestsPerHost(1);
         appDeployer.deploy(appConfig);
@@ -34,7 +33,8 @@ public class UpdateForestCountTest extends AbstractAppDeployerTest {
 
         appConfig.setContentForestsPerHost(1);
         appDeployer.deploy(appConfig);
-        assertEquals("Should still have 2 forests, we don't yet support deleting forests when the number drops", 2, mgr.getForestIds(appConfig.getContentDatabaseName()).size());
+        assertEquals("Should still have 2 forests, we don't yet support deleting forests when the number drops", 2,
+	        mgr.getForestIds(appConfig.getContentDatabaseName()).size());
     }
 
     @After

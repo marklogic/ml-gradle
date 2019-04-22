@@ -2,7 +2,6 @@ package com.marklogic.appdeployer.command.es;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.client.DatabaseClient;
@@ -34,7 +33,7 @@ public class GenerateModelArtifactsTest extends AbstractAppDeployerTest {
 		appConfig.getSchemaPaths().add(projectPath + "/src/main/ml-schemas");
 		appConfig.setModelsDatabase(appConfig.getContentDatabaseName());
 
-		initializeAppDeployer(new DeployContentDatabasesCommand(1), new DeployOtherDatabasesCommand(1),
+		initializeAppDeployer(new DeployOtherDatabasesCommand(1),
 			new DeployRestApiServersCommand(), new GenerateModelArtifactsCommand());
 		deploySampleApp();
 

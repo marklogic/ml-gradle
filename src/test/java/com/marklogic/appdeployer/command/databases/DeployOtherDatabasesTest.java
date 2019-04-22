@@ -39,6 +39,7 @@ public class DeployOtherDatabasesTest extends AbstractAppDeployerTest {
         configDir.setBaseDir(new File("src/test/resources/sample-app/lots-of-databases"));
         configDir.getContentDatabaseFiles().add(new File(configDir.getBaseDir(), "other-database-files/more-content-db-config.json"));
 
+        appConfig.setContentForestsPerHost(2);
         appConfig.getForestCounts().put("other-sample-app-content", 2);
         appConfig.getForestCounts().put("other-sample-app-schemas", 3);
         appConfig.setResourceFilenamesToIgnore("ignored-database.json");
@@ -46,7 +47,7 @@ public class DeployOtherDatabasesTest extends AbstractAppDeployerTest {
         // Speed up this test and ensure that all the forests still get created correctly
         appConfig.setDeployForestsWithCma(true);
 
-        initializeAppDeployer(new DeployContentDatabasesCommand(2), new DeployOtherDatabasesCommand());
+        initializeAppDeployer(new DeployOtherDatabasesCommand());
 
         DatabaseManager dbMgr = new DatabaseManager(manageClient);
 

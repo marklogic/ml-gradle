@@ -1,19 +1,17 @@
 package com.marklogic.appdeployer.scaffold;
 
-import java.io.File;
-
-import com.marklogic.appdeployer.command.databases.DeployContentDatabasesCommand;
-import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
-import org.junit.Test;
-
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
+import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.appdeployer.command.security.DeployRolesCommand;
 import com.marklogic.appdeployer.command.security.DeployUsersCommand;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.security.RoleManager;
 import com.marklogic.mgmt.resource.security.UserManager;
+import org.junit.Test;
+
+import java.io.File;
 
 public class GenerateScaffoldTest extends AbstractAppDeployerTest {
 
@@ -36,7 +34,7 @@ public class GenerateScaffoldTest extends AbstractAppDeployerTest {
         appConfig.getModulePaths().clear();
         appConfig.getModulePaths().add(path + "/src/main/ml-modules");
 
-        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployContentDatabasesCommand(), new DeployOtherDatabasesCommand(),
+        initializeAppDeployer(new DeployRestApiServersCommand(), new DeployOtherDatabasesCommand(),
                 new DeployUsersCommand(), new DeployRolesCommand(), buildLoadModulesCommand());
         appDeployer.deploy(appConfig);
 

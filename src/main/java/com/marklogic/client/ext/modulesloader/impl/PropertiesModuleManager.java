@@ -1,5 +1,6 @@
 package com.marklogic.client.ext.modulesloader.impl;
 
+import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.client.ext.modulesloader.ModulesManager;
 
@@ -16,6 +17,7 @@ public class PropertiesModuleManager extends LoggingObject implements ModulesMan
     private Properties props;
     private String propertiesFilePath;
     private long minimumFileTimestampToLoad;
+    private String host;
 
     public PropertiesModuleManager() {
         this(DEFAULT_FILE_PATH);
@@ -24,6 +26,20 @@ public class PropertiesModuleManager extends LoggingObject implements ModulesMan
     public PropertiesModuleManager(String propertiesFilePath) {
         props = new Properties();
         this.propertiesFilePath = propertiesFilePath;
+    }
+
+	/**
+	 * Use this constructor so that the keys generated for the properties file account for the host associated with the
+	 * given DatabaseClient.
+	 *
+	 * @param propertiesFilePath
+	 * @param client
+	 */
+	public PropertiesModuleManager(String propertiesFilePath, DatabaseClient client) {
+    	this(propertiesFilePath);
+    	if (client != null) {
+    		host = client.getHost();
+	    }
     }
 
     @Override
@@ -64,7 +80,13 @@ public class PropertiesModuleManager extends LoggingObject implements ModulesMan
         }
     }
 
-    public boolean hasFileBeenModifiedSinceLastLoaded(File file) {
+	/**
+	 *
+	 * @param file
+	 * @return
+	 */
+	@Override
+	public boolean hasFileBeenModifiedSinceLastLoaded(File file) {
     	if (minimumFileTimestampToLoad > 0 && file.lastModified() <= minimumFileTimestampToLoad) {
     		if (logger.isDebugEnabled()) {
     			logger.debug(String.format("lastModified for file '%s' is %d, which is before the minimumFileTimestampToLoad of %d",
@@ -83,7 +105,13 @@ public class PropertiesModuleManager extends LoggingObject implements ModulesMan
         return true;
     }
 
-    public void saveLastLoadedTimestamp(File file, Date date) {
+	/**
+	 *
+	 * @param file
+	 * @param date
+	 */
+	@Override
+	public void saveLastLoadedTimestamp(File file, Date date) {
         String key = buildKey(file);
         props.setProperty(key, date.getTime() + "");
         FileWriter fw = null;
@@ -110,10 +138,23 @@ public class PropertiesModuleManager extends LoggingObject implements ModulesMan
      * @return
      */
     protected String buildKey(File file) {
-        return file.getAbsolutePath().toLowerCase();
+        String path = file.getAbsolutePath().toLowerCase();
+        final String key = host != null ? host + ":" + path : path;
+        if (logger.isDebugEnabled()) {
+        	logger.debug("Key for file " + file.getAbsolutePath() + ": " + key);
+        }
+        return key;
     }
 
 	public void setMinimumFileTimestampToLoad(long minimumFileTimestampToLoad) {
 		this.minimumFileTimestampToLoad = minimumFileTimestampToLoad;
+	}
+
+	public String getHost() {
+		return host;
+	}
+
+	public void setHost(String host) {
+		this.host = host;
 	}
 }

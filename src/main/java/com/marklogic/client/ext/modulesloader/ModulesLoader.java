@@ -8,16 +8,21 @@ import java.util.Set;
 /**
  * Interface for objects that can load a set of modules via the REST API, which is intended to include not just what the
  * REST API calls "assets" (regular modules), but also options, services, transforms, and namespaces.
+ *
+ * Note that in both of the methods in this interface, the DatabaseClient is used for loading REST extensions. This is
+ * to account for the fact that how search options are loaded (i.e. the URI they're written to) differs based on what
+ * REST server they're loaded from. But the implementation is not expected to use this DatabaseClient for loading
+ * non-REST modules - that is likely done via an instance of AssetFileLoader that uses the App-Services port by
+ * default for loading non-REST modules.
  */
 public interface ModulesLoader {
 
 	/**
-	 * Use the given DatabaseClient to load modules found in the given directory. Return a set containing any files that
-	 * were loaded.
+	 * Load modules from the given directory, and return the set of resources containing all modules written.
 	 *
 	 * @param directory
 	 * @param modulesFinder
-	 * @param client
+	 * @param client the DatabaseClient to use for loading REST extensions
 	 * @return
 	 */
 	Set<Resource> loadModules(String directory, ModulesFinder modulesFinder, DatabaseClient client);
@@ -28,7 +33,7 @@ public interface ModulesLoader {
 	 *
 	 * @param client
 	 * @param modulesFinder
-	 * @param paths
+	 * @param paths the DatabaseClient to use for loading REST extensions
 	 * @return
 	 */
 	Set<Resource> loadModules(DatabaseClient client, ModulesFinder modulesFinder, String... paths);

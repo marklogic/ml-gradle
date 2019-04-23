@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Properties;
@@ -42,6 +43,11 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 
 		modulesLoader = new DefaultModulesLoader(new AssetFileLoader(modulesClient));
 		modulesLoader.setModulesManager(null);
+
+		File file = new File(PropertiesModuleManager.DEFAULT_FILE_PATH);
+		if (file.exists()) {
+			file.delete();
+		}
 	}
 
 	@Test
@@ -193,6 +199,29 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 		Set<Resource> files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
 		logger.info(files.size() + "");
 		assertEquals(message, count, files.size());
+	}
+
+	@Test
+	public void loadModulesAndAccountForHost() {
+		PropertiesModuleManager moduleManager = new PropertiesModuleManager(PropertiesModuleManager.DEFAULT_FILE_PATH, modulesClient);
+		modulesLoader.setAssetFileLoader(new AssetFileLoader(modulesClient, moduleManager));
+		modulesLoader.setModulesManager(moduleManager);
+
+		String dir = Paths.get("src", "test", "resources", "sample-base-dir").toString();
+		Set<Resource> files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
+		assertEquals(26, files.size());
+
+		files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
+		assertEquals("No files should have been loaded since none were new or modified", 0, files.size());
+
+		// The host defaults to "localhost", so change it to a host that should still hit localhost on any OS, and
+		// verify all files were loaded because a different host was used
+		moduleManager.setHost("127.0.0.1");
+		files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
+		assertEquals(26, files.size());
+
+		files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
+		assertEquals("No files should have been loaded since none were new or modified", 0, files.size());
 	}
 
 	@Test

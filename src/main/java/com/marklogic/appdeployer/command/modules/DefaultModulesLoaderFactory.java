@@ -1,6 +1,7 @@
 package com.marklogic.appdeployer.command.modules;
 
 import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.ext.batch.RestBatchWriter;
 import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.client.ext.modulesloader.ModulesLoader;
@@ -15,27 +16,43 @@ public class DefaultModulesLoaderFactory extends LoggingObject implements Module
 
 	@Override
 	public ModulesLoader newModulesLoader(AppConfig appConfig) {
+		/**
+		 * Construct a DatabaseClient for loading non-REST extensions. This typically means connecting to the
+		 * App-Services server on port 8000, which is likely to exist and support the client REST API (specifically,
+		 * the /v1/documents endpoint).
+		 *
+		 * It however is not used for loading REST extensions. Because of how search options are loaded - their URI
+		 * depends on the app server that they're loaded with - a DatabaseClient must be passed into the
+		 * ModulesLoader method that's used for loading modules. This allows for the same ModulesLoader to be used for
+		 * loading REST extensions against multiple REST servers.
+		 */
+		final DatabaseClient modulesDatabaseClient = appConfig.newModulesDatabaseClient();
+
 		ModulesManager modulesManager = null;
-		String path = appConfig.getModuleTimestampsPath();
+		final String path = appConfig.getModuleTimestampsPath();
 		if (path != null) {
-			modulesManager = new PropertiesModuleManager(path);
+			if (appConfig.isModuleTimestampsUseHost()) {
+				modulesManager = new PropertiesModuleManager(path, modulesDatabaseClient);
+			} else {
+				modulesManager = new PropertiesModuleManager(path);
+			}
 		}
 
-		int threadCount = appConfig.getModulesLoaderThreadCount();
+		final int threadCount = appConfig.getModulesLoaderThreadCount();
 
-		RestBatchWriter assetBatchWriter = new RestBatchWriter(appConfig.newModulesDatabaseClient(), false);
+		RestBatchWriter assetBatchWriter = new RestBatchWriter(modulesDatabaseClient, false);
 		assetBatchWriter.setThreadCount(threadCount);
 		AssetFileLoader assetFileLoader = new AssetFileLoader(assetBatchWriter, modulesManager);
 		if (appConfig.getModulesLoaderBatchSize() != null) {
 			assetFileLoader.setBatchSize(appConfig.getModulesLoaderBatchSize());
 		}
 
-		String permissions = appConfig.getModulePermissions();
+		final String permissions = appConfig.getModulePermissions();
 		if (permissions != null) {
 			assetFileLoader.setPermissions(permissions);
 		}
 
-		String[] extensions = appConfig.getAdditionalBinaryExtensions();
+		final String[] extensions = appConfig.getAdditionalBinaryExtensions();
 		if (extensions != null) {
 			assetFileLoader.setAdditionalBinaryExtensions(extensions);
 		}
@@ -44,7 +61,7 @@ public class DefaultModulesLoaderFactory extends LoggingObject implements Module
 			assetFileLoader.addFileFilter(appConfig.getAssetFileFilter());
 		}
 
-		DefaultModulesLoader modulesLoader = new DefaultModulesLoader(assetFileLoader);
+		final DefaultModulesLoader modulesLoader = new DefaultModulesLoader(assetFileLoader);
 
 		if (appConfig.isReplaceTokensInModules()) {
 			TokenReplacer tokenReplacer = appConfig.buildTokenReplacer();

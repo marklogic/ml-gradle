@@ -547,6 +547,11 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			}
 		});
 
+		propertyConsumerMap.put("mlModuleTimestampsUseHost", (config, prop) -> {
+			logger.info("Use host in module timestamps file: " + prop);
+			config.setModuleTimestampsUseHost(Boolean.parseBoolean(prop));
+		});
+
 		propertyConsumerMap.put("mlModulesRegex", (config, prop) -> {
 			logger.info("Including module filenames matching regex: " + prop);
 			config.setModuleFilenamesIncludePattern(Pattern.compile(prop));

@@ -125,6 +125,7 @@ public class AppConfig {
 	private boolean staticCheckLibraryAssets = false;
 	private boolean bulkLoadAssets = true;
 	private String moduleTimestampsPath = PropertiesModuleManager.DEFAULT_FILE_PATH;
+	private boolean moduleTimestampsUseHost = true;
 	private boolean deleteTestModules = false;
 	private String deleteTestModulesPattern = "/test/**";
 	private int modulesLoaderThreadCount = 1;
@@ -1366,5 +1367,13 @@ public class AppConfig {
 
 	public void setMergeResources(boolean mergeResources) {
 		this.mergeResources = mergeResources;
+	}
+
+	public boolean isModuleTimestampsUseHost() {
+		return moduleTimestampsUseHost;
+	}
+
+	public void setModuleTimestampsUseHost(boolean moduleTimestampsUseHost) {
+		this.moduleTimestampsUseHost = moduleTimestampsUseHost;
 	}
 }

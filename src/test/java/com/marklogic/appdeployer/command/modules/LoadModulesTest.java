@@ -3,6 +3,8 @@ package com.marklogic.appdeployer.command.modules;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.client.ext.modulesloader.impl.DefaultFileFilter;
+import com.marklogic.client.ext.modulesloader.impl.DefaultModulesLoader;
+import com.marklogic.client.ext.modulesloader.impl.PropertiesModuleManager;
 import com.marklogic.junit.Fragment;
 import com.marklogic.junit.PermissionsFragment;
 import com.marklogic.xcc.template.XccTemplate;
@@ -64,9 +66,15 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 		}
 
 		appConfig.setModuleTimestampsPath("build/custom-path.properties");
-		initializeAppDeployer(new DeployRestApiServersCommand(true), new LoadModulesCommand());
+		LoadModulesCommand command = new LoadModulesCommand();
+		initializeAppDeployer(new DeployRestApiServersCommand(true), command);
 		appDeployer.deploy(appConfig);
 		assertTrue("The custom file should have been created when the modules were loaded", customFile.exists());
+
+		DefaultModulesLoader loader = (DefaultModulesLoader)command.getModulesLoader();
+		PropertiesModuleManager manager = (PropertiesModuleManager)loader.getModulesManager();
+		assertEquals("The host should have been set on the PropertiesModuleManager via DefaultModulesLoaderFactory " +
+			"so that module timestamps account for the host", appConfig.getHost(), manager.getHost());
 	}
 
 	@Test

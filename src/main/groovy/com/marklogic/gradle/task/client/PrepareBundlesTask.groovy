@@ -2,6 +2,7 @@ package com.marklogic.gradle.task.client
 
 import com.marklogic.appdeployer.ConfigDir
 import com.marklogic.gradle.task.MarkLogicTask
+import org.apache.commons.io.FileUtils
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.internal.project.DefaultAntBuilder
 import org.gradle.api.internal.project.ant.AntLoggingAdapter
@@ -29,8 +30,13 @@ class PrepareBundlesTask extends MarkLogicTask {
 				if ("mlRestApi".equals(configurationName)) {
 					println "\nWARNING: mlRestApi is deprecated as of release 3.13.0, please use mlBundle instead, which is a drop-in replacement.\n"
 				}
+				
 				def buildDir = new File("build/" + configurationName)
-				buildDir.delete()
+				try {
+					FileUtils.cleanDirectory(buildDir)
+				} catch (Exception e) {
+					println "Unable to delete directory: " + buildDir
+				}
 				buildDir.mkdirs()
 
 				// Constructing a DefaultAntBuilder seems to avoid Xerces-related classpath issues

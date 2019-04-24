@@ -1,5 +1,6 @@
 package com.marklogic.appdeployer;
 
+import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.ext.SecurityContextType;
 import com.marklogic.mgmt.util.SimplePropertySource;
@@ -227,6 +228,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		p.setProperty("mlUsername", "propuser1");
 		p.setProperty("mlPassword", "proppassword");
 
+		p.setProperty("mlRestConnectionType", DatabaseClient.ConnectionType.DIRECT.name());
 		p.setProperty("mlRestPort", "4321");
 		p.setProperty("mlTestRestPort", "8765");
 		p.setProperty("mlRestAdminUsername", "propuser2");
@@ -236,6 +238,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		p.setProperty("mlRestCertPassword", "restCertPassword");
 		p.setProperty("mlRestExternalName", "restExternalName");
 
+		p.setProperty("mlAppServicesConnectionType", DatabaseClient.ConnectionType.GATEWAY.name());
 		p.setProperty("mlAppServicesUsername", "appServicesUsername");
 		p.setProperty("mlAppServicesPassword", "appServicesPassword");
 		p.setProperty("mlAppServicesPort", "8123");
@@ -331,6 +334,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		assertTrue(config.isNoRestServer());
 
 		// REST server connection properties
+		assertEquals(DatabaseClient.ConnectionType.DIRECT, config.getRestConnectionType());
 		assertEquals((Integer) 4321, config.getRestPort());
 		assertEquals((Integer) 8765, config.getTestRestPort());
 		assertEquals("propuser2", config.getRestAdminUsername());
@@ -341,6 +345,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		assertEquals("restExternalName", config.getRestExternalName());
 
 		// App-Services server connection properties
+		assertEquals(DatabaseClient.ConnectionType.GATEWAY, config.getAppServicesConnectionType());
 		assertEquals("appServicesUsername", config.getAppServicesUsername());
 		assertEquals("appServicesPassword", config.getAppServicesPassword());
 		assertEquals((Integer) 8123, config.getAppServicesPort());

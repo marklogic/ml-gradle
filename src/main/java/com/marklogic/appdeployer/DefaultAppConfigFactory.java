@@ -1,5 +1,6 @@
 package com.marklogic.appdeployer;
 
+import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.ext.SecurityContextType;
 import com.marklogic.mgmt.util.PropertySource;
 import com.marklogic.mgmt.util.PropertySourceFactory;
@@ -164,6 +165,10 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		propertyConsumerMap.put("mlAppServicesCertPassword", (config, prop) -> {
 			config.setAppServicesCertPassword(prop);
 		});
+		propertyConsumerMap.put("mlAppServicesConnectionType", (config, prop) -> {
+			logger.info("App Services connection type: " + prop);
+			config.setAppServicesConnectionType(DatabaseClient.ConnectionType.valueOf(prop));
+		});
 		propertyConsumerMap.put("mlAppServicesExternalName", (config, prop) -> {
 			logger.info("App Services external name: " + prop);
 			config.setAppServicesExternalName(prop);
@@ -207,6 +212,10 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			if (!propertyExists("mlAppServicesPassword")) {
 				config.setAppServicesPassword(prop);
 			}
+		});
+		propertyConsumerMap.put("mlRestConnectionType", (config, prop) -> {
+			logger.info("REST connection type: " + prop);
+			config.setRestConnectionType(DatabaseClient.ConnectionType.valueOf(prop));
 		});
 		propertyConsumerMap.put("mlRestAuthentication", (config, prop) -> {
 			logger.info("App REST authentication: " + prop);

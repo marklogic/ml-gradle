@@ -83,7 +83,8 @@ public class AppConfig {
     // Used to construct DatabaseClient instances based on inputs defined in this class
     private ConfiguredDatabaseClientFactory configuredDatabaseClientFactory = new DefaultConfiguredDatabaseClientFactory();
 
-    // Username/password combo for using the client REST API - e.g. to load modules
+    // Connection info for using the client REST API - e.g. to load modules
+	private DatabaseClient.ConnectionType restConnectionType;
 	private SecurityContextType restSecurityContextType = SecurityContextType.DIGEST;
     private String restAdminUsername = DEFAULT_USERNAME;
     private String restAdminPassword = DEFAULT_PASSWORD;
@@ -96,7 +97,8 @@ public class AppConfig {
     private Integer restPort = DEFAULT_PORT;
     private Integer testRestPort;
 
-    // Username/password combo for using the App Services client REST API - e.g. to load non-REST API modules
+    // Connection info for using the App Services client REST API - e.g. to load non-REST API modules
+	private DatabaseClient.ConnectionType appServicesConnectionType;
     private SecurityContextType appServicesSecurityContextType = SecurityContextType.DIGEST;
 	private String appServicesUsername = DEFAULT_USERNAME;
 	private String appServicesPassword = DEFAULT_PASSWORD;
@@ -343,6 +345,7 @@ public class AppConfig {
 	    DatabaseClientConfig config = new DatabaseClientConfig(getHost(), port, getRestAdminUsername(), getRestAdminPassword());
 	    config.setCertFile(getRestCertFile());
 	    config.setCertPassword(getRestCertPassword());
+	    config.setConnectionType(restConnectionType);
 	    config.setExternalName(getRestExternalName());
 	    config.setSecurityContextType(restSecurityContextType);
 	    config.setSslContext(getRestSslContext());
@@ -372,6 +375,7 @@ public class AppConfig {
 	    DatabaseClientConfig config = new DatabaseClientConfig(getHost(), getAppServicesPort(), getAppServicesUsername(), getAppServicesPassword());
 	    config.setCertFile(getAppServicesCertFile());
 	    config.setCertPassword(getAppServicesCertPassword());
+	    config.setConnectionType(appServicesConnectionType);
 	    config.setDatabase(databaseName);
 	    config.setExternalName(getAppServicesExternalName());
 	    config.setSecurityContextType(appServicesSecurityContextType);
@@ -1375,5 +1379,21 @@ public class AppConfig {
 
 	public void setModuleTimestampsUseHost(boolean moduleTimestampsUseHost) {
 		this.moduleTimestampsUseHost = moduleTimestampsUseHost;
+	}
+
+	public DatabaseClient.ConnectionType getRestConnectionType() {
+		return restConnectionType;
+	}
+
+	public void setRestConnectionType(DatabaseClient.ConnectionType restConnectionType) {
+		this.restConnectionType = restConnectionType;
+	}
+
+	public DatabaseClient.ConnectionType getAppServicesConnectionType() {
+		return appServicesConnectionType;
+	}
+
+	public void setAppServicesConnectionType(DatabaseClient.ConnectionType appServicesConnectionType) {
+		this.appServicesConnectionType = appServicesConnectionType;
 	}
 }

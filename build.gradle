@@ -17,8 +17,8 @@ repositories {
 }
 
 dependencies {
-  compile 'com.marklogic:marklogic-client-api:4.1.1'
-  compile 'com.marklogic:marklogic-xcc:9.0.3'
+  compile 'com.marklogic:marklogic-client-api:4.2.0'
+  compile 'com.marklogic:marklogic-xcc:9.0.9'
   compile 'org.jdom:jdom2:2.0.6'
   compile 'org.springframework:spring-context:4.3.7.RELEASE'
 

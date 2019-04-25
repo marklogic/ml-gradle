@@ -3,6 +3,10 @@ package com.marklogic.appdeployer.command.triggers;
 import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
+import com.marklogic.mgmt.api.API;
+import com.marklogic.mgmt.api.trigger.Trigger;
+import com.marklogic.mgmt.mapper.DefaultResourceMapper;
+import com.marklogic.mgmt.mapper.ResourceMapper;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.triggers.TriggerManager;
 
@@ -29,7 +33,39 @@ public class ManageTriggersTest extends AbstractManageResourceTest {
         return new String[] { "my-trigger" };
     }
 
-    /**
+	/**
+	 * Added the Trigger class in 3.14.0, doing some basic validation of it here.
+	 */
+	@Override
+	protected void afterResourcesCreated() {
+		ResourceMapper mapper = new DefaultResourceMapper(new API(manageClient));
+
+    	String json = newResourceManager().getPropertiesAsJson("my-trigger");
+		verifyTriggerProperties(mapper.readResource(json, Trigger.class));
+
+		String xml = newResourceManager().getPropertiesAsXmlString("my-trigger");
+		verifyTriggerProperties(mapper.readResource(xml, Trigger.class));
+	}
+
+	private void verifyTriggerProperties(Trigger t) {
+		assertNotNull(t.getId());
+		assertEquals("my-trigger", t.getName());
+		assertEquals("my trigger", t.getDescription());
+		assertEquals("/myDir/", t.getEvent().getDataEvent().getDirectoryScope().getUri());
+		assertEquals("1", t.getEvent().getDataEvent().getDirectoryScope().getDepth());
+		assertEquals("create", t.getEvent().getDataEvent().getDocumentContent().getUpdateKind());
+		assertEquals("post-commit", t.getEvent().getDataEvent().getWhen());
+		assertEquals("/test.xqy", t.getModule());
+		assertEquals("Modules", t.getModuleDb());
+		assertEquals("/modules/", t.getModuleRoot());
+		assertTrue(t.getEnabled());
+		assertTrue(t.getRecursive());
+		assertEquals("normal", t.getTaskPriority());
+		assertEquals("trigger-management", t.getPermission().get(0).getRoleName());
+		assertEquals("update", t.getPermission().get(0).getCapability());
+	}
+
+	/**
      * No need to do anything here, as the triggers are deleted when the triggers database is deleted.
      */
     @Override

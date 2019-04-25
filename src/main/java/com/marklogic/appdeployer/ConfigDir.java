@@ -115,6 +115,15 @@ public class ConfigDir {
 		return new File(getSecurityDir(), "roles");
 	}
 
+	public File getTriggersDir(String databaseName) {
+		if (databaseName == null) {
+			return getTriggersDir();
+		}
+		File dir = getDatabasesDir();
+		File databaseDir = new File(dir, databaseName);
+		return new File(databaseDir, "triggers");
+	}
+
 	public File getTriggersDir() {
 		return new File(getBaseDir(), "triggers");
 	}

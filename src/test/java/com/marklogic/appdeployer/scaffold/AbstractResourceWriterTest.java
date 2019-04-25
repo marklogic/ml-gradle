@@ -2,9 +2,9 @@ package com.marklogic.appdeployer.scaffold;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
-import com.marklogic.mgmt.template.TemplateBuilder;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.Resource;
+import com.marklogic.mgmt.template.TemplateBuilder;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -34,9 +34,13 @@ public abstract class AbstractResourceWriterTest extends AbstractAppDeployerTest
 		appConfig.setConfigDir(new ConfigDir(baseDir));
 	}
 
-	protected void buildResourceAndDeploy(TemplateBuilder templateBuilder) {
+	protected void writeResource(TemplateBuilder templateBuilder) {
 		Resource r = templateBuilder.buildTemplate(propertyMap);
 		new DefaultResourceWriter().writeResourceAsJson(r, appConfig.getFirstConfigDir());
+	}
+
+	protected void buildResourceAndDeploy(TemplateBuilder templateBuilder) {
+		writeResource(templateBuilder);
 		deploySampleApp();
 	}
 }

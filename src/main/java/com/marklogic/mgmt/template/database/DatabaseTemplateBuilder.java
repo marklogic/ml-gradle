@@ -10,8 +10,12 @@ import java.util.List;
 public class DatabaseTemplateBuilder extends GenericTemplateBuilder {
 
 	public DatabaseTemplateBuilder() {
+		this("CHANGEME-name-of-database");
+	}
+
+	public DatabaseTemplateBuilder(String databaseName) {
 		super(Database.class);
-		addDefaultPropertyValue("database-name", "CHANGEME-name-of-database");
+		addDefaultPropertyValue("database-name", databaseName);
 		addDefaultPropertyValue("enabled", "true");
 		addDefaultPropertyValue("wordSearches", "true");
 
@@ -25,5 +29,4 @@ public class DatabaseTemplateBuilder extends GenericTemplateBuilder {
 		list.add(index);
 		addDefaultPropertyValue("range-element-index", list);
 	}
-
 }

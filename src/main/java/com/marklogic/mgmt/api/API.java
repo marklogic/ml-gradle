@@ -1,10 +1,6 @@
 package com.marklogic.mgmt.api;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.marklogic.appdeployer.DefaultAppConfigFactory;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.ext.helper.ClientHelper;
@@ -12,7 +8,6 @@ import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.mgmt.DefaultManageConfigFactory;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.ManageConfig;
-import com.marklogic.mgmt.admin.AdminConfig;
 import com.marklogic.mgmt.admin.AdminManager;
 import com.marklogic.mgmt.api.cluster.Cluster;
 import com.marklogic.mgmt.api.database.Database;
@@ -22,6 +17,7 @@ import com.marklogic.mgmt.api.restapi.RestApi;
 import com.marklogic.mgmt.api.security.*;
 import com.marklogic.mgmt.api.server.Server;
 import com.marklogic.mgmt.api.task.Task;
+import com.marklogic.mgmt.api.trigger.Trigger;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
@@ -29,6 +25,7 @@ import com.marklogic.mgmt.resource.forests.ForestManager;
 import com.marklogic.mgmt.resource.groups.GroupManager;
 import com.marklogic.mgmt.resource.security.*;
 import com.marklogic.mgmt.resource.tasks.TaskManager;
+import com.marklogic.mgmt.resource.triggers.TriggerManager;
 import com.marklogic.mgmt.util.ObjectMapperFactory;
 import com.marklogic.mgmt.util.SimplePropertySource;
 import com.marklogic.mgmt.util.SystemPropertySource;
@@ -250,6 +247,17 @@ public class API extends LoggingObject {
 
     public Server getServer() {
         return server(null);
+    }
+
+    public Trigger trigger(String name, String databaseName) {
+    	Trigger t = new Trigger();
+    	t.setApi(this);
+    	t.setName(name);
+    	t.setDatabaseName(databaseName);
+    	if (name != null && t.exists()) {
+    		return getResource(name, new TriggerManager(getManageClient(), databaseName), Trigger.class);
+	    }
+    	return t;
     }
 
     /**

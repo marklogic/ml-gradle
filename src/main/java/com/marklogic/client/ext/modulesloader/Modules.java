@@ -7,6 +7,10 @@ import java.util.List;
 
 public class Modules {
 
+	/**
+	 * DHF is making use of these so they can't be removed, even though they're not used within this project.
+	 */
+	private List<Resource> assets;
 	private List<Resource> assetDirectories;
 	private List<Resource> namespaces;
 	private List<Resource> options;
@@ -84,4 +88,11 @@ public class Modules {
 		this.assetDirectories = assetDirectories;
 	}
 
+	public List<Resource> getAssets() {
+		return assets;
+	}
+
+	public void setAssets(List<Resource> assets) {
+		this.assets = assets;
+	}
 }

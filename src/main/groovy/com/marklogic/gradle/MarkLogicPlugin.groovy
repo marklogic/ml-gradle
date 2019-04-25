@@ -51,6 +51,7 @@ import com.marklogic.gradle.task.scaffold.NewProtectedCollectionTask
 import com.marklogic.gradle.task.scaffold.NewRoleTask
 import com.marklogic.gradle.task.scaffold.NewServerTask
 import com.marklogic.gradle.task.scaffold.NewTaskTask
+import com.marklogic.gradle.task.scaffold.NewTriggerTask
 import com.marklogic.gradle.task.scaffold.NewUserTask
 import com.marklogic.gradle.task.test.UnitTestTask
 import com.marklogic.gradle.task.test.GenerateUnitTestSuiteTask
@@ -188,6 +189,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlNewRole", type: NewRoleTask, group: devGroup, description: "Generate a new role resource file. " + newResourceMessage)
 		project.task("mlNewServer", type: NewServerTask, group: devGroup, description: "Generate a new server resource file. " + newResourceMessage)
 		project.task("mlNewTask", type: NewTaskTask, group: devGroup, description: "Generate a new task resource file. " + newResourceMessage)
+		project.task("mlNewTrigger", type: NewTriggerTask, group: devGroup, description: "Generate a new trigger resource file. A triggers database name must be specified via -Pdatabase=(database name). " + newResourceMessage)
 		project.task("mlNewUser", type: NewUserTask, group: devGroup, description: "Generate a new user resource file. " + newResourceMessage)
 		project.task("mlScaffold", type: GenerateScaffoldTask, group: devGroup, description: "Generate project scaffold for a new project")
 

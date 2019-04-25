@@ -4,6 +4,7 @@ import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.mgmt.api.API;
+import com.marklogic.mgmt.api.trigger.Permission;
 import com.marklogic.mgmt.api.trigger.Trigger;
 import com.marklogic.mgmt.mapper.DefaultResourceMapper;
 import com.marklogic.mgmt.mapper.ResourceMapper;
@@ -61,8 +62,16 @@ public class ManageTriggersTest extends AbstractManageResourceTest {
 		assertTrue(t.getEnabled());
 		assertTrue(t.getRecursive());
 		assertEquals("normal", t.getTaskPriority());
-		assertEquals("trigger-management", t.getPermission().get(0).getRoleName());
-		assertEquals("update", t.getPermission().get(0).getCapability());
+
+		// Order isn't guaranteed, so check them all
+		boolean foundPermission = false;
+		for (Permission p : t.getPermission()) {
+			if ("trigger-management".equals(p.getRoleName()) && "update".equals(p.getCapability())) {
+				foundPermission = true;
+				break;
+			}
+		}
+		assertTrue("Did not find trigger-management/update permission", foundPermission);
 	}
 
 	/**

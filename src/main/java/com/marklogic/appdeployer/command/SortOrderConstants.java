@@ -112,13 +112,14 @@ public abstract class SortOrderConstants {
     public static Integer DELETE_SCHEMAS_DATABASE = 8160;
 
     public static Integer DELETE_REST_API_SERVERS = 7000;
-    public static Integer DELETE_OTHER_SERVERS = 7010;
 
 	// Amps can reference roles and databases, so must delete amps before both (and before deleting REST API servers
 	// too, which may delete databases)
 	public static Integer DELETE_AMPS = 2000;
 
 	public static Integer DELETE_SCHEDULED_TASKS = 1000;
+
+	public static Integer DELETE_OTHER_SERVERS = 750;
 
 	public static Integer UNINSTALL_PLUGINS = 500;
 }

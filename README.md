@@ -1,4 +1,6 @@
-## What is ml-app-deployer?
+![GitHub release](https://img.shields.io/github/release/marklogic-community/ml-app-deployer.svg)
+![GitHub last commit](https://img.shields.io/github/last-commit/marklogic-community/ml-app-deployer.svg)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ml-app-deployer is a Java library that provides two capabilities:
 
@@ -9,13 +11,13 @@ If you're just looking for a Java library for interacting with the Management RE
 
 Javadocs for ml-app-deployer are [here](http://rjrudin.github.io/marklogic-java/javadocs/ml-app-deployer/index.html).
 
-## What does it depend on? 
+### What does ml-app-deployer depend on? 
 
 ml-app-deployer depends on MarkLogic 8 and Java 1.7+.
 
 Under the hood, it depends on Spring's [RestTemplate](http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html) for interacting with the Management REST API. It also depends on [ml-javaclient-util](https://github.com/rjrudin/ml-javaclient-util) for loading modules, which is done via the MarkLogic Client REST API. 
 
-## How do I start using the client library?
+### How do I start using the client library?
 
 The general pattern for using the management client library is:
 
@@ -30,7 +32,7 @@ Here's a brief example of what that looks like:
     DatabaseManager dbMgr = new DatabaseManager(client);
     dbMgr.save("{\"database-name\":\"my-database\"}");
 
-## How do I start using the deployer library?
+### How do I start using the deployer library?
 
 The main concept behind the deployer library is invoke a series of commands, where each command looks for one or more configuration files in a specific directory structure and then uses a Manager class in the client library to apply those configuration files as part of deploying an application. 
 

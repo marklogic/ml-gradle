@@ -3,12 +3,12 @@
 	"schema-database": "%%SCHEMAS_DATABASE%%",
 	"range-element-index": [
 		{
-			"collation": "",
+			"collation": "http://marklogic.com/collation/",
 			"invalid-values": "reject",
-			"localname": "amount",
+			"localname": "applicationSpecificId",
 			"namespace-uri": "",
 			"range-value-positions": false,
-			"scalar-type": "double"
+			"scalar-type": "string"
 		}
 	]
 }

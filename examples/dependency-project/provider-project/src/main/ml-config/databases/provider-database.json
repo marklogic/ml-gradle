@@ -2,12 +2,12 @@
 	"database-name": "%%DATABASE%%",
 	"range-element-index": [
 		{
-			"collation": "http://marklogic.com/collation/",
+			"collation": "",
 			"invalid-values": "reject",
-			"localname": "providerId",
+			"localname": "amount",
 			"namespace-uri": "",
 			"range-value-positions": false,
-			"scalar-type": "string"
+			"scalar-type": "double"
 		}
 	]
 }

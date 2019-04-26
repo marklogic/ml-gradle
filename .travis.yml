@@ -2,15 +2,10 @@ language: java
 jdk:
   - oraclejdk8
 sudo: true
-before_install:
-  - echo 'America/Los_Angeles' | sudo tee /etc/timezone
-  - sudo dpkg-reconfigure --frontend noninteractive tzdata
 install:
-  - ./shared/dev-tasks/install-dependencies.sh
+  - ./.travis/install-dependencies.sh
 script:
-  - ./shared/dev-tasks/run-tests.sh
-
-#whitelist
+  - ./.travis/run-tests.sh
 branches:
   only:
     - master

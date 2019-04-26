@@ -12,7 +12,6 @@ import com.marklogic.mgmt.resource.appservers.ServerManager;
 import javax.xml.bind.annotation.*;
 import java.util.List;
 
-@XmlRootElement(name = "http-server-properties")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Server extends Resource {
 

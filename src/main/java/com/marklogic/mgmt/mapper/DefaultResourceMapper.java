@@ -1,8 +1,12 @@
 package com.marklogic.mgmt.mapper;
 
+import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.Resource;
-import com.marklogic.mgmt.api.security.Role;
+import com.marklogic.mgmt.api.server.HttpServer;
+import com.marklogic.mgmt.api.server.OdbcServer;
+import com.marklogic.mgmt.api.server.Server;
+import com.marklogic.mgmt.api.server.XdbcServer;
 
 import javax.xml.bind.JAXBContext;
 import java.io.StringReader;
@@ -17,6 +21,7 @@ public class DefaultResourceMapper implements ResourceMapper {
 
 	private API api;
 	private Map<Class<?>, JAXBContext> jaxbContextMap;
+	private PayloadParser payloadParser = new PayloadParser();
 
 	public DefaultResourceMapper() {
 		this.jaxbContextMap = new HashMap<>();
@@ -30,17 +35,43 @@ public class DefaultResourceMapper implements ResourceMapper {
 	@Override
 	public <T extends Resource> T readResource(String payload, Class<T> resourceType) {
 		try {
-			T resource = null;
-			if (isJsonPayload(payload)) {
+			T resource;
+			if (payloadParser.isJsonPayload(payload)) {
 				resource = api.getObjectMapper().readerFor(resourceType).readValue(payload);
-			}
-			else {
-				JAXBContext context = jaxbContextMap.get(resourceType);
+			} else {
+				JAXBContext context;
+
+				/**
+				 * Can't figure out how to use a JAXB ObjectFactory to support the 3 different kinds of servers, so using
+				 * this hacky approach.
+				 */
+				if (resourceType.equals(Server.class)) {
+					if (payload.contains("xdbc-server-properties")) {
+						context = jaxbContextMap.get(XdbcServer.class);
+					} else if (payload.contains("odbc-server-properties")) {
+						context = jaxbContextMap.get(OdbcServer.class);
+					} else {
+						context = jaxbContextMap.get(HttpServer.class);
+					}
+				} else {
+					context = jaxbContextMap.get(resourceType);
+				}
+
 				if (context == null) {
-					context = JAXBContext.newInstance(resourceType);
+					if (resourceType.equals(Server.class)) {
+						if (payload.contains("xdbc-server-properties")) {
+							context = JAXBContext.newInstance(XdbcServer.class);
+						} else if (payload.contains("odbc-server-properties")) {
+							context = JAXBContext.newInstance(OdbcServer.class);
+						} else {
+							context = JAXBContext.newInstance(HttpServer.class);
+						}
+					} else {
+						context = JAXBContext.newInstance(resourceType);
+					}
 					jaxbContextMap.put(resourceType, context);
 				}
-				resource = (T)context.createUnmarshaller().unmarshal(new StringReader(payload));
+				resource = (T) context.createUnmarshaller().unmarshal(new StringReader(payload));
 			}
 			if (api != null) {
 				resource.setApi(api);
@@ -52,14 +83,4 @@ public class DefaultResourceMapper implements ResourceMapper {
 		}
 	}
 
-	/**
-	 * TODO Move this to util class?
-	 *
-	 * @param payload
-	 * @return
-	 */
-	protected boolean isJsonPayload(String payload) {
-		String s = payload.trim();
-		return s.startsWith("{") || s.startsWith("[");
-	}
 }

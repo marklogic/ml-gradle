@@ -160,8 +160,17 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 		String payload = readResourceFromFile(mgr, context, resourceFile);
 
 		if (payload != null && resourceMergingIsSupported(context)) {
-			storeResourceInCommandContextMap(context, resourceFile, payload);
-			return null;
+			try {
+				storeResourceInCommandContextMap(context, resourceFile, payload);
+				return null;
+			} catch (Exception ex) {
+				/**
+				 * As a worst case, if the payload cannot be unmarshalled (and converted if necessary) into an ObjectNode,
+				 * this warning will be logged and the resource will be saved immediately.
+				 */
+				logger.warn("Unable to store resource in context map so it can be merged (if needed) and " +
+					"saved later, so the resource will instead be saved immediately. Error cause: " + ex.getMessage());
+			}
 		}
 
 		return saveResource(mgr, context, payload);

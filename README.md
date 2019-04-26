@@ -1,3 +1,8 @@
+![GitHub release](https://img.shields.io/github/release/marklogic-community/ml-javaclient-util.svg)
+[![Build Status](https://travis-ci.org/marklogic-community/ml-javaclient-util.svg?branch=master)](https://travis-ci.org/marklogic-community/ml-javaclient-util) 
+![GitHub last commit](https://img.shields.io/github/last-commit/marklogic-community/ml-javaclient-util.svg)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 ml-javaclient-util is a library of Java classes that provide some useful functionality on top of 
 the [MarkLogic Java Client API](http://docs.marklogic.com/guide/java). Those features include:
 

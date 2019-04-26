@@ -152,9 +152,9 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 		List<DatabasePlan> databasePlans = mergeDatabasePlanFiles(context, databasePlan);
 		buildDeployDatabaseCommands(context, databasePlans);
 
-		if (logger.isDebugEnabled()) {
-			logger.debug("Logging each DatabasePlan before any databases are created/updated:");
-			databasePlans.forEach(plan -> logger.debug(plan + "\n"));
+		if (logger.isInfoEnabled()) {
+			logger.info("Logging the files for each database before it's created or updated:");
+			databasePlans.forEach(plan -> logger.info(plan + "\n"));
 		}
 
 		return databasePlans;

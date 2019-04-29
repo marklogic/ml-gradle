@@ -42,7 +42,7 @@ public class UpdateRestApiServersCommand extends AbstractCommand {
 			if (appConfig.isTestPortSet()) {
 				String payload = copyFileToString(f);
 				payload = payloadTokenReplacer.replaceTokens(payload, appConfig, true);
-				payload = adjustPayloadBeforeSavingResource(mgr, context, f, payload);
+				payload = adjustPayloadBeforeSavingResource(context, f, payload);
 				mgr.save(payload);
 			}
 		}

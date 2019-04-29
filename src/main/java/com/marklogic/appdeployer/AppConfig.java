@@ -74,6 +74,7 @@ public class AppConfig {
     private boolean catchUndeployExceptions = false;
 
     private boolean deployAmpsWithCma = false;
+    private boolean deployDatabasesWithCma = false;
     private boolean deployForestsWithCma = false;
     private boolean deployPrivilegesWithCma = false;
     private boolean mergeResources = true;
@@ -1395,5 +1396,13 @@ public class AppConfig {
 
 	public void setAppServicesConnectionType(DatabaseClient.ConnectionType appServicesConnectionType) {
 		this.appServicesConnectionType = appServicesConnectionType;
+	}
+
+	public boolean isDeployDatabasesWithCma() {
+		return deployDatabasesWithCma;
+	}
+
+	public void setDeployDatabasesWithCma(boolean deployDatabasesWithCma) {
+		this.deployDatabasesWithCma = deployDatabasesWithCma;
 	}
 }

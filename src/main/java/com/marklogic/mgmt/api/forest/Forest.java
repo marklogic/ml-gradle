@@ -1,10 +1,9 @@
 package com.marklogic.mgmt.api.forest;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.Resource;
 import com.marklogic.mgmt.api.database.DatabaseReplication;
+import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.forests.ForestManager;
 import com.marklogic.mgmt.resource.hosts.HostManager;
 

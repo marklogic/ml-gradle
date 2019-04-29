@@ -106,12 +106,23 @@ public class MergeResourcesWhileDeployingTest extends AbstractAppDeployerTest {
 		assertEquals("test2", namespaces.get(1).getPrefix());
 	}
 
+	@Test
+	public void databasesWithoutCma() {
+		appConfig.setDeployDatabasesWithCma(false);
+		deployMultipleDatabasesNeededMergingAndVerify();
+	}
+
+	@Test
+	public void databasesWithCma() {
+		appConfig.setDeployDatabasesWithCma(true);
+		deployMultipleDatabasesNeededMergingAndVerify();
+	}
+
 	/**
 	 * Includes sub-databases so their creation can be verified when their parent database has files merged together.
 	 */
-	@Test
-	public void databases() {
-		appConfig.setContentForestsPerHost(1);
+	private void deployMultipleDatabasesNeededMergingAndVerify() {
+		appConfig.setContentForestsPerHost(2);
 		appConfig.setTestRestPort(appConfig.getRestPort() + 1);
 		appConfig.setDeployForestsWithCma(true);
 
@@ -157,8 +168,10 @@ public class MergeResourcesWhileDeployingTest extends AbstractAppDeployerTest {
 		assertTrue(forestManager.exists("sample-app-one-database-subdb02-1"));
 
 		assertTrue(forestManager.exists("sample-app-content-1"));
-		assertFalse(forestManager.exists("sample-app-content-2"));
+		assertTrue(forestManager.exists("sample-app-content-2"));
+		assertFalse(forestManager.exists("sample-app-content-3"));
 		assertTrue(forestManager.exists("sample-app-test-content-1"));
-		assertFalse(forestManager.exists("sample-app-test-content-2"));
+		assertTrue(forestManager.exists("sample-app-test-content-2"));
+		assertFalse(forestManager.exists("sample-app-test-content-3"));
 	}
 }

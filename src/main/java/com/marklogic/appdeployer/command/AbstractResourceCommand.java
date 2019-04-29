@@ -10,8 +10,10 @@ import com.marklogic.mgmt.api.configuration.Configurations;
 import com.marklogic.mgmt.mapper.DefaultResourceMapper;
 import com.marklogic.mgmt.mapper.ResourceMapper;
 import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.util.ObjectMapperFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -152,15 +154,21 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 	 * @param resourceDir
 	 */
 	protected void deployResourcesViaCma(CommandContext context, File resourceDir) {
-		ResourceMapper resourceMapper = new DefaultResourceMapper(new API(context.getManageClient()));
 		Configuration config = new Configuration();
 		for (File f : listFilesInDirectory(resourceDir, context)) {
 			if (logger.isInfoEnabled()) {
 				logger.info("Processing file: " + f.getAbsolutePath());
 			}
-			String payload = readResourceFromFile(null, context, f);
+			String payload = readResourceFromFile(context, f);
 			if (payload != null && payload.trim().length() > 0) {
-				((SupportsCmaCommand) this).addResourceToConfiguration(payload, resourceMapper, config);
+				payload = convertXmlPayloadToJsonIfNecessary(context, payload);
+				ObjectNode objectNode;
+				try {
+					objectNode = (ObjectNode)ObjectMapperFactory.getObjectMapper().readTree(payload);
+				} catch (IOException e) {
+					throw new RuntimeException("Unable to read JSON, cause: " + e.getMessage(), e);
+				}
+				((SupportsCmaCommand) this).addResourceToConfiguration(objectNode, config);
 			}
 		}
 		new Configurations(config).submit(context.getManageClient());
@@ -173,10 +181,8 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 	 */
 	protected void saveMergedResourcesViaCma(CommandContext context, List<ResourceReference> mergedReferences) {
 		Configuration config = new Configuration();
-		ResourceMapper resourceMapper = new DefaultResourceMapper(new API(context.getManageClient()));
 		for (ResourceReference reference : mergedReferences) {
-			String payload = reference.getObjectNode().toString();
-			((SupportsCmaCommand)this).addResourceToConfiguration(payload, resourceMapper, config);
+			((SupportsCmaCommand)this).addResourceToConfiguration(reference.getObjectNode(), config);
 		}
 		new Configurations(config).submit(context.getManageClient());
 	}

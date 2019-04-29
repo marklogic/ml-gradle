@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.appdeployer.command.*;
 import com.marklogic.mgmt.api.configuration.Configuration;
 import com.marklogic.mgmt.api.security.Privilege;
-import com.marklogic.mgmt.mapper.ResourceMapper;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.security.PrivilegeManager;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -38,8 +37,8 @@ public class DeployPrivilegesCommand extends AbstractResourceCommand implements 
 	}
 
 	@Override
-	public void addResourceToConfiguration(String payload, ResourceMapper resourceMapper, Configuration configuration) {
-		configuration.addPrivilege(resourceMapper.readResource(payload, Privilege.class));
+	public void addResourceToConfiguration(ObjectNode resource, Configuration configuration) {
+		configuration.addPrivilege(resource);
 	}
 
 	@Override

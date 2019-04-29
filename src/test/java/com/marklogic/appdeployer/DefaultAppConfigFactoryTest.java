@@ -218,6 +218,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		p.setProperty("mlCatchUndeployExceptions", "true");
 
 		p.setProperty("mlDeployAmpsWithCma", "true");
+		p.setProperty("mlDeployDatabasesWithCma", "true");
 		p.setProperty("mlDeployForestsWithCma", "true");
 		p.setProperty("mlDeployPrivilegesWithCma", "true");
 		p.setProperty("mlDeployRolesWithCma", "true");
@@ -326,6 +327,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		assertTrue(config.isCatchUndeployExceptions());
 
 		assertTrue(config.isDeployAmpsWithCma());
+		assertTrue(config.isDeployDatabasesWithCma());
 		assertTrue(config.isDeployForestsWithCma());
 		assertTrue(config.isDeployPrivilegesWithCma());
 

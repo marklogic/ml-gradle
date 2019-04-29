@@ -157,7 +157,7 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 	 * @return
 	 */
 	protected SaveReceipt saveResource(ResourceManager mgr, CommandContext context, File resourceFile) {
-		String payload = readResourceFromFile(mgr, context, resourceFile);
+		String payload = readResourceFromFile(context, resourceFile);
 
 		if (payload != null && resourceMergingIsSupported(context)) {
 			try {
@@ -344,9 +344,9 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 	 * @param f
 	 * @return
 	 */
-	protected String readResourceFromFile(ResourceManager mgr, CommandContext context, File f) {
+	protected String readResourceFromFile(CommandContext context, File f) {
 		String payload = copyFileToString(f, context);
-		return adjustPayloadBeforeSavingResource(mgr, context, f, payload);
+		return adjustPayloadBeforeSavingResource(context, f, payload);
 	}
 
 	/**
@@ -386,13 +386,12 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 	 * <p>
 	 * A subclass can return null from this method to indicate that the resource should not be saved.
 	 *
-	 * @param mgr
 	 * @param context
 	 * @param f
 	 * @param payload
 	 * @return
 	 */
-	protected String adjustPayloadBeforeSavingResource(ResourceManager mgr, CommandContext context, File f, String payload) {
+	protected String adjustPayloadBeforeSavingResource(CommandContext context, File f, String payload) {
 		String[] props = context.getAppConfig().getExcludeProperties();
 		if (props != null && props.length > 0) {
 			logger.info(format("Excluding properties %s from payload", Arrays.asList(props).toString()));

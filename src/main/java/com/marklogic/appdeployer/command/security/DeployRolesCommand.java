@@ -92,8 +92,8 @@ public class DeployRolesCommand extends AbstractResourceCommand {
 	 * @return
 	 */
 	@Override
-	protected String adjustPayloadBeforeSavingResource(ResourceManager mgr, CommandContext context, File f, String payload) {
-		payload = super.adjustPayloadBeforeSavingResource(mgr, context, f, payload);
+	protected String adjustPayloadBeforeSavingResource(CommandContext context, File f, String payload) {
+		payload = super.adjustPayloadBeforeSavingResource(context, f, payload);
 
 		if (resourceMapper == null) {
 			API api = new API(context.getManageClient(), context.getAdminManager());

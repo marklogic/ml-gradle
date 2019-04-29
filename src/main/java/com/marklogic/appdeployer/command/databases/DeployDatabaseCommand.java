@@ -123,16 +123,16 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 
 	@Override
     public void execute(CommandContext context) {
-        String payload = buildPayload(context);
+        String payload = buildPayloadForSaving(context);
         if (payload != null) {
-            DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
-            databaseName = dbMgr.getResourceId(payload);
+	        DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
+	        databaseName = dbMgr.getResourceId(payload);
 
-            payload = adjustPayloadBeforeSavingResource(dbMgr, context, null, payload);
             dbMgr.save(payload);
 
-            if (shouldCreateForests(context, payload)) {
-	            deployForestsCommand = buildDeployForestsCommand(databaseName, context);
+            DeployForestsCommand tempCommand = buildDeployForestsCommand(databaseName, context);
+            if (tempCommand != null) {
+            	this.deployForestsCommand = tempCommand;
 	            if (postponeForestCreation) {
 		            logger.info("Postponing creation of forests for database: " + databaseName);
 	            } else {
@@ -140,10 +140,34 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 	            }
             }
 
-            if (!isSubDatabase()) {
-            	new DeploySubDatabasesCommand(databaseName, deployDatabaseCommandFactory).execute(context);
-            }
+            deploySubDatabases(this.databaseName, context);
         }
+    }
+
+	/**
+	 * If this is not a sub-database, then deploy sub-databases if any have been configured for this database.
+	 *
+	 * @param context
+	 */
+	public void deploySubDatabases(String dbName, CommandContext context) {
+	    if (!isSubDatabase()) {
+		    new DeploySubDatabasesCommand(dbName, deployDatabaseCommandFactory).execute(context);
+	    }
+    }
+
+	/**
+	 * Performs all work necessary to construct a payload that can either be saved immediately or included in a CMA
+	 * configuration.
+	 *
+	 * @param context
+	 * @return
+	 */
+	public String buildPayloadForSaving(CommandContext context) {
+	    String payload = buildPayload(context);
+	    if (payload != null) {
+		    payload = adjustPayloadBeforeSavingResource(context, null, payload);
+	    }
+	    return payload;
     }
 
 	/**
@@ -267,11 +291,11 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 	 * name is extracted from the payload via a PayloadParser. This check can be disabled by setting
 	 * checkForCustomForests to false.
 	 *
+	 * @param databaseName
 	 * @param context
-	 * @param payload
 	 * @return
 	 */
-	protected boolean shouldCreateForests(CommandContext context, String payload) {
+	protected boolean shouldCreateForests(String databaseName, CommandContext context) {
 		if (!context.getAppConfig().isCreateForests()) {
 			if (logger.isInfoEnabled()) {
 				logger.info("Forest creation is disabled, so not creating any forests");
@@ -280,11 +304,9 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 		}
 
 		if (isCheckForCustomForests()) {
-			PayloadParser parser = new PayloadParser();
-			String dbName = parser.getPayloadFieldValue(payload, "database-name");
-			boolean customForestsDontExist = !customForestsExist(context, dbName);
+			boolean customForestsDontExist = !customForestsExist(context, databaseName);
 			if (!customForestsDontExist && logger.isInfoEnabled()) {
-				logger.info("Found custom forests for database " + dbName + ", so not creating default forests");
+				logger.info("Found custom forests for database " + databaseName + ", so not creating default forests");
 			}
 			return customForestsDontExist;
 		}
@@ -315,14 +337,17 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
      *
      * @param databaseName
      * @param context
-     * @return
+     * @return will return null if it's determined that no forests should be created for the database
      */
     public DeployForestsCommand buildDeployForestsCommand(String databaseName, CommandContext context) {
-        DeployForestsCommand c = new DeployForestsCommand(databaseName);
-        c.setForestsPerHost(getForestsPerHost());
-        c.setCreateForestsOnEachHost(createForestsOnEachHost);
-        c.setForestFilename(forestFilename);
-        return c;
+    	if (shouldCreateForests(databaseName, context)) {
+		    DeployForestsCommand c = new DeployForestsCommand(databaseName);
+		    c.setForestsPerHost(getForestsPerHost());
+		    c.setCreateForestsOnEachHost(createForestsOnEachHost);
+		    c.setForestFilename(forestFilename);
+		    return c;
+	    }
+    	return null;
     }
 
     protected String buildDefaultDatabasePayload(CommandContext context) {

@@ -85,7 +85,7 @@ public class DeployForestsCommand extends AbstractCommand {
 
 	protected void createForestsViaCma(CommandContext context, List<Forest> forests) {
 		Configuration config = new Configuration();
-		config.setForests(forests);
+		forests.forEach(forest -> config.addForest(forest.toObjectNode()));
 		new Configurations(config).submit(context.getManageClient());
 	}
 
@@ -155,7 +155,7 @@ public class DeployForestsCommand extends AbstractCommand {
 		}
 
 		if (payload != null) {
-			return adjustPayloadBeforeSavingResource(forestManager, context, null, payload);
+			return adjustPayloadBeforeSavingResource(context, null, payload);
 		}
 
 		return null;

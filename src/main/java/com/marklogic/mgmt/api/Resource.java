@@ -1,6 +1,7 @@
 package com.marklogic.mgmt.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.mgmt.DeleteReceipt;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.resource.ResourceManager;
@@ -9,6 +10,7 @@ import com.marklogic.mgmt.util.ObjectMapperFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -49,7 +51,22 @@ public abstract class Resource extends ApiObject {
 	    return logger;
     }
 
-    /**
+	/**
+	 *
+	 * @return
+	 */
+	public ObjectNode toObjectNode() {
+		// Haven't found a better way than serializing this out to a String and then reading back in as an ObjectNode
+		String json = getJson();
+		try {
+			return (ObjectNode)ObjectMapperFactory.getObjectMapper().readTree(json);
+		} catch (IOException e) {
+			throw new RuntimeException("Unable to convert to ObjectNode, cause: " + e.getMessage(), e);
+		}
+	}
+
+
+	/**
      * @return a receipt string containing the path and HTTP status code
      */
     public String save() {

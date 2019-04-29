@@ -60,7 +60,7 @@ public class DeployCustomForestsCommand extends AbstractCommand {
 			if (logger.isInfoEnabled()) {
 				logger.info("Processing forests in file: " + f.getAbsolutePath());
 			}
-			String payload = readResourceFromFile(mgr, context, f);
+			String payload = readResourceFromFile(context, f);
 			if (payloadParser.isJsonPayload(payload)) {
 				mgr.saveJsonForests(payload);
 			} else {

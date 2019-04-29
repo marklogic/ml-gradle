@@ -6,6 +6,7 @@ import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractUndoableCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
+import com.marklogic.appdeployer.command.SupportsCmaCommand;
 import com.marklogic.appdeployer.command.forests.DeployForestsCommand;
 import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.api.API;
@@ -87,20 +88,27 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 			logger.info("Not sorting databases by dependencies, will sort them by their filenames instead");
 		}
 
-		databasePlans.forEach(databasePlan -> {
-			databasePlan.getDeployDatabaseCommand().execute(context);
-		});
+		if (context.getAppConfig().isDeployDatabasesWithCma()) {
+			deployDatabasesAndForestsViaCma(context, databasePlans);
+		}
 
-		// Either create forests in one bulk CMA request, or via a command per database
-		if (context.getAppConfig().isDeployForestsWithCma()) {
-			deployAllForestsInSingleCmaRequest(context, databasePlans);
-		} else {
+		else {
+			// Otherwise, create each database one at a time, which also handles sub-databases
 			databasePlans.forEach(databasePlan -> {
-				DeployForestsCommand dfc = databasePlan.getDeployDatabaseCommand().getDeployForestsCommand();
-				if (dfc != null) {
-					dfc.execute(context);
-				}
+				databasePlan.getDeployDatabaseCommand().execute(context);
 			});
+
+			// Either create forests in one bulk CMA request, or via a command per database
+			if (context.getAppConfig().isDeployForestsWithCma()) {
+				deployAllForestsInSingleCmaRequest(context, databasePlans);
+			} else {
+				databasePlans.forEach(databasePlan -> {
+					DeployForestsCommand dfc = databasePlan.getDeployDatabaseCommand().getDeployForestsCommand();
+					if (dfc != null) {
+						dfc.execute(context);
+					}
+				});
+			}
 		}
 	}
 
@@ -341,6 +349,42 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 	}
 
 	/**
+	 * As of 3.15.0, if databases are to be deployed via CMA, then their forests will also be deployed via CMA,
+	 * regardless of the setting on the AppConfig instance.
+	 *
+	 * Also as of 3.15.0, sub-databases and their forests are never deployed by CMA. Will support this in a future
+	 * release.
+	 *
+	 * @param context
+	 * @param databasePlans
+	 */
+	protected void deployDatabasesAndForestsViaCma(CommandContext context, List<DatabasePlan> databasePlans) {
+		Configuration dbConfig = new Configuration();
+		// Forests must be included in a separate configuration object
+		Configuration forestConfig = new Configuration();
+
+		databasePlans.forEach(plan -> {
+			final DeployDatabaseCommand deployDatabaseCommand = plan.getDeployDatabaseCommand();
+			String payload = deployDatabaseCommand.buildPayloadForSaving(context);
+			payload = convertXmlPayloadToJsonIfNecessary(context, payload);
+			dbConfig.addDatabase(payload);
+
+			DeployForestsCommand deployForestsCommand = deployDatabaseCommand.buildDeployForestsCommand(plan.getDatabaseName(), context);
+			if (deployForestsCommand != null) {
+				deployForestsCommand.buildForests(context, false).forEach(forest -> forestConfig.addForest(forest.toObjectNode()));
+			}
+		});
+
+		new Configurations(dbConfig, forestConfig).submit(context.getManageClient());
+
+		// Now account for sub-databases, but not with CMA
+		databasePlans.forEach(plan -> {
+			final DeployDatabaseCommand deployDatabaseCommand = plan.getDeployDatabaseCommand();
+			deployDatabaseCommand.deploySubDatabases(plan.getDatabaseName(), context);
+		});
+	}
+
+	/**
 	 * Each DatabasePlan is expected to have constructed a DeployForestCommand, but not executed it. Each
 	 * DeployForestCommand can then be used to build a list of forests. All of those forests can be combined into a
 	 * single list and then submitted to CMA, thereby greatly speeding up the creation of the forests.
@@ -350,15 +394,15 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 	 */
 	protected void deployAllForestsInSingleCmaRequest(CommandContext context, List<DatabasePlan> databasePlans) {
 		List<Forest> allForests = new ArrayList<>();
-		for (DatabasePlan reference : databasePlans) {
-			DeployForestsCommand deployForestsCommand = reference.getDeployDatabaseCommand().getDeployForestsCommand();
-			if (deployForestsCommand != null) {
-				allForests.addAll(deployForestsCommand.buildForests(context, false));
+		databasePlans.forEach(plan -> {
+			DeployForestsCommand dfc = plan.getDeployDatabaseCommand().getDeployForestsCommand();
+			if (dfc != null) {
+				allForests.addAll(dfc.buildForests(context, false));
 			}
-		}
+		});
 		if (!allForests.isEmpty()) {
 			Configuration config = new Configuration();
-			config.setForests(allForests);
+			allForests.forEach(forest -> config.addForest(forest.toObjectNode()));
 			new Configurations(config).submit(context.getManageClient());
 		}
 	}

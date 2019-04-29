@@ -1,12 +1,12 @@
 package com.marklogic.appdeployer.command.security;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.appdeployer.command.SupportsCmaCommand;
 import com.marklogic.mgmt.api.configuration.Configuration;
 import com.marklogic.mgmt.api.security.Amp;
-import com.marklogic.mgmt.mapper.ResourceMapper;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.security.AmpManager;
 
@@ -17,6 +17,9 @@ public class DeployAmpsCommand extends AbstractResourceCommand implements Suppor
 	public DeployAmpsCommand() {
 		setExecuteSortOrder(SortOrderConstants.DEPLOY_AMPS);
 		setUndoSortOrder(SortOrderConstants.DELETE_AMPS);
+
+		// Need this to support CMA deployments
+		setResourceClassType(Amp.class);
 	}
 
 	@Override
@@ -35,7 +38,7 @@ public class DeployAmpsCommand extends AbstractResourceCommand implements Suppor
 	}
 
 	@Override
-	public void addResourceToConfiguration(String payload, ResourceMapper resourceMapper, Configuration configuration) {
-		configuration.addAmp(resourceMapper.readResource(payload, Amp.class));
+	public void addResourceToConfiguration(ObjectNode payload, Configuration configuration) {
+		configuration.addAmp(payload);
 	}
 }

@@ -76,7 +76,7 @@ public class DeployForestsCommand extends AbstractCommand {
 		// Replicas are currently handled by ConfigureForestReplicasCommand
 		List<Forest> forests = buildForests(context, false);
 
-		if (context.getAppConfig().isDeployForestsWithCma() && !forests.isEmpty() && cmaEndpointExists(context)) {
+		if (context.getAppConfig().getCmaConfig().isDeployForests() && !forests.isEmpty() && cmaEndpointExists(context)) {
 			createForestsViaCma(context, forests);
 		} else {
 			createForestsViaForestEndpoint(context, forests);

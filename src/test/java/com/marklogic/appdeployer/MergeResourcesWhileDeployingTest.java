@@ -108,13 +108,13 @@ public class MergeResourcesWhileDeployingTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void databasesWithoutCma() {
-		appConfig.setDeployDatabasesWithCma(false);
+		appConfig.getCmaConfig().setDeployDatabases(false);
 		deployMultipleDatabasesNeededMergingAndVerify();
 	}
 
 	@Test
 	public void databasesWithCma() {
-		appConfig.setDeployDatabasesWithCma(true);
+		appConfig.getCmaConfig().setDeployDatabases(true);
 		deployMultipleDatabasesNeededMergingAndVerify();
 	}
 
@@ -124,7 +124,7 @@ public class MergeResourcesWhileDeployingTest extends AbstractAppDeployerTest {
 	private void deployMultipleDatabasesNeededMergingAndVerify() {
 		appConfig.setContentForestsPerHost(2);
 		appConfig.setTestRestPort(appConfig.getRestPort() + 1);
-		appConfig.setDeployForestsWithCma(true);
+		appConfig.getCmaConfig().setDeployForests(true);
 
 		initializeAppDeployer(new DeployOtherDatabasesCommand());
 		deploySampleApp();

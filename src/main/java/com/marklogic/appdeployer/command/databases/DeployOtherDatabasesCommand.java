@@ -88,7 +88,7 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 			logger.info("Not sorting databases by dependencies, will sort them by their filenames instead");
 		}
 
-		if (context.getAppConfig().isDeployDatabasesWithCma()) {
+		if (context.getAppConfig().getCmaConfig().isDeployDatabases()) {
 			deployDatabasesAndForestsViaCma(context, databasePlans);
 		}
 
@@ -99,7 +99,7 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 			});
 
 			// Either create forests in one bulk CMA request, or via a command per database
-			if (context.getAppConfig().isDeployForestsWithCma()) {
+			if (context.getAppConfig().getCmaConfig().isDeployForests()) {
 				deployAllForestsInSingleCmaRequest(context, databasePlans);
 			} else {
 				databasePlans.forEach(databasePlan -> {
@@ -343,7 +343,7 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 			// Set the payload so the command doesn't try to generate it
 			command.setPayload(databasePlan.getPayload());
 
-			command.setPostponeForestCreation(context.getAppConfig().isDeployForestsWithCma());
+			command.setPostponeForestCreation(context.getAppConfig().getCmaConfig().isDeployForests());
 			databasePlan.setDeployDatabaseCommand(command);
 		});
 	}

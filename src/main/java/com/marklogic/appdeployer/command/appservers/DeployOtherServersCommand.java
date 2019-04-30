@@ -3,6 +3,7 @@ package com.marklogic.appdeployer.command.appservers;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.appdeployer.command.*;
 import com.marklogic.mgmt.PayloadParser;
+import com.marklogic.mgmt.api.configuration.Configuration;
 import com.marklogic.mgmt.api.server.Server;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
@@ -17,7 +18,7 @@ import java.util.function.BiPredicate;
  * "Other" = non-REST-API servers. This will process every JSON/XML file that's not named "rest-api-server.*" in the
  * servers directory.
  */
-public class DeployOtherServersCommand extends AbstractResourceCommand {
+public class DeployOtherServersCommand extends AbstractResourceCommand implements SupportsCmaCommand {
 
 	/**
 	 * Defines the server names that, by default, this command will never undeploy.
@@ -35,6 +36,16 @@ public class DeployOtherServersCommand extends AbstractResourceCommand {
 
 		setSupportsResourceMerging(true);
 		setResourceClassType(Server.class);
+	}
+
+	@Override
+	public boolean cmaShouldBeUsed(CommandContext context) {
+		return context.getAppConfig().getCmaConfig().isDeployServers();
+	}
+
+	@Override
+	public void addResourceToConfiguration(ObjectNode resource, Configuration configuration) {
+		configuration.addServer(resource);
 	}
 
 	protected void initializeDefaultServersToNotUndeploy() {

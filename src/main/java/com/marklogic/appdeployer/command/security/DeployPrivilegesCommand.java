@@ -33,7 +33,7 @@ public class DeployPrivilegesCommand extends AbstractResourceCommand implements 
 
 	@Override
 	public boolean cmaShouldBeUsed(CommandContext context) {
-		return context.getAppConfig().isDeployPrivilegesWithCma();
+		return context.getAppConfig().getCmaConfig().isDeployPrivileges();
 	}
 
 	@Override

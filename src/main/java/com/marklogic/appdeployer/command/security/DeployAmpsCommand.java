@@ -34,7 +34,7 @@ public class DeployAmpsCommand extends AbstractResourceCommand implements Suppor
 
 	@Override
 	public boolean cmaShouldBeUsed(CommandContext context) {
-		return context.getAppConfig().isDeployAmpsWithCma();
+		return context.getAppConfig().getCmaConfig().isDeployAmps();
 	}
 
 	@Override

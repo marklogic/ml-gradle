@@ -23,7 +23,7 @@ public class DeployAmpsWithCmaTest extends AbstractAppDeployerTest {
 
 		AmpManager mgr = new AmpManager(manageClient);
 
-		appConfig.setDeployAmpsWithCma(true);
+		appConfig.getCmaConfig().setDeployAmps(true);
 		deploySampleApp();
 
 		try {

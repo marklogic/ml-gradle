@@ -16,7 +16,7 @@ public class DeployForestsWithCmaTest extends AbstractAppDeployerTest {
 	 */
 	@Test
 	public void test() {
-		appConfig.setDeployForestsWithCma(true);
+		appConfig.getCmaConfig().setDeployForests(true);
 		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/db-only-config"));
 
 		initializeAppDeployer(new DeployOtherDatabasesCommand(6));

@@ -67,28 +67,34 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			logger.info("mlOptimizeWithCma is DEPRECATED; please use a property specific to the resource that you want to deploy with CMA");
 			// mlOptimizeWithCma was deprecated in 3.11; it was only used for deploying forests, so if the
 			// property is still used, the client in theory expects forests to still be deployed with CMA
-			config.setDeployForestsWithCma(true);
+			config.getCmaConfig().setDeployForests(true);
 		});
 
 		final String cmaMessage = " with the Configuration Management API (CMA): ";
+
 		propertyConsumerMap.put("mlDeployAmpsWithCma", (config, prop) -> {
 			logger.info("Deploy amps" + cmaMessage + prop);
-			config.setDeployAmpsWithCma(Boolean.parseBoolean(prop));
+			config.getCmaConfig().setDeployAmps(Boolean.parseBoolean(prop));
 		});
 
 		propertyConsumerMap.put("mlDeployDatabasesWithCma", (config, prop) -> {
 			logger.info("Deploy databases and forests" + cmaMessage + prop);
-			config.setDeployDatabasesWithCma(Boolean.parseBoolean(prop));
+			config.getCmaConfig().setDeployDatabases(Boolean.parseBoolean(prop));
 		});
 
 		propertyConsumerMap.put("mlDeployForestsWithCma", (config, prop) -> {
 			logger.info("Deploy forests" + cmaMessage + prop);
-			config.setDeployForestsWithCma(Boolean.parseBoolean(prop));
+			config.getCmaConfig().setDeployForests(Boolean.parseBoolean(prop));
 		});
 
 		propertyConsumerMap.put("mlDeployPrivilegesWithCma", (config, prop) -> {
 			logger.info("Deploy privileges" + cmaMessage + prop);
-			config.setDeployPrivilegesWithCma(Boolean.parseBoolean(prop));
+			config.getCmaConfig().setDeployPrivileges(Boolean.parseBoolean(prop));
+		});
+
+		propertyConsumerMap.put("mlDeployServersWithCma", (config, prop) -> {
+			logger.info("Deploy servers" + cmaMessage + prop);
+			config.getCmaConfig().setDeployServers(Boolean.parseBoolean(prop));
 		});
 
 		propertyConsumerMap.put("mlAddHostNameTokens", (config, prop) -> {

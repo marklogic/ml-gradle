@@ -26,7 +26,7 @@ public class ManageOtherServerTest extends AbstractAppDeployerTest {
         }
     }
 
-    @Test
+	@Test
     public void odbcAndXdbcServers() {
         appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/other-servers")));
 

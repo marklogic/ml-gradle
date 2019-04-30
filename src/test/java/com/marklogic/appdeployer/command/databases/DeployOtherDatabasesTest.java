@@ -45,7 +45,7 @@ public class DeployOtherDatabasesTest extends AbstractAppDeployerTest {
         appConfig.setResourceFilenamesToIgnore("ignored-database.json");
 
         // Speed up this test and ensure that all the forests still get created correctly
-        appConfig.setDeployForestsWithCma(true);
+        appConfig.getCmaConfig().setDeployForests(true);
 
         initializeAppDeployer(new DeployOtherDatabasesCommand());
 

@@ -13,7 +13,7 @@ public class DeployPrivilegesWithCmaTest extends AbstractAppDeployerTest {
 		initializeAppDeployer(new TestDeployPrivilegesCommand());
 
 		PrivilegeManager mgr = new PrivilegeManager(manageClient);
-		appConfig.setDeployPrivilegesWithCma(true);
+		appConfig.getCmaConfig().setDeployPrivileges(true);
 
 		try {
 			deploySampleApp();

@@ -73,10 +73,7 @@ public class AppConfig {
     private boolean catchDeployExceptions = false;
     private boolean catchUndeployExceptions = false;
 
-    private boolean deployAmpsWithCma = false;
-    private boolean deployDatabasesWithCma = false;
-    private boolean deployForestsWithCma = false;
-    private boolean deployPrivilegesWithCma = false;
+    private CmaConfig cmaConfig = new CmaConfig();
     private boolean mergeResources = true;
 
     private boolean addHostNameTokens = false;
@@ -1260,22 +1257,6 @@ public class AppConfig {
 		this.appServicesTrustManager = appServicesTrustManager;
 	}
 
-	public boolean isDeployAmpsWithCma() {
-		return deployAmpsWithCma;
-	}
-
-	public void setDeployAmpsWithCma(boolean deployAmpsWithCma) {
-		this.deployAmpsWithCma = deployAmpsWithCma;
-	}
-
-	public boolean isDeployForestsWithCma() {
-		return deployForestsWithCma;
-	}
-
-	public void setDeployForestsWithCma(boolean deployForestsWithCma) {
-		this.deployForestsWithCma = deployForestsWithCma;
-	}
-
 	@Deprecated
 	public boolean isCreateTriggersDatabase() {
 		return createTriggersDatabase;
@@ -1284,14 +1265,6 @@ public class AppConfig {
 	@Deprecated
 	public void setCreateTriggersDatabase(boolean createTriggerDatabase) {
 		this.createTriggersDatabase = createTriggerDatabase;
-	}
-
-	public boolean isDeployPrivilegesWithCma() {
-		return deployPrivilegesWithCma;
-	}
-
-	public void setDeployPrivilegesWithCma(boolean deployPrivilegesWithCma) {
-		this.deployPrivilegesWithCma = deployPrivilegesWithCma;
 	}
 
 	public ReplicaBuilderStrategy getReplicaBuilderStrategy() {
@@ -1398,11 +1371,11 @@ public class AppConfig {
 		this.appServicesConnectionType = appServicesConnectionType;
 	}
 
-	public boolean isDeployDatabasesWithCma() {
-		return deployDatabasesWithCma;
+	public CmaConfig getCmaConfig() {
+		return cmaConfig;
 	}
 
-	public void setDeployDatabasesWithCma(boolean deployDatabasesWithCma) {
-		this.deployDatabasesWithCma = deployDatabasesWithCma;
+	public void setCmaConfig(CmaConfig cmaConfig) {
+		this.cmaConfig = cmaConfig;
 	}
 }

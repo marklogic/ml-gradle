@@ -1,7 +1,8 @@
-package com.marklogic.appdeployer.command.security;
+package com.marklogic.appdeployer.command.cma;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.CommandContext;
+import com.marklogic.appdeployer.command.security.DeployPrivilegesCommand;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.security.PrivilegeManager;
 import org.junit.Test;

@@ -114,6 +114,7 @@ public class MergeResourcesWhileDeployingTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void databasesWithCma() {
+		appConfig.getCmaConfig().setCombineRequests(true);
 		appConfig.getCmaConfig().setDeployDatabases(true);
 		deployMultipleDatabasesNeededMergingAndVerify();
 	}
@@ -127,6 +128,7 @@ public class MergeResourcesWhileDeployingTest extends AbstractAppDeployerTest {
 		appConfig.getCmaConfig().setDeployForests(true);
 
 		initializeAppDeployer(new DeployOtherDatabasesCommand());
+
 		deploySampleApp();
 
 		DatabaseManager mgr = new DatabaseManager(manageClient);

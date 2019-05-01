@@ -171,7 +171,7 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 				((SupportsCmaCommand) this).addResourceToConfiguration(objectNode, config);
 			}
 		}
-		new Configurations(config).submit(context.getManageClient());
+		deployConfiguration(context, config);
 	}
 
 	/**
@@ -184,7 +184,20 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 		for (ResourceReference reference : mergedReferences) {
 			((SupportsCmaCommand)this).addResourceToConfiguration(reference.getObjectNode(), config);
 		}
-		new Configurations(config).submit(context.getManageClient());
+		deployConfiguration(context, config);
+	}
+
+	/**
+	 * Subclasses may override this to defer submission of a configuration so that it can be combined with other
+	 * configurations.
+	 *
+	 * @param context
+	 * @param config
+	 */
+	protected void deployConfiguration(CommandContext context, Configuration config) {
+		if (config.hasResources()) {
+			new Configurations(config).submit(context.getManageClient());
+		}
 	}
 
 	/**

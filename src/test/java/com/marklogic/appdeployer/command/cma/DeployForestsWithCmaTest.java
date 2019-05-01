@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.command.forests;
+package com.marklogic.appdeployer.command.cma;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;

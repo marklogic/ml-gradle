@@ -8,7 +8,7 @@ import com.marklogic.mgmt.util.ObjectMapperFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,21 +29,50 @@ public class Configurations extends ApiObject {
 	private List<Configuration> configs;
 
 	public Configurations() {
-	}
-
-	public Configurations(Configuration... configs) {
-		this(Arrays.asList(configs));
-	}
-
-	public Configurations(List<Configuration> configs) {
 		super();
-		this.configs = configs;
 		setObjectMapper(ObjectMapperFactory.getObjectMapper());
 	}
 
+	public Configurations(Configuration... configs) {
+		this();
+		for (Configuration c : configs) {
+			addConfig(c);
+		}
+	}
+
+	public Configurations(List<Configuration> configs) {
+		this();
+		this.configs = configs;
+	}
+
+	public void addConfig(Configuration config) {
+		if (this.configs == null) {
+			this.configs = new ArrayList<>();
+		}
+		this.configs.add(config);
+	}
+
+	public boolean hasResources() {
+		if (configs == null || configs.isEmpty()) {
+			return false;
+		}
+		for (Configuration c : configs) {
+			if (c.hasResources()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public void submit(ManageClient manageClient) {
-		final String json = getJson();
 		final Logger logger = LoggerFactory.getLogger(getClass());
+
+		if (!hasResources()) {
+			logger.info("No resources are present in this set of CMA configurations, so nothing will be submitted");
+			return;
+		}
+
+		final String json = getJson();
 
 		if (logger.isInfoEnabled()) {
 			if (json.contains("password")) {
@@ -52,7 +81,9 @@ public class Configurations extends ApiObject {
 				logger.info("Submitting configuration: " + json);
 			}
 		}
+
 		new ConfigurationManager(manageClient).submit(json);
+
 		if (logger.isInfoEnabled()) {
 			logger.info("Successfully submitted configuration");
 		}

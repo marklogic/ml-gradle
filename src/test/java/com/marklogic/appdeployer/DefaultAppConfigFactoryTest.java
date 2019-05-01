@@ -209,6 +209,32 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	}
 
 	@Test
+	public void deployWithCma() {
+		Properties p = new Properties();
+
+		CmaConfig cmaConfig = new DefaultAppConfigFactory(new SimplePropertySource(p)).newAppConfig().getCmaConfig();
+		assertFalse(cmaConfig.isCombineRequests());
+		assertFalse(cmaConfig.isDeployAmps());
+		assertFalse(cmaConfig.isDeployDatabases());
+		assertFalse(cmaConfig.isDeployForests());
+		assertFalse(cmaConfig.isDeployPrivileges());
+		assertFalse(cmaConfig.isDeployRoles());
+		assertFalse(cmaConfig.isDeployServers());
+		assertFalse(cmaConfig.isDeployUsers());
+
+		p.setProperty("mlDeployWithCma", "true");
+		cmaConfig = new DefaultAppConfigFactory(new SimplePropertySource(p)).newAppConfig().getCmaConfig();
+		assertTrue(cmaConfig.isCombineRequests());
+		assertTrue(cmaConfig.isDeployAmps());
+		assertTrue(cmaConfig.isDeployDatabases());
+		assertTrue(cmaConfig.isDeployForests());
+		assertTrue(cmaConfig.isDeployPrivileges());
+		assertTrue(cmaConfig.isDeployRoles());
+		assertTrue(cmaConfig.isDeployServers());
+		assertTrue(cmaConfig.isDeployUsers());
+	}
+
+	@Test
 	public void mostProperties() {
 		Properties p = new Properties();
 
@@ -217,11 +243,14 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		p.setProperty("mlCatchDeployExceptions", "true");
 		p.setProperty("mlCatchUndeployExceptions", "true");
 
+		p.setProperty("mlCombineCmaRequests", "true");
 		p.setProperty("mlDeployAmpsWithCma", "true");
 		p.setProperty("mlDeployDatabasesWithCma", "true");
 		p.setProperty("mlDeployForestsWithCma", "true");
 		p.setProperty("mlDeployPrivilegesWithCma", "true");
+		p.setProperty("mlDeployRolesWithCma", "true");
 		p.setProperty("mlDeployServersWithCma", "true");
+		p.setProperty("mlDeployUsersWithCma", "true");
 
 		p.setProperty("mlHost", "prophost");
 		p.setProperty("mlAppName", "propname");
@@ -326,11 +355,14 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		assertTrue(config.isCatchDeployExceptions());
 		assertTrue(config.isCatchUndeployExceptions());
 
+		assertTrue(config.getCmaConfig().isCombineRequests());
 		assertTrue(config.getCmaConfig().isDeployAmps());
 		assertTrue(config.getCmaConfig().isDeployDatabases());
 		assertTrue(config.getCmaConfig().isDeployForests());
 		assertTrue(config.getCmaConfig().isDeployPrivileges());
+		assertTrue(config.getCmaConfig().isDeployRoles());
 		assertTrue(config.getCmaConfig().isDeployServers());
+		assertTrue(config.getCmaConfig().isDeployUsers());
 
 		assertEquals("prophost", config.getHost());
 		assertEquals("propname", config.getName());

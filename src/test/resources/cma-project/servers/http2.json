@@ -1,0 +1,9 @@
+{
+	"server-name": "sample-app-server2",
+	"server-type": "http",
+	"root": "/",
+	"group-name": "Default",
+	"port": 8042,
+	"modules-database": "%%MODULES_DATABASE%%",
+	"content-database": "%%DATABASE%%"
+}

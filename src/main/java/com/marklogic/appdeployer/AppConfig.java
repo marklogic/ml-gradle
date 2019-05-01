@@ -1378,4 +1378,19 @@ public class AppConfig {
 	public void setCmaConfig(CmaConfig cmaConfig) {
 		this.cmaConfig = cmaConfig;
 	}
+
+	// Still used by DHF 4.3.x
+	@Deprecated
+	public void setDeployForestsWithCma(boolean b) {
+		getCmaConfig().setDeployForests(b);
+	}
+	@Deprecated
+	public void setDeployPrivilegesWithCma(boolean b) {
+		getCmaConfig().setDeployPrivileges(b);
+	}
+	@Deprecated
+	public void setDeployAmpsWithCma(boolean b) {
+		getCmaConfig().setDeployAmps(b);
+	}
+	// End of methods still used by DHF 4.3.x
 }

@@ -2,11 +2,25 @@ package com.marklogic.appdeployer;
 
 public class CmaConfig {
 
-	private boolean deployAmps = false;
-	private boolean deployDatabases = false;
-	private boolean deployForests = false;
-	private boolean deployPrivileges = false;
-	private boolean deployServers = false;
+	private boolean combineRequests;
+	private boolean deployAmps;
+	private boolean deployDatabases;
+	private boolean deployForests;
+	private boolean deployPrivileges;
+	private boolean deployRoles;
+	private boolean deployServers;
+	private boolean deployUsers;
+
+	public void enableAll() {
+		setCombineRequests(true);
+		setDeployAmps(true);
+		setDeployDatabases(true);
+		setDeployForests(true);
+		setDeployPrivileges(true);
+		setDeployRoles(true);
+		setDeployServers(true);
+		setDeployUsers(true);
+	}
 
 	public boolean isDeployAmps() {
 		return deployAmps;
@@ -46,5 +60,29 @@ public class CmaConfig {
 
 	public void setDeployServers(boolean deployServers) {
 		this.deployServers = deployServers;
+	}
+
+	public boolean isDeployRoles() {
+		return deployRoles;
+	}
+
+	public void setDeployRoles(boolean deployRoles) {
+		this.deployRoles = deployRoles;
+	}
+
+	public boolean isDeployUsers() {
+		return deployUsers;
+	}
+
+	public void setDeployUsers(boolean deployUsers) {
+		this.deployUsers = deployUsers;
+	}
+
+	public boolean isCombineRequests() {
+		return combineRequests;
+	}
+
+	public void setCombineRequests(boolean combineRequests) {
+		this.combineRequests = combineRequests;
 	}
 }

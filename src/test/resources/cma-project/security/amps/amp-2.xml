@@ -1,0 +1,9 @@
+<amp-properties xmlns="http://marklogic.com/manage">
+	<local-name>function2</local-name>
+	<document-uri>/module/path/name2</document-uri>
+	<namespace>org:example</namespace>
+	<modules-database>%%MODULES_DATABASE%%</modules-database>
+	<roles>
+		<role>rest-writer</role>
+	</roles>
+</amp-properties>

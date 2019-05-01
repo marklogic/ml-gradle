@@ -29,10 +29,14 @@ public abstract class SortOrderConstants {
 	public static Integer DEPLOY_SCHEMAS_DATABASE = 100;
 
 	public static Integer DEPLOY_OTHER_DATABASES = 120;
-    public static Integer DEPLOY_CONTENT_DATABASES = 130;
     public static Integer DEPLOY_FORESTS = 150;
 
-    public static Integer DEPLOY_REST_API_SERVERS = 200;
+	// The modules database must exist before we deploy amps
+	// For 3.15.0, amps are now deployed after databases and before servers so they can be included in a combined
+	// CMA request with databases and forests.
+	public static Integer DEPLOY_AMPS = 170;
+
+	public static Integer DEPLOY_REST_API_SERVERS = 200;
     public static Integer UPDATE_REST_API_SERVERS = 250;
     public static Integer DEPLOY_OTHER_SERVERS = 300;
 
@@ -45,9 +49,6 @@ public abstract class SortOrderConstants {
     // modules via SSL, then the REST API server must already be configured with a certificate template
     public static Integer LOAD_MODULES = 400;
     public static Integer DELETE_TEST_MODULES = 410;
-
-    // The modules database must exist before we deploy amps
-    public static Integer DEPLOY_AMPS = 450;
 
     public static Integer DEPLOY_TRIGGERS = 700;
 

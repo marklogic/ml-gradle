@@ -40,6 +40,19 @@ public class Configuration {
 	@JsonProperty("user")
 	private List<ObjectNode> users;
 
+	public boolean hasResources() {
+		return
+			(amps != null && !amps.isEmpty()) ||
+				(databases != null && !databases.isEmpty()) ||
+				(forests != null && !forests.isEmpty()) ||
+				(groups != null && !groups.isEmpty()) ||
+				(privileges != null && !privileges.isEmpty()) ||
+				(roles != null && !roles.isEmpty()) ||
+				(servers != null && !servers.isEmpty()) ||
+				(users != null && !users.isEmpty());
+
+	}
+
 	public void addAmp(ObjectNode amp) {
 		if (amps == null) amps = new ArrayList<>();
 		amps.add(amp);
@@ -47,7 +60,7 @@ public class Configuration {
 
 	protected ObjectNode readJson(String json) {
 		try {
-			return (ObjectNode)ObjectMapperFactory.getObjectMapper().readTree(json);
+			return (ObjectNode) ObjectMapperFactory.getObjectMapper().readTree(json);
 		} catch (IOException e) {
 			throw new RuntimeException("Unable to read JSON into an ObjectNode, cause: " + e.getMessage(), e);
 		}

@@ -41,6 +41,7 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
 
 		this.deployerListeners = new ArrayList<>();
 		this.deployerListeners.add(new AddHostNameTokensDeployerListener());
+		this.deployerListeners.add(new CmaDeployerListener());
 	}
 
 	/**
@@ -67,25 +68,26 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
 
 		CommandContext context = new CommandContext(appConfig, manageClient, adminManager);
 
-		invokeDeployerListenersBeforeCommandsAreExecuted(new DeploymentContext(context, appConfig, commands));
+		final DeploymentContext deploymentContext = new DeploymentContext(context, appConfig, commands);
 
-		for (Command command : commands) {
+		deployerListeners.forEach(listener -> listener.beforeCommandsExecuted(deploymentContext));
+
+		int commandCount = commands.size();
+		for (int i = 0; i < commandCount; i++) {
+			Command command = commands.get(i);
+			final List<Command> remainingCommands = commands.subList(i + 1, commandCount);
 			String name = command.getClass().getName();
+
 			logger.info(format("Executing command [%s] with sort order [%d]", name, command.getExecuteSortOrder()));
 			prepareCommand(command, context);
+			deployerListeners.forEach(listener -> listener.beforeCommandExecuted(command, deploymentContext, remainingCommands));
+			long start = System.currentTimeMillis();
 			executeCommand(command, context);
-			logger.info(format("Finished executing command [%s]\n", name));
+			logger.info(format("Finished executing command [%s] in %dms\n", name, (System.currentTimeMillis() - start)));
+			deployerListeners.forEach(listener -> listener.afterCommandExecuted(command, deploymentContext, remainingCommands));
 		}
 
 		logger.info(format("Deployed app %s", appConfig.getName()));
-	}
-
-	protected void invokeDeployerListenersBeforeCommandsAreExecuted(DeploymentContext context) {
-		if (deployerListeners != null) {
-			for (DeployerListener listener : deployerListeners) {
-				listener.beforeCommandsExecuted(context);
-			}
-		}
 	}
 
 	/**

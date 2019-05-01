@@ -1,4 +1,4 @@
-package com.marklogic.appdeployer.command.servers;
+package com.marklogic.appdeployer.command.cma;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
@@ -15,6 +15,7 @@ public class DeployServersWithCmaTest extends AbstractAppDeployerTest {
 
 	@After
 	public void teardown() {
+		initializeAppDeployer(new DeployOtherServersCommand());
 		undeploySampleApp();
 	}
 

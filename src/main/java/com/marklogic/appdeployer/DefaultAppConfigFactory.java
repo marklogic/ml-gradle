@@ -72,6 +72,18 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 
 		final String cmaMessage = " with the Configuration Management API (CMA): ";
 
+		propertyConsumerMap.put("mlDeployWithCma", (config, prop) -> {
+			logger.info("Deploy all supported resources and combine requests" + cmaMessage + prop);
+			if (Boolean.parseBoolean(prop)) {
+				config.getCmaConfig().enableAll();
+			}
+		});
+
+		propertyConsumerMap.put("mlCombineCmaRequests", (config, prop) -> {
+			logger.info("Combine requests" + cmaMessage + prop);
+			config.getCmaConfig().setCombineRequests(Boolean.parseBoolean(prop));
+		});
+
 		propertyConsumerMap.put("mlDeployAmpsWithCma", (config, prop) -> {
 			logger.info("Deploy amps" + cmaMessage + prop);
 			config.getCmaConfig().setDeployAmps(Boolean.parseBoolean(prop));
@@ -92,9 +104,19 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			config.getCmaConfig().setDeployPrivileges(Boolean.parseBoolean(prop));
 		});
 
+		propertyConsumerMap.put("mlDeployRolesWithCma", (config, prop) -> {
+			logger.info("Deploy servers" + cmaMessage + prop);
+			config.getCmaConfig().setDeployRoles(Boolean.parseBoolean(prop));
+		});
+
 		propertyConsumerMap.put("mlDeployServersWithCma", (config, prop) -> {
 			logger.info("Deploy servers" + cmaMessage + prop);
 			config.getCmaConfig().setDeployServers(Boolean.parseBoolean(prop));
+		});
+
+		propertyConsumerMap.put("mlDeployUsersWithCma", (config, prop) -> {
+			logger.info("Deploy users" + cmaMessage + prop);
+			config.getCmaConfig().setDeployUsers(Boolean.parseBoolean(prop));
 		});
 
 		propertyConsumerMap.put("mlAddHostNameTokens", (config, prop) -> {

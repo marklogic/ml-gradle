@@ -1,17 +1,23 @@
 package com.marklogic.mgmt.api.security;
 
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.Resource;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.security.RoleManager;
+import com.marklogic.mgmt.util.ObjectMapperFactory;
 
 import javax.xml.bind.annotation.*;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @XmlRootElement(name = "role-properties")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Role extends Resource {
+public class Role extends Resource implements Comparable<Role> {
 
 	@XmlElement(name = "role-name")
 	private String roleName;
@@ -38,9 +44,82 @@ public class Role extends Resource {
 	public Role() {
 	}
 
+	public Role(String roleName) {
+		this(null, roleName);
+	}
+
 	public Role(API api, String roleName) {
 		super(api);
 		this.roleName = roleName;
+	}
+
+	@Override
+	public int compareTo(Role other) {
+		if (other == null || other.getRoleName() == null) {
+			return 1;
+		}
+		if (this.roleName == null) {
+			return -1;
+		}
+
+		final String otherName = other.getRoleName();
+		if (otherName == null) {
+			return 1;
+		}
+
+		if (this.role != null && this.role.contains(otherName)) {
+			return 1;
+		}
+		if (hasPermissionWithRoleName(otherName)) {
+			return 1;
+		}
+
+		if (other.getRole() != null && other.getRole().contains(this.roleName)) {
+			return -1;
+		}
+		if (other.hasPermissionWithRoleName(this.roleName)) {
+			return -1;
+		}
+
+		final boolean hasDependencies = hasPermissionsOrRoles();
+		final boolean otherHasDependencies = other.hasPermissionsOrRoles();
+
+		if (hasDependencies && otherHasDependencies) {
+			return this.roleName.compareTo(otherName);
+		}
+
+		if (hasDependencies) {
+			return 1;
+		}
+
+		if (otherHasDependencies) {
+			return -1;
+		}
+
+		return this.roleName.compareTo(otherName);
+	}
+
+	/**
+	 * Return a new list of object nodes, sorted based on the dependencies of each role.
+	 *
+	 * @param objectNodes
+	 * @return
+	 */
+	public static List<ObjectNode> sortObjectNodes(List<ObjectNode> objectNodes) {
+		List<Role> roles = new ArrayList<>();
+		ObjectReader reader = ObjectMapperFactory.getObjectMapper().readerFor(Role.class);
+		for (ObjectNode node : objectNodes) {
+			try {
+				roles.add(reader.readValue(node));
+			} catch (IOException e) {
+				throw new RuntimeException("Unable to read ObjectNode into Role; node: " + node, e);
+			}
+		}
+		Collections.sort(roles, Comparator.naturalOrder());
+
+		List<ObjectNode> newList = new ArrayList<>();
+		roles.forEach(role -> newList.add(role.toObjectNode()));
+		return newList;
 	}
 
 	public boolean hasPermissionsOrRoles() {

@@ -5,7 +5,7 @@ import com.marklogic.mgmt.resource.hosts.HostManager;
 
 import java.util.List;
 
-public class AddHostNameTokensDeployerListener implements DeployerListener {
+public class AddHostNameTokensDeployerListener extends DeployerListenerSupport {
 
 	@Override
 	public void beforeCommandsExecuted(DeploymentContext context) {

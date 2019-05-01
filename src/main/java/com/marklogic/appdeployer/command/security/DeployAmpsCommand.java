@@ -41,4 +41,14 @@ public class DeployAmpsCommand extends AbstractResourceCommand implements Suppor
 	public void addResourceToConfiguration(ObjectNode payload, Configuration configuration) {
 		configuration.addAmp(payload);
 	}
+
+	@Override
+	protected void deployConfiguration(CommandContext context, Configuration config) {
+		if (context.getAppConfig().getCmaConfig().isCombineRequests()) {
+			logger.info("Adding amps to combined CMA request");
+			context.addCmaConfigurationToCombinedRequest(config);
+		} else {
+			super.deployConfiguration(context, config);
+		}
+	}
 }

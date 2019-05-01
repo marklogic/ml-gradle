@@ -6,7 +6,6 @@ import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractUndoableCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
-import com.marklogic.appdeployer.command.SupportsCmaCommand;
 import com.marklogic.appdeployer.command.forests.DeployForestsCommand;
 import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.api.API;
@@ -90,9 +89,7 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 
 		if (context.getAppConfig().getCmaConfig().isDeployDatabases()) {
 			deployDatabasesAndForestsViaCma(context, databasePlans);
-		}
-
-		else {
+		} else {
 			// Otherwise, create each database one at a time, which also handles sub-databases
 			databasePlans.forEach(databasePlan -> {
 				databasePlan.getDeployDatabaseCommand().execute(context);
@@ -143,7 +140,7 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 	 * database files together; and then building an instance of DeployDatabaseCommand for each database that needs
 	 * to be deployed. This method doesn't make any calls to deploy/undeploy databases though - it just builds up all
 	 * the data that is needed to do so.
-	 *
+	 * <p>
 	 * This is public so that ml-gradle can invoke it when previewing what forests will be created for a database.
 	 *
 	 * @param context
@@ -160,9 +157,9 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 		List<DatabasePlan> databasePlans = mergeDatabasePlanFiles(context, databasePlan);
 		buildDeployDatabaseCommands(context, databasePlans);
 
-		if (logger.isInfoEnabled()) {
-			logger.info("Logging the files for each database before it's created or updated:");
-			databasePlans.forEach(plan -> logger.info(plan + "\n"));
+		if (logger.isDebugEnabled()) {
+			logger.debug("Logging the files for each database before it's created or updated:");
+			databasePlans.forEach(plan -> logger.debug(plan + "\n"));
 		}
 
 		return databasePlans;
@@ -351,7 +348,7 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 	/**
 	 * As of 3.15.0, if databases are to be deployed via CMA, then their forests will also be deployed via CMA,
 	 * regardless of the setting on the AppConfig instance.
-	 *
+	 * <p>
 	 * Also as of 3.15.0, sub-databases and their forests are never deployed by CMA. Will support this in a future
 	 * release.
 	 *
@@ -375,13 +372,19 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 			}
 		});
 
-		new Configurations(dbConfig, forestConfig).submit(context.getManageClient());
+		if (context.getAppConfig().getCmaConfig().isCombineRequests()) {
+			logger.info("Adding databases and forests to combined CMA request");
+			context.addCmaConfigurationToCombinedRequest(dbConfig);
+			context.addCmaConfigurationToCombinedRequest(forestConfig);
+			context.getContextMap().put("database-plans", databasePlans);
+		} else {
+			new Configurations(dbConfig, forestConfig).submit(context.getManageClient());
 
-		// Now account for sub-databases, but not with CMA
-		databasePlans.forEach(plan -> {
-			final DeployDatabaseCommand deployDatabaseCommand = plan.getDeployDatabaseCommand();
-			deployDatabaseCommand.deploySubDatabases(plan.getDatabaseName(), context);
-		});
+			// Now account for sub-databases, but not yet (as of 3.15.0) with CMA
+			databasePlans.forEach(plan -> {
+				plan.getDeployDatabaseCommand().deploySubDatabases(plan.getDatabaseName(), context);
+			});
+		}
 	}
 
 	/**

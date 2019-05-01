@@ -42,6 +42,16 @@ public class DeployPrivilegesCommand extends AbstractResourceCommand implements 
 	}
 
 	@Override
+	protected void deployConfiguration(CommandContext context, Configuration config) {
+		if (context.getAppConfig().getCmaConfig().isCombineRequests()) {
+			logger.info("Adding privileges to combined CMA request");
+			context.addCmaConfigurationToCombinedRequest(config);
+		} else {
+			super.deployConfiguration(context, config);
+		}
+	}
+
+	@Override
 	protected BiPredicate<ResourceReference, ResourceReference> getBiPredicateForMergingResources() {
 		return (reference1, reference2) -> {
 			EqualsBuilder b = new EqualsBuilder();

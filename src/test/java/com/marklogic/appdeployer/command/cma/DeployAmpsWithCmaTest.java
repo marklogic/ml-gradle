@@ -1,8 +1,9 @@
-package com.marklogic.appdeployer.command.security;
+package com.marklogic.appdeployer.command.cma;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.CommandContext;
+import com.marklogic.appdeployer.command.security.DeployAmpsCommand;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.security.AmpManager;
 import org.junit.Test;

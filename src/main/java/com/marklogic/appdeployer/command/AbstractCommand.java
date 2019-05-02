@@ -218,6 +218,13 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 		return getClass().getName() + "-resources-to-save";
 	}
 
+	/**
+	 * If the payload is XML, this will first convert it to JSON.
+	 *
+	 * @param context
+	 * @param payload
+	 * @return
+	 */
 	protected ObjectNode convertPayloadToObjectNode(CommandContext context, String payload) {
 		payload = convertXmlPayloadToJsonIfNecessary(context, payload);
 		try {

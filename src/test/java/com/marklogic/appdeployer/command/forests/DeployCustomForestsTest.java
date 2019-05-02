@@ -32,4 +32,10 @@ public class DeployCustomForestsTest extends AbstractAppDeployerTest {
 		assertTrue(mgr.exists("sample-app-content-custom-2"));
 		assertTrue(mgr.exists("sample-app-content-custom-3"));
 	}
+
+	@Test
+	public void deployWithCma() {
+		appConfig.getCmaConfig().enableAll();
+		test();
+	}
 }

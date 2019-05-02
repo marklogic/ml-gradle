@@ -66,12 +66,6 @@ public class Configuration {
 		}
 	}
 
-	public ObjectNode addDatabase(String json) {
-		ObjectNode node = readJson(json);
-		addDatabase(node);
-		return node;
-	}
-
 	public void addDatabase(ObjectNode d) {
 		if (databases == null) databases = new ArrayList<>();
 		databases.add(d);

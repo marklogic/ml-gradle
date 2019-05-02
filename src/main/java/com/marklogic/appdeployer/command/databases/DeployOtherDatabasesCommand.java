@@ -363,8 +363,7 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 		databasePlans.forEach(plan -> {
 			final DeployDatabaseCommand deployDatabaseCommand = plan.getDeployDatabaseCommand();
 			String payload = deployDatabaseCommand.buildPayloadForSaving(context);
-			payload = convertXmlPayloadToJsonIfNecessary(context, payload);
-			dbConfig.addDatabase(payload);
+			dbConfig.addDatabase(convertPayloadToObjectNode(context, payload));
 
 			DeployForestsCommand deployForestsCommand = deployDatabaseCommand.buildDeployForestsCommand(plan.getDatabaseName(), context);
 			if (deployForestsCommand != null) {

@@ -4,16 +4,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.mgmt.SaveReceipt;
-import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.configuration.Configuration;
 import com.marklogic.mgmt.api.configuration.Configurations;
-import com.marklogic.mgmt.mapper.DefaultResourceMapper;
-import com.marklogic.mgmt.mapper.ResourceMapper;
 import com.marklogic.mgmt.resource.ResourceManager;
-import com.marklogic.mgmt.util.ObjectMapperFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -161,13 +156,7 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 			}
 			String payload = readResourceFromFile(context, f);
 			if (payload != null && payload.trim().length() > 0) {
-				payload = convertXmlPayloadToJsonIfNecessary(context, payload);
-				ObjectNode objectNode;
-				try {
-					objectNode = (ObjectNode)ObjectMapperFactory.getObjectMapper().readTree(payload);
-				} catch (IOException e) {
-					throw new RuntimeException("Unable to read JSON, cause: " + e.getMessage(), e);
-				}
+				ObjectNode objectNode = convertPayloadToObjectNode(context, payload);
 				((SupportsCmaCommand) this).addResourceToConfiguration(objectNode, config);
 			}
 		}
@@ -175,14 +164,13 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 	}
 
 	/**
-	 *
 	 * @param context
 	 * @param mergedReferences
 	 */
 	protected void saveMergedResourcesViaCma(CommandContext context, List<ResourceReference> mergedReferences) {
 		Configuration config = new Configuration();
 		for (ResourceReference reference : mergedReferences) {
-			((SupportsCmaCommand)this).addResourceToConfiguration(reference.getObjectNode(), config);
+			((SupportsCmaCommand) this).addResourceToConfiguration(reference.getObjectNode(), config);
 		}
 		deployConfiguration(context, config);
 	}

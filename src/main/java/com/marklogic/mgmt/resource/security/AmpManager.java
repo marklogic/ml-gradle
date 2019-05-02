@@ -1,9 +1,9 @@
 package com.marklogic.mgmt.resource.security;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.marklogic.mgmt.resource.AbstractResourceManager;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.SaveReceipt;
+import com.marklogic.mgmt.resource.AbstractResourceManager;
 import com.marklogic.rest.util.Fragment;
 import com.marklogic.rest.util.ResourcesFragment;
 import org.springframework.http.ResponseEntity;
@@ -74,17 +74,19 @@ public class AmpManager extends AbstractResourceManager {
 	public boolean ampExists(String payload) {
 		String resourceId = getResourceId(payload);
 		AmpParams params = getAmpParams(payload);
-		ResourcesFragment resources = getAsXml();
+		return ampExists(getAsXml(), resourceId, params.documentUri, params.namespace, params.modulesDatabase);
+	}
 
+	public boolean ampExists(ResourcesFragment resources, String localName, String documentUri, String namespace, String modulesDatabase) {
 		String xpath = "/node()/*[local-name(.) = 'list-items']/node()[" +
 			"(*[local-name(.) = 'nameref'] = '%s' or *[local-name(.) = 'idref'] = '%s')" +
 			" and *[local-name(.) = 'document-uri'] = '%s'";
-		xpath = format(xpath, resourceId, resourceId, params.documentUri);
-		if (params.namespace != null) {
-			xpath += format(" and *[local-name(.) = 'namespace'] = '%s'", params.namespace);
+		xpath = format(xpath, localName, localName, documentUri);
+		if (namespace != null) {
+			xpath += format(" and *[local-name(.) = 'namespace'] = '%s'", namespace);
 		}
-		if (params.modulesDatabase != null) {
-			xpath += format(" and *[local-name(.) = 'modules-database'] = '%s'", params.modulesDatabase);
+		if (modulesDatabase != null) {
+			xpath += format(" and *[local-name(.) = 'modules-database'] = '%s'", modulesDatabase);
 		} else {
 			xpath += format(" and *[local-name(.) = 'modules-database'] = 'filesystem'");
 		}

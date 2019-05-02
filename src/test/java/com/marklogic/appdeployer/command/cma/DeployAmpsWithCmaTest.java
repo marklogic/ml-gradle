@@ -4,6 +4,7 @@ import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.security.DeployAmpsCommand;
+import com.marklogic.mgmt.api.configuration.Configuration;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.security.AmpManager;
 import org.junit.Test;
@@ -31,7 +32,10 @@ public class DeployAmpsWithCmaTest extends AbstractAppDeployerTest {
 			assertTrue(mgr.ampExists(amp1));
 			assertTrue(mgr.ampExists(amp2));
 
+			// On the second invocation, nothing should be sent.
+			initializeAppDeployer(new SecondDeploymentDeployAmpsCommand());
 			deploySampleApp();
+
 			assertTrue(mgr.ampExists(amp1));
 			assertTrue(mgr.ampExists(amp2));
 		} finally {
@@ -55,4 +59,15 @@ class TestDeployAmpsCommand extends DeployAmpsCommand {
 		throw new RuntimeException("This shouldn't be called when CMA is used");
 	}
 
+}
+
+class SecondDeploymentDeployAmpsCommand extends TestDeployAmpsCommand {
+
+	@Override
+	protected void deployConfiguration(CommandContext context, Configuration config) {
+		if (config.getAmps() != null && !config.getAmps().isEmpty()) {
+			throw new RuntimeException("No amps should have been added during the second deployment as none of them changed");
+		}
+		super.deployConfiguration(context, config);
+	}
 }

@@ -78,9 +78,9 @@ public class TdeDocumentFileProcessor extends LoggingObject implements DocumentF
 				try {
 					ServerEvaluationCall call = null;
 					if (Format.XML.equals(documentFile.getFormat())) {
-						call = buildXqueryCall(fileContent);
+						call = buildXqueryCall(documentFile, fileContent);
 					} else if (Format.JSON.equals(documentFile.getFormat())) {
-						call = buildJavascriptCall(fileContent);
+						call = buildJavascriptCall(documentFile, fileContent);
 					} else {
 						logger.info("Unrecognized file format, will not try to validate TDE template in file: " + file + "; format: " + documentFile.getFormat());
 					}
@@ -100,16 +100,22 @@ public class TdeDocumentFileProcessor extends LoggingObject implements DocumentF
 		}
 	}
 
-	protected ServerEvaluationCall buildJavascriptCall(String fileContent) {
+	protected ServerEvaluationCall buildJavascriptCall(DocumentFile documentFile, String fileContent) {
 		StringBuilder script = new StringBuilder("xdmp.invokeFunction(function() {var tde = require('/MarkLogic/tde.xqy');");
-		script.append(format("\nreturn tde.validate([xdmp.toJSON(%s)])}, {database: xdmp.database('%s')})", fileContent, tdeValidationDatabase));
+		script.append(format(
+			"\nreturn tde.validate([xdmp.toJSON(%s)], ['%s'])}, {database: xdmp.database('%s')})",
+			fileContent, documentFile.getUri(), tdeValidationDatabase
+		));
 		return databaseClient.newServerEval().javascript(script.toString());
 	}
 
-	protected ServerEvaluationCall buildXqueryCall(String fileContent) {
+	protected ServerEvaluationCall buildXqueryCall(DocumentFile documentFile, String fileContent) {
 		StringBuilder script = new StringBuilder("import module namespace tde = 'http://marklogic.com/xdmp/tde' at '/MarkLogic/tde.xqy'; ");
 		script.append(format("\nxdmp:invoke-function(function() { \nlet $t := %s ", fileContent));
-		script.append(format("\nreturn tde:validate($t)}, <options xmlns='xdmp:eval'><database>{xdmp:database('%s')}</database></options>)", tdeValidationDatabase));
+		script.append(format(
+			"\nreturn tde:validate($t, '%s')}, <options xmlns='xdmp:eval'><database>{xdmp:database('%s')}</database></options>)",
+			documentFile.getUri(), tdeValidationDatabase
+		));
 		return databaseClient.newServerEval().xquery(script.toString());
 	}
 

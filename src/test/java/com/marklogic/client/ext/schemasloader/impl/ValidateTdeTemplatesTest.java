@@ -35,6 +35,18 @@ public class ValidateTdeTemplatesTest extends AbstractSchemasTest {
 	}
 
 	@Test
+	public void goodTemplateThatsThenUpdatedViaJavascript() {
+		List<DocumentFile> files = loader.loadSchemas(Paths.get("src", "test", "resources", "good-schemas", "originals").toString());
+		assertEquals(2, files.size());
+
+		files = loader.loadSchemas(Paths.get("src", "test", "resources", "good-schemas", "updated").toString());
+		assertEquals("Verifying that the updated schemas were still loaded correctly, which depends on telling the " +
+			"TDE validation function to exclude the schema that's currently loaded; otherwise a TDE-INCONSISTENTVIEW " +
+			"error will be thrown", 2, files.size());
+	}
+
+
+	@Test
 	public void badXmlFile() {
 		try {
 			loader.loadSchemas(Paths.get("src", "test", "resources", "bad-schemas", "bad-xml").toString());

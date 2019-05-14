@@ -1,8 +1,6 @@
 package com.marklogic.appdeployer.command.security;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.appdeployer.command.CommandContext;
-import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.security.RoleManager;
 import org.junit.Test;
 
@@ -88,33 +86,5 @@ public class DeployRolesWithDependenciesTest extends AbstractAppDeployerTest {
 		} finally {
 			undeploySampleApp();
 		}
-	}
-
-	@Test
-	public void twoPhasesDisabled() {
-		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/roles-with-dependencies"));
-
-		DeployRolesCommand command = new DeployRolesCommand();
-		command.setDeployRolesInTwoPhases(false);
-		initializeAppDeployer(command);
-
-		try {
-			deploySampleApp();
-			fail("Deployment should have failed because deploying roles in two phases was disabled");
-		} catch (Exception ex) {
-			String message = ex.getMessage();
-			logger.info("Caught expected message: " + message);
-			assertTrue(message.contains("400 Bad Request"));
-		} finally {
-			undeploySampleApp();
-		}
-	}
-}
-
-class TestDeployRolesCommand extends DeployRolesCommand {
-
-	@Override
-	protected ResourceManager getResourceManager(CommandContext context) {
-		throw new RuntimeException("This should not be called when deploying with CMA");
 	}
 }

@@ -480,15 +480,6 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 		return new ConfigurationManager(context.getManageClient()).endpointExists();
 	}
 
-	protected void ignoreIncrementalCheckForFile(File file) {
-		if (resourceFilenameFilter instanceof IncrementalFilenameFilter) {
-			((IncrementalFilenameFilter) resourceFilenameFilter).ignoreIncrementalCheckForFile(file);
-		} else {
-			logger.warn("resourceFilenameFilter does not implement " + IncrementalFilenameFilter.class.getName() + ", and thus " +
-				"ignoreIncrementalCheckForFile for file " + file.getAbsolutePath() + " cannot be invoked");
-		}
-	}
-
 	protected void setIncrementalMode(boolean incrementalMode) {
 		if (resourceFilenameFilter instanceof IncrementalFilenameFilter) {
 			((IncrementalFilenameFilter) resourceFilenameFilter).setIncrementalMode(incrementalMode);

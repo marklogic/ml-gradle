@@ -2,34 +2,38 @@ package com.marklogic.appdeployer.command.security;
 
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.marklogic.appdeployer.command.*;
+import com.marklogic.appdeployer.command.AbstractResourceCommand;
+import com.marklogic.appdeployer.command.CommandContext;
+import com.marklogic.appdeployer.command.SortOrderConstants;
+import com.marklogic.appdeployer.command.SupportsCmaCommand;
 import com.marklogic.mgmt.SaveReceipt;
-import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.configuration.Configuration;
 import com.marklogic.mgmt.api.configuration.Configurations;
 import com.marklogic.mgmt.api.security.Role;
-import com.marklogic.mgmt.mapper.DefaultResourceMapper;
-import com.marklogic.mgmt.mapper.ResourceMapper;
+import com.marklogic.mgmt.api.security.RoleObjectNodesSorter;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.security.RoleManager;
 import com.marklogic.mgmt.util.ObjectMapperFactory;
+import com.marklogic.mgmt.util.ObjectNodesSorter;
 import com.marklogic.rest.util.ResourcesFragment;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
+/**
+ * As of 3.15.0, this no longer deploys roles in two phases. This is due to the new sorting class, which uses a
+ * topological sort to properly account for role dependencies.
+ * <p>
+ * However, to take advantage of this sorting, this class instructs the parent class to always construct a CMA request
+ * for all of the roles that are found. This allows for all of the roles to be sorted easily, as they're in a list of
+ * ObjectNode objects. Once the CMA request is ready to be submitted, this class then checks to see if CMA should
+ * actually be used. If not, then each role is submitted individually in the correct order.
+ */
 public class DeployRolesCommand extends AbstractResourceCommand implements SupportsCmaCommand {
 
-	// Used internally
-	private boolean removeRolesAndPermissionsDuringDeployment = false;
-	private ResourceMapper resourceMapper;
-	private Set<String> roleNamesThatDontNeedToBeRedeployed;
-
-	private boolean deployRolesInTwoPhases = true;
+	private ObjectNodesSorter objectNodesSorter = new RoleObjectNodesSorter();
 
 	public DeployRolesCommand() {
 		setExecuteSortOrder(SortOrderConstants.DEPLOY_ROLES);
@@ -40,9 +44,21 @@ public class DeployRolesCommand extends AbstractResourceCommand implements Suppo
 		setResourceClassType(Role.class);
 	}
 
+	/**
+	 * This tells the parent class to always build a Configuration, even if CMA isn't available. When it's time to
+	 * deploy the configuration, we'll check to see if CMA truly is available.
+	 *
+	 * @param context
+	 * @return
+	 */
+	@Override
+	protected boolean useCmaForDeployingResources(CommandContext context) {
+		return true;
+	}
+
 	@Override
 	public boolean cmaShouldBeUsed(CommandContext context) {
-		return context.getAppConfig().getCmaConfig().isDeployRoles();
+		return true;
 	}
 
 	@Override
@@ -51,59 +67,58 @@ public class DeployRolesCommand extends AbstractResourceCommand implements Suppo
 	}
 
 	/**
-	 * The set of roles is processed twice. The first time, the roles are saved without any default permissions or references to other roles.
-	 * This is to avoid issues where the roles refer to each other or to themselves (via default permissions). The second time, the roles are
-	 * saved with permissions and references to other roles, which is guaranteed to work now that the roles have all been created.
+	 * Before a role configuration can be submitted, the roles within the configuration must be sorted based on their
+	 * dependencies.
 	 * <p>
-	 * For 3.11.0, as part of the new preview feature, the boolean deployRolesInTwoPhases has been added so that the
-	 * process of deploying roles in two phases can be disabled during a preview.
+	 * Then, if CMA is available and the user wants it to be used, the configuration is either submitted or added to a
+	 * combined CMA request. Otherwise, each role will be created individually. In both cases, a check is made on
+	 * each role to see if it does not exist yet and refers to itself. If so, such roles will be created first without
+	 * any dependencies.
 	 *
 	 * @param context
+	 * @param config
 	 */
 	@Override
-	public void execute(CommandContext context) {
-		roleNamesThatDontNeedToBeRedeployed = new HashSet<>();
-		if (deployRolesInTwoPhases && !cmaShouldBeUsed(context)) {
-			removeRolesAndPermissionsDuringDeployment = true;
-			if (logger.isInfoEnabled()) {
-				logger.info("Deploying roles minus their default permissions and references to roles");
-			}
-			super.execute(context);
-			if (logger.isInfoEnabled()) {
-				logger.info("Redeploying roles that have default permissions and/or references to roles");
-			}
-			removeRolesAndPermissionsDuringDeployment = false;
+	protected void deployConfiguration(CommandContext context, Configuration config) {
+		List<ObjectNode> roleNodes = config.getRoles();
+		if (roleNodes == null || roleNodes.isEmpty()) {
+			return;
 		}
 
-		super.execute(context);
+		if (objectNodesSorter != null) {
+			logger.info("Sorting roles before they are saved");
+			roleNodes = objectNodesSorter.sortObjectNodes(roleNodes);
+			config.setRoles(roleNodes);
+		}
+
+		if (context.getAppConfig().getCmaConfig().isDeployRoles() && cmaEndpointExists(context)) {
+			submitRolesConfigurationViaCma(context, config);
+		} else {
+			submitRolesIndividually(context, roleNodes);
+		}
 	}
 
-	@Override
-	protected void deployConfiguration(CommandContext context, Configuration config) {
-		submitConfigurationWithRolesThatReferenceThemselves(context, config);
-
-		if (config.getRoles() != null) {
-			logger.info("Sorting roles before they are submitted in a CMA request");
-			config.setRoles(Role.sortObjectNodes(config.getRoles()));
-		}
-
+	protected void submitRolesConfigurationViaCma(CommandContext context, Configuration config) {
+		submitConfigurationWithRolesThatReferenceThemselves(context, config.getRoles());
 		if (context.getAppConfig().getCmaConfig().isCombineRequests()) {
 			logger.info("Adding roles to combined CMA request");
 			context.addCmaConfigurationToCombinedRequest(config);
 		} else {
-			final String key = getClass().getSimpleName() + "-roles";
-			if (removeRolesAndPermissionsDuringDeployment) {
-				context.getContextMap().put(key, new Configurations(config));
-			} else {
-				Configurations configs = (Configurations) context.getContextMap().get(key);
-				if (configs == null) {
-					// This shouldn't ever happen, but just in case
-					configs = new Configurations();
-				}
-				configs.getConfigs().add(config);
-				configs.submit(context.getManageClient());
-			}
+			super.deployConfiguration(context, config);
 		}
+	}
+
+	protected void submitRolesIndividually(CommandContext context, List<ObjectNode> roleNodes) {
+		RoleManager roleManager = new RoleManager(context.getManageClient());
+
+		findRolesThatReferenceThemselves(context, roleNodes).forEach(role -> {
+			roleManager.save(format("{\"role-name\":\"%s\"}", role.getRoleName()));
+		});
+
+		roleNodes.forEach(roleNode -> {
+			SaveReceipt receipt = saveResource(roleManager, context, roleNode.toString());
+			afterResourceSaved(roleManager, context, null, receipt);
+		});
 	}
 
 	/**
@@ -113,100 +128,46 @@ public class DeployRolesCommand extends AbstractResourceCommand implements Suppo
 	 * already exist, then no problem will occur).
 	 *
 	 * @param context
-	 * @param config
+	 * @param roles
 	 */
-	protected void submitConfigurationWithRolesThatReferenceThemselves(CommandContext context, Configuration config) {
-		List<ObjectNode> roles = config.getRoles();
-		if (roles != null && !roles.isEmpty()) {
-			ObjectReader reader = ObjectMapperFactory.getObjectMapper().readerFor(Role.class);
-			List<ObjectNode> rolesThatReferenceThemselves = new ArrayList<>();
-			ResourcesFragment rolesXml = new RoleManager(context.getManageClient()).getAsXml();
+	protected void submitConfigurationWithRolesThatReferenceThemselves(CommandContext context, List<ObjectNode> roles) {
+		List<Role> rolesThatReferenceThemselves = findRolesThatReferenceThemselves(context, roles);
 
-			roles.forEach(role -> {
-				try {
-					Role r = reader.readValue(role);
-					if (r.hasPermissionWithOwnRoleName() && !rolesXml.resourceExists(r.getRoleName())) {
-						ObjectNode node = ObjectMapperFactory.getObjectMapper().createObjectNode();
-						node.put("role-name", r.getRoleName());
-						rolesThatReferenceThemselves.add(node);
-					}
-				} catch (IOException e) {
-					throw new RuntimeException("Unable to read ObjectNode into Role; node: " + role, e);
-				}
+		if (!rolesThatReferenceThemselves.isEmpty()) {
+			Configuration roleNamesOnlyConfig = new Configuration();
+			rolesThatReferenceThemselves.forEach(role -> {
+				ObjectNode node = ObjectMapperFactory.getObjectMapper().createObjectNode();
+				node.put("role-name", role.getRoleName());
+				roleNamesOnlyConfig.addRole(node);
 			});
-
-			if (!rolesThatReferenceThemselves.isEmpty()) {
-				Configuration roleNamesOnlyConfig = new Configuration();
-				rolesThatReferenceThemselves.forEach(role -> roleNamesOnlyConfig.addRole(role));
-				logger.info("Submitting CMA configuration containing roles that reference themselves and do not yet exist");
-				new Configurations(roleNamesOnlyConfig).submit(context.getManageClient());
-			}
+			logger.info("Submitting CMA configuration containing roles that reference themselves and do not yet exist");
+			new Configurations(roleNamesOnlyConfig).submit(context.getManageClient());
 		}
 	}
 
 	/**
-	 * If the resource was saved during the first pass - i.e. when roles and permissions have been removed from the role
-	 * - then it must be processed during the second pass so that those roles/permissions can be added back. Thus, the
-	 * incremental check on the file must be ignored. Note that this only matters during an incremental deploy, which
-	 * means that the ResourceReference should have a single File in it.
-	 */
-	@Override
-	protected void afterResourceSaved(ResourceManager mgr, CommandContext context, ResourceReference resourceReference, SaveReceipt receipt) {
-		if (removeRolesAndPermissionsDuringDeployment && resourceReference != null) {
-			ignoreIncrementalCheckForFile(resourceReference.getLastFile());
-		}
-		super.afterResourceSaved(mgr, context, resourceReference, receipt);
-	}
-
-	/**
-	 * If this is the first time roles are being deployed by this command - indicated by the removeRolesAndPermissionsDuringDeployment
-	 * class variable - then each payload is modified so that default permissions and role references are not included,
-	 * thus ensuring that the role can be created successfully.
-	 * <p>
-	 * If this is the second time that roles are being deployed by this command, then the entire payload is sent. However,
-	 * if the role doesn't have any default permissions or role references, it will not be deployed a second time, as
-	 * there was nothing missing from the first deployment of the role.
+	 * Returns a list of roles, one for each role in the given ObjectNode list that does not exist yet and refers to
+	 * itself.
 	 *
-	 * @param mgr
 	 * @param context
-	 * @param f
-	 * @param payload
+	 * @param roles
 	 * @return
 	 */
-	@Override
-	protected String adjustPayloadBeforeSavingResource(CommandContext context, File f, String payload) {
-		payload = super.adjustPayloadBeforeSavingResource(context, f, payload);
-
-		if (resourceMapper == null) {
-			API api = new API(context.getManageClient(), context.getAdminManager());
-			resourceMapper = new DefaultResourceMapper(api);
-		}
-
-		Role role = resourceMapper.readResource(payload, Role.class);
-
-		// Is this the first time the roles are being deployed?
-		if (removeRolesAndPermissionsDuringDeployment) {
-			if (role.hasPermissionsOrRoles()) {
-				role.clearPermissionsAndRoles();
-				return role.getJson();
-			} else {
-				roleNamesThatDontNeedToBeRedeployed.add(role.getRoleName());
-				return payload;
+	protected List<Role> findRolesThatReferenceThemselves(CommandContext context, List<ObjectNode> roles) {
+		ObjectReader reader = ObjectMapperFactory.getObjectMapper().readerFor(Role.class);
+		List<Role> rolesThatReferenceThemselves = new ArrayList<>();
+		ResourcesFragment rolesXml = new RoleManager(context.getManageClient()).getAsXml();
+		roles.forEach(role -> {
+			try {
+				Role r = reader.readValue(role);
+				if (r.hasPermissionWithOwnRoleName() && !rolesXml.resourceExists(r.getRoleName())) {
+					rolesThatReferenceThemselves.add(r);
+				}
+			} catch (IOException e) {
+				throw new RuntimeException("Unable to read ObjectNode into Role; node: " + role, e);
 			}
-		}
-		// Else it's the second time roles are being deployed, but no need to deploy a role if it doesn't have any default permissions or role references
-		else if (roleNamesThatDontNeedToBeRedeployed.contains(role.getRoleName())) {
-			if (logger.isInfoEnabled()) {
-				logger.info("Not redeploying role " + role.getRoleName() + ", as it does not have any default permissions or references to other roles");
-			}
-			return null;
-		}
-		// Else log a message to indicate that the role is being redeployed
-		else if (logger.isInfoEnabled()) {
-			logger.info("Redeploying role " + role.getRoleName() + " with default permissions and references to other roles included");
-		}
-
-		return payload;
+		});
+		return rolesThatReferenceThemselves;
 	}
 
 	protected File[] getResourceDirs(CommandContext context) {
@@ -218,8 +179,13 @@ public class DeployRolesCommand extends AbstractResourceCommand implements Suppo
 		return new RoleManager(context.getManageClient());
 	}
 
+	@Deprecated
 	public void setDeployRolesInTwoPhases(boolean deployRolesInTwoPhases) {
-		this.deployRolesInTwoPhases = deployRolesInTwoPhases;
+		// No longer needed as of 3.15.0
+	}
+
+	public void setObjectNodesSorter(ObjectNodesSorter objectNodesSorter) {
+		this.objectNodesSorter = objectNodesSorter;
 	}
 }
 

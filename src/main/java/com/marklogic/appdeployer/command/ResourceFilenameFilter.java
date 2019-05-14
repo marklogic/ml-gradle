@@ -20,7 +20,6 @@ public class ResourceFilenameFilter extends LoggingObject implements Incremental
 	private Pattern includePattern;
 	private ResourceFileManager resourceFileManager;
 
-	private Set<File> filesToIgnoreIncrementalCheck = new HashSet<>();
 	private boolean incrementalMode = false;
 
 	private Set<String> supportedFilenameExtensions = new HashSet<>();
@@ -117,15 +116,7 @@ public class ResourceFilenameFilter extends LoggingObject implements Incremental
 	 * @return
 	 */
 	protected boolean acceptFileBasedOnIncrementalCheck(File dir, String filename) {
-		File resourceFile = new File(dir, filename);
-		if (filesToIgnoreIncrementalCheck.contains(resourceFile)) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("Ignoring incremental check for file: " + resourceFile.getAbsolutePath());
-			}
-			return true;
-		} else {
-			return resourceFileManager.shouldResourceFileBeProcessed(resourceFile);
-		}
+		return resourceFileManager.shouldResourceFileBeProcessed(new File(dir, filename));
 	}
 
 	public void setFilenamesToIgnore(Set<String> ignoreFilenames) {
@@ -155,11 +146,6 @@ public class ResourceFilenameFilter extends LoggingObject implements Incremental
 	@Override
 	public void setIncrementalMode(boolean incrementalMode) {
 		this.incrementalMode = incrementalMode;
-	}
-
-	@Override
-	public void ignoreIncrementalCheckForFile(File resourceFile) {
-		this.filesToIgnoreIncrementalCheck.add(resourceFile);
 	}
 
 	public void setResourceFileManager(ResourceFileManager resourceFileManager) {

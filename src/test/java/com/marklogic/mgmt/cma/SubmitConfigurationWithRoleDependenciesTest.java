@@ -6,6 +6,7 @@ import com.marklogic.mgmt.api.configuration.Configuration;
 import com.marklogic.mgmt.api.configuration.Configurations;
 import com.marklogic.mgmt.api.security.Permission;
 import com.marklogic.mgmt.api.security.Role;
+import com.marklogic.mgmt.api.security.RoleObjectNodesSorter;
 import com.marklogic.mgmt.resource.security.RoleManager;
 import org.junit.After;
 import org.junit.Before;
@@ -60,7 +61,7 @@ public class SubmitConfigurationWithRoleDependenciesTest extends AbstractMgmtTes
 		config.addRole(r2.toObjectNode());
 		config.addRole(r1.toObjectNode());
 
-		config.setRoles(Role.sortObjectNodes(config.getRoles()));
+		config.setRoles(new RoleObjectNodesSorter().sortObjectNodes(config.getRoles()));
 
 		new Configurations(config).submit(manageClient);
 

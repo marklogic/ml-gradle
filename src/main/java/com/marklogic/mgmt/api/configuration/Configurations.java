@@ -30,6 +30,7 @@ public class Configurations extends ApiObject {
 
 	public Configurations() {
 		super();
+		this.configs = new ArrayList<>();
 		setObjectMapper(ObjectMapperFactory.getObjectMapper());
 	}
 

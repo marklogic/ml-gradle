@@ -17,7 +17,7 @@ public class UseSecurityUserTest extends Assert {
 		assertTrue(new PrivilegeManager(null).useSecurityUser());
 		assertTrue(new ProtectedCollectionsManager(null).useSecurityUser());
 		assertTrue(new ProtectedPathManager(null).useSecurityUser());
-		assertTrue(new QueryRolesetsManager(null).useSecurityUser());
+		assertTrue(new QueryRolesetManager(null).useSecurityUser());
 		assertTrue(new RoleManager(null).useSecurityUser());
 		assertTrue(new UserManager(null).useSecurityUser());
 	}

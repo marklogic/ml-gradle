@@ -41,6 +41,7 @@ public class Fragment {
             list.add(Namespace.getNamespace("msec", "http://marklogic.com/manage/security"));
 	        list.add(Namespace.getNamespace("pki", "http://marklogic.com/xdmp/pki"));
 	        list.add(Namespace.getNamespace("req", "http://marklogic.com/manage/requests"));
+	        list.add(Namespace.getNamespace("qr", "http://marklogic.com/manage/query-roleset/properties"));
 	        list.add(Namespace.getNamespace("s", "http://marklogic.com/manage/servers"));
             list.add(Namespace.getNamespace("sec", "http://marklogic.com/xdmp/security"));
 			list.add(Namespace.getNamespace("ts", "http://marklogic.com/manage/task-server"));

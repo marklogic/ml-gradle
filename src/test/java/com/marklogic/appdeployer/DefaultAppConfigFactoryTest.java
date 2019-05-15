@@ -229,6 +229,8 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		assertTrue(cmaConfig.isDeployDatabases());
 		assertTrue(cmaConfig.isDeployForests());
 		assertTrue(cmaConfig.isDeployPrivileges());
+		assertTrue(cmaConfig.isDeployProtectedPaths());
+		assertTrue(cmaConfig.isDeployQueryRolesets());
 		assertTrue(cmaConfig.isDeployRoles());
 		assertTrue(cmaConfig.isDeployServers());
 		assertTrue(cmaConfig.isDeployUsers());
@@ -248,6 +250,8 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		p.setProperty("mlDeployDatabasesWithCma", "true");
 		p.setProperty("mlDeployForestsWithCma", "true");
 		p.setProperty("mlDeployPrivilegesWithCma", "true");
+		p.setProperty("mlDeployProtectedPathsWithCma", "true");
+		p.setProperty("mlDeployQueryRolesetsWithCma", "true");
 		p.setProperty("mlDeployRolesWithCma", "true");
 		p.setProperty("mlDeployServersWithCma", "true");
 		p.setProperty("mlDeployUsersWithCma", "true");
@@ -360,6 +364,8 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		assertTrue(config.getCmaConfig().isDeployDatabases());
 		assertTrue(config.getCmaConfig().isDeployForests());
 		assertTrue(config.getCmaConfig().isDeployPrivileges());
+		assertTrue(config.getCmaConfig().isDeployProtectedPaths());
+		assertTrue(config.getCmaConfig().isDeployQueryRolesets());
 		assertTrue(config.getCmaConfig().isDeployRoles());
 		assertTrue(config.getCmaConfig().isDeployServers());
 		assertTrue(config.getCmaConfig().isDeployUsers());

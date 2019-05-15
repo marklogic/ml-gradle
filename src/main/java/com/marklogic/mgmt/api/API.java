@@ -15,6 +15,8 @@ import com.marklogic.mgmt.api.forest.Forest;
 import com.marklogic.mgmt.api.group.Group;
 import com.marklogic.mgmt.api.restapi.RestApi;
 import com.marklogic.mgmt.api.security.*;
+import com.marklogic.mgmt.api.security.protectedpath.ProtectedPath;
+import com.marklogic.mgmt.api.security.queryroleset.QueryRoleset;
 import com.marklogic.mgmt.api.server.Server;
 import com.marklogic.mgmt.api.task.Task;
 import com.marklogic.mgmt.api.trigger.Trigger;
@@ -31,6 +33,8 @@ import com.marklogic.mgmt.util.SimplePropertySource;
 import com.marklogic.mgmt.util.SystemPropertySource;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Big facade-style class for the MarkLogic Management API. Use this to instantiate or access any resource, as it will
@@ -228,6 +232,26 @@ public class API extends LoggingObject {
 
     public Forest getForest() {
         return forest(null);
+    }
+
+    public ProtectedPath protectedPath(String pathExpression) {
+    	ProtectedPath path = new ProtectedPath(pathExpression);
+    	path.setApi(this);
+    	return pathExpression != null && path.exists() ?
+		    getResource(pathExpression, new ProtectedPathManager(getManageClient()), ProtectedPath.class) : path;
+    }
+
+    public QueryRoleset queryRoleset(String... roleNames) {
+	    List<String> names = new ArrayList<>();
+	    for (String name : roleNames) {
+	    	names.add(name);
+	    }
+    	QueryRoleset roleset = new QueryRoleset();
+	    roleset.setApi(this);
+	    roleset.setRoleName(names);
+    	return roleNames != null && roleset.exists() ?
+		    getResource(roleset.getRoleNamesAsJsonArrayString(), new QueryRolesetManager(getManageClient()), QueryRoleset.class) :
+		    roleset;
     }
 
     public Server server(String name) {

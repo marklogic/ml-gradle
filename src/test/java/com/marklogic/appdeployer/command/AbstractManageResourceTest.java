@@ -1,9 +1,8 @@
 package com.marklogic.appdeployer.command;
 
-import org.junit.Test;
-
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.mgmt.resource.ResourceManager;
+import org.junit.Test;
 
 /**
  * Provides a basic create-then-delete test for testing any implementation of ResourceManager.

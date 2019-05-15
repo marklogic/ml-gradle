@@ -19,17 +19,17 @@ public class DeployPrivilegesWithCmaTest extends AbstractAppDeployerTest {
 		try {
 			deploySampleApp();
 			assertTrue(mgr.exists("sample-app-execute-1"));
-			assertTrue(mgr.exists("sample-app-execute-1"));
+			assertTrue(mgr.exists("sample-app-execute-2"));
 
 			deploySampleApp();
 			assertTrue(mgr.exists("sample-app-execute-1"));
-			assertTrue(mgr.exists("sample-app-execute-1"));
+			assertTrue(mgr.exists("sample-app-execute-2"));
 		} finally {
 			initializeAppDeployer(new DeployPrivilegesCommand());
 
 			undeploySampleApp();
 			assertFalse(mgr.exists("sample-app-execute-1"));
-			assertFalse(mgr.exists("sample-app-execute-1"));
+			assertFalse(mgr.exists("sample-app-execute-2"));
 		}
 	}
 }

@@ -104,6 +104,16 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			config.getCmaConfig().setDeployPrivileges(Boolean.parseBoolean(prop));
 		});
 
+		propertyConsumerMap.put("mlDeployProtectedPathsWithCma", (config, prop) -> {
+			logger.info("Deploy protected paths" + cmaMessage + prop);
+			config.getCmaConfig().setDeployProtectedPaths(Boolean.parseBoolean(prop));
+		});
+
+		propertyConsumerMap.put("mlDeployQueryRolesetsWithCma", (config, prop) -> {
+			logger.info("Deploy query rolesets" + cmaMessage + prop);
+			config.getCmaConfig().setDeployQueryRolesets(Boolean.parseBoolean(prop));
+		});
+
 		propertyConsumerMap.put("mlDeployRolesWithCma", (config, prop) -> {
 			logger.info("Deploy servers" + cmaMessage + prop);
 			config.getCmaConfig().setDeployRoles(Boolean.parseBoolean(prop));
@@ -730,7 +740,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			logger.info("Supported resources will only be deployed if their resource files are new or have been modified since the last deployment: " + prop);
 			config.setIncrementalDeploy(Boolean.parseBoolean(prop));
 		});
-    
+
 		propertyConsumerMap.put("mlUpdateMimetypeWhenPropertiesAreEqual", (config, prop) -> {
 			logger.info("Update mimetype when properties are equal (defaults to false to avoid unnecessary ML restarts): " + prop);
 			config.setUpdateMimetypeWhenPropertiesAreEqual(Boolean.parseBoolean(prop));

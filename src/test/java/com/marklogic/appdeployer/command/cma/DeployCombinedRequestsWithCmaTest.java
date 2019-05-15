@@ -4,18 +4,17 @@ import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.appservers.DeployOtherServersCommand;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
-import com.marklogic.appdeployer.command.security.DeployAmpsCommand;
-import com.marklogic.appdeployer.command.security.DeployPrivilegesCommand;
-import com.marklogic.appdeployer.command.security.DeployRolesCommand;
-import com.marklogic.appdeployer.command.security.DeployUsersCommand;
+import com.marklogic.appdeployer.command.security.*;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.security.Amp;
 import com.marklogic.mgmt.api.security.Role;
 import com.marklogic.mgmt.api.security.User;
+import com.marklogic.mgmt.api.security.queryroleset.QueryRoleset;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.forests.ForestManager;
 import com.marklogic.mgmt.resource.security.PrivilegeManager;
+import com.marklogic.mgmt.resource.security.ProtectedPathManager;
 import com.marklogic.mgmt.resource.security.RoleManager;
 import com.marklogic.mgmt.resource.security.UserManager;
 import org.junit.After;
@@ -41,6 +40,7 @@ public class DeployCombinedRequestsWithCmaTest extends AbstractAppDeployerTest {
 
 		initializeAppDeployer(
 			new DeployPrivilegesCommand(), new DeployRolesCommand(), new DeployUsersCommand(), new DeployAmpsCommand(),
+			new DeployProtectedPathsCommand(), new DeployQueryRolesetsCommand(),
 			new DeployOtherDatabasesCommand(2), new DeployOtherServersCommand());
 
 		long start = System.currentTimeMillis();
@@ -78,6 +78,12 @@ public class DeployCombinedRequestsWithCmaTest extends AbstractAppDeployerTest {
 		User jane = api.user("sample-app-jane");
 		assertEquals("manage-user", jane.getRole().get(0));
 		assertEquals("sample-app-role2", jane.getRole().get(1));
+
+		ProtectedPathManager pathManager = new ProtectedPathManager(manageClient);
+		assertTrue(pathManager.exists("/test:element"));
+
+		QueryRoleset queryRoleset = api.queryRoleset("view-admin", "flexrep-user");
+		assertTrue(queryRoleset.exists());
 
 		DatabaseManager dbManager = new DatabaseManager(manageClient);
 		assertTrue(dbManager.exists("sample-app-content"));

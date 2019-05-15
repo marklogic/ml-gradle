@@ -7,6 +7,8 @@ public class CmaConfig {
 	private boolean deployDatabases;
 	private boolean deployForests;
 	private boolean deployPrivileges;
+	private boolean deployProtectedPaths;
+	private boolean deployQueryRolesets;
 	private boolean deployRoles;
 	private boolean deployServers;
 	private boolean deployUsers;
@@ -17,6 +19,8 @@ public class CmaConfig {
 		setDeployDatabases(true);
 		setDeployForests(true);
 		setDeployPrivileges(true);
+		setDeployProtectedPaths(true);
+		setDeployQueryRolesets(true);
 		setDeployRoles(true);
 		setDeployServers(true);
 		setDeployUsers(true);
@@ -84,5 +88,21 @@ public class CmaConfig {
 
 	public void setCombineRequests(boolean combineRequests) {
 		this.combineRequests = combineRequests;
+	}
+
+	public boolean isDeployProtectedPaths() {
+		return deployProtectedPaths;
+	}
+
+	public void setDeployProtectedPaths(boolean deployProtectedPaths) {
+		this.deployProtectedPaths = deployProtectedPaths;
+	}
+
+	public boolean isDeployQueryRolesets() {
+		return deployQueryRolesets;
+	}
+
+	public void setDeployQueryRolesets(boolean deployQueryRolesets) {
+		this.deployQueryRolesets = deployQueryRolesets;
 	}
 }

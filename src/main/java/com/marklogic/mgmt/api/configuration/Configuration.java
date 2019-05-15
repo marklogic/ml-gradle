@@ -31,6 +31,12 @@ public class Configuration {
 	@JsonProperty("privilege")
 	private List<ObjectNode> privileges;
 
+	@JsonProperty("protected-path")
+	private List<ObjectNode> protectedPaths;
+
+	@JsonProperty("query-roleset")
+	private List<ObjectNode> queryRolesets;
+
 	@JsonProperty("role")
 	private List<ObjectNode> roles;
 
@@ -47,6 +53,8 @@ public class Configuration {
 				(forests != null && !forests.isEmpty()) ||
 				(groups != null && !groups.isEmpty()) ||
 				(privileges != null && !privileges.isEmpty()) ||
+				(protectedPaths != null && !protectedPaths.isEmpty()) ||
+				(queryRolesets != null && !queryRolesets.isEmpty()) ||
 				(roles != null && !roles.isEmpty()) ||
 				(servers != null && !servers.isEmpty()) ||
 				(users != null && !users.isEmpty());
@@ -79,6 +87,16 @@ public class Configuration {
 	public void addGroup(ObjectNode g) {
 		if (groups == null) groups = new ArrayList<>();
 		groups.add(g);
+	}
+
+	public void addProtectedPath(ObjectNode node) {
+		if (protectedPaths == null) protectedPaths = new ArrayList<>();
+		protectedPaths.add(node);
+	}
+
+	public void addQueryRoleset(ObjectNode node) {
+		if (queryRolesets == null) queryRolesets = new ArrayList<>();
+		queryRolesets.add(node);
 	}
 
 	public void addRole(ObjectNode r) {
@@ -163,5 +181,21 @@ public class Configuration {
 
 	public void setPrivileges(List<ObjectNode> privileges) {
 		this.privileges = privileges;
+	}
+
+	public List<ObjectNode> getProtectedPaths() {
+		return protectedPaths;
+	}
+
+	public void setProtectedPaths(List<ObjectNode> protectedPaths) {
+		this.protectedPaths = protectedPaths;
+	}
+
+	public List<ObjectNode> getQueryRolesets() {
+		return queryRolesets;
+	}
+
+	public void setQueryRolesets(List<ObjectNode> queryRolesets) {
+		this.queryRolesets = queryRolesets;
 	}
 }

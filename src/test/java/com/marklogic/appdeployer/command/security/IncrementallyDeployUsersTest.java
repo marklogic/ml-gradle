@@ -1,5 +1,6 @@
 package com.marklogic.appdeployer.command.security;
 
+import com.marklogic.appdeployer.CmaConfig;
 import com.marklogic.appdeployer.command.AbstractIncrementalDeployTest;
 import com.marklogic.appdeployer.command.ResourceFileManagerImpl;
 import com.marklogic.mgmt.resource.security.RoleManager;
@@ -24,6 +25,9 @@ public class IncrementallyDeployUsersTest extends AbstractIncrementalDeployTest 
 
 		// Have to turn resource merging off for this to work
 		appConfig.setMergeResources(false);
+
+		// And turn off CMA
+		appConfig.setCmaConfig(new CmaConfig());
 	}
 
 	@After
@@ -53,7 +57,7 @@ public class IncrementallyDeployUsersTest extends AbstractIncrementalDeployTest 
 	}
 
 	@Test
-	public void usersAndRoles() throws IOException  {
+	public void usersAndRoles() throws IOException {
 		this.originalManageClient = this.manageClient;
 
 		assertUsersDontExist();

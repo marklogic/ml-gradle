@@ -63,20 +63,22 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			config.setMergeResources(Boolean.parseBoolean(prop));
 		});
 
-		propertyConsumerMap.put("mlOptimizeWithCma", (config, prop) -> {
-			logger.info("mlOptimizeWithCma is DEPRECATED; please use a property specific to the resource that you want to deploy with CMA");
-			// mlOptimizeWithCma was deprecated in 3.11; it was only used for deploying forests, so if the
-			// property is still used, the client in theory expects forests to still be deployed with CMA
-			config.getCmaConfig().setDeployForests(true);
-		});
-
 		final String cmaMessage = " with the Configuration Management API (CMA): ";
 
 		propertyConsumerMap.put("mlDeployWithCma", (config, prop) -> {
 			logger.info("Deploy all supported resources and combine requests" + cmaMessage + prop);
 			if (Boolean.parseBoolean(prop)) {
 				config.getCmaConfig().enableAll();
+			} else {
+				config.setCmaConfig(new CmaConfig());
 			}
+		});
+
+		propertyConsumerMap.put("mlOptimizeWithCma", (config, prop) -> {
+			logger.info("mlOptimizeWithCma is DEPRECATED; please use a property specific to the resource that you want to deploy with CMA");
+			// mlOptimizeWithCma was deprecated in 3.11; it was only used for deploying forests, so if the
+			// property is still used, the client in theory expects forests to still be deployed with CMA
+			config.getCmaConfig().setDeployForests(true);
 		});
 
 		propertyConsumerMap.put("mlCombineCmaRequests", (config, prop) -> {

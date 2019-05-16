@@ -13,6 +13,15 @@ public class CmaConfig {
 	private boolean deployServers;
 	private boolean deployUsers;
 
+	public CmaConfig() {
+	}
+
+	public CmaConfig(boolean enableAll) {
+		if (enableAll) {
+			enableAll();
+		}
+	}
+
 	public void enableAll() {
 		setCombineRequests(true);
 		setDeployAmps(true);

@@ -3,7 +3,6 @@ package com.marklogic.appdeployer.impl;
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.AppDeployer;
 import com.marklogic.appdeployer.ConfigDir;
-import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.Command;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.UndoableCommand;
@@ -15,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Abstract base class that just needs the subclass to define the list of Command instances to use. Handles executing
@@ -41,6 +39,7 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
 
 		this.deployerListeners = new ArrayList<>();
 		this.deployerListeners.add(new AddHostNameTokensDeployerListener());
+		this.deployerListeners.add(new PrepareCommandListener());
 		this.deployerListeners.add(new CmaDeployerListener());
 	}
 
@@ -72,6 +71,8 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
 
 		deployerListeners.forEach(listener -> listener.beforeCommandsExecuted(deploymentContext));
 
+		boolean catchExceptions = appConfig.isCatchDeployExceptions();
+
 		int commandCount = commands.size();
 		for (int i = 0; i < commandCount; i++) {
 			Command command = commands.get(i);
@@ -79,41 +80,14 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
 			String name = command.getClass().getName();
 
 			logger.info(format("Executing command [%s] with sort order [%d]", name, command.getExecuteSortOrder()));
-			prepareCommand(command, context);
-			deployerListeners.forEach(listener -> listener.beforeCommandExecuted(command, deploymentContext, remainingCommands));
+			invokeListenersBeforeCommandExecuted(context, command, deploymentContext, remainingCommands, catchExceptions);
 			long start = System.currentTimeMillis();
 			executeCommand(command, context);
 			logger.info(format("Finished executing command [%s] in %dms\n", name, (System.currentTimeMillis() - start)));
-			deployerListeners.forEach(listener -> listener.afterCommandExecuted(command, deploymentContext, remainingCommands));
+			invokeListenersAfterCommandExecuted(context, command, deploymentContext, remainingCommands, catchExceptions);
 		}
 
 		logger.info(format("Deployed app %s", appConfig.getName()));
-	}
-
-	/**
-	 * Prepare the given command before either execute or undo is called on it.
-	 *
-	 * @param command
-	 * @param context
-	 */
-	protected void prepareCommand(Command command, CommandContext context) {
-		if (command instanceof AbstractCommand) {
-			AppConfig appConfig = context.getAppConfig();
-			String[] filenamesToIgnore = appConfig.getResourceFilenamesToIgnore();
-			Pattern excludePattern = appConfig.getResourceFilenamesExcludePattern();
-			Pattern includePattern = appConfig.getResourceFilenamesIncludePattern();
-
-			AbstractCommand abstractCommand = (AbstractCommand) command;
-			if (filenamesToIgnore != null) {
-				abstractCommand.setFilenamesToIgnore(filenamesToIgnore);
-			}
-			if (excludePattern != null) {
-				abstractCommand.setResourceFilenamesExcludePattern(excludePattern);
-			}
-			if (includePattern != null) {
-				abstractCommand.setResourceFilenamesIncludePattern(includePattern);
-			}
-		}
 	}
 
 	/**
@@ -158,12 +132,22 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
 		Collections.sort(undoableCommands, new UndoComparator());
 		CommandContext context = new CommandContext(appConfig, manageClient, adminManager);
 
-		for (UndoableCommand command : undoableCommands) {
+		final DeploymentContext deploymentContext = new DeploymentContext(context, appConfig, commands);
+		deployerListeners.forEach(listener -> listener.beforeCommandsExecuted(deploymentContext));
+
+		boolean catchExceptions = appConfig.isCatchUndeployExceptions();
+
+		int commandCount = undoableCommands.size();
+		for (int i = 0; i < commandCount; i++) {
+			UndoableCommand command = undoableCommands.get(i);
+			final List<Command> remainingCommands = commands.subList(i + 1, commandCount);
+
 			String name = command.getClass().getName();
 			logger.info(format("Undoing command [%s] with sort order [%d]", name, command.getUndoSortOrder()));
-			prepareCommand(command, context);
+			invokeListenersBeforeCommandExecuted(context, command, deploymentContext, remainingCommands, catchExceptions);
 			undoCommand(command, context);
 			logger.info(format("Finished undoing command [%s]\n", name));
+			invokeListenersAfterCommandExecuted(context, command, deploymentContext, remainingCommands, catchExceptions);
 		}
 
 		logger.info(format("Undeployed app %s", appConfig.getName()));
@@ -185,6 +169,36 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
 				throw ex;
 			}
 		}
+	}
+
+	protected void invokeListenersBeforeCommandExecuted(CommandContext context, Command command, DeploymentContext deploymentContext,
+	                                                    List<Command> remainingCommands, boolean catchExceptions) {
+		deployerListeners.forEach(listener -> {
+			try {
+				listener.beforeCommandExecuted(command, deploymentContext, remainingCommands);
+			} catch (Exception ex) {
+				if (catchExceptions) {
+					logger.error(format("Listener threw exception that was caught; cause: %s", ex.getMessage()), ex);
+				} else {
+					throw ex;
+				}
+			}
+		});
+	}
+
+	protected void invokeListenersAfterCommandExecuted(CommandContext context, Command command, DeploymentContext deploymentContext,
+	                                                   List<Command> remainingCommands, boolean catchExceptions) {
+		deployerListeners.forEach(listener -> {
+			try {
+				listener.afterCommandExecuted(command, deploymentContext, remainingCommands);
+			} catch (Exception ex) {
+				if (catchExceptions) {
+					logger.error(format("Listener threw exception that was caught; cause: %s", ex.getMessage()), ex);
+				} else {
+					throw ex;
+				}
+			}
+		});
 	}
 
 	public List<DeployerListener> getDeployerListeners() {

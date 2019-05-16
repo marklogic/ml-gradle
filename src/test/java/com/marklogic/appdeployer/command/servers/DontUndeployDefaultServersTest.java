@@ -14,6 +14,9 @@ public class DontUndeployDefaultServersTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void test() {
+		// CMA doesn't like the minimal Manage server file
+		appConfig.getCmaConfig().setDeployServers(false);
+
 		appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/default-servers")));
 
 		ServerManager mgr = new ServerManager(manageClient);

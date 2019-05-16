@@ -73,7 +73,7 @@ public class AppConfig {
     private boolean catchDeployExceptions = false;
     private boolean catchUndeployExceptions = false;
 
-    private CmaConfig cmaConfig = new CmaConfig();
+    private CmaConfig cmaConfig;
     private boolean mergeResources = true;
 
     private boolean addHostNameTokens = false;
@@ -250,6 +250,11 @@ public class AppConfig {
 
 		dataConfig = new DataConfig(projectDir);
 		pluginConfig = new PluginConfig(projectDir);
+
+		// As of 3.15.0, defaulting everything except servers to use CMA. Changes to servers, such as changing group or
+	    // port number, cause conflicts with CMA.
+		cmaConfig = new CmaConfig(true);
+		cmaConfig.setDeployServers(false);
 
 		modulePaths = new ArrayList<>();
 		String path = projectDir != null ? new File(projectDir, DEFAULT_MODULES_PATH).getAbsolutePath() : DEFAULT_MODULES_PATH;

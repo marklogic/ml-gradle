@@ -213,27 +213,27 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		Properties p = new Properties();
 
 		CmaConfig cmaConfig = new DefaultAppConfigFactory(new SimplePropertySource(p)).newAppConfig().getCmaConfig();
-		assertFalse(cmaConfig.isCombineRequests());
-		assertFalse(cmaConfig.isDeployAmps());
-		assertFalse(cmaConfig.isDeployDatabases());
-		assertFalse(cmaConfig.isDeployForests());
-		assertFalse(cmaConfig.isDeployPrivileges());
-		assertFalse(cmaConfig.isDeployRoles());
-		assertFalse(cmaConfig.isDeployServers());
-		assertFalse(cmaConfig.isDeployUsers());
-
-		p.setProperty("mlDeployWithCma", "true");
-		cmaConfig = new DefaultAppConfigFactory(new SimplePropertySource(p)).newAppConfig().getCmaConfig();
 		assertTrue(cmaConfig.isCombineRequests());
 		assertTrue(cmaConfig.isDeployAmps());
 		assertTrue(cmaConfig.isDeployDatabases());
 		assertTrue(cmaConfig.isDeployForests());
 		assertTrue(cmaConfig.isDeployPrivileges());
-		assertTrue(cmaConfig.isDeployProtectedPaths());
-		assertTrue(cmaConfig.isDeployQueryRolesets());
 		assertTrue(cmaConfig.isDeployRoles());
-		assertTrue(cmaConfig.isDeployServers());
+		assertFalse(cmaConfig.isDeployServers());
 		assertTrue(cmaConfig.isDeployUsers());
+
+		p.setProperty("mlDeployWithCma", "false");
+		cmaConfig = new DefaultAppConfigFactory(new SimplePropertySource(p)).newAppConfig().getCmaConfig();
+		assertFalse(cmaConfig.isCombineRequests());
+		assertFalse(cmaConfig.isDeployAmps());
+		assertFalse(cmaConfig.isDeployDatabases());
+		assertFalse(cmaConfig.isDeployForests());
+		assertFalse(cmaConfig.isDeployPrivileges());
+		assertFalse(cmaConfig.isDeployProtectedPaths());
+		assertFalse(cmaConfig.isDeployQueryRolesets());
+		assertFalse(cmaConfig.isDeployRoles());
+		assertFalse(cmaConfig.isDeployServers());
+		assertFalse(cmaConfig.isDeployUsers());
 	}
 
 	@Test

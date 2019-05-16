@@ -96,6 +96,7 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
     public DeployDatabaseCommand() {
 	    setExecuteSortOrder(SortOrderConstants.DEPLOY_OTHER_DATABASES);
         setUndoSortOrder(SortOrderConstants.DELETE_OTHER_DATABASES);
+        setResourceClassType(Database.class);
     }
 
     public DeployDatabaseCommand(File databaseFile) {

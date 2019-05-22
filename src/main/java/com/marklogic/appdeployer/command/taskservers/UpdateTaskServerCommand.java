@@ -37,7 +37,7 @@ public class UpdateTaskServerCommand extends AbstractCommand {
 						logger.info("Processing file: " + f.getAbsolutePath());
 					}
 					String payload = copyFileToString(f, context);
-					mgr.updateTaskServer(taskServerName, payload);
+					mgr.updateTaskServer(taskServerName, payload, context.getAdminManager());
 				}
 			} else {
 				logResourceDirectoryNotFound(dir);

@@ -2,7 +2,9 @@ package com.marklogic.mgmt.resource.taskservers;
 
 import com.marklogic.mgmt.AbstractManager;
 import com.marklogic.mgmt.ManageClient;
+import com.marklogic.mgmt.admin.AdminManager;
 import com.marklogic.rest.util.Fragment;
+import org.springframework.http.ResponseEntity;
 
 public class TaskServerManager extends AbstractManager {
 
@@ -12,12 +14,24 @@ public class TaskServerManager extends AbstractManager {
 		this.manageClient = manageClient;
 	}
 
-	public void updateTaskServer(String taskServerName, String payload) {
+	/**
+	 *
+	 * @param taskServerName
+	 * @param payload
+	 * @param adminManager required in the event that the update to the task server causes a restart
+	 */
+	public void updateTaskServer(String taskServerName, String payload, AdminManager adminManager) {
 		String path = format("/manage/v2/task-servers/%s/properties", taskServerName);
+
+		ResponseEntity<String> response;
 		if (payloadParser.isJsonPayload(payload)) {
-			manageClient.putJson(path, payload);
+			response = manageClient.putJson(path, payload);
 		} else {
-			manageClient.putXml(path, payload);
+			response = manageClient.putXml(path, payload);
+		}
+
+		if (response != null && response.getHeaders().getLocation() != null && adminManager != null) {
+			adminManager.waitForRestart();
 		}
 	}
 

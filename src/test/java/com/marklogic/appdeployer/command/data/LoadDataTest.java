@@ -41,6 +41,9 @@ public class LoadDataTest extends AbstractAppDeployerTest {
 
 		assertNotNull("This should be loaded from the additional data path", mgr.exists("/test4.json"));
 
+		assertNull("Files starting with a . or in a directory starting with a . should not be loaded by default",
+			mgr.exists("/.DS_Store/shouldBeIgnored.json"));
+
 		DocumentMetadataHandle metadata = mgr.readMetadata("/child/test2.xml", new DocumentMetadataHandle());
 		assertTrue(metadata.getCollections().contains("xml-data"));
 		assertFalse(metadata.getCollections().contains("text-data"));

@@ -1,5 +1,7 @@
 package com.marklogic.appdeployer;
 
+import com.marklogic.client.ext.modulesloader.impl.DefaultFileFilter;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
@@ -14,7 +16,7 @@ public class DataConfig {
 	private String databaseName;
 	private Integer batchSize;
 	private boolean replaceTokensInData = true;
-	private FileFilter fileFilter;
+	private FileFilter fileFilter = new DefaultFileFilter();
 	private boolean logUris = true;
 
 	private String[] collections;

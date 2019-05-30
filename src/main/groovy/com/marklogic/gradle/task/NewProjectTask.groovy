@@ -78,7 +78,7 @@ class NewProjectTask extends MarkLogicTask {
 			} else {
 				appConfig.setNoRestServer(true)
 			}
-			new ScaffoldGenerator().generateScaffold(".", appConfig)
+			new ScaffoldGenerator().generateScaffold(new File(".").getAbsolutePath(), appConfig)
 		}
 	}
 

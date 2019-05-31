@@ -364,8 +364,14 @@ public class API extends LoggingObject {
     }
 
     public Task task(String taskId) {
+    	return task(taskId, Group.DEFAULT_GROUP_NAME);
+    }
+
+    public Task task(String taskId, String groupId) {
         Task t = new Task(this, taskId);
-        return taskId != null && t.exists() ? getResource(taskId, new TaskManager(getManageClient()), Task.class) : t;
+        return taskId != null && t.exists() ?
+	        getResource(taskId, new TaskManager(getManageClient()), Task.class, "group-id", groupId) :
+	        t;
     }
 
     public Task getTask() {

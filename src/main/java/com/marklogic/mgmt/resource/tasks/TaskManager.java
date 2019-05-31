@@ -135,7 +135,23 @@ public class TaskManager extends AbstractResourceManager {
 	@Override
 	protected SaveReceipt createNewResource(String payload, String resourceId) {
 		final String taskPath = payloadParser.getPayloadFieldValue(payload, "task-path", false);
-		return super.createNewResource(payload, taskPath);
+
+		SaveReceipt receipt = super.createNewResource(payload, taskPath);
+		updateNewTaskIfItShouldBeDisabled(payload, taskPath);
+		return receipt;
+	}
+
+	/**
+	 * This accounts for a bug in the Manage API where when a new task is created and it has task-enabled=false, the
+	 * task isn't actually disabled. So an update call is made to the task right after it's created.
+	 *
+	 * @param payload
+	 * @param taskPath
+	 * @return
+	 */
+	protected SaveReceipt updateNewTaskIfItShouldBeDisabled(String payload, String taskPath) {
+		String enabled = payloadParser.getPayloadFieldValue(payload, "task-enabled", false);
+		return "false".equals(enabled) ? super.updateResource(payload, taskPath) : null;
 	}
 
 	public List<String> getTaskPaths() {

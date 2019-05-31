@@ -1,24 +1,31 @@
 package com.marklogic.mgmt.api.database;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+
+@XmlAccessorType(XmlAccessType.FIELD)
 public class TokenizerOverride {
 
-    private String character;
-    private String tokenizerClass;
+	private String character;
 
-    public String getCharacter() {
-        return character;
-    }
+	@XmlElement(name = "tokenizer-class")
+	private String tokenizerClass;
 
-    public void setCharacter(String character) {
-        this.character = character;
-    }
+	public String getCharacter() {
+		return character;
+	}
 
-    public String getTokenizerClass() {
-        return tokenizerClass;
-    }
+	public void setCharacter(String character) {
+		this.character = character;
+	}
 
-    public void setTokenizerClass(String tokenizerClass) {
-        this.tokenizerClass = tokenizerClass;
-    }
+	public String getTokenizerClass() {
+		return tokenizerClass;
+	}
+
+	public void setTokenizerClass(String tokenizerClass) {
+		this.tokenizerClass = tokenizerClass;
+	}
 
 }

@@ -5,12 +5,15 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ElementIndex extends Index {
+public class GeospatialElementIndex extends GeospatialIndex {
 
 	@XmlElement(name = "namespace-uri")
 	private String namespaceUri;
-	
+
 	private String localname;
+
+	@XmlElement(name = "point-format")
+	private String pointFormat;
 
 	public String getNamespaceUri() {
 		return namespaceUri;
@@ -27,4 +30,13 @@ public class ElementIndex extends Index {
 	public void setLocalname(String localname) {
 		this.localname = localname;
 	}
+
+	public String getPointFormat() {
+		return pointFormat;
+	}
+
+	public void setPointFormat(String pointFormat) {
+		this.pointFormat = pointFormat;
+	}
+
 }

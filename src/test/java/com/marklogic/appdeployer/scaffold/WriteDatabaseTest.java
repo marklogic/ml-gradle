@@ -21,6 +21,6 @@ public class WriteDatabaseTest extends AbstractResourceWriterTest {
 		assertEquals("CHANGEME-name-of-element", index.getLocalname());
 		assertEquals("CHANGEME-namespace-of-element", index.getNamespaceUri());
 		assertEquals("http://marklogic.com/collation/", index.getCollation());
-		assertFalse(index.isRangeValuePositions());
+		assertFalse(index.getRangeValuePositions());
 	}
 }

@@ -32,6 +32,8 @@ public class Field {
 	@XmlElement(name = "excluded-element")
 	private List<ExcludedElement> excludedElement;
 
+	private String metadata;
+
 	@XmlElement(name = "stemmed-searches")
 	private String stemmedSearches;
 
@@ -70,6 +72,10 @@ public class Field {
 
 	@XmlElement(name = "one-character-searches")
 	private Boolean oneCharacterSearches;
+
+	@XmlElementWrapper(name = "tokenizer-overrides")
+	@XmlElement(name = "tokenizer-override")
+	private List<TokenizerOverride> tokenizerOverride;
 
 	public void addFieldPath(FieldPath path) {
 		if (fieldPath == null) {
@@ -228,5 +234,21 @@ public class Field {
 
 	public void setOneCharacterSearches(Boolean oneCharacterSearches) {
 		this.oneCharacterSearches = oneCharacterSearches;
+	}
+
+	public List<TokenizerOverride> getTokenizerOverride() {
+		return tokenizerOverride;
+	}
+
+	public void setTokenizerOverride(List<TokenizerOverride> tokenizerOverride) {
+		this.tokenizerOverride = tokenizerOverride;
+	}
+
+	public String getMetadata() {
+		return metadata;
+	}
+
+	public void setMetadata(String metadata) {
+		this.metadata = metadata;
 	}
 }

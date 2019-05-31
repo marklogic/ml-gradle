@@ -2,7 +2,7 @@ package com.marklogic.mgmt.api.forest;
 
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.Resource;
-import com.marklogic.mgmt.api.database.DatabaseReplication;
+import com.marklogic.mgmt.api.database.ForestDatabaseReplication;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.forests.ForestManager;
 import com.marklogic.mgmt.resource.hosts.HostManager;
@@ -52,7 +52,7 @@ public class Forest extends Resource {
 	private List<ForestBackup> forestBackup;
 
 	@XmlElement(name = "database-replication")
-	private DatabaseReplication databaseReplication;
+	private ForestDatabaseReplication databaseReplication;
 
 	@XmlElementWrapper(name = "forest-replicas")
 	@XmlElement(name = "forest-replica")
@@ -204,11 +204,11 @@ public class Forest extends Resource {
         this.forestBackup = forestBackup;
     }
 
-    public DatabaseReplication getDatabaseReplication() {
+    public ForestDatabaseReplication getDatabaseReplication() {
         return databaseReplication;
     }
 
-    public void setDatabaseReplication(DatabaseReplication databaseReplication) {
+    public void setDatabaseReplication(ForestDatabaseReplication databaseReplication) {
         this.databaseReplication = databaseReplication;
     }
 

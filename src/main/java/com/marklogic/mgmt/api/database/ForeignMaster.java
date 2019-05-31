@@ -5,7 +5,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ForeignReplica {
+public class ForeignMaster {
 
 	@XmlElement(name = "foreign-cluster-name")
 	private String foreignClusterName;
@@ -15,15 +15,6 @@ public class ForeignReplica {
 
 	@XmlElement(name = "connect-forests-by-name")
 	private Boolean connectForestsByName;
-
-	@XmlElement(name = "lag-limit")
-	private Integer lagLimit;
-
-	@XmlElement(name = "replication-enabled")
-	private Boolean replicationEnabled;
-
-	@XmlElement(name = "queue-size")
-	private Integer queueSize;
 
 	public String getForeignClusterName() {
 		return foreignClusterName;
@@ -47,29 +38,5 @@ public class ForeignReplica {
 
 	public void setConnectForestsByName(Boolean connectForestsByName) {
 		this.connectForestsByName = connectForestsByName;
-	}
-
-	public Integer getLagLimit() {
-		return lagLimit;
-	}
-
-	public void setLagLimit(Integer lagLimit) {
-		this.lagLimit = lagLimit;
-	}
-
-	public Boolean getReplicationEnabled() {
-		return replicationEnabled;
-	}
-
-	public void setReplicationEnabled(Boolean replicationEnabled) {
-		this.replicationEnabled = replicationEnabled;
-	}
-
-	public Integer getQueueSize() {
-		return queueSize;
-	}
-
-	public void setQueueSize(Integer queueSize) {
-		this.queueSize = queueSize;
 	}
 }

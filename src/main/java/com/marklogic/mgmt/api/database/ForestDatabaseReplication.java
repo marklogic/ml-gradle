@@ -7,28 +7,28 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.List;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-public class DatabaseReplication {
+public class ForestDatabaseReplication {
 
 	@XmlElementWrapper(name = "foreign-replicas")
 	@XmlElement(name = "foreign-replica")
-	private List<ForeignReplica> foreignReplica;
+	private List<ForestForeignReplica> foreignReplica;
 
 	@XmlElement(name = "foreign-master")
-	private ForeignMaster foreignMaster;
+	private ForestForeignReplica foreignMaster;
 
-	public List<ForeignReplica> getForeignReplica() {
+	public List<ForestForeignReplica> getForeignReplica() {
 		return foreignReplica;
 	}
 
-	public void setForeignReplica(List<ForeignReplica> foreignReplica) {
+	public void setForeignReplica(List<ForestForeignReplica> foreignReplica) {
 		this.foreignReplica = foreignReplica;
 	}
 
-	public ForeignMaster getForeignMaster() {
+	public ForestForeignReplica getForeignMaster() {
 		return foreignMaster;
 	}
 
-	public void setForeignMaster(ForeignMaster foreignMaster) {
+	public void setForeignMaster(ForestForeignReplica foreignMaster) {
 		this.foreignMaster = foreignMaster;
 	}
 }

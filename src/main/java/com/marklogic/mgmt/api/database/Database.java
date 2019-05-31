@@ -234,8 +234,63 @@ public class Database extends Resource implements Comparable<Database> {
 	@XmlElement(name = "range-element-index")
 	private List<ElementIndex> rangeElementIndex;
 
+	@XmlElementWrapper(name = "range-element-attribute-indexes")
+	@XmlElement(name = "range-element-attribute-index")
+	private List<ElementAttributeIndex> rangeElementAttributeIndex;
+
+	@XmlElementWrapper(name = "element-word-lexicons")
+	@XmlElement(name = "element-word-lexicon")
+	private List<ElementWordLexicon> elementWordLexicon;
+
+	@XmlElementWrapper(name = "element-attribute-word-lexicons")
+	@XmlElement(name = "element-attribute-word-lexicon")
+	private List<ElementAttributeWordLexicon> elementAttributeWordLexicon;
+
+	@XmlElementWrapper(name = "path-namespaces")
+	@XmlElement(name = "path-namespace")
+	private List<PathNamespace> pathNamespace;
+
 	@XmlElementWrapper(name = "fields")
 	private List<Field> field;
+
+	@XmlElementWrapper(name = "range-field-indexes")
+	@XmlElement(name = "range-field-index")
+	private List<FieldIndex> rangeFieldIndex;
+
+	@XmlElementWrapper(name = "geospatial-element-indexes")
+	@XmlElement(name = "geospatial-element-index")
+	private List<GeospatialElementIndex> geospatialElementIndex;
+
+	@XmlElementWrapper(name = "geospatial-element-child-indexes")
+	@XmlElement(name = "geospatial-element-child-index")
+	private List<GeospatialElementChildIndex> geospatialElementChildIndex;
+
+	@XmlElementWrapper(name = "geospatial-element-pair-indexes")
+	@XmlElement(name = "geospatial-element-pair-index")
+	private List<GeospatialElementPairIndex> geospatialElementPairIndex;
+
+	@XmlElementWrapper(name = "geospatial-element-attribute-pair-indexes")
+	@XmlElement(name = "geospatial-element-attribute-pair-index")
+	private List<GeospatialElementPairIndex> geospatialElementAttributePairIndex;
+
+	@XmlElementWrapper(name = "geospatial-path-indexes")
+	@XmlElement(name = "geospatial-path-index")
+	private List<GeospatialPathIndex> geospatialPathIndex;
+
+	@XmlElementWrapper(name = "geospatial-region-path-indexes")
+	@XmlElement(name = "geospatial-region-path-index")
+	private List<GeospatialRegionPathIndex> geospatialRegionPathIndex;
+
+	@XmlElementWrapper(name = "default-rulesets")
+	@XmlElement(name = "default-ruleset")
+	private List<DefaultRuleset> defaultRuleset;
+
+	@XmlElement(name = "database-replication")
+	private DatabaseReplication databaseReplication;
+
+	@XmlElementWrapper(name = "database-references")
+	@XmlElement(name = "database-reference")
+	private List<DatabaseReference> databaseReference;
 
 	@XmlElement(name = "rebalancer-enable")
 	private Boolean rebalancerEnable;
@@ -1014,5 +1069,117 @@ public class Database extends Resource implements Comparable<Database> {
 
 	public void setAssignmentPolicy(AssignmentPolicy assignmentPolicy) {
 		this.assignmentPolicy = assignmentPolicy;
+	}
+
+	public List<FieldIndex> getRangeFieldIndex() {
+		return rangeFieldIndex;
+	}
+
+	public void setRangeFieldIndex(List<FieldIndex> rangeFieldIndex) {
+		this.rangeFieldIndex = rangeFieldIndex;
+	}
+
+	public List<ElementAttributeIndex> getRangeElementAttributeIndex() {
+		return rangeElementAttributeIndex;
+	}
+
+	public void setRangeElementAttributeIndex(List<ElementAttributeIndex> rangeElementAttributeIndex) {
+		this.rangeElementAttributeIndex = rangeElementAttributeIndex;
+	}
+
+	public List<ElementWordLexicon> getElementWordLexicon() {
+		return elementWordLexicon;
+	}
+
+	public void setElementWordLexicon(List<ElementWordLexicon> elementWordLexicon) {
+		this.elementWordLexicon = elementWordLexicon;
+	}
+
+	public List<ElementAttributeWordLexicon> getElementAttributeWordLexicon() {
+		return elementAttributeWordLexicon;
+	}
+
+	public void setElementAttributeWordLexicon(List<ElementAttributeWordLexicon> elementAttributeWordLexicon) {
+		this.elementAttributeWordLexicon = elementAttributeWordLexicon;
+	}
+
+	public List<PathNamespace> getPathNamespace() {
+		return pathNamespace;
+	}
+
+	public void setPathNamespace(List<PathNamespace> pathNamespace) {
+		this.pathNamespace = pathNamespace;
+	}
+
+	public List<GeospatialElementIndex> getGeospatialElementIndex() {
+		return geospatialElementIndex;
+	}
+
+	public void setGeospatialElementIndex(List<GeospatialElementIndex> geospatialElementIndex) {
+		this.geospatialElementIndex = geospatialElementIndex;
+	}
+
+	public List<GeospatialElementChildIndex> getGeospatialElementChildIndex() {
+		return geospatialElementChildIndex;
+	}
+
+	public void setGeospatialElementChildIndex(List<GeospatialElementChildIndex> geospatialElementChildIndex) {
+		this.geospatialElementChildIndex = geospatialElementChildIndex;
+	}
+
+	public List<GeospatialElementPairIndex> getGeospatialElementPairIndex() {
+		return geospatialElementPairIndex;
+	}
+
+	public void setGeospatialElementPairIndex(List<GeospatialElementPairIndex> geospatialElementPairIndex) {
+		this.geospatialElementPairIndex = geospatialElementPairIndex;
+	}
+
+	public List<GeospatialElementPairIndex> getGeospatialElementAttributePairIndex() {
+		return geospatialElementAttributePairIndex;
+	}
+
+	public void setGeospatialElementAttributePairIndex(List<GeospatialElementPairIndex> geospatialElementAttributePairIndex) {
+		this.geospatialElementAttributePairIndex = geospatialElementAttributePairIndex;
+	}
+
+	public List<GeospatialPathIndex> getGeospatialPathIndex() {
+		return geospatialPathIndex;
+	}
+
+	public void setGeospatialPathIndex(List<GeospatialPathIndex> geospatialPathIndex) {
+		this.geospatialPathIndex = geospatialPathIndex;
+	}
+
+	public List<GeospatialRegionPathIndex> getGeospatialRegionPathIndex() {
+		return geospatialRegionPathIndex;
+	}
+
+	public void setGeospatialRegionPathIndex(List<GeospatialRegionPathIndex> geospatialRegionPathIndex) {
+		this.geospatialRegionPathIndex = geospatialRegionPathIndex;
+	}
+
+	public List<DefaultRuleset> getDefaultRuleset() {
+		return defaultRuleset;
+	}
+
+	public void setDefaultRuleset(List<DefaultRuleset> defaultRuleset) {
+		this.defaultRuleset = defaultRuleset;
+	}
+
+	public DatabaseReplication getDatabaseReplication() {
+		return databaseReplication;
+	}
+
+	public void setDatabaseReplication(DatabaseReplication databaseReplication) {
+		this.databaseReplication = databaseReplication;
+	}
+
+	public List<DatabaseReference> getDatabaseReference() {
+		return databaseReference;
+	}
+
+	public void setDatabaseReference(List<DatabaseReference> databaseReference) {
+		this.databaseReference = databaseReference;
 	}
 }

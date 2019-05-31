@@ -8,7 +8,7 @@ class GenerateUnitTestSuiteTask extends MarkLogicTask {
 	static String getSampleTestsXqy() {
 		return """xquery version '1.0-ml';
 
-import module namespace test = 'http://marklogic.com/roxy/test-helper' at '/test/test-helper.xqy';
+import module namespace test = 'http://marklogic.com/test' at '/test/test-helper.xqy';
 
 test:assert-true(fn:true()),
 test:log("\$testName COMPLETE....")"""
@@ -17,7 +17,7 @@ test:log("\$testName COMPLETE....")"""
 	static String getSetupXqy() {
 		return """xquery version '1.0-ml';
 
-import module namespace test = 'http://marklogic.com/roxy/test-helper' at '/test/test-helper.xqy';
+import module namespace test = 'http://marklogic.com/test' at '/test/test-helper.xqy';
 
 (: 
    This module will be run before each test in your suite.
@@ -31,7 +31,7 @@ test:log("\$testName Setup COMPLETE....")"""
 	static String getTeardownXqy() {
 		return """xquery version '1.0-ml';
 
-import module namespace test = 'http://marklogic.com/roxy/test-helper' at '/test/test-helper.xqy';
+import module namespace test = 'http://marklogic.com/test' at '/test/test-helper.xqy';
 
 (:
    This module will run after each test in your suite.
@@ -44,7 +44,7 @@ test:log("\$testName Teardown COMPLETE....")"""
 	static String getSuiteSetupXqy() {
 		return """xquery version '1.0-ml';
 
-import module namespace test = 'http://marklogic.com/roxy/test-helper' at '/test/test-helper.xqy';
+import module namespace test = 'http://marklogic.com/test' at '/test/test-helper.xqy';
 
 (:
    Runs once when your suite is started.
@@ -57,7 +57,7 @@ test:log("\$suiteName Suite Setup COMPLETE....")"""
 	static String getSuiteTeardownXqy() {
 		return """xquery version '1.0-ml';
 
-import module namespace test = 'http://marklogic.com/roxy/test-helper' at '/test/test-helper.xqy';
+import module namespace test = 'http://marklogic.com/test' at '/test/test-helper.xqy';
 
 (:
    Runs once when your suite is finished, to clean up after the suite's tests.

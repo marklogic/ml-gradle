@@ -12,7 +12,7 @@ include this by default (not every ml-gradle user will use marklogic-unit-test),
         jcenter()
       }
       dependencies {
-        classpath "com.marklogic:marklogic-unit-test-client:0.12.0"
+        classpath "com.marklogic:marklogic-unit-test-client:1.0.beta"
       }
     }
 
@@ -24,7 +24,7 @@ is a feature of ml-gradle for depending on packages of MarkLogic modules):
     }
       
     dependencies {
-      mlBundle "com.marklogic:marklogic-unit-test-modules:0.12.0"
+      mlBundle "com.marklogic:marklogic-unit-test-modules:1.0.beta"
     }
 
 ## Running unit tests

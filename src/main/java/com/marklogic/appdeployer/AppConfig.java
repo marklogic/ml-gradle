@@ -318,11 +318,13 @@ public class AppConfig {
     public void setSimpleSslConfig() {
 		setRestSslContext(SimpleX509TrustManager.newSSLContext());
 		setRestSslHostnameVerifier(DatabaseClientFactory.SSLHostnameVerifier.ANY);
+		setRestTrustManager(new SimpleX509TrustManager());
     }
 
     public void setAppServicesSimpleSslConfig() {
 		setAppServicesSslContext(SimpleX509TrustManager.newSSLContext());
 		setAppServicesSslHostnameVerifier(DatabaseClientFactory.SSLHostnameVerifier.ANY);
+		setAppServicesTrustManager(new SimpleX509TrustManager());
     }
 
     /**

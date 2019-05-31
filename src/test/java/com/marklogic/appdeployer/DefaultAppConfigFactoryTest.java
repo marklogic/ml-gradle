@@ -395,6 +395,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		assertEquals("appServicesCertPassword", config.getAppServicesCertPassword());
 		assertEquals("appServicesExternalName", config.getAppServicesExternalName());
 		assertNotNull(config.getAppServicesSslContext());
+		assertNotNull("As of 3.15.0, a trust manager must be set in order for SSL to work on >= Java 9", config.getAppServicesTrustManager());
 		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.ANY, config.getAppServicesSslHostnameVerifier());
 
 		assertEquals("my-rest-server", config.getRestServerName());
@@ -418,6 +419,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 
 		assertNotNull(config.getRestSslContext());
 		assertNotNull(config.getRestSslHostnameVerifier());
+		assertNotNull("As of 3.15.0, a trust manager is set so that simple SSL works on >= Java 9", config.getRestTrustManager());
 		assertEquals("my-content-db", config.getContentDatabaseName());
 		assertEquals("my-test-db", config.getTestContentDatabaseName());
 		assertEquals("my-modules", config.getModulesDatabaseName());

@@ -176,19 +176,6 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 	}
 
 	/**
-	 * Subclasses may override this to defer submission of a configuration so that it can be combined with other
-	 * configurations.
-	 *
-	 * @param context
-	 * @param config
-	 */
-	protected void deployConfiguration(CommandContext context, Configuration config) {
-		if (config.hasResources()) {
-			new Configurations(config).submit(context.getManageClient());
-		}
-	}
-
-	/**
 	 * Defaults to the parent method. This was extracted so that a subclass can override it and have access to the
 	 * CommandContext, which allows for reading in the contents of each file and replacing tokens, which may impact the
 	 * order in which the files are processed.

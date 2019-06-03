@@ -372,19 +372,12 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 			}
 		});
 
-		if (context.getAppConfig().getCmaConfig().isCombineRequests()) {
-			logger.info("Adding databases and forests to combined CMA request");
-			context.addCmaConfigurationToCombinedRequest(dbConfig);
-			context.addCmaConfigurationToCombinedRequest(forestConfig);
-			context.getContextMap().put("database-plans", databasePlans);
-		} else {
-			new Configurations(dbConfig, forestConfig).submit(context.getManageClient());
+		new Configurations(dbConfig, forestConfig).submit(context.getManageClient());
 
-			// Now account for sub-databases, but not yet (as of 3.15.0) with CMA
-			databasePlans.forEach(plan -> {
-				plan.getDeployDatabaseCommand().deploySubDatabases(plan.getDatabaseName(), context);
-			});
-		}
+		// Now account for sub-databases, but not yet (as of 3.15.0) with CMA
+		databasePlans.forEach(plan -> {
+			plan.getDeployDatabaseCommand().deploySubDatabases(plan.getDatabaseName(), context);
+		});
 	}
 
 	/**

@@ -54,7 +54,7 @@ public class DeployCustomForestsCommand extends AbstractCommand {
 		}
 
 		if (configuration != null) {
-			context.addCmaConfigurationToCombinedRequest(configuration);
+			deployConfiguration(context, configuration);
 		}
 	}
 

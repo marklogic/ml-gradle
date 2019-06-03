@@ -7,6 +7,8 @@ import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.admin.AdminManager;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.Resource;
+import com.marklogic.mgmt.api.configuration.Configuration;
+import com.marklogic.mgmt.api.configuration.Configurations;
 import com.marklogic.mgmt.cma.ConfigurationManager;
 import com.marklogic.mgmt.mapper.DefaultResourceMapper;
 import com.marklogic.mgmt.mapper.ResourceMapper;
@@ -478,6 +480,19 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 	 */
 	protected boolean cmaEndpointExists(CommandContext context) {
 		return new ConfigurationManager(context.getManageClient()).endpointExists();
+	}
+
+	/**
+	 * Subclasses may override this to defer submission of a configuration so that it can be combined with other
+	 * configurations.
+	 *
+	 * @param context
+	 * @param config
+	 */
+	protected void deployConfiguration(CommandContext context, Configuration config) {
+		if (config.hasResources()) {
+			new Configurations(config).submit(context.getManageClient());
+		}
 	}
 
 	protected void setIncrementalMode(boolean incrementalMode) {

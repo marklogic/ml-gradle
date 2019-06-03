@@ -3,8 +3,6 @@ package com.marklogic.appdeployer.impl;
 import com.marklogic.appdeployer.command.Command;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
-import com.marklogic.appdeployer.command.databases.DatabasePlan;
-import com.marklogic.appdeployer.command.security.DeployAmpsCommand;
 import com.marklogic.appdeployer.command.security.DeployUsersCommand;
 import com.marklogic.mgmt.api.configuration.Configurations;
 
@@ -15,10 +13,10 @@ import java.util.List;
  * should be submitted when any of the following are true:
  *
  * <ol>
- * <li>DeployUsersCommand was just executed, meaning that a combined request of privileges, roles, and users should be submitted.</li>
- * <li>DeployOtherDatabaseCommand was just executed, meaning that a combined request of databases and forests should be submitted.</li>
+ * <li>Users were just deployed, meaning that a combined request of privileges, roles, protected paths,
+ * query rolesets, and users should be submitted.</li>
  * <li>No commands remain to be executed. In this case, need to check for a pending combined request that should be submitted. This can easily
- * happen in e.g. an ml-gradle context when running a task like mlDeployPrivileges or mlDeployDatabases.
+ * happen in e.g. an ml-gradle context when running a task like mlDeployPrivileges.
  * </li>
  * </ol>
  * <p>
@@ -30,33 +28,22 @@ public class CmaDeployerListener extends DeployerListenerSupport {
 
 	@Override
 	public void afterCommandExecuted(Command command, DeploymentContext context, List<Command> remainingCommands) {
-		if (combinedRequestBeSubmitted(command, remainingCommands)) {
+		if (combinedRequestShouldBeSubmitted(command, remainingCommands)) {
 			CommandContext commandContext = context.getCommandContext();
 
 			Configurations configs = commandContext.getCombinedCmaRequest();
 			if (configs != null) {
 				commandContext.removeCombinedCmaRequest();
-
 				if (configs.hasResources()) {
 					logger.info("Submitting combined CMA request");
 					configs.submit(commandContext.getManageClient());
-
-					if (command instanceof DeployAmpsCommand || remainingCommands.isEmpty()) {
-						List<DatabasePlan> databasePlans = (List<DatabasePlan>) commandContext.getContextMap().get("database-plans");
-						if (databasePlans != null) {
-							commandContext.getContextMap().remove("database-plans");
-							databasePlans.forEach(plan -> {
-								plan.getDeployDatabaseCommand().deploySubDatabases(plan.getDatabaseName(), commandContext);
-							});
-						}
-					}
 				}
 			}
 		}
 	}
 
-	protected boolean combinedRequestBeSubmitted(Command command, List<Command> remainingCommands) {
-		if (command instanceof DeployUsersCommand || command instanceof DeployAmpsCommand) {
+	protected boolean combinedRequestShouldBeSubmitted(Command command, List<Command> remainingCommands) {
+		if (command instanceof DeployUsersCommand) {
 			return true;
 		}
 
@@ -65,12 +52,11 @@ public class CmaDeployerListener extends DeployerListenerSupport {
 		}
 
 		/**
-		 * At least for many ml-app-deployer tests, a small subset of commands are used - for example, perhaps only the
-		 * commands for deploying databases and triggers are used. To ensure that databases are still deployed, we look
-		 * at the next command to see if it's being executed after amps are deployed, as amps are the last resource
-		 * we include in a combined request. If so, then we know we need to submit the combined request.
+		 * At least for many ml-app-deployer tests, a small subset of commands are used. To ensure a combined request
+		 * is submitted, we look at the next command to see if it executes after users are deployed, and if so, then
+		 * the request is submitted.
 		 */
 		Command nextCommand = remainingCommands.get(0);
-		return nextCommand.getExecuteSortOrder() >= SortOrderConstants.DEPLOY_AMPS;
+		return nextCommand.getExecuteSortOrder() >= SortOrderConstants.DEPLOY_USERS;
 	}
 }

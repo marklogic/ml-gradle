@@ -75,14 +75,4 @@ public class DeployAmpsCommand extends AbstractResourceCommand implements Suppor
 		}
 		return false;
 	}
-
-	@Override
-	protected void deployConfiguration(CommandContext context, Configuration config) {
-		if (context.getAppConfig().getCmaConfig().isCombineRequests()) {
-			logger.info("Adding amps to combined CMA request");
-			context.addCmaConfigurationToCombinedRequest(config);
-		} else {
-			super.deployConfiguration(context, config);
-		}
-	}
 }

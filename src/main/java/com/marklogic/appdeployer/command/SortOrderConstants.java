@@ -32,11 +32,6 @@ public abstract class SortOrderConstants {
 	public static Integer DEPLOY_OTHER_DATABASES = 120;
     public static Integer DEPLOY_FORESTS = 150;
 
-	// The modules database must exist before we deploy amps
-	// For 3.15.0, amps are now deployed after databases and before servers so they can be included in a combined
-	// CMA request with databases and forests.
-	public static Integer DEPLOY_AMPS = 170;
-
 	public static Integer DEPLOY_REST_API_SERVERS = 200;
     public static Integer UPDATE_REST_API_SERVERS = 250;
     public static Integer DEPLOY_OTHER_SERVERS = 300;
@@ -51,7 +46,10 @@ public abstract class SortOrderConstants {
     public static Integer LOAD_MODULES = 400;
     public static Integer DELETE_TEST_MODULES = 410;
 
-    public static Integer DEPLOY_TRIGGERS = 700;
+	// The modules database must exist before we deploy amps
+	public static Integer DEPLOY_AMPS = 450;
+
+	public static Integer DEPLOY_TRIGGERS = 700;
 
 	public static Integer DEPLOY_TEMPORAL_AXIS = 750;
 	public static Integer DEPLOY_TEMPORAL_COLLECTIONS = 751;

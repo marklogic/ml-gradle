@@ -69,19 +69,23 @@ Starting in release 3.8.1, you can configure which REST API server mlUnitTest wi
 exposes a property of type [DatabaseClientConfig](https://github.com/marklogic-community/ml-javaclient-util/blob/master/src/main/java/com/marklogic/client/ext/DatabaseClientConfig.java). 
 You can configure the properties of this object, and mlUnitTest will use it for creating a connection to MarkLogic. 
 
-Below is an example - note that you need to configure every property necessary for the type of connection you want, as 
+Below is an example of configuring the mlUnitTest task in build.gradle - note that you need to configure every property necessary for the type of connection you want, as 
 none of the properties of the DatabaseClientConfig have any default value:
 
-    mlUnitTest.databaseClientConfig.host = mlHost
-    mlUnitTest.databaseClientConfig.port = 8880 // probably a port that differs from mlRestPort and mlTestRestPort
-    mlUnitTest.databaseClientConfig.username = mlUsername
-    mlUnitTest.databaseClientConfig.password = mlPassword
-    // Other properties that can be set
-    // mlUnitTest.databaseClientConfig.securityContextType
-    // mlUnitTest.databaseClientConfig.database
-    // mlUnitTest.databaseClientConfig.sslContext
-    // mlUnitTest.databaseClientConfig.sslHostnameVerifier
-    // mlUnitTest.databaseClientConfig.certFile
-    // mlUnitTest.databaseClientConfig.certPassword 
-    // mlUnitTest.databaseClientConfig.externalName
-    // mlUnitTest.databaseClientConfig.trustManager
+```
+ext {
+  mlUnitTest.databaseClientConfig.host = mlHost
+  mlUnitTest.databaseClientConfig.port = 8880 // probably a port that differs from mlRestPort and mlTestRestPort
+  mlUnitTest.databaseClientConfig.username = mlUsername
+  mlUnitTest.databaseClientConfig.password = mlPassword
+  // Other properties that can be set
+  // mlUnitTest.databaseClientConfig.securityContextType
+  // mlUnitTest.databaseClientConfig.database
+  // mlUnitTest.databaseClientConfig.sslContext
+  // mlUnitTest.databaseClientConfig.sslHostnameVerifier
+  // mlUnitTest.databaseClientConfig.certFile
+  // mlUnitTest.databaseClientConfig.certPassword 
+  // mlUnitTest.databaseClientConfig.externalName
+  // mlUnitTest.databaseClientConfig.trustManager
+}
+```

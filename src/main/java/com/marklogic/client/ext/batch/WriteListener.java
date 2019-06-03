@@ -10,4 +10,6 @@ import java.util.List;
 public interface WriteListener {
 
 	void onWriteFailure(Throwable ex, List<? extends DocumentWriteOperation> items);
+
+	void afterCompletion();
 }

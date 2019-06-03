@@ -26,6 +26,24 @@ public class RestBatchWriterTest extends AbstractIntegrationTest {
 	@Test
 	public void failureTest() {
 		RestBatchWriter writer = new RestBatchWriter(newClient("Documents"));
+
+		DocumentWriteOperation op = new DocumentWriteOperationImpl(DocumentWriteOperation.OperationType.DOCUMENT_WRITE,
+			"/test.xml", null, new StringHandle("<hello>world</hello>asdf"));
+
+		writer.initialize();
+		writer.write(Arrays.asList(op));
+
+		try {
+			writer.waitForCompletion();
+			fail("The error caused by malformed XML should have been thrown");
+		} catch (Exception ex) {
+			// Expected
+		}
+	}
+
+	@Test
+	public void failureTestWithCustomListener() {
+		RestBatchWriter writer = new RestBatchWriter(newClient("Documents"));
 		TestWriteListener testWriteListener = new TestWriteListener();
 		writer.setWriteListener(testWriteListener);
 
@@ -70,7 +88,7 @@ public class RestBatchWriterTest extends AbstractIntegrationTest {
 	}
 }
 
-class TestWriteListener implements WriteListener {
+class TestWriteListener extends WriteListenerSupport {
 	public Throwable caughtError;
 
 	@Override

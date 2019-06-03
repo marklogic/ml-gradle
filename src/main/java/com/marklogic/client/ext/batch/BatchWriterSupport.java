@@ -21,7 +21,7 @@ public abstract class BatchWriterSupport extends LoggingObject implements BatchW
 
 	private TaskExecutor taskExecutor;
 	private int threadCount = 16;
-	private WriteListener writeListener;
+	private WriteListener writeListener = new DefaultWriteListener();
 
 	@Override
 	public void initialize() {
@@ -41,6 +41,10 @@ public abstract class BatchWriterSupport extends LoggingObject implements BatchW
 				logger.debug("Thread pool finished shutdown");
 			}
 			taskExecutor = null;
+		}
+
+		if (writeListener != null) {
+			writeListener.afterCompletion();
 		}
 	}
 

@@ -31,13 +31,15 @@ class PrepareBundlesTask extends MarkLogicTask {
 					println "\nWARNING: mlRestApi is deprecated as of release 3.13.0, please use mlBundle instead, which is a drop-in replacement.\n"
 				}
 				
-				def buildDir = new File("build/" + configurationName)
-				try {
-					FileUtils.cleanDirectory(buildDir)
-				} catch (Exception e) {
-					println "Unable to delete directory: " + buildDir
-				}
+				def buildDir = new File(getProject().getProjectDir(), "build")
 				buildDir.mkdirs()
+				def bundleDir = new File(buildDir, configurationName)
+				try {
+					FileUtils.cleanDirectory(bundleDir)
+				} catch (Exception e) {
+					println "Unable to delete directory: " + bundleDir
+				}
+				bundleDir.mkdirs()
 
 				// Constructing a DefaultAntBuilder seems to avoid Xerces-related classpath issues
 				// The DefaultAntBuilder constructor changed between Gradle 2.13 and 2.14, and we want
@@ -50,7 +52,7 @@ class PrepareBundlesTask extends MarkLogicTask {
 				}
 
 				for (f in config.files) {
-					ant.unzip(src: f, dest: buildDir, overwrite: "true")
+					ant.unzip(src: f, dest: bundleDir, overwrite: "true")
 				}
 
 				List<ConfigDir> configDirs = getAppConfig().getConfigDirs()
@@ -68,7 +70,7 @@ class PrepareBundlesTask extends MarkLogicTask {
 				List<String> schemaPaths = getAppConfig().getSchemaPaths()
 				List<String> newSchemaPaths = new ArrayList<>()
 
-				for (dir in buildDir.listFiles()) {
+				for (dir in bundleDir.listFiles()) {
 					if (dir.isDirectory()) {
 						File configDir = new File(dir, "ml-config")
 						if (configDir != null && configDir.exists()) {

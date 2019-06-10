@@ -1,5 +1,5 @@
 plugins {
-  id "java"
+  id "java-library"
   id "maven-publish"
   id "eclipse"
   id "idea"
@@ -17,32 +17,32 @@ repositories {
 }
 
 dependencies {
-  compile 'com.marklogic:ml-javaclient-util:' + mlJavaclientUtilVersion
-  compile 'jaxen:jaxen:1.1.6'
-  compile 'org.apache.httpcomponents:httpclient:4.3.6'
-  compile 'org.springframework:spring-web:4.3.5.RELEASE'
+  api 'com.marklogic:ml-javaclient-util:' + mlJavaclientUtilVersion
+  api 'jaxen:jaxen:1.1.6'
+  api 'org.apache.httpcomponents:httpclient:4.3.6'
+  api 'org.springframework:spring-web:4.3.5.RELEASE'
 
 	// For EqualsBuilder; added in 3.8.1 to support detecting if a mimetype's properties have changed or not
-	compile "org.apache.commons:commons-lang3:3.7"
+	api "org.apache.commons:commons-lang3:3.7"
 
 	// For PreviewInterceptor; can be excluded if that feature is not used
-	compile "com.flipkart.zjsonpatch:zjsonpatch:0.4.6"
+	api "com.flipkart.zjsonpatch:zjsonpatch:0.4.6"
 
 	// Required for Java 11
-	compile "javax.xml.bind:jaxb-api:2.3.1"
-	compile "com.sun.xml.bind:jaxb-core:2.3.0.1"
-	compile "com.sun.xml.bind:jaxb-impl:2.3.2"
+	api "javax.xml.bind:jaxb-api:2.3.1"
+	api "com.sun.xml.bind:jaxb-core:2.3.0.1"
+	api "com.sun.xml.bind:jaxb-impl:2.3.2"
 
 	// Don't want to include this in the published jar, just the executable jar
 	compileOnly "com.beust:jcommander:1.72"
 
-  testCompile 'com.marklogic:ml-junit:' + mlJunitVersion
-  testCompile 'commons-io:commons-io:2.5'
+  testImplementation 'com.marklogic:ml-junit:' + mlJunitVersion
+	testImplementation 'commons-io:commons-io:2.5'
 
   // Forcing Spring to use logback instead of commons-logging
-  compile "ch.qos.logback:logback-classic:1.1.8" // Needs to be compile for CLI
-  runtime group: "org.slf4j", name: "jcl-over-slf4j", version: "1.7.22"
-  runtime group: "org.slf4j", name: "slf4j-api", version: "1.7.22"
+  implementation "ch.qos.logback:logback-classic:1.1.8" // Needs to be implementation for CLI
+	testImplementation group: "org.slf4j", name: "jcl-over-slf4j", version: "1.7.22"
+	testImplementation group: "org.slf4j", name: "slf4j-api", version: "1.7.22"
 }
 
 // This ensures that Gradle includes in the published jar any non-java files under src/main/java
@@ -102,7 +102,8 @@ test {
 }
 
 task executableJar(type: Jar) {
-	baseName = "deployer"
+	description = "Construct an executable jar for executing ml-app-deployer commands via the command line"
+	archiveBaseName = "deployer"
 	manifest {
 		attributes("Main-Class": "com.marklogic.appdeployer.cli.Main")
 	}
@@ -110,12 +111,12 @@ task executableJar(type: Jar) {
 	from sourceSets.main.output
 	// Include all project dependencies
 	from {
-		configurations.runtime.collect {
+		configurations.compileClasspath.collect {
 			it.isDirectory() ? it : zipTree(it)
 		}
 	}
 	from {
-		configurations.compileOnly.collect {
+		configurations.runtimeClasspath.collect {
 			it.isDirectory() ? it : zipTree(it)
 		}
 	}

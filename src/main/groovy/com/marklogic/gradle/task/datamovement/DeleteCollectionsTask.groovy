@@ -9,7 +9,7 @@ class DeleteCollectionsTask extends DataMovementTask {
 
 	@TaskAction
 	void deleteCollections() {
-		project.ext.collections = (collections != null && collections.length > 0) ? collections.join(",") : null
+		project.ext.collections = (collections != null && collections.length > 0) ? collections.join(",") : project.ext.collections
 		runQueryBatcherJob(new DeleteCollectionsJob())
 	}
 }

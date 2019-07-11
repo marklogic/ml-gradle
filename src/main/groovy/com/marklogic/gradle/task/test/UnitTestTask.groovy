@@ -5,6 +5,7 @@ import com.marklogic.gradle.task.MarkLogicTask
 import com.marklogic.test.unit.DefaultJUnitTestReporter
 import com.marklogic.test.unit.JUnitTestSuite
 import com.marklogic.test.unit.TestManager
+import org.apache.commons.io.FileUtils
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 
@@ -73,9 +74,11 @@ class UnitTestTask extends MarkLogicTask {
 
 			File resultsDir = new File(resultsPath)
 			if (resultsDir.exists()) {
-				boolean deleted = resultsDir.deleteDir()
-				if (!deleted) {
-					println "Unable to delete test results directory: " + resultsPath
+				try {
+					FileUtils.cleanDirectory(resultsDir)
+					println "Deleted existing results directory: " + resultsDir
+				} catch (Exception e) {
+					println "Unable to delete test results directory: " + resultsDir
 				}
 			}
 			resultsDir.mkdirs()

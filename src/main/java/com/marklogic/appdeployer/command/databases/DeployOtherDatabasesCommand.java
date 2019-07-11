@@ -12,6 +12,7 @@ import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.configuration.Configuration;
 import com.marklogic.mgmt.api.configuration.Configurations;
 import com.marklogic.mgmt.api.database.Database;
+import com.marklogic.mgmt.api.database.DatabaseSorter;
 import com.marklogic.mgmt.api.forest.Forest;
 import com.marklogic.mgmt.mapper.DefaultResourceMapper;
 import com.marklogic.mgmt.mapper.ResourceMapper;
@@ -83,7 +84,7 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 		List<DatabasePlan> databasePlans = buildDatabasePlans(context);
 
 		if (context.getAppConfig().isSortOtherDatabaseByDependencies()) {
-			Collections.sort(databasePlans, new DatabasePlanComparator(false));
+			databasePlans = sortDatabasePlans(databasePlans);
 		} else {
 			logger.info("Not sorting databases by dependencies, will sort them by their filenames instead");
 		}
@@ -120,7 +121,8 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 		List<DatabasePlan> databasePlans = buildDatabasePlans(context);
 
 		if (context.getAppConfig().isSortOtherDatabaseByDependencies()) {
-			Collections.sort(databasePlans, new DatabasePlanComparator(true));
+			databasePlans = sortDatabasePlans(databasePlans);
+			Collections.reverse(databasePlans);
 		} else {
 			logger.info("Not sorting databases by dependencies, will sort them by their filenames instead");
 		}
@@ -254,10 +256,12 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 
 		DatabasePlan testDatabasePlan = null;
 
+		final String testContentDatabaseName = context.getAppConfig().getTestContentDatabaseName();
+
 		for (DatabasePlan reference : databasePlanList) {
 			boolean createTestDatabase = reference.isMainContentDatabase() && context.getAppConfig().isTestPortSet();
 			if (createTestDatabase) {
-				testDatabasePlan = new DatabasePlan(context.getAppConfig().getTestContentDatabaseName(), reference.getFiles());
+				testDatabasePlan = new DatabasePlan(testContentDatabaseName, reference.getFiles());
 			}
 
 			List<File> files = reference.getFiles();
@@ -268,7 +272,9 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 				if (createTestDatabase) {
 					String testPayload = payloadTokenReplacer.replaceTokens(copyFileToString(files.get(0)), context.getAppConfig(), true);
 					testDatabasePlan.setPayload(testPayload);
-					testDatabasePlan.setDatabaseForSorting(resourceMapper.readResource(payload, Database.class));
+					Database testDb = resourceMapper.readResource(payload, Database.class);
+					testDb.setDatabaseName(testContentDatabaseName);
+					testDatabasePlan.setDatabaseForSorting(testDb);
 				}
 			} else {
 				List<ObjectNode> nodes = new ArrayList<>();
@@ -307,6 +313,23 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 		}
 
 		return databasePlanList;
+	}
+
+	protected List<DatabasePlan> sortDatabasePlans(List<DatabasePlan> databasePlans) {
+		List<Database> databases = new ArrayList<>();
+		Map<String, DatabasePlan> map = new HashMap<>();
+		databasePlans.forEach(plan -> {
+			databases.add(plan.getDatabaseForSorting());
+			map.put(plan.getDatabaseName(), plan);
+		});
+
+		String[] sortedNames = new DatabaseSorter().sortDatabasesAndReturnNames(databases);
+
+		List<DatabasePlan> sortedList = new ArrayList<>();
+		for (String name : sortedNames) {
+			sortedList.add(map.get(name));
+		}
+		return sortedList;
 	}
 
 	/**
@@ -483,30 +506,5 @@ class DatabasePlans {
 
 	public void setTestDatabasePlan(DatabasePlan testDatabasePlan) {
 		this.testDatabasePlan = testDatabasePlan;
-	}
-}
-
-class DatabasePlanComparator implements Comparator<DatabasePlan> {
-
-	private boolean reverseOrder;
-
-	public DatabasePlanComparator(boolean reverseOrder) {
-		this.reverseOrder = reverseOrder;
-	}
-
-	@Override
-	public int compare(DatabasePlan o1, DatabasePlan o2) {
-		Database db1 = o1.getDatabaseForSorting();
-		Database db2 = o2.getDatabaseForSorting();
-
-		int result = db1.compareTo(db2);
-		if (result == 0) {
-			return 0;
-		}
-		if (reverseOrder) {
-			return result == 1 ? -1 : 1;
-		}
-		return result;
-
 	}
 }

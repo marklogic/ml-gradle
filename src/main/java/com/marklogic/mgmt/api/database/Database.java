@@ -1,11 +1,12 @@
 package com.marklogic.mgmt.api.database;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.Resource;
 import com.marklogic.mgmt.api.forest.Forest;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
-import org.slf4j.Logger;
+import org.springframework.util.StringUtils;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import java.util.List;
 
 @XmlRootElement(name = "database-properties")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Database extends Resource implements Comparable<Database> {
+public class Database extends Resource {
 
 	@XmlElement(name = "database-name")
 	private String databaseName;
@@ -378,81 +379,19 @@ public class Database extends Resource implements Comparable<Database> {
 		}
 	}
 
-	/**
-	 * The comparison is based on each database's dependencies. A return value of 1 indicates that this database either
-	 * depends on the other database, or this has dependencies (and the other either does or does not). A return value
-	 * of -1 indicates that the other database either depends on this database, or the other has dependencies and this
-	 * database does not. And a return value of zero indicates that neither database has any dependencies and thus they
-	 * have no relation to each other.
-	 *
-	 * @param other
-	 * @return
-	 */
-	@Override
-	public int compareTo(Database other) {
-		if (other == null) {
-			return 1;
+	@JsonIgnore
+	public List<String> getDatabaseDependencyNames() {
+		List<String> list = new ArrayList<>();
+		if (StringUtils.hasText(schemaDatabase)) {
+			list.add(schemaDatabase);
 		}
-
-		final String dbName1 = getDatabaseName();
-		final String dbName2 = other.getDatabaseName();
-		final Logger logger = getLogger();
-
-		if (dependsOnDatabase(other)) {
-			if (logger.isDebugEnabled()) {
-				logger.debug(format("%s depends on %s", dbName1, dbName2));
-			}
-			return 1;
-		} else if (other.dependsOnDatabase(this)) {
-			if (logger.isDebugEnabled()) {
-				logger.debug(format("%s depends on %s", dbName2, dbName1));
-			}
-			return -1;
-		} else if (hasDatabaseDependencies()) {
-			/**
-			 * The thinking here is that if both have dependencies, we still want one to be considered "greater than"
-			 * the other. Treating them as equal may result in them not being sorted into a position where they're now
-			 * next to databases that they either depend on or are depended on.
-			 */
-			if (logger.isDebugEnabled()) {
-				logger.debug(format("%s has database dependencies, though not on %s", dbName1, dbName2));
-			}
-			return 1;
-		} else if (other.hasDatabaseDependencies()) {
-			if (logger.isDebugEnabled()) {
-				logger.debug(format("%s has database dependencies and %s does not", dbName2, dbName1));
-			}
-			return -1;
+		if (StringUtils.hasText(triggersDatabase)) {
+			list.add(triggersDatabase);
 		}
-
-		if (logger.isDebugEnabled()) {
-			logger.debug(format("%s and %s do not have any dependencies", dbName1, dbName2));
+		if (StringUtils.hasText(securityDatabase)) {
+			list.add(securityDatabase);
 		}
-		return 0;
-	}
-
-	/**
-	 * @param other
-	 * @return true if the name of the other database equals the name of this database object's schema database,
-	 * triggers database, or security database
-	 */
-	public boolean dependsOnDatabase(Database other) {
-		String otherName = other.getDatabaseName();
-
-		if (otherName == null) {
-			return false;
-		}
-
-		return otherName.equals(schemaDatabase) || otherName.equals(triggersDatabase) || otherName.equals(securityDatabase);
-	}
-
-	/**
-	 * @return true if this database depends on any other database
-	 */
-	public boolean hasDatabaseDependencies() {
-		return (schemaDatabase != null && schemaDatabase.trim().length() > 0) ||
-			(triggersDatabase != null && triggersDatabase.trim().length() > 0) ||
-			(securityDatabase != null && securityDatabase.trim().length() > 0);
+		return list;
 	}
 
 	public String getDatabaseName() {

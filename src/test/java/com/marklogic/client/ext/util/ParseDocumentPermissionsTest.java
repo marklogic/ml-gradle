@@ -19,4 +19,16 @@ public class ParseDocumentPermissionsTest extends Assert {
 		assertEquals(2, perms.get("rest-admin").size());
 		assertEquals(1, perms.get("rest-extension-user").size());
 	}
+
+	@Test
+	public void badInput() {
+		String str = "rest-admin,read,rest-admin";
+		try {
+			parser.parsePermissions(str, new DocumentMetadataHandle().getPermissions());
+			fail("An IllegalArgumentException should be thrown because the permissions string is missing a second capability " +
+				"to go with the second role");
+		} catch (IllegalArgumentException ex) {
+			assertTrue(ex.getMessage().startsWith("Unable to parse permissions string"));
+		}
+	}
 }

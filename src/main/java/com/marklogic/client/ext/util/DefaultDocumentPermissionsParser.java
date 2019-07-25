@@ -12,6 +12,10 @@ public class DefaultDocumentPermissionsParser implements DocumentPermissionsPars
             String[] tokens = str.split(",");
             for (int i = 0; i < tokens.length; i += 2) {
                 String role = tokens[i];
+                if (i + 1 >= tokens.length) {
+                	throw new IllegalArgumentException("Unable to parse permissions string, which must be a comma-separated " +
+		                "list of role names and capabilities - i.e. role1,read,role2,update,role3,execute; string: " + str);
+                }
                 String capability = tokens[i + 1];
                 Capability c = null;
                 if (capability.equals("execute")) {

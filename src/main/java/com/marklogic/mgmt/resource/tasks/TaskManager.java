@@ -1,11 +1,15 @@
 package com.marklogic.mgmt.resource.tasks;
 
 import com.marklogic.mgmt.ManageClient;
+import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.SaveReceipt;
+import com.marklogic.mgmt.api.API;
+import com.marklogic.mgmt.api.task.Task;
 import com.marklogic.mgmt.resource.AbstractResourceManager;
 import com.marklogic.mgmt.resource.requests.RequestManager;
 import com.marklogic.rest.util.Fragment;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -137,7 +141,7 @@ public class TaskManager extends AbstractResourceManager {
 		final String taskPath = payloadParser.getPayloadFieldValue(payload, "task-path", false);
 
 		SaveReceipt receipt = super.createNewResource(payload, taskPath);
-		updateNewTaskIfItShouldBeDisabled(payload, taskPath);
+		updateNewTaskIfItShouldBeDisabled(payload, receipt);
 		return receipt;
 	}
 
@@ -146,12 +150,50 @@ public class TaskManager extends AbstractResourceManager {
 	 * task isn't actually disabled. So an update call is made to the task right after it's created.
 	 *
 	 * @param payload
-	 * @param taskPath
+	 * @param receipt
+	 */
+	protected void updateNewTaskIfItShouldBeDisabled(String payload, SaveReceipt receipt) {
+		String enabled = payloadParser.getPayloadFieldValue(payload, "task-enabled", false);
+		if ("false".equalsIgnoreCase(enabled)) {
+			// We don't reuse updateResource here since that first deletes the task
+			URI uri = receipt.getResponse().getHeaders().getLocation();
+			// Expecting a path of "/manage/(version)/tasks/(taskId)"
+			String[] tokens = uri.getPath().split("/");
+			final String taskId = tokens[tokens.length - 1];
+
+			Task task = new Task(new API(getManageClient()), taskId);
+			task.setTaskEnabled(false);
+
+			String path = getPropertiesPath(taskId);
+			path = appendParamsAndValuesToPath(path, getUpdateResourceParams(payload));
+			logger.info("Updating new scheduled task so it is disabled; task ID: " + taskId);
+			putPayload(getManageClient(), path, task.getJson());
+		}
+	}
+
+	/**
+	 * Per ticket #367, when a task is updated, it is first deleted. This is to workaround Manage API behavior which
+	 * does not allow for any property besides "task-enabled" to be updated on a scheduled task. But it's often handy
+	 * during a deployment to update some other property of a scheduled task. Unfortunately, that throws an error.
+	 *
+	 * So to work around that, when a scheduled task is updated, it's first deleted. Then the task is created, which
+	 * includes making another call to disable the task if task-enabled is set to false.
+	 *
+	 * @param payload
+	 * @param resourceId
 	 * @return
 	 */
-	protected SaveReceipt updateNewTaskIfItShouldBeDisabled(String payload, String taskPath) {
-		String enabled = payloadParser.getPayloadFieldValue(payload, "task-enabled", false);
-		return "false".equals(enabled) ? super.updateResource(payload, taskPath) : null;
+	@Override
+	public SaveReceipt updateResource(String payload, String resourceId) {
+		logger.info("Deleting scheduled task first since updates are not allowed except for task-enabled; task ID: " + resourceId);
+		deleteByIdField(resourceId);
+
+		PayloadParser parser = new PayloadParser();
+		payload = parser.excludeProperties(payload, "task-id");
+		String taskPath = parser.getPayloadFieldValue(payload, "task-path");
+		SaveReceipt receipt = super.createNewResource(payload, taskPath);
+		updateNewTaskIfItShouldBeDisabled(payload, receipt);
+		return receipt;
 	}
 
 	public List<String> getTaskPaths() {

@@ -8,7 +8,10 @@ import com.marklogic.mgmt.util.SimplePropertySource;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BuildForestTest extends Assert {
 
@@ -89,7 +92,7 @@ public class BuildForestTest extends Assert {
 		verifyNameAndHost(forests.get(2), "testdb-3", "host3");
 
 		forests = builder.buildForests(new ForestPlan("testdb", "host1", "host2", "host3")
-			.withForestsPerDataDirectory(3).withExistingForestsPerDataDirectory(1), config);
+			.withForestsPerDataDirectory(3).withExistingForests(forests), config);
 		assertEquals(6, forests.size());
 		verifyNameAndHost(forests.get(0), "testdb-4", "host1");
 		verifyNameAndHost(forests.get(1), "testdb-5", "host1");
@@ -97,6 +100,50 @@ public class BuildForestTest extends Assert {
 		verifyNameAndHost(forests.get(3), "testdb-7", "host2");
 		verifyNameAndHost(forests.get(4), "testdb-8", "host3");
 		verifyNameAndHost(forests.get(5), "testdb-9", "host3");
+	}
+
+	@Test
+	public void twoDataDirectories() {
+		AppConfig config = new DefaultAppConfigFactory().newAppConfig();
+		Map<String, List<String>> dataDirectories = new HashMap<>();
+		dataDirectories.put("testdb", Arrays.asList("/path1", "/path2"));
+		config.setDatabaseDataDirectories(dataDirectories);
+
+		List<Forest> forests = builder.buildForests(new ForestPlan("testdb", "host1", "host2", "host3").withForestsPerDataDirectory(1), config);
+		assertEquals(6, forests.size());
+		verifyNameAndHost(forests.get(0), "testdb-1", "host1");
+		verifyNameAndHost(forests.get(1), "testdb-2", "host1");
+		verifyNameAndHost(forests.get(2), "testdb-3", "host2");
+		verifyNameAndHost(forests.get(3), "testdb-4", "host2");
+		verifyNameAndHost(forests.get(4), "testdb-5", "host3");
+		verifyNameAndHost(forests.get(5), "testdb-6", "host3");
+
+		forests = builder.buildForests(new ForestPlan("testdb", "host1", "host2", "host3")
+			.withForestsPerDataDirectory(2).withExistingForests(forests), config);
+		assertEquals(6, forests.size());
+		verifyNameAndHost(forests.get(0), "testdb-7", "host1");
+		verifyNameAndHost(forests.get(1), "testdb-8", "host1");
+		verifyNameAndHost(forests.get(2), "testdb-9", "host2");
+		verifyNameAndHost(forests.get(3), "testdb-10", "host2");
+		verifyNameAndHost(forests.get(4), "testdb-11", "host3");
+		verifyNameAndHost(forests.get(5), "testdb-12", "host3");
+	}
+
+	@Test
+	public void hostIsAdded() {
+		AppConfig config = new DefaultAppConfigFactory().newAppConfig();
+		List<Forest> forests = builder.buildForests(new ForestPlan("testdb", "host1", "host2").withForestsPerDataDirectory(1), config);
+		assertEquals(2, forests.size());
+		verifyNameAndHost(forests.get(0), "testdb-1", "host1");
+		verifyNameAndHost(forests.get(1), "testdb-2", "host2");
+
+		forests = builder.buildForests(new ForestPlan("testdb", "host1", "host2", "host3")
+			.withForestsPerDataDirectory(2).withExistingForests(forests), config);
+		assertEquals(4, forests.size());
+		verifyNameAndHost(forests.get(0), "testdb-3", "host1");
+		verifyNameAndHost(forests.get(1), "testdb-4", "host2");
+		verifyNameAndHost(forests.get(2), "testdb-5", "host3");
+		verifyNameAndHost(forests.get(3), "testdb-6", "host3");
 	}
 
 	@Test

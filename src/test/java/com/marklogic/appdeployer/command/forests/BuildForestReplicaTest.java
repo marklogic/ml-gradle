@@ -12,12 +12,14 @@ import java.util.List;
 
 public class BuildForestReplicaTest extends Assert {
 
+	private ForestBuilder builder = new ForestBuilder();
+
 	@Test
 	public void customNamingStrategyWithDistributedStrategy() {
 		AppConfig appConfig = newAppConfig("mlForestsPerHost", "my-database,2");
 		addCustomNamingStrategy(appConfig);
 
-		List<Forest> forests = new ForestBuilder().buildForests(
+		List<Forest> forests = builder.buildForests(
 			new ForestPlan("my-database", "host1", "host2", "host3").withReplicaCount(2), appConfig);
 
 		Forest f1 = forests.get(0);
@@ -53,6 +55,30 @@ public class BuildForestReplicaTest extends Assert {
 		assertEquals("host2", f5.getForestReplica().get(1).getHost());
 	}
 
+	@Test
+	public void hostIsAdded() {
+		AppConfig appConfig = newAppConfig();
+		List<Forest> forests = builder.buildForests(new ForestPlan("testdb", "host1", "host2", "host3")
+			.withForestsPerDataDirectory(1).withReplicaCount(1), appConfig);
+		assertEquals(3, forests.size());
+		assertEquals("testdb-1-replica-1", forests.get(0).getForestReplica().get(0).getReplicaName());
+		assertEquals("host2", forests.get(0).getForestReplica().get(0).getHost());
+		assertEquals("testdb-2-replica-1", forests.get(1).getForestReplica().get(0).getReplicaName());
+		assertEquals("host3", forests.get(1).getForestReplica().get(0).getHost());
+		assertEquals("testdb-3-replica-1", forests.get(2).getForestReplica().get(0).getReplicaName());
+		assertEquals("host1", forests.get(2).getForestReplica().get(0).getHost());
+
+		forests = builder.buildForests(new ForestPlan("testdb", "host1", "host2", "host3", "host4")
+			.withForestsPerDataDirectory(1).withExistingForests(forests).withReplicaCount(1), appConfig);
+		assertEquals(1, forests.size());
+		assertEquals("testdb-4-replica-1", forests.get(0).getForestReplica().get(0).getReplicaName());
+		assertEquals(
+			"When adding a new host and creating replicas, the replicas will naturally be uneven because the existing " +
+				"forests on hosts 1, 2, and 3 won't have their replicas moved to 4 automatically, and thus host 4 won't " +
+				"have any replicas on it. And for the new replicas, we expect those to start being created on the first host.",
+			"host1", forests.get(0).getForestReplica().get(0).getHost());
+	}
+
 	/**
 	 * This shows how replicas for host 1 all end up on host 2. The distributed strategy above is preferred, and
 	 * the grouped one is deprecated, but this test exists to show how the grouped one differs while it still exists.
@@ -64,7 +90,7 @@ public class BuildForestReplicaTest extends Assert {
 		addCustomNamingStrategy(appConfig);
 		appConfig.setReplicaBuilderStrategy(new GroupedReplicaBuilderStrategy());
 
-		List<Forest> forests = new ForestBuilder().buildForests(
+		List<Forest> forests = builder.buildForests(
 			new ForestPlan("my-database", "host1", "host2", "host3").withReplicaCount(2), appConfig);
 
 		Forest f1 = forests.get(0);
@@ -171,7 +197,7 @@ public class BuildForestReplicaTest extends Assert {
 	private ForestReplica buildForestReplica(String... propertyNamesAndValues) {
 		AppConfig config = newAppConfig(propertyNamesAndValues);
 
-		Forest forest = new ForestBuilder().buildForests(
+		Forest forest = builder.buildForests(
 			new ForestPlan("my-database", "host1", "host2").withReplicaCount(1), config).get(0);
 		ForestReplica replica = forest.getForestReplica().get(0);
 		assertEquals("my-database-1-replica-1", replica.getReplicaName());

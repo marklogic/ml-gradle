@@ -8,6 +8,7 @@ import com.marklogic.mgmt.mapper.DefaultResourceMapper;
 import com.marklogic.mgmt.mapper.ResourceMapper;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +20,7 @@ public class ForestBuilder extends LoggingObject {
 
 	private ForestNamingStrategy forestNamingStrategy;
 	private ReplicaBuilderStrategy replicaBuilderStrategy;
+	private ResourceMapper resourceMapper;
 
 	public ForestBuilder() {
 		this(new DefaultForestNamingStrategy());
@@ -27,6 +29,7 @@ public class ForestBuilder extends LoggingObject {
 	public ForestBuilder(ForestNamingStrategy forestNamingStrategy) {
 		this.forestNamingStrategy = forestNamingStrategy;
 		this.replicaBuilderStrategy = new DistributedReplicaBuilderStrategy();
+		this.resourceMapper = new DefaultResourceMapper(new API(null));
 	}
 
 	/**
@@ -42,66 +45,100 @@ public class ForestBuilder extends LoggingObject {
 	 */
 	public List<Forest> buildForests(ForestPlan forestPlan, AppConfig appConfig) {
 		final String databaseName = forestPlan.getDatabaseName();
-		final List<String> hostNames = forestPlan.getHostNames();
 
-		List<String> dataDirectories = determineDataDirectories(databaseName, appConfig);
+		// Find out what forests we have already, keyed on host and then data directory
+		Map<String, Map<String, List<Forest>>> existingForestsMap = existingForestsMap(forestPlan);
 
-		int forestsPerDataDirectory = determineForestsPerDataDirectory(forestPlan, appConfig);
+		final int forestsPerDataDirectory = determineForestsPerDataDirectory(forestPlan, appConfig);
+		final List<String> dataDirectories = determineDataDirectories(databaseName, appConfig);
 
-		// Number of hosts * number of data directories * number of forests per data directory
-		int numberToBuild = hostNames.size() * dataDirectories.size() * forestsPerDataDirectory;
+		List<Forest> forestsToBuild = new ArrayList<>();
 
-		// So now we have numberToBuild - we want to iterate over each host, and over each data directory
-		int forestCounter = (hostNames.size() * dataDirectories.size() * forestPlan.getExistingForestsPerDataDirectory()) + 1;
+		// For naming any new forests we build, start with the current count and bump up as we build each forest
+		int forestCounter = forestPlan.getExistingForests().size();
 
-		forestsPerDataDirectory -= forestPlan.getExistingForestsPerDataDirectory();
-
-		List<Forest> forests = new ArrayList<>();
-
-		for (String hostName : hostNames) {
+		/**
+		 * Now loop over each host, and for each host, loop over each data directory. See how many forests exist already
+		 * in that data directory. Build new forests as needed so each data directory has the correct amount.
+		 */
+		for (String hostName : forestPlan.getHostNames()) {
+			Map<String, List<Forest>> hostMap = existingForestsMap.get(hostName);
 			for (String dataDirectory : dataDirectories) {
-				for (int i = 0; i < forestsPerDataDirectory; i++) {
-					if (forestCounter <= numberToBuild) {
-						Forest forest = newForest(forestPlan);
-						forest.setForestName(getForestName(databaseName, forestCounter, appConfig));
-						forest.setHost(hostName);
-						forest.setDatabase(databaseName);
+				int forestsToCreate = forestsPerDataDirectory;
+				if (hostMap != null && hostMap.containsKey(dataDirectory)) {
+					forestsToCreate -= hostMap.get(dataDirectory).size();
+				}
+				for (int i = 0; i < forestsToCreate; i++) {
+					forestCounter++;
+					Forest forest = newForest(forestPlan);
+					forest.setForestName(getForestName(databaseName, forestCounter, appConfig));
+					forest.setHost(hostName);
+					forest.setDatabase(databaseName);
 
-						if (dataDirectory != null && dataDirectory.trim().length() > 0) {
-							forest.setDataDirectory(dataDirectory);
-						}
-
-						// First see if we have any database-agnostic forest directories
-						if (appConfig.getForestFastDataDirectory() != null) {
-							forest.setFastDataDirectory(appConfig.getForestFastDataDirectory());
-						}
-						if (appConfig.getForestLargeDataDirectory() != null) {
-							forest.setLargeDataDirectory(appConfig.getForestLargeDataDirectory());
-						}
-
-						// Now check for database-specific forest directories
-						Map<String, String> map = appConfig.getDatabaseFastDataDirectories();
-						if (map != null && map.containsKey(databaseName)) {
-							forest.setFastDataDirectory(map.get(databaseName));
-						}
-						map = appConfig.getDatabaseLargeDataDirectories();
-						if (map != null && map.containsKey(databaseName)) {
-							forest.setLargeDataDirectory(map.get(databaseName));
-						}
-
-						forests.add(forest);
-
-						forestCounter++;
+					if (dataDirectory != null && dataDirectory.trim().length() > 0) {
+						forest.setDataDirectory(dataDirectory);
 					}
+
+					// First see if we have any database-agnostic forest directories
+					if (appConfig.getForestFastDataDirectory() != null) {
+						forest.setFastDataDirectory(appConfig.getForestFastDataDirectory());
+					}
+					if (appConfig.getForestLargeDataDirectory() != null) {
+						forest.setLargeDataDirectory(appConfig.getForestLargeDataDirectory());
+					}
+
+					// Now check for database-specific forest directories
+					Map<String, String> map = appConfig.getDatabaseFastDataDirectories();
+					if (map != null && map.containsKey(databaseName)) {
+						forest.setFastDataDirectory(map.get(databaseName));
+					}
+					map = appConfig.getDatabaseLargeDataDirectories();
+					if (map != null && map.containsKey(databaseName)) {
+						forest.setLargeDataDirectory(map.get(databaseName));
+					}
+
+					forestsToBuild.add(forest);
 				}
 			}
 		}
 
 		if (forestPlan.getReplicaCount() > 0) {
-			addReplicasToForests(forests, forestPlan, appConfig, dataDirectories);
+			addReplicasToForests(forestsToBuild, forestPlan, appConfig, dataDirectories);
 		}
 
-		return forests;
+		return forestsToBuild;
+	}
+
+	/**
+	 * Returns a map with keys of host names, where each value is a map whose keys are data directory paths bound to
+	 * a list of forests that already exist at each data directory path.
+	 *
+	 * @param forestPlan
+	 * @return
+	 */
+	protected Map<String, Map<String, List<Forest>>> existingForestsMap(ForestPlan forestPlan) {
+		Map<String, Map<String, List<Forest>>> existingForestsMap = new LinkedHashMap<>();
+		for (Forest f : forestPlan.getExistingForests()) {
+			String host = f.getHost();
+			String dataDirectory = f.getDataDirectory();
+			if (dataDirectory == null) {
+				dataDirectory = "";
+			}
+
+			Map<String, List<Forest>> dataDirectoryMap = existingForestsMap.get(host);
+			if (dataDirectoryMap == null) {
+				dataDirectoryMap = new LinkedHashMap<>();
+				existingForestsMap.put(host, dataDirectoryMap);
+			}
+
+			List<Forest> list = dataDirectoryMap.get(dataDirectory);
+			if (list == null) {
+				list = new ArrayList<>();
+				dataDirectoryMap.put(dataDirectory, list);
+			}
+			list.add(f);
+		}
+		return existingForestsMap;
 	}
 
 	/**
@@ -146,7 +183,6 @@ public class ForestBuilder extends LoggingObject {
 			return new Forest();
 		}
 		try {
-			ResourceMapper resourceMapper = new DefaultResourceMapper(new API(null));
 			return resourceMapper.readResource(template, Forest.class);
 		} catch (Exception ex) {
 			logger.warn("Unable to construct a new Forest using template: " + template, ex);
@@ -229,7 +265,6 @@ public class ForestBuilder extends LoggingObject {
 	}
 
 	/**
-	 *
 	 * @param databaseName
 	 * @param forestNumber
 	 * @param appConfig
@@ -240,7 +275,6 @@ public class ForestBuilder extends LoggingObject {
 	}
 
 	/**
-	 *
 	 * @param databaseName
 	 * @param appConfig
 	 * @return

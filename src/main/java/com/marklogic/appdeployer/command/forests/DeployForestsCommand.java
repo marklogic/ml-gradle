@@ -4,9 +4,12 @@ import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
+import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.configuration.Configuration;
 import com.marklogic.mgmt.api.configuration.Configurations;
 import com.marklogic.mgmt.api.forest.Forest;
+import com.marklogic.mgmt.mapper.DefaultResourceMapper;
+import com.marklogic.mgmt.mapper.ResourceMapper;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.forests.ForestManager;
 import com.marklogic.mgmt.resource.hosts.DefaultHostNameProvider;
@@ -113,12 +116,12 @@ public class DeployForestsCommand extends AbstractCommand {
 		List<String> hostNames = new HostManager(context.getManageClient()).getHostNames();
 		hostNames = determineHostNamesForForest(context, hostNames);
 
-		int countOfExistingForests = new DatabaseManager(context.getManageClient()).getPrimaryForestIds(this.databaseName).size();
-
+		// Need to know what primary forests exist already in case more need to be added, or a new host has been added
+		List<Forest> forests = getExistingPrimaryForests(context, this.databaseName);
 		ForestPlan forestPlan = new ForestPlan(this.databaseName, hostNames)
 			.withTemplate(template)
 			.withForestsPerDataDirectory(this.forestsPerHost)
-			.withExistingForestsPerDataDirectory(countOfExistingForests);
+			.withExistingForests(forests);
 
 		if (includeReplicas) {
 			Map<String, Integer> map = context.getAppConfig().getDatabaseNamesAndReplicaCounts();
@@ -131,6 +134,18 @@ public class DeployForestsCommand extends AbstractCommand {
 		}
 
 		return forestBuilder.buildForests(forestPlan, context.getAppConfig());
+	}
+
+	protected List<Forest> getExistingPrimaryForests(CommandContext context, String databaseName) {
+		List<String> forestIds = new DatabaseManager(context.getManageClient()).getPrimaryForestIds(databaseName);
+		ForestManager forestMgr = new ForestManager(context.getManageClient());
+		ResourceMapper mapper = new DefaultResourceMapper(new API(context.getManageClient()));
+		List<Forest> forests = new ArrayList<>();
+		for (String forestId : forestIds) {
+			String json = forestMgr.getPropertiesAsJson(forestId);
+			forests.add(mapper.readResource(json, Forest.class));
+		}
+		return forests;
 	}
 
 	protected String buildForestTemplate(CommandContext context, ForestManager forestManager) {

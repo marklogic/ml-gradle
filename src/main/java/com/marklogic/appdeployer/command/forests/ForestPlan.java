@@ -2,6 +2,7 @@ package com.marklogic.appdeployer.command.forests;
 
 import com.marklogic.mgmt.api.forest.Forest;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -11,7 +12,7 @@ public class ForestPlan {
 	private List<String> hostNames;
 	private String template;
 	private int forestsPerDataDirectory = 1;
-	private int existingForestsPerDataDirectory = 0;
+	private List<Forest> existingForests = new ArrayList<>();
 	private int replicaCount = 0;
 
 	public ForestPlan(String databaseName, String... hostNames) {
@@ -33,8 +34,8 @@ public class ForestPlan {
 		return this;
 	}
 
-	public ForestPlan withExistingForestsPerDataDirectory(int count) {
-		this.existingForestsPerDataDirectory = count;
+	public ForestPlan withExistingForests(List<Forest> existingForests) {
+		this.existingForests = existingForests;
 		return this;
 	}
 
@@ -55,15 +56,15 @@ public class ForestPlan {
 		return forestsPerDataDirectory;
 	}
 
-	public int getExistingForestsPerDataDirectory() {
-		return existingForestsPerDataDirectory;
-	}
-
 	public int getReplicaCount() {
 		return replicaCount;
 	}
 
 	public String getTemplate() {
 		return template;
+	}
+
+	public List<Forest> getExistingForests() {
+		return existingForests;
 	}
 }

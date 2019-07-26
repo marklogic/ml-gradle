@@ -5,6 +5,7 @@ import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.databases.DeployDatabaseCommand;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.ManageConfig;
+import com.marklogic.mgmt.resource.hosts.HostManager;
 
 import java.util.*;
 
@@ -28,29 +29,36 @@ public class ConfigureForestReplicasDebug {
 		map.put(dbName, 1);
 		appConfig.setDatabaseNamesAndReplicaCounts(map);
 
+		List<String> hostNames = new HostManager(manageClient).getHostNames();
+
 		Map<String, List<String>> databaseHosts = new LinkedHashMap<>();
 		List<String> hosts = new ArrayList<>();
+		hosts.add(hostNames.get(0));
+		hosts.add(hostNames.get(1));
 		databaseHosts.put(dbName, hosts);
-		appConfig.setDatabaseHosts(databaseHosts);
+		//appConfig.setDatabaseHosts(databaseHosts);
 
 		Map<String, List<String>> databaseGroups = new LinkedHashMap<>();
 		List<String> groups = new ArrayList<>();
 		groups.add("Default");
 		databaseGroups.put(dbName, groups);
-		appConfig.setDatabaseGroups(databaseGroups);
+		//appConfig.setDatabaseGroups(databaseGroups);
 
 		CommandContext context = new CommandContext(appConfig, manageClient, null);
 
 		DeployDatabaseCommand ddc = new DeployDatabaseCommand();
-		ddc.setForestsPerHost(1);
+		ddc.setForestsPerHost(2);
 		ddc.setCreateDatabaseWithoutFile(true);
 		ddc.setDatabaseName(dbName);
 
 		ConfigureForestReplicasCommand cfrc = new ConfigureForestReplicasCommand();
+		Map<String, Integer> replicaCounts = new HashMap<>();
+		replicaCounts.put(dbName, 1);
+		appConfig.setDatabaseNamesAndReplicaCounts(replicaCounts);
 
 		// Deploy the database, and then configure replicas
-		//ddc.execute(context);
-		//cfrc.execute(context);
+		ddc.execute(context);
+		cfrc.execute(context);
 
 		// Deploy again to make sure there are no errors
 		//cfrc.execute(context);

@@ -185,7 +185,7 @@ public class AppConfig {
     private Map<String, List<String>> databaseDataDirectories;
     private Map<String, String> databaseFastDataDirectories;
     private Map<String, String> databaseLargeDataDirectories;
-    private Map<String, String> databaseReplicaDataDirectories;
+    private Map<String, List<String>> databaseReplicaDataDirectories;
     private Map<String, String> databaseReplicaFastDataDirectories;
     private Map<String, String> databaseReplicaLargeDataDirectories;
 
@@ -1074,11 +1074,11 @@ public class AppConfig {
 		this.forestLargeDataDirectory = forestLargeDataDirectory;
 	}
 
-	public Map<String, String> getDatabaseReplicaDataDirectories() {
+	public Map<String, List<String>> getDatabaseReplicaDataDirectories() {
 		return databaseReplicaDataDirectories;
 	}
 
-	public void setDatabaseReplicaDataDirectories(Map<String, String> databaseReplicaDataDirectories) {
+	public void setDatabaseReplicaDataDirectories(Map<String, List<String>> databaseReplicaDataDirectories) {
 		this.databaseReplicaDataDirectories = databaseReplicaDataDirectories;
 	}
 

@@ -343,7 +343,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		p.setProperty("mlDatabaseFastDataDirectories", "Documents,/fast/documents,Security,/fast/security");
 		p.setProperty("mlDatabaseLargeDataDirectories", "Documents,/large/documents,Security,/large/security");
 
-		p.setProperty("mlDatabaseReplicaDataDirectories", "Documents,/data/replicas,Security,/data/security/replicas");
+		p.setProperty("mlDatabaseReplicaDataDirectories", "Documents,/data/replicas|/data/replicas2,Security,/data/security/replicas");
 		p.setProperty("mlDatabaseReplicaFastDataDirectories", "Documents,/fast/replicas,Security,/fast/security/replicas");
 		p.setProperty("mlDatabaseReplicaLargeDataDirectories", "Documents,/large/replicas,Security,/large/security/replicas");
 
@@ -505,9 +505,11 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		assertEquals("/large/documents", map.get("Documents"));
 		assertEquals("/large/security", map.get("Security"));
 
-		map = config.getDatabaseReplicaDataDirectories();
-		assertEquals("/data/replicas", map.get("Documents"));
-		assertEquals("/data/security/replicas", map.get("Security"));
+		mapOfLists = config.getDatabaseReplicaDataDirectories();
+		assertEquals("/data/replicas", mapOfLists.get("Documents").get(0));
+		assertEquals("/data/replicas2", mapOfLists.get("Documents").get(1));
+		assertEquals("/data/security/replicas", mapOfLists.get("Security").get(0));
+
 		map = config.getDatabaseReplicaFastDataDirectories();
 		assertEquals("/fast/replicas", map.get("Documents"));
 		assertEquals("/fast/security/replicas", map.get("Security"));

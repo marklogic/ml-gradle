@@ -180,6 +180,48 @@ public class BuildForestReplicaTest extends Assert {
 		assertEquals("/my/replica/large", replica.getLargeDataDirectory());
 	}
 
+	@Test
+	public void multipleReplicaDataDirectories() {
+		AppConfig config = newAppConfig("mlDatabaseReplicaDataDirectories", "my-database,/path1|/path2");
+
+		List<Forest> forests = builder.buildForests(
+			new ForestPlan("my-database", "host1", "host2", "host3").withReplicaCount(2), config);
+
+		Forest f1 = forests.get(0);
+		assertEquals("my-database-1", f1.getForestName());
+		assertEquals("my-database-1-replica-1", f1.getForestReplica().get(0).getReplicaName());
+		assertEquals("host2", f1.getForestReplica().get(0).getHost());
+		assertEquals("/path1", f1.getForestReplica().get(0).getDataDirectory());
+		assertEquals("my-database-1-replica-2", f1.getForestReplica().get(1).getReplicaName());
+		assertEquals("host3", f1.getForestReplica().get(1).getHost());
+		assertEquals("/path2", f1.getForestReplica().get(1).getDataDirectory());
+
+		Forest f2 = forests.get(1);
+		assertEquals("my-database-2", f2.getForestName());
+		assertEquals("my-database-2-replica-1", f2.getForestReplica().get(0).getReplicaName());
+		assertEquals("host3", f2.getForestReplica().get(0).getHost());
+		assertEquals("/path1", f2.getForestReplica().get(0).getDataDirectory());
+		assertEquals("my-database-2-replica-2", f2.getForestReplica().get(1).getReplicaName());
+		assertEquals("host1", f2.getForestReplica().get(1).getHost());
+		assertEquals("/path2", f2.getForestReplica().get(1).getDataDirectory());
+
+		Forest f3 = forests.get(2);
+		assertEquals("my-database-3", f3.getForestName());
+		assertEquals("my-database-3-replica-1", f3.getForestReplica().get(0).getReplicaName());
+		assertEquals("host1", f3.getForestReplica().get(0).getHost());
+		assertEquals("/path1", f3.getForestReplica().get(0).getDataDirectory());
+		assertEquals("my-database-3-replica-2", f3.getForestReplica().get(1).getReplicaName());
+		assertEquals("host2", f3.getForestReplica().get(1).getHost());
+		assertEquals("/path2", f3.getForestReplica().get(1).getDataDirectory());
+
+//		for (Forest forest : forests) {
+//			System.out.println(forest.getForestName());
+//			for (ForestReplica replica : forest.getForestReplica()) {
+//				System.out.println(replica.getHost() + ":" + replica.getDataDirectory());
+//			}
+//		}
+	}
+
 	private void addCustomNamingStrategy(AppConfig appConfig) {
 		appConfig.getForestNamingStrategies().put("my-database", new ForestNamingStrategy() {
 			@Override

@@ -233,11 +233,11 @@ public class ForestBuilder extends LoggingObject {
 			replicaDataDirectories.add(appConfig.getReplicaForestDataDirectory());
 		}
 
-		Map<String, String> replicaDataDirectoryMap = appConfig.getDatabaseReplicaDataDirectories();
+		Map<String, List<String>> replicaDataDirectoryMap = appConfig.getDatabaseReplicaDataDirectories();
 		final String databaseName = forestPlan.getDatabaseName();
 		if (replicaDataDirectoryMap != null && replicaDataDirectoryMap.containsKey(databaseName)) {
 			replicaDataDirectories = new ArrayList<>();
-			replicaDataDirectories.add(replicaDataDirectoryMap.get(databaseName));
+			replicaDataDirectories.addAll(replicaDataDirectoryMap.get(databaseName));
 		}
 
 		return replicaDataDirectories;

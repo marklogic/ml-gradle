@@ -478,7 +478,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 
 		propertyConsumerMap.put("mlDatabaseReplicaDataDirectories", (config, prop) -> {
 			logger.info("Databases and replica forest data directories: " + prop);
-			config.setDatabaseReplicaDataDirectories(buildMapFromCommaDelimitedString(prop));
+			config.setDatabaseReplicaDataDirectories(buildMapOfListsFromDelimitedString(prop));
 		});
 
 		propertyConsumerMap.put("mlDatabaseReplicaFastDataDirectories", (config, prop) -> {

@@ -71,4 +71,11 @@ public class ValidateTdeTemplatesTest extends AbstractSchemasTest {
 		List<DocumentFile> files = loader.loadSchemas(Paths.get("src", "test", "resources", "bad-schemas", "bad-json").toString());
 		assertEquals("TDE validation is disabled, so the bad TDE template should have been loaded", 1, files.size());
 	}
+
+	@Test
+	public void mixedContent() {
+		List<DocumentFile> files = loader.loadSchemas(Paths.get("src", "test", "resources", "good-schemas", "xml-schemas").toString());
+		assertEquals("Verifying that the file still loads correctly even with processing instructions and comments in it",
+			1, files.size());
+	}
 }

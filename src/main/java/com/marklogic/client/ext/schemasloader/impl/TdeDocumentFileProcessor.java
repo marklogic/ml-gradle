@@ -2,13 +2,13 @@ package com.marklogic.client.ext.schemasloader.impl;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.client.DatabaseClient;
-import com.marklogic.client.FailedRequestException;
 import com.marklogic.client.eval.ServerEvaluationCall;
 import com.marklogic.client.ext.file.DocumentFile;
 import com.marklogic.client.ext.file.DocumentFileProcessor;
 import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.client.io.Format;
 import com.marklogic.client.io.JacksonHandle;
+import com.marklogic.client.io.StringHandle;
 import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
@@ -75,48 +75,46 @@ public class TdeDocumentFileProcessor extends LoggingObject implements DocumentF
 				logger.warn("Could not read TDE template from file, will not validate; cause: " + e.getMessage());
 			}
 			if (fileContent != null) {
-				try {
-					ServerEvaluationCall call = null;
-					if (Format.XML.equals(documentFile.getFormat())) {
-						call = buildXqueryCall(documentFile, fileContent);
-					} else if (Format.JSON.equals(documentFile.getFormat())) {
-						call = buildJavascriptCall(documentFile, fileContent);
-					} else {
-						logger.info("Unrecognized file format, will not try to validate TDE template in file: " + file + "; format: " + documentFile.getFormat());
-					}
+				ServerEvaluationCall call = null;
+				if (Format.XML.equals(documentFile.getFormat())) {
+					call = buildXqueryCall(documentFile, fileContent);
+				} else if (Format.JSON.equals(documentFile.getFormat())) {
+					call = buildJavascriptCall(documentFile, fileContent);
+				} else {
+					logger.info("Unrecognized file format, will not try to validate TDE template in file: " + file + "; format: " + documentFile.getFormat());
+				}
 
-					if (call != null) {
-						ObjectNode node = (ObjectNode) call.eval(new JacksonHandle()).get();
-						if (node.get("valid").asBoolean()) {
-							logger.info("TDE template passed validation: " + file);
-						} else {
-							throw new RuntimeException(format("TDE template failed validation; file: %s; cause: %s", file, node.get("message").asText()));
-						}
+				if (call != null) {
+					ObjectNode node = (ObjectNode) call.eval(new JacksonHandle()).get();
+					if (node.get("valid").asBoolean()) {
+						logger.info("TDE template passed validation: " + file);
+					} else {
+						throw new RuntimeException(format("TDE template failed validation; file: %s; cause: %s", file, node.get("message").asText()));
 					}
-				} catch (FailedRequestException e) {
-					logger.warn("Unexpected error when trying to validate TDE template in file: " + file + "; cause: " + e.getMessage());
 				}
 			}
 		}
 	}
 
 	protected ServerEvaluationCall buildJavascriptCall(DocumentFile documentFile, String fileContent) {
-		StringBuilder script = new StringBuilder("xdmp.invokeFunction(function() {var tde = require('/MarkLogic/tde.xqy');");
+		StringBuilder script = new StringBuilder("var template; xdmp.invokeFunction(function() {var tde = require('/MarkLogic/tde.xqy');");
 		script.append(format(
-			"\nreturn tde.validate([xdmp.toJSON(%s)], ['%s'])}, {database: xdmp.database('%s')})",
-			fileContent, documentFile.getUri(), tdeValidationDatabase
+			"\nreturn tde.validate([xdmp.toJSON(template)], ['%s'])}, {database: xdmp.database('%s')})",
+			documentFile.getUri(), tdeValidationDatabase
 		));
-		return databaseClient.newServerEval().javascript(script.toString());
+		return databaseClient.newServerEval().javascript(script.toString())
+			.addVariable("template", new StringHandle(fileContent).withFormat(Format.JSON));
 	}
 
 	protected ServerEvaluationCall buildXqueryCall(DocumentFile documentFile, String fileContent) {
 		StringBuilder script = new StringBuilder("import module namespace tde = 'http://marklogic.com/xdmp/tde' at '/MarkLogic/tde.xqy'; ");
-		script.append(format("\nxdmp:invoke-function(function() { \nlet $t := %s ", fileContent));
+		script.append("\ndeclare variable $template external; ");
+		script.append("\nxdmp:invoke-function(function() { ");
 		script.append(format(
-			"\nreturn tde:validate($t, '%s')}, <options xmlns='xdmp:eval'><database>{xdmp:database('%s')}</database></options>)",
+			"\ntde:validate($template, '%s')}, <options xmlns='xdmp:eval'><database>{xdmp:database('%s')}</database></options>)",
 			documentFile.getUri(), tdeValidationDatabase
 		));
-		return databaseClient.newServerEval().xquery(script.toString());
+		return databaseClient.newServerEval().xquery(script.toString()).addVariable("template", new StringHandle(fileContent).withFormat(Format.XML));
 	}
 
 	public DatabaseClient getDatabaseClient() {

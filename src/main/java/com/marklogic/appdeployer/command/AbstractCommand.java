@@ -1,6 +1,7 @@
 package com.marklogic.appdeployer.command;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.SaveReceipt;
@@ -13,6 +14,7 @@ import com.marklogic.mgmt.cma.ConfigurationManager;
 import com.marklogic.mgmt.mapper.DefaultResourceMapper;
 import com.marklogic.mgmt.mapper.ResourceMapper;
 import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.util.ObjectMapperFactory;
 import com.marklogic.rest.util.JsonNodeUtil;
 import com.marklogic.rest.util.PropertyBasedBiPredicate;
@@ -502,6 +504,44 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 			logger.warn("resourceFilenameFilter does not implement " + IncrementalFilenameFilter.class.getName() + ", and thus " +
 				"setIncrementalMode cannot be invoked");
 		}
+	}
+
+	/**
+	 * By default, the name of a database resource directory is assumed to be the name of the database that the resources
+	 * within the directory should be associated with. But starting in 3.16.0, if the name of the directory doesn't
+	 * match that of an existing database, then a check is made to see if there's a database file in the given ConfigDir
+	 * that has the same name, minus its extension, as the database directory name. If so, then the database-name is
+	 * extracted from that file and used as the database name. If not, an exception is thrown.
+	 *
+	 * @param context
+	 * @param configDir
+	 * @param databaseResourceDir
+	 * @return
+	 */
+	protected String determineDatabaseNameForDatabaseResourceDirectory(CommandContext context, ConfigDir configDir, File databaseResourceDir) {
+		final String dirName = databaseResourceDir.getName();
+
+		if (new DatabaseManager(context.getManageClient()).exists(dirName)) {
+			return dirName;
+		}
+
+		File databasesDir = configDir.getDatabasesDir();
+		for (File f : listFilesInDirectory(databasesDir)) {
+			String name = f.getName();
+			int index = name.lastIndexOf('.');
+			name = index > 0 ? name.substring(0, index) : name;
+			if (dirName.equals(name)) {
+				logger.info("Found database file with same name, minus its extension, as the database resource directory; " +
+					"file: " + f);
+				String payload = copyFileToString(f, context);
+				String databaseName = new PayloadParser().getPayloadFieldValue(payload, "database-name");
+				logger.info("Associating database resource directory with database: " + databaseName);
+				return databaseName;
+			}
+		}
+
+		throw new RuntimeException("Could not determine database to associate with database resource directory: " +
+			databaseResourceDir);
 	}
 
 	public void setPayloadTokenReplacer(PayloadTokenReplacer payloadTokenReplacer) {

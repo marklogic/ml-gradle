@@ -29,5 +29,8 @@ public class DeployTriggersToMultipleDatabasesTest extends AbstractAppDeployerTe
 
 		triggerManager = new TriggerManager(manageClient, "other-" + appConfig.getTriggersDatabaseName());
 		assertTrue(triggerManager.exists("other-trigger"));
+
+		triggerManager = new TriggerManager(manageClient, "third-" + appConfig.getTriggersDatabaseName());
+		assertTrue(triggerManager.exists("third-trigger"));
 	}
 }

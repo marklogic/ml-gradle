@@ -5,7 +5,9 @@ import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
+import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.triggers.TriggerManager;
 
 import java.io.File;
@@ -33,8 +35,9 @@ public class DeployTriggersCommand extends AbstractResourceCommand {
 		for (ConfigDir configDir : appConfig.getConfigDirs()) {
 			final String initialTriggersDatabaseName = databaseIdOrName != null ? databaseIdOrName : appConfig.getTriggersDatabaseName();
 			deployTriggers(context, configDir, initialTriggersDatabaseName);
-			for (File databaseResourceDir : configDir.getDatabaseResourceDirectories()) {
-				deployTriggers(context, new ConfigDir(databaseResourceDir), databaseResourceDir.getName());
+			for (File dir : configDir.getDatabaseResourceDirectories()) {
+				String databaseName = determineDatabaseNameForDatabaseResourceDirectory(context, configDir, dir);
+				deployTriggers(context, new ConfigDir(dir), databaseName);
 			}
 		}
 	}

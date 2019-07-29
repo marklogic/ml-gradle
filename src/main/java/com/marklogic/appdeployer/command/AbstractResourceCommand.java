@@ -5,7 +5,6 @@ import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.api.configuration.Configuration;
-import com.marklogic.mgmt.api.configuration.Configurations;
 import com.marklogic.mgmt.resource.ResourceManager;
 
 import java.io.File;

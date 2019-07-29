@@ -36,7 +36,8 @@ public class DeployTargetsCommand extends AbstractCommand {
 		for (ConfigDir configDir : appConfig.getConfigDirs()) {
 			deployTargets(context, configDir, appConfig.getContentDatabaseName());
 			for (File dir : configDir.getDatabaseResourceDirectories()) {
-				deployTargets(context, new ConfigDir(dir), dir.getName());
+				String databaseName = determineDatabaseNameForDatabaseResourceDirectory(context, configDir, dir);
+				deployTargets(context, new ConfigDir(dir), databaseName);
 			}
 		}
 	}

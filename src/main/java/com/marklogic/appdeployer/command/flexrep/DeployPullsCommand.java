@@ -34,7 +34,8 @@ public class DeployPullsCommand extends AbstractResourceCommand {
 		for (ConfigDir configDir : appConfig.getConfigDirs()) {
 			deployFlexRepPulls(context, configDir, appConfig.getContentDatabaseName());
 			for (File dir : configDir.getDatabaseResourceDirectories()) {
-				deployFlexRepPulls(context, new ConfigDir(dir), dir.getName());
+				String databaseName = determineDatabaseNameForDatabaseResourceDirectory(context, configDir, dir);
+				deployFlexRepPulls(context, new ConfigDir(dir), databaseName);
 			}
 		}
 	}

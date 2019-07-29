@@ -25,7 +25,8 @@ public class DeployAlertConfigsCommand extends AbstractResourceCommand {
 		for (ConfigDir configDir : appConfig.getConfigDirs()) {
 			deployAlertConfigs(context, configDir, appConfig.getContentDatabaseName());
 			for (File dir : configDir.getDatabaseResourceDirectories()) {
-				deployAlertConfigs(context, new ConfigDir(dir), dir.getName());
+				String databaseName = determineDatabaseNameForDatabaseResourceDirectory(context, configDir, dir);
+				deployAlertConfigs(context, new ConfigDir(dir), databaseName);
 			}
 		}
 	}

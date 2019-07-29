@@ -6,10 +6,12 @@ import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.io.StringHandle;
+import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
 
 public class GenerateModelArtifactsTest extends AbstractAppDeployerTest {
 
@@ -19,12 +21,13 @@ public class GenerateModelArtifactsTest extends AbstractAppDeployerTest {
 	}
 
 	@Test
-	public void test() {
+	public void test() throws IOException {
 		String projectPath = "src/test/resources/entity-services-project";
 		File srcDir = new File(projectPath, "src");
 		if (srcDir.exists()) {
-			srcDir.delete();
+			FileUtils.cleanDirectory(srcDir);
 		}
+
 		appConfig.setConfigDir(new ConfigDir(new File(projectPath + "/src/main/ml-config")));
 		appConfig.setModelsPath(projectPath + "/data/entity-services");
 		appConfig.getModulePaths().clear();
@@ -57,10 +60,10 @@ public class GenerateModelArtifactsTest extends AbstractAppDeployerTest {
 		deploySampleApp();
 
 		// These shouldn't exist because the content is the same
-		assertFalse(new File(projectPath, "src/main/ml-modules/ext/entity-services/Race-0.0.1-GENERATED.xqy").exists());
-		assertFalse(new File(projectPath, "src/main/ml-modules/options/Race-GENERATED.xml").exists());
-		assertFalse(new File(projectPath, "src/main/ml-config/databases/content-database-GENERATED.json").exists());
-		assertFalse(new File(projectPath, "src/main/ml-schemas/Race-0.0.1-GENERATED.xsd").exists());
-		assertFalse(new File(projectPath, "src/main/ml-schemas/Race-0.0.1-GENERATED.tdex").exists());
+		assertFalse(new File(projectPath, "src/main/ml-modules/ext/entity-services/Race-0.0.1.xqy.GENERATED").exists());
+		assertFalse(new File(projectPath, "src/main/ml-modules/options/Race.xml.GENERATED").exists());
+		assertFalse(new File(projectPath, "src/main/ml-config/databases/content-database.json.GENERATED").exists());
+		assertFalse(new File(projectPath, "src/main/ml-schemas/Race-0.0.1.xsd.GENERATED").exists());
+		assertFalse(new File(projectPath, "src/main/ml-schemas/Race-0.0.1.tdex.GENERATED").exists());
 	}
 }

@@ -124,7 +124,7 @@ public class GenerateModelArtifactsCommand extends AbstractCommand {
 					}
 					return;
 				}
-				out = new File(esDir, code.getTitle() + "-" + code.getVersion() + "-GENERATED.xqy");
+				out = new File(esDir, code.getTitle() + "-" + code.getVersion() + ".xqy.GENERATED");
 				logMessage = "Instance converter does not match existing file, so writing to: ";
 			}
 			try {
@@ -152,7 +152,7 @@ public class GenerateModelArtifactsCommand extends AbstractCommand {
 					}
 					return;
 				}
-				out = new File(optionsDir, code.getTitle() + "-GENERATED.xml");
+				out = new File(optionsDir, code.getTitle() + "xml.GENERATED");
 				logMessage = "Search options does not match existing file, so writing to: ";
 			}
 			try {
@@ -187,7 +187,7 @@ public class GenerateModelArtifactsCommand extends AbstractCommand {
 					}
 					return;
 				}
-				out = new File(dbDir, "content-database-GENERATED.json");
+				out = new File(dbDir, "content-database.json.GENERATED");
 				logMessage = "Database properties does not match existing file, so writing to: ";
 			}
 			try {
@@ -226,7 +226,7 @@ public class GenerateModelArtifactsCommand extends AbstractCommand {
 					}
 					return;
 				}
-				out = new File(dir, code.getTitle() + "-" + code.getVersion() + "-GENERATED.xsd");
+				out = new File(dir, code.getTitle() + "-" + code.getVersion() + "xsd.GENERATED");
 				logMessage = "Schema does not match existing file, so writing to: ";
 			}
 			try {
@@ -256,7 +256,7 @@ public class GenerateModelArtifactsCommand extends AbstractCommand {
 					}
 					return;
 				}
-				out = new File(dir, code.getTitle() + "-" + code.getVersion() + "-GENERATED.tdex");
+				out = new File(dir, code.getTitle() + "-" + code.getVersion() + "tdex.GENERATED");
 				logMessage = "Extraction template does not match existing file, so writing to: ";
 			}
 			try {

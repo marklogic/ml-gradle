@@ -316,15 +316,29 @@ public class AppConfig {
 	}
 
     public void setSimpleSslConfig() {
-		setRestSslContext(SimpleX509TrustManager.newSSLContext());
-		setRestSslHostnameVerifier(DatabaseClientFactory.SSLHostnameVerifier.ANY);
-		setRestTrustManager(new SimpleX509TrustManager());
+		setSimpleSslConfig(null);
+    }
+
+	/**
+	 * @param protocol the name of the SSL/TLS protocol to use; if null, will use whatever SimpleX509TrustManager defaults to
+	 */
+	public void setSimpleSslConfig(String protocol) {
+	    setRestSslContext(protocol != null ? SimpleX509TrustManager.newSSLContext(protocol) : SimpleX509TrustManager.newSSLContext());
+	    setRestSslHostnameVerifier(DatabaseClientFactory.SSLHostnameVerifier.ANY);
+	    setRestTrustManager(new SimpleX509TrustManager());
     }
 
     public void setAppServicesSimpleSslConfig() {
-		setAppServicesSslContext(SimpleX509TrustManager.newSSLContext());
-		setAppServicesSslHostnameVerifier(DatabaseClientFactory.SSLHostnameVerifier.ANY);
-		setAppServicesTrustManager(new SimpleX509TrustManager());
+		setAppServicesSimpleSslConfig(null);
+    }
+
+	/**
+	 * @param protocol the name of the SSL/TLS protocol to use; if null, will use whatever SimpleX509TrustManager defaults to
+	 */
+    public void setAppServicesSimpleSslConfig(String protocol) {
+	    setAppServicesSslContext(protocol != null ? SimpleX509TrustManager.newSSLContext(protocol) : SimpleX509TrustManager.newSSLContext());
+	    setAppServicesSslHostnameVerifier(DatabaseClientFactory.SSLHostnameVerifier.ANY);
+	    setAppServicesTrustManager(new SimpleX509TrustManager());
     }
 
     /**

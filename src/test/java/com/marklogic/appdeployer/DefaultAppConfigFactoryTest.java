@@ -577,6 +577,41 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		final String message = "If the user has configured the set of databases, then the default schema and trigger databases names should not be added automatically";
 		assertFalse(message, set.contains("example-triggers"));
 		assertFalse(message, set.contains("example-schemas"));
+	}
 
+	@Test
+	public void appServicesSimpleSsl() {
+		AppConfig config = new DefaultAppConfigFactory(new SimplePropertySource("mlAppServicesSimpleSsl", "true")).newAppConfig();
+		assertEquals("TLSv1.2", config.getAppServicesSslContext().getProtocol());
+
+		config = new DefaultAppConfigFactory(new SimplePropertySource("mlAppServicesSimpleSsl", "TLSv1.2")).newAppConfig();
+		assertEquals("TLSv1.2", config.getAppServicesSslContext().getProtocol());
+
+		config = new DefaultAppConfigFactory(new SimplePropertySource("mlAppServicesSimpleSsl", "TLSv1.1")).newAppConfig();
+		assertEquals("TLSv1.1", config.getAppServicesSslContext().getProtocol());
+
+		config = new DefaultAppConfigFactory(new SimplePropertySource("mlAppServicesSimpleSsl", "false")).newAppConfig();
+		assertNull(config.getAppServicesSslContext());
+
+		config = new DefaultAppConfigFactory(new SimplePropertySource()).newAppConfig();
+		assertNull(config.getAppServicesSslContext());
+	}
+
+	@Test
+	public void restSimpleSsl() {
+		AppConfig config = new DefaultAppConfigFactory(new SimplePropertySource("mlSimpleSsl", "true")).newAppConfig();
+		assertEquals("TLSv1.2", config.getRestSslContext().getProtocol());
+
+		config = new DefaultAppConfigFactory(new SimplePropertySource("mlSimpleSsl", "TLSv1.2")).newAppConfig();
+		assertEquals("TLSv1.2", config.getRestSslContext().getProtocol());
+
+		config = new DefaultAppConfigFactory(new SimplePropertySource("mlSimpleSsl", "TLSv1.1")).newAppConfig();
+		assertEquals("TLSv1.1", config.getRestSslContext().getProtocol());
+
+		config = new DefaultAppConfigFactory(new SimplePropertySource("mlSimpleSsl", "false")).newAppConfig();
+		assertNull(config.getRestSslContext());
+
+		config = new DefaultAppConfigFactory(new SimplePropertySource()).newAppConfig();
+		assertNull(config.getRestSslContext());
 	}
 }

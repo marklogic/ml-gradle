@@ -4,6 +4,7 @@ import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.ext.SecurityContextType;
 import com.marklogic.mgmt.util.PropertySource;
 import com.marklogic.mgmt.util.PropertySourceFactory;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.util.*;
@@ -218,10 +219,17 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			logger.info("App Services external name: " + prop);
 			config.setAppServicesExternalName(prop);
 		});
+
 		propertyConsumerMap.put("mlAppServicesSimpleSsl", (config, prop) -> {
-			if ("true".equals(prop)) {
-				logger.info("Using simple SSL context and 'ANY' hostname verifier for authenticating against the App-Services server");
-				config.setAppServicesSimpleSslConfig();
+			if (StringUtils.hasText(prop) && !"false".equalsIgnoreCase(prop)) {
+				if ("true".equalsIgnoreCase(prop)) {
+					config.setAppServicesSimpleSslConfig();
+				} else {
+					config.setAppServicesSimpleSslConfig(prop);
+				}
+				String protocol = config.getAppServicesSslContext().getProtocol();
+				logger.info(format("Using protocol '%s' and 'ANY' hostname verifier for authenticating against the " +
+					"App-Services server", protocol));
 			}
 		});
 
@@ -284,10 +292,15 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		 * setting this property will force the simplest SSL connection to be created.
 		 */
 		propertyConsumerMap.put("mlSimpleSsl", (config, prop) -> {
-			if ("true".equals(prop)) {
-				logger.info(
-					"Using simple SSL context and 'ANY' hostname verifier for authenticating against client REST API server");
-				config.setSimpleSslConfig();
+			if (StringUtils.hasText(prop) && !"false".equalsIgnoreCase(prop)) {
+				if ("true".equalsIgnoreCase(prop)) {
+					config.setSimpleSslConfig();
+				} else {
+					config.setSimpleSslConfig(prop);
+				}
+				String protocol = config.getRestSslContext().getProtocol();
+				logger.info(format("Using protocol '%s' and 'ANY' hostname verifier for authenticating against the " +
+					"client REST API server", protocol));
 			}
 		});
 

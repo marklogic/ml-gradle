@@ -5,7 +5,10 @@ import com.marklogic.appdeployer.command.Command;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.document.GenericDocumentManager;
+import com.marklogic.client.io.BytesHandle;
+import com.marklogic.client.io.DOMHandle;
 import com.marklogic.client.io.DocumentMetadataHandle;
+import com.marklogic.client.io.StringHandle;
 import org.junit.After;
 import org.junit.Test;
 
@@ -49,6 +52,8 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 	@Test
 	public void testSchemaLoading() {
 		initializeAppDeployer(new DeployOtherDatabasesCommand(1), newCommand());
+
+		appConfig.getCustomTokens().put("%%replaceMe%%", "world");
 		appDeployer.deploy(appConfig);
 
 		DatabaseClient client = appConfig.newSchemasDatabaseClient();
@@ -60,6 +65,10 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 		assertNotNull("XSD document loaded", docMgr.exists("/x.xsd").getUri());
 		assertNull(docMgr.exists("/.do-not-load"));
 		assertNull(docMgr.exists(".do-not-load"));
+
+		String content = new String(docMgr.read("/x.xsd", new BytesHandle()).get());
+		assertTrue("Tokens should be replaced when schemas are loaded; actual content: " + content,
+			content.contains("<hello>world</hello>"));
 	}
 
 	@Test

@@ -111,6 +111,12 @@ public class LoadSchemasCommand extends AbstractCommand {
 		if (filter != null) {
 			schemasLoader.addFileFilter(filter);
 		}
+
+		// TODO Should rename this method to something more generic than "modules"; not sure what that should be yet
+		if (appConfig.isReplaceTokensInModules()) {
+			schemasLoader.setTokenReplacer(appConfig.buildTokenReplacer());
+		}
+
 		return schemasLoader;
 	}
 

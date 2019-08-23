@@ -20,6 +20,9 @@ public class DefaultHostCalculator extends LoggingObject implements HostCalculat
 	public List<String> calculateHostNames(String databaseName, CommandContext context) {
 		List<String> hostNamesFromDatabaseGroups = determineHostsNamesBasedOnDatabaseGroups(databaseName, context);
 		if (hostNamesFromDatabaseGroups != null) {
+			if (hostNamesFromDatabaseGroups.size() > 1 && context.getAppConfig().isDatabaseWithForestsOnOneHost(databaseName)) {
+				return hostNamesFromDatabaseGroups.subList(0, 1);
+			}
 			return hostNamesFromDatabaseGroups;
 		}
 

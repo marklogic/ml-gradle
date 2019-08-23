@@ -1128,6 +1128,13 @@ public class AppConfig {
 		this.catchUndeployExceptions = catchUndeployExceptions;
 	}
 
+	public boolean isDatabaseWithForestsOnOneHost(String databaseName) {
+    	if (databasesWithForestsOnOneHost == null) {
+    		return false;
+	    }
+    	return databasesWithForestsOnOneHost.contains(databaseName);
+	}
+
 	public Set<String> getDatabasesWithForestsOnOneHost() {
 		return databasesWithForestsOnOneHost;
 	}

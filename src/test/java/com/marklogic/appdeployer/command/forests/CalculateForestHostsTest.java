@@ -49,4 +49,22 @@ public class CalculateForestHostsTest extends Assert {
 		assertTrue(hostNames.contains("name4"));
 		assertTrue(hostNames.contains("name5"));
 	}
+
+	@Test
+	public void databaseWithForestOnOneHost() {
+		TestHostNameProvider hostNameProvider = new TestHostNameProvider("name1", "name2", "name3");
+		hostNameProvider.addGroupHostNames("group1", "name1");
+		hostNameProvider.addGroupHostNames("group2", "name2", "name3");
+
+		DefaultHostCalculator hostCalculator = new DefaultHostCalculator(hostNameProvider);
+
+		Properties props = new Properties();
+		props.setProperty("mlDatabaseGroups", "test-db,group2");
+		props.setProperty("mlDatabasesWithForestsOnOneHost", "test-db");
+
+		CommandContext context = new CommandContext(new DefaultAppConfigFactory(new SimplePropertySource(props)).newAppConfig(), null, null);
+		List<String> hostNames = hostCalculator.calculateHostNames("test-db", context);
+		assertEquals("The database should only have a forest on the first host", 1, hostNames.size());
+		assertEquals("name2", hostNames.get(0));
+	}
 }

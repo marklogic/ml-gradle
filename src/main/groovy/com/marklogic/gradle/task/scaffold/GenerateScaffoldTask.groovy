@@ -10,7 +10,7 @@ class GenerateScaffoldTask extends MarkLogicTask {
     void generateScaffold() {
         ScaffoldGenerator g = new ScaffoldGenerator()
         def propName = "scaffoldPath"
-        def path = project.hasProperty(propName) ? project.property(propName) : new File(".").getAbsolutePath()
+        def path = project.hasProperty(propName) ? project.property(propName) : getProject().getProjectDir().getAbsolutePath()
         println "Generating scaffold for path: " + path
         g.generateScaffold(path, getAppConfig())
     }

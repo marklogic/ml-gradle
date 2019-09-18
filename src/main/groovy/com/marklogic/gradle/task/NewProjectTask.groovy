@@ -78,13 +78,14 @@ class NewProjectTask extends MarkLogicTask {
 			} else {
 				appConfig.setNoRestServer(true)
 			}
-			new ScaffoldGenerator().generateScaffold(new File(".").getAbsolutePath(), appConfig)
+			new ScaffoldGenerator().generateScaffold(getProject().getProjectDir().getAbsolutePath(), appConfig)
 		}
 	}
 
 	void makeDirectory(String path) {
-		println "Making directory: " + path
-		new File(path).mkdirs()
+		File f = new File(getProject().getProjectDir(), path);
+		f.mkdirs()
+		println "Making directory: " + f.getAbsolutePath()
 	}
 
 	void writeFile(String filename, String text) {

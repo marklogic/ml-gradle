@@ -10,6 +10,7 @@ import org.jdom2.Namespace;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -367,10 +368,20 @@ public class ManageClient extends LoggingObject {
 
     protected void logSecurityUserRequest(String path, String contentType, String method) {
         if (logger.isInfoEnabled()) {
-	        String username = manageConfig != null ? manageConfig.getUsername() : "(unknown)";
             logger.info(String.format("Sending %s %s request as user '%s' (who must have the 'manage-admin' and 'security' roles) to path: %s",
-	            contentType, method, username, path));
+	            contentType, method, determineUsernameForSecurityUserRequest(), path));
         }
+    }
+
+    protected String determineUsernameForSecurityUserRequest() {
+	    String username = "(unknown)";
+	    if (manageConfig != null) {
+		    username = manageConfig.getSecurityUsername();
+		    if (StringUtils.isEmpty(username)) {
+			    username = manageConfig.getUsername();
+		    }
+	    }
+	    return username;
     }
 
 	public URI buildUri(String path) {

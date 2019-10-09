@@ -25,7 +25,7 @@ Groovy - ml-gradle is then a fairly thin wrapper around ml-app-deployer to expos
 Start using ml-gradle
 =========
 
-ml-gradle depends on at least [Java 8](https://java.com/en/download/) and [MarkLogic 8 or 9](https://developer.marklogic.com/products), 
+ml-gradle depends on at least [Java 8](https://java.com/en/download/) and [MarkLogic 8 or 9 or 10](https://developer.marklogic.com/products), 
 so if you have those installed, you're just a couple minutes away from using ml-gradle to start a new project and deploy an 
 application from it. 
 

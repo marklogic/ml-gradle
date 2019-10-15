@@ -23,10 +23,10 @@ public class ConfigureForestReplicasDebug {
 
 		ManageConfig config = new ManageConfig(host, 8002, "admin", password);
 		ManageClient manageClient = new ManageClient(config);
-		AppConfig appConfig = new AppConfig();
 
+		AppConfig appConfig = new AppConfig();
 		Map<String, Integer> map = new HashMap<>();
-		map.put(dbName, 1);
+		map.put(dbName, 2);
 		appConfig.setDatabaseNamesAndReplicaCounts(map);
 
 		List<String> hostNames = new HostManager(manageClient).getHostNames();
@@ -52,16 +52,13 @@ public class ConfigureForestReplicasDebug {
 		ddc.setDatabaseName(dbName);
 
 		ConfigureForestReplicasCommand cfrc = new ConfigureForestReplicasCommand();
-		Map<String, Integer> replicaCounts = new HashMap<>();
-		replicaCounts.put(dbName, 1);
-		appConfig.setDatabaseNamesAndReplicaCounts(replicaCounts);
 
 		// Deploy the database, and then configure replicas
 		ddc.execute(context);
 		cfrc.execute(context);
 
 		// Deploy again to make sure there are no errors
-		//cfrc.execute(context);
+		cfrc.execute(context);
 
 		// Then delete the replicas, and then undeploy the database
 		cfrc.undo(context);

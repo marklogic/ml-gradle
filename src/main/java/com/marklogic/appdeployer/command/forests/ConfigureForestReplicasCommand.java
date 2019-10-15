@@ -108,10 +108,44 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 	 * @param context
 	 */
 	protected void configureDatabaseReplicaForests(String databaseName, int replicaCount, List<String> hostNames, CommandContext context) {
+		List<Forest> forestsNeedingReplicas = determineForestsNeedingReplicas(databaseName, context);
+
+		ForestBuilder forestBuilder = new ForestBuilder();
+		List<String> selectedHostNames = getHostNamesForDatabaseForests(databaseName, hostNames, context);
+		ForestPlan forestPlan = new ForestPlan(databaseName, selectedHostNames).withReplicaCount(replicaCount);
+		List<String> dataDirectories = forestBuilder.determineDataDirectories(databaseName, context.getAppConfig());
+		forestBuilder.addReplicasToForests(forestsNeedingReplicas, forestPlan, context.getAppConfig(), dataDirectories);
+
+		// TODO Use CMA here in the future? Need to test to see if a forest name + replicas are allowable
+		ForestManager forestManager = new ForestManager(context.getManageClient());
+		for (Forest forest : forestsNeedingReplicas) {
+			final String forestName = forest.getForestName();
+
+			Forest forestWithOnlyReplicas = new Forest();
+			forestWithOnlyReplicas.setForestReplica(forest.getForestReplica());
+			String json = forestWithOnlyReplicas.getJson();
+
+			logger.info(format("Creating forest replicas for primary forest %s", forestName));
+			context.getManageClient().putJson(forestManager.getPropertiesPath(forestName), json);
+			logger.info(format("Finished creating forest replicas for primary forest %s", forestName));
+		}
+	}
+
+	/**
+	 * Per #389, the list of replicas needs to be calculated for all forests at once so that ForestBuilder produces the
+	 * correct results.
+	 *
+	 * @param databaseName
+	 * @param context
+	 * @return
+	 */
+	protected List<Forest> determineForestsNeedingReplicas(String databaseName, CommandContext context) {
 		ForestManager forestManager = new ForestManager(context.getManageClient());
 		DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
 		API api = new API(context.getManageClient());
 		ResourceMapper resourceMapper = new DefaultResourceMapper(api);
+
+		List<Forest> forestsNeedingReplicas = new ArrayList<>();
 
 		for (String forestName : dbMgr.getForestNames(databaseName)) {
 			logger.info(format("Checking the status of forest %s to determine if it is a primary forest and whether or not it has replicas already.", forestName));
@@ -125,25 +159,12 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 				continue;
 			}
 
-			logger.info(format("Creating forest replicas for primary forest %s", forestName));
-
 			String forestJson = forestManager.getPropertiesAsJson(forestName);
 			Forest forest = resourceMapper.readResource(forestJson, Forest.class);
-
-			List<String> selectedHostNames = getHostNamesForDatabaseForests(databaseName, hostNames, context);
-
-			ForestBuilder forestBuilder = new ForestBuilder();
-			ForestPlan forestPlan = new ForestPlan(databaseName, selectedHostNames).withReplicaCount(replicaCount);
-			List<String> dataDirectories = forestBuilder.determineDataDirectories(databaseName, context.getAppConfig());
-			forestBuilder.addReplicasToForests(Arrays.asList(forest), forestPlan, context.getAppConfig(), dataDirectories);
-
-			Forest forestWithOnlyReplicas = new Forest();
-			forestWithOnlyReplicas.setForestReplica(forest.getForestReplica());
-
-			String json = forestWithOnlyReplicas.getJson();
-			context.getManageClient().putJson(forestManager.getPropertiesPath(forestName), json);
-			logger.info(format("Finished creating forest replicas for primary forest %s", forestName));
+			forestsNeedingReplicas.add(forest);
 		}
+
+		return forestsNeedingReplicas;
 	}
 
 	/**

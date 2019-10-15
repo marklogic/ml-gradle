@@ -15,6 +15,29 @@ public class BuildForestReplicaTest extends Assert {
 	private ForestBuilder builder = new ForestBuilder();
 
 	@Test
+	public void multipleForestsOnEachHost() {
+		AppConfig appConfig = newAppConfig("mlForestsPerHost", "db,2");
+
+		List<Forest> forests = builder.buildForests(
+			new ForestPlan("db", "host1", "host2", "host3").withReplicaCount(1), appConfig);
+
+		assertEquals("host1", forests.get(0).getHost());
+		assertEquals("host2", forests.get(0).getForestReplica().get(0).getHost());
+		assertEquals("host1", forests.get(1).getHost());
+		assertEquals("host3", forests.get(1).getForestReplica().get(0).getHost());
+
+		assertEquals("host2", forests.get(2).getHost());
+		assertEquals("host3", forests.get(2).getForestReplica().get(0).getHost());
+		assertEquals("host2", forests.get(3).getHost());
+		assertEquals("host1", forests.get(3).getForestReplica().get(0).getHost());
+
+		assertEquals("host3", forests.get(4).getHost());
+		assertEquals("host1", forests.get(4).getForestReplica().get(0).getHost());
+		assertEquals("host3", forests.get(5).getHost());
+		assertEquals("host2", forests.get(5).getForestReplica().get(0).getHost());
+	}
+
+	@Test
 	public void customNamingStrategyWithDistributedStrategy() {
 		AppConfig appConfig = newAppConfig("mlForestsPerHost", "my-database,2");
 		addCustomNamingStrategy(appConfig);

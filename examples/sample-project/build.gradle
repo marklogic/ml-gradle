@@ -8,7 +8,7 @@ buildscript {
 		jcenter()
 	}
 	dependencies {
-		classpath "com.marklogic:ml-gradle:3.16.1"
+		classpath "com.marklogic:ml-gradle:3.16.2"
 	}
 }
 

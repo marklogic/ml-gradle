@@ -27,7 +27,7 @@ public class ForestBackup extends ApiObject {
 	private Integer backupPeriod;
 
 	@XmlElement(name = "backup-month-day")
-	private String backupMonthDay;
+	private Integer backupMonthDay;
 
 	@XmlElementWrapper(name = "backup-days")
 	@XmlElement(name = "backup-day")
@@ -82,11 +82,11 @@ public class ForestBackup extends ApiObject {
 		this.backupPeriod = backupPeriod;
 	}
 
-	public String getBackupMonthDay() {
+	public Integer getBackupMonthDay() {
 		return backupMonthDay;
 	}
 
-	public void setBackupMonthDay(String backupMonthDay) {
+	public void setBackupMonthDay(Integer backupMonthDay) {
 		this.backupMonthDay = backupMonthDay;
 	}
 

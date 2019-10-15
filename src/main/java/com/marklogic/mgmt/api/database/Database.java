@@ -219,6 +219,22 @@ public class Database extends Resource {
 	@XmlElement(name = "retain-until-backup")
 	private Boolean retainUntilBackup;
 
+	@XmlElementWrapper(name = "merge-blackouts")
+	@XmlElement(name = "merge-blackout")
+	private List<MergeBlackout> mergeBlackout;
+
+	@XmlElementWrapper(name = "database-backups")
+	@XmlElement(name = "database-backup")
+	private List<DatabaseBackup> databaseBackup;
+
+	@XmlElementWrapper(name = "fragment-roots")
+	@XmlElement(name = "fragment-root")
+	private List<FragmentRoot> fragmentRoot;
+
+	@XmlElementWrapper(name = "fragment-parents")
+	@XmlElement(name = "fragment-parent")
+	private List<FragmentParent> fragmentParent;
+
 	@XmlElementWrapper(name = "element-word-query-throughs")
 	@XmlElement(name = "element-word-query-through")
 	private List<Element> elementWordQueryThrough;
@@ -1120,5 +1136,37 @@ public class Database extends Resource {
 
 	public void setDatabaseReference(List<DatabaseReference> databaseReference) {
 		this.databaseReference = databaseReference;
+	}
+
+	public List<DatabaseBackup> getDatabaseBackup() {
+		return databaseBackup;
+	}
+
+	public void setDatabaseBackup(List<DatabaseBackup> databaseBackup) {
+		this.databaseBackup = databaseBackup;
+	}
+
+	public List<MergeBlackout> getMergeBlackout() {
+		return mergeBlackout;
+	}
+
+	public void setMergeBlackout(List<MergeBlackout> mergeBlackout) {
+		this.mergeBlackout = mergeBlackout;
+	}
+
+	public List<FragmentRoot> getFragmentRoot() {
+		return fragmentRoot;
+	}
+
+	public void setFragmentRoot(List<FragmentRoot> fragmentRoot) {
+		this.fragmentRoot = fragmentRoot;
+	}
+
+	public List<FragmentParent> getFragmentParent() {
+		return fragmentParent;
+	}
+
+	public void setFragmentParent(List<FragmentParent> fragmentParent) {
+		this.fragmentParent = fragmentParent;
 	}
 }

@@ -49,6 +49,7 @@ public class Forest extends Resource {
 	private List<String> failoverHost;
 
 	@XmlElementWrapper(name = "forest-backups")
+	@XmlElement(name = "forest-backup")
 	private List<ForestBackup> forestBackup;
 
 	@XmlElement(name = "database-replication")

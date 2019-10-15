@@ -12,7 +12,16 @@ public class RolePrivilege {
     private String action;
     private String kind;
 
-    public String getPrivilegeName() {
+	public RolePrivilege() {
+	}
+
+	public RolePrivilege(String privilegeName, String action, String kind) {
+		this.privilegeName = privilegeName;
+		this.action = action;
+		this.kind = kind;
+	}
+
+	public String getPrivilegeName() {
         return privilegeName;
     }
 

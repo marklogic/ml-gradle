@@ -33,7 +33,12 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		for (String propertyName : propertyConsumerMap.keySet()) {
 			String value = getProperty(propertyName);
 			if (value != null) {
-				propertyConsumerMap.get(propertyName).accept(appConfig, value);
+				try {
+					propertyConsumerMap.get(propertyName).accept(appConfig, value);
+				} catch (Exception ex) {
+					throw new IllegalArgumentException(
+						format("Unable to parse value '%s' for property '%s'; cause: %s", value, propertyName, ex.getMessage()), ex);
+				}
 			}
 		}
 

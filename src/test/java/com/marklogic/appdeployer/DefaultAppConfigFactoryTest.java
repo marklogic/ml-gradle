@@ -73,6 +73,21 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	}
 
 	@Test
+	public void invalidPropertyValue() {
+		sut = new DefaultAppConfigFactory(new SimplePropertySource("mlForestsPerHost", "3"));
+		try {
+			sut.newAppConfig();
+			fail("The call should have failed because the property has an invalid value; it's expecting 'forestName,value'");
+		} catch (IllegalArgumentException ex) {
+			String message = ex.getMessage();
+			assertTrue(
+				"Expected the exception to identify the property name and value; message: " + message,
+				message.startsWith("Unable to parse value '3' for property 'mlForestsPerHost'")
+			);
+		}
+	}
+
+	@Test
 	public void trimProperties() {
 		sut = new DefaultAppConfigFactory(new SimplePropertySource("mlHost", "  has-spaces   ", "mlUsername", "has spaces"));
 		AppConfig config = sut.newAppConfig();

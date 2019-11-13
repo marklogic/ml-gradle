@@ -139,6 +139,23 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 		modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
 	}
 
+	@Test
+	public void catchExceptionsForInvalidModules() {
+		String dir = Paths.get("src", "test", "resources", "bad-modules").toString();
+
+		try {
+			modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
+			fail("Loading modules should have failed because of an invalid JSON file");
+		} catch (RuntimeException re) {
+			assertTrue(re.getMessage().contains("Unexpected end of file in JSON"));
+		}
+
+		modulesLoader.setCatchExceptions(true);
+		// This should now succeed since we're catching exceptions
+		Set<Resource> loadedModules = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
+		assertTrue("There's only the one invalid module, so nothing should have been loaded", loadedModules.isEmpty());
+	}
+
 	/**
 	 * This test is a little brittle because it assumes the URI of options/services/transforms that are loaded
 	 * into the Modules database.

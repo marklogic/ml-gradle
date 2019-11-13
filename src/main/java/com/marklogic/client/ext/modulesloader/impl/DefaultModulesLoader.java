@@ -358,26 +358,21 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 		}
 
 		if (includeFilenamePattern != null) {
-			// Make sure the DocumentFileReader is not null
-			assetFileLoader.initializeDocumentFileReader();
-			DocumentFileReader dfr = assetFileLoader.getDocumentFileReader();
-			if (dfr instanceof DefaultDocumentFileReader) {
-				DefaultDocumentFileReader reader = (DefaultDocumentFileReader) dfr;
-				reader.addDocumentFileProcessor(documentFile -> {
-					File f = documentFile.getFile();
-					if (f == null) {
-						return null;
-					}
-					if (!includeFilenamePattern.matcher(f.getAbsolutePath()).matches()) {
-						return null;
-					}
-					return documentFile;
-				});
+			applyIncludeFilenamePattern();
+		}
+
+		List<DocumentFile> list = null;
+		try {
+			list = assetFileLoader.loadFiles(paths);
+		} catch (RuntimeException ex) {
+			if (catchExceptions) {
+				logger.error("Error loading modules: " + ex.getMessage());
+			} else {
+				throw ex;
 			}
 		}
 
-		List<DocumentFile> list = assetFileLoader.loadFiles(paths);
-		if (staticChecker != null && !list.isEmpty()) {
+		if (staticChecker != null && list != null && !list.isEmpty()) {
 			try {
 				staticChecker.checkLoadedAssets(list);
 			} catch (RuntimeException ex) {
@@ -389,8 +384,29 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 			}
 		}
 
-		for (DocumentFile asset : list) {
-			loadedModules.add(asset.getResource());
+		if (list != null) {
+			for (DocumentFile asset : list) {
+				loadedModules.add(asset.getResource());
+			}
+		}
+	}
+
+	protected void applyIncludeFilenamePattern() {
+		// Make sure the DocumentFileReader is not null
+		assetFileLoader.initializeDocumentFileReader();
+		DocumentFileReader dfr = assetFileLoader.getDocumentFileReader();
+		if (dfr instanceof DefaultDocumentFileReader) {
+			DefaultDocumentFileReader reader = (DefaultDocumentFileReader) dfr;
+			reader.addDocumentFileProcessor(documentFile -> {
+				File f = documentFile.getFile();
+				if (f == null) {
+					return null;
+				}
+				if (!includeFilenamePattern.matcher(f.getAbsolutePath()).matches()) {
+					return null;
+				}
+				return documentFile;
+			});
 		}
 	}
 

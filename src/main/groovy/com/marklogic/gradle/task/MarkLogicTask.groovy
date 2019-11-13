@@ -77,9 +77,7 @@ class MarkLogicTask extends DefaultTask {
     }
 
     void deployWithCommands(List<Command> commands) {
-        SimpleAppDeployer deployer = new SimpleAppDeployer(getManageClient(), getAdminManager())
-        deployer.setCommands(commands)
-        deployer.deploy(getAppConfig())
+        newAppDeployer(commands).deploy(getAppConfig())
     }
 
     void undeployWithCommandListProperty(String propertyName) {
@@ -87,10 +85,14 @@ class MarkLogicTask extends DefaultTask {
     }
 
     void undeployWithCommands(List<Command> commands) {
-        SimpleAppDeployer deployer = new SimpleAppDeployer(getManageClient(), getAdminManager())
-        deployer.setCommands(commands)
-        deployer.undeploy(getAppConfig())
+        newAppDeployer(commands).undeploy(getAppConfig())
     }
+
+	AppDeployer newAppDeployer(List<Command> commands) {
+		SimpleAppDeployer deployer = new SimpleAppDeployer(getManageClient(), getAdminManager())
+		deployer.setCommands(commands)
+		return deployer
+	}
 
     void invokeDeployerCommandWithClassName(String className) {
         SimpleAppDeployer d = (SimpleAppDeployer)getAppDeployer()

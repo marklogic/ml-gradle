@@ -11,6 +11,7 @@ import com.marklogic.client.ext.modulesloader.impl.DefaultModulesLoader
 import com.marklogic.client.ext.modulesloader.impl.PropertiesModuleManager
 import com.marklogic.gradle.task.MarkLogicTask
 import org.gradle.api.tasks.TaskAction
+import org.gradle.internal.impldep.bsh.This
 import org.springframework.core.io.Resource
 
 import java.util.function.Consumer
@@ -26,7 +27,11 @@ class WatchTask extends MarkLogicTask {
 
 	long sleepTime = 1000
 
+	// Hook for after one or more modules have been loaded
 	Consumer<Set<Resource>> onModulesLoaded
+
+	// Hook for after zero or more modules have been loaded, and after onModulesLoader has been invoked
+	Consumer<ModuleWatchingContext> afterModulesLoadedCallback
 
 	@TaskAction
 	void watchModules() {
@@ -53,7 +58,7 @@ class WatchTask extends MarkLogicTask {
 			 * REST modules because REST modules are loaded async - unless DefaultModulesLoader's thread count is set
 			 * to 1, in which case catchExceptions suffices. rethrowRestModulesFailure was added in 3.7.0 of
 			 * ml-javaclient-util to cause deployments to fail when REST modules fail to load, which is good default
-			 * behavior but isn't good for this task. 
+			 * behavior but isn't good for this task.
 			 */
 			dml.setCatchExceptions(true)
 			dml.setRethrowRestModulesFailure(false)
@@ -64,7 +69,7 @@ class WatchTask extends MarkLogicTask {
 				ModulesManager mgr = dml.getModulesManager()
 				if (mgr instanceof PropertiesModuleManager) {
 					println "Ignoring modules that need loading, will only load modules that are created/modified after this starts"
-					((PropertiesModuleManager)mgr).setMinimumFileTimestampToLoad(System.currentTimeMillis())
+					((PropertiesModuleManager) mgr).setMinimumFileTimestampToLoad(System.currentTimeMillis())
 				} else {
 					println "Unable to apply ignoreDirty property; the underlying modules loader implementation does not support this feature."
 				}
@@ -75,6 +80,9 @@ class WatchTask extends MarkLogicTask {
 		println "Watching modules in paths: " + paths
 
 		DatabaseClient client = newClient()
+
+		ModuleWatchingContext moduleWatchingContext = new ModuleWatchingContext(loader, getAppConfig(), client)
+
 		while (true) {
 			for (String path : paths) {
 				Set<Resource> loadedModules = loader.loadModules(path, new DefaultModulesFinder(), client);
@@ -83,6 +91,11 @@ class WatchTask extends MarkLogicTask {
 				}
 			}
 
+			if (afterModulesLoadedCallback != null) {
+				afterModulesLoadedCallback.accept(moduleWatchingContext)
+			}
+
+			// Kept here for legacy purposes
 			afterModulesLoaded()
 
 			try {
@@ -95,7 +108,10 @@ class WatchTask extends MarkLogicTask {
 
 	/**
 	 * Exists primarily so that DHF's extension of this class can invoke DHF-specific logic for loading modules.
+	 *
+	 * Now deprecated in 3.16.3 in favor of setting afterModulesLoaderCallback
 	 */
+	@Deprecated
 	void afterModulesLoaded() {
 
 	}

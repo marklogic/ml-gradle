@@ -114,4 +114,8 @@ public abstract class BatchWriterSupport extends LoggingObject implements BatchW
 	public void setWriteListener(WriteListener writeListener) {
 		this.writeListener = writeListener;
 	}
+
+	public int getThreadCount() {
+		return threadCount;
+	}
 }

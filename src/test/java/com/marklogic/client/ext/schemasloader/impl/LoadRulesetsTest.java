@@ -28,9 +28,6 @@ public class LoadRulesetsTest extends AbstractSchemasTest {
 		assertTrue(collections.contains("ruleset-xyz"));
 
 		DocumentMetadataHandle.DocumentPermissions perms = helper.getMetadata("/ruleset1.xml").getPermissions();
-		assertEquals("Should have the two default perms plus the two custom ones", 4, perms.size());
-		assertEquals(DocumentMetadataHandle.Capability.READ, perms.get("rest-reader").iterator().next());
-		assertEquals(DocumentMetadataHandle.Capability.UPDATE, perms.get("rest-writer").iterator().next());
 		assertEquals(DocumentMetadataHandle.Capability.READ, perms.get("rest-admin").iterator().next());
 		assertEquals(DocumentMetadataHandle.Capability.UPDATE, perms.get("manage-admin").iterator().next());
 	}

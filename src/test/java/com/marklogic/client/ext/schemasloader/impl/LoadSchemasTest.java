@@ -1,5 +1,6 @@
 package com.marklogic.client.ext.schemasloader.impl;
 
+import com.marklogic.client.ext.batch.RestBatchWriter;
 import com.marklogic.client.ext.file.DocumentFile;
 import com.marklogic.client.ext.helper.ClientHelper;
 import org.junit.Test;
@@ -12,6 +13,9 @@ public class LoadSchemasTest extends AbstractSchemasTest {
 	@Test
 	public void test() {
 		DefaultSchemasLoader loader = new DefaultSchemasLoader(client);
+		RestBatchWriter writer = (RestBatchWriter)loader.getBatchWriter();
+		assertEquals("Should default to 1 so that any error from loading a document " +
+			"into a schemas database is immediately thrown to the client", 1, writer.getThreadCount());
 
 		List<DocumentFile> files = loader.loadSchemas(Paths.get("src", "test", "resources", "schemas").toString());
 		assertEquals(5, files.size());

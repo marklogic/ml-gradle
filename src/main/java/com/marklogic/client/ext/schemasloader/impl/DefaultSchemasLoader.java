@@ -2,12 +2,14 @@ package com.marklogic.client.ext.schemasloader.impl;
 
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.ext.batch.BatchWriter;
+import com.marklogic.client.ext.batch.RestBatchWriter;
 import com.marklogic.client.ext.file.DocumentFile;
 import com.marklogic.client.ext.file.GenericFileLoader;
 import com.marklogic.client.ext.modulesloader.impl.DefaultFileFilter;
 import com.marklogic.client.ext.schemasloader.SchemasLoader;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 public class DefaultSchemasLoader extends GenericFileLoader implements SchemasLoader {
 
@@ -34,7 +36,15 @@ public class DefaultSchemasLoader extends GenericFileLoader implements SchemasLo
 	 * @param tdeValidationDatabase
 	 */
 	public DefaultSchemasLoader(DatabaseClient schemasDatabaseClient, String tdeValidationDatabase) {
-		super(schemasDatabaseClient);
+		super(((Supplier<BatchWriter>) () -> {
+			RestBatchWriter writer = new RestBatchWriter(schemasDatabaseClient);
+			// Default this to 1, as it's not typical to have such a large number of schemas to load that multiple threads
+			// are needed. This also ensures that if an error occurs when loading a schema, it's thrown to the client.
+			writer.setThreadCount(1);
+			writer.setReleaseDatabaseClients(false);
+			return writer;
+		}).get());
+
 		this.schemasDatabaseClient = schemasDatabaseClient;
 		this.tdeValidationDatabase = tdeValidationDatabase;
 		initializeDefaultSchemasLoader();

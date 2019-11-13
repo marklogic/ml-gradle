@@ -3,7 +3,7 @@ package com.marklogic.gradle.task.client
 import com.marklogic.gradle.task.MarkLogicTask
 import org.gradle.api.tasks.TaskAction
 
-class CreateTransformTask extends MarkLogicTask {
+class CreateTransformTask extends AbstractModuleCreationTask {
 
     final static String XQUERY_TEMPLATE = '''xquery version "1.0-ml";
 
@@ -54,11 +54,7 @@ exports.transform = transform;
         if (getProject().hasProperty(propName)) {
 	        String transformsPath = transformsDir
 	        if (!transformsPath) {
-		        List<String> modulePaths = getAppConfig().getModulePaths()
-		        if (modulePaths != null && !modulePaths.isEmpty()) {
-			        // Use the last path so modules aren't written to e.g. mlBundle paths
-			        transformsPath = modulePaths.get(modulePaths.size() - 1) + "/transforms"
-		        }
+		        transformsPath = selectModulesPath() + "/transforms"
 	        }
 
             String name = getProject().getProperties().get(propName)

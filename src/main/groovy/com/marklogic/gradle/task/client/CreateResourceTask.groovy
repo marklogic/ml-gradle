@@ -4,7 +4,7 @@ import org.gradle.api.tasks.TaskAction
 
 import com.marklogic.gradle.task.MarkLogicTask
 
-class CreateResourceTask extends MarkLogicTask {
+class CreateResourceTask extends AbstractModuleCreationTask {
 
     final static String SJS_RESOURCE_TEMPLATE =
 '''function get(context, params) {
@@ -92,11 +92,7 @@ declare function delete(
         if (getProject().hasProperty(propName)) {
 	        String servicesPath = servicesDir
 	        if (!servicesPath) {
-		        List<String> modulePaths = getAppConfig().getModulePaths()
-		        if (modulePaths != null && !modulePaths.isEmpty()) {
-			        // Use the last path so modules aren't written to e.g. mlBundle paths
-			        servicesPath = modulePaths.get(modulePaths.size() - 1) + "/services"
-		        }
+		        servicesPath = selectModulesPath() + "/services"
 	        }
 
             String name = getProject().getProperties().get(propName)

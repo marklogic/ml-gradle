@@ -90,7 +90,7 @@ class UnitTestTask extends MarkLogicTask {
 					testsFailed = true
 				}
 				String xml = suite.getXml()
-				String filename = "TEST-" + suite.getName() + ".xml"
+				String filename = "TEST-" + suite.getName().replaceAll("(/|\\\\)", "_") + ".xml"
 				org.springframework.util.FileCopyUtils.copy(xml.getBytes(), new File(resultsDir, filename))
 				fileCount++;
 			}

@@ -17,7 +17,7 @@ class ClearModulesDatabaseTask extends MarkLogicTask {
 		if (command != null) {
 			command.execute(getCommandContext())
 		} else {
-			new DatabaseManager(context.getManageClient()).clearDatabase(getAppConfig().getModulesDatabaseName());
+			new DatabaseManager(getManageClient()).clearDatabase(getAppConfig().getModulesDatabaseName());
 		}
 	}
 }

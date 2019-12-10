@@ -42,7 +42,7 @@ class NewProjectTask extends MarkLogicTask {
 		if (ant.mlPropertiesPlugin == "y") {
 			def text = 'plugins {' +
 				'\n  id "net.saliman.properties" version "1.5.1"' +
-				'\n  id "com.marklogic.ml-gradle" version "3.16.3"' +
+				'\n  id "com.marklogic.ml-gradle" version "3.16.4"' +
 				'\n}'
 			println "Updating build.gradle so that the Gradle properties plugin can be applied"
 			writeFile("build.gradle", text)

@@ -12,8 +12,7 @@ public class Element {
 	@XmlElement(name = "namespace-uri")
 	private String namespaceUri;
 
-	@XmlElementWrapper(name = "localnames")
-	private List<String> localname;
+	private String localname;
 
 	public String getNamespaceUri() {
 		return namespaceUri;
@@ -23,11 +22,11 @@ public class Element {
 		this.namespaceUri = namespaceUri;
 	}
 
-	public List<String> getLocalname() {
+	public String getLocalname() {
 		return localname;
 	}
 
-	public void setLocalname(List<String> localname) {
+	public void setLocalname(String localname) {
 		this.localname = localname;
 	}
 

@@ -124,7 +124,7 @@ public class AppConfig {
 	private boolean staticCheckAssets = false;
 	private boolean staticCheckLibraryAssets = false;
 	private boolean bulkLoadAssets = true;
-	private String moduleTimestampsPath = PropertiesModuleManager.DEFAULT_FILE_PATH;
+	private String moduleTimestampsPath;
 	private boolean moduleTimestampsUseHost = true;
 	private boolean deleteTestModules = false;
 	private String deleteTestModulesPattern = "/test/**";
@@ -266,6 +266,9 @@ public class AppConfig {
 
 	    configDirs = new ArrayList<>();
 	    configDirs.add(ConfigDir.withProjectDir(projectDir));
+
+	    moduleTimestampsPath = projectDir != null ? new File(projectDir, PropertiesModuleManager.DEFAULT_FILE_PATH).getAbsolutePath()
+		    : PropertiesModuleManager.DEFAULT_FILE_PATH;
     }
 
 	public void populateCustomTokens(PropertiesSource propertiesSource) {

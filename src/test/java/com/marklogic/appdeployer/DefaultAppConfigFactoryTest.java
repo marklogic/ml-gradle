@@ -3,6 +3,7 @@ package com.marklogic.appdeployer;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.ext.SecurityContextType;
+import com.marklogic.client.ext.modulesloader.impl.PropertiesModuleManager;
 import com.marklogic.mgmt.util.SimplePropertySource;
 import org.junit.Assert;
 import org.junit.Test;
@@ -46,6 +47,8 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		assertEquals(projectPath + "/path1", appConfig.getConfigDirs().get(0).getBaseDir().getAbsolutePath());
 		assertEquals(projectPath + "/path2", appConfig.getConfigDirs().get(1).getBaseDir().getAbsolutePath());
 		assertEquals(projectPath + "/schemasPath", appConfig.getSchemaPaths().get(0));
+
+		assertEquals(projectPath + "/" + PropertiesModuleManager.DEFAULT_FILE_PATH, appConfig.getModuleTimestampsPath());
 	}
 
 	/**

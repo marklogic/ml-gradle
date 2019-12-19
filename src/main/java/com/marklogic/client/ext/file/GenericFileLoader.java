@@ -86,7 +86,7 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 	 * If batchSize is not set, then this method will load all the documents in one call to the BatchWriter. Otherwise,
 	 * this will divide up the list of documentFiles into batches matching the value of batchSize, with the last batch
 	 * possibly being less than batchSize.
-	 * 
+	 *
 	 * @param documentFiles
 	 * @param startPosition
 	 */
@@ -155,6 +155,8 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 			reader.addDocumentFileProcessor(processor);
 		}
 
+		applyTokenReplacerOnKnownDocumentProcessors(reader);
+
 		if (additionalBinaryExtensions != null) {
 			FormatDocumentFileProcessor processor = reader.getFormatDocumentFileProcessor();
 			FormatGetter formatGetter = processor.getFormatGetter();
@@ -166,6 +168,27 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 			} else {
 				logger.warn("FormatGetter is not an instanceof DefaultDocumentFormatGetter, " +
 					"so unable to add additionalBinaryExtensions: " + Arrays.asList(additionalBinaryExtensions));
+			}
+		}
+	}
+
+	/**
+	 * If this is an instance of DefaultDocumentFileReader and a TokenReplacer has been set on the instance of this
+	 * class, then pass the TokenReplacer along to the known processors in the reader so that those processors
+	 * can replace token occurrences in property values.
+	 *
+	 * @param reader
+	 */
+	protected void applyTokenReplacerOnKnownDocumentProcessors(AbstractDocumentFileReader reader) {
+		if (reader instanceof DefaultDocumentFileReader && tokenReplacer != null) {
+			DefaultDocumentFileReader defaultReader = (DefaultDocumentFileReader)reader;
+			CollectionsFileDocumentFileProcessor cp = defaultReader.getCollectionsFileDocumentFileProcessor();
+			if (cp != null) {
+				cp.setTokenReplacer(tokenReplacer);
+			}
+			PermissionsFileDocumentFileProcessor pp = defaultReader.getPermissionsFileDocumentFileProcessor();
+			if (pp != null) {
+				pp.setTokenReplacer(tokenReplacer);
 			}
 		}
 	}

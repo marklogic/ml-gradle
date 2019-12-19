@@ -1,6 +1,7 @@
 package com.marklogic.client.ext.file;
 
 import com.marklogic.client.ext.helper.LoggingObject;
+import com.marklogic.client.ext.tokenreplacer.TokenReplacer;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -22,6 +23,8 @@ public abstract class PropertiesDrivenDocumentFileProcessor extends LoggingObjec
 
 	// Used to avoid checking for and loading the properties for every file in a directory
 	private Map<File, Properties> propertiesCache = new HashMap<>();
+
+	private TokenReplacer tokenReplacer;
 
 	protected PropertiesDrivenDocumentFileProcessor(String propertiesFilename) {
 		this.propertiesFilename = propertiesFilename;
@@ -81,11 +84,27 @@ public abstract class PropertiesDrivenDocumentFileProcessor extends LoggingObjec
 		}
 	}
 
+	protected String getPropertyValue(Properties properties, String propertyName) {
+		if (properties == null || propertyName == null) {
+			return null;
+		}
+		String value = properties.getProperty(propertyName);
+		return tokenReplacer != null && value != null ? tokenReplacer.replaceTokens(value) : value;
+	}
+
 	public Map<File, Properties> getPropertiesCache() {
 		return propertiesCache;
 	}
 
 	public String getPropertiesFilename() {
 		return propertiesFilename;
+	}
+
+	public void setTokenReplacer(TokenReplacer tokenReplacer) {
+		this.tokenReplacer = tokenReplacer;
+	}
+
+	protected TokenReplacer getTokenReplacer() {
+		return tokenReplacer;
 	}
 }

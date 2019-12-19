@@ -1,9 +1,11 @@
 package com.marklogic.client.ext.file;
 
+import com.marklogic.client.ext.tokenreplacer.DefaultTokenReplacer;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.Properties;
 
 public class CollectionsFileDocumentFileProcessorTest extends Assert {
 
@@ -24,5 +26,21 @@ public class CollectionsFileDocumentFileProcessorTest extends Assert {
 		assertFalse(file.getDocumentMetadata().getCollections().contains("json-data"));
 		assertTrue(file.getDocumentMetadata().getCollections().contains("xml-data"));
 		assertTrue(file.getDocumentMetadata().getCollections().contains("global"));
+	}
+
+	@Test
+	public void replaceTokens() {
+		File testDir = new File("src/test/resources/process-files/token-test");
+
+		DefaultTokenReplacer tokenReplacer = new DefaultTokenReplacer();
+		Properties props = new Properties();
+		props.setProperty("%%someCollection%%", "this-was-replaced");
+		tokenReplacer.setProperties(props);
+		processor.setTokenReplacer(tokenReplacer);
+
+		DocumentFile file = new DocumentFile("/test.json", new File(testDir, "test.json"));
+		processor.processDocumentFile(file);
+		assertTrue(file.getDocumentMetadata().getCollections().contains("this-was-replaced"));
+		assertFalse(file.getDocumentMetadata().getCollections().contains("%%someCollection%%"));
 	}
 }

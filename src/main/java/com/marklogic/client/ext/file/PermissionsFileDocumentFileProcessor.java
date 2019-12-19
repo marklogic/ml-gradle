@@ -30,12 +30,12 @@ public class PermissionsFileDocumentFileProcessor extends PropertiesDrivenDocume
 	protected void processProperties(DocumentFile documentFile, Properties properties) {
 		String name = documentFile.getFile().getName();
 		if (properties.containsKey(name)) {
-			String value = properties.getProperty(name);
+			String value = getPropertyValue(properties, name);
 			documentPermissionsParser.parsePermissions(value, documentFile.getDocumentMetadata().getPermissions());
 		}
 
 		if (properties.containsKey(WILDCARD_KEY)) {
-			String value = properties.getProperty(WILDCARD_KEY);
+			String value = getPropertyValue(properties, WILDCARD_KEY);
 			documentPermissionsParser.parsePermissions(value, documentFile.getDocumentMetadata().getPermissions());
 		}
 	}

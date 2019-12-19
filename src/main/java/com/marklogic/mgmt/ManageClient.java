@@ -69,7 +69,7 @@ public class ManageClient extends LoggingObject {
 	    String securityUsername = config.getSecurityUsername();
 	    if (securityUsername != null && securityUsername.trim().length() > 0 && !securityUsername.equals(config.getUsername())) {
 		    if (logger.isInfoEnabled()) {
-			    logger.info(format("Initializing separate connection to Manage API with user '%s' that must have both manage-admin and security roles", securityUsername));
+			    logger.info(format("Initializing separate connection to Manage API with user '%s' that should have the 'manage-admin' and 'security' roles", securityUsername));
 		    }
 
 		    RestConfig rc = new RestConfig(config.getHost(), config.getPort(), securityUsername, config.getSecurityPassword());
@@ -368,7 +368,7 @@ public class ManageClient extends LoggingObject {
 
     protected void logSecurityUserRequest(String path, String contentType, String method) {
         if (logger.isInfoEnabled()) {
-            logger.info(String.format("Sending %s %s request as user '%s' (who must have the 'manage-admin' and 'security' roles) to path: %s",
+            logger.info(String.format("Sending %s %s request as user '%s' (who should have the 'manage-admin' and 'security' roles) to path: %s",
 	            contentType, method, determineUsernameForSecurityUserRequest(), path));
         }
     }

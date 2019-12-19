@@ -8,6 +8,9 @@ public abstract class SortOrderConstants {
 	public static Integer DEPLOY_QUERY_ROLESETS = 13; // depends on roles
     public static Integer DEPLOY_USERS = 15; // depends on roles
 
+	// After users are deployed so they're not included in combined CMA requests
+	public static Integer DEPLOY_PRIVILEGE_ROLES = 18;
+
 	public static Integer DEPLOY_CERTIFICATE_AUTHORITIES = 20;
 	public static Integer DEPLOY_CERTIFICATE_TEMPLATES = 24;
 	public static Integer GENERATE_TEMPORARY_CERTIFICATE = 25;

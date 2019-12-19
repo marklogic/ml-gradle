@@ -1,76 +1,82 @@
 package com.marklogic.mgmt.api.security;
 
-import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.Resource;
+import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.security.PrivilegeManager;
 
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@XmlRootElement(name = "privilege-properties")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Privilege extends Resource {
 
-    private String privilegeName;
-    private String action;
-    private String kind;
-    private List<String> role;
+	@XmlElement(name = "privilege-name")
+	private String privilegeName;
+	private String action;
+	private String kind;
 
-    public Privilege() {
-        super();
-    }
+	@XmlElementWrapper(name = "roles")
+	private List<String> role;
 
-    public Privilege(API api, String privilegeName) {
-        super(api);
-        this.privilegeName = privilegeName;
-    }
+	public Privilege() {
+		super();
+	}
 
-    public void addRole(String r) {
-        if (role == null) {
-            role = new ArrayList<String>();
-        }
-        role.add(r);
-    }
+	public Privilege(API api, String privilegeName) {
+		super(api);
+		this.privilegeName = privilegeName;
+	}
 
-    @Override
-    protected ResourceManager getResourceManager() {
-        return new PrivilegeManager(getClient());
-    }
+	public void addRole(String r) {
+		if (role == null) {
+			role = new ArrayList<>();
+		}
+		role.add(r);
+	}
 
-    @Override
-    protected String getResourceId() {
-        return privilegeName;
-    }
+	@Override
+	protected ResourceManager getResourceManager() {
+		return new PrivilegeManager(getClient());
+	}
 
-    public String getPrivilegeName() {
-        return privilegeName;
-    }
+	@Override
+	protected String getResourceId() {
+		return privilegeName;
+	}
 
-    public void setPrivilegeName(String privilegeName) {
-        this.privilegeName = privilegeName;
-    }
+	public String getPrivilegeName() {
+		return privilegeName;
+	}
 
-    public String getAction() {
-        return action;
-    }
+	public void setPrivilegeName(String privilegeName) {
+		this.privilegeName = privilegeName;
+	}
 
-    public void setAction(String action) {
-        this.action = action;
-    }
+	public String getAction() {
+		return action;
+	}
 
-    public String getKind() {
-        return kind;
-    }
+	public void setAction(String action) {
+		this.action = action;
+	}
 
-    public void setKind(String kind) {
-        this.kind = kind;
-    }
+	public String getKind() {
+		return kind;
+	}
 
-    public List<String> getRole() {
-        return role;
-    }
+	public void setKind(String kind) {
+		this.kind = kind;
+	}
 
-    public void setRole(List<String> role) {
-        this.role = role;
-    }
+	public List<String> getRole() {
+		return role;
+	}
+
+	public void setRole(List<String> role) {
+		this.role = role;
+	}
 
 }

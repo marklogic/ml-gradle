@@ -2,6 +2,7 @@ package com.marklogic.appdeployer.command.security;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.appdeployer.command.*;
+import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.api.configuration.Configuration;
 import com.marklogic.mgmt.api.security.Privilege;
 import com.marklogic.mgmt.resource.ResourceManager;
@@ -12,6 +13,8 @@ import java.io.File;
 import java.util.function.BiPredicate;
 
 public class DeployPrivilegesCommand extends AbstractResourceCommand implements SupportsCmaCommand {
+
+	private boolean removeRolesBeforeSaving = true;
 
 	public DeployPrivilegesCommand() {
 		setExecuteSortOrder(SortOrderConstants.DEPLOY_PRIVILEGES);
@@ -32,12 +35,22 @@ public class DeployPrivilegesCommand extends AbstractResourceCommand implements 
 	}
 
 	@Override
+	protected String adjustPayloadBeforeSavingResource(CommandContext context, File f, String payload) {
+		payload = super.adjustPayloadBeforeSavingResource(context, f, payload);
+		return removeRolesBeforeSaving ? new PayloadParser().excludeProperties(payload, "role") : payload;
+	}
+
+	@Override
 	public boolean cmaShouldBeUsed(CommandContext context) {
 		return context.getAppConfig().getCmaConfig().isDeployPrivileges();
 	}
 
 	@Override
 	public void addResourceToConfiguration(ObjectNode resource, Configuration configuration) {
+		if (removeRolesBeforeSaving && resource != null && resource.has("role")) {
+			resource.remove("role");
+		}
+
 		configuration.addPrivilege(resource);
 	}
 
@@ -53,16 +66,29 @@ public class DeployPrivilegesCommand extends AbstractResourceCommand implements 
 
 	@Override
 	protected BiPredicate<ResourceReference, ResourceReference> getBiPredicateForMergingResources() {
-		return (reference1, reference2) -> {
-			EqualsBuilder b = new EqualsBuilder();
+		return new PrivilegeBiPredicate();
+	}
 
-			final ObjectNode node1 = reference1.getObjectNode();
-			final ObjectNode node2 = reference2.getObjectNode();
+	public boolean isRemoveRolesBeforeSaving() {
+		return removeRolesBeforeSaving;
+	}
 
-			b.append(node1.get("privilege-name").asText(), node2.get("privilege-name").asText());
-			b.append(node1.has("kind") ? node1.get("kind").asText() : null, node2.has("kind") ? node2.get("kind").asText() : null);
+	public void setRemoveRolesBeforeSaving(boolean removeRolesBeforeSaving) {
+		this.removeRolesBeforeSaving = removeRolesBeforeSaving;
+	}
+}
 
-			return b.isEquals();
-		};
+class PrivilegeBiPredicate implements BiPredicate<ResourceReference, ResourceReference> {
+	@Override
+	public boolean test(ResourceReference reference1, ResourceReference reference2) {
+		EqualsBuilder b = new EqualsBuilder();
+
+		final ObjectNode node1 = reference1.getObjectNode();
+		final ObjectNode node2 = reference2.getObjectNode();
+
+		b.append(node1.get("privilege-name").asText(), node2.get("privilege-name").asText());
+		b.append(node1.has("kind") ? node1.get("kind").asText() : null, node2.has("kind") ? node2.get("kind").asText() : null);
+
+		return b.isEquals();
 	}
 }

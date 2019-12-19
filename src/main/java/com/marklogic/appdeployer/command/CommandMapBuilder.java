@@ -62,6 +62,7 @@ public class CommandMapBuilder {
 		securityCommands.add(new InsertCertificateHostsTemplateCommand());
 		securityCommands.add(new DeployExternalSecurityCommand());
 		securityCommands.add(new DeployPrivilegesCommand());
+		securityCommands.add(new DeployPrivilegeRolesCommand());
 		securityCommands.add(new DeployProtectedCollectionsCommand());
 		securityCommands.add(new DeployProtectedPathsCommand());
 		securityCommands.add(new DeployQueryRolesetsCommand());
@@ -158,7 +159,7 @@ public class CommandMapBuilder {
 		List<Command> pluginCommands = new ArrayList<>();
 		pluginCommands.add(new InstallPluginsCommand());
 		map.put("mlPluginCommands", pluginCommands);
-		
+
 		// Tasks
 		List<Command> taskCommands = new ArrayList<Command>();
 		taskCommands.add(new DeployScheduledTasksCommand());

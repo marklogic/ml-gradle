@@ -30,6 +30,7 @@ public class LoadDataTest extends AbstractAppDeployerTest {
 
 		initializeAppDeployer(new DeployRestApiServersCommand(), new LoadDataCommand());
 		appConfig.getCustomTokens().put("%%TOKEN_TEST%%", "this was replaced");
+		appConfig.getCustomTokens().put("%%roleName%%", "manage-user");
 		deploySampleApp();
 
 		DatabaseClient client = appConfig.newDatabaseClient();

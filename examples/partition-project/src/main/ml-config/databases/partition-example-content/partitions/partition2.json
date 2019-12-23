@@ -1,0 +1,12 @@
+{
+	"partition-name": "myDate-2012",
+	"lower-bound": "2012-01-01",
+	"upper-bound": "2012-12-31",
+	"forests-per-host": 1,
+	"host": [
+		"mlHostName1"
+	],
+	"option": [
+		"failover=none"
+	]
+}

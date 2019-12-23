@@ -1,0 +1,17 @@
+<partition xmlns="http://marklogic.com/manage">
+	<partition-name>myDate-2011</partition-name>
+	<lower-bound>2011-01-01</lower-bound>
+	<upper-bound>2011-12-31</upper-bound>
+	<forests-per-host>1</forests-per-host>
+	<hosts>
+		<host>mlHostName1</host>
+	</hosts>
+	<!--
+	<data-directory></data-directory>
+	<large-data-directory></large-data-directory>
+	<fast-data-directory></fast-data-directory>
+	<options>
+		<option>failover=none</option>
+	</options>
+	-->
+</partition>

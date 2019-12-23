@@ -38,6 +38,10 @@ import com.marklogic.gradle.task.plugins.InstallPluginsTask
 import com.marklogic.gradle.task.plugins.UninstallPluginsTask
 import com.marklogic.gradle.task.qconsole.ExportWorkspacesTask
 import com.marklogic.gradle.task.qconsole.ImportWorkspacesTask
+import com.marklogic.gradle.task.rebalancer.DeployPartitionQueriesTask
+import com.marklogic.gradle.task.rebalancer.DeployPartitionsTask
+import com.marklogic.gradle.task.rebalancer.TakePartitionOfflineTask
+import com.marklogic.gradle.task.rebalancer.TakePartitionOnlineTask
 import com.marklogic.gradle.task.restapis.DeployRestApisTask
 import com.marklogic.gradle.task.roxy.RoxyMigrateBuildStepsTask
 import com.marklogic.gradle.task.roxy.RoxyMigrateFilesTask
@@ -239,6 +243,14 @@ class MarkLogicPlugin implements Plugin<Project> {
 		String qconsoleGroup = "ml-gradle qconsole"
 		project.task("mlImportWorkspaces", type: ImportWorkspacesTask, group: qconsoleGroup, description: "Import workspaces into qconsole")
 		project.task("mlExportWorkspaces", type: ExportWorkspacesTask, group: qconsoleGroup, description: "Export workspaces from qconsole")
+
+		String rebalancerGroup = "ml-gradle Rebalancer"
+		project.task("mlDeployPartitions", type: DeployPartitionsTask, group: rebalancerGroup, description: "Deploy database-specific partitions")
+		project.task("mlDeployPartitionQueries", type: DeployPartitionQueriesTask, group: rebalancerGroup, description: "Deploy database-specific partition queries")
+		project.task("mlTakePartitionOffline", type: TakePartitionOfflineTask, group: rebalancerGroup,
+			description: "Take a partition offline. Use -Pdatabase=dbName and -Ppartition=partitionName to specify the database and partition names.")
+		project.task("mlTakePartitionOnline", type: TakePartitionOnlineTask, group: rebalancerGroup,
+			description: "Take a partition online. Use -Pdatabase=dbName and -Ppartition=partitionName to specify the database and partition names.")
 
 		String restApisGroup = "ml-gradle REST API"
 		project.task("mlDeployRestApis", type: DeployRestApisTask, group: restApisGroup, description: "Deploy the REST API instances defined by a resource file or the mlRestPort/mlTestRestPort properties")

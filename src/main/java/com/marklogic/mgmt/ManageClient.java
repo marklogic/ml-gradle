@@ -263,12 +263,19 @@ public class ManageClient extends LoggingObject {
 	}
 
     public String getJson(String path) {
-        logRequest(path, "JSON", "GET");
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
-        return getRestTemplate().exchange(buildUri(path), HttpMethod.GET, new HttpEntity<>(headers), String.class)
-                .getBody();
+		return getJson(path, String.class).getBody();
     }
+
+	public JsonNode getJsonNode(String path) {
+		return getJson(path, JsonNode.class).getBody();
+	}
+
+	protected <T> ResponseEntity<T> getJson(String path, Class<T> responseType) {
+		logRequest(path, "JSON", "GET");
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
+		return getRestTemplate().exchange(buildUri(path), HttpMethod.GET, new HttpEntity<>(headers), responseType);
+	}
 
     public String getJson(URI uri) {
         logRequest(uri.toString(), "JSON", "GET");

@@ -1,0 +1,11 @@
+{
+	"partition-name": "tier1",
+	"partition-number": "1",
+	"forests-per-host": 1,
+	"host": [
+		"mlHostName1"
+	],
+	"option": [
+		"failover=none"
+	]
+}

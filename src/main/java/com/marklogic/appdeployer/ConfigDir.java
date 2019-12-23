@@ -128,6 +128,16 @@ public class ConfigDir {
 		return new File(getBaseDir(), "triggers");
 	}
 
+	// This is expected to be relative to a database-specific directory
+	public File getPartitionsDir() {
+		return new File(getBaseDir(), "partitions");
+	}
+
+	// This is expected to be relative to a database-specific directory
+	public File getPartitionQueriesDir() {
+		return new File(getBaseDir(), "partition-queries");
+	}
+
 	public File getUsersDir() {
 		return new File(getSecurityDir(), "users");
 	}

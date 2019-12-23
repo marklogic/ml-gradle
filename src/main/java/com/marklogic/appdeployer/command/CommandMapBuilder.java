@@ -23,6 +23,8 @@ import com.marklogic.appdeployer.command.mimetypes.DeployMimetypesCommand;
 import com.marklogic.appdeployer.command.modules.DeleteTestModulesCommand;
 import com.marklogic.appdeployer.command.modules.LoadModulesCommand;
 import com.marklogic.appdeployer.command.plugins.InstallPluginsCommand;
+import com.marklogic.appdeployer.command.rebalancer.DeployPartitionQueriesCommand;
+import com.marklogic.appdeployer.command.rebalancer.DeployPartitionsCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.appdeployer.command.schemas.LoadSchemasCommand;
 import com.marklogic.appdeployer.command.security.*;
@@ -42,7 +44,7 @@ import java.util.Map;
 /**
  * The intent of this class is to construct a map of commonly used commands that can used in a variety of contexts - i.e.
  * ml-gradle or the Data Hub Framework - thus preventing those clients from having to duplicate this code.
- *
+ * <p>
  * A map is returned so that the commands can be grouped into lists, which is convenient for e.g. ml-gradle tasks that
  * want to execute all of the commands for a particular resource or set of resources - e.g. mlSecurityCommands for
  * invoking all commands pertaining to security resources.
@@ -82,6 +84,12 @@ public class CommandMapBuilder {
 		List<Command> dbCommands = new ArrayList<Command>();
 		dbCommands.add(new DeployOtherDatabasesCommand());
 		map.put("mlDatabaseCommands", dbCommands);
+
+		// Database rebalancer
+		List<Command> rebalancerCommands = new ArrayList<>();
+		rebalancerCommands.add(new DeployPartitionsCommand());
+		rebalancerCommands.add(new DeployPartitionQueriesCommand());
+		map.put("mlRebalancerCommands", rebalancerCommands);
 
 		// Schemas
 		List<Command> schemaCommands = new ArrayList<>();

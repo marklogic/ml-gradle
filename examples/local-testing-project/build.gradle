@@ -8,7 +8,11 @@ buildscript {
   }
 }
 
-apply plugin: "java"
+plugins {
+	id "net.saliman.properties" version "1.5.1"
+	id "java"
+}
+
 apply plugin: "com.marklogic.ml-gradle"
 
 repositories {

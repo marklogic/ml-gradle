@@ -40,6 +40,21 @@ public class DefaultAdminConfigFactoryTest extends Assert {
 		assertEquals("host2", config.getHost());
 	}
 
+	@Test
+	public void sslProperties() {
+		AdminConfig config = configure(
+			"mlAdminSimpleSsl", "true",
+			"mlAdminSslProtocol", "TLSv1.2",
+			"mlAdminUseDefaultKeystore", "true",
+			"mlAdminTrustManagementAlgorithm", "PKIX"
+		);
+
+		assertTrue(config.isConfigureSimpleSsl());
+		assertEquals("TLSv1.2", config.getSslProtocol());
+		assertTrue(config.isUseDefaultKeystore());
+		assertEquals("PKIX", config.getTrustManagementAlgorithm());
+	}
+
 	private AdminConfig configure(String... properties) {
 		return new DefaultAdminConfigFactory(new SimplePropertySource(properties)).newAdminConfig();
 	}

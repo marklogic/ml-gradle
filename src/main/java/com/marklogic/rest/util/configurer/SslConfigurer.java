@@ -1,76 +1,87 @@
 package com.marklogic.rest.util.configurer;
 
 import com.marklogic.client.ext.helper.LoggingObject;
+import com.marklogic.client.ext.ssl.SslUtil;
 import com.marklogic.rest.util.HttpClientBuilderConfigurer;
 import com.marklogic.rest.util.RestConfig;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 import org.apache.http.conn.ssl.SSLContextBuilder;
-import org.apache.http.conn.ssl.TrustStrategy;
-import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocket;
-import java.security.cert.X509Certificate;
 
 public class SslConfigurer extends LoggingObject implements HttpClientBuilderConfigurer {
 
+	/**
+	 * First checks for a custom SSLContext; then checks to see if the default keystore should be used; then checks to
+	 * see if a simple "trust everything" approach should be used.
+	 *
+	 * @param config
+	 * @param httpClientBuilder
+	 * @return
+	 */
 	@Override
 	public HttpClientBuilder configureHttpClientBuilder(RestConfig config, HttpClientBuilder httpClientBuilder) {
-		if (config.isConfigureSimpleSsl()) {
-			if (logger.isInfoEnabled()) {
-				logger.info("Configuring simple SSL approach for connecting to: " + config.getBaseUrl());
-			}
-			configureSimpleSsl(httpClientBuilder);
-		}
-
+		SSLContext sslContext = null;
 		if (config.getSslContext() != null) {
 			if (logger.isInfoEnabled()) {
 				logger.info("Using custom SSLContext for connecting to: " + config.getBaseUrl());
 			}
-			httpClientBuilder.setSslcontext(config.getSslContext());
+			sslContext = config.getSslContext();
+		} else if (config.isUseDefaultKeystore()) {
+			sslContext = buildSslContextViaTrustManagerFactory(config);
+		} else if (config.isConfigureSimpleSsl()) {
+			sslContext = buildSimpleSslContext(config);
 		}
 
-		if (config.getHostnameVerifier() != null) {
-			if (logger.isInfoEnabled()) {
-				logger.info("Using custom X509HostnameVerifier for connecting to: " + config.getBaseUrl());
+		if (sslContext != null) {
+			httpClientBuilder.setSslcontext(sslContext);
+
+			if (config.getHostnameVerifier() != null) {
+				if (logger.isInfoEnabled()) {
+					logger.info("Using custom X509HostnameVerifier for connecting to: " + config.getBaseUrl());
+				}
+				httpClientBuilder.setHostnameVerifier(config.getHostnameVerifier());
+			} else {
+				if (logger.isInfoEnabled()) {
+					logger.info("Using 'allow all' X509HostnameVerifier for connecting to: " + config.getBaseUrl());
+				}
+				httpClientBuilder.setHostnameVerifier(new AllowAllHostnameVerifier());
 			}
-			httpClientBuilder.setHostnameVerifier(config.getHostnameVerifier());
 		}
 
 		return httpClientBuilder;
 	}
 
-	protected void configureSimpleSsl(HttpClientBuilder httpClientBuilder) {
-		try {
-			SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
-				@Override
-				public boolean isTrusted(X509Certificate[] chain, String authType) {
-					return true;
-				}
-			}).build();
-			httpClientBuilder.setSslcontext(sslContext);
-		} catch (Exception ex) {
-			throw new RuntimeException("Unable to configure simple SSLContext, cause: " + ex.getMessage(), ex);
+	protected SSLContext buildSslContextViaTrustManagerFactory(RestConfig config) {
+		final String protocol = determineProtocol(config);
+		final String algorithm = config.getTrustManagementAlgorithm();
+		if (logger.isInfoEnabled()) {
+			logger.info("Using default keystore with SSL protocol " + protocol + " for connecting to: " + config.getBaseUrl());
 		}
+		return SslUtil.configureUsingTrustManagerFactory(protocol, algorithm).getSslContext();
+	}
 
-		httpClientBuilder.setHostnameVerifier(new X509HostnameVerifier() {
-			@Override
-			public void verify(String host, SSLSocket ssl) {
-			}
+	protected SSLContext buildSimpleSslContext(RestConfig config) {
+		final String protocol = determineProtocol(config);
 
-			@Override
-			public void verify(String host, X509Certificate cert) {
-			}
+		SSLContextBuilder builder = new SSLContextBuilder().useProtocol(protocol);
+		if (logger.isInfoEnabled()) {
+			logger.info("Configuring simple SSL approach with protocol " + protocol + " for connecting to: " + config.getBaseUrl());
+		}
+		try {
+			return builder.loadTrustMaterial(null, (chain, authType) -> true).build();
+		} catch (Exception ex) {
+			throw new RuntimeException("Unable to configure simple SSLContext for connecting to: " + config.getBaseUrl() + ", cause: " + ex.getMessage(), ex);
+		}
+	}
 
-			@Override
-			public void verify(String host, String[] cns, String[] subjectAlts) {
-			}
-
-			@Override
-			public boolean verify(String s, SSLSession sslSession) {
-				return true;
-			}
-		});
+	protected String determineProtocol(RestConfig config) {
+		String protocol = config.getSslProtocol();
+		if (StringUtils.isEmpty(protocol)) {
+			protocol = SslUtil.DEFAULT_SSL_PROTOCOL;
+		}
+		return protocol;
 	}
 }

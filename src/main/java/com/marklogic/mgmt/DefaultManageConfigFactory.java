@@ -82,6 +82,21 @@ public class DefaultManageConfigFactory extends PropertySourceFactory implements
 		    config.setConfigureSimpleSsl(Boolean.parseBoolean(prop));
 	    });
 
+	    propertyConsumerMap.put("mlManageSslProtocol", (config, prop) -> {
+		    logger.info("Using SSL protocol for Manage app server: " + prop);
+		    config.setSslProtocol(prop);
+	    });
+
+	    propertyConsumerMap.put("mlManageUseDefaultKeystore", (config, prop) -> {
+	    	logger.info("Using default JVM keystore for SSL for Manage app server: " + prop);
+	    	config.setUseDefaultKeystore(Boolean.parseBoolean(prop));
+	    });
+
+	    propertyConsumerMap.put("mlManageTrustManagementAlgorithm", (config, prop) -> {
+		    logger.info("Using trust management algorithm for SSL for Manage app server: " + prop);
+		    config.setTrustManagementAlgorithm(prop);
+	    });
+
 	    propertyConsumerMap.put("mlManageCleanJsonPayloads", (config, prop) -> {
 		    logger.info("Cleaning Management API JSON payloads: " + prop);
 		    config.setCleanJsonPayloads(Boolean.parseBoolean(prop));

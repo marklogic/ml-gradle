@@ -1,21 +1,24 @@
 package com.marklogic.rest.util;
 
-import com.marklogic.mgmt.AbstractMgmtTest;
+import com.marklogic.junit.BaseTestHelper;
 import com.marklogic.mgmt.ManageClient;
-import com.marklogic.rest.util.RestTemplateUtil;
+import com.marklogic.mgmt.ManageConfig;
+import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 import org.apache.http.conn.ssl.SSLContextBuilder;
-import org.apache.http.conn.ssl.TrustStrategy;
-import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.junit.Test;
 
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocket;
-import java.security.cert.X509Certificate;
 
-public class RestTemplateUtilTest extends AbstractMgmtTest {
+/**
+ * Many of these tests are just smoke tests that can be used to inspect logging as well. Ideally, they can soon depend
+ * on the Manage server being configured to use SSL. Although testing the use of the default keystore would likely
+ * still be out of scope due to the difficulty of using a certificate signed by an authority that's trusted by the
+ * default keystore.
+ */
+public class RestTemplateUtilTest extends BaseTestHelper {
 
 	private boolean configurerInvoked = false;
+	private ManageConfig manageConfig = new ManageConfig();
 
 	@Test
 	public void configurerList() {
@@ -32,49 +35,68 @@ public class RestTemplateUtilTest extends AbstractMgmtTest {
 		assertTrue(configurerInvoked);
 	}
 
-	/**
-	 * Just a smoke test to inspect the logging.
-	 */
 	@Test
 	public void configureSimpleSsl() {
 		manageConfig.setConfigureSimpleSsl(true);
 		new ManageClient(manageConfig);
 	}
 
-	/**
-	 * Another smoke test to inspect logging.
-	 */
+	@Test
+	public void simpleSslWithCustomProtocol() {
+		manageConfig.setConfigureSimpleSsl(true);
+		manageConfig.setSslProtocol("SSLv3");
+		new ManageClient(manageConfig);
+	}
+
+	@Test
+	public void simpleSslWithInvalidProtocol() {
+		manageConfig.setConfigureSimpleSsl(true);
+		manageConfig.setSslProtocol("invalid");
+		try {
+			new ManageClient(manageConfig);
+			fail("Expected failure due to invalid protocol");
+		} catch (Exception ex) {
+			logger.info("Caught expected exception: " + ex.getMessage());
+		}
+	}
+
 	@Test
 	public void customSslContextAndHostnameVerifier() throws Exception {
-		SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
-			@Override
-			public boolean isTrusted(X509Certificate[] chain, String authType) {
-				return true;
-			}
-		}).build();
-
-		X509HostnameVerifier verifier = new X509HostnameVerifier() {
-			@Override
-			public void verify(String host, SSLSocket ssl) {
-			}
-
-			@Override
-			public void verify(String host, X509Certificate cert) {
-			}
-
-			@Override
-			public void verify(String host, String[] cns, String[] subjectAlts) {
-			}
-
-			@Override
-			public boolean verify(String s, SSLSession sslSession) {
-				return false;
-			}
-		};
+		SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, (chain, authType) -> true).build();
 
 		manageConfig.setSslContext(sslContext);
-		manageConfig.setHostnameVerifier(verifier);
+		manageConfig.setHostnameVerifier(new AllowAllHostnameVerifier());
 
 		new ManageClient(manageConfig);
+	}
+
+	@Test
+	public void useDefaultKeystore() {
+		manageConfig.setUseDefaultKeystore(true);
+		new ManageClient(manageConfig);
+	}
+
+	@Test
+	public void defaultKeystoreWithInvalidProtocol() {
+		manageConfig.setUseDefaultKeystore(true);
+		manageConfig.setSslProtocol("invalid");
+		try {
+			new ManageClient(manageConfig);
+			fail("Expected failure due to invalid protocol");
+		} catch (Exception ex) {
+			logger.info("Caught expected exception: " + ex.getMessage());
+		}
+	}
+
+	@Test
+	public void defaultKeystoreWithInvalidAlgorithm() {
+		manageConfig.setUseDefaultKeystore(true);
+		manageConfig.setTrustManagementAlgorithm("invalid");
+		try {
+			new ManageClient(manageConfig);
+			fail("Expected failure due to invalid algorithm");
+		} catch (Exception ex) {
+			logger.info("Caught expected exception: " + ex.getMessage());
+		}
 	}
 }

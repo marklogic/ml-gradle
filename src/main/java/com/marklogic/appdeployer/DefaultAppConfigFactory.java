@@ -238,6 +238,21 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			}
 		});
 
+		propertyConsumerMap.put("mlAppServicesSslProtocol", (config, prop) -> {
+			logger.info("Using SSL protocol for App-Services server: " + prop);
+			config.setAppServicesSslProtocol(prop);
+		});
+
+		propertyConsumerMap.put("mlAppServicesUseDefaultKeystore", (config, prop) -> {
+			logger.info("Using default JVM keystore for SSL for App-Services server: " + prop);
+			config.setAppServicesUseDefaultKeystore(Boolean.parseBoolean(prop));
+		});
+
+		propertyConsumerMap.put("mlAppServicesTrustManagementAlgorithm", (config, prop) -> {
+			logger.info("Using trust management algorithm for SSL for App-Services server: " + prop);
+			config.setAppServicesTrustManagementAlgorithm(prop);
+		});
+
 		/**
 		 * Set this to true to prevent creating a REST API server by default.
 		 */
@@ -308,6 +323,22 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 					"client REST API server", protocol));
 			}
 		});
+
+		propertyConsumerMap.put("mlRestSslProtocol", (config, prop) -> {
+			logger.info("Using SSL protocol for client REST API server: " + prop);
+			config.setRestSslProtocol(prop);
+		});
+
+		propertyConsumerMap.put("mlRestUseDefaultKeystore", (config, prop) -> {
+			logger.info("Using default JVM keystore for SSL for client REST API server: " + prop);
+			config.setRestUseDefaultKeystore(Boolean.parseBoolean(prop));
+		});
+
+		propertyConsumerMap.put("mlRestTrustManagementAlgorithm", (config, prop) -> {
+			logger.info("Using trust management algorithm for SSL for client REST API server: " + prop);
+			config.setRestTrustManagementAlgorithm(prop);
+		});
+
 
 		/**
 		 * mlUsername and mlPassword are the default username/password for connecting to the app's REST server (if one

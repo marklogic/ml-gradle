@@ -71,6 +71,21 @@ public class DefaultManageConfigFactoryTest extends Assert {
 	}
 
 	@Test
+	public void sslProperties() {
+		ManageConfig config = configure(
+			"mlManageSimpleSsl", "true",
+			"mlManageSslProtocol", "TLSv1.2",
+			"mlManageUseDefaultKeystore", "true",
+			"mlManageTrustManagementAlgorithm", "PKIX"
+		);
+
+		assertTrue(config.isConfigureSimpleSsl());
+		assertEquals("TLSv1.2", config.getSslProtocol());
+		assertTrue(config.isUseDefaultKeystore());
+		assertEquals("PKIX", config.getTrustManagementAlgorithm());
+	}
+
+	@Test
 	public void mlHost() {
 		ManageConfig config = configure("mlHost", "host1");
 		assertEquals("host1", config.getHost());

@@ -636,4 +636,30 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		config = new DefaultAppConfigFactory(new SimplePropertySource()).newAppConfig();
 		assertNull(config.getRestSslContext());
 	}
+
+	@Test
+	public void restUseDefaultKeystore() {
+		AppConfig config = new DefaultAppConfigFactory(new SimplePropertySource(
+			"mlRestUseDefaultKeystore", "true",
+			"mlRestSslProtocol", "SSLv3",
+			"mlRestTrustManagementAlgorithm", "PKIX"
+		)).newAppConfig();
+
+		assertTrue(config.isRestUseDefaultKeystore());
+		assertEquals("SSLv3", config.getRestSslProtocol());
+		assertEquals("PKIX", config.getRestTrustManagementAlgorithm());
+	}
+
+	@Test
+	public void appServicesUseDefaultKeystore() {
+		AppConfig config = new DefaultAppConfigFactory(new SimplePropertySource(
+			"mlAppServicesUseDefaultKeystore", "true",
+			"mlAppServicesSslProtocol", "SSLv3",
+			"mlAppServicesTrustManagementAlgorithm", "PKIX"
+		)).newAppConfig();
+
+		assertTrue(config.isAppServicesUseDefaultKeystore());
+		assertEquals("SSLv3", config.getAppServicesSslProtocol());
+		assertEquals("PKIX", config.getAppServicesTrustManagementAlgorithm());
+	}
 }

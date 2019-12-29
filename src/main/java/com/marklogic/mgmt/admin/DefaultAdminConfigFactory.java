@@ -78,6 +78,21 @@ public class DefaultAdminConfigFactory extends PropertySourceFactory implements 
 		    logger.info("Use simple SSL for Admin interface: " + prop);
 		    config.setConfigureSimpleSsl(Boolean.parseBoolean(prop));
 	    });
+
+	    propertyConsumerMap.put("mlAdminSslProtocol", (config, prop) -> {
+		    logger.info("Using SSL protocol for Admin app server: " + prop);
+		    config.setSslProtocol(prop);
+	    });
+
+	    propertyConsumerMap.put("mlAdminUseDefaultKeystore", (config, prop) -> {
+		    logger.info("Using default JVM keystore for SSL for Admin app server: " + prop);
+		    config.setUseDefaultKeystore(Boolean.parseBoolean(prop));
+	    });
+
+	    propertyConsumerMap.put("mlAdminTrustManagementAlgorithm", (config, prop) -> {
+		    logger.info("Using trust management algorithm for SSL for Admin app server: " + prop);
+		    config.setTrustManagementAlgorithm(prop);
+	    });
     }
 
     @Override

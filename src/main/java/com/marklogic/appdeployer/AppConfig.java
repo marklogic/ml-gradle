@@ -12,10 +12,12 @@ import com.marklogic.client.ext.DefaultConfiguredDatabaseClientFactory;
 import com.marklogic.client.ext.SecurityContextType;
 import com.marklogic.client.ext.modulesloader.impl.PropertiesModuleManager;
 import com.marklogic.client.ext.modulesloader.ssl.SimpleX509TrustManager;
+import com.marklogic.client.ext.ssl.SslUtil;
 import com.marklogic.client.ext.tokenreplacer.DefaultTokenReplacer;
 import com.marklogic.client.ext.tokenreplacer.PropertiesSource;
 import com.marklogic.client.ext.tokenreplacer.RoxyTokenReplacer;
 import com.marklogic.client.ext.tokenreplacer.TokenReplacer;
+import org.springframework.util.StringUtils;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.X509TrustManager;
@@ -92,7 +94,11 @@ public class AppConfig {
     private String restCertPassword;
     private String restExternalName;
     private X509TrustManager restTrustManager;
-    private Integer restPort = DEFAULT_PORT;
+	private boolean restUseDefaultKeystore;
+	private String restSslProtocol;
+	private String restTrustManagementAlgorithm;
+
+	private Integer restPort = DEFAULT_PORT;
     private Integer testRestPort;
 
     // Connection info for using the App Services client REST API - e.g. to load non-REST API modules
@@ -107,6 +113,9 @@ public class AppConfig {
 	private String appServicesCertPassword;
 	private String appServicesExternalName;
 	private X509TrustManager appServicesTrustManager;
+	private boolean appServicesUseDefaultKeystore;
+	private String appServicesSslProtocol;
+	private String appServicesTrustManagementAlgorithm;
 
     // These can all be set to override the default names that are generated off of the "name" attribute.
     private String groupName = DEFAULT_GROUP;
@@ -364,15 +373,24 @@ public class AppConfig {
     }
 
     public DatabaseClientConfig newRestDatabaseClientConfig(int port) {
-	    DatabaseClientConfig config = new DatabaseClientConfig(getHost(), port, getRestAdminUsername(), getRestAdminPassword());
-	    config.setCertFile(getRestCertFile());
-	    config.setCertPassword(getRestCertPassword());
+	    DatabaseClientConfig config = new DatabaseClientConfig(host, port, restAdminUsername, restAdminPassword);
+	    config.setCertFile(restCertFile);
+	    config.setCertPassword(restCertPassword);
 	    config.setConnectionType(restConnectionType);
-	    config.setExternalName(getRestExternalName());
+	    config.setExternalName(restExternalName);
 	    config.setSecurityContextType(restSecurityContextType);
-	    config.setSslContext(getRestSslContext());
-	    config.setSslHostnameVerifier(getRestSslHostnameVerifier());
-	    config.setTrustManager(restTrustManager);
+
+	    if (restUseDefaultKeystore) {
+		    config.setSslProtocol(StringUtils.hasText(restSslProtocol) ? restSslProtocol : SslUtil.DEFAULT_SSL_PROTOCOL);
+		    config.setTrustManagementAlgorithm(restTrustManagementAlgorithm);
+		    config.setSslHostnameVerifier(restSslHostnameVerifier != null ? restSslHostnameVerifier : SSLHostnameVerifier.ANY);
+	    }
+	    else {
+		    config.setSslContext(restSslContext);
+		    config.setTrustManager(restTrustManager);
+		    config.setSslHostnameVerifier(restSslHostnameVerifier);
+	    }
+
 	    return config;
     }
 
@@ -394,16 +412,25 @@ public class AppConfig {
     }
 
     public DatabaseClient newAppServicesDatabaseClient(String databaseName) {
-	    DatabaseClientConfig config = new DatabaseClientConfig(getHost(), getAppServicesPort(), getAppServicesUsername(), getAppServicesPassword());
-	    config.setCertFile(getAppServicesCertFile());
-	    config.setCertPassword(getAppServicesCertPassword());
+	    DatabaseClientConfig config = new DatabaseClientConfig(host, appServicesPort, appServicesUsername, appServicesPassword);
+	    config.setCertFile(appServicesCertFile);
+	    config.setCertPassword(appServicesCertPassword);
 	    config.setConnectionType(appServicesConnectionType);
 	    config.setDatabase(databaseName);
-	    config.setExternalName(getAppServicesExternalName());
+	    config.setExternalName(appServicesExternalName);
 	    config.setSecurityContextType(appServicesSecurityContextType);
-	    config.setSslContext(getAppServicesSslContext());
-	    config.setSslHostnameVerifier(getAppServicesSslHostnameVerifier());
-	    config.setTrustManager(appServicesTrustManager);
+
+	    if (appServicesUseDefaultKeystore) {
+		    config.setSslProtocol(StringUtils.hasText(appServicesSslProtocol) ? appServicesSslProtocol : SslUtil.DEFAULT_SSL_PROTOCOL);
+		    config.setTrustManagementAlgorithm(appServicesTrustManagementAlgorithm);
+		    config.setSslHostnameVerifier(appServicesSslHostnameVerifier != null ? appServicesSslHostnameVerifier : SSLHostnameVerifier.ANY);
+	    }
+	    else {
+		    config.setSslContext(appServicesSslContext);
+		    config.setTrustManager(appServicesTrustManager);
+		    config.setSslHostnameVerifier(appServicesSslHostnameVerifier);
+	    }
+
 	    return configuredDatabaseClientFactory.newDatabaseClient(config);
     }
 
@@ -1424,4 +1451,53 @@ public class AppConfig {
 		getCmaConfig().setDeployAmps(b);
 	}
 	// End of methods still used by DHF 4.3.x
+
+
+	public boolean isRestUseDefaultKeystore() {
+		return restUseDefaultKeystore;
+	}
+
+	public void setRestUseDefaultKeystore(boolean restUseDefaultKeystore) {
+		this.restUseDefaultKeystore = restUseDefaultKeystore;
+	}
+
+	public String getRestSslProtocol() {
+		return restSslProtocol;
+	}
+
+	public void setRestSslProtocol(String restSslProtocol) {
+		this.restSslProtocol = restSslProtocol;
+	}
+
+	public String getRestTrustManagementAlgorithm() {
+		return restTrustManagementAlgorithm;
+	}
+
+	public void setRestTrustManagementAlgorithm(String restTrustManagementAlgorithm) {
+		this.restTrustManagementAlgorithm = restTrustManagementAlgorithm;
+	}
+
+	public boolean isAppServicesUseDefaultKeystore() {
+		return appServicesUseDefaultKeystore;
+	}
+
+	public void setAppServicesUseDefaultKeystore(boolean appServicesUseDefaultKeystore) {
+		this.appServicesUseDefaultKeystore = appServicesUseDefaultKeystore;
+	}
+
+	public String getAppServicesSslProtocol() {
+		return appServicesSslProtocol;
+	}
+
+	public void setAppServicesSslProtocol(String appServicesSslProtocol) {
+		this.appServicesSslProtocol = appServicesSslProtocol;
+	}
+
+	public String getAppServicesTrustManagementAlgorithm() {
+		return appServicesTrustManagementAlgorithm;
+	}
+
+	public void setAppServicesTrustManagementAlgorithm(String appServicesTrustManagementAlgorithm) {
+		this.appServicesTrustManagementAlgorithm = appServicesTrustManagementAlgorithm;
+	}
 }

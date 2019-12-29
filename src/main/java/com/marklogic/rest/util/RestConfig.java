@@ -13,7 +13,12 @@ public class RestConfig {
 	private String username;
 	private String password;
 	private String scheme = "http";
+
 	private boolean configureSimpleSsl;
+	private boolean useDefaultKeystore;
+	private String sslProtocol;
+	private String trustManagementAlgorithm;
+
 	private SSLContext sslContext;
 	private X509HostnameVerifier hostnameVerifier;
 
@@ -115,5 +120,29 @@ public class RestConfig {
 
 	public void setHostnameVerifier(X509HostnameVerifier hostnameVerifier) {
 		this.hostnameVerifier = hostnameVerifier;
+	}
+
+	public String getSslProtocol() {
+		return sslProtocol;
+	}
+
+	public void setSslProtocol(String sslProtocol) {
+		this.sslProtocol = sslProtocol;
+	}
+
+	public String getTrustManagementAlgorithm() {
+		return trustManagementAlgorithm;
+	}
+
+	public void setTrustManagementAlgorithm(String trustManagementAlgorithm) {
+		this.trustManagementAlgorithm = trustManagementAlgorithm;
+	}
+
+	public boolean isUseDefaultKeystore() {
+		return useDefaultKeystore;
+	}
+
+	public void setUseDefaultKeystore(boolean useDefaultKeystore) {
+		this.useDefaultKeystore = useDefaultKeystore;
 	}
 }

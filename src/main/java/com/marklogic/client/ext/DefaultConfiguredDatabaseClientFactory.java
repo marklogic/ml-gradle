@@ -2,8 +2,8 @@ package com.marklogic.client.ext;
 
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
-import com.marklogic.client.ext.ConfiguredDatabaseClientFactory;
-import com.marklogic.client.ext.DatabaseClientConfig;
+import com.marklogic.client.ext.ssl.SslConfig;
+import com.marklogic.client.ext.ssl.SslUtil;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.X509TrustManager;
@@ -31,17 +31,17 @@ public class DefaultConfiguredDatabaseClientFactory implements ConfiguredDatabas
 			securityContext = new DatabaseClientFactory.KerberosAuthContext(config.getExternalName());
 		} else if (SecurityContextType.NONE.equals(securityContextType)) {
 			securityContext = null;
-		}
-		else {
+		} else {
 			throw new IllegalArgumentException("Unsupported SecurityContextType: " + securityContextType);
 		}
 
 		if (securityContext != null) {
-			SSLContext sslContext = config.getSslContext();
-			DatabaseClientFactory.SSLHostnameVerifier verifier = config.getSslHostnameVerifier();
-			if (sslContext != null) {
-				securityContext = securityContext.withSSLContext(sslContext, config.getTrustManager());
+			final SslConfig sslConfig = determineSslConfig(config);
+			if (sslConfig != null) {
+				securityContext = securityContext.withSSLContext(sslConfig.getSslContext(), sslConfig.getTrustManager());
 			}
+
+			DatabaseClientFactory.SSLHostnameVerifier verifier = config.getSslHostnameVerifier();
 			if (verifier != null) {
 				securityContext = securityContext.withSSLHostnameVerifier(verifier);
 			}
@@ -62,8 +62,7 @@ public class DefaultConfiguredDatabaseClientFactory implements ConfiguredDatabas
 				return DatabaseClientFactory.newClient(host, port, securityContext);
 			}
 			return DatabaseClientFactory.newClient(host, port, database, securityContext);
-		}
-		else {
+		} else {
 			if (securityContext == null) {
 				if (database == null) {
 					return DatabaseClientFactory.newClient(host, port, null, connectionType);
@@ -76,7 +75,6 @@ public class DefaultConfiguredDatabaseClientFactory implements ConfiguredDatabas
 			return DatabaseClientFactory.newClient(host, port, database, securityContext, connectionType);
 		}
 	}
-
 
 	protected DatabaseClientFactory.SecurityContext buildCertificateAuthContent(DatabaseClientConfig config) {
 		X509TrustManager trustManager = config.getTrustManager();
@@ -93,12 +91,23 @@ public class DefaultConfiguredDatabaseClientFactory implements ConfiguredDatabas
 			}
 		}
 
+		SslConfig sslConfig = determineSslConfig(config);
 		DatabaseClientFactory.SSLHostnameVerifier verifier = config.getSslHostnameVerifier();
+		return verifier != null ?
+			new DatabaseClientFactory.CertificateAuthContext(sslConfig.getSslContext(), verifier, sslConfig.getTrustManager()) :
+			new DatabaseClientFactory.CertificateAuthContext(sslConfig.getSslContext(), sslConfig.getTrustManager());
+	}
 
-		if (verifier != null) {
-			return new DatabaseClientFactory.CertificateAuthContext(config.getSslContext(), verifier, trustManager);
+	protected SslConfig determineSslConfig(DatabaseClientConfig config) {
+		SSLContext sslContext = config.getSslContext();
+		X509TrustManager trustManager = config.getTrustManager();
+		if (sslContext != null && trustManager != null) {
+			return new SslConfig(sslContext, trustManager);
 		}
 
-		return new DatabaseClientFactory.CertificateAuthContext(config.getSslContext(), trustManager);
+		final String protocol = config.getSslProtocol();
+		return protocol != null && protocol.trim().length() > 0 ?
+			SslUtil.configureUsingTrustManagerFactory(protocol, config.getTrustManagementAlgorithm()) :
+			null;
 	}
 }

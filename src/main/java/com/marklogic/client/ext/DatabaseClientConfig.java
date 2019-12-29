@@ -17,13 +17,18 @@ public class DatabaseClientConfig {
 	private String username;
 	private String password;
 	private String database;
+
 	private SSLContext sslContext;
+	private String sslProtocol;
+	private String trustManagementAlgorithm;
 	private SSLHostnameVerifier sslHostnameVerifier;
+
 	private String certFile;
 	private String certPassword;
 	private String externalName;
 	private X509TrustManager trustManager;
 	private DatabaseClient.ConnectionType connectionType;
+
 
 	public DatabaseClientConfig() {
 	}
@@ -147,5 +152,21 @@ public class DatabaseClientConfig {
 
 	public void setConnectionType(DatabaseClient.ConnectionType connectionType) {
 		this.connectionType = connectionType;
+	}
+
+	public String getSslProtocol() {
+		return sslProtocol;
+	}
+
+	public void setSslProtocol(String sslProtocol) {
+		this.sslProtocol = sslProtocol;
+	}
+
+	public String getTrustManagementAlgorithm() {
+		return trustManagementAlgorithm;
+	}
+
+	public void setTrustManagementAlgorithm(String trustManagementAlgorithm) {
+		this.trustManagementAlgorithm = trustManagementAlgorithm;
 	}
 }

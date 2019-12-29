@@ -12,7 +12,12 @@ public class Element {
 	@XmlElement(name = "namespace-uri")
 	private String namespaceUri;
 
-	private String localname;
+	/**
+	 * As of ML 10.0-2, this won't work for both JSON and XML. When multiple values exist, the Manage API expects the
+	 * JSON representation to be an array of strings, while the XML representation always expects a single value.
+	 */
+	@XmlElementWrapper(name = "localname")
+	private List<String> localname;
 
 	public String getNamespaceUri() {
 		return namespaceUri;
@@ -22,11 +27,11 @@ public class Element {
 		this.namespaceUri = namespaceUri;
 	}
 
-	public String getLocalname() {
+	public List<String> getLocalname() {
 		return localname;
 	}
 
-	public void setLocalname(String localname) {
+	public void setLocalname(List<String> localname) {
 		this.localname = localname;
 	}
 

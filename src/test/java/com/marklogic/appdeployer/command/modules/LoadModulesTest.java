@@ -71,8 +71,8 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 		appDeployer.deploy(appConfig);
 		assertTrue("The custom file should have been created when the modules were loaded", customFile.exists());
 
-		DefaultModulesLoader loader = (DefaultModulesLoader)command.getModulesLoader();
-		PropertiesModuleManager manager = (PropertiesModuleManager)loader.getModulesManager();
+		DefaultModulesLoader loader = (DefaultModulesLoader) command.getModulesLoader();
+		PropertiesModuleManager manager = (PropertiesModuleManager) loader.getModulesManager();
 		assertEquals("The host should have been set on the PropertiesModuleManager via DefaultModulesLoaderFactory " +
 			"so that module timestamps account for the host", appConfig.getHost(), manager.getHost());
 	}
@@ -101,8 +101,6 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 		appDeployer.deploy(appConfig);
 
 		PermissionsFragment perms = getDocumentPermissions("/ext/sample-lib.xqy", modulesXccTemplate);
-		perms.assertPermissionCount(6);
-
 		// Default permissions set by AppConfig
 		perms.assertPermissionExists("rest-admin", "read");
 		perms.assertPermissionExists("rest-admin", "update");
@@ -110,10 +108,6 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 
 		// Custom permission
 		perms.assertPermissionExists("app-user", "execute");
-
-		// Permissions that the REST API still applies, which seems like a bug
-		perms.assertPermissionExists("rest-reader", "read");
-		perms.assertPermissionExists("rest-writer", "update");
 	}
 
 	@Test
@@ -184,27 +178,11 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 
 	private void assertModuleExistsWithDefaultPermissions(String message, String uri) {
 		assertEquals(message, "true", modulesXccTemplate.executeAdhocQuery(format("fn:doc-available('%s')", uri)));
-		assertDefaultPermissionsExists(uri);
-	}
-
-	/**
-	 * Apparently, the REST API won't let you remove these 3 default permissions, they're always present.
-	 * <p>
-	 * And, now that we're loading modules via the REST API by default, rest-reader/read and rest-writer/update are
-	 * always present, at least on 8.0-6.3 and 9.0-1.1, which seems like a bug.
-	 */
-	private void assertDefaultPermissionsExists(String uri) {
 		PermissionsFragment perms = getDocumentPermissions(uri, modulesXccTemplate);
-		perms.assertPermissionCount(5);
 		perms.assertPermissionExists("rest-admin", "read");
 		perms.assertPermissionExists("rest-admin", "update");
 		perms.assertPermissionExists("rest-extension-user", "execute");
-
-		// Not really expected!
-		perms.assertPermissionExists("rest-reader", "read");
-		perms.assertPermissionExists("rest-writer", "update");
 	}
-
 }
 
 class TestFileFilter extends DefaultFileFilter {

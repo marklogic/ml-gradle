@@ -1,5 +1,6 @@
 package com.marklogic.appdeployer.scaffold;
 
+import com.marklogic.appdeployer.command.security.DeployPrivilegeRolesCommand;
 import com.marklogic.appdeployer.command.security.DeployPrivilegesCommand;
 import com.marklogic.mgmt.api.security.Privilege;
 import com.marklogic.mgmt.template.security.PrivilegeTemplateBuilder;
@@ -11,7 +12,7 @@ public class WritePrivilegeTest extends AbstractResourceWriterTest {
 
 	@Test
 	public void defaultValues() {
-		initializeAppDeployer(new DeployPrivilegesCommand());
+		initializeAppDeployer(new DeployPrivilegesCommand(), new DeployPrivilegeRolesCommand());
 		buildResourceAndDeploy(new PrivilegeTemplateBuilder());
 
 		Privilege p = api.privilegeExecute("CHANGEME-name-of-privilege");
@@ -31,16 +32,13 @@ public class WritePrivilegeTest extends AbstractResourceWriterTest {
 		propertyMap.put("privilege-name", "CHANGEME-uri-privilege");
 		propertyMap.put("action", "test");
 		propertyMap.put("kind", "uri");
+		propertyMap.put("role", null);
 		buildResourceAndDeploy(new PrivilegeTemplateBuilder());
 
 		Privilege p = api.privilegeUri("CHANGEME-uri-privilege");
 		// Odd, the Manage API automatically appends a "/"
 		assertEquals("test/", p.getAction());
 		assertEquals("uri", p.getKind());
-
-		List<String> roles = p.getRole();
-		assertEquals(2, roles.size());
-		assertTrue(roles.contains("rest-reader"));
-		assertTrue(roles.contains("rest-writer"));
+		assertNull(p.getRole());
 	}
 }

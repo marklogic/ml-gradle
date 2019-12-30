@@ -2,6 +2,7 @@ package com.marklogic.appdeployer;
 
 import com.marklogic.appdeployer.command.appservers.DeployOtherServersCommand;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
+import com.marklogic.appdeployer.command.security.DeployPrivilegeRolesCommand;
 import com.marklogic.appdeployer.command.security.DeployPrivilegesCommand;
 import com.marklogic.appdeployer.command.security.DeployRolesCommand;
 import com.marklogic.appdeployer.command.security.DeployUsersCommand;
@@ -79,7 +80,7 @@ public class MergeResourcesWhileDeployingTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void privileges() {
-		initializeAppDeployer(new DeployPrivilegesCommand());
+		initializeAppDeployer(new DeployPrivilegesCommand(), new DeployPrivilegeRolesCommand());
 		deploySampleApp();
 
 		PrivilegeManager mgr = new PrivilegeManager(manageClient);

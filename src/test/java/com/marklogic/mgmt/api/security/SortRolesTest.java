@@ -92,17 +92,18 @@ public class SortRolesTest extends Assert {
 
 		sortRoles();
 
+		List<String> roleNames = new ArrayList<>();
+		for (Role role : roles) {
+			roleNames.add(role.getRoleName());
+		}
+
 		assertEquals("xyz-reader", roles.get(0).getRoleName());
 		assertEquals("xyz-writer", roles.get(1).getRoleName());
-		assertEquals("xyz-admin", roles.get(2).getRoleName());
-		assertEquals("abc-sss-ui-role", roles.get(3).getRoleName());
-		assertEquals("abc-ui-offline-user", roles.get(4).getRoleName());
-		assertEquals("abc-ui-offline-admin", roles.get(5).getRoleName());
-		assertEquals("Doesn't matter when this is created because it has no dependencies",
-			"abc-ui-developer", roles.get(6).getRoleName());
-		assertEquals("abc-ui-admin", roles.get(7).getRoleName());
-		assertEquals("Doesn't matter when this is created because it has no dependencies",
-			"abc-login-role", roles.get(8).getRoleName());
+
+		// The exact positions of these don't matter, but rather the order does
+		assertTrue(roleNames.indexOf("abc-ui-offline-user") > roleNames.indexOf("abc-sss-ui-role"));
+		assertTrue(roleNames.indexOf("abc-ui-offline-admin") > roleNames.indexOf("abc-ui-offline-user"));
+		assertTrue(roleNames.indexOf("abc-ui-admin") > roleNames.indexOf("abc-ui-offline-admin"));
 	}
 
 	private void sortRoles() {

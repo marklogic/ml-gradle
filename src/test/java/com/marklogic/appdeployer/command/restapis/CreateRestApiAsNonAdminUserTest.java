@@ -33,7 +33,6 @@ public class CreateRestApiAsNonAdminUserTest extends AbstractAppDeployerTest {
 	}
 
 	@Test
-	@SuppressWarnings("deprecation")
 	public void test() {
 		// Use config specific to this test
 		appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/non-admin-test/ml-config")));
@@ -44,8 +43,8 @@ public class CreateRestApiAsNonAdminUserTest extends AbstractAppDeployerTest {
 		ManageConfig newConfig = new ManageConfig(manageConfig.getHost(), manageConfig.getPort(),
 			"sample-app-manage-admin", "sample-app-manage-admin");
 		// Need to set this to the admin user so that user is used to create our app-specific users/roles/privileges
-		newConfig.setAdminUsername(manageConfig.getUsername());
-		newConfig.setAdminPassword(manageConfig.getPassword());
+		newConfig.setSecurityUsername(manageConfig.getUsername());
+		newConfig.setSecurityPassword(manageConfig.getPassword());
 		this.manageClient = new ManageClient(newConfig);
 
 		// And ensure we use our custom user for loading modules; the custom app role has the privileges required for

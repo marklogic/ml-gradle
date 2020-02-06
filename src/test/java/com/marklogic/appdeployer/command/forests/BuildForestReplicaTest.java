@@ -102,37 +102,6 @@ public class BuildForestReplicaTest extends Assert {
 			"host1", forests.get(0).getForestReplica().get(0).getHost());
 	}
 
-	/**
-	 * This shows how replicas for host 1 all end up on host 2. The distributed strategy above is preferred, and
-	 * the grouped one is deprecated, but this test exists to show how the grouped one differs while it still exists.
-	 */
-	@SuppressWarnings("deprecation")
-	@Test
-	public void customNamingStrategyWithGroupedStrategy() {
-		AppConfig appConfig = newAppConfig("mlForestsPerHost", "my-database,2");
-		addCustomNamingStrategy(appConfig);
-		appConfig.setReplicaBuilderStrategy(new GroupedReplicaBuilderStrategy());
-
-		List<Forest> forests = builder.buildForests(
-			new ForestPlan("my-database", "host1", "host2", "host3").withReplicaCount(2), appConfig);
-
-		Forest f1 = forests.get(0);
-		assertEquals("forest-1", f1.getForestName());
-		assertEquals("host1", f1.getHost());
-		assertEquals("my-replica-forest-1-1", f1.getForestReplica().get(0).getReplicaName());
-		assertEquals("my-replica-forest-1-2", f1.getForestReplica().get(1).getReplicaName());
-		assertEquals("host2", f1.getForestReplica().get(0).getHost());
-		assertEquals("host3", f1.getForestReplica().get(1).getHost());
-
-		Forest f2 = forests.get(1);
-		assertEquals("forest-2", f2.getForestName());
-		assertEquals("host1", f2.getHost());
-		assertEquals("my-replica-forest-2-1", f2.getForestReplica().get(0).getReplicaName());
-		assertEquals("my-replica-forest-2-2", f2.getForestReplica().get(1).getReplicaName());
-		assertEquals("host2", f2.getForestReplica().get(0).getHost());
-		assertEquals("host3", f2.getForestReplica().get(1).getHost());
-	}
-
 	@Test
 	public void databaseAgnosticDirectories() {
 		ForestReplica replica = buildForestReplica(

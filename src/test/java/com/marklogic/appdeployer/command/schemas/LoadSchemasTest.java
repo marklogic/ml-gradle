@@ -6,15 +6,12 @@ import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.document.GenericDocumentManager;
 import com.marklogic.client.io.BytesHandle;
-import com.marklogic.client.io.DOMHandle;
 import com.marklogic.client.io.DocumentMetadataHandle;
-import com.marklogic.client.io.StringHandle;
 import org.junit.After;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.List;
 
 public class LoadSchemasTest extends AbstractAppDeployerTest {
 
@@ -136,21 +133,6 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 
 		assertTrue(docMgr.readMetadata("/tde/template1.json", new DocumentMetadataHandle()).getCollections().contains("http://marklogic.com/xdmp/tde"));
 		assertTrue(docMgr.readMetadata("/tde/template2.json", new DocumentMetadataHandle()).getCollections().contains("http://marklogic.com/xdmp/tde"));
-	}
-
-	/**
-	 * Verifying that the deprecated methods work as expected.
-	 */
-	@Test
-	public void testSchemasPath() {
-		appConfig.getSchemaPaths().add("path1");
-		appConfig.getSchemaPaths().add("path2");
-		assertEquals("If multiple paths exist, the last one should be return", "path2", appConfig.getSchemasPath());
-
-		appConfig.setSchemasPath("/some/path");
-		List<String> paths = appConfig.getSchemaPaths();
-		assertEquals(1, paths.size());
-		assertEquals("Calling setSchemasPath will remove any paths already set", "/some/path", paths.get(0));
 	}
 
 	private Command newCommand() {

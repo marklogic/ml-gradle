@@ -1,15 +1,12 @@
 package com.marklogic.appdeployer.command.databases;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.rest.util.Fragment;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.File;
 
 public class UpdateContentDatabasesTest extends AbstractAppDeployerTest {
 
@@ -40,22 +37,5 @@ public class UpdateContentDatabasesTest extends AbstractAppDeployerTest {
 
 		db = dbMgr.getPropertiesAsXml(appConfig.getTestContentDatabaseName());
 		assertTrue(db.elementExists(idRangeIndexPath));
-	}
-
-	@Test
-	public void multipleDatabaseConfigFiles() {
-		ConfigDir dir = appConfig.getFirstConfigDir();
-		dir.getContentDatabaseFiles().add(new File(dir.getBaseDir(), "other-database-files/more-content-db-config.json"));
-
-		initializeAppDeployer(new DeployRestApiServersCommand(), new DeployOtherDatabasesCommand());
-
-		appDeployer.deploy(appConfig);
-
-		String rangeIndexXpath = "//m:range-element-index[m:namespace-uri = 'urn:sampleapp' and m:localname='anotherElement']";
-
-		Fragment db = dbMgr.getPropertiesAsXml(appConfig.getContentDatabaseName());
-		assertTrue(db.elementExists("//m:maintain-last-modified[. = 'true']"));
-		assertTrue(db.elementExists(idRangeIndexPath));
-		assertTrue(db.elementExists(rangeIndexXpath));
 	}
 }

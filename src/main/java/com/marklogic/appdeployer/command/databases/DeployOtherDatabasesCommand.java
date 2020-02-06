@@ -153,7 +153,6 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 		DatabasePlans databasePlan = new DatabasePlans();
 
 		for (ConfigDir configDir : context.getAppConfig().getConfigDirs()) {
-			addLegacyContentDatabaseFiles(context, configDir, databasePlan);
 			addDatabaseFiles(context, configDir, databasePlan);
 		}
 
@@ -166,42 +165,6 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 		}
 
 		return databasePlans;
-	}
-
-	/**
-	 * This processes the content database files as defined in the ConfigDir object. This approach dates back to the
-	 * 2.0 release of ml-app-deployer, where multiple files could be defined for the content database. Starting in
-	 * 3.14.0, multiple files will be detected and merged automatically for several resources, including database,
-	 * thus rendering this approach unnecessary. But it's being kept for backwards-compatibility purposes.
-	 *
-	 * @param context
-	 * @param configDir
-	 * @param databasePlans
-	 */
-	@Deprecated
-	protected void addLegacyContentDatabaseFiles(CommandContext context, ConfigDir configDir, DatabasePlans databasePlans) {
-		List<File> files = configDir.getContentDatabaseFiles();
-		if (files != null && !files.isEmpty()) {
-			for (File f : files) {
-				// We're not using listFilesInDirectory, but should still apply the filename filter
-				if (f != null && f.exists() && getResourceFilenameFilter().accept(f.getParentFile(), f.getName())) {
-					String payload = copyFileToString(f, context);
-					String databaseName = payloadParser.getPayloadFieldValue(payload, "database-name", false);
-					if (databaseName != null) {
-						if (databasePlans.getMainContentDatabaseName() == null) {
-							databasePlans.setMainContentDatabaseName(databaseName);
-						}
-						if (databasePlans.getDatabasePlanMap().containsKey(databaseName)) {
-							DatabasePlan ref = databasePlans.getDatabasePlanMap().get(databaseName);
-							ref.addFile(f);
-							ref.setMainContentDatabase(true);
-						} else {
-							databasePlans.getDatabasePlanMap().put(databaseName, new DatabasePlan(databaseName, f, true));
-						}
-					}
-				}
-			}
-		}
 	}
 
 	/**

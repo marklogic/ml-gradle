@@ -42,16 +42,6 @@ public class ManageClient extends LoggingObject {
     }
 
 	/**
-	 * Use setManageConfig instead.
-	 *
-	 * @param config
-	 */
-	@Deprecated
-	public void initialize(ManageConfig config) {
-    	setManageConfig(config);
-	}
-
-	/**
 	 * Uses the given ManageConfig instance to construct a Spring RestTemplate for communicating with the Manage API.
 	 * In addition, if adminUsername on the ManageConfig instance differs from username, then a separate RestTemplate is
 	 * constructed for making calls to the Manage API that need user with the manage-admin and security roles, which is
@@ -116,18 +106,6 @@ public class ManageClient extends LoggingObject {
         return restTemplate.exchange(buildUri(path), HttpMethod.PUT, buildJsonEntity(json), String.class);
     }
 
-	/**
-	 * Use putJsonAsSecurityUser instead.
-	 *
-	 * @param path
-	 * @param json
-	 * @return
-	 */
-	@Deprecated
-    public ResponseEntity<String> putJsonAsAdmin(String path, String json) {
-		return putJsonAsSecurityUser(path, json);
-    }
-
 	public ResponseEntity<String> putJsonAsSecurityUser(String path, String json) {
 		logSecurityUserRequest(path, "JSON", "PUT");
 		return securityUserRestTemplate.exchange(buildUri(path), HttpMethod.PUT, buildJsonEntity(json), String.class);
@@ -136,18 +114,6 @@ public class ManageClient extends LoggingObject {
     public ResponseEntity<String> putXml(String path, String xml) {
         logRequest(path, "XML", "PUT");
         return restTemplate.exchange(buildUri(path), HttpMethod.PUT, buildXmlEntity(xml), String.class);
-    }
-
-	/**
-	 * Use putXmlAsSecurityUser.
-	 *
-	 * @param path
-	 * @param xml
-	 * @return
-	 */
-	@Deprecated
-    public ResponseEntity<String> putXmlAsAdmin(String path, String xml) {
-		return putXmlAsSecurityUser(path, xml);
     }
 
 	public ResponseEntity<String> putXmlAsSecurityUser(String path, String xml) {
@@ -160,18 +126,6 @@ public class ManageClient extends LoggingObject {
         return restTemplate.exchange(buildUri(path), HttpMethod.POST, buildJsonEntity(json), String.class);
     }
 
-	/**
-	 * Use postJsonAsSecurityUser instead.
-	 *
-	 * @param path
-	 * @param json
-	 * @return
-	 */
-	@Deprecated
-    public ResponseEntity<String> postJsonAsAdmin(String path, String json) {
-		return postJsonAsSecurityUser(path, json);
-    }
-
 	public ResponseEntity<String> postJsonAsSecurityUser(String path, String json) {
 		logSecurityUserRequest(path, "JSON", "POST");
 		return securityUserRestTemplate.exchange(buildUri(path), HttpMethod.POST, buildJsonEntity(json), String.class);
@@ -180,18 +134,6 @@ public class ManageClient extends LoggingObject {
     public ResponseEntity<String> postXml(String path, String xml) {
         logRequest(path, "XML", "POST");
         return restTemplate.exchange(buildUri(path), HttpMethod.POST, buildXmlEntity(xml), String.class);
-    }
-
-	/**
-	 * Use postXmlAsSecurityUser instead.
-	 *
-	 * @param path
-	 * @param xml
-	 * @return
-	 */
-	@Deprecated
-    public ResponseEntity<String> postXmlAsAdmin(String path, String xml) {
-		return postXmlAsSecurityUser(path, xml);
     }
 
 	public ResponseEntity<String> postXmlAsSecurityUser(String path, String xml) {
@@ -225,33 +167,10 @@ public class ManageClient extends LoggingObject {
         return new Fragment(xml, list.toArray(new Namespace[] {}));
     }
 
-	/**
-	 * Use getXmlStringAsSecurityUser instead.
-	 *
-	 * @param path
-	 * @return
-	 */
-	@Deprecated
-	public String getXmlStringAsAdmin(String path) {
-		return getXmlStringAsSecurityUser(path);
-	}
-
 	public String getXmlStringAsSecurityUser(String path) {
 		logSecurityUserRequest(path, "XML", "GET");
 		return securityUserRestTemplate.getForObject(buildUri(path), String.class);
 	}
-
-	/**
-	 * Use getXmlAsSecurityUser instead.
-	 *
-	 * @param path
-	 * @param namespacePrefixesAndUris
-	 * @return
-	 */
-	@Deprecated
-    public Fragment getXmlAsAdmin(String path, String... namespacePrefixesAndUris) {
-		return getXmlAsSecurityUser(path, namespacePrefixesAndUris);
-    }
 
 	public Fragment getXmlAsSecurityUser(String path, String... namespacePrefixesAndUris) {
 		String xml = getXmlStringAsSecurityUser(path);
@@ -284,17 +203,6 @@ public class ManageClient extends LoggingObject {
         return getRestTemplate().exchange(uri, HttpMethod.GET, new HttpEntity<>(headers), String.class).getBody();
     }
 
-	/**
-	 * Use getJsonAsSecurityUser instead.
-	 *
-	 * @param path
-	 * @return
-	 */
-	@Deprecated
-    public String getJsonAsAdmin(String path) {
-		return getJsonAsSecurityUser(path);
-    }
-
 	public String getJsonAsSecurityUser(String path) {
 		logSecurityUserRequest(path, "JSON", "GET");
 		HttpHeaders headers = new HttpHeaders();
@@ -306,16 +214,6 @@ public class ManageClient extends LoggingObject {
 	public void delete(String path) {
         logRequest(path, "", "DELETE");
         restTemplate.delete(buildUri(path));
-    }
-
-	/**
-	 * Use deleteAsSecurityUser instead.
-	 *
-	 * @param path
-	 */
-	@Deprecated
-    public void deleteAsAdmin(String path) {
-		deleteAsSecurityUser(path);
     }
 
     public void deleteAsSecurityUser(String path) {
@@ -399,32 +297,12 @@ public class ManageClient extends LoggingObject {
         return restTemplate;
     }
 
-	/**
-	 * Use getSecurityUserRestTemplate.
-	 *
-	 * @return
-	 */
-	@Deprecated
-	public RestTemplate getAdminRestTemplate() {
-		return getSecurityUserRestTemplate();
-    }
-
     public ManageConfig getManageConfig() {
         return manageConfig;
     }
 
 	public void setRestTemplate(RestTemplate restTemplate) {
 		this.restTemplate = restTemplate;
-	}
-
-	/**
-	 * Use setSecurityUserRestTemplate.
-	 *
-	 * @param restTemplate
-	 */
-	@Deprecated
-	public void setAdminRestTemplate(RestTemplate restTemplate) {
-		setSecurityUserRestTemplate(restTemplate);
 	}
 
 	public RestTemplate getSecurityUserRestTemplate() {

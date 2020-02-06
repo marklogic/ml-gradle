@@ -42,8 +42,6 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			}
 		}
 
-		setDefaultsForDatabasesWithForestsOnOneHost(appConfig);
-
 		return appConfig;
 	}
 
@@ -873,32 +871,6 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 	protected ConfigDir buildConfigDir(String path) {
 		File baseDir = this.projectDir != null ? new File(this.projectDir, path) : new File(path);
 		return new ConfigDir(baseDir);
-	}
-
-	/**
-	 * This was added in 3.11.0 to mirror the functionality of the now-deprecated DeployTriggersDatabaseCommand and
-	 * DeploySchemasDatabaseCommand classes. But the mlDatabasesWithForestsOnOneHost property is the better way of
-	 * handling this so that it's explicitly configured, rather than happening magically via setting mlAppName.
-	 *
-	 * @param appConfig
-	 */
-	@Deprecated
-	protected void setDefaultsForDatabasesWithForestsOnOneHost(AppConfig appConfig) {
-		Set<String> set = appConfig.getDatabasesWithForestsOnOneHost();
-		if (set == null || set.isEmpty()) {
-			set = new HashSet<>();
-			final String triggersName = appConfig.getTriggersDatabaseName();
-			if (triggersName != null) {
-				set.add(triggersName);
-			}
-			final String schemasName = appConfig.getSchemasDatabaseName();
-			if (schemasName != null) {
-				set.add(schemasName);
-			}
-			if (!set.isEmpty()) {
-				appConfig.setDatabasesWithForestsOnOneHost(set);
-			}
-		}
 	}
 
 	protected List<String> buildPathListFromCommaDelimitedString(String prop) {

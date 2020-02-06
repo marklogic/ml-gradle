@@ -149,9 +149,6 @@ public class AppConfig {
     // Passed into the PayloadTokenReplacer that subclasses of AbstractCommand use
     private Map<String, String> customTokens = new HashMap<>();
 
-	@Deprecated
-    private boolean createTriggersDatabase = false;
-
     // Controls whether forests are created when a database is created
     private boolean createForests = true;
 
@@ -609,18 +606,6 @@ public class AppConfig {
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
-    }
-
-    /**
-     * As of 3.3.0, this now returns the first ConfigDir in the List of ConfigsDir that this class now maintains.
-     *
-     * @return a {@code ConfigDir} instance that defines the location of the configuration directory (where files are
-     * stored that are then loaded via MarkLogic Management API endpoints) as well as paths to specific
-     * resources within that directory
-     */
-    @Deprecated
-    public ConfigDir getConfigDir() {
-    	return getFirstConfigDir();
     }
 
 	/**
@@ -1315,16 +1300,6 @@ public class AppConfig {
 		this.appServicesTrustManager = appServicesTrustManager;
 	}
 
-	@Deprecated
-	public boolean isCreateTriggersDatabase() {
-		return createTriggersDatabase;
-	}
-
-	@Deprecated
-	public void setCreateTriggersDatabase(boolean createTriggerDatabase) {
-		this.createTriggersDatabase = createTriggerDatabase;
-	}
-
 	public ReplicaBuilderStrategy getReplicaBuilderStrategy() {
 		return replicaBuilderStrategy;
 	}
@@ -1373,30 +1348,6 @@ public class AppConfig {
 		this.schemaPaths = schemaPaths;
 	}
 
-	/**
-	 * With the 3.13.0 release, this should no longer be used, as it necessarily has to clear out the current list
-	 * of schema paths in order to set the list to the single path passed in.
-	 *
-	 * @param path
-	 */
-	@Deprecated
-	public void setSchemasPath(String path) {
-    	List<String> paths = new ArrayList<>();
-    	paths.add(path);
-    	setSchemaPaths(paths);
-	}
-
-	/**
-	 * @return the last path in schemaPaths, if any exist
-	 */
-	@Deprecated
-	public String getSchemasPath() {
-		if (schemaPaths == null || schemaPaths.isEmpty()) {
-			return null;
-		}
-		return schemaPaths.get(schemaPaths.size() - 1);
-	}
-
 	public boolean isMergeResources() {
 		return mergeResources;
 	}
@@ -1436,22 +1387,6 @@ public class AppConfig {
 	public void setCmaConfig(CmaConfig cmaConfig) {
 		this.cmaConfig = cmaConfig;
 	}
-
-	// Still used by DHF 4.3.x
-	@Deprecated
-	public void setDeployForestsWithCma(boolean b) {
-		getCmaConfig().setDeployForests(b);
-	}
-	@Deprecated
-	public void setDeployPrivilegesWithCma(boolean b) {
-		getCmaConfig().setDeployPrivileges(b);
-	}
-	@Deprecated
-	public void setDeployAmpsWithCma(boolean b) {
-		getCmaConfig().setDeployAmps(b);
-	}
-	// End of methods still used by DHF 4.3.x
-
 
 	public boolean isRestUseDefaultKeystore() {
 		return restUseDefaultKeystore;

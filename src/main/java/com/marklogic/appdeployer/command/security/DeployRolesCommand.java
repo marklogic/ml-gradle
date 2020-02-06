@@ -179,11 +179,6 @@ public class DeployRolesCommand extends AbstractResourceCommand implements Suppo
 		return new RoleManager(context.getManageClient());
 	}
 
-	@Deprecated
-	public void setDeployRolesInTwoPhases(boolean deployRolesInTwoPhases) {
-		// No longer needed as of 3.15.0
-	}
-
 	public void setObjectNodesSorter(ObjectNodesSorter objectNodesSorter) {
 		this.objectNodesSorter = objectNodesSorter;
 	}

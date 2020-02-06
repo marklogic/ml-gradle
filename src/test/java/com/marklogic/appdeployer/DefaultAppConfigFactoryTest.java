@@ -570,22 +570,6 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		assertNull("SSL hostname verifier should be null by default", config.getRestSslHostnameVerifier());
 	}
 
-	/**
-	 * See notes on the method that's deprecated, should be removed in ml-app-deployer 4.0.
-	 */
-	@Deprecated
-	@Test
-	public void schemasAndTriggerDatabaseNamesShouldBeInSetOfDatabasesWithForestsOnOneHost() {
-		sut = new DefaultAppConfigFactory(new SimplePropertySource("mlAppName", "example"));
-		AppConfig config = sut.newAppConfig();
-		assertEquals("example-triggers", config.getTriggersDatabaseName());
-		assertEquals("example-schemas", config.getSchemasDatabaseName());
-
-		Set<String> set = config.getDatabasesWithForestsOnOneHost();
-		assertTrue(set.contains("example-triggers"));
-		assertTrue(set.contains("example-schemas"));
-	}
-
 	@Test
 	public void dontModifySetOfDatabasesWithForestsOnOneHostIfItsBeenConfigured() {
 		sut = new DefaultAppConfigFactory(new SimplePropertySource("mlAppName", "example", "mlDatabasesWithForestsOnOneHost", "db1,db2"));

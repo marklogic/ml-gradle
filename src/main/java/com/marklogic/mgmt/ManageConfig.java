@@ -56,46 +56,6 @@ public class ManageConfig extends RestConfig {
 		this.cleanJsonPayloads = cleanJsonPayloads;
 	}
 
-	/**
-	 * Use getSecurityUsername instead.
-	 *
-	 * @return
-	 */
-	@Deprecated
-	public String getAdminUsername() {
-		return getSecurityUsername();
-	}
-
-	/**
-	 * Use setSecurityUsername instead.
-	 *
-	 * @param username
-	 */
-	@Deprecated
-	public void setAdminUsername(String username) {
-		setSecurityUsername(username);
-	}
-
-	/**
-	 * Use getSecurityPassword instead.
-	 *
-	 * @return
-	 */
-	@Deprecated
-	public String getAdminPassword() {
-		return getSecurityPassword();
-	}
-
-	/**
-	 * Use setSecurityPassword instead.
-	 *
-	 * @param password
-	 */
-	@Deprecated
-	public void setAdminPassword(String password) {
-		setSecurityPassword(password);
-	}
-
 	public String getSecurityUsername() {
 		return securityUsername;
 	}

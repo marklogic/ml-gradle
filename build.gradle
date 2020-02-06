@@ -9,8 +9,8 @@ plugins {
 	id "java-gradle-plugin"
 }
 
-sourceCompatibility = "1.8"
-targetCompatibility = "1.8"
+sourceCompatibility = "9"
+targetCompatibility = "9"
 
 repositories {
   mavenLocal() // Used for local development only

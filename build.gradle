@@ -7,8 +7,8 @@ plugins {
 	id "com.github.jk1.dependency-license-report" version "1.3"
 }
 
-sourceCompatibility = "1.8"
-targetCompatibility = "1.8"
+sourceCompatibility = "9"
+targetCompatibility = "9"
 
 repositories {
   jcenter()
@@ -17,8 +17,8 @@ repositories {
 }
 
 dependencies {
-  api 'com.marklogic:marklogic-client-api:4.2.0'
-  api 'com.marklogic:marklogic-xcc:9.0.9'
+  api 'com.marklogic:marklogic-client-api:5.1.0'
+  api 'com.marklogic:marklogic-xcc:10.0.3'
   api 'org.jdom:jdom2:2.0.6'
   api 'org.springframework:spring-context:4.3.7.RELEASE'
 

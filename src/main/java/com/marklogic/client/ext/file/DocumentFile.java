@@ -1,7 +1,11 @@
 package com.marklogic.client.ext.file;
 
 import com.marklogic.client.document.DocumentWriteOperation;
-import com.marklogic.client.io.*;
+import com.marklogic.client.impl.DocumentWriteOperationImpl;
+import com.marklogic.client.io.DocumentMetadataHandle;
+import com.marklogic.client.io.Format;
+import com.marklogic.client.io.InputStreamHandle;
+import com.marklogic.client.io.StringHandle;
 import com.marklogic.client.io.marker.AbstractWriteHandle;
 import com.marklogic.client.io.marker.DocumentMetadataWriteHandle;
 import org.springframework.core.io.FileSystemResource;
@@ -12,14 +16,14 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 /**
- * Encapsulates a file that should be written to MarkLogic as a single document. Implements DocumentWriteOperation so
- * that it can be easily written via the Java Client API.
- *
- * The modifiedContent allows for the content of this DocumentWriteOperation to be set via that property instead of via
- * the File. The assumption is that something like a DocumentFileProcessor has read in the contents of the File used to
- * construct this class,
+ * Encapsulates a file that should be written to MarkLogic as a single document. A DocumentWriteOperation can be
+ * constructed via the toDocumentWriteOperation method.
+ * <p>
+ * The modifiedContent allows for the content of the constructed DocumentWriteOperation to be set via that property
+ * instead of via the File. The assumption is that something like a DocumentFileProcessor has read in the contents of
+ * the File used to construct this class.
  */
-public class DocumentFile implements DocumentWriteOperation {
+public class DocumentFile {
 
 	private String uri;
 	private Resource resource;
@@ -43,22 +47,28 @@ public class DocumentFile implements DocumentWriteOperation {
 		this.documentMetadata = new DocumentMetadataHandle();
 	}
 
-	@Override
+	public DocumentWriteOperation toDocumentWriteOperation() {
+		return new DocumentWriteOperationImpl(
+			getOperationType(),
+			uri,
+			getMetadata(),
+			getContent(),
+			getTemporalDocumentURI()
+		);
+	}
+
 	public String getUri() {
 		return uri;
 	}
 
-	@Override
-	public OperationType getOperationType() {
-		return OperationType.DOCUMENT_WRITE;
+	public DocumentWriteOperation.OperationType getOperationType() {
+		return DocumentWriteOperation.OperationType.DOCUMENT_WRITE;
 	}
 
-	@Override
 	public DocumentMetadataWriteHandle getMetadata() {
 		return documentMetadata;
 	}
 
-	@Override
 	public AbstractWriteHandle getContent() {
 		if (modifiedContent != null) {
 			StringHandle h = new StringHandle(modifiedContent);
@@ -73,7 +83,6 @@ public class DocumentFile implements DocumentWriteOperation {
 		return format != null ? h.withFormat(format) : h;
 	}
 
-	@Override
 	public String getTemporalDocumentURI() {
 		return temporalDocumentURI;
 	}
@@ -143,6 +152,7 @@ public class DocumentFile implements DocumentWriteOperation {
 
 	/**
 	 * Optional to set - the Path that this File was loaded relative to
+	 *
 	 * @param rootPath
 	 */
 	public void setRootPath(Path rootPath) {

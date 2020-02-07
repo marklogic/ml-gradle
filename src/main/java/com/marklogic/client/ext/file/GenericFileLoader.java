@@ -1,6 +1,7 @@
 package com.marklogic.client.ext.file;
 
 import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.document.DocumentWriteOperation;
 import com.marklogic.client.ext.batch.BatchWriter;
 import com.marklogic.client.ext.batch.RestBatchWriter;
 import com.marklogic.client.ext.helper.LoggingObject;
@@ -10,12 +11,13 @@ import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Generic implementation of FileLoader. Delegates to a DocumentFileReader for reading from a set of file paths, and
  * delegates to a BatchWriter for writing to MarkLogic (where that BatchWriter could use XCC, the REST API, or the
  * Data Movement SDK in ML9).
- *
+ * <p>
  * The batchSize property defaults to null, which means all files are written in one call via the BatchWriter. Setting
  * this means that the List of DocumentFile objects read from the DocumentFileReader will be written in batches, each
  * the size of the batchSize property, except for the final one that may be less than this size.
@@ -108,15 +110,18 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 
 		List<DocumentFile> batch = documentFiles.subList(startPosition, endPosition);
 		if (!batch.isEmpty()) {
-			if (logger.isInfoEnabled()) {
+			final boolean infoEnabled = logger.isInfoEnabled();
+			if (infoEnabled) {
 				logger.info(format("Writing %d files", batch.size()));
-				if (logFileUris) {
-					for (DocumentFile df : batch) {
-						logger.info("Writing: " + df.getUri());
-					}
-				}
 			}
-			batchWriter.write(batch);
+			List<DocumentWriteOperation> documentWriteOperations = batch.stream().map(file -> {
+				if (logFileUris && infoEnabled) {
+					final String uri = file.getUri();
+					logger.info("Writing: " + uri != null ? uri : file.getTemporalDocumentURI());
+				}
+				return file.toDocumentWriteOperation();
+			}).collect(Collectors.toList());
+			batchWriter.write(documentWriteOperations);
 		}
 
 		if (endPosition < documentFilesSize) {
@@ -161,7 +166,7 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 			FormatDocumentFileProcessor processor = reader.getFormatDocumentFileProcessor();
 			FormatGetter formatGetter = processor.getFormatGetter();
 			if (formatGetter instanceof DefaultDocumentFormatGetter) {
-				DefaultDocumentFormatGetter ddfg = (DefaultDocumentFormatGetter)formatGetter;
+				DefaultDocumentFormatGetter ddfg = (DefaultDocumentFormatGetter) formatGetter;
 				for (String ext : additionalBinaryExtensions) {
 					ddfg.getBinaryExtensions().add(ext);
 				}
@@ -181,7 +186,7 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 	 */
 	protected void applyTokenReplacerOnKnownDocumentProcessors(AbstractDocumentFileReader reader) {
 		if (reader instanceof DefaultDocumentFileReader && tokenReplacer != null) {
-			DefaultDocumentFileReader defaultReader = (DefaultDocumentFileReader)reader;
+			DefaultDocumentFileReader defaultReader = (DefaultDocumentFileReader) reader;
 			CollectionsFileDocumentFileProcessor cp = defaultReader.getCollectionsFileDocumentFileProcessor();
 			if (cp != null) {
 				cp.setTokenReplacer(tokenReplacer);

@@ -210,6 +210,9 @@ public class Server extends Resource {
 	@XmlElement(name = "rewrite-resolves-globally")
 	private Boolean rewriteResolvesGlobally;
 
+	@XmlElement(name = "ssl-certificate-template")
+	private String sslCertificateTemplate;
+
 	@XmlElement(name = "ssl-allow-sslv3")
 	private Boolean sslAllowSslv3;
 
@@ -905,5 +908,13 @@ public class Server extends Resource {
 
 	public void setSslClientCertificatePem(List<String> sslClientCertificatePem) {
 		this.sslClientCertificatePem = sslClientCertificatePem;
+	}
+
+	public String getSslCertificateTemplate() {
+		return sslCertificateTemplate;
+	}
+
+	public void setSslCertificateTemplate(String sslCertificateTemplate) {
+		this.sslCertificateTemplate = sslCertificateTemplate;
 	}
 }

@@ -50,7 +50,7 @@ class ExportResourcesTask extends MarkLogicTask {
 	}
 
 	void export(ResourceSelector selector) {
-		def path = getAppConfig().getConfigDir().getBaseDir()
+		def path = getAppConfig().getFirstConfigDir().getBaseDir()
 		if (getProject().hasProperty("exportPath")) {
 			/**
 			 * Note that if a user provides a path and they're using Java 11 and the Gradle daemon, then the path

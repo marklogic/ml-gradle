@@ -1,5 +1,6 @@
 package com.marklogic.gradle.task.export
 
+import com.marklogic.appdeployer.ConfigDir
 import com.marklogic.appdeployer.export.ExportedResources
 import com.marklogic.appdeployer.export.Exporter
 import com.marklogic.gradle.task.MarkLogicTask
@@ -50,7 +51,9 @@ class ExportResourcesTask extends MarkLogicTask {
 	}
 
 	void export(ResourceSelector selector) {
-		def path = getAppConfig().getFirstConfigDir().getBaseDir()
+		List<ConfigDir> configDirs = getAppConfig().getConfigDirs()
+		ConfigDir lastConfigDir = configDirs.get(configDirs.size() - 1)
+		def path = lastConfigDir.getBaseDir()
 		if (getProject().hasProperty("exportPath")) {
 			/**
 			 * Note that if a user provides a path and they're using Java 11 and the Gradle daemon, then the path

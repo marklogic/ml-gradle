@@ -71,8 +71,8 @@ class ExportResourcesTask extends MarkLogicTask {
 		}
 
 		ExportedResources resources = exporter
-			.select(selector)
 			.withTriggersDatabase(getAppConfig().getTriggersDatabaseName())
+			.select(selector)
 			.export(path)
 
 		println "Exported files:"

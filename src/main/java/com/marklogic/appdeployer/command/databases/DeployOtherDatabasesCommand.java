@@ -2,9 +2,11 @@ package com.marklogic.appdeployer.command.databases;
 
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractUndoableCommand;
 import com.marklogic.appdeployer.command.CommandContext;
+import com.marklogic.appdeployer.command.ResourceFilenameFilter;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.appdeployer.command.forests.DeployForestsCommand;
 import com.marklogic.mgmt.PayloadParser;
@@ -21,6 +23,7 @@ import com.marklogic.mgmt.util.ObjectMapperFactory;
 import com.marklogic.rest.util.JsonNodeUtil;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.*;
 
@@ -134,8 +137,39 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 		// If no databases were found, may still need to delete the content database in case no file exists for it.
 		// That's because the command for creating a REST API server will not delete the content database by default,
 		// though it will delete the test database by default
-		DatabaseManager dbMgr = new DeployDatabaseCommand().newDatabaseManageForDeleting(context);
-		dbMgr.deleteByName(context.getAppConfig().getContentDatabaseName());
+		if (deleteContentDatabaseOnUndo(databasePlans, context.getAppConfig())) {
+			DatabaseManager dbMgr = new DeployDatabaseCommand().newDatabaseManageForDeleting(context);
+			dbMgr.deleteByName(context.getAppConfig().getContentDatabaseName());
+		}
+	}
+
+	/**
+	 * If no database files are found, may still need to delete the content database in case no file exists for it.
+	 * That's because the command for creating a REST API server will not delete the content database by default.
+	 *
+	 * Per ticket #404, this will now do a check to see if the default content database filename is ignored. If so,
+	 * and there are no database files found, then the content database will not be deleted.
+	 *
+	 * @param databasePlans
+	 * @param appConfig
+	 * @return
+	 */
+	protected boolean deleteContentDatabaseOnUndo(List<DatabasePlan> databasePlans, AppConfig appConfig) {
+		if (databasePlans == null || databasePlans.isEmpty()) {
+			FilenameFilter filter = getResourceFilenameFilter();
+			if (filter != null && filter instanceof ResourceFilenameFilter) {
+				Set<String> filenamesToIgnore = ((ResourceFilenameFilter) filter).getFilenamesToIgnore();
+				if (filenamesToIgnore != null && !filenamesToIgnore.isEmpty() && appConfig.getConfigDirs() != null) {
+					for (ConfigDir configDir : appConfig.getConfigDirs()) {
+						if (filenamesToIgnore.contains(configDir.getDefaultContentDatabaseFilename())) {
+							return false;
+						}
+					}
+				}
+			}
+			return true;
+		}
+		return false;
 	}
 
 	/**

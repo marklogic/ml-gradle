@@ -53,7 +53,28 @@ public class TaskManager extends AbstractResourceManager {
 			format("/t:tasks-default-list/t:list-items/t:list-item[t:task-path = '%s' and t:task-database = '%s']/t:idref", taskPath, taskDatabase) :
 			format("/t:tasks-default-list/t:list-items/t:list-item[t:task-path = '%s']/t:idref", taskPath);
 
-		return getAsXml().getElementValue(xpath);
+		final List<String> resourceIds = getAsXml().getElementValues(xpath);
+		if (resourceIds == null || resourceIds.isEmpty()) {
+			return null;
+		}
+
+		// Check each matching resource ID until we fine one with the same taskRoot
+		final String taskRoot = payloadParser.getPayloadFieldValue(payload, "task-root", false);
+		if (taskRoot == null) {
+			throw new RuntimeException("Unable to determine ID for task, as multiple existing tasks have the same " +
+				"task-path and task-database, but payload is missing a task-root to determine which existing task is " +
+				"the same root; payload: " + payload);
+		}
+		for (String resourceId : resourceIds) {
+			String json = getManageClient().getJson(appendGroupId(super.getResourcesPath() + "/" + resourceId + "/properties"));
+			String thisTaskRoot = payloadParser.getPayloadFieldValue(json, "task-root", false);
+			if (taskRoot.equals(thisTaskRoot)) {
+				return resourceId;
+			}
+		}
+
+		// If no matching task has the same taskRoot, then this is a new task
+		return null;
 	}
 
 	@Override
@@ -101,11 +122,14 @@ public class TaskManager extends AbstractResourceManager {
 		Fragment f = getAsXml();
 		String xpath = "/t:tasks-default-list/t:list-items/t:list-item[t:task-path = '%s' or t:idref = '%s']/t:idref";
 		xpath = String.format(xpath, taskPathOrTaskId, taskPathOrTaskId);
-		String id = f.getElementValue(xpath);
-		if (id == null) {
+		List<String> resourceIds = f.getElementValues(xpath);
+		if (resourceIds == null || resourceIds.isEmpty()) {
 			throw new RuntimeException("Could not find a scheduled task with a task-path or task-id of: " + taskPathOrTaskId);
 		}
-		return id;
+		if (resourceIds.size() == 1) {
+			return resourceIds.get(0);
+		}
+		throw new RuntimeException(format("Found multiple task IDs with the same task-path of %s; IDs: %s", taskPathOrTaskId, resourceIds));
 	}
 
 	/**

@@ -267,6 +267,10 @@ public class Database extends Resource {
 	@XmlElement(name = "path-namespace")
 	private List<PathNamespace> pathNamespace;
 
+	@XmlElementWrapper(name = "range-path-indexes")
+	@XmlElement(name = "range-path-index")
+	private List<PathIndex> rangePathIndex;
+
 	@XmlElementWrapper(name = "fields")
 	private List<Field> field;
 
@@ -1168,5 +1172,13 @@ public class Database extends Resource {
 
 	public void setFragmentParent(List<FragmentParent> fragmentParent) {
 		this.fragmentParent = fragmentParent;
+	}
+
+	public List<PathIndex> getRangePathIndex() {
+		return rangePathIndex;
+	}
+
+	public void setRangePathIndex(List<PathIndex> rangePathIndex) {
+		this.rangePathIndex = rangePathIndex;
 	}
 }

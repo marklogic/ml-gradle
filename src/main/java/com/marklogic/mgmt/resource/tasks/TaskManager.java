@@ -65,6 +65,7 @@ public class TaskManager extends AbstractResourceManager {
 				"task-path and task-database, but payload is missing a task-root to determine which existing task is " +
 				"the same root; payload: " + payload);
 		}
+
 		for (String resourceId : resourceIds) {
 			String json = getManageClient().getJson(appendGroupId(super.getResourcesPath() + "/" + resourceId + "/properties"));
 			String thisTaskRoot = payloadParser.getPayloadFieldValue(json, "task-root", false);
@@ -252,8 +253,17 @@ public class TaskManager extends AbstractResourceManager {
 		deleteAllScheduledTasks();
 	}
 
+	/**
+	 * @param taskPath
+	 */
+	@Deprecated(since = "Deprecated since 4.0.2, as the taskPath may not suffice for uniquely identifying a task. " +
+		"This now assumes a task root of '/' to at least avoid an error being thrown.")
 	public void deleteTaskWithPath(String taskPath) {
-		String json = format("{\"task-path\":\"%s\"}", taskPath);
+		deleteTaskWithPath(taskPath, "/");
+	}
+
+	public void deleteTaskWithPath(String taskPath, String taskRoot) {
+		String json = format("{\"task-path\":\"%s\", \"task-root\":\"%s\"}", taskPath, taskRoot);
 		delete(json, "group-id", groupName);
 	}
 

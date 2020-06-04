@@ -30,14 +30,14 @@ public class ExportTasksTest extends AbstractExportTest {
 		assertEquals("query.xqy.json", resources.getFiles().get(0).getName());
 
 		TaskManager mgr = new TaskManager(manageClient);
-		mgr.deleteTaskWithPath(taskPath);
+		mgr.deleteTaskWithPath(taskPath, "/");
 		assertFalse(mgr.exists(taskPath));
 
 		appConfig.getFirstConfigDir().setBaseDir(exportDir);
 		deploySampleApp();
 		assertTrue(mgr.exists(taskPath));
 
-		mgr.deleteTaskWithPath(taskPath);
+		mgr.deleteTaskWithPath(taskPath, "/");
 		assertFalse(mgr.exists(taskPath));
 	}
 }

@@ -138,10 +138,13 @@ public class PayloadParser {
 			//assume XML
 			Fragment frag = new Fragment(payload);
 			Element doc = frag.getInternalDoc().getRootElement();
+			// For XML, the propertyName needs to be an XPath expression
 			for (String propertyName : propertyNames) {
-				if (frag.elementExists(propertyName)) {
-					Element el = doc.getChild(propertyName);
-					el.detach();
+				List<Element> elements = frag.getElements(propertyName);
+				if (elements != null) {
+					for (Element el : elements) {
+						el.detach();
+					}
 				}
 			}
 			payload = new XMLOutputter().outputString(doc);

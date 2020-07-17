@@ -1,6 +1,7 @@
 package com.marklogic.gradle.task.shell
 
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.TaskAction
 
@@ -18,10 +19,16 @@ import org.gradle.api.tasks.TaskAction
  */
 class ShellTask extends JavaExec {
 
+	// Starting in Gradle 6.4, setMain must be called here instead of in a TaskAction method
+	@Override
+	Task configure(Closure closure) {
+		setMain("com.marklogic.groovysh.Main")
+		return super.configure(closure)
+	}
+
 	@TaskAction
 	@Override
 	public void exec() {
-		setMain("com.marklogic.groovysh.Main")
 		setStandardInput(System.in)
 
 		Project project = getProject()

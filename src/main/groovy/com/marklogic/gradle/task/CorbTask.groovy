@@ -1,5 +1,6 @@
 package com.marklogic.gradle.task
 
+import org.gradle.api.Task
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.TaskAction
 
@@ -88,14 +89,20 @@ XQUERY-MODULE".tokenize(',')
   // corb defaults to 1, but 8 seems like a more common default
   def threadCount = 8 // THREAD-COUNT
 
-  @TaskAction
+	// Starting in Gradle 6.4, setMain must be called here instead of in a TaskAction method
+	@Override
+	Task configure(Closure closure) {
+		setMain("com.marklogic.developer.corb.Manager")
+		return super.configure(closure)
+	}
+
+	@TaskAction
   @Override
   public void exec() {
     //By convention, if there is a corb configuration, use it to set the classpath
     if (getProject().configurations.findByName('corb')) {
       setClasspath(getProject().configurations.corb)
     }
-    setMain("com.marklogic.developer.corb.Manager")
 
     Map options = buildCorbOptions()
     //CoRB2 will evaluate System properties for options

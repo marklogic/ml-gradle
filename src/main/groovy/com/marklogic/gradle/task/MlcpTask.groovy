@@ -3,6 +3,7 @@ package com.marklogic.gradle.task
 import com.marklogic.client.DatabaseClient
 import com.marklogic.client.io.FileHandle
 import com.marklogic.contentpump.bean.MlcpBean
+import org.gradle.api.Task
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.JavaExec
@@ -35,10 +36,16 @@ class MlcpTask extends JavaExec {
 		return Logging.getLogger(MlcpTask.class)
 	}
 
+	// Starting in Gradle 6.4, setMain must be called here instead of in a TaskAction method
+	@Override
+	Task configure(Closure closure) {
+		setMain("com.marklogic.contentpump.ContentPump")
+		return super.configure(closure)
+	}
+
 	@TaskAction
 	@Override
 	void exec() {
-		setMain("com.marklogic.contentpump.ContentPump")
 		AppConfig config = getProject().property("mlAppConfig")
 
 		List<String> newArgs = new ArrayList<>()

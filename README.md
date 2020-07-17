@@ -33,7 +33,7 @@ First, [install Gradle](https://gradle.org/install/).
 
 Then, in an empty directory, create a file named "build.gradle" with your favorite text editor and enter the following:
 
-    plugins { id "com.marklogic.ml-gradle" version "4.0.3" }
+    plugins { id "com.marklogic.ml-gradle" version "4.0.4" }
     
 Then run:
 

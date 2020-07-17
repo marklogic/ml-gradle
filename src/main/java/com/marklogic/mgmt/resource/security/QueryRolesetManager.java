@@ -10,6 +10,13 @@ public class QueryRolesetManager extends AbstractResourceManager {
 
 	public QueryRolesetManager(ManageClient client) {
 		super(client);
+
+		/**
+		 * See https://github.com/marklogic-community/ml-app-deployer/issues/412 - ML 10.0-4 no longer supports a PUT
+		 * on a query roleset, and before it, it did not do anything. This is consistent with the ML Admin UI too,
+		 * where a user can only create and delete query rolesets.
+		 */
+		setUpdateAllowed(false);
 	}
 
 	@Override
@@ -37,7 +44,7 @@ public class QueryRolesetManager extends AbstractResourceManager {
 		if (isRoleId(resourceNameOrId)) {
 			return super.getResourcePath(resourceNameOrId, resourceUrlParams);
 		}
-		
+
 		String id = getIdForRoleNames(resourceNameOrId, getAsXml());
 		if (id == null) {
 			throw new RuntimeException("Could not find a query-roleset with roles: " + resourceNameOrId);

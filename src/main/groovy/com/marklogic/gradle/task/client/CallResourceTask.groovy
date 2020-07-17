@@ -10,7 +10,7 @@ class CallResourceTask extends MarkLogicTask {
 
 	def params = [:]
 	def method = "GET"
-	def client = newClient()
+	def client = null
 	def mimeType = "application/json"
 	String resourceName
 	String body

@@ -1,21 +1,30 @@
 buildscript {
-    repositories {
-        mavenCentral()
+    dependencies {
+        classpath group: 'com.liferay', name: 'com.liferay.gradle.plugins.jsdoc', version: '2.0.54'
     }
 
-    dependencies {
-        classpath 'commons-io:commons-io:2.6'
+    repositories {
+        maven {
+            url 'https://repository-cdn.liferay.com/nexus/content/groups/public'
+        }
     }
 }
 
 plugins {
-  id "com.marklogic.ml-gradle" version "3.11.0"
-  id "com.liferay.app.jsdoc" version "2.0.19"
+    id 'com.marklogic.ml-gradle' version '4.0.4'
+    id 'com.liferay.node'        version '7.2.0'
+    id 'com.liferay.app.jsdoc'   version '2.0.54'
 }
 
+allprojects {
+    plugins.withId('com.liferay.node') {
+        // Override default of v5.5.0
+        node.nodeUrl = 'https://nodejs.org/dist/v12.18.3/node-v12.18.3-win-x64.zip'
+    }
+}
 
 task generateJsDoc(type:com.liferay.gradle.plugins.jsdoc.JSDocTask) {
-    configuration = project.resources.text.fromFile(file("jsdoc.json"))
-    destinationDir = "build/docs/jsdoc"
-    sourceDirs = file("src/main/ml-modules/lib")
-} 
+    configuration = project.resources.text.fromFile(file('jsdoc.json'))
+    destinationDir = 'build/docs/jsdoc'
+    sourceDirs = file('src/main/ml-modules/lib')
+}

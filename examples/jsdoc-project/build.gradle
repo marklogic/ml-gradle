@@ -19,7 +19,8 @@ plugins {
 allprojects {
     plugins.withId('com.liferay.node') {
         // Override default of v5.5.0
-        node.nodeUrl = 'https://nodejs.org/dist/v12.18.3/node-v12.18.3-win-x64.zip'
+        node.nodeVersion = '12.18.3'
+        node.nodeUrl = "https://nodejs.org/dist/v${node.nodeVersion}/node-v${node.nodeVersion}-${platform}-x${bitMode}.${extension}"
     }
 }
 

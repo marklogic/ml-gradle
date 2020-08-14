@@ -1,19 +1,12 @@
 buildscript {
-    dependencies {
-        classpath group: 'com.liferay', name: 'com.liferay.gradle.plugins.jsdoc', version: '2.0.54'
-    }
-
     repositories {
-        maven {
-            url 'https://repository-cdn.liferay.com/nexus/content/groups/public'
-        }
+        mavenCentral()
     }
 }
 
 plugins {
     id 'com.marklogic.ml-gradle' version '4.0.4'
-    id 'com.liferay.node'        version '7.2.0'
-    id 'com.liferay.app.jsdoc'   version '2.0.54'
+    id 'com.liferay.app.jsdoc'   version '2.0.53'
 }
 
 allprojects {

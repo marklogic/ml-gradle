@@ -2,6 +2,7 @@ package com.marklogic.appdeployer.command.tasks;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.mgmt.resource.tasks.TaskManager;
+import com.marklogic.rest.util.PreviewInterceptor;
 import org.junit.After;
 import org.junit.Test;
 
@@ -39,10 +40,21 @@ public class DeployTasksWithSamePathTest extends AbstractAppDeployerTest {
 
 			deploySampleApp();
 			assertEquals("There should still be just 3 new tasks", initialTaskCount + 3, taskManager.getAsXml().getResourceCount());
+
+			// test preview. No tasks are accidentally deleted
+			PreviewInterceptor interceptor = new PreviewInterceptor(manageClient);
+			manageClient.getRestTemplate().getInterceptors().add(interceptor);
+
+			deploySampleApp();
+			assertEquals("There should still be just 3 new tasks", initialTaskCount + 3, taskManager.getAsXml().getResourceCount());
+
 		} finally {
+			// we want to undeploy the sample app not just preview it
+			manageClient.getRestTemplate().getInterceptors().clear();
 			undeploySampleApp();
 
 			assertEquals("The 3 new tasks should have been deleted", initialTaskCount, taskManager.getAsXml().getResourceCount());
 		}
 	}
+
 }

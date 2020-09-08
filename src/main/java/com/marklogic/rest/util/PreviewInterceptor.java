@@ -69,6 +69,8 @@ public class PreviewInterceptor extends DefaultResponseErrorHandler implements C
 			return previewPut(request, bytes);
 		} else if (HttpMethod.POST.equals(request.getMethod())) {
 			return previewPost(request, bytes);
+		} else if (HttpMethod.DELETE.equals(request.getMethod())) {
+			return previewDelete(request, bytes);
 		}
 		return execution.execute(request, bytes);
 	}
@@ -206,6 +208,19 @@ public class PreviewInterceptor extends DefaultResponseErrorHandler implements C
 
 		logger.info("Previewing, so not sending POST to: " + request.getURI());
 
+		return newFakeResponse();
+	}
+
+	/**
+	 * For a DELETE operation, a resource is being deleted, so just need to include the resource URI in the report - no
+	 * diff is needed.
+	 *
+	 * @param request
+	 * @param bytes
+	 * @return
+	 */
+	protected ClientHttpResponse previewDelete(HttpRequest request, byte[] bytes) throws IOException {
+		logger.info("Previewing, so not sending DELETE to: " + request.getURI());
 		return newFakeResponse();
 	}
 

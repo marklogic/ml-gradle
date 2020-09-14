@@ -100,7 +100,18 @@ class MlcpTask extends JavaExec {
 		// Include any args that a user has configured via the args parameter of the Gradle task
 		newArgs.addAll(getArgs())
 
-		println "mlcp arguments, excluding password: " + newArgs
+		// Build args to print, excluding the two known COPY arguments that will reveal passwords
+		List<String> safeArgsToPrint = new ArrayList<>()
+		for (int i = 0; i < newArgs.size(); i++) {
+			String arg = newArgs.get(i)
+			if ("-password".equals(arg) || "-input_password".equals(arg) || "-output_password".equals(arg)) {
+				// Skip the next argument too
+				i++
+			} else {
+				safeArgsToPrint.add(arg)
+			}
+		}
+		println "mlcp arguments, excluding known password arguments: " + safeArgsToPrint
 
 		if (!isCopy) {
 			newArgs.add("-password")

@@ -21,7 +21,7 @@ configurations {
 }
 
 dependencies {
-	mlcp "com.marklogic:mlcp:9.0.7"
+	mlcp "com.marklogic:mlcp:10.0.4"
 
 	/**
 	 * mlcp uses Log4j for logging, and if Log4j can't find a configuration file, it will complain and you'll

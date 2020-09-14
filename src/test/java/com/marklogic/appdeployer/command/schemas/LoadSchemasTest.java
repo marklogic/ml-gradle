@@ -24,10 +24,16 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 	public void databaseSpecificPaths() {
 		initializeAppDeployer(new DeployOtherDatabasesCommand(), newCommand());
 
-		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/multiple-schema-databases/ml-config"));
+		File configDir = new File("src/test/resources/sample-app/multiple-schema-databases/ml-config");
+		appConfig.getFirstConfigDir().setBaseDir(configDir);
 		appConfig.setSchemasDatabaseName("sample-app-schemas1");
 		appConfig.getSchemaPaths().clear();
 		appConfig.getSchemaPaths().add("src/test/resources/sample-app/multiple-schema-databases/ml-schemas");
+
+		// Create an empty schemas dir to ensure this doesn't cause any failures
+		File emptyDatabaseDir = new File(appConfig.getFirstConfigDir().getDatabasesDir(), "doesnt-exist-db");
+		File emptySchemasDir = new File(emptyDatabaseDir, "schemas");
+		emptySchemasDir.mkdirs();
 
 		deploySampleApp();
 

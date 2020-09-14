@@ -53,9 +53,11 @@ public class LoadSchemasCommand extends AbstractCommand {
 		context.getAppConfig().getConfigDirs().forEach(configDir -> {
 			configDir.getDatabaseResourceDirectories().forEach(dir -> {
 				File schemasDir = new File(dir, "schemas");
-				if (schemasDir.exists()) {
+				if (schemasDir.exists() && schemasDir.listFiles().length > 0) {
 					String databaseName = determineDatabaseNameForDatabaseResourceDirectory(context, configDir, dir);
-					loadSchemas(schemasDir.getAbsolutePath(), databaseName, context);
+					if (databaseName != null) {
+						loadSchemas(schemasDir.getAbsolutePath(), databaseName, context);
+					}
 				}
 			});
 		});

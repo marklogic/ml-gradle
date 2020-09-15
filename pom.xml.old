@@ -2,6 +2,12 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
+	<!--
+	This is being retained in case a pom.xml file is needed again in the future. But it is no
+	longer named pom.xml so as to not cause confusion as to what defines the dependencies for this
+	project - build.gradle does.
+	-->
+
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.marklogic</groupId>
 	<artifactId>ml-javaclient-util</artifactId>

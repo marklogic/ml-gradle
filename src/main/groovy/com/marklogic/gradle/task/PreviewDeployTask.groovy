@@ -55,12 +55,6 @@ class PreviewDeployTask extends DeployAppTask {
 			for (Command c : simpleAppDeployer.getCommands()) {
 				if (c instanceof LoadSchemasCommand || c instanceof LoadModulesCommand) {
 					// Don't include these; no need to load schemas or modules during a preview
-				}
-				// Loading roles in two phases breaks the preview feature, so it's disabled
-				else if (c instanceof DeployRolesCommand) {
-					DeployRolesCommand deployRolesCommand = (DeployRolesCommand) c
-					deployRolesCommand.setDeployRolesInTwoPhases(false)
-					newCommands.add(c)
 				} else {
 					newCommands.add(c)
 				}

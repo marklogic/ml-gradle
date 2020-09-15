@@ -17,32 +17,34 @@ repositories {
 }
 
 dependencies {
-  api 'com.marklogic:ml-javaclient-util:' + mlJavaclientUtilVersion
+  api 'com.marklogic:ml-javaclient-util:4.1.0-rc1'
   api 'jaxen:jaxen:1.1.6'
-  api 'org.apache.httpcomponents:httpclient:4.3.6'
-  api 'org.springframework:spring-web:4.3.5.RELEASE'
+  api 'org.apache.httpcomponents:httpclient:4.5.12'
+  api 'org.springframework:spring-web:5.2.8.RELEASE'
 
 	// For EqualsBuilder; added in 3.8.1 to support detecting if a mimetype's properties have changed or not
-	api "org.apache.commons:commons-lang3:3.7"
+	api "org.apache.commons:commons-lang3:3.11"
 
 	// For PreviewInterceptor; can be excluded if that feature is not used
-	api "com.flipkart.zjsonpatch:zjsonpatch:0.4.6"
+	api "com.flipkart.zjsonpatch:zjsonpatch:0.4.11"
 
 	// Required for Java 11
 	api "javax.xml.bind:jaxb-api:2.3.1"
 	api "com.sun.xml.bind:jaxb-core:2.3.0.1"
-	api "com.sun.xml.bind:jaxb-impl:2.3.2"
+	api "com.sun.xml.bind:jaxb-impl:2.3.3"
 
 	// Don't want to include this in the published jar, just the executable jar
-	compileOnly "com.beust:jcommander:1.72"
+	compileOnly "com.beust:jcommander:1.78"
 
-  testImplementation 'com.marklogic:ml-junit:' + mlJunitVersion
-	testImplementation 'commons-io:commons-io:2.5'
+  testImplementation 'com.marklogic:ml-junit:3.2.0'
+	// Force ml-junit to use 5.2.8 instead of 4.1.5
+	testImplementation "org.springframework:spring-test:5.2.8.RELEASE"
+	testImplementation 'commons-io:commons-io:2.8.0'
 
   // Forcing Spring to use logback instead of commons-logging
-  implementation "ch.qos.logback:logback-classic:1.1.8" // Needs to be implementation for CLI
-	testImplementation group: "org.slf4j", name: "jcl-over-slf4j", version: "1.7.22"
-	testImplementation group: "org.slf4j", name: "slf4j-api", version: "1.7.22"
+  implementation "ch.qos.logback:logback-classic:1.2.3" // Needs to be implementation for CLI
+	testImplementation group: "org.slf4j", name: "jcl-over-slf4j", version: "1.7.30"
+	testImplementation group: "org.slf4j", name: "slf4j-api", version: "1.7.30"
 }
 
 // This ensures that Gradle includes in the published jar any non-java files under src/main/java

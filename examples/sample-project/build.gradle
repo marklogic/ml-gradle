@@ -8,7 +8,7 @@ buildscript {
 		jcenter()
 	}
 	dependencies {
-		classpath "com.marklogic:ml-gradle:4.0.4"
+		classpath "com.marklogic:ml-gradle:4.1.0-rc1"
 	}
 }
 
@@ -65,7 +65,7 @@ dependencies {
 	testRuntime "com.sun.xml.bind:jaxb-impl:2.3.2"
 
 	// corb jar available from jcenter
-	corb "com.marklogic:marklogic-corb:2.3.2"
+	corb "com.marklogic:marklogic-corb:2.4.5"
 }
 
 /*

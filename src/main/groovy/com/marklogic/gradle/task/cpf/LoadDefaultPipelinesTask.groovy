@@ -12,6 +12,6 @@ class LoadDefaultPipelinesTask extends MarkLogicTask {
     @TaskAction
     void loadDefaultPipelines() {
         def dbName = databaseName != null ? databaseName : getAppConfig().getTriggersDatabaseName()
-        new PipelineManager(getManageClient()).loadDefaultPipelines(dbName)
+        new PipelineManager(getManageClient(), dbName).loadDefaultPipelines()
     }
 }

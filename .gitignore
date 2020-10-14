@@ -18,3 +18,5 @@ examples/mlcp-project/data/export/
 .idea
 *.iml
 out
+gradle-local.properties
+snyk

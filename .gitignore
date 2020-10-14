@@ -11,4 +11,6 @@ out
 *.ipr
 *.iws
 target
+gradle-local.properties
+snyk
 

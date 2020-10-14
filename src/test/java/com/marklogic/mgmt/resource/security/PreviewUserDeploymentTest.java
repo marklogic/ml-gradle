@@ -69,6 +69,7 @@ public class PreviewUserDeploymentTest extends AbstractAppDeployerTest {
 			assertEquals("rest-writer", secondChange.get("value").asText());
 
 		} finally {
+			manageClient.getRestTemplate().getInterceptors().clear();
 			mgr.delete(json);
 		}
 	}

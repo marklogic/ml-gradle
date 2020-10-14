@@ -1,11 +1,12 @@
 package com.marklogic.appdeployer.command.forests;
 
 import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.mgmt.api.forest.ForestReplica;
 
 import java.util.Map;
 
-public abstract class AbstractReplicaBuilderStrategy implements ReplicaBuilderStrategy {
+public abstract class AbstractReplicaBuilderStrategy extends LoggingObject implements ReplicaBuilderStrategy {
 
 	/**
 	 * Configures the fast and large data directories for a replica based on what's in AppConfig for the given

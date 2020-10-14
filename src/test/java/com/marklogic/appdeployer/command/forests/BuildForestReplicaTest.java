@@ -8,7 +8,11 @@ import com.marklogic.mgmt.util.SimplePropertySource;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 public class BuildForestReplicaTest extends Assert {
 
@@ -35,6 +39,56 @@ public class BuildForestReplicaTest extends Assert {
 		assertEquals("host1", forests.get(4).getForestReplica().get(0).getHost());
 		assertEquals("host3", forests.get(5).getHost());
 		assertEquals("host2", forests.get(5).getForestReplica().get(0).getHost());
+	}
+
+	/**
+	 * Test was added for https://github.com/marklogic-community/ml-app-deployer/issues/423, where a bug was detected
+	 * when the "host pointer" in the implementation code could exceed the number of hosts. This test reproduced the bug.
+	 * Just doing some basic assertions on the number of forests and replicas created, but the key is that the test no
+	 * longer fails.
+	 */
+	@Test
+	public void sameNumberOfForestsAsHosts() {
+		AppConfig appConfig = newAppConfig("mlForestsPerHost", "db,4");
+
+		List<Forest> forests = builder.buildForests(
+			new ForestPlan("db", "host1", "host2", "host3", "host4").withReplicaCount(3), appConfig);
+
+		assertEquals(16, forests.size());
+		forests.forEach(forest -> {
+			assertEquals(3, forest.getForestReplica().size());
+		});
+	}
+
+	/**
+	 * Similar to the above test, just even more forests. 
+	 */
+	@Test
+	public void numberOfForestsPerHostIsMoreThanDoubleTheNumberOfHosts() {
+		AppConfig appConfig = newAppConfig("mlForestsPerHost", "db,10");
+
+		List<Forest> forests = builder.buildForests(
+			new ForestPlan("db", "host1", "host2", "host3", "host4").withReplicaCount(3), appConfig);
+
+		assertEquals(40, forests.size());
+
+		Map<String, AtomicInteger> hostToReplicaCounts = new HashMap<>();
+		Stream.of("host1", "host2", "host3", "host4").forEach(host -> hostToReplicaCounts.put(host, new AtomicInteger(0)));
+
+		AtomicInteger replicaCount = new AtomicInteger(0);
+
+		forests.forEach(forest -> {
+			assertEquals(3, forest.getForestReplica().size());
+			forest.getForestReplica().forEach(replica -> {
+				hostToReplicaCounts.get(replica.getHost()).getAndIncrement();
+				replicaCount.getAndIncrement();
+			});
+		});
+
+		assertEquals("Expecting 120 replicas; we have 40 forests, and we expect 3 replicas for each", 120, replicaCount.get());
+		Stream.of("host1", "host2", "host3", "host4").forEach(host -> {
+			assertEquals("Each host should have 30 replicas, as there are 120 total", 30, hostToReplicaCounts.get(host).get());
+		});
 	}
 
 	@Test

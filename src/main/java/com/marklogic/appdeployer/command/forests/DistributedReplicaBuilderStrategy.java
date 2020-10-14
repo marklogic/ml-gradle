@@ -35,6 +35,7 @@ public class DistributedReplicaBuilderStrategy extends AbstractReplicaBuilderStr
 		}
 
 		for (String host : hostToForests.keySet()) {
+			logger.info("Determining replicas for host: " + host);
 
 			// availableHosts will be the hosts that we can put a forest's replicas on, which excludes the host where
 			// the forest lives. We also want to have the hosts in different order as we assign replicas to hosts, so
@@ -46,6 +47,8 @@ public class DistributedReplicaBuilderStrategy extends AbstractReplicaBuilderStr
 				availableHosts.addAll(hostNames.subList(hostIndex + 1, hostNames.size()));
 			}
 			availableHosts.addAll(hostNames.subList(0, hostIndex));
+			final int availableHostCount = availableHosts.size();
+			logger.info("Available hosts for replicas: " + availableHosts);
 
 			int hostPointer = 0;
 
@@ -59,11 +62,12 @@ public class DistributedReplicaBuilderStrategy extends AbstractReplicaBuilderStr
 					replicas.add(replica);
 
 					int replicaHostPointer = hostPointer + i - 1;
-					if (replicaHostPointer == availableHosts.size()) {
-						replicaHostPointer = 0;
+					if (replicaHostPointer >= availableHostCount) {
+						// Must do a modulo here in the event that there are more primary forests per host than number of hosts
+						replicaHostPointer %= availableHostCount;
 					}
-
 					replica.setHost(availableHosts.get(replicaHostPointer));
+					logger.info(format("Built replica '%s' for forest '%s' on host '%s'", replica.getReplicaName(), currForest.getForestName(), replica.getHost()));
 
 					dataDirectoryPointer++;
 					if (dataDirectoryPointer == replicaDataDirectories.size()) {
@@ -82,7 +86,7 @@ public class DistributedReplicaBuilderStrategy extends AbstractReplicaBuilderStr
 
 				++hostPointer;
 
-				if (hostPointer == availableHosts.size()) {
+				if (hostPointer == availableHostCount) {
 					hostPointer = 0;
 				}
 

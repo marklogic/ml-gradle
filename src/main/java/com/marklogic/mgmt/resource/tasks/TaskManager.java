@@ -200,7 +200,7 @@ public class TaskManager extends AbstractResourceManager {
 	 * Per ticket #367, when a task is updated, it is first deleted. This is to workaround Manage API behavior which
 	 * does not allow for any property besides "task-enabled" to be updated on a scheduled task. But it's often handy
 	 * during a deployment to update some other property of a scheduled task. Unfortunately, that throws an error.
-	 *
+	 * <p>
 	 * So to work around that, when a scheduled task is updated, it's first deleted. Then the task is created, which
 	 * includes making another call to disable the task if task-enabled is set to false.
 	 *
@@ -256,8 +256,9 @@ public class TaskManager extends AbstractResourceManager {
 	/**
 	 * @param taskPath
 	 */
-	@Deprecated(since = "Deprecated since 4.0.2, as the taskPath may not suffice for uniquely identifying a task. " +
-		"This now assumes a task root of '/' to at least avoid an error being thrown.")
+	// Deprecated since 4.0.2, as the taskPath may not suffice for uniquely identifying a task.
+	// This now assumes a task root of '/' to at least avoid an error being thrown.
+	@Deprecated
 	public void deleteTaskWithPath(String taskPath) {
 		deleteTaskWithPath(taskPath, "/");
 	}

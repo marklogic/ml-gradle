@@ -1,6 +1,7 @@
 ![GitHub release](https://img.shields.io/github/release/marklogic-community/ml-app-deployer.svg)
 ![GitHub last commit](https://img.shields.io/github/last-commit/marklogic-community/ml-app-deployer.svg)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Known Vulnerabilities](https://snyk.io/test/github/marklogic-community/ml-app-deployer/badge.svg)](https://snyk.io/test/github/marklogic-community/ml-app-deployer)
 
 ml-app-deployer is a Java library that provides two capabilities:
 

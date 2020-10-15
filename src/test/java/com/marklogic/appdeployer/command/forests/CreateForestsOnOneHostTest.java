@@ -27,22 +27,27 @@ public class CreateForestsOnOneHostTest extends Assert {
 		HostCalculator hostCalculator = new DefaultHostCalculator(new TestHostNameProvider("host1", "host2", "host3"));
 		command.setHostCalculator(hostCalculator);
 
-		List<String> hostNames = command.determineHostNamesForForest(context, fakeHostNames);
-		assertEquals(3, hostNames.size());
+		ForestHostNames hostNames = command.determineHostNamesForForest(context, fakeHostNames);
+		assertEquals(3, hostNames.getPrimaryForestHostNames().size());
 
 		command.setCreateForestsOnEachHost(false);
 		hostNames = command.determineHostNamesForForest(context, fakeHostNames);
-		assertEquals(1, hostNames.size());
-		assertEquals("host1", hostNames.get(0));
+		assertEquals(1, hostNames.getPrimaryForestHostNames().size());
+		assertEquals("host1", hostNames.getPrimaryForestHostNames().get(0));
+		assertEquals(
+			"When forests aren't created on each host, all hosts should still be available for replica forests, " +
+				"with the expectation that the primary forest host will still not be used",
+			3, hostNames.getReplicaForestHostNames().size());
 
 		command.setCreateForestsOnEachHost(true);
 		hostNames = command.determineHostNamesForForest(context, fakeHostNames);
-		assertEquals(3, hostNames.size());
+		assertEquals(3, hostNames.getPrimaryForestHostNames().size());
 
 		Set<String> names = new HashSet<>();
 		names.add("test-db");
 		appConfig.setDatabasesWithForestsOnOneHost(names);
 		hostNames = command.determineHostNamesForForest(context, fakeHostNames);
-		assertEquals(1, hostNames.size());
+		assertEquals(1, hostNames.getPrimaryForestHostNames().size());
+		assertEquals(3, hostNames.getReplicaForestHostNames().size());
 	}
 }

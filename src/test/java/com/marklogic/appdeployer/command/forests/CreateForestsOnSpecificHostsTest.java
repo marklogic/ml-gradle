@@ -26,8 +26,9 @@ public class CreateForestsOnSpecificHostsTest extends Assert {
 
 		command.setHostCalculator(new DefaultHostCalculator(new TestHostNameProvider(fakeHostNames.toArray(new String[]{}))));
 		// Verify we get all 3 hosts back when nothing special is configured
-		List<String> hostNames = command.determineHostNamesForForest(context, fakeHostNames);
-		assertEquals(3, hostNames.size());
+		ForestHostNames hostNames = command.determineHostNamesForForest(context, fakeHostNames);
+		assertEquals(3, hostNames.getPrimaryForestHostNames().size());
+		assertEquals(3, hostNames.getReplicaForestHostNames().size());
 
 		// Select 2 of the 3 hosts for test-db
 		Properties props = new Properties();
@@ -37,16 +38,18 @@ public class CreateForestsOnSpecificHostsTest extends Assert {
 		context = new CommandContext(appConfig, null, null);
 
 		hostNames = command.determineHostNamesForForest(context, fakeHostNames);
-		assertEquals(2, hostNames.size());
-		assertTrue(hostNames.contains("host1"));
-		assertTrue(hostNames.contains("host2"));
+		assertEquals(2, hostNames.getPrimaryForestHostNames().size());
+		assertEquals(2, hostNames.getReplicaForestHostNames().size());
+		assertTrue(hostNames.getPrimaryForestHostNames().contains("host1"));
+		assertTrue(hostNames.getPrimaryForestHostNames().contains("host2"));
 
 		// Select 1 of the 3 hosts, and include a bad host; the bad one should be ignored
 		props.setProperty("mlDatabaseHosts", "some-other-db,host2,test-db,bad-host|host2");
 		appConfig = factory.newAppConfig();
 		context = new CommandContext(appConfig, null, null);
 		hostNames = command.determineHostNamesForForest(context, fakeHostNames);
-		assertEquals(1, hostNames.size());
-		assertTrue(hostNames.contains("host2"));
+		assertEquals(1, hostNames.getPrimaryForestHostNames().size());
+		assertEquals(1, hostNames.getReplicaForestHostNames().size());
+		assertTrue(hostNames.getPrimaryForestHostNames().contains("host2"));
 	}
 }

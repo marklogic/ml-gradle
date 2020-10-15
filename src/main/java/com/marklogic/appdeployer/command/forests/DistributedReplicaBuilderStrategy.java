@@ -17,7 +17,7 @@ public class DistributedReplicaBuilderStrategy extends AbstractReplicaBuilderStr
 		List<String> replicaDataDirectories, ForestNamingStrategy fns)
 	{
 		final String databaseName = forestPlan.getDatabaseName();
-		final List<String> hostNames = forestPlan.getHostNames();
+		final List<String> hostNames = forestPlan.getReplicaHostNames();
 		final int replicaCount = forestPlan.getReplicaCount();
 
 		HashMap<String, List<Forest>> hostToForests = new HashMap<String, List<Forest>>();

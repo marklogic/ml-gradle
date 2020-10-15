@@ -151,7 +151,7 @@ public class ForestBuilder extends LoggingObject {
 	 */
 	public void addReplicasToForests(List<Forest> forests, ForestPlan forestPlan, AppConfig appConfig, List<String> dataDirectories) {
 		final String databaseName = forestPlan.getDatabaseName();
-		final List<String> hostNames = forestPlan.getHostNames();
+		final List<String> hostNames = forestPlan.getReplicaHostNames();
 		final int replicaCount = forestPlan.getReplicaCount();
 
 		if (replicaCount >= hostNames.size()) {

@@ -38,13 +38,13 @@ public class DeploySubDatabasesCommand extends AbstractUndoableCommand {
 
 			if (subdbDir.exists()) {
 				List<String> subDbNames = new ArrayList<String>();
-				for (File f : listFilesInDirectory(subdbDir)) {
-					logger.info(format("Processing sub-database for %s found in file: %s", superDatabaseName, f.getAbsolutePath()));
+				for (File subDatabaseFile : listFilesInDirectory(subdbDir)) {
+					logger.info(format("Processing sub-database for %s found in file: %s", superDatabaseName, subDatabaseFile.getAbsolutePath()));
 
-					DeployDatabaseCommand subDbCommand = this.deployDatabaseCommandFactory.newDeployDatabaseCommand(null);
+					DeployDatabaseCommand subDbCommand = this.deployDatabaseCommandFactory.newDeployDatabaseCommand(subDatabaseFile);
 					// Sub databases should be created immediately so they can then be attached
 					subDbCommand.setSupportsResourceMerging(false);
-					subDbCommand.setDatabaseFile(f);
+					subDbCommand.setDatabaseFile(subDatabaseFile);
 					subDbCommand.setSuperDatabaseName(superDatabaseName);
 					subDbCommand.setSubDatabase(true);
 					subDbCommand.execute(context);

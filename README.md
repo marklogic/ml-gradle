@@ -1,6 +1,7 @@
 ![GitHub release](https://img.shields.io/github/release/marklogic-community/ml-gradle.svg)
 ![GitHub last commit](https://img.shields.io/github/last-commit/marklogic-community/ml-gradle.svg)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Known Vulnerabilities](https://snyk.io/test/github/marklogic-community/ml-gradle/badge.svg)](https://snyk.io/test/github/marklogic-community/ml-gradle)
 
 Automate everything involving MarkLogic with Gradle
 =========

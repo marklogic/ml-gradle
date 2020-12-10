@@ -117,12 +117,21 @@ public class CertificateTemplateManager extends AbstractResourceManager {
 	 * Used because ML9.0-5 (and prior) has bug for "needs-certificate" call
 	 */
 	public boolean certificateExists(String templateIdOrName) {
-		Fragment response = getCertificatesForTemplate(templateIdOrName);
-		if (logger.isDebugEnabled()) {
-			logger.debug(format("Checking if %s template has certificates --> for template: %s", templateIdOrName, response.getPrettyXml()));
-		}
+		return certificateExists(templateIdOrName, null);
+	}
 
-		return response.elementExists("/msec:certificate-list/msec:certificate");
+	/**
+	 *
+	 * @param templateIdOrName
+	 * @param certificateHostName if not null, then true will be iff a certificate with the given templateIdOrName
+	 *                            exists, and it has a host-name matching this parameter
+	 * @return
+	 */
+	public boolean certificateExists(String templateIdOrName, String certificateHostName) {
+		Fragment response = getCertificatesForTemplate(templateIdOrName);
+		return certificateHostName != null ?
+			response.elementExists(format("/msec:certificate-list/msec:certificate[msec:host-name = '%s']", certificateHostName)) :
+			response.elementExists("/msec:certificate-list/msec:certificate");
 	}
 
     public Fragment getCertificatesForTemplate(String templateIdOrName) {

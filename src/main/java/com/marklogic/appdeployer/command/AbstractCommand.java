@@ -199,7 +199,6 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 	 * an ObjectNode, which is the preferred data structure for merging resources together, and then stashing that
 	 * ObjectNode in the CommandContext map.
 	 *
-	 * @return
 	 */
 	protected void storeResourceInCommandContextMap(CommandContext context, File resourceFile, String payload) {
 		final String contextKey = getContextKeyForResourcesToSave();

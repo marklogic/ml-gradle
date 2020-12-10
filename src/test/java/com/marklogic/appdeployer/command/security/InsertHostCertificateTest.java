@@ -13,9 +13,57 @@ import java.util.List;
 public class InsertHostCertificateTest extends AbstractAppDeployerTest {
 
 	private final static String TEMPLATE_NAME = "sample-app-certificate-template";
+	private final static String CERTIFICATE_HOSTNAME = "host1.marklogic.com";
 
 	@Test
-	public void test() {
+	public void extractHostNameFromEvalResponse() {
+		String hostName = new InsertCertificateHostsTemplateCommand().extractHostNameFromEvalResponse("--8f04db15a117ed37\n" +
+			"Content-Type: text/plain\n" +
+			"X-Primitive: string\n" +
+			"\n" +
+			"MarkLogicBogusCA\n" +
+			"--8f04db15a117ed37--");
+		assertEquals("MarkLogicBogusCA", hostName);
+	}
+
+	@Test
+	public void unexpectedEvalResponse() {
+		try {
+			new InsertCertificateHostsTemplateCommand().extractHostNameFromEvalResponse("--8f04db15a117ed37\n" +
+				"Content-Type: text/plain\n" +
+				"\n" +
+				"MarkLogicBogusCA\n" +
+				"--8f04db15a117ed37--");
+			fail("Should have failed because X-Primitive: string is missing");
+		} catch (IllegalArgumentException ex) {
+			assertTrue(ex.getMessage().contains("did not find: X-Primitive: string"));
+		}
+	}
+
+	@Test
+	public void anotherUnexpectedEvalResponse() {
+		try {
+			new InsertCertificateHostsTemplateCommand().extractHostNameFromEvalResponse("--8f04db15a117ed37\n" +
+				"Content-Type: text/plain\n" +
+				"X-Primitive: string\n" +
+				"\n" +
+				"MarkLogicBogusCA\n");
+			fail("Should have failed because there's no '--' after X-Primitive: string");
+		} catch (IllegalArgumentException ex) {
+			assertTrue(ex.getMessage().contains("did not find '--'"));
+		}
+	}
+
+	@Test
+	public void extractHostNameFromFile() {
+		File certFile = new File("src/test/resources/sample-app/host-certificates/security/certificate-templates" +
+			"/host-certificates/sample-app-certificate-template/host1.marklogic.com.crt");
+		String hostName = new InsertCertificateHostsTemplateCommand().getCertificateHostName(certFile, manageClient);
+		assertEquals("host1.marklogic.com", hostName);
+	}
+
+	@Test
+	public void insertCertificateAndVerify() {
 		appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/host-certificates")));
 
 		initializeAppDeployer(
@@ -49,7 +97,7 @@ public class InsertHostCertificateTest extends AbstractAppDeployerTest {
 		assertTrue(templateNames.contains(TEMPLATE_NAME));
 
 		Fragment xml = mgr.getCertificatesForTemplate(TEMPLATE_NAME);
-		assertEquals("host1.marklogic.com", xml.getElementValue("/msec:certificate-list/msec:certificate/msec:host-name"));
+		assertEquals(CERTIFICATE_HOSTNAME, xml.getElementValue("/msec:certificate-list/msec:certificate/msec:host-name"));
 		assertEquals("MarkLogicBogusCA", xml.getElementValue("/msec:certificate-list/msec:certificate/cert:cert/cert:issuer/cert:commonName"));
 	}
 }

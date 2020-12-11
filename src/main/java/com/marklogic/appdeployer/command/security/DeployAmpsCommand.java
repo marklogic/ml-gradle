@@ -29,8 +29,18 @@ public class DeployAmpsCommand extends AbstractResourceCommand implements Suppor
 	@Override
 	public void execute(CommandContext context) {
 		ampManager = new AmpManager(context.getManageClient());
-		existingAmpResources = ampManager.getAsXml();
+		existingAmpResources = findExistingAmpResources(ampManager);
 		super.execute(context);
+	}
+
+	/**
+	 * Protected so a subclass can override it.
+	 *
+	 * @param ampManager
+	 * @return
+	 */
+	protected ResourcesFragment findExistingAmpResources(AmpManager ampManager) {
+		return ampManager.getAsXml();
 	}
 
 	@Override

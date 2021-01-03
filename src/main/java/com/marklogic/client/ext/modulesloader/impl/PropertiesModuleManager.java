@@ -7,6 +7,7 @@ import com.marklogic.client.ext.modulesloader.ModulesManager;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.Properties;
 
@@ -129,14 +130,27 @@ public class PropertiesModuleManager extends LoggingObject implements ModulesMan
      * @param file
      * @return a string that can be used as a key for a Properties object
      */
-    protected String buildKey(File file) {
-        String path = file.getAbsolutePath().toLowerCase();
-        final String key = host != null ? host + ":" + path : path;
-        if (logger.isDebugEnabled()) {
-        	logger.debug("Key for file " + file.getAbsolutePath() + ": " + key);
-        }
-        return key;
-    }
+	protected String buildKey(File file) {
+		String path = normalizeDriveLetter(file);
+		final String key = host != null ? host + ":" + path : path;
+		if (logger.isDebugEnabled()) {
+			logger.debug("Key for file " + file.getAbsolutePath() + ": " + key);
+		}
+		return key;
+	}
+
+	protected String normalizeDriveLetter(File file) {
+		Path absolutePath = file.toPath().toAbsolutePath();
+		String path = absolutePath.toString();
+		Path root = absolutePath.getRoot();
+		if (root != null) {
+			String drive = root.toString();
+			if (path.startsWith(drive)) {
+				path = drive.toLowerCase() + path.substring(drive.length());
+			}
+		}
+		return path;
+	}
 
 	public void setMinimumFileTimestampToLoad(long minimumFileTimestampToLoad) {
 		this.minimumFileTimestampToLoad = minimumFileTimestampToLoad;

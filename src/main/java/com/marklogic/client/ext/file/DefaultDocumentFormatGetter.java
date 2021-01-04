@@ -17,7 +17,7 @@ public class DefaultDocumentFormatGetter implements FormatGetter {
 	public final static String[] DEFAULT_XML_EXTENSIONS = new String[]{"xml", "xsl", "xslt", "xsd", "tdex"};
 	public final static String[] DEFAULT_JSON_EXTENSIONS = new String[]{"json", "tdej"};
 
-	private List<String> binaryExtensions = new ArrayList<String>();
+	private List<String> binaryExtensions = new ArrayList<>();
 	private List<String> xmlExtensions = new ArrayList<>();
 	private List<String> jsonExtensions = new ArrayList<>();
 

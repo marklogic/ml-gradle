@@ -6,9 +6,7 @@ import com.marklogic.client.ext.tokenreplacer.TokenReplacer;
 import org.springframework.core.io.Resource;
 import org.springframework.util.FileCopyUtils;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 /**
  * Processor that delegates to a TokenReplacer for replacing tokens in the content of a DocumentFile. In order to

@@ -55,7 +55,7 @@ public class ClientHelper extends LoggingObject {
         StringQueryDefinition def = mgr.newStringDefinition();
         def.setCollections(collectionName);
         SearchHandle h = mgr.search(def, new SearchHandle());
-        List<String> uris = new ArrayList<String>();
+        List<String> uris = new ArrayList<>();
         for (MatchDocumentSummary s : h.getMatchResults()) {
             uris.add(s.getUri());
         }

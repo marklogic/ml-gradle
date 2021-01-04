@@ -3,7 +3,6 @@ package com.marklogic.client.ext.modulesloader.impl;
 import com.marklogic.client.ext.modulesloader.Modules;
 import com.marklogic.client.ext.modulesloader.ModulesFinder;
 
-import java.nio.file.Paths;
 
 /**
  * Default implementation that loads all of the different kinds of REST modules.

@@ -177,10 +177,14 @@ XQUERY-MODULE".tokenize(',')
     this.metaClass.getProperties().collectEntries {
       String corbOptionKey = CORB_PROPERTY_PREFIX + it.name.capitalize()
       //evaluate whether a value is set and the name matches the corbOptions key pattern
-	  if (corbOptions[corbOptionKey] && this[it.name]) {
-	    [(corbOptions[corbOptionKey]): this[it.name] ]
-	  } else {
-	    [:]
+	  try {
+	    if (corbOptions[corbOptionKey] && this[it.name]) {
+	      [(corbOptions[corbOptionKey]): this[it.name] ]
+	    } else {
+	      [:]
+	    }
+	  } catch (groovy.lang.GroovyRuntimeException ex) {
+	    return [:]
 	  }
     }
   }

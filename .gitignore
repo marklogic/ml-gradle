@@ -15,3 +15,4 @@ src/test/resources/entity-services-project/src
 target
 gradle-local.properties
 snyk
+.vscode

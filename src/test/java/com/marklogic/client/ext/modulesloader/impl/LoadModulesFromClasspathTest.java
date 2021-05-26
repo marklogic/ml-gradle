@@ -1,14 +1,15 @@
 package com.marklogic.client.ext.modulesloader.impl;
 
-import com.marklogic.client.ext.AbstractIntegrationTest;
 import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.ext.AbstractIntegrationTest;
 import com.marklogic.client.ext.file.JarDocumentFileReader;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.Resource;
 
 import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Program for manually testing loading modules from the classpath instead of from the filesystem. This uses the test
@@ -18,7 +19,7 @@ public class LoadModulesFromClasspathTest extends AbstractIntegrationTest {
 
 	private DatabaseClient modulesClient;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		client = newClient("Modules");
 		modulesClient = client;

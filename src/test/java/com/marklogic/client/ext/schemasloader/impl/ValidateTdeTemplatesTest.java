@@ -1,11 +1,13 @@
 package com.marklogic.client.ext.schemasloader.impl;
 
 import com.marklogic.client.ext.file.DocumentFile;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Paths;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * This test assumes that the default Documents database has the default Schemas database as its schemas database.
@@ -15,7 +17,7 @@ public class ValidateTdeTemplatesTest extends AbstractSchemasTest {
 
 	private DefaultSchemasLoader loader;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		super.setup();
 		// Assumes that Documents points to Schemas as its schemas database
@@ -40,9 +42,9 @@ public class ValidateTdeTemplatesTest extends AbstractSchemasTest {
 		assertEquals(2, files.size());
 
 		files = loader.loadSchemas(Paths.get("src", "test", "resources", "good-schemas", "updated").toString());
-		assertEquals("Verifying that the updated schemas were still loaded correctly, which depends on telling the " +
+		assertEquals(2, files.size(), "Verifying that the updated schemas were still loaded correctly, which depends on telling the " +
 			"TDE validation function to exclude the schema that's currently loaded; otherwise a TDE-INCONSISTENTVIEW " +
-			"error will be thrown", 2, files.size());
+			"error will be thrown");
 	}
 
 
@@ -61,21 +63,20 @@ public class ValidateTdeTemplatesTest extends AbstractSchemasTest {
 	@Test
 	public void badJsonFileInNonTdeDirectory() {
 		List<DocumentFile> files = loader.loadSchemas(Paths.get("src", "test", "resources", "bad-schemas", "otherpath").toString());
-		assertEquals("The file in the otherpath directory is a TDE template, but it's not under /tde/, so it's not " +
-			"validated as a TDE template", 1, files.size());
+		assertEquals(1, files.size(), "The file in the otherpath directory is a TDE template, but it's not under /tde/, so it's not " +
+			"validated as a TDE template");
 	}
 
 	@Test
 	public void validationDisabled() {
 		loader = new DefaultSchemasLoader(client, null);
 		List<DocumentFile> files = loader.loadSchemas(Paths.get("src", "test", "resources", "bad-schemas", "bad-json").toString());
-		assertEquals("TDE validation is disabled, so the bad TDE template should have been loaded", 1, files.size());
+		assertEquals(1, files.size(), "TDE validation is disabled, so the bad TDE template should have been loaded");
 	}
 
 	@Test
 	public void mixedContent() {
 		List<DocumentFile> files = loader.loadSchemas(Paths.get("src", "test", "resources", "good-schemas", "xml-schemas").toString());
-		assertEquals("Verifying that the file still loads correctly even with processing instructions and comments in it",
-			1, files.size());
+		assertEquals(1, files.size(), "Verifying that the file still loads correctly even with processing instructions and comments in it");
 	}
 }

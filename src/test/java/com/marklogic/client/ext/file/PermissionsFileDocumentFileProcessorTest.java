@@ -2,13 +2,14 @@ package com.marklogic.client.ext.file;
 
 import com.marklogic.client.ext.tokenreplacer.DefaultTokenReplacer;
 import com.marklogic.client.io.DocumentMetadataHandle;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.Properties;
 
-public class PermissionsFileDocumentFileProcessorTest extends Assert {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class PermissionsFileDocumentFileProcessorTest {
 
 	private PermissionsFileDocumentFileProcessor processor = new PermissionsFileDocumentFileProcessor();
 

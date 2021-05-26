@@ -2,8 +2,7 @@ package com.marklogic.client.ext.modulesloader.impl;
 
 import com.marklogic.client.ext.modulesloader.Modules;
 import com.marklogic.client.ext.modulesloader.ModulesFinder;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -11,7 +10,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-public class DefaultModulesFinderTest extends Assert {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class DefaultModulesFinderTest {
 
     private ModulesFinder sut = new DefaultModulesFinder();
 
@@ -23,25 +25,25 @@ public class DefaultModulesFinderTest extends Assert {
 			"javascript-options.json", "sample-options.xml"
 		);
 		modules.getOptions().forEach(resource -> {
-			assertTrue(resource.getFilename() + " is not a valid resource", validOptions.contains(resource.getFilename()));
+			assertTrue(validOptions.contains(resource.getFilename()), resource.getFilename() + " is not a valid resource");
 		});
 
-        assertEquals("Only recognized XQuery files should be included; the XML file should be ignored", 3,
-                modules.getServices().size());
+        assertEquals(3, modules.getServices().size(),
+			"Only recognized XQuery files should be included; the XML file should be ignored");
 		List<String> validServices = Arrays.asList(
 			"another-sample.xq", "javascript.sjs", "sample.xqy"
 		);
 		modules.getServices().forEach(resource -> {
-			assertTrue(resource.getFilename() + " is not a valid resource", validServices.contains(resource.getFilename()));
+			assertTrue(validServices.contains(resource.getFilename()), resource.getFilename() + " is not a valid resource");
 		});
 
-        assertEquals("Only recognized XSL files should be included; the XML file should be ignored", 5,
-                modules.getTransforms().size());
+        assertEquals(5, modules.getTransforms().size(),
+			"Only recognized XSL files should be included; the XML file should be ignored");
 		List<String> validTransforms = Arrays.asList(
 			"another-sample.xslt", "another-sample-xquery-transform.xq", "javascript-transform.sjs", "sample.xsl", "sample-xquery-transform.xqy"
 		);
         modules.getTransforms().forEach(resource -> {
-			assertTrue(resource.getFilename() + " is not a valid resource", validTransforms.contains(resource.getFilename()));
+			assertTrue(validTransforms.contains(resource.getFilename()), resource.getFilename() + " is not a valid resource");
 		});
 
         List<Resource> dirs = modules.getAssetDirectories();
@@ -50,13 +52,11 @@ public class DefaultModulesFinderTest extends Assert {
         assertEquals("include-this-too", dirs.get(1).getFile().getName());
 		assertEquals("root", dirs.get(2).getFile().getName());
 
-        assertEquals(
-                "Namespace files don't have to fit any filename format; the body of the file should be the namespace URI",
-                1, modules.getNamespaces().size());
+        assertEquals(1, modules.getNamespaces().size(), "Namespace files don't have to fit any filename format; the body of the file should be the namespace URI");
     }
 
     @Test
-    public void emptyBaseDir() throws IOException {
+    public void emptyBaseDir() {
         Modules files = sut.findModules(getBaseDir("empty-base-dir"));
         assertEquals(0, files.getAssetDirectories().size());
         assertEquals(0, files.getOptions().size());

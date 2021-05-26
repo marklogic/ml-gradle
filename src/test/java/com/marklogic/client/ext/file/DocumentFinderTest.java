@@ -1,16 +1,15 @@
 package com.marklogic.client.ext.file;
 
-import com.marklogic.client.ext.file.DefaultDocumentFileReader;
-import com.marklogic.client.ext.file.DocumentFile;
-import com.marklogic.client.ext.file.DocumentFileReader;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DocumentFinderTest extends Assert {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class DocumentFinderTest {
 
 	private DocumentFileReader sut = new DefaultDocumentFileReader();
 

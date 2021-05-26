@@ -8,8 +8,8 @@ import com.marklogic.client.ext.modulesloader.ModulesFinder;
 import com.marklogic.client.ext.tokenreplacer.DefaultTokenReplacer;
 import com.marklogic.client.io.BytesHandle;
 import com.marklogic.client.io.StringHandle;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
@@ -20,17 +20,19 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 public class LoadModulesTest extends AbstractIntegrationTest {
 
 	private DatabaseClient modulesClient;
 	private DefaultModulesLoader modulesLoader;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		client = newClient("Modules");
 		client.newServerEval().xquery("cts:uris((), (), cts:true-query()) ! xdmp:document-delete(.)").eval();
 		modulesClient = client;
-		assertEquals("No new modules should have been created", 0, getUriCountInModulesDatabase());
+		assertEquals(0, getUriCountInModulesDatabase(), "No new modules should have been created");
 
 		/**
 		 * Odd - the Client REST API doesn't allow for loading namespaces when the DatabaseClient has a database
@@ -115,7 +117,7 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 		ModulesFinder finder = new DefaultModulesFinder();
 		Modules modules = finder.findModules(dir);
 		List<Resource> assetDirectories = modules.getAssetDirectories();
-		assertEquals("Expecting one directory, the 'root' directory", 1, assetDirectories.size());
+		assertEquals(1, assetDirectories.size(), "Expecting one directory, the 'root' directory");
 
 		// Now load the modules for real
 		modulesLoader.loadModules(dir, finder, client);
@@ -153,7 +155,7 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 		modulesLoader.setCatchExceptions(true);
 		// This should now succeed since we're catching exceptions
 		Set<Resource> loadedModules = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
-		assertTrue("There's only the one invalid module, so nothing should have been loaded", loadedModules.isEmpty());
+		assertTrue(loadedModules.isEmpty(), "There's only the one invalid module, so nothing should have been loaded");
 	}
 
 	/**
@@ -214,8 +216,7 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 		String dir = Paths.get("src", "test", "resources", "sample-base-dir").toString();
 		modulesLoader.setIncludeFilenamePattern(Pattern.compile(pattern));
 		Set<Resource> files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
-		logger.info(files.size() + "");
-		assertEquals(message, count, files.size());
+		assertEquals(count, files.size(), message);
 	}
 
 	@Test
@@ -229,7 +230,7 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 		assertEquals(26, files.size());
 
 		files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
-		assertEquals("No files should have been loaded since none were new or modified", 0, files.size());
+		assertEquals(0, files.size(), "No files should have been loaded since none were new or modified");
 
 		// The host defaults to "localhost", so change it to a host that should still hit localhost on any OS, and
 		// verify all files were loaded because a different host was used
@@ -238,7 +239,7 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 		assertEquals(26, files.size());
 
 		files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
-		assertEquals("No files should have been loaded since none were new or modified", 0, files.size());
+		assertEquals(0, files.size(), "No files should have been loaded since none were new or modified");
 	}
 
 	@Test
@@ -270,7 +271,7 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 		modulesLoader.setModulesManager(moduleManager);
 		moduleManager.setMinimumFileTimestampToLoad(System.currentTimeMillis() + 10000);
 		files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
-		assertEquals("No files should have been loaded since the minimum last-modified timestamp is in the future", 0, files.size());
+		assertEquals(0, files.size(), "No files should have been loaded since the minimum last-modified timestamp is in the future");
 
 		// run this section twice to test that a bug was fixed in deletePropertiesFile
 		for (int i = 0; i < 2; i++) {
@@ -278,14 +279,14 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 			moduleManager.deletePropertiesFile();
 			moduleManager.setMinimumFileTimestampToLoad(0);
 			files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
-			assertEquals("All files should have been loaded since a ModulesManager wasn't used on the first load", 26, files.size());
-			assertEquals("No new modules should have been created", initialModuleCount, getUriCountInModulesDatabase());
+			assertEquals(26, files.size(), "All files should have been loaded since a ModulesManager wasn't used on the first load");
+			assertEquals(initialModuleCount, getUriCountInModulesDatabase(), "No new modules should have been created");
 		}
 
 		// Load again; this time, no files should have been loaded
 		files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
-		assertEquals("No files should have been loaded since none were new or modified", 0, files.size());
-		assertEquals("Module count shouldn't have changed either", initialModuleCount, getUriCountInModulesDatabase());
+		assertEquals(0, files.size(), "No files should have been loaded since none were new or modified");
+		assertEquals(initialModuleCount, getUriCountInModulesDatabase(), "Module count shouldn't have changed either");
 
 	}
 

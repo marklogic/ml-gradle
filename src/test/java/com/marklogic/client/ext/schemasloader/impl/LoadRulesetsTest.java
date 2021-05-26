@@ -3,10 +3,12 @@ package com.marklogic.client.ext.schemasloader.impl;
 import com.marklogic.client.ext.file.DocumentFile;
 import com.marklogic.client.ext.helper.ClientHelper;
 import com.marklogic.client.io.DocumentMetadataHandle;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Paths;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class LoadRulesetsTest extends AbstractSchemasTest {
 

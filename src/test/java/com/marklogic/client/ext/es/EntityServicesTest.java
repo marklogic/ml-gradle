@@ -1,8 +1,10 @@
 package com.marklogic.client.ext.es;
 
 import com.marklogic.client.ext.AbstractIntegrationTest;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests against the default Documents database. Doesn't clear it out before or after.
@@ -33,7 +35,7 @@ public class EntityServicesTest extends AbstractIntegrationTest {
 		"  }\n" +
 		"}";
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		client = newClient("Documents");
 	}

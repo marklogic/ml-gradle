@@ -1,12 +1,13 @@
 package com.marklogic.client.ext.ssl;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.net.ssl.SSLContext;
 import java.security.cert.X509Certificate;
 
-public class SslUtilTest extends Assert {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class SslUtilTest {
 
 	@Test
 	public void configureWithDefaults() {

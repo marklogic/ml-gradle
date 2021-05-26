@@ -1,10 +1,11 @@
 package com.marklogic.client.ext.util;
 
 import com.marklogic.client.io.DocumentMetadataHandle;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ParseDocumentPermissionsTest extends Assert {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class ParseDocumentPermissionsTest {
 
 	private DefaultDocumentPermissionsParser parser = new DefaultDocumentPermissionsParser();
 

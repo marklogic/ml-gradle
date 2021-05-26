@@ -1,18 +1,18 @@
 package com.marklogic.client.ext.modulesloader.impl;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-
 import com.marklogic.client.admin.MethodType;
 import com.marklogic.client.admin.ResourceExtensionsManager.MethodParameters;
 import com.marklogic.client.ext.modulesloader.ExtensionMetadataAndParams;
+import org.junit.jupiter.api.Test;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
-public class XmlExtensionMetadataProviderTest extends Assert {
+import java.io.IOException;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class XmlExtensionMetadataProviderTest {
 
     @Test
     public void test() throws IOException {
@@ -28,8 +28,7 @@ public class XmlExtensionMetadataProviderTest extends Assert {
         MethodParameters method = methods.get(1);
         assertEquals(MethodType.POST, method.getMethod());
         assertEquals(2, method.size());
-        assertEquals("xs:string is the default when no type param is provided", "xs:string", method.get("sourceId")
-                .get(0));
+        assertEquals("xs:string", method.get("sourceId").get(0), "xs:string is the default when no type param is provided");
         assertEquals("xs:boolean", method.get("edit").get(0));
     }
 
@@ -38,6 +37,6 @@ public class XmlExtensionMetadataProviderTest extends Assert {
         DefaultExtensionMetadataProvider p = new DefaultExtensionMetadataProvider();
         Resource resource = new ClassPathResource("sample-base-dir/services/another-sample.xq");
         ExtensionMetadataAndParams emap = p.provideExtensionMetadataAndParams(resource);
-        assertEquals("Title should default to the filename minus the extension", "another-sample", emap.metadata.getTitle());
+        assertEquals("another-sample", emap.metadata.getTitle(), "Title should default to the filename minus the extension");
     }
 }

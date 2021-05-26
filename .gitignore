@@ -13,4 +13,4 @@ out
 target
 gradle-local.properties
 snyk
-
+.vscode

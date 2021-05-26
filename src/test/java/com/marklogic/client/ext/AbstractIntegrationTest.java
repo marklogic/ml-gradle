@@ -2,9 +2,8 @@ package com.marklogic.client.ext;
 
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.ext.spring.SpringDatabaseClientConfig;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +13,11 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestConfig.class})
-public abstract class AbstractIntegrationTest extends Assert {
+public abstract class AbstractIntegrationTest {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -33,7 +32,7 @@ public abstract class AbstractIntegrationTest extends Assert {
 		return client;
 	}
 
-	@After
+	@AfterEach
 	public void releaseClientOnTearDown() {
 		if (client != null) {
 			try {

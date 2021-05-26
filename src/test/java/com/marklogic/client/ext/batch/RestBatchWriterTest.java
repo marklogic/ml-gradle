@@ -12,7 +12,7 @@ import com.marklogic.client.impl.DocumentWriteOperationImpl;
 import com.marklogic.client.io.FileHandle;
 import com.marklogic.client.io.Format;
 import com.marklogic.client.io.StringHandle;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class RestBatchWriterTest extends AbstractIntegrationTest {
 
@@ -55,7 +57,7 @@ public class RestBatchWriterTest extends AbstractIntegrationTest {
 		writer.waitForCompletion();
 
 		Throwable caughtError = testWriteListener.caughtError;
-		assertNotNull("An error should have been thrown due to the invalid XML", caughtError);
+		assertNotNull(caughtError, "An error should have been thrown due to the invalid XML");
 		assertTrue(caughtError instanceof FailedRequestException);
 	}
 

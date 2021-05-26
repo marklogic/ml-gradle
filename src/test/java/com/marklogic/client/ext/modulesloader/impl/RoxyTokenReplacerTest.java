@@ -1,13 +1,14 @@
 package com.marklogic.client.ext.modulesloader.impl;
 
 import com.marklogic.client.ext.tokenreplacer.RoxyTokenReplacer;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
 
-public class RoxyTokenReplacerTest extends Assert {
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class RoxyTokenReplacerTest {
 
 	@Test
 	public void test() throws Exception {

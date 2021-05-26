@@ -9,11 +9,12 @@ import com.marklogic.xcc.Content;
 import com.marklogic.xcc.ContentCapability;
 import com.marklogic.xcc.ContentCreateOptions;
 import com.marklogic.xcc.ContentPermission;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.util.FileCopyUtils;
 
-public class DefaultDocumentWriteOperationAdapterTest extends Assert {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class DefaultDocumentWriteOperationAdapterTest {
 
 	private DefaultDocumentWriteOperationAdapter sut = new DefaultDocumentWriteOperationAdapter();
 

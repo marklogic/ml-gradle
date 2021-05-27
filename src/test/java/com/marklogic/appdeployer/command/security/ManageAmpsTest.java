@@ -2,12 +2,42 @@ package com.marklogic.appdeployer.command.security;
 
 import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
+import com.marklogic.appdeployer.command.modules.LoadModulesCommand;
+import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
+import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.mgmt.ManageClient;
+import com.marklogic.mgmt.ManageConfig;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.security.AmpManager;
 import org.junit.Test;
 
 public class ManageAmpsTest extends AbstractManageResourceTest {
+
+	@Test
+	public void ampLoadedBeforeModules() {
+		initializeAppDeployer(new DeployUsersCommand(), new DeployRestApiServersCommand(true),
+			new DeployAmpsCommand(), new LoadModulesCommand());
+		appConfig.setModuleTimestampsPath(null);
+
+		try {
+			deploySampleApp();
+
+			// Create a client for a user that does not have the status privilege, which is required
+			// by the get-host-status function
+			DatabaseClient client = DatabaseClientFactory.newClient(super.manageConfig.getHost(), appConfig.getRestPort(),
+				new DatabaseClientFactory.DigestAuthContext("sample-app-jane", "password"));
+
+			String output = client.newServerEval().xquery(
+				"import module namespace sample = 'urn:sampleapp' at '/ext/sample-lib.xqy'; " +
+				"sample:get-host-status()").evalAs(String.class);
+
+			assertNotNull("The amp is loaded before the module, but it should still apply and allow the user " +
+				"to invoke the function that requires the status-builtins privilege", output);
+		} finally {
+			undeploySampleApp();
+		}
+	}
 
 	/**
 	 * This test verifies that AmpManager can correctly handle two amps that have the same local-name, document-uri,

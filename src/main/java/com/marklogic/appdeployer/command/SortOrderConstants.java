@@ -41,13 +41,14 @@ public abstract class SortOrderConstants {
 	// Module code may depend on schemas, but not vice-versa.
 	public static Integer LOAD_SCHEMAS = 350;
 
+	// The modules database must exist before we deploy amps, but in the event that loading modules depends
+	// on an amp (will be true in DHF 5.5), amps should be deployed before modules are loaded.
+	public static Integer DEPLOY_AMPS = 390;
+
 	// Modules have to be loaded after the REST API server has been updated, for if the deployer is expecting to load
 	// modules via SSL, then the REST API server must already be configured with a certificate template
 	public static Integer LOAD_MODULES = 400;
 	public static Integer DELETE_TEST_MODULES = 410;
-
-	// The modules database must exist before we deploy amps
-	public static Integer DEPLOY_AMPS = 450;
 
 	public static Integer DEPLOY_TRIGGERS = 700;
 

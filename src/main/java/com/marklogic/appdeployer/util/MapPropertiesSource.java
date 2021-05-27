@@ -21,7 +21,12 @@ public class MapPropertiesSource implements PropertiesSource {
 	@Override
 	public Properties getProperties() {
 		Properties props = new Properties();
-		props.putAll(map);
+		for (String key : map.keySet()) {
+			String value = map.get(key);
+			if (value != null) {
+				props.setProperty(key, value);
+			}
+		}
 		return props;
 	}
 }

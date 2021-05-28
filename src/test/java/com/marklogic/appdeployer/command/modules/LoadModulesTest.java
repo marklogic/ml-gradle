@@ -15,6 +15,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -174,11 +176,30 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 		appConfig.setModuleFilenamesIncludePattern(Pattern.compile(".*/ext.*"));
 
 		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
-		appDeployer.deploy(appConfig);
+		deploySampleApp();
 
 		String xquery = "fn:count(cts:uris((), (), cts:true-query()))";
 		assertEquals(4, Integer.parseInt(modulesXccTemplate.executeAdhocQuery(xquery)),
 			"Should have the 3 /ext modules plus the REST API properties file, which was loaded when the REST server was created");
+	}
+
+	@Test
+	void uriPrefix() {
+		appConfig.setModuleUriPrefix("/example/prefix ");
+		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
+		deploySampleApp();
+
+		String[] uris = modulesXccTemplate
+			.executeAdhocQuery("cts:uris((), (), cts:directory-query('/example/prefix/', 'infinity'))")
+			.split("\n");
+
+		assertEquals(3, uris.length, "The trailing space is expected to be trimmed off to avoid errors from a user " +
+			"accidentally including a trailing space e.g. in their gradle.properties file");
+
+		List<String> uriList = Arrays.asList(uris);
+		assertTrue(uriList.contains("/example/prefix/ext/lib/test2.xqy"));
+		assertTrue(uriList.contains("/example/prefix/ext/lib/test.xqy"));
+		assertTrue(uriList.contains("/example/prefix/ext/sample-lib.xqy"));
 	}
 
 	private void assertModuleExistsWithDefaultPermissions(String message, String uri) {

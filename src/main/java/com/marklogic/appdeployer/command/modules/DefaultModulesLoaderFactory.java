@@ -9,6 +9,7 @@ import com.marklogic.client.ext.modulesloader.ModulesManager;
 import com.marklogic.client.ext.modulesloader.impl.*;
 import com.marklogic.client.ext.tokenreplacer.TokenReplacer;
 import com.marklogic.xcc.template.XccTemplate;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.regex.Pattern;
 
@@ -59,6 +60,13 @@ public class DefaultModulesLoaderFactory extends LoggingObject implements Module
 
 		if (appConfig.getAssetFileFilter() != null) {
 			assetFileLoader.addFileFilter(appConfig.getAssetFileFilter());
+		}
+
+		if (StringUtils.isNotBlank(appConfig.getModuleUriPrefix())) {
+			assetFileLoader.addDocumentFileProcessor(documentFile -> {
+				documentFile.setUri(appConfig.getModuleUriPrefix().trim() + documentFile.getUri());
+				return documentFile;
+			});
 		}
 
 		final DefaultModulesLoader modulesLoader = new DefaultModulesLoader(assetFileLoader);

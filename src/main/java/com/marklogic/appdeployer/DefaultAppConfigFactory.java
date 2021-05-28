@@ -653,6 +653,11 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			config.setModuleTimestampsUseHost(Boolean.parseBoolean(prop));
 		});
 
+		propertyConsumerMap.put("mlModuleUriPrefix", (config, prop) -> {
+			logger.info("Will added prefix to the URI of each module: " + prop);
+			config.setModuleUriPrefix(prop);
+		});
+
 		propertyConsumerMap.put("mlModulesRegex", (config, prop) -> {
 			logger.info("Including module filenames matching regex: " + prop);
 			config.setModuleFilenamesIncludePattern(Pattern.compile(prop));

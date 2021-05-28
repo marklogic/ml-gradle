@@ -330,6 +330,7 @@ public class DefaultAppConfigFactoryTest  {
 		p.setProperty("mlDeleteTestModulesPattern", "/some/pattern");
 		p.setProperty("mlModulesLoaderThreadCount", "3");
 		p.setProperty("mlModulesLoaderBatchSize", "79");
+		p.setProperty("mlModuleUriPrefix", "/something");
 
 		p.setProperty("mlModelsPath", "ml/models");
 		p.setProperty("mlModelsDatabase", "my-models-database");
@@ -454,7 +455,8 @@ public class DefaultAppConfigFactoryTest  {
 		assertTrue(config.isDeleteTestModules());
 		assertEquals("/some/pattern", config.getDeleteTestModulesPattern());
 		assertEquals(3, config.getModulesLoaderThreadCount());
-		assertEquals(new Integer(79), config.getModulesLoaderBatchSize());
+		assertEquals(79, config.getModulesLoaderBatchSize());
+		assertEquals("/something", config.getModuleUriPrefix());
 
 		assertEquals("ml/models", config.getModelsPath());
 		assertEquals("my-models-database", config.getModelsDatabase());

@@ -4,13 +4,13 @@ import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.DefaultAppConfigFactory;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.mgmt.util.SimplePropertySource;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Properties;
 
-public class CalculateForestHostsTest extends Assert {
+public class CalculateForestHostsTest  {
 
 	@Test
 	public void test() {
@@ -64,7 +64,7 @@ public class CalculateForestHostsTest extends Assert {
 
 		CommandContext context = new CommandContext(new DefaultAppConfigFactory(new SimplePropertySource(props)).newAppConfig(), null, null);
 		List<String> hostNames = hostCalculator.calculateHostNames("test-db", context);
-		assertEquals("The database should only have a forest on the first host", 1, hostNames.size());
+		assertEquals(1, hostNames.size(), "The database should only have a forest on the first host");
 		assertEquals("name2", hostNames.get(0));
 	}
 }

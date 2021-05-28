@@ -17,16 +17,18 @@ import com.marklogic.mgmt.resource.security.PrivilegeManager;
 import com.marklogic.mgmt.resource.security.ProtectedPathManager;
 import com.marklogic.mgmt.resource.security.RoleManager;
 import com.marklogic.mgmt.resource.security.UserManager;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 public class DeployCombinedRequestsWithCmaTest extends AbstractAppDeployerTest {
 
-	@After
+	@AfterEach
 	public void teardown() {
 		undeploySampleApp();
 	}
@@ -65,7 +67,7 @@ public class DeployCombinedRequestsWithCmaTest extends AbstractAppDeployerTest {
 		assertTrue(roleManager.exists("sample-app-role2"));
 
 		Role role2 = api.role("sample-app-role2");
-		assertNotNull("sample-app-role2 should have a dependent role", role2.getRole());
+		assertNotNull(role2.getRole(), "sample-app-role2 should have a dependent role");
 		assertEquals("sample-app-role1", role2.getRole().get(0));
 
 		Role role3 = api.role("sample-app-role3");

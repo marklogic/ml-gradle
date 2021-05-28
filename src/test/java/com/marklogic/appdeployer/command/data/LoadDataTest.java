@@ -6,15 +6,17 @@ import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.document.GenericDocumentManager;
 import com.marklogic.client.io.DocumentMetadataHandle;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 public class LoadDataTest extends AbstractAppDeployerTest {
 
-	@After
+	@AfterEach
 	public void teardown() {
 		undeploySampleApp();
 	}
@@ -40,10 +42,10 @@ public class LoadDataTest extends AbstractAppDeployerTest {
 		String json = mgr.readAs("/test1.json", String.class);
 		assertEquals("{\"hello\":\"this was replaced\"}", json);
 
-		assertNotNull("This should be loaded from the additional data path", mgr.exists("/test4.json"));
+		assertNotNull(mgr.exists("/test4.json"), "This should be loaded from the additional data path");
 
-		assertNull("Files starting with a . or in a directory starting with a . should not be loaded by default",
-			mgr.exists("/.DS_Store/shouldBeIgnored.json"));
+		assertNull(mgr.exists("/.DS_Store/shouldBeIgnored.json"),
+			"Files starting with a . or in a directory starting with a . should not be loaded by default");
 
 		DocumentMetadataHandle metadata = mgr.readMetadata("/child/test2.xml", new DocumentMetadataHandle());
 		assertTrue(metadata.getCollections().contains("xml-data"));
@@ -65,14 +67,14 @@ public class LoadDataTest extends AbstractAppDeployerTest {
 	public void databaseNameIsSet() {
 		LoadDataCommand command = new LoadDataCommand();
 		DatabaseClient client = command.determineDatabaseClient(appConfig);
-		assertNull("The database property isn't set on a DatabaseClient when no value is provided when the " +
-			"DatabaseClient is constructed", client.getDatabase());
+		assertNull(client.getDatabase(), "The database property isn't set on a DatabaseClient when no value is provided when the " +
+			"DatabaseClient is constructed");
 		client.release();
 
 		appConfig.getDataConfig().setDatabaseName("Documents");
 		client = command.determineDatabaseClient(appConfig);
 		assertEquals("Documents", client.getDatabase());
-		assertEquals(new Integer(appConfig.getAppServicesPort()), new Integer(client.getPort()));
+		assertEquals(appConfig.getAppServicesPort(), client.getPort());
 		client.release();
 	}
 }

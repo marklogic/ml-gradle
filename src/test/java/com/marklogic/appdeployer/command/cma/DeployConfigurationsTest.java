@@ -2,9 +2,11 @@ package com.marklogic.appdeployer.command.cma;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.mgmt.resource.forests.ForestManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.regex.Pattern;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DeployConfigurationsTest extends AbstractAppDeployerTest {
 

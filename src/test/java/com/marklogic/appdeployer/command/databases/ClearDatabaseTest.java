@@ -1,15 +1,17 @@
 package com.marklogic.appdeployer.command.databases;
 
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class ClearDatabaseTest extends AbstractAppDeployerTest {
 
-    @After
+    @AfterEach
     public void teardown() {
         undeploySampleApp();
     }
@@ -31,6 +33,6 @@ public class ClearDatabaseTest extends AbstractAppDeployerTest {
         mgr.clearDatabase(appConfig.getModulesDatabaseName());
 
         String uris = newModulesXccTemplate().executeAdhocQuery("cts:uris((), (), cts:and-query(()))");
-        assertTrue("The modules database should have been cleared", uris.length() == 0);
+        assertTrue(uris.length() == 0, "The modules database should have been cleared");
     }
 }

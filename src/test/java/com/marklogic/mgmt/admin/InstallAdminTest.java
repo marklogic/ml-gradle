@@ -1,6 +1,6 @@
 package com.marklogic.mgmt.admin;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.marklogic.mgmt.AbstractMgmtTest;
 

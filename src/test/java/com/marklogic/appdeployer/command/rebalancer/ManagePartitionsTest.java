@@ -8,17 +8,20 @@ import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.rebalancer.PartitionManager;
 import com.marklogic.mgmt.resource.rebalancer.PartitionProperties;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ManagePartitionsTest extends AbstractAppDeployerTest {
 
 	@Test
 	public void test() {
 		List<Command> commands = new CommandMapBuilder().buildCommandMap().get("mlRebalancerCommands");
-		
+
 		assertEquals(2, commands.size());
 		assertTrue(commands.get(0) instanceof DeployPartitionsCommand);
 		assertTrue(commands.get(1) instanceof DeployPartitionQueriesCommand);

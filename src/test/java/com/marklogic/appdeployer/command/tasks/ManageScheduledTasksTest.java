@@ -1,7 +1,7 @@
 package com.marklogic.appdeployer.command.tasks;
 
 import com.marklogic.appdeployer.command.groups.DeployGroupsCommand;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
@@ -10,6 +10,8 @@ import com.marklogic.mgmt.resource.tasks.TaskManager;
 import com.marklogic.rest.util.ResourcesFragment;
 
 import java.io.File;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ManageScheduledTasksTest extends AbstractManageResourceTest {
 
@@ -38,7 +40,7 @@ public class ManageScheduledTasksTest extends AbstractManageResourceTest {
         mgr.deleteAllScheduledTasks();
 
         ResourcesFragment frag = mgr.getAsXml();
-        assertEquals("All of the scheduled tasks should have been deleted", 0, frag.getListItemIdRefs().size());
+        assertEquals(0, frag.getListItemIdRefs().size(), "All of the scheduled tasks should have been deleted");
     }
 
     @Test
@@ -50,7 +52,7 @@ public class ManageScheduledTasksTest extends AbstractManageResourceTest {
 
 		    TaskManager taskManager = new TaskManager(manageClient, "sampleAppGroup1");
 		    ResourcesFragment tasks = taskManager.getAsXml();
-		    assertEquals("Should have 1 task for our test group", 1, tasks.getResourceCount());
+		    assertEquals(1, tasks.getResourceCount(), "Should have 1 task for our test group");
 		    String taskId = tasks.getListItemIdRefs().get(0);
 		    assertEquals("/path/to/other-query.xqy", tasks.getListItemValue(taskId, "task-path"));
 	    } finally {

@@ -2,9 +2,12 @@ package com.marklogic.appdeployer.command.databases;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UndeployDatabasesWithIgnoredContentDatabaseTest extends AbstractAppDeployerTest {
 
@@ -24,13 +27,10 @@ public class UndeployDatabasesWithIgnoredContentDatabaseTest extends AbstractApp
 		String dbName = appConfig.getContentDatabaseName();
 		try {
 			// Verify db is still there
-			assertTrue(
-				"The database should still exist since the database file was ignored",
-				mgr.exists(dbName)
-			);
+			assertTrue(mgr.exists(dbName), "The database should still exist since the database file was ignored");
 		} finally {
 			mgr.deleteByName(appConfig.getContentDatabaseName());
-			assertFalse("Verifying the database was deleted", mgr.exists(dbName));
+			assertFalse(mgr.exists(dbName), "Verifying the database was deleted");
 		}
 	}
 }

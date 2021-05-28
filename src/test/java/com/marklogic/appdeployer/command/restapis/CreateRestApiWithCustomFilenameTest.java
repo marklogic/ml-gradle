@@ -2,13 +2,16 @@ package com.marklogic.appdeployer.command.restapis;
 
 import java.io.File;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.forests.ForestManager;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CreateRestApiWithCustomFilenameTest extends AbstractAppDeployerTest {
 
@@ -29,7 +32,7 @@ public class CreateRestApiWithCustomFilenameTest extends AbstractAppDeployerTest
             assertTrue(dbMgr.exists("my-custom-content"));
             assertTrue(dbMgr.exists("my-custom-modules"));
             assertTrue(forestMgr.exists("my-custom-content-1"));
-            assertFalse("The custom REST API file only asks for 1 forest", forestMgr.exists("my-custom-content-2"));
+            assertFalse(forestMgr.exists("my-custom-content-2"), "The custom REST API file only asks for 1 forest");
         } finally {
             undeploySampleApp();
 

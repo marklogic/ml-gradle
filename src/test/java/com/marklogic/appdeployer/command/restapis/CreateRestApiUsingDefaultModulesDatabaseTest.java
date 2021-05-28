@@ -5,10 +5,12 @@ import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
 import com.marklogic.rest.util.Fragment;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CreateRestApiUsingDefaultModulesDatabaseTest extends AbstractAppDeployerTest {
 
@@ -39,7 +41,7 @@ public class CreateRestApiUsingDefaultModulesDatabaseTest extends AbstractAppDep
         assertEquals("sample-app-content", props.getElementValue("/m:http-server-properties/m:content-database"));
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         undeploySampleApp();
     }

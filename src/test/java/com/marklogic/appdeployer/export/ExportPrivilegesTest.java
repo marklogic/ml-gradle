@@ -2,21 +2,23 @@ package com.marklogic.appdeployer.export;
 
 import com.marklogic.appdeployer.command.security.DeployPrivilegesCommand;
 import com.marklogic.mgmt.resource.security.PrivilegeManager;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ExportPrivilegesTest extends AbstractExportTest {
 
 	private String privilegeName = "sample-app-execute-1";
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		appConfig.getFirstConfigDir().setBaseDir(exportDir);
 		initializeAppDeployer(new DeployPrivilegesCommand());
 	}
 
-	@After
+	@AfterEach
 	public void teardown() {
 		undeploySampleApp();
 	}

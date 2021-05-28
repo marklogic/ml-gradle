@@ -3,14 +3,17 @@ package com.marklogic.appdeployer.command.restapis;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.groups.DeployGroupsCommand;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class CreateRestApiInOtherGroupTest extends AbstractAppDeployerTest {
 
-	@After
+	@AfterEach
 	public void tearDown() {
 		undeploySampleApp();
 	}
@@ -29,9 +32,9 @@ public class CreateRestApiInOtherGroupTest extends AbstractAppDeployerTest {
 		assertFalse(new ServerManager(manageClient).exists(serverName));
 
 		deploySampleApp();
-		assertTrue("The deployment should have succeeded because RestApiManager now checks to see if the REST API server " +
-				"exists in the group defined by appConfig.getGroupName as opposed to just the Default group",
-			new ServerManager(manageClient, groupName).exists(serverName));
+		assertTrue(new ServerManager(manageClient, groupName).exists(serverName),
+			"The deployment should have succeeded because RestApiManager now checks to see if the REST API server " +
+				"exists in the group defined by appConfig.getGroupName as opposed to just the Default group");
 		assertFalse(new ServerManager(manageClient).exists(serverName));
 	}
 }

@@ -2,15 +2,15 @@ package com.marklogic.appdeployer.command.forests;
 
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.command.CommandContext;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class CreateForestsOnOneHostTest extends Assert {
+public class CreateForestsOnOneHostTest  {
 
 	@Test
 	public void test() {
@@ -34,10 +34,9 @@ public class CreateForestsOnOneHostTest extends Assert {
 		hostNames = command.determineHostNamesForForest(context, fakeHostNames);
 		assertEquals(1, hostNames.getPrimaryForestHostNames().size());
 		assertEquals("host1", hostNames.getPrimaryForestHostNames().get(0));
-		assertEquals(
+		assertEquals(3, hostNames.getReplicaForestHostNames().size(),
 			"When forests aren't created on each host, all hosts should still be available for replica forests, " +
-				"with the expectation that the primary forest host will still not be used",
-			3, hostNames.getReplicaForestHostNames().size());
+				"with the expectation that the primary forest host will still not be used");
 
 		command.setCreateForestsOnEachHost(true);
 		hostNames = command.determineHostNamesForForest(context, fakeHostNames);

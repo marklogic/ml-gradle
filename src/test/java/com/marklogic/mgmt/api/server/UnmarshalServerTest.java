@@ -3,12 +3,12 @@ package com.marklogic.mgmt.api.server;
 import com.marklogic.mgmt.api.group.Namespace;
 import com.marklogic.mgmt.api.group.Schema;
 import com.marklogic.mgmt.mapper.DefaultResourceMapper;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-public class UnmarshalServerTest extends Assert {
+public class UnmarshalServerTest  {
 
 	@Test
 	public void test() {

@@ -5,7 +5,9 @@ import com.marklogic.mgmt.api.task.Task;
 import com.marklogic.mgmt.mapper.DefaultResourceMapper;
 import com.marklogic.mgmt.resource.tasks.TaskManager;
 import com.marklogic.mgmt.template.task.TaskTemplateBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class WriteTaskTest extends AbstractResourceWriterTest {
 

@@ -2,9 +2,11 @@ package com.marklogic.appdeployer.command.security;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.mgmt.resource.security.RoleManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Each of these tests verifies that the roles in the given config dir can be deployed successfully based on their

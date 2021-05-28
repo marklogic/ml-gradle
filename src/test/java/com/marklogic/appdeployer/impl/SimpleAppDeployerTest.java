@@ -3,17 +3,17 @@ package com.marklogic.appdeployer.impl;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.appdeployer.command.security.DeployUsersCommand;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class SimpleAppDeployerTest extends Assert {
+public class SimpleAppDeployerTest  {
 
     private SimpleAppDeployer deployer;
     private DeployRestApiServersCommand restApiCommand;
     private DeployOtherDatabasesCommand dbCommand;
 
-    @Before
+    @BeforeEach
     public void setup() {
         restApiCommand = new DeployRestApiServersCommand();
         dbCommand = new DeployOtherDatabasesCommand();

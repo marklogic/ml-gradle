@@ -7,11 +7,14 @@ import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.server.Server;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
 import com.marklogic.mgmt.resource.hosts.HostManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AssignHostsToGroupsTest extends AbstractAppDeployerTest {
 
@@ -43,12 +46,13 @@ public class AssignHostsToGroupsTest extends AbstractAppDeployerTest {
 
 			Server adminServer = new API(manageClient).server("Admin", otherGroup);
 			assertEquals(otherGroup, adminServer.getGroupName());
-			assertEquals("Verifying that the rewriter was set correctly for the new Admin server", "rewriter.xqy",
-				adminServer.getUrlRewriter());
+			assertEquals("rewriter.xqy", adminServer.getUrlRewriter(),
+				"Verifying that the rewriter was set correctly for the new Admin server");
 		} finally {
 			undeploySampleApp();
 
-			assertEquals("The host's group should have been set back to Default", "Default", hostManager.getAssignedGroupName(hostname));
+			assertEquals("Default", hostManager.getAssignedGroupName(hostname),
+				"The host's group should have been set back to Default");
 		}
 	}
 }

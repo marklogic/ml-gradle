@@ -4,13 +4,13 @@ import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.DefaultAppConfigFactory;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.mgmt.util.SimplePropertySource;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.env.PropertiesPropertySource;
 
 import java.util.*;
 
-public class CreateForestsOnSpecificHostsTest extends Assert {
+public class CreateForestsOnSpecificHostsTest  {
 
 	@Test
 	public void test() {

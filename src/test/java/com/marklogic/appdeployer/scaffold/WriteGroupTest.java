@@ -3,7 +3,10 @@ package com.marklogic.appdeployer.scaffold;
 import com.marklogic.appdeployer.command.groups.DeployGroupsCommand;
 import com.marklogic.mgmt.api.group.Group;
 import com.marklogic.mgmt.template.group.GroupTemplateBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class WriteGroupTest extends AbstractResourceWriterTest {
 

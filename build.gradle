@@ -21,10 +21,10 @@ repositories {
 
 dependencies {
   api 'com.marklogic:ml-javaclient-util:4.2.0-rc1'
-  api 'jaxen:jaxen:1.2.0'
-  api 'org.apache.httpcomponents:httpclient:4.5.13'
   api 'org.springframework:spring-web:5.3.7'
 
+	implementation 'jaxen:jaxen:1.2.0'
+	implementation 'org.apache.httpcomponents:httpclient:4.5.13'
 	implementation 'org.jdom:jdom2:2.0.6'
 
 	// Forcing httpclient to use this to address https://snyk.io/vuln/SNYK-JAVA-COMMONSCODEC-561518
@@ -37,24 +37,23 @@ dependencies {
 	implementation "com.flipkart.zjsonpatch:zjsonpatch:0.4.11"
 
 	// Required for Java 11
-	api "javax.xml.bind:jaxb-api:2.3.1"
-	api "com.sun.xml.bind:jaxb-core:2.3.0.1"
-	api "com.sun.xml.bind:jaxb-impl:2.3.3"
+	implementation "javax.xml.bind:jaxb-api:2.3.1"
+	implementation "com.sun.xml.bind:jaxb-core:2.3.0.1"
+	implementation "com.sun.xml.bind:jaxb-impl:2.3.3"
 
 	// Don't want to include this in the published jar, just the executable jar
 	compileOnly "com.beust:jcommander:1.78"
 	compileOnly "ch.qos.logback:logback-classic:1.2.3"
 
-	// This uses JUnit 4; we'll soon replace this with marklogic-junit5 and JUnit5
-	testImplementation 'com.marklogic:ml-junit:3.2.0'
-
-	testImplementation "org.springframework:spring-test:5.3.7"
+	testImplementation "org.junit.jupiter:junit-jupiter:5.7.1"
+	testImplementation 'org.springframework:spring-test:5.3.7'
 	testImplementation 'commons-io:commons-io:2.8.0'
+	testImplementation 'xmlunit:xmlunit:1.6'
 
 	// Forcing Spring to use logback for testing instead of commons-logging
 	testImplementation "ch.qos.logback:logback-classic:1.2.3"
-	testImplementation group: "org.slf4j", name: "jcl-over-slf4j", version: "1.7.30"
-	testImplementation group: "org.slf4j", name: "slf4j-api", version: "1.7.30"
+	testImplementation "org.slf4j:jcl-over-slf4j:1.7.30"
+	testImplementation "org.slf4j:slf4j-api:1.7.30"
 }
 
 // This ensures that Gradle includes in the published jar any non-java files under src/main/java
@@ -83,6 +82,7 @@ publishing {
 }
 
 test {
+	useJUnitPlatform()
   testLogging {
     events 'started','passed', 'skipped', 'failed'
     exceptionFormat 'full'

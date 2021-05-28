@@ -3,14 +3,17 @@ package com.marklogic.appdeployer.command.tasks;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.mgmt.resource.tasks.TaskManager;
 import com.marklogic.rest.util.PreviewInterceptor;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
 public class DeployTasksWithSamePathTest extends AbstractAppDeployerTest {
 
-	@After
+	@AfterEach
 	public void after() {
 		new TaskManager(manageClient).deleteAllScheduledTasks();
 	}
@@ -27,8 +30,9 @@ public class DeployTasksWithSamePathTest extends AbstractAppDeployerTest {
 
 		try {
 			deploySampleApp();
-			assertEquals("There should be 3 new tasks; task-4.json should overwrite task 3 because it has the same " +
-				"database, module path, and task root as task-3.json", initialTaskCount + 3, taskManager.getAsXml().getResourceCount());
+			assertEquals(initialTaskCount + 3, taskManager.getAsXml().getResourceCount(),
+				"There should be 3 new tasks; task-4.json should overwrite task 3 because it has the same " +
+					"database, module path, and task root as task-3.json");
 
 			// Verify we get an expected error when trying to get a single task by a task-path
 			try {
@@ -39,21 +43,21 @@ public class DeployTasksWithSamePathTest extends AbstractAppDeployerTest {
 			}
 
 			deploySampleApp();
-			assertEquals("There should still be just 3 new tasks", initialTaskCount + 3, taskManager.getAsXml().getResourceCount());
+			assertEquals(initialTaskCount + 3, taskManager.getAsXml().getResourceCount(), "There should still be just 3 new tasks");
 
 			// test preview. No tasks are accidentally deleted
 			PreviewInterceptor interceptor = new PreviewInterceptor(manageClient);
 			manageClient.getRestTemplate().getInterceptors().add(interceptor);
 
 			deploySampleApp();
-			assertEquals("There should still be just 3 new tasks", initialTaskCount + 3, taskManager.getAsXml().getResourceCount());
+			assertEquals(initialTaskCount + 3, taskManager.getAsXml().getResourceCount(), "There should still be just 3 new tasks");
 
 		} finally {
 			// we want to undeploy the sample app not just preview it
 			manageClient.getRestTemplate().getInterceptors().clear();
 			undeploySampleApp();
 
-			assertEquals("The 3 new tasks should have been deleted", initialTaskCount, taskManager.getAsXml().getResourceCount());
+			assertEquals(initialTaskCount, taskManager.getAsXml().getResourceCount(), "The 3 new tasks should have been deleted");
 		}
 	}
 

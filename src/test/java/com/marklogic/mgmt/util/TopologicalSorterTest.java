@@ -1,9 +1,9 @@
 package com.marklogic.mgmt.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
-public class TopologicalSorterTest extends Assert {
+public class TopologicalSorterTest  {
 
 	/**
 	 * Adapted from http://www.java2s.com/Code/Java/Collections-Data-Structure/Topologicalsorting.htm

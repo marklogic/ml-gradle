@@ -1,6 +1,6 @@
 package com.marklogic.mgmt.api;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import com.marklogic.mgmt.AbstractMgmtTest;
 
@@ -8,7 +8,7 @@ public abstract class AbstractApiTest extends AbstractMgmtTest {
 
     protected API api;
 
-    @Before
+    @BeforeEach
     public void setup() {
         api = new API(manageClient);
     }

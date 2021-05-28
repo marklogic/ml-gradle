@@ -5,14 +5,17 @@ import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.forests.DeployCustomForestsCommand;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.forests.ForestManager;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class ExportDatabaseTest extends AbstractExportTest {
 
-	@After
+	@AfterEach
 	public void teardown() {
 		// No matter what happens, try to undeploy the sample app
 		undeploySampleApp();
@@ -32,15 +35,15 @@ public class ExportDatabaseTest extends AbstractExportTest {
 		File dbFile = new File(exportDir, "databases/sample-app-content.json");
 		assertTrue(dbFile.exists());
 		ObjectNode dbNode = (ObjectNode) objectMapper.readTree(dbFile);
-		assertFalse("The forest key should have been removed so the database can be created before the forests exist",
-			dbNode.has("forest"));
+		assertFalse(dbNode.has("forest"),
+			"The forest key should have been removed so the database can be created before the forests exist");
 
 		// Verify a forest file
 		File forest1File = new File(exportDir, "forests/sample-app-content/sample-app-content-1.json");
 		assertTrue(forest1File.exists());
 		ObjectNode forestNode = (ObjectNode) objectMapper.readTree(forest1File);
-		assertFalse("The range key should have been removed due to a bug in the Manage API, where range:null causes an error",
-			forestNode.has("range"));
+		assertFalse(forestNode.has("range"),
+			"The range key should have been removed due to a bug in the Manage API, where range:null causes an error");
 
 		// Undeploy the app so we can try to deploy it from the export dir
 		undeploySampleApp();

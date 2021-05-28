@@ -21,19 +21,21 @@ import com.marklogic.mgmt.resource.forests.ForestManager;
 import com.marklogic.mgmt.resource.security.PrivilegeManager;
 import com.marklogic.mgmt.resource.security.RoleManager;
 import com.marklogic.mgmt.resource.security.UserManager;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 public class MergeResourcesWhileDeployingTest extends AbstractAppDeployerTest {
 
 	private ResourceMapper resourceMapper;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		List<ConfigDir> list = new ArrayList<>();
 		list.add(new ConfigDir(new File("src/test/resources/sample-app/multiple-config-paths/path1")));
@@ -43,7 +45,7 @@ public class MergeResourcesWhileDeployingTest extends AbstractAppDeployerTest {
 		resourceMapper = new DefaultResourceMapper(new API(manageClient));
 	}
 
-	@After
+	@AfterEach
 	public void teardown() {
 		undeploySampleApp();
 	}
@@ -56,7 +58,7 @@ public class MergeResourcesWhileDeployingTest extends AbstractAppDeployerTest {
 		UserManager mgr = new UserManager(manageClient);
 		User user = resourceMapper.readResource(mgr.getAsJson("sample-app-jane"), User.class);
 		assertEquals(2, user.getRole().size());
-		assertEquals("The role from the first path should be first", "rest-reader", user.getRole().get(0));
+		assertEquals("rest-reader", user.getRole().get(0), "The role from the first path should be first");
 		assertEquals("manage-user", user.getRole().get(1));
 	}
 
@@ -138,8 +140,8 @@ public class MergeResourcesWhileDeployingTest extends AbstractAppDeployerTest {
 		assertEquals(2, db.getRangeElementIndex().size());
 		assertEquals("id", db.getRangeElementIndex().get(0).getLocalname());
 		assertEquals("otherId", db.getRangeElementIndex().get(1).getLocalname());
-		assertTrue("The file in the second path should override single-value properties from the " +
-			"file in the first path", db.getTripleIndex());
+		assertTrue(db.getTripleIndex(), "The file in the second path should override single-value properties from the " +
+			"file in the first path");
 		assertEquals("sample-app-schema-database", db.getSchemaDatabase());
 		assertEquals("sample-app-triggers-database", db.getTriggersDatabase());
 

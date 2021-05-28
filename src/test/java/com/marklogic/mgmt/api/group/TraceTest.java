@@ -1,8 +1,10 @@
 package com.marklogic.mgmt.api.group;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.marklogic.mgmt.api.AbstractApiTest;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TraceTest extends AbstractApiTest {
 

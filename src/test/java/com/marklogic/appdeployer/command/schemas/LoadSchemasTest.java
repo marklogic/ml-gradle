@@ -7,15 +7,17 @@ import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.document.GenericDocumentManager;
 import com.marklogic.client.io.BytesHandle;
 import com.marklogic.client.io.DocumentMetadataHandle;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileFilter;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 public class LoadSchemasTest extends AbstractAppDeployerTest {
 
-	@After
+	@AfterEach
 	public void cleanup() {
 		undeploySampleApp();
 	}
@@ -63,15 +65,15 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 
 		GenericDocumentManager docMgr = client.newDocumentManager();
 
-		assertNull("Rules document loaded", docMgr.exists("notExists"));
-		assertNotNull("Rules document loaded", docMgr.exists("/my.rules").getUri());
-		assertNotNull("XSD document loaded", docMgr.exists("/x.xsd").getUri());
+		assertNull(docMgr.exists("notExists"), "Rules document loaded");
+		assertNotNull(docMgr.exists("/my.rules").getUri(), "Rules document loaded");
+		assertNotNull(docMgr.exists("/x.xsd").getUri(), "XSD document loaded");
 		assertNull(docMgr.exists("/.do-not-load"));
 		assertNull(docMgr.exists(".do-not-load"));
 
 		String content = new String(docMgr.read("/x.xsd", new BytesHandle()).get());
-		assertTrue("Tokens should be replaced when schemas are loaded; actual content: " + content,
-			content.contains("<hello>world</hello>"));
+		assertTrue(content.contains("<hello>world</hello>"),
+			"Tokens should be replaced when schemas are loaded; actual content: " + content);
 	}
 
 	@Test
@@ -88,15 +90,15 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 
 		GenericDocumentManager docMgr = client.newDocumentManager();
 
-		assertNotNull("TDEXML document loaded", docMgr.exists("/x.tdex").getUri());
-		assertNotNull("TDEJSON document loaded", docMgr.exists("/x.tdej").getUri());
+		assertNotNull(docMgr.exists("/x.tdex").getUri(), "TDEXML document loaded");
+		assertNotNull(docMgr.exists("/x.tdej").getUri(), "TDEJSON document loaded");
 		assertNull(docMgr.exists("/to-be-ignored/test.xml"));
 		assertNull(docMgr.exists("to-be-ignored/test.xml"));
 
 		for (String uri : new String[]{"/x.tdex", "/x.tdej"}) {
 			DocumentMetadataHandle h = docMgr.readMetadata(uri, new DocumentMetadataHandle());
-			assertEquals("Files ending in tdex and tdej go into a special collection", "http://marklogic.com/xdmp/tde",
-				h.getCollections().iterator().next());
+			assertEquals("http://marklogic.com/xdmp/tde", h.getCollections().iterator().next(),
+				"Files ending in tdex and tdej go into a special collection");
 		}
 	}
 

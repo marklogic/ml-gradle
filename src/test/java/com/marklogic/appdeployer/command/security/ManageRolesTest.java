@@ -2,7 +2,7 @@ package com.marklogic.appdeployer.command.security;
 
 import java.io.File;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractManageResourceTest;
@@ -11,6 +11,9 @@ import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.security.PrivilegeManager;
 import com.marklogic.mgmt.resource.security.RoleManager;
 import com.marklogic.rest.util.Fragment;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ManageRolesTest extends AbstractManageResourceTest {
 
@@ -42,8 +45,8 @@ public class ManageRolesTest extends AbstractManageResourceTest {
             mgr.save("{\"role-name\": \"sample-app-role1\", \"description\":\"This is an updated description\"}");
 
             Fragment f = mgr.getAsXml("sample-app-role1");
-            assertTrue("The save call should either create or update a role",
-                    f.elementExists("/msec:role-default/msec:description[. = 'This is an updated description']"));
+            assertTrue(f.elementExists("/msec:role-default/msec:description[. = 'This is an updated description']"),
+				"The save call should either create or update a role");
         } finally {
             appDeployer.undeploy(appConfig);
         }

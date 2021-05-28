@@ -5,7 +5,7 @@ import com.marklogic.mgmt.ManageConfig;
 import com.marklogic.mgmt.admin.AdminConfig;
 import com.marklogic.mgmt.admin.AdminManager;
 import com.marklogic.mgmt.resource.hosts.HostManager;
-import org.junit.Assert;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Basic test to test adding a new host to a cluster and then removing it.
@@ -26,7 +26,7 @@ public class AddAndRemoveHostDebug {
 
 		HostManager hostManager = new HostManager(manageClient);
 
-		Assert.assertEquals("Expecting only one host to start out with", 1, hostManager.getHostIds().size());
+		assertEquals(1, hostManager.getHostIds().size(), "Expecting only one host to start out with");
 
 		// Add joining host to the cluster
 		ClusterManager clusterManager = new ClusterManager(manageClient);
@@ -34,13 +34,13 @@ public class AddAndRemoveHostDebug {
 		AdminManager adminManager = new AdminManager(adminConfig);
 		clusterManager.addHost(adminManager, joiningHost);
 
-		Assert.assertEquals("Expecting two hosts after the add", 2, hostManager.getHostIds().size());
+		assertEquals(2, hostManager.getHostIds().size(), "Expecting two hosts after the add");
 		System.out.println("After adding a host, the cluster now has two hosts");
 
 		// Remove joining host from cluster
 		clusterManager.removeHost(joiningHost);
 
-		Assert.assertEquals("Expecting 1 host after removing", 1, hostManager.getHostIds().size());
+		assertEquals(1, hostManager.getHostIds().size(), "Expecting 1 host after removing");
 		System.out.println("After removing a host, the cluster now has one host");
 
 

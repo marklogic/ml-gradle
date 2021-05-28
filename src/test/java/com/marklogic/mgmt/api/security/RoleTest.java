@@ -1,9 +1,9 @@
 package com.marklogic.mgmt.api.security;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
-public class RoleTest extends Assert {
+public class RoleTest  {
 
 	@Test
 	public void roleDependencies() {
@@ -25,7 +25,7 @@ public class RoleTest extends Assert {
 		role.addPermission(new Permission("test1", "update"));
 		assertEquals(3, role.getDependentRoleNames().size());
 		assertFalse(role.hasPermissionWithOwnRoleName());
-		
+
 		role.addPermission(new Permission("test0", "update"));
 		assertEquals(4, role.getDependentRoleNames().size());
 		assertTrue(role.hasPermissionWithOwnRoleName());

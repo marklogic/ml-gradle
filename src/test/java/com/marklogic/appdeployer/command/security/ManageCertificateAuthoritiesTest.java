@@ -4,9 +4,11 @@ import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.ResourceFilenameFilter;
 import com.marklogic.mgmt.resource.security.CertificateAuthorityManager;
 import com.marklogic.rest.util.ResourcesFragment;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * All we can reliably do from a file-driven approach is create a certificate authority. The Management REST API in
@@ -26,7 +28,7 @@ public class ManageCertificateAuthoritiesTest extends AbstractAppDeployerTest {
 		CertificateAuthorityManager mgr = new CertificateAuthorityManager(manageClient);
 		ResourcesFragment resources = mgr.getAsXml();
 		String id = resources.getListItemValue("MarkLogic TX Engineering", "idref");
-		assertNotNull("The certificate authority should have been created", id);
+		assertNotNull(id, "The certificate authority should have been created");
 
 		// Delete the certificate authority
 		mgr.delete(id);
@@ -34,7 +36,7 @@ public class ManageCertificateAuthoritiesTest extends AbstractAppDeployerTest {
 		// And then verify that it's gone
 		resources = mgr.getAsXml();
 		id = resources.getListItemValue("MarkLogic TX Engineering", "idref");
-		assertNull("The certificate authority should no longer exist", id);
+		assertNull(id, "The certificate authority should no longer exist");
 	}
 
 	@Test

@@ -3,15 +3,18 @@ package com.marklogic.appdeployer.scaffold;
 import com.marklogic.appdeployer.command.security.DeployRolesCommand;
 import com.marklogic.mgmt.api.security.Role;
 import com.marklogic.mgmt.template.security.RoleTemplateBuilder;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class WriteRoleTest extends AbstractResourceWriterTest {
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		initializeAppDeployer(new DeployRolesCommand());
 	}

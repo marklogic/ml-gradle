@@ -10,7 +10,9 @@ import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.ManageConfig;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.security.AmpManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ManageAmpsTest extends AbstractManageResourceTest {
 
@@ -32,8 +34,8 @@ public class ManageAmpsTest extends AbstractManageResourceTest {
 				"import module namespace sample = 'urn:sampleapp' at '/ext/sample-lib.xqy'; " +
 				"sample:get-host-status()").evalAs(String.class);
 
-			assertNotNull("The amp is loaded before the module, but it should still apply and allow the user " +
-				"to invoke the function that requires the status-builtins privilege", output);
+			assertNotNull(output, "The amp is loaded before the module, but it should still apply and allow the user " +
+				"to invoke the function that requires the status-builtins privilege");
 		} finally {
 			undeploySampleApp();
 		}

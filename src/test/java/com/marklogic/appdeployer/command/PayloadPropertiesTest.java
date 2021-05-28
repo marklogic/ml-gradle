@@ -4,14 +4,16 @@ import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.rest.util.Fragment;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 public class PayloadPropertiesTest extends AbstractAppDeployerTest {
 
-	@After
+	@AfterEach
 	public void teardown() {
 		undeploySampleApp();
 	}

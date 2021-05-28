@@ -9,11 +9,13 @@ import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.ext.modulesloader.impl.DefaultModulesLoader;
 import com.marklogic.client.io.BytesHandle;
 import com.marklogic.client.io.StringHandle;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Properties;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ReplaceTokensTest extends AbstractAppDeployerTest {
 
@@ -41,7 +43,7 @@ public class ReplaceTokensTest extends AbstractAppDeployerTest {
 		DatabaseClient modulesClient = appConfig.newAppServicesDatabaseClient(appConfig.getModulesDatabaseName());
 		try {
 			String moduleText = new String(modulesClient.newDocumentManager().read("/hello.xqy", new BytesHandle()).get());
-			assertTrue("Did not find replaced text in module: " + moduleText, moduleText.contains("replaced!"));
+			assertTrue(moduleText.contains("replaced!"), "Did not find replaced text in module: " + moduleText);
 		} finally {
 			modulesClient.release();
 			undeploySampleApp();

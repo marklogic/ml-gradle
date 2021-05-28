@@ -2,13 +2,13 @@ package com.marklogic.mgmt.api.database;
 
 import com.marklogic.mgmt.api.database.Database;
 import com.marklogic.mgmt.api.database.DatabaseSorter;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class SortDatabasesTest extends Assert {
+public class SortDatabasesTest  {
 
 	@Test
 	public void test() {

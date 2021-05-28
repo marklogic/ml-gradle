@@ -5,12 +5,14 @@ import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.database.Database;
 import com.marklogic.mgmt.mapper.DefaultResourceMapper;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class InvokeDatabaseOperationsTest extends AbstractAppDeployerTest {
 
-    @After
+    @AfterEach
     public void teardown() {
         undeploySampleApp();
     }

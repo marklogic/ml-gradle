@@ -3,7 +3,7 @@ package com.marklogic.appdeployer.export;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,7 +13,7 @@ public abstract class AbstractExportTest extends AbstractAppDeployerTest {
 	protected File exportDir;
 	protected static ObjectMapper objectMapper = new ObjectMapper();
 
-	@Before
+	@BeforeEach
 	public void initializeExportDir() throws IOException {
 		exportDir = new File("build/export-test");
 		exportDir.mkdirs();

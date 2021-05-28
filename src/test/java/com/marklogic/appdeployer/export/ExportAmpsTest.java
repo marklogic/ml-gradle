@@ -9,12 +9,14 @@ import com.marklogic.mgmt.resource.security.AmpManager;
 import com.marklogic.mgmt.selector.PropertiesResourceSelector;
 import com.marklogic.mgmt.selector.RegexResourceSelector;
 import com.marklogic.mgmt.selector.ResourceSelector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
 import java.util.List;
 import java.util.Properties;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ExportAmpsTest extends AbstractExportTest {
 

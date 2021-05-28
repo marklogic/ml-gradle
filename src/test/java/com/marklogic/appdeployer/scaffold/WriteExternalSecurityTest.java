@@ -4,7 +4,9 @@ import com.marklogic.appdeployer.command.security.DeployExternalSecurityCommand;
 import com.marklogic.mgmt.api.security.ExternalSecurity;
 import com.marklogic.mgmt.api.security.LdapServer;
 import com.marklogic.mgmt.template.security.ExternalSecurityTemplateBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class WriteExternalSecurityTest extends AbstractResourceWriterTest {
 

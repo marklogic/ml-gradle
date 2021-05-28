@@ -1,19 +1,19 @@
 package com.marklogic.appdeployer;
 
 import com.marklogic.appdeployer.util.SimplePropertiesSource;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 import java.util.Properties;
 
-public class PopulateCustomTokensTest extends Assert {
+public class PopulateCustomTokensTest  {
 
 	private AppConfig appConfig;
 	private Properties props;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		appConfig = new AppConfig();
 

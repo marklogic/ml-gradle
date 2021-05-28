@@ -7,14 +7,17 @@ import com.marklogic.appdeployer.command.groups.DeployGroupsCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
 import com.marklogic.mgmt.resource.groups.GroupManager;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class ExportServerTest extends AbstractExportTest {
 
-	@After
+	@AfterEach
 	public void teardown() {
 		undeploySampleApp();
 	}

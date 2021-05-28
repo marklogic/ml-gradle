@@ -1,9 +1,9 @@
 package com.marklogic.mgmt.resource.security;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
-public class UseSecurityUserTest extends Assert {
+public class UseSecurityUserTest  {
 
 	/**
 	 * Just a little unit test to make sure these manager classes all use the security user.

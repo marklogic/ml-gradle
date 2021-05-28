@@ -1,10 +1,10 @@
 package com.marklogic.mgmt.api.security;
 
 import com.marklogic.mgmt.mapper.DefaultResourceMapper;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
-public class UnmarshalAmpTest extends Assert {
+public class UnmarshalAmpTest  {
 
 	@Test
 	public void xmlSmokeTest() {

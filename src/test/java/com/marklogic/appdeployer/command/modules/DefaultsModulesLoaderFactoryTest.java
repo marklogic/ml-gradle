@@ -3,7 +3,10 @@ package com.marklogic.appdeployer.command.modules;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.client.ext.modulesloader.impl.DefaultModulesLoader;
 import com.marklogic.client.ext.modulesloader.impl.PropertiesModuleManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class DefaultsModulesLoaderFactoryTest extends AbstractAppDeployerTest {
 

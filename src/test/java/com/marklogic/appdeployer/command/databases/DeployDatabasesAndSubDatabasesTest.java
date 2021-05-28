@@ -3,10 +3,13 @@ package com.marklogic.appdeployer.command.databases;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DeployDatabasesAndSubDatabasesTest extends AbstractAppDeployerTest {
 
@@ -26,23 +29,23 @@ public class DeployDatabasesAndSubDatabasesTest extends AbstractAppDeployerTest 
 			appDeployer.deploy(appConfig);
 
 			for (String name : dbNames) {
-				assertTrue("Expected to find database: " + name, dbMgr.exists(name));
+				assertTrue(dbMgr.exists(name), "Expected to find database: " + name);
 			}
 
 			// check that subdatabases are associated
 			List<String> subDatabases = dbMgr.getSubDatabases("mysuperdb");
-			assertTrue("Expected to find subdatabase of 'mysuperdb-subdb01'", subDatabases.contains("mysuperdb-subdb01"));
-			assertTrue("Expected to find subdatabase of 'mysuperdb-subdb02'", subDatabases.contains("mysuperdb-subdb02"));
+			assertTrue(subDatabases.contains("mysuperdb-subdb01"), "Expected to find subdatabase of 'mysuperdb-subdb01'");
+			assertTrue(subDatabases.contains("mysuperdb-subdb02"), "Expected to find subdatabase of 'mysuperdb-subdb02'");
 
 			subDatabases = dbMgr.getSubDatabases("sample-app-content");
-			assertTrue("Expected to find subdatabase of 'sample-app-content-subdb01'", subDatabases.contains("sample-app-content-subdb01"));
-			assertTrue("Expected to find subdatabase of 'sample-app-content-subdb02'", subDatabases.contains("sample-app-content-subdb02"));
+			assertTrue(subDatabases.contains("sample-app-content-subdb01"), "Expected to find subdatabase of 'sample-app-content-subdb01'");
+			assertTrue(subDatabases.contains("sample-app-content-subdb02"), "Expected to find subdatabase of 'sample-app-content-subdb02'");
 
 
 		} finally {
 			undeploySampleApp();
 			for (String name : dbNames) {
-				assertFalse("Expected to not find database: " + name, dbMgr.exists(name));
+				assertFalse(dbMgr.exists(name), "Expected to not find database: " + name);
 			}
 		}
 	}

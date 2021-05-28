@@ -12,6 +12,8 @@ import com.marklogic.rest.util.ResourcesFragment;
 
 import java.io.File;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 public class ManageAlertActionsAndRulesTest extends AbstractManageResourceTest {
 
     private final static String CONFIG_URI = "my-alert-config";
@@ -105,7 +107,7 @@ public class ManageAlertActionsAndRulesTest extends AbstractManageResourceTest {
     protected void afterResourcesCreatedAgain() {
         AlertConfigManager mgr = new AlertConfigManager(manageClient, appConfig.getContentDatabaseName());
         mgr.deleteAllConfigs();
-        assertTrue("All of the alert configs should have been deleted", mgr.getAsXml().getListItemIdRefs().isEmpty());
+        assertTrue(mgr.getAsXml().getListItemIdRefs().isEmpty(), "All of the alert configs should have been deleted");
     }
 
     /**

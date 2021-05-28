@@ -6,12 +6,14 @@ import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.mgmt.resource.cpf.CpfConfigManager;
 import com.marklogic.mgmt.resource.cpf.DomainManager;
 import com.marklogic.mgmt.resource.cpf.PipelineManager;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ManageCpfTest extends AbstractAppDeployerTest {
 
-	@After
+	@AfterEach
 	public void teardown() {
 		undeploySampleApp();
 	}

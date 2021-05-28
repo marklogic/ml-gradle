@@ -3,10 +3,12 @@ package com.marklogic.appdeployer.command.databases;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.regex.Pattern;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DeployOtherDatabasesTest extends AbstractAppDeployerTest {
 
@@ -26,7 +28,7 @@ public class DeployOtherDatabasesTest extends AbstractAppDeployerTest {
 		try {
 			appDeployer.deploy(appConfig);
 			assertTrue(dbMgr.exists(dbName));
-			assertTrue("No forests should have been created for the database", dbMgr.getForestIds(dbName).isEmpty());
+			assertTrue(dbMgr.getForestIds(dbName).isEmpty(), "No forests should have been created for the database");
 		} finally {
 			undeploySampleApp();
 			assertFalse(dbMgr.exists(dbName));
@@ -56,23 +58,23 @@ public class DeployOtherDatabasesTest extends AbstractAppDeployerTest {
 			appDeployer.deploy(appConfig);
 
 			for (String name : dbNames) {
-				assertTrue("Expected to find database: " + name, dbMgr.exists(name));
+				assertTrue(dbMgr.exists(name), "Expected to find database: " + name);
 			}
-			assertFalse("ignored-database.json should have been ignored", dbMgr.exists("ignored-content"));
+			assertFalse(dbMgr.exists("ignored-content"), "ignored-database.json should have been ignored");
 
-			assertEquals("The main content database should have 2 forests, as set in the command", 2,
-				dbMgr.getForestIds("sample-app-content").size());
-			assertEquals("AppConfig is configured for other-sample-app-content to have 2 forests instead of 1", 2,
-				dbMgr.getForestIds("other-sample-app-content").size());
-			assertEquals("other-sample-app-schemas is configured to have 3 forests", 3,
-				dbMgr.getForestIds("other-sample-app-schemas").size());
-			assertEquals("other-sample-app-triggers should have the default of 1 forest", 1,
-				dbMgr.getForestIds("other-sample-app-triggers").size());
+			assertEquals(2, dbMgr.getForestIds("sample-app-content").size(),
+				"The main content database should have 2 forests, as set in the command");
+			assertEquals(2, dbMgr.getForestIds("other-sample-app-content").size(),
+				"AppConfig is configured for other-sample-app-content to have 2 forests instead of 1");
+			assertEquals(3, dbMgr.getForestIds("other-sample-app-schemas").size(),
+				"other-sample-app-schemas is configured to have 3 forests");
+			assertEquals(1, dbMgr.getForestIds("other-sample-app-triggers").size(),
+				"other-sample-app-triggers should have the default of 1 forest");
 		} finally {
 			undeploySampleApp();
 
 			for (String name : dbNames) {
-				assertFalse("Expected to not find database: " + name, dbMgr.exists(name));
+				assertFalse(dbMgr.exists(name), "Expected to not find database: " + name);
 			}
 		}
 	}

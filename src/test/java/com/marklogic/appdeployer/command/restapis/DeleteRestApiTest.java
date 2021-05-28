@@ -6,9 +6,12 @@ import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.restapis.RestApiManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This test ensures that the convenience methods for creating and deleting a sample application work properly, and thus
@@ -24,12 +27,12 @@ public class DeleteRestApiTest extends AbstractAppDeployerTest {
         initializeAppDeployer(new DeployRestApiServersCommand(true));
         appDeployer.deploy(appConfig);
 
-        assertTrue("The REST API server should exist", mgr.restApiServerExists(SAMPLE_APP_NAME));
-        assertTrue("The REST API app server should exist", serverMgr.exists(SAMPLE_APP_NAME));
+        assertTrue(mgr.restApiServerExists(SAMPLE_APP_NAME), "The REST API server should exist");
+        assertTrue(serverMgr.exists(SAMPLE_APP_NAME), "The REST API app server should exist");
 
         undeploySampleApp();
-        assertFalse("The REST API server should have been deleted", mgr.restApiServerExists(SAMPLE_APP_NAME));
-        assertFalse("The REST API app server have been deleted", serverMgr.exists(SAMPLE_APP_NAME));
+        assertFalse(mgr.restApiServerExists(SAMPLE_APP_NAME), "The REST API server should have been deleted");
+        assertFalse(serverMgr.exists(SAMPLE_APP_NAME), "The REST API app server have been deleted");
     }
 
     @Test
@@ -42,12 +45,10 @@ public class DeleteRestApiTest extends AbstractAppDeployerTest {
         initializeAppDeployer(new DeployRestApiServersCommand(), new DeployOtherDatabasesCommand(1));
 
         appDeployer.deploy(appConfig);
-        assertTrue("The content database should have been created by the REST API command", dbMgr.exists(dbName));
+        assertTrue(dbMgr.exists(dbName), "The content database should have been created by the REST API command");
 
         undeploySampleApp();
-        assertFalse(
-                "The content database should have been deleted by the REST API command, and the database command shouldn't throw any error",
-                dbMgr.exists(dbName));
+        assertFalse(dbMgr.exists(dbName), "The content database should have been deleted by the REST API command, and the database command shouldn't throw any error");
     }
 
     @Test
@@ -60,12 +61,11 @@ public class DeleteRestApiTest extends AbstractAppDeployerTest {
         initializeAppDeployer(new DeployRestApiServersCommand(), new DeployOtherDatabasesCommand(1));
 
         appDeployer.deploy(appConfig);
-        assertTrue("The content database should have been created by the REST API command", dbMgr.exists(dbName));
+        assertTrue(dbMgr.exists(dbName), "The content database should have been created by the REST API command");
 
         undeploySampleApp();
-        assertFalse(
-                "The content database should have been deleted by the content database command, even though a content-database.json file doesn't exist",
-                dbMgr.exists(dbName));
+        assertFalse(dbMgr.exists(dbName),
+			"The content database should have been deleted by the content database command, even though a content-database.json file doesn't exist");
     }
 
     @Test
@@ -77,18 +77,18 @@ public class DeleteRestApiTest extends AbstractAppDeployerTest {
         appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/empty-ml-config")));
 
         DeployRestApiServersCommand command = new DeployRestApiServersCommand();
-        assertFalse("By default, this command shouldn't delete the content database", command.isDeleteContentDatabase());
-        assertTrue("By default, this command should delete the modules database", command.isDeleteModulesDatabase());
+        assertFalse(command.isDeleteContentDatabase(), "By default, this command shouldn't delete the content database");
+        assertTrue(command.isDeleteModulesDatabase(), "By default, this command should delete the modules database");
 
         command.setDeleteContentDatabase(true);
         initializeAppDeployer(command);
 
         appDeployer.deploy(appConfig);
-        assertTrue("The content database should have been created by the REST API command", dbMgr.exists(dbName));
-        assertTrue("The modules database should have been created by the REST API command", dbMgr.exists(modulesDbName));
+        assertTrue(dbMgr.exists(dbName), "The content database should have been created by the REST API command");
+        assertTrue(dbMgr.exists(modulesDbName), "The modules database should have been created by the REST API command");
 
         undeploySampleApp();
-        assertFalse("The content database should have been deleted by REST API command", dbMgr.exists(dbName));
-        assertFalse("The modules database should have been deleted by REST API command", dbMgr.exists(modulesDbName));
+        assertFalse(dbMgr.exists(dbName), "The content database should have been deleted by REST API command");
+        assertFalse(dbMgr.exists(modulesDbName), "The modules database should have been deleted by REST API command");
     }
 }

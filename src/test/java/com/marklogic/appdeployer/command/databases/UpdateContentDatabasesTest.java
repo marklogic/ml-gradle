@@ -4,21 +4,23 @@ import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.rest.util.Fragment;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UpdateContentDatabasesTest extends AbstractAppDeployerTest {
 
 	private DatabaseManager dbMgr;
 	private String idRangeIndexPath = "//m:range-element-index[m:scalar-type = 'string' and m:namespace-uri = 'urn:sampleapp' and m:localname='id' and m:collation='http://marklogic.com/collation/']";
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		dbMgr = new DatabaseManager(manageClient);
 	}
 
-	@After
+	@AfterEach
 	public void teardown() {
 		undeploySampleApp();
 	}

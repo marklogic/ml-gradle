@@ -9,9 +9,11 @@ import com.marklogic.appdeployer.command.security.DeployUsersCommand;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.security.RoleManager;
 import com.marklogic.mgmt.resource.security.UserManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class GenerateScaffoldTest extends AbstractAppDeployerTest {
 

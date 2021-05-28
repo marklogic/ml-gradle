@@ -2,10 +2,12 @@ package com.marklogic.appdeployer.command.databases;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Verifies support for bumping up the number of content forests and then re-deploying. Does not yet support lowering
@@ -22,22 +24,22 @@ public class UpdateForestCountTest extends AbstractAppDeployerTest {
 
         appConfig.setContentForestsPerHost(1);
         appDeployer.deploy(appConfig);
-        assertEquals("Should only have 1 forest", 1, mgr.getForestIds(appConfig.getContentDatabaseName()).size());
+        assertEquals(1, mgr.getForestIds(appConfig.getContentDatabaseName()).size(), "Should only have 1 forest");
 
         appConfig.setContentForestsPerHost(2);
         appDeployer.deploy(appConfig);
-        assertEquals("Should now have 2 forests", 2, mgr.getForestIds(appConfig.getContentDatabaseName()).size());
+        assertEquals(2, mgr.getForestIds(appConfig.getContentDatabaseName()).size(), "Should now have 2 forests");
 
         appDeployer.deploy(appConfig);
-        assertEquals("Should still have 2 forests", 2, mgr.getForestIds(appConfig.getContentDatabaseName()).size());
+        assertEquals(2, mgr.getForestIds(appConfig.getContentDatabaseName()).size(), "Should still have 2 forests");
 
         appConfig.setContentForestsPerHost(1);
         appDeployer.deploy(appConfig);
-        assertEquals("Should still have 2 forests, we don't yet support deleting forests when the number drops", 2,
-	        mgr.getForestIds(appConfig.getContentDatabaseName()).size());
+        assertEquals(2, mgr.getForestIds(appConfig.getContentDatabaseName()).size(),
+			"Should still have 2 forests, we don't yet support deleting forests when the number drops");
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         undeploySampleApp();
     }

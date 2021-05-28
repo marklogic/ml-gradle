@@ -2,7 +2,7 @@ package com.marklogic.appdeployer.command.servers;
 
 import java.io.File;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
@@ -12,6 +12,8 @@ import com.marklogic.mgmt.resource.appservers.ServerManager;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.forests.ForestManager;
 import com.marklogic.rest.util.Fragment;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UpdateRestApiServersWithCustomFilenameTest extends AbstractAppDeployerTest {
     @Test
@@ -31,7 +33,7 @@ public class UpdateRestApiServersWithCustomFilenameTest extends AbstractAppDeplo
             assertTrue(dbMgr.exists("my-custom-content"));
             assertTrue(dbMgr.exists("my-custom-modules"));
             assertTrue(forestMgr.exists("my-custom-content-1"));
-            assertFalse("The custom REST API file only asks for 1 forest", forestMgr.exists("my-custom-content-2"));
+            assertFalse(forestMgr.exists("my-custom-content-2"), "The custom REST API file only asks for 1 forest");
 
             Fragment appServer = serverMgr.getPropertiesAsXml("my-custom-rest-api");
             assertEquals(appServer.getElementValue("//m:default-error-format"), "xml");
@@ -43,7 +45,7 @@ public class UpdateRestApiServersWithCustomFilenameTest extends AbstractAppDeplo
             assertTrue(dbMgr.exists("my-custom-content"));
             assertTrue(dbMgr.exists("my-custom-modules"));
             assertTrue(forestMgr.exists("my-custom-content-1"));
-            assertFalse("The custom REST API file only asks for 1 forest", forestMgr.exists("my-custom-content-2"));
+            assertFalse(forestMgr.exists("my-custom-content-2"), "The custom REST API file only asks for 1 forest");
 
             appServer = serverMgr.getPropertiesAsXml("my-custom-rest-api");
             assertEquals(appServer.getElementValue("//m:default-error-format"), "json");

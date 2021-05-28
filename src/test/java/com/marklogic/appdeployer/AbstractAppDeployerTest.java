@@ -7,7 +7,7 @@ import com.marklogic.appdeployer.impl.SimpleAppDeployer;
 import com.marklogic.client.ext.modulesloader.impl.DefaultModulesLoader;
 import com.marklogic.mgmt.AbstractMgmtTest;
 import com.marklogic.xcc.template.XccTemplate;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.io.File;
 
@@ -27,7 +27,7 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
     protected AppDeployer appDeployer;
     protected AppConfig appConfig;
 
-    @Before
+    @BeforeEach
     public void initialize() {
         initializeAppConfig();
     }

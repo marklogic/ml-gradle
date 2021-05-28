@@ -6,7 +6,9 @@ import com.marklogic.mgmt.api.trigger.Trigger;
 import com.marklogic.mgmt.resource.triggers.TriggerManager;
 import com.marklogic.mgmt.template.database.DatabaseTemplateBuilder;
 import com.marklogic.mgmt.template.trigger.TriggerTemplateBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class WriteTriggerTest extends AbstractResourceWriterTest {
 

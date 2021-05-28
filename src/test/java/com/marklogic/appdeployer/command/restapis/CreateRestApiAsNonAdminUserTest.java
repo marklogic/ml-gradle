@@ -4,13 +4,14 @@ import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.security.DeployRolesCommand;
 import com.marklogic.appdeployer.command.security.DeployUsersCommand;
+import com.marklogic.junit.BaseTestHelper;
 import com.marklogic.junit.PermissionsFragment;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.ManageConfig;
 import com.marklogic.xcc.template.XccTemplate;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
@@ -22,12 +23,12 @@ public class CreateRestApiAsNonAdminUserTest extends AbstractAppDeployerTest {
 
 	private XccTemplate xccTemplate;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		xccTemplate = newModulesXccTemplate();
 	}
 
-	@After
+	@AfterEach
 	public void teardown() {
 		undeploySampleApp();
 	}
@@ -57,7 +58,7 @@ public class CreateRestApiAsNonAdminUserTest extends AbstractAppDeployerTest {
 		appDeployer.deploy(appConfig);
 
 		// And now ensure that the module was loaded correctly
-		PermissionsFragment perms = getDocumentPermissions("/ext/hello-lib.xqy", xccTemplate);
+		PermissionsFragment perms = new BaseTestHelper().getDocumentPermissions("/ext/hello-lib.xqy", xccTemplate);
 		perms.assertPermissionExists("rest-admin", "read");
 		perms.assertPermissionExists("rest-admin", "update");
 		perms.assertPermissionExists("rest-extension-user", "execute");

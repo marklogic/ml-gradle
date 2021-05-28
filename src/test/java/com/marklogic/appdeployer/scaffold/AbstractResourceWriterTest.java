@@ -6,8 +6,8 @@ import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.Resource;
 import com.marklogic.mgmt.template.TemplateBuilder;
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,12 +19,12 @@ public abstract class AbstractResourceWriterTest extends AbstractAppDeployerTest
 	protected Map<String, Object> propertyMap = new HashMap<>();
 	protected API api;
 
-	@After
+	@AfterEach
 	public void teardown() {
 		undeploySampleApp();
 	}
 
-	@Before
+	@BeforeEach
 	public void initializeConfigDir() throws IOException {
 		api = new API(manageClient);
 

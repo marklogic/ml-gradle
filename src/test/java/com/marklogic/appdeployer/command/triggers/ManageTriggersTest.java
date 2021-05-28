@@ -11,6 +11,8 @@ import com.marklogic.mgmt.mapper.ResourceMapper;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.triggers.TriggerManager;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 public class ManageTriggersTest extends AbstractManageResourceTest {
 
     @Override
@@ -71,7 +73,7 @@ public class ManageTriggersTest extends AbstractManageResourceTest {
 				break;
 			}
 		}
-		assertTrue("Did not find trigger-management/update permission", foundPermission);
+		assertTrue(foundPermission, "Did not find trigger-management/update permission");
 	}
 
 	/**

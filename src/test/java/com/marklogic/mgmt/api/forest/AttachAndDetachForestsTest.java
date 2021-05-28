@@ -1,10 +1,13 @@
 package com.marklogic.mgmt.api.forest;
 
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import com.marklogic.mgmt.api.AbstractApiTest;
 import com.marklogic.mgmt.api.database.Database;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AttachAndDetachForestsTest extends AbstractApiTest {
 
@@ -15,7 +18,7 @@ public class AttachAndDetachForestsTest extends AbstractApiTest {
     private final static String FOREST1_NAME = "api-forest-1";
     private final static String FOREST2_NAME = "api-forest-2";
 
-    @After
+    @AfterEach
     public void teardown() {
         deleteIfExists(db, f1, f2);
     }

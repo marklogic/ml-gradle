@@ -1,10 +1,10 @@
 package com.marklogic.mgmt.api.forest;
 
 import com.marklogic.mgmt.mapper.DefaultResourceMapper;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
-public class UnmarshalForestTest extends Assert {
+public class UnmarshalForestTest  {
 
 	@Test
 	public void xmlSmokeTest() {

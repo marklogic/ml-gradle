@@ -2,7 +2,10 @@ package com.marklogic.appdeployer.command;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.mgmt.resource.ResourceManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Provides a basic create-then-delete test for testing any implementation of ResourceManager.

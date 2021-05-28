@@ -4,7 +4,10 @@ import com.marklogic.appdeployer.command.security.DeployProtectedCollectionsComm
 import com.marklogic.mgmt.api.security.Permission;
 import com.marklogic.mgmt.api.security.ProtectedCollection;
 import com.marklogic.mgmt.template.security.ProtectedCollectionTemplateBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class WriteProtectedCollectionTest extends AbstractResourceWriterTest {
 

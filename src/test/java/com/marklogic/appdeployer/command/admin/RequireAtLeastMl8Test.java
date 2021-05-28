@@ -1,7 +1,7 @@
 package com.marklogic.appdeployer.command.admin;
 
-import org.junit.Test;
-import org.junit.After;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterEach;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 
@@ -13,7 +13,7 @@ public class RequireAtLeastMl8Test extends AbstractAppDeployerTest {
         appDeployer.deploy(appConfig);
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         undeploySampleApp();
     }

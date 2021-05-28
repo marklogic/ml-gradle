@@ -8,20 +8,23 @@ import com.marklogic.mgmt.api.security.Permission;
 import com.marklogic.mgmt.api.security.Role;
 import com.marklogic.mgmt.api.security.RoleObjectNodesSorter;
 import com.marklogic.mgmt.resource.security.RoleManager;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class SubmitConfigurationWithRoleDependenciesTest extends AbstractMgmtTest {
 
 	private API api;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		api = new API(manageClient);
 	}
 
-	@After
+	@AfterEach
 	public void teardown() {
 		RoleManager mgr = new RoleManager(manageClient);
 		mgr.deleteByIdField("sample-app-test-role1");
@@ -89,7 +92,7 @@ public class SubmitConfigurationWithRoleDependenciesTest extends AbstractMgmtTes
 		new Configurations(secondConfig).submit(manageClient);
 
 		r1 = api.role("sample-app-test-role1");
-		assertNotNull("The role should have a permission referencing itself", r1.getPermission());
+		assertNotNull(r1.getPermission(), "The role should have a permission referencing itself");
 		assertEquals("sample-app-test-role1", r1.getPermission().get(0).getRoleName());
 	}
 

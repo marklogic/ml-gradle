@@ -4,14 +4,16 @@ import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.triggers.DeployTriggersCommand;
 import com.marklogic.mgmt.resource.triggers.TriggerManager;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class DeployTriggersToMultipleDatabasesTest extends AbstractAppDeployerTest {
 
-	@After
+	@AfterEach
 	public void teardown() {
 		undeploySampleApp();
 	}

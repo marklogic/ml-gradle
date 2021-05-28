@@ -6,10 +6,12 @@ import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.document.GenericDocumentManager;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ManagePartitionQueriesTest extends AbstractAppDeployerTest {
 

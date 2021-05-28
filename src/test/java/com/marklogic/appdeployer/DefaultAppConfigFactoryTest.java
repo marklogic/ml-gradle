@@ -5,8 +5,8 @@ import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.ext.SecurityContextType;
 import com.marklogic.client.ext.modulesloader.impl.PropertiesModuleManager;
 import com.marklogic.mgmt.util.SimplePropertySource;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-public class DefaultAppConfigFactoryTest extends Assert {
+public class DefaultAppConfigFactoryTest  {
 
 	private DefaultAppConfigFactory sut;
 
@@ -84,8 +84,8 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		} catch (IllegalArgumentException ex) {
 			String message = ex.getMessage();
 			assertTrue(
-				"Expected the exception to identify the property name and value; message: " + message,
-				message.startsWith("Unable to parse value '3' for property 'mlForestsPerHost'")
+				message.startsWith("Unable to parse value '3' for property 'mlForestsPerHost'"),
+				"Expected the exception to identify the property name and value; message: " + message
 			);
 		}
 	}
@@ -127,8 +127,8 @@ public class DefaultAppConfigFactoryTest extends Assert {
 	public void unrecognizedProperties() {
 		sut = new DefaultAppConfigFactory(new SimplePropertySource("foo.mlHost", "host", "foo.mlUsername", "user"));
 		AppConfig config = sut.newAppConfig();
-		assertEquals("Should use default", "localhost", config.getHost());
-		assertEquals("Should use default", AppConfig.DEFAULT_USERNAME, config.getRestAdminUsername());
+		assertEquals("localhost", config.getHost(), "Should use default");
+		assertEquals(AppConfig.DEFAULT_USERNAME, config.getRestAdminUsername(), "Should use default");
 	}
 
 	@Test
@@ -168,8 +168,8 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		sut = new DefaultAppConfigFactory(new SimplePropertySource("mlAppName", "test"));
 		AppConfig config = sut.newAppConfig();
 		assertEquals("test-triggers", config.getTriggersDatabaseName());
-		assertEquals("CPF database should default to the triggers database when not specified",
-			"test-triggers", config.getCpfDatabaseName());
+		assertEquals("test-triggers", config.getCpfDatabaseName(),
+			"CPF database should default to the triggers database when not specified");
 
 		sut = new DefaultAppConfigFactory(new SimplePropertySource("mlAppName", "test", "mlCpfDatabaseName", "my-cpf-db"));
 		config = sut.newAppConfig();
@@ -413,7 +413,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		assertEquals("appServicesCertPassword", config.getAppServicesCertPassword());
 		assertEquals("appServicesExternalName", config.getAppServicesExternalName());
 		assertNotNull(config.getAppServicesSslContext());
-		assertNotNull("As of 3.15.0, a trust manager must be set in order for SSL to work on >= Java 9", config.getAppServicesTrustManager());
+		assertNotNull(config.getAppServicesTrustManager(), "As of 3.15.0, a trust manager must be set in order for SSL to work on >= Java 9");
 		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.ANY, config.getAppServicesSslHostnameVerifier());
 
 		assertEquals("my-rest-server", config.getRestServerName());
@@ -437,7 +437,7 @@ public class DefaultAppConfigFactoryTest extends Assert {
 
 		assertNotNull(config.getRestSslContext());
 		assertNotNull(config.getRestSslHostnameVerifier());
-		assertNotNull("As of 3.15.0, a trust manager is set so that simple SSL works on >= Java 9", config.getRestTrustManager());
+		assertNotNull(config.getRestTrustManager(), "As of 3.15.0, a trust manager is set so that simple SSL works on >= Java 9");
 		assertEquals("my-content-db", config.getContentDatabaseName());
 		assertEquals("my-test-db", config.getTestContentDatabaseName());
 		assertEquals("my-modules", config.getModulesDatabaseName());
@@ -561,13 +561,13 @@ public class DefaultAppConfigFactoryTest extends Assert {
 			new SimplePropertySource("mlUsername", "customuser", "mlPassword", "custompassword"));
 		AppConfig config = sut.newAppConfig();
 
-		assertEquals("When mlRestAdminUsername is not set, mlUsername should be used", "customuser",
-			config.getRestAdminUsername());
-		assertEquals("When mlRestAdminPassword is not set, mlPassword should be used", "custompassword",
-			config.getRestAdminPassword());
+		assertEquals("customuser", config.getRestAdminUsername(),
+			"When mlRestAdminUsername is not set, mlUsername should be used");
+		assertEquals("custompassword", config.getRestAdminPassword(),
+			"When mlRestAdminPassword is not set, mlPassword should be used");
 
-		assertNull("SSL context should be null by default", config.getRestSslContext());
-		assertNull("SSL hostname verifier should be null by default", config.getRestSslHostnameVerifier());
+		assertNull(config.getRestSslContext(), "SSL context should be null by default");
+		assertNull(config.getRestSslHostnameVerifier(), "SSL hostname verifier should be null by default");
 	}
 
 	@Test
@@ -581,8 +581,8 @@ public class DefaultAppConfigFactoryTest extends Assert {
 		assertTrue(set.contains("db2"));
 
 		final String message = "If the user has configured the set of databases, then the default schema and trigger databases names should not be added automatically";
-		assertFalse(message, set.contains("example-triggers"));
-		assertFalse(message, set.contains("example-schemas"));
+		assertFalse(set.contains("example-triggers"), message);
+		assertFalse(set.contains("example-schemas"), message);
 	}
 
 	@Test

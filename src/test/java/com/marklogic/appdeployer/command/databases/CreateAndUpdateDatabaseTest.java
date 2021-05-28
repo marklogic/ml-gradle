@@ -1,7 +1,7 @@
 package com.marklogic.appdeployer.command.databases;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 

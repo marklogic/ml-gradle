@@ -1,13 +1,13 @@
 package com.marklogic.appdeployer.command;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
-public class SortOrderConstantsTest extends Assert {
+public class SortOrderConstantsTest  {
 
 	@Test
 	public void undeployMimetypesBeforeUsers() {
-		assertTrue("Mimetypes need to be undeployed before users since the user doing the deleting may be deleted when users are undeployed",
-			SortOrderConstants.DELETE_MIMETYPES < SortOrderConstants.DELETE_USERS);
+		assertTrue(SortOrderConstants.DELETE_MIMETYPES < SortOrderConstants.DELETE_USERS,
+			"Mimetypes need to be undeployed before users since the user doing the deleting may be deleted when users are undeployed");
 	}
 }

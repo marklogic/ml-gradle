@@ -3,17 +3,19 @@ package com.marklogic.appdeployer.command.databases;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.forests.ForestManager;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Doesn't actually use a command, but it's nice to extend the parent test class.
  */
 public class SetUpdatesAllowedOnDatabaseForestsTest extends AbstractAppDeployerTest {
 
-    @After
+    @AfterEach
     public void teardown() {
         undeploySampleApp();
     }

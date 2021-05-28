@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.rest.util.PreviewInterceptor;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PreviewUserDeploymentTest extends AbstractAppDeployerTest {
 
@@ -31,7 +33,7 @@ public class PreviewUserDeploymentTest extends AbstractAppDeployerTest {
 			String message = result.get("message").asText();
 			assertTrue(message.startsWith("Will create new resource at: "));
 			assertTrue(message.endsWith("/manage/v2/users"));
-			assertTrue("The resource to be created should be in the result object", result.has("resource"));
+			assertTrue(result.has("resource"), "The resource to be created should be in the result object");
 
 			// Now create the user
 			manageClient.getRestTemplate().getInterceptors().clear();

@@ -2,11 +2,13 @@ package com.marklogic.appdeployer.command.security;
 
 import com.marklogic.appdeployer.command.AbstractIncrementalDeployTest;
 import com.marklogic.mgmt.resource.security.RoleManager;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class IncrementallyDeployRolesTest extends AbstractIncrementalDeployTest {
 
@@ -15,7 +17,7 @@ public class IncrementallyDeployRolesTest extends AbstractIncrementalDeployTest 
 
 	private RoleManager roleManager;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/roles-with-permissions"));
 		roleManager = new RoleManager(manageClient);
@@ -25,7 +27,7 @@ public class IncrementallyDeployRolesTest extends AbstractIncrementalDeployTest 
 		appConfig.setMergeResources(false);
 	}
 
-	@After
+	@AfterEach
 	public void teardown() {
 		this.manageClient = originalManageClient;
 		initializeAppDeployer(new DeployRolesCommand());

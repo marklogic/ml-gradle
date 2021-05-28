@@ -5,9 +5,12 @@ import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.appservers.DeployOtherServersCommand;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Main purpose of these tests is to ensure that we wait properly after deleting a server.
@@ -37,9 +40,7 @@ public class ManageOtherServerTest extends AbstractAppDeployerTest {
 
         assertTrue(mgr.exists("sample-app-xdbc"));
         assertTrue(mgr.exists("sample-app-odbc"));
-        assertFalse(
-                "The command should ignore the rest-api-server.json file, as that's processed by DeployRestApiServersCommand",
-                mgr.exists("sample-app"));
+        assertFalse(mgr.exists("sample-app"), "The command should ignore the rest-api-server.json file, as that's processed by DeployRestApiServersCommand");
 
         appDeployer.undeploy(appConfig);
 
@@ -62,8 +63,8 @@ public class ManageOtherServerTest extends AbstractAppDeployerTest {
 
         final String message = "Both the ODBC and REST API server files should have been ignored";
         assertTrue(mgr.exists("sample-app-xdbc"));
-        assertFalse(message, mgr.exists("sample-app-odbc"));
-        assertFalse(message, mgr.exists("sample-app"));
+        assertFalse(mgr.exists("sample-app-odbc"), message);
+        assertFalse(mgr.exists("sample-app"), message);
 
         appDeployer.undeploy(appConfig);
 

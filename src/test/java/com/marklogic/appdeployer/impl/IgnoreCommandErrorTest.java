@@ -3,10 +3,12 @@ package com.marklogic.appdeployer.impl;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.regex.Pattern;
+
+import static org.springframework.test.util.AssertionErrors.fail;
 
 public class IgnoreCommandErrorTest extends AbstractAppDeployerTest {
 

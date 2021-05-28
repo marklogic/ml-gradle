@@ -5,15 +5,15 @@ import com.marklogic.appdeployer.DefaultAppConfigFactory;
 import com.marklogic.mgmt.api.forest.Forest;
 import com.marklogic.mgmt.api.forest.ForestReplica;
 import com.marklogic.mgmt.util.SimplePropertySource;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BuildForestTest extends Assert {
+public class BuildForestTest  {
 
 	private ForestBuilder builder = new ForestBuilder();
 
@@ -64,7 +64,8 @@ public class BuildForestTest extends Assert {
 		List<Forest> forests = builder.buildForests(
 			new ForestPlan("testdb", "host1", "host2", "host3").withReplicaCount(2).withForestsPerDataDirectory(2), config
 		);
-		assertEquals("Should have 18 forests - 3 data directories, and 2 forests per data directory, and 3 hosts", 18, forests.size());
+		assertEquals(18, forests.size(),
+			"Should have 18 forests - 3 data directories, and 2 forests per data directory, and 3 hosts");
 
 		Forest first = forests.get(0);
 		assertEquals("testdb-1", first.getForestName());

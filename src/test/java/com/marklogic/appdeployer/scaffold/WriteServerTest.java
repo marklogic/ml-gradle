@@ -3,7 +3,10 @@ package com.marklogic.appdeployer.scaffold;
 import com.marklogic.appdeployer.command.appservers.DeployOtherServersCommand;
 import com.marklogic.mgmt.api.server.Server;
 import com.marklogic.mgmt.template.server.ServerTemplateBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class WriteServerTest extends AbstractResourceWriterTest {
 

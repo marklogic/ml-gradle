@@ -2,8 +2,10 @@ package com.marklogic.mgmt;
 
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.security.Role;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.util.ClassUtils;
+
+import static org.springframework.test.util.AssertionErrors.fail;
 
 /**
  * This test is used for manual inspection of the errors that are logged. Any resource works here, roles are just easy

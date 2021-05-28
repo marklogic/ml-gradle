@@ -5,12 +5,14 @@ import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.mgmt.resource.cpf.PipelineManager;
 import com.marklogic.rest.util.ResourcesFragment;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class LoadDefaultCpfPipelinesTest extends AbstractAppDeployerTest {
 
-    @After
+    @AfterEach
     public void teardown() {
         undeploySampleApp();
     }
@@ -27,6 +29,6 @@ public class LoadDefaultCpfPipelinesTest extends AbstractAppDeployerTest {
         mgr.loadDefaultPipelines();
 
         ResourcesFragment f = mgr.getAsXml();
-        assertEquals("As of ML 8.0-3, 23 default pipelines should have been loaded", 23, f.getResourceCount());
+        assertEquals(23, f.getResourceCount(), "As of ML 8.0-3, 23 default pipelines should have been loaded");
     }
 }

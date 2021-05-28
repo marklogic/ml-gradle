@@ -1,10 +1,10 @@
 package com.marklogic.mgmt;
 
 import com.marklogic.mgmt.util.SimplePropertySource;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
-public class DefaultManageConfigFactoryTest extends Assert {
+public class DefaultManageConfigFactoryTest  {
 
 	@Test
 	public void mlUsername() {

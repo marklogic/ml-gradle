@@ -1,7 +1,10 @@
 package com.marklogic.appdeployer.impl;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AddHostNameTokensTest extends AbstractAppDeployerTest {
 

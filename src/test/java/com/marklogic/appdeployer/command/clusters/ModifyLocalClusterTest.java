@@ -2,9 +2,11 @@ package com.marklogic.appdeployer.command.clusters;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.mgmt.resource.clusters.ClusterManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ModifyLocalClusterTest extends AbstractAppDeployerTest {
 

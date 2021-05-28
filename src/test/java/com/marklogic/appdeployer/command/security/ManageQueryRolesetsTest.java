@@ -8,6 +8,8 @@ import com.marklogic.mgmt.mapper.DefaultResourceMapper;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.security.QueryRolesetManager;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class ManageQueryRolesetsTest extends AbstractManageResourceTest {
 
 	@Override

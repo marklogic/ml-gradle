@@ -12,14 +12,16 @@ import com.marklogic.mgmt.resource.cpf.PipelineManager;
 import com.marklogic.mgmt.resource.flexrep.ConfigManager;
 import com.marklogic.mgmt.resource.flexrep.PullManager;
 import com.marklogic.mgmt.resource.flexrep.TargetManager;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 public class DeployFlexrepTest extends AbstractAppDeployerTest {
 
-    @After
+    @AfterEach
     public void tearDown() {
         undeploySampleApp();
     }
@@ -41,8 +43,8 @@ public class DeployFlexrepTest extends AbstractAppDeployerTest {
 
         ConfigManager mgr = new ConfigManager(manageClient, appConfig.getContentDatabaseName());
         mgr.deleteAllConfigs();
-        assertTrue("All of the configs should have been deleted, including their targets", mgr.getAsXml()
-                .getListItemIdRefs().isEmpty());
+        assertTrue(mgr.getAsXml().getListItemIdRefs().isEmpty(),
+			"All of the configs should have been deleted, including their targets");
     }
 
     @Test
@@ -125,8 +127,8 @@ public class DeployFlexrepTest extends AbstractAppDeployerTest {
 
 			ConfigManager mgr = new ConfigManager(manageClient, appConfig.getContentDatabaseName());
 			mgr.deleteAllConfigs();
-			assertTrue("All of the configs should have been deleted, including their targets", mgr.getAsXml()
-				.getListItemIdRefs().isEmpty());
+			assertTrue(mgr.getAsXml().getListItemIdRefs().isEmpty(),
+				"All of the configs should have been deleted, including their targets");
 
 		} finally {
 			undeploySampleApp();

@@ -3,9 +3,12 @@ package com.marklogic.appdeployer.scaffold;
 import com.marklogic.appdeployer.command.security.DeployAmpsCommand;
 import com.marklogic.mgmt.api.security.Amp;
 import com.marklogic.mgmt.template.security.AmpTemplateBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class WriteAmpTest extends AbstractResourceWriterTest {
 

@@ -1,9 +1,9 @@
 package com.marklogic.mgmt.api.mimetypes;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
-public class MimetypeTest extends Assert {
+public class MimetypeTest  {
 
 	@Test
 	public void testEquals() {

@@ -5,10 +5,13 @@ import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.client.ext.modulesloader.impl.DefaultModulesLoader;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.Arrays;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class LoadInvalidRestModulesTest extends AbstractAppDeployerTest {
 

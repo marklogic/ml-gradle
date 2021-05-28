@@ -3,10 +3,12 @@ package com.marklogic.appdeployer.command.databases;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DontUndeployDefaultDatabasesTest extends AbstractAppDeployerTest {
 

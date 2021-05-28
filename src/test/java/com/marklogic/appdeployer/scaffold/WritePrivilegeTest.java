@@ -4,9 +4,11 @@ import com.marklogic.appdeployer.command.security.DeployPrivilegeRolesCommand;
 import com.marklogic.appdeployer.command.security.DeployPrivilegesCommand;
 import com.marklogic.mgmt.api.security.Privilege;
 import com.marklogic.mgmt.template.security.PrivilegeTemplateBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class WritePrivilegeTest extends AbstractResourceWriterTest {
 

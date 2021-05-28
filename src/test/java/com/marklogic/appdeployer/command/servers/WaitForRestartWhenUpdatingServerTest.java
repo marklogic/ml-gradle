@@ -3,14 +3,14 @@ package com.marklogic.appdeployer.command.servers;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.appservers.DeployOtherServersCommand;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
 public class WaitForRestartWhenUpdatingServerTest extends AbstractAppDeployerTest {
 
-	@After
+	@AfterEach
 	public void tearDown() {
 		undeploySampleApp();
 	}

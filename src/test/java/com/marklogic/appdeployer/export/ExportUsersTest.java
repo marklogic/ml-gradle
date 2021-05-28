@@ -2,8 +2,10 @@ package com.marklogic.appdeployer.export;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.marklogic.rest.util.Fragment;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.util.FileCopyUtils;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ExportUsersTest extends AbstractExportTest {
 

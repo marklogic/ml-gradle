@@ -2,9 +2,11 @@ package com.marklogic.appdeployer.command.security;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.mgmt.resource.security.RoleManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.regex.Pattern;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class IgnoreRoleTest extends AbstractAppDeployerTest {
 
@@ -17,7 +19,7 @@ public class IgnoreRoleTest extends AbstractAppDeployerTest {
 		try {
 			RoleManager mgr = new RoleManager(manageClient);
 			assertTrue(mgr.exists("sample-app-role1"));
-			assertFalse("Role should not have been created because its resource file was ignored", mgr.exists("sample-app-role2"));
+			assertFalse(mgr.exists("sample-app-role2"), "Role should not have been created because its resource file was ignored");
 		} finally {
 			undeploySampleApp();
 		}
@@ -32,7 +34,7 @@ public class IgnoreRoleTest extends AbstractAppDeployerTest {
 		try {
 			RoleManager mgr = new RoleManager(manageClient);
 			assertTrue(mgr.exists("sample-app-role2"));
-			assertFalse("Role should not have been created because its filename was excluded via regex", mgr.exists("sample-app-role1"));
+			assertFalse(mgr.exists("sample-app-role1"), "Role should not have been created because its filename was excluded via regex");
 		} finally {
 			undeploySampleApp();
 		}
@@ -47,7 +49,7 @@ public class IgnoreRoleTest extends AbstractAppDeployerTest {
 		try {
 			RoleManager mgr = new RoleManager(manageClient);
 			assertTrue(mgr.exists("sample-app-role1"));
-			assertFalse("Role should not have been created because its filename was not included via regex", mgr.exists("sample-app-role2"));
+			assertFalse(mgr.exists("sample-app-role2"), "Role should not have been created because its filename was not included via regex");
 		} finally {
 			undeploySampleApp();
 		}

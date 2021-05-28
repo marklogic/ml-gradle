@@ -5,9 +5,11 @@ import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.ManageConfig;
 import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 import org.apache.http.conn.ssl.SSLContextBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.net.ssl.SSLContext;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Many of these tests are just smoke tests that can be used to inspect logging as well. Ideally, they can soon depend

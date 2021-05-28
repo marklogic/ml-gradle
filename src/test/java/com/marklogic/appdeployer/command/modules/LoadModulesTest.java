@@ -5,27 +5,31 @@ import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.client.ext.modulesloader.impl.DefaultFileFilter;
 import com.marklogic.client.ext.modulesloader.impl.DefaultModulesLoader;
 import com.marklogic.client.ext.modulesloader.impl.PropertiesModuleManager;
+import com.marklogic.junit.BaseTestHelper;
 import com.marklogic.junit.Fragment;
 import com.marklogic.junit.PermissionsFragment;
+import com.marklogic.junit.XmlHelper;
 import com.marklogic.xcc.template.XccTemplate;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.regex.Pattern;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class LoadModulesTest extends AbstractAppDeployerTest {
 
 	private XccTemplate modulesXccTemplate;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		modulesXccTemplate = new XccTemplate(appConfig.getHost(), appConfig.getAppServicesPort(), appConfig.getRestAdminUsername(),
 			appConfig.getRestAdminPassword(), appConfig.getModulesDatabaseName());
 	}
 
-	@After
+	@AfterEach
 	public void teardown() {
 		undeploySampleApp();
 	}
@@ -48,8 +52,8 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 			fail("An error should have been thrown because /ext/bad.xqy failed static check");
 		} catch (Exception ex) {
 			String message = ex.getMessage();
-			assertTrue("Loading modules with 2.11.0 of ml-javaclient-util defaults to bulk loading, so static checking should as well; message: " + message,
-				message.contains("Unexpected token syntax error"));
+			assertTrue(message.contains("Unexpected token syntax error"),
+				"Loading modules with 2.11.0 of ml-javaclient-util defaults to bulk loading, so static checking should as well; message: " + message);
 			assertTrue(message.contains("in /ext/bad.xqy, on line 2"));
 		} finally {
 			initializeAppDeployer(new DeployRestApiServersCommand(true));
@@ -69,12 +73,13 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 		LoadModulesCommand command = new LoadModulesCommand();
 		initializeAppDeployer(new DeployRestApiServersCommand(true), command);
 		appDeployer.deploy(appConfig);
-		assertTrue("The custom file should have been created when the modules were loaded", customFile.exists());
+		assertTrue(customFile.exists(), "The custom file should have been created when the modules were loaded");
 
 		DefaultModulesLoader loader = (DefaultModulesLoader) command.getModulesLoader();
 		PropertiesModuleManager manager = (PropertiesModuleManager) loader.getModulesManager();
-		assertEquals("The host should have been set on the PropertiesModuleManager via DefaultModulesLoaderFactory " +
-			"so that module timestamps account for the host", appConfig.getHost(), manager.getHost());
+		assertEquals(appConfig.getHost(), manager.getHost(),
+			"The host should have been set on the PropertiesModuleManager via DefaultModulesLoaderFactory " +
+				"so that module timestamps account for the host");
 	}
 
 	@Test
@@ -100,7 +105,7 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 
 		appDeployer.deploy(appConfig);
 
-		PermissionsFragment perms = getDocumentPermissions("/ext/sample-lib.xqy", modulesXccTemplate);
+		PermissionsFragment perms = new BaseTestHelper().getDocumentPermissions("/ext/sample-lib.xqy", modulesXccTemplate);
 		// Default permissions set by AppConfig
 		perms.assertPermissionExists("rest-admin", "read");
 		perms.assertPermissionExists("rest-admin", "update");
@@ -131,7 +136,7 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 		assertEquals("false", modulesXccTemplate.executeAdhocQuery("doc-available('/ext/lib/test2.xqy')"));
 
 		String xml = modulesXccTemplate.executeAdhocQuery("doc('/ext/lib/test.xqy')");
-		Fragment f = parse(xml);
+		Fragment f = new XmlHelper().parse(xml);
 		f.assertElementValue("/test/color", "red");
 		f.assertElementValue("/test/description", "red description");
 	}
@@ -172,13 +177,13 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 		appDeployer.deploy(appConfig);
 
 		String xquery = "fn:count(cts:uris((), (), cts:true-query()))";
-		assertEquals("Should have the 3 /ext modules plus the REST API properties file, which was loaded when the REST server was created",
-			4, Integer.parseInt(modulesXccTemplate.executeAdhocQuery(xquery)));
+		assertEquals(4, Integer.parseInt(modulesXccTemplate.executeAdhocQuery(xquery)),
+			"Should have the 3 /ext modules plus the REST API properties file, which was loaded when the REST server was created");
 	}
 
 	private void assertModuleExistsWithDefaultPermissions(String message, String uri) {
-		assertEquals(message, "true", modulesXccTemplate.executeAdhocQuery(format("fn:doc-available('%s')", uri)));
-		PermissionsFragment perms = getDocumentPermissions(uri, modulesXccTemplate);
+		assertEquals("true", modulesXccTemplate.executeAdhocQuery(format("fn:doc-available('%s')", uri)), message);
+		PermissionsFragment perms = new BaseTestHelper().getDocumentPermissions(uri, modulesXccTemplate);
 		perms.assertPermissionExists("rest-admin", "read");
 		perms.assertPermissionExists("rest-admin", "update");
 		perms.assertPermissionExists("rest-extension-user", "execute");

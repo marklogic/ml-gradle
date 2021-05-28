@@ -1,6 +1,6 @@
 package com.marklogic.mgmt.api;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ConnectTest extends AbstractApiTest {
 

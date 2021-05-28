@@ -2,13 +2,13 @@ package com.marklogic.mgmt.api.trigger;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.mgmt.util.ObjectMapperFactory;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 import javax.xml.bind.JAXBContext;
 import java.io.StringWriter;
 
-public class TriggerTest extends Assert {
+public class TriggerTest  {
 
 	@Test
 	public void marshal() throws Exception {
@@ -19,8 +19,8 @@ public class TriggerTest extends Assert {
 		String json = t.getJson();
 		ObjectNode node = (ObjectNode) ObjectMapperFactory.getObjectMapper().readTree(json);
 		assertEquals("test", node.get("name").asText());
-		assertFalse("The databaseIdOrName property only exists to support constructing a TriggerManager",
-			node.has("database-name") || node.has("databaseName"));
+		assertFalse(node.has("database-name") || node.has("databaseName"),
+			"The databaseIdOrName property only exists to support constructing a TriggerManager");
 
 		JAXBContext context = JAXBContext.newInstance(Trigger.class);
 		StringWriter writer = new StringWriter();

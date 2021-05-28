@@ -4,12 +4,14 @@ import com.marklogic.appdeployer.command.tasks.DeployScheduledTasksCommand;
 import com.marklogic.mgmt.selector.PrefixResourceSelector;
 import com.marklogic.mgmt.selector.ResourceSelection;
 import com.marklogic.mgmt.resource.tasks.TaskManager;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ExportTasksTest extends AbstractExportTest {
 
-	@After
+	@AfterEach
 	public void teardown() {
 		undeploySampleApp();
 	}

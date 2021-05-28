@@ -1,13 +1,13 @@
 package com.marklogic.appdeployer.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-public class MapPropertiesSourceTest extends Assert {
+public class MapPropertiesSourceTest  {
 
 	@Test
 	public void propertiesWithNull() {

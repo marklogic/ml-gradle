@@ -1,7 +1,7 @@
 package com.marklogic.appdeployer.command.servers;
 
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.appservers.UpdateRestApiServersCommand;
@@ -9,9 +9,11 @@ import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
 import com.marklogic.rest.util.Fragment;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class UpdateRestApiServersTest extends AbstractAppDeployerTest {
 
-    @After
+    @AfterEach
     public void teardown() {
         undeploySampleApp();
     }
@@ -43,8 +45,8 @@ public class UpdateRestApiServersTest extends AbstractAppDeployerTest {
 
     private void assertAuthentication(String message, String serverName, String auth) {
         Fragment xml = new ServerManager(manageClient, appConfig.getGroupName()).getPropertiesAsXml(serverName);
-        assertTrue(message,
-                xml.elementExists(String.format("/m:http-server-properties/m:authentication[. = '%s']", auth)));
+        assertTrue(xml.elementExists(String.format("/m:http-server-properties/m:authentication[. = '%s']", auth)),
+			message);
     }
 
 }

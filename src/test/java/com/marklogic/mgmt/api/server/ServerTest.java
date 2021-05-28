@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.mapper.DefaultResourceMapper;
 import com.marklogic.mgmt.util.ObjectMapperFactory;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
-public class ServerTest extends Assert {
+public class ServerTest  {
 
 	/**
 	 * Verifies that the correct JSON keys are used for these properties.

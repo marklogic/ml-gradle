@@ -2,7 +2,9 @@ package com.marklogic.mgmt;
 
 import com.marklogic.junit.BaseTestHelper;
 import com.marklogic.junit.Fragment;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PayloadParserTest extends BaseTestHelper {
 

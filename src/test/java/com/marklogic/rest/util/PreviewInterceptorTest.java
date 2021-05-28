@@ -3,20 +3,21 @@ package com.marklogic.rest.util;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.marklogic.mgmt.util.ObjectMapperFactory;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-public class PreviewInterceptorTest extends Assert {
+public class PreviewInterceptorTest  {
 
 	private PreviewInterceptor interceptor = new PreviewInterceptor(null);
 
 	@Test
 	public void hasError() {
 		assertTrue(interceptor.hasError(HttpStatus.BAD_REQUEST));
-		assertFalse("A 404 isn't regarded as an error because while doing a previw, " +
-			"it may occur because a new resource, like a database, needs to be created and a GET is " +
-			"being made on a resource specific to that database, like a CPF pipeline", interceptor.hasError(HttpStatus.NOT_FOUND));
+		assertFalse(interceptor.hasError(HttpStatus.NOT_FOUND),
+			"A 404 isn't regarded as an error because while doing a preview, " +
+				"it may occur because a new resource, like a database, needs to be created and a GET is " +
+				"being made on a resource specific to that database, like a CPF pipeline");
 	}
 
 	@Test

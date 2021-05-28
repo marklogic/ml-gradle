@@ -4,16 +4,19 @@ import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.task.Task;
 import com.marklogic.mgmt.resource.tasks.TaskManager;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class DeployDisabledTaskTest extends AbstractAppDeployerTest {
 
 	private final static String TASK_PATH = "/this/should/be/disabled.xqy";
 
-	@After
+	@AfterEach
 	public void teardown() {
 		undeploySampleApp();
 		assertFalse(new TaskManager(manageClient).exists(TASK_PATH));
@@ -30,9 +33,9 @@ public class DeployDisabledTaskTest extends AbstractAppDeployerTest {
 		deploySampleApp();
 
 		Task task = new API(manageClient).task(mgr.getTaskIdForTaskPath(TASK_PATH));
-		assertFalse("Due to a bug in the Manage API, when a task is first created, task-enabled is ignored " +
+		assertFalse(task.getTaskEnabled(), "Due to a bug in the Manage API, when a task is first created, task-enabled is ignored " +
 			"and the task is always enabled. To work around this, if the payload has task-enabled set to false, " +
-			"then a second call should be made to ensure it gets set to false", task.getTaskEnabled());
+			"then a second call should be made to ensure it gets set to false");
 
 		// For ticket #367, make sure that the scheduled task can be updated without throwing an error.
 		// This should result in a delete call followed by the task being created again
@@ -41,6 +44,6 @@ public class DeployDisabledTaskTest extends AbstractAppDeployerTest {
 
 		task = new API(manageClient).task(mgr.getTaskIdForTaskPath(TASK_PATH));
 		assertEquals("Modules", task.getTaskModules());
-		assertFalse("The task should still be disabled", task.getTaskEnabled());
+		assertFalse(task.getTaskEnabled(), "The task should still be disabled");
 	}
 }

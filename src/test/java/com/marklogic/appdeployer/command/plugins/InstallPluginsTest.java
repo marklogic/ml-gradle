@@ -10,14 +10,16 @@ import com.marklogic.client.document.JSONDocumentManager;
 import com.marklogic.client.io.DocumentMetadataHandle;
 import com.marklogic.client.io.JacksonHandle;
 import com.marklogic.mgmt.util.ObjectMapperFactory;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 public class InstallPluginsTest extends AbstractAppDeployerTest {
 
-	@After
+	@AfterEach
 	public void teardown() {
 		initializeAppDeployer(new DeployOtherDatabasesCommand(1), new InstallPluginsCommand(), new DeployRestApiServersCommand());
 		undeploySampleApp();
@@ -36,8 +38,8 @@ public class InstallPluginsTest extends AbstractAppDeployerTest {
 		deploySampleApp();
 
 		DatabaseClient contentClient = appConfig.newAppServicesDatabaseClient(appConfig.getContentDatabaseName());
-		assertNotNull("The plugin zip should have been written to the content database so that it can be installed",
-			contentClient.newDocumentManager().exists("/com.marklogic/plugins/varianceplugin.zip"));
+		assertNotNull(contentClient.newDocumentManager().exists("/com.marklogic/plugins/varianceplugin.zip"),
+			"The plugin zip should have been written to the content database so that it can be installed");
 
 		// Make sure everything is in Extensions as expected
 		DatabaseClient extensionsClient = appConfig.newAppServicesDatabaseClient("Extensions");

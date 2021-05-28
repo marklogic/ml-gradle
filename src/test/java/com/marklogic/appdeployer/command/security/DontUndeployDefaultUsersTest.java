@@ -2,10 +2,12 @@ package com.marklogic.appdeployer.command.security;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.mgmt.resource.security.UserManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DontUndeployDefaultUsersTest extends AbstractAppDeployerTest {
 
@@ -27,8 +29,8 @@ public class DontUndeployDefaultUsersTest extends AbstractAppDeployerTest {
 			undeploySampleApp();
 
 			assertFalse(mgr.exists("ml-app-deployer-test-user"));
-			assertTrue("The 'nobody' user should not have been deleted since it's in the list of " +
-				"users to not undeploy", mgr.exists("nobody"));
+			assertTrue(mgr.exists("nobody"), "The 'nobody' user should not have been deleted since it's in the list of " +
+				"users to not undeploy");
 		}
 	}
 

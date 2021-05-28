@@ -9,6 +9,8 @@ import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.security.CertificateTemplateManager;
 import com.marklogic.rest.util.Fragment;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 public class ManageCertificateTemplatesTest extends AbstractManageResourceTest {
 
     @Override
@@ -30,9 +32,8 @@ public class ManageCertificateTemplatesTest extends AbstractManageResourceTest {
     protected void afterResourcesCreated() {
         Map<String, String> customTokens = appConfig.getCustomTokens();
         String key = "%%certificate-templates-id-sample-app-template%%";
-        assertNotNull(
-                "The cert template ID should have been stored in the tokens map so that it can be referenced in an HTTP server file",
-                customTokens.get(key));
+        assertNotNull(customTokens.get(key),
+			"The cert template ID should have been stored in the tokens map so that it can be referenced in an HTTP server file");
 
         // Clear out the key so we can verify it's set again during the second deploy
         customTokens.remove(key);
@@ -46,7 +47,7 @@ public class ManageCertificateTemplatesTest extends AbstractManageResourceTest {
         CertificateTemplateManager mgr = new CertificateTemplateManager(manageClient);
 
         Fragment response = mgr.getCertificatesForTemplate("sample-app-template");
-        assertFalse("The template shouldn't have any certificates yet", response.elementExists("/node()/node()"));
+        assertFalse(response.elementExists("/node()/node()"), "The template shouldn't have any certificates yet");
 
         GenerateTemporaryCertificateCommand gtcc = new GenerateTemporaryCertificateCommand();
         gtcc.setTemplateIdOrName("sample-app-template");
@@ -54,15 +55,14 @@ public class ManageCertificateTemplatesTest extends AbstractManageResourceTest {
         gtcc.execute(new CommandContext(appConfig, manageClient, adminManager));
 
         response = mgr.getCertificatesForTemplate("sample-app-template");
-        assertTrue("The template should now have a certificate",
-                response.elementExists("/msec:certificate-list/msec:certificate"));
+        assertTrue(response.elementExists("/msec:certificate-list/msec:certificate"), "The template should now have a certificate");
     }
 
     @Override
     protected void afterResourcesCreatedAgain() {
         Map<String, String> customTokens = appConfig.getCustomTokens();
         String key = "%%certificate-templates-id-sample-app-template%%";
-        assertNotNull("Verifying that the cert template ID is stored on an update as well", customTokens.get(key));
+        assertNotNull(customTokens.get(key), "Verifying that the cert template ID is stored on an update as well");
     }
 
 }

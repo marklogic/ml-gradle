@@ -2,14 +2,14 @@ package com.marklogic.mgmt.api.security;
 
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.marklogic.mgmt.util.ObjectMapperFactory;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SortRolesTest extends Assert {
+public class SortRolesTest  {
 
 	private Role r1 = new Role("r1");
 	private Role r2 = new Role("r2");
@@ -77,8 +77,8 @@ public class SortRolesTest extends Assert {
 
 		assertEquals(r1.getRoleName(), roles.get(0).getRoleName());
 		assertEquals(r2.getRoleName(), roles.get(1).getRoleName());
-		assertEquals("r3 is here because it has no relation to r4, so their names should be compared",
-			r3.getRoleName(), roles.get(2).getRoleName());
+		assertEquals(r3.getRoleName(), roles.get(2).getRoleName(),
+			"r3 is here because it has no relation to r4, so their names should be compared");
 		assertEquals(r4.getRoleName(), roles.get(3).getRoleName());
 	}
 

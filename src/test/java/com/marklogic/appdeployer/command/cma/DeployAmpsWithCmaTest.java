@@ -7,10 +7,13 @@ import com.marklogic.appdeployer.command.security.DeployAmpsCommand;
 import com.marklogic.mgmt.api.configuration.Configuration;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.security.AmpManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DeployAmpsWithCmaTest extends AbstractAppDeployerTest {
 

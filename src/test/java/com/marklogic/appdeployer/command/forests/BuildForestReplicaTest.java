@@ -5,8 +5,8 @@ import com.marklogic.appdeployer.DefaultAppConfigFactory;
 import com.marklogic.mgmt.api.forest.Forest;
 import com.marklogic.mgmt.api.forest.ForestReplica;
 import com.marklogic.mgmt.util.SimplePropertySource;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-public class BuildForestReplicaTest extends Assert {
+public class BuildForestReplicaTest  {
 
 	private ForestBuilder builder = new ForestBuilder();
 
@@ -86,9 +86,9 @@ public class BuildForestReplicaTest extends Assert {
 			});
 		});
 
-		assertEquals("Expecting 120 replicas; we have 40 forests, and we expect 3 replicas for each", 120, replicaCount.get());
+		assertEquals(120, replicaCount.get(), "Expecting 120 replicas; we have 40 forests, and we expect 3 replicas for each");
 		Stream.of("host1", "host2", "host3", "host4").forEach(host -> {
-			assertEquals("Each host should have 30 replicas, as there are 120 total", 30, hostToReplicaCounts.get(host).get());
+			assertEquals(30, hostToReplicaCounts.get(host).get(), "Each host should have 30 replicas, as there are 120 total");
 		});
 	}
 

@@ -4,12 +4,12 @@ import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.DefaultAppConfigFactory;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.mgmt.util.SimplePropertySource;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-public class ConfigureForestReplicasOnSpecificGroupsTest extends Assert {
+public class ConfigureForestReplicasOnSpecificGroupsTest  {
 
 	@Test
 	public void test() {

@@ -5,20 +5,22 @@ import com.marklogic.appdeployer.command.AbstractIncrementalDeployTest;
 import com.marklogic.appdeployer.command.ResourceFileManagerImpl;
 import com.marklogic.mgmt.resource.security.RoleManager;
 import com.marklogic.mgmt.resource.security.UserManager;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class IncrementallyDeployUsersTest extends AbstractIncrementalDeployTest {
 
 	private UserManager userManager;
 	private RoleManager roleManager;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		userManager = new UserManager(manageClient);
 		roleManager = new RoleManager(manageClient);
@@ -30,7 +32,7 @@ public class IncrementallyDeployUsersTest extends AbstractIncrementalDeployTest 
 		appConfig.setCmaConfig(new CmaConfig());
 	}
 
-	@After
+	@AfterEach
 	public void teardown() {
 		this.manageClient = originalManageClient;
 		initializeAppDeployer(new DeployUsersCommand(), new DeployRolesCommand());
@@ -78,7 +80,7 @@ public class IncrementallyDeployUsersTest extends AbstractIncrementalDeployTest 
 		FileReader reader = new FileReader(ResourceFileManagerImpl.DEFAULT_FILE_PATH);
 		props.load(reader);
 		reader.close();
-		assertEquals("There should be 2 entries for users and 2 entries for roles", 4, props.size());
+		assertEquals(4, props.size(), "There should be 2 entries for users and 2 entries for roles");
 	}
 
 	private void assertUsersExist() {

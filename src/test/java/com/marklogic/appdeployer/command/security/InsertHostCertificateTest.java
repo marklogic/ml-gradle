@@ -4,10 +4,12 @@ import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.mgmt.resource.security.CertificateTemplateManager;
 import com.marklogic.rest.util.Fragment;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class InsertHostCertificateTest extends AbstractAppDeployerTest {

@@ -3,10 +3,10 @@ package com.marklogic.mgmt.api.database;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.mapper.DefaultResourceMapper;
 import com.marklogic.mgmt.util.ObjectMapperFactory;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
-public class UnmarshalDatabaseTest extends Assert {
+public class UnmarshalDatabaseTest  {
 
 	@Test
 	public void xmlSmokeTest() {

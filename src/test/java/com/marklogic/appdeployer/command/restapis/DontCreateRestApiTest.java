@@ -3,9 +3,11 @@ package com.marklogic.appdeployer.command.restapis;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.mgmt.resource.restapis.RestApiManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class DontCreateRestApiTest extends AbstractAppDeployerTest {
 
@@ -19,8 +21,7 @@ public class DontCreateRestApiTest extends AbstractAppDeployerTest {
 		try {
 			appDeployer.deploy(appConfig);
 			RestApiManager mgr = new RestApiManager(manageClient);
-			assertFalse("A REST API server should not have been created",
-				mgr.restApiServerExists(appConfig.getRestServerName()));
+			assertFalse(mgr.restApiServerExists(appConfig.getRestServerName()), "A REST API server should not have been created");
 		} finally {
 			undeploySampleApp();
 		}

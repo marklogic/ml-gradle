@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.mgmt.util.ObjectMapperFactory;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
-public class JsonNodeUtilTest extends Assert {
+public class JsonNodeUtilTest  {
 
 	private ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
 
@@ -42,7 +42,7 @@ public class JsonNodeUtilTest extends Assert {
 		node2.put("flag", false);
 
 		ObjectNode merged = JsonNodeUtil.mergeObjectNodes(node1, node2);
-		assertFalse("The value from the second object should win", merged.get("flag").asBoolean());
+		assertFalse(merged.get("flag").asBoolean(), "The value from the second object should win");
 
 		merged = JsonNodeUtil.mergeObjectNodes(node2, node1);
 		assertTrue(merged.get("flag").asBoolean());

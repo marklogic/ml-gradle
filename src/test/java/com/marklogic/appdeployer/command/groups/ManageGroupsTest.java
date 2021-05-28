@@ -6,6 +6,8 @@ import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.groups.GroupManager;
 import com.marklogic.rest.util.Fragment;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class ManageGroupsTest extends AbstractManageResourceTest {
 
     @Override
@@ -27,8 +29,8 @@ public class ManageGroupsTest extends AbstractManageResourceTest {
     protected void afterResourcesCreated() {
         GroupManager mgr = new GroupManager(manageClient);
         Fragment f = mgr.getPropertiesAsXml("sample-app-group");
-        assertEquals("metering should be turned off as configured in sample-app-group.json", "false",
-                f.getElementValue("/m:group-properties/m:metering-enabled"));
+        assertEquals("false", f.getElementValue("/m:group-properties/m:metering-enabled"),
+			"metering should be turned off as configured in sample-app-group.json");
     }
 
 }

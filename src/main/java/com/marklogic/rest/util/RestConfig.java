@@ -32,6 +32,19 @@ public class RestConfig {
 		this.password = password;
 	}
 
+	public RestConfig(RestConfig other) {
+		this(other.host, other.port, other.username, other.password);
+		if (other.scheme != null) {
+			this.scheme = other.scheme;
+		}
+		this.configureSimpleSsl = other.configureSimpleSsl;
+		this.useDefaultKeystore = other.useDefaultKeystore;
+		this.sslProtocol = other.sslProtocol;
+		this.trustManagementAlgorithm = other.trustManagementAlgorithm;
+		this.sslContext = other.sslContext;
+		this.hostnameVerifier = other.hostnameVerifier;
+	}
+
 	@Override
 	public String toString() {
 		return String.format("[scheme: %s, host: %s, port: %d, username: %s]", scheme, host, port, username);

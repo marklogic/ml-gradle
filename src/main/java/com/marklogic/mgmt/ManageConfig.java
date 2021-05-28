@@ -25,7 +25,6 @@ public class ManageConfig extends RestConfig {
 	private String securityUsername;
 	private String securityPassword;
 	private SSLContext securitySslContext;
-
 	private boolean cleanJsonPayloads = false;
 
 	public ManageConfig() {
@@ -42,6 +41,13 @@ public class ManageConfig extends RestConfig {
 		setSecurityPassword(password);
 	}
 
+	public ManageConfig(ManageConfig other) {
+		super(other);
+		this.securityUsername = other.securityUsername;
+		this.securityPassword = other.securityPassword;
+		this.securitySslContext = other.securitySslContext;
+		this.cleanJsonPayloads = other.cleanJsonPayloads;
+	}
 	@Override
 	public String toString() {
 		return String.format("[ManageConfig host: %s, port: %d, username: %s, security username: %s]", getHost(),

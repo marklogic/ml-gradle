@@ -20,4 +20,7 @@ public class AdminConfig extends RestConfig {
         super(host, port, username, password);
     }
 
+    public AdminConfig(AdminConfig other) {
+    	super(other);
+	}
 }

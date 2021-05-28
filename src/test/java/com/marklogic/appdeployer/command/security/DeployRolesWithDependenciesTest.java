@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Each of these tests verifies that the roles in the given config dir can be deployed successfully based on their
@@ -68,6 +68,22 @@ public class DeployRolesWithDependenciesTest extends AbstractAppDeployerTest {
 		initializeAppDeployer(new DeployRolesCommand());
 		try {
 			deploySampleApp();
+		} finally {
+			undeploySampleApp();
+		}
+	}
+
+	@Test
+	void circularDependencies() {
+		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/roles-with-circular-dependencies"));
+		initializeAppDeployer(new DeployRolesCommand());
+		try {
+			deploySampleApp();
+			fail("Expected an error due to a circular dependency between the two roles");
+		} catch (IllegalArgumentException ex) {
+			assertEquals("Unable to deploy roles due to circular dependencies between two or more roles; " +
+					"please remove these circular dependencies in order to deploy your roles",
+				ex.getMessage());
 		} finally {
 			undeploySampleApp();
 		}

@@ -78,7 +78,15 @@ public class RoleObjectNodesSorter implements ObjectNodesSorter {
 			}
 		}
 
-		String[] sortedRoleNames = sorter.sort();
+		String[] sortedRoleNames;
+		try {
+			sortedRoleNames = sorter.sort();
+		} catch (IllegalStateException ex) {
+			throw new IllegalArgumentException("Unable to deploy roles due to circular dependencies " +
+				"between two or more roles; please remove these circular dependencies in order to deploy" +
+				" your roles");
+		}
+
 		roles = new ArrayList<>();
 		for (String name : sortedRoleNames) {
 			roles.add(map.get(name));

@@ -6,6 +6,7 @@ import com.marklogic.appdeployer.command.AbstractResourceCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.appdeployer.command.SupportsCmaCommand;
+import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.api.configuration.Configuration;
 import com.marklogic.mgmt.api.configuration.Configurations;
@@ -19,8 +20,7 @@ import com.marklogic.rest.util.ResourcesFragment;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * As of 3.15.0, this no longer deploys roles in two phases. This is due to the new sorting class, which uses a
@@ -34,6 +34,7 @@ import java.util.List;
 public class DeployRolesCommand extends AbstractResourceCommand implements SupportsCmaCommand {
 
 	private ObjectNodesSorter objectNodesSorter = new RoleObjectNodesSorter();
+	private Set<String> defaultRolesToNotUndeploy;
 
 	public DeployRolesCommand() {
 		setExecuteSortOrder(SortOrderConstants.DEPLOY_ROLES);
@@ -42,6 +43,10 @@ public class DeployRolesCommand extends AbstractResourceCommand implements Suppo
 		setSupportsResourceMerging(true);
 		setResourceIdPropertyName("role-name");
 		setResourceClassType(Role.class);
+
+		defaultRolesToNotUndeploy = new HashSet<>();
+		// "admin" is the main one to never delete, throwing in a couple other sensible ones too
+		defaultRolesToNotUndeploy.addAll(Arrays.asList("admin", "manage-admin", "security"));
 	}
 
 	/**
@@ -179,8 +184,28 @@ public class DeployRolesCommand extends AbstractResourceCommand implements Suppo
 		return new RoleManager(context.getManageClient());
 	}
 
+	@Override
+	protected String adjustPayloadBeforeDeletingResource(ResourceManager mgr, CommandContext context, File f, String payload) {
+		String roleName = new PayloadParser().getPayloadFieldValue(payload, "role-name", false);
+
+		if (roleName != null && defaultRolesToNotUndeploy != null && defaultRolesToNotUndeploy.contains(roleName)) {
+			logger.info(format("Not undeploying role '%s' because it's in the list of role names to not undeploy", roleName));
+			return null;
+		}
+
+		return super.adjustPayloadBeforeDeletingResource(mgr, context, f, payload);
+	}
+
 	public void setObjectNodesSorter(ObjectNodesSorter objectNodesSorter) {
 		this.objectNodesSorter = objectNodesSorter;
+	}
+
+	public Set<String> getDefaultRolesToNotUndeploy() {
+		return defaultRolesToNotUndeploy;
+	}
+
+	public void setDefaultRolesToNotUndeploy(Set<String> defaultRolesToNotUndeploy) {
+		this.defaultRolesToNotUndeploy = defaultRolesToNotUndeploy;
 	}
 }
 

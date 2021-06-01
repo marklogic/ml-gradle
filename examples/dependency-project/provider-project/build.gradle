@@ -25,8 +25,8 @@ task bundleJar(type: Jar) {
 	from("src/main/ml-schemas") {
 		into("example-dependency/ml-schemas")
 	}
-	destinationDir file("build/libs")
-	baseName "example-dependency"
+	destinationDirectory = file("build/libs")
+	archiveBaseName = "example-dependency"
 }
 
 artifacts {

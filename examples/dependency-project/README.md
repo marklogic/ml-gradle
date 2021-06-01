@@ -17,10 +17,11 @@ If you'd like to inspect the zip, you'll find it at ~/.m2/repository/com/marklog
 
 ## Deploying and verifying the ml-gradle project
 
-Next, deploy the app in the ml-gradle-client-project:
+Next, deploy the app in the ml-gradle-client-project, replacing "changeme" below with the password for your admin user 
+(or using a different admin-like user):
 
     cd ../ml-gradle-client-project
-    gradle -i mlDeploy
+    gradle -i mlDeploy -PmlUsername=admin -PmlPassword=change
 
 You'll see logging like this that lets you know that the modules and data from the example-dependency zip 
 will be included when the application is deployed:

@@ -1,8 +1,8 @@
 /*
- * This buildscript shows how corb dependencies can be easily declared and then a Gradle configuration named
- * "corb". This configuration is then used as the classpath for CorbTask, which is an extension of Gradle's
- * JavaExec task that exposes the corb options as task attributes. The CorbTask will apply any corb options set via
- * task attributes, project properties, or System properties.
+ * This build script shows how CoRB dependencies can be easily declared and then a Gradle configuration named "corb".
+ * This configuration is then used as the classpath for CorbTask, which is an extension of Gradle's JavaExec task that
+ * exposes the CoRB options as task attributes.
+ * The CorbTask will apply any corb options set via task attributes, project properties, or System properties.
  */
 
 /*
@@ -12,25 +12,20 @@
  */
 buildscript {
   repositories {
-    jcenter()
-    // Needed for corb dependency: XCC
-    maven { url "http://developer.marklogic.com/maven2/" }
+		jcenter()
   }
   dependencies {
-    //Needed for CorbTask to dynamicaly generate properties from CORB Options class
-    classpath 'com.marklogic:marklogic-corb:2.4.5'
+    //Needed for CorbTask to dynamically generate properties from CORB Options class
+    classpath "com.marklogic:marklogic-corb:${corbVersion}"
   }
 }
 
 plugins {
-    id "com.marklogic.ml-gradle" version "4.0.4"
+    id "com.marklogic.ml-gradle" version "4.1.0"
 }
 
 repositories {
     jcenter()
-
-    // Needed for corb dependency: XCC
-    maven { url "http://developer.marklogic.com/maven2/" }
 }
 
 configurations {
@@ -42,7 +37,7 @@ configurations {
 
 dependencies {
     // required to run CoRB2
-    corb 'com.marklogic:marklogic-corb:2.4.5'
+    corb "com.marklogic:marklogic-corb:${corbVersion}"
     // optional
     //corb 'org.jasypt:jasypt:1.9.2' // would be necessary to leverage JasyptDecrypter
 }

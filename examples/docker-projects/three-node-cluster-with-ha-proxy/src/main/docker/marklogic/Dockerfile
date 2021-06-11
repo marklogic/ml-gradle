@@ -15,14 +15,14 @@ ENV PATH /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/MarkL
 # Copy the MarkLogic installer to a temp directory in the Docker image being built
 COPY MarkLogic-9*.rpm /tmp/MarkLogic.rpm
 # Optional - copy the converter package
-COPY MarkLogicC*.rpm /tmp/MarkLogicConverters.rpm
+##COPY MarkLogicC*.rpm /tmp/MarkLogicConverters.rpm
 COPY create-cluster /usr/local/sbin
 COPY init-marklogic /usr/local/sbin
 
 # Install MarkLogic then delete the .RPM file if the install succeeded
 RUN yum -y install /tmp/MarkLogic.rpm && rm /tmp/MarkLogic.rpm
 # Optional - Install MarkLogic Converters then delete the .RPM file if the install succeeded
-RUN yum -y install /tmp/MarkLogicConverters.rpm && rm /tmp/MarkLogicConverters.rpm
+##RUN yum -y install /tmp/MarkLogicConverters.rpm && rm /tmp/MarkLogicConverters.rpm
 
 # Expose MarkLogic Server ports
 # Also expose any ports your own MarkLogic App Servers use such as

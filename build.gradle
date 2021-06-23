@@ -75,6 +75,7 @@ publishing {
 			pom {
 				name = "${group}:${project.name}"
 				description = "Library that adds functionality on top of the MarkLogic Java Client"
+				packaging = "jar"
 				url = "https://github.com/marklogic-community/${project.name}"
 				licenses {
 					license {
@@ -87,6 +88,8 @@ publishing {
 						id = "marklogic"
 						name = "MarkLogic Github Contributors"
 						email = "general@developer.marklogic.com"
+						organization = "MarkLogic"
+						organizationUrl = "https://www.marklogic.com"
 					}
 				}
 				scm {
@@ -103,10 +106,10 @@ publishing {
 	repositories {
 		maven {
 			name = "central"
-			url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+			url = mavenCentralUrl
 			credentials {
-				username "$ossrhUsername"
-				password "$ossrhPassword"
+				username mavenCentralUsername
+				password mavenCentralPassword
 			}
 		}
 	}

@@ -1,10 +1,14 @@
 plugins {
-  id "java-library"
-  id "maven-publish"
+	id "java-library"
+	id "maven-publish"
+	id "signing"
   id "com.github.jk1.dependency-license-report" version "1.3"
 	id "net.saliman.properties" version "1.5.1"
 	id "io.snyk.gradle.plugin.snykplugin" version "0.4"
 }
+
+group = "com.marklogic"
+version = "4.2.0"
 
 sourceCompatibility = "8"
 targetCompatibility = "8"
@@ -13,14 +17,12 @@ repositories {
 	mavenLocal()
 	mavenCentral()
 
-	// Still need this for ml-junit
-	// Once marklogic-junit5 is published to mavenCentral, we can convert all the tests over to JUnit5 and
-	// then remove this as a repository
+	// Still needed for marklogic-junit5
 	jcenter()
 }
 
 dependencies {
-  api 'com.marklogic:ml-javaclient-util:4.2.0-rc1'
+  api 'com.marklogic:ml-javaclient-util:4.2.0'
   api 'org.springframework:spring-web:5.3.7'
 
 	implementation 'jaxen:jaxen:1.2.0'
@@ -61,24 +63,66 @@ sourceSets.main.resources.srcDir 'src/main/java'
 
 task sourcesJar(type: Jar, dependsOn: classes) {
   classifier 'sources'
-  from sourceSets.main.allJava
+  from sourceSets.main.allSource
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
 	classifier "javadoc"
-	from file(javadocsDir + "/" + project.name)
+	from javadoc
 }
-javadoc.destinationDir = file(javadocsDir + "/" + project.name)
 javadoc.failOnError = false
 
+artifacts {
+	archives javadocJar, sourcesJar
+}
+signing {
+	sign configurations.archives
+}
+
 publishing {
-  publications {
-    mainJava(MavenPublication) {
-      from components.java
-      artifact sourcesJar
-		  artifact javadocJar
-	  }
-  }
+	publications {
+		mainJava(MavenPublication) {
+			pom {
+				name = "${group}:${project.name}"
+				description = "Java client for the MarkLogic REST Management API and for deploying applications to MarkLogic"
+				packaging = "jar"
+				url = "https://github.com/marklogic-community/${project.name}"
+				licenses {
+					license {
+						name = "The Apache License, Version 2.0"
+						url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+					}
+				}
+				developers {
+					developer {
+						id = "marklogic"
+						name = "MarkLogic Github Contributors"
+						email = "general@developer.marklogic.com"
+						organization = "MarkLogic"
+						organizationUrl = "https://www.marklogic.com"
+					}
+				}
+				scm {
+					url = "git@github.com:marklogic-community/${project.name}.git"
+					connection = "scm:git@github.com:marklogic-community/${project.name}.git"
+					developerConnection = "scm:git@github.com:marklogic-community/${project.name}.git"
+				}
+			}
+			from components.java
+			artifact sourcesJar
+			artifact javadocJar
+		}
+	}
+	repositories {
+		maven {
+			name = "central"
+			url = mavenCentralUrl
+			credentials {
+				username mavenCentralUsername
+				password mavenCentralPassword
+			}
+		}
+	}
 }
 
 test {

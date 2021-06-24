@@ -1,5 +1,6 @@
 package com.marklogic.appdeployer.command.security;
 
+import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
 import com.marklogic.appdeployer.command.modules.LoadModulesCommand;
@@ -12,12 +13,16 @@ import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.security.AmpManager;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ManageAmpsTest extends AbstractManageResourceTest {
 
 	@Test
 	public void ampLoadedBeforeModules() {
+		appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/real-amp")));
+
 		initializeAppDeployer(new DeployUsersCommand(), new DeployRestApiServersCommand(true),
 			new DeployAmpsCommand(), new LoadModulesCommand());
 		appConfig.setModuleTimestampsPath(null);

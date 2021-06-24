@@ -16,3 +16,4 @@ target
 gradle-local.properties
 snyk
 .vscode
+src/test/resources/sample-app/build

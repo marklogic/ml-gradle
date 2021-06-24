@@ -179,10 +179,11 @@ public class BuildForestReplicaTest  {
 		assertEquals(1, forests.size());
 		assertEquals("testdb-4-replica-1", forests.get(0).getForestReplica().get(0).getReplicaName());
 		assertEquals(
+			"host1", forests.get(0).getForestReplica().get(0).getHost(),
 			"When adding a new host and creating replicas, the replicas will naturally be uneven because the existing " +
 				"forests on hosts 1, 2, and 3 won't have their replicas moved to 4 automatically, and thus host 4 won't " +
-				"have any replicas on it. And for the new replicas, we expect those to start being created on the first host.",
-			"host1", forests.get(0).getForestReplica().get(0).getHost());
+				"have any replicas on it. And for the new replicas, we expect those to start being created on the first host."
+		);
 	}
 
 	@Test

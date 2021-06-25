@@ -17,6 +17,14 @@ Next, run the following Gradle task to deploy the example application:
 This creates an app server suitable for Data Services - i.e. one without a rewriter. It also creates a user named 
 "data-services-example-user" which demonstrates the minimum set of roles needed to invoke a Data Services endpoint. 
 
+To generate the `org.example.HelloWorld` proxy class, run:
+
+```shell
+gradle generateHelloWorld
+```
+
+Take a look at `build.gradle` to see how this task is implemented using `com.marklogic.client.tools.gradle.EndpointProxiesGenTask`.
+
 You can then test the application either by running the following Gradle task:
 
 ```shell

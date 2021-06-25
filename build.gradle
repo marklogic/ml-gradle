@@ -64,6 +64,8 @@ sourceSets.main.resources.srcDir 'src/main/java'
 task sourcesJar(type: Jar, dependsOn: classes) {
   classifier 'sources'
   from sourceSets.main.allSource
+	// For unknown reasons, Gradle 7.1 (but not 6.x) is complaining that AbstractManager.java is a duplicate.
+	duplicatesStrategy = "exclude"
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {

@@ -4,13 +4,13 @@
 //		mavenLocal()
 //	}
 //	dependencies {
-//		classpath "com.marklogic:ml-gradle:4.1.1"
+//		classpath "com.marklogic:ml-gradle:4.2.0"
 //	}
 //}
 
 plugins {
 	id "net.saliman.properties" version "1.5.1"
-	id "com.marklogic.ml-gradle" version "4.1.1"
+	id "com.marklogic.ml-gradle" version "4.2.0"
 }
 
 //apply plugin: "com.marklogic.ml-gradle"

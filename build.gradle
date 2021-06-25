@@ -1,9 +1,8 @@
 plugins {
   id "groovy"
   id "maven-publish"
-  id "eclipse"
-  id "idea"
-  id "com.jfrog.bintray" version "1.8.4"
+	id "signing"
+
   id "com.github.jk1.dependency-license-report" version "1.3"
   id "com.gradle.plugin-publish" version "0.11.0"
 	id "java-gradle-plugin"
@@ -12,31 +11,38 @@ plugins {
 	id "io.snyk.gradle.plugin.snykplugin" version "0.4"
 }
 
+group = "com.marklogic"
+version = "4.2.0"
+
 sourceCompatibility = "8"
 targetCompatibility = "8"
 
 repositories {
-  mavenLocal() // Used for local development only
+  mavenLocal() // Used only for local development
+
+	mavenCentral()
+
+	// Needed for marklogic-unit-test-client
   jcenter()
 }
 
 dependencies {
-  compile gradleApi()
-  compile localGroovy()
-  compile "com.marklogic:ml-app-deployer:4.1.1"
-  compile "com.marklogic:mlcp-util:0.9.0"
-	compile "com.marklogic:marklogic-data-movement-components:2.2.1"
-	compile "commons-io:commons-io:2.8.0"
+  implementation gradleApi()
+	implementation localGroovy()
+	api "com.marklogic:ml-app-deployer:4.2.0"
+	implementation "com.marklogic:mlcp-util:0.9.0"
+	implementation "com.marklogic:marklogic-data-movement-components:2.3.0"
+	implementation "commons-io:commons-io:2.8.0"
 
 	compileOnly "com.marklogic:marklogic-unit-test-client:1.0.0"
 
-	testCompile localGroovy()
-	testCompile gradleTestKit()
-	testCompile 'xmlunit:xmlunit:1.3'
+	testImplementation localGroovy()
+	testImplementation gradleTestKit()
+	testImplementation 'xmlunit:xmlunit:1.3'
 
 	// Force spock-core to use 4.13.1 to avoid security issue in 4.11
-	testCompile 'junit:junit:4.13.1'
-	testCompile('org.spockframework:spock-core:1.1-groovy-2.4') {
+	testImplementation 'junit:junit:4.13.1'
+	testImplementation('org.spockframework:spock-core:1.1-groovy-2.4') {
 		exclude module: 'groovy-all'
 	}
 }
@@ -49,40 +55,61 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
 	classifier "javadoc"
-	from file(javadocsDir + "/" + project.name)
+	from javadoc
+}
+javadoc.failOnError = false
+
+artifacts {
+	archives javadocJar, sourcesJar
+}
+signing {
+	sign configurations.archives
 }
 
 publishing {
-  publications {
-    mainJava(MavenPublication) {
-      from components.java
-    }
-    sourcesJava(MavenPublication) {
-      from components.java
-      artifact sourcesJar
-    }
-	  mavenJavadoc(MavenPublication) {
-		  artifact javadocJar
-	  }
-  }
-}
-
-if (project.hasProperty("myBintrayUser")) {
-  bintray {
-    user = myBintrayUser
-    key = myBintrayKey
-    publications = ['mainJava', 'sourcesJava']
-    pkg {
-      repo = 'maven'
-      name = project.name
-      licenses = ['Apache-2.0']
-      vcsUrl = 'https://github.com/rjrudin/' + project.name + '.git'
-      version {
-        name = project.version
-        released = new Date()
-      }
-    }
-  }
+	publications {
+		mainJava(MavenPublication) {
+			pom {
+				name = "${group}:${project.name}"
+				description = "Gradle plugin for automating everything involving MarkLogic"
+				packaging = "jar"
+				url = "https://github.com/marklogic-community/${project.name}"
+				licenses {
+					license {
+						name = "The Apache License, Version 2.0"
+						url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+					}
+				}
+				developers {
+					developer {
+						id = "marklogic"
+						name = "MarkLogic Github Contributors"
+						email = "general@developer.marklogic.com"
+						organization = "MarkLogic"
+						organizationUrl = "https://www.marklogic.com"
+					}
+				}
+				scm {
+					url = "git@github.com:marklogic-community/${project.name}.git"
+					connection = "scm:git@github.com:marklogic-community/${project.name}.git"
+					developerConnection = "scm:git@github.com:marklogic-community/${project.name}.git"
+				}
+			}
+			from components.java
+			artifact sourcesJar
+			artifact javadocJar
+		}
+	}
+	repositories {
+		maven {
+			name = "central"
+			url = mavenCentralUrl
+			credentials {
+				username mavenCentralUsername
+				password mavenCentralPassword
+			}
+		}
+	}
 }
 
 pluginBundle {

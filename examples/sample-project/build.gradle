@@ -6,9 +6,10 @@ buildscript {
 	repositories {
 		mavenLocal()
 		jcenter()
+		mavenCentral()
 	}
 	dependencies {
-		classpath "com.marklogic:ml-gradle:4.1.1"
+		classpath "com.marklogic:ml-gradle:4.2.0"
 	}
 }
 
@@ -56,13 +57,13 @@ configurations {
 dependencies {
 	// Needed to compile and run the JUnit tests
 	// Note that ml-junit has been deprecated and replaced by marklogic-unit-test + marklogic-junit
-	testCompile "com.marklogic:ml-junit:3.2.0"
-	testCompile "com.jayway.restassured:rest-assured:2.4.1"
+	testImplementation "com.marklogic:ml-junit:3.2.0"
+	testImplementation "com.jayway.restassured:rest-assured:2.4.1"
 
 	// Required for Java 11
-	testRuntime "javax.xml.bind:jaxb-api:2.3.1"
-	testRuntime "com.sun.xml.bind:jaxb-core:2.3.0.1"
-	testRuntime "com.sun.xml.bind:jaxb-impl:2.3.2"
+	testImplementation "javax.xml.bind:jaxb-api:2.3.1"
+	testImplementation "com.sun.xml.bind:jaxb-core:2.3.0.1"
+	testImplementation "com.sun.xml.bind:jaxb-impl:2.3.2"
 
 	// corb jar available from jcenter
 	corb "com.marklogic:marklogic-corb:2.4.5"

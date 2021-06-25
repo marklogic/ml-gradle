@@ -36,11 +36,8 @@ class MlcpTask extends JavaExec {
 		return Logging.getLogger(MlcpTask.class)
 	}
 
-	// Starting in Gradle 6.4, setMain must be called here instead of in a TaskAction method
-	@Override
-	Task configure(Closure closure) {
-		setMain("com.marklogic.contentpump.ContentPump")
-		return super.configure(closure)
+	MlcpTask() {
+		mainClass.set("com.marklogic.contentpump.ContentPump")
 	}
 
 	@TaskAction

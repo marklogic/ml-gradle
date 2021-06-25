@@ -41,7 +41,9 @@ XML-FILE,XML-METADATA,XML-NODE,XML-SCHEMA,XML-TEMP-DIR,ZIP-FILE\
 XQUERY-MODULE".tokenize(',')
 
   CorbTask() {
-    String[] optionNames = DEFAULT_CORB_OPTIONS
+	  mainClass.set("com.marklogic.developer.corb.Manager")
+
+	  String[] optionNames = DEFAULT_CORB_OPTIONS
     // obtain the options from CoRB Options class, to ensure that the latest available are applied to this task
     try {
         optionNames = Class.forName("com.marklogic.developer.corb.Options", true, Thread.currentThread().contextClassLoader)
@@ -91,13 +93,6 @@ XQUERY-MODULE".tokenize(',')
 
   // corb defaults to 1, but 8 seems like a more common default
   def threadCount = 8 // THREAD-COUNT
-
-	// Starting in Gradle 6.4, setMain must be called here instead of in a TaskAction method
-	@Override
-	Task configure(Closure closure) {
-		setMain("com.marklogic.developer.corb.Manager")
-		return super.configure(closure)
-	}
 
 	@TaskAction
   @Override

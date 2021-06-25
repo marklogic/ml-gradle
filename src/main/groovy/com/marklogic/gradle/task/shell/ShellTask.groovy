@@ -19,11 +19,8 @@ import org.gradle.api.tasks.TaskAction
  */
 class ShellTask extends JavaExec {
 
-	// Starting in Gradle 6.4, setMain must be called here instead of in a TaskAction method
-	@Override
-	Task configure(Closure closure) {
-		setMain("com.marklogic.groovysh.Main")
-		return super.configure(closure)
+	ShellTask() {
+		mainClass.set("com.marklogic.groovysh.Main")
 	}
 
 	@TaskAction

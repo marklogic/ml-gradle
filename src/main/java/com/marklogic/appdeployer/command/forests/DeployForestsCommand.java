@@ -19,7 +19,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * This command constructs forests based on properties found in the AppConfig object associated with the incoming
@@ -197,33 +196,17 @@ public class DeployForestsCommand extends AbstractCommand {
 	 * configured to only have forests on one host, or when the deprecated setCreateForestsOnOneHost method is used.
 	 */
 	protected ForestHostNames determineHostNamesForForest(CommandContext context, List<Forest> existingPrimaryForests) {
-		Set<String> databaseNames = context.getAppConfig().getDatabasesWithForestsOnOneHost();
-		boolean onlyOnOneHost = databaseNames != null && databaseNames.contains(this.databaseName);
-
 		if (hostCalculator == null) {
 			hostCalculator = new DefaultHostCalculator(new DefaultHostNameProvider(context.getManageClient()));
 		}
 
-		// "candidate" = hosts that can be used for primary and replica forests
-		List<String> candidateHostNames = hostCalculator.calculateHostNames(this.databaseName, context);
-		List<String> primaryForestHostNames = new ArrayList<>();
-
-		if (!createForestsOnEachHost || onlyOnOneHost) {
-			// If the database should only have forests on one host and such forests already exist, then use the host
-			// that the forests exist on
-			if (!existingPrimaryForests.isEmpty()) {
-				primaryForestHostNames.add(existingPrimaryForests.get(0).getHost());
-			}
-			else {
-				String first = candidateHostNames.get(0);
-				logger.info(format("Only creating forests on the first host: " + first));
-				primaryForestHostNames.add(first);
-			}
-		} else {
-			primaryForestHostNames.addAll(candidateHostNames);
+		// If this deprecated feature is used, then configure the AppConfig object so that the hostCalculator can be
+		// aware of it.
+		if (!createForestsOnEachHost) {
+			context.getAppConfig().addDatabaseWithForestsOnOneHost(this.databaseName);
 		}
 
-		return new ForestHostNames(primaryForestHostNames, candidateHostNames);
+		return hostCalculator.calculateHostNames(this.databaseName, context, existingPrimaryForests);
 	}
 
 	public int getForestsPerHost() {
@@ -283,23 +266,5 @@ public class DeployForestsCommand extends AbstractCommand {
 
 	public void setForestBuilder(ForestBuilder forestBuilder) {
 		this.forestBuilder = forestBuilder;
-	}
-}
-
-class ForestHostNames {
-	private List<String> primaryForestHostNames;
-	private List<String> replicaForestHostNames;
-
-	public ForestHostNames(List<String> primaryForestHostNames, List<String> replicaForestHostNames) {
-		this.primaryForestHostNames = primaryForestHostNames;
-		this.replicaForestHostNames = replicaForestHostNames;
-	}
-
-	public List<String> getPrimaryForestHostNames() {
-		return primaryForestHostNames;
-	}
-
-	public List<String> getReplicaForestHostNames() {
-		return replicaForestHostNames;
 	}
 }

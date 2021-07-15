@@ -2,6 +2,7 @@ package com.marklogic.appdeployer.command.forests;
 
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.client.ext.helper.LoggingObject;
+import com.marklogic.mgmt.api.forest.Forest;
 import com.marklogic.mgmt.resource.hosts.HostNameProvider;
 
 import java.util.ArrayList;
@@ -17,21 +18,44 @@ public class DefaultHostCalculator extends LoggingObject implements HostCalculat
 	}
 
 	@Override
-	public List<String> calculateHostNames(String databaseName, CommandContext context) {
-		List<String> hostNamesFromDatabaseGroups = determineHostsNamesBasedOnDatabaseGroups(databaseName, context);
-		if (hostNamesFromDatabaseGroups != null) {
-			if (hostNamesFromDatabaseGroups.size() > 1 && context.getAppConfig().isDatabaseWithForestsOnOneHost(databaseName)) {
-				return hostNamesFromDatabaseGroups.subList(0, 1);
-			}
-			return hostNamesFromDatabaseGroups;
+	public ForestHostNames calculateHostNames(String databaseName, CommandContext context, List<Forest> existingPrimaryForests) {
+		final List<String> candidateHostNames = getCandidateHostNames(databaseName, context);
+		if (candidateHostNames.isEmpty()) {
+			throw new RuntimeException("Unable to determine host names for forests for database: " + databaseName + "; please check the " +
+				"properties you've set for creating forests for this database to ensure that forests can be created on at " +
+				"least one host in your cluster");
 		}
 
+		final List<String> primaryForestHostNames = new ArrayList<>();
+		final List<String> replicaForestHostNames = new ArrayList<>();
+
+		if (context.getAppConfig().isDatabaseWithForestsOnOneHost(databaseName)) {
+			if (existingPrimaryForests.size() > 0) {
+				primaryForestHostNames.add(existingPrimaryForests.get(0).getHost());
+				replicaForestHostNames.addAll(candidateHostNames);
+			} else {
+				primaryForestHostNames.add(candidateHostNames.get(0));
+				replicaForestHostNames.addAll(candidateHostNames);
+			}
+		} else {
+			primaryForestHostNames.addAll(candidateHostNames);
+			replicaForestHostNames.addAll(candidateHostNames);
+		}
+
+		return new ForestHostNames(primaryForestHostNames, replicaForestHostNames);
+	}
+
+	protected List<String> getCandidateHostNames(String databaseName, CommandContext context) {
 		if (logger.isInfoEnabled()) {
 			logger.info("Finding eligible hosts for forests for database: " + databaseName);
 		}
 
-		List<String> hostNames = hostNameProvider.getHostNames();
+		List<String> hostNamesFromDatabaseGroups = determineHostNamesBasedOnDatabaseGroups(databaseName, context);
+		if (hostNamesFromDatabaseGroups != null) {
+			return hostNamesFromDatabaseGroups;
+		}
 
+		List<String> hostNames = hostNameProvider.getHostNames();
 		List<String> hostNamesFromDatabaseHosts = determineHostNamesBasedOnDatabaseHosts(databaseName, context, hostNames);
 		if (hostNamesFromDatabaseHosts != null) {
 			return hostNamesFromDatabaseHosts;
@@ -44,7 +68,7 @@ public class DefaultHostCalculator extends LoggingObject implements HostCalculat
 	 * @param context
 	 * @return
 	 */
-	protected List<String> determineHostsNamesBasedOnDatabaseGroups(String databaseName, CommandContext context) {
+	protected List<String> determineHostNamesBasedOnDatabaseGroups(String databaseName, CommandContext context) {
 		Map<String, List<String>> databaseGroups = context.getAppConfig().getDatabaseGroups();
 		if (databaseGroups != null) {
 			List<String> selectedGroupNames = databaseGroups.get(databaseName);

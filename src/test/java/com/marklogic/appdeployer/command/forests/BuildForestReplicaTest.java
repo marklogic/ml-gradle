@@ -5,7 +5,6 @@ import com.marklogic.appdeployer.DefaultAppConfigFactory;
 import com.marklogic.mgmt.api.forest.Forest;
 import com.marklogic.mgmt.api.forest.ForestReplica;
 import com.marklogic.mgmt.util.SimplePropertySource;
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -15,7 +14,10 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-public class BuildForestReplicaTest  {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class BuildForestReplicaTest {
 
 	private ForestBuilder builder = new ForestBuilder();
 
@@ -118,6 +120,23 @@ public class BuildForestReplicaTest  {
 				assertTrue(host.equals("host2") || host.equals("host3"));
 			}
 		});
+	}
+
+	@Test
+	void databaseHasPrimaryForestsOnOneHost() {
+		AppConfig config = newAppConfig("mlDatabasesWithForestsOnOneHost", "my-database");
+
+		Forest forest = builder.buildForests(new ForestPlan("my-database", "host1", "host2", "host3").withReplicaCount(2), config).get(0);
+		assertEquals("host1", forest.getHost(), "host1 should be selected since it's the first host");
+		assertEquals(2, forest.getForestReplica().size(), "Expecting 2 replicas since replica count is 2");
+
+		ForestReplica replica = forest.getForestReplica().get(0);
+		assertEquals("my-database-1-replica-1", replica.getReplicaName());
+		assertEquals("host2", replica.getHost());
+
+		replica = forest.getForestReplica().get(1);
+		assertEquals("my-database-1-replica-2", replica.getReplicaName());
+		assertEquals("host3", replica.getHost());
 	}
 
 	@Test

@@ -7,6 +7,7 @@ import com.marklogic.mgmt.util.SimplePropertySource;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -25,7 +26,7 @@ public class CalculateForestHostsTest  {
 		DefaultHostCalculator hostCalculator = new DefaultHostCalculator(hostNameProvider);
 
 		// Verify we get all 5 hosts back when nothing special is configured
-		List<String> hostNames = hostCalculator.calculateHostNames("test-db", context);
+		List<String> hostNames = hostCalculator.calculateHostNames("test-db", context, new ArrayList<>()).getPrimaryForestHostNames();
 		assertEquals(5, hostNames.size());
 
 		// Select 2 of the 3 hosts for test-db
@@ -35,7 +36,7 @@ public class CalculateForestHostsTest  {
 		appConfig = factory.newAppConfig();
 		context = new CommandContext(appConfig, null, null);
 
-		hostNames = hostCalculator.calculateHostNames("test-db", context);
+		hostNames = hostCalculator.calculateHostNames("test-db", context, new ArrayList<>()).getPrimaryForestHostNames();
 		assertEquals(3, hostNames.size());
 		assertTrue(hostNames.contains("name1"));
 		assertTrue(hostNames.contains("name2"));
@@ -44,7 +45,7 @@ public class CalculateForestHostsTest  {
 		props.setProperty("mlDatabaseGroups", "test-db,group3");
 		appConfig = factory.newAppConfig();
 		context = new CommandContext(appConfig, null, null);
-		hostNames = hostCalculator.calculateHostNames("test-db", context);
+		hostNames = hostCalculator.calculateHostNames("test-db", context, new ArrayList<>()).getPrimaryForestHostNames();
 		assertEquals(2, hostNames.size());
 		assertTrue(hostNames.contains("name4"));
 		assertTrue(hostNames.contains("name5"));
@@ -63,7 +64,7 @@ public class CalculateForestHostsTest  {
 		props.setProperty("mlDatabasesWithForestsOnOneHost", "test-db");
 
 		CommandContext context = new CommandContext(new DefaultAppConfigFactory(new SimplePropertySource(props)).newAppConfig(), null, null);
-		List<String> hostNames = hostCalculator.calculateHostNames("test-db", context);
+		List<String> hostNames = hostCalculator.calculateHostNames("test-db", context, new ArrayList<>()).getPrimaryForestHostNames();
 		assertEquals(1, hostNames.size(), "The database should only have a forest on the first host");
 		assertEquals("name2", hostNames.get(0));
 	}

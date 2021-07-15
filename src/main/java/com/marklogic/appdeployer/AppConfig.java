@@ -1151,6 +1151,13 @@ public class AppConfig {
 		return databasesWithForestsOnOneHost.contains(databaseName);
 	}
 
+	public void addDatabaseWithForestsOnOneHost(String databaseName) {
+		if (databasesWithForestsOnOneHost == null) {
+			databasesWithForestsOnOneHost = new HashSet<>();
+		}
+		databasesWithForestsOnOneHost.add(databaseName);
+	}
+
 	public Set<String> getDatabasesWithForestsOnOneHost() {
 		return databasesWithForestsOnOneHost;
 	}

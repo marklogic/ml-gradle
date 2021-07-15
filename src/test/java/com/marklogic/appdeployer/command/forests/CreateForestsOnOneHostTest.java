@@ -7,7 +7,9 @@ import com.marklogic.mgmt.api.forest.Forest;
 import com.marklogic.mgmt.util.SimplePropertySource;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -25,6 +27,28 @@ public class CreateForestsOnOneHostTest {
 
 		ForestHostNames hostNames = command.determineHostNamesForForest(context, new ArrayList<>());
 		assertEquals(3, hostNames.getPrimaryForestHostNames().size());
+		assertEquals(3, hostNames.getReplicaForestHostNames().size());
+
+		appConfig.addDatabaseWithForestsOnOneHost("test-db");
+		hostNames = command.determineHostNamesForForest(context, new ArrayList<>());
+		assertEquals(1, hostNames.getPrimaryForestHostNames().size());
+		assertEquals(3, hostNames.getReplicaForestHostNames().size());
+	}
+
+	@Test
+	void deprecatedWayOfCreatingForestsOnOneHost() {
+		AppConfig appConfig = new AppConfig();
+		CommandContext context = new CommandContext(appConfig, null, null);
+
+		DeployForestsCommand command = new DeployForestsCommand("test-db");
+
+		HostCalculator hostCalculator = new DefaultHostCalculator(new TestHostNameProvider("host1", "host2", "host3"));
+		command.setHostCalculator(hostCalculator);
+
+		command.setCreateForestsOnEachHost(true);
+		ForestHostNames hostNames = command.determineHostNamesForForest(context, new ArrayList<>());
+		assertEquals(3, hostNames.getPrimaryForestHostNames().size());
+		assertEquals(3, hostNames.getReplicaForestHostNames().size());
 
 		command.setCreateForestsOnEachHost(false);
 		hostNames = command.determineHostNamesForForest(context, new ArrayList<>());
@@ -33,17 +57,6 @@ public class CreateForestsOnOneHostTest {
 		assertEquals(3, hostNames.getReplicaForestHostNames().size(),
 			"When forests aren't created on each host, all hosts should still be available for replica forests, " +
 				"with the expectation that the primary forest host will still not be used");
-
-		command.setCreateForestsOnEachHost(true);
-		hostNames = command.determineHostNamesForForest(context, new ArrayList<>());
-		assertEquals(3, hostNames.getPrimaryForestHostNames().size());
-
-		Set<String> names = new HashSet<>();
-		names.add("test-db");
-		appConfig.setDatabasesWithForestsOnOneHost(names);
-		hostNames = command.determineHostNamesForForest(context, new ArrayList<>());
-		assertEquals(1, hostNames.getPrimaryForestHostNames().size());
-		assertEquals(3, hostNames.getReplicaForestHostNames().size());
 	}
 
 	/**

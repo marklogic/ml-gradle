@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.marklogic"
-version = "4.2.0"
+version = "4.2.1"
 
 sourceCompatibility = "8"
 targetCompatibility = "8"

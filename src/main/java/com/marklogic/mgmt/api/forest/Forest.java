@@ -67,6 +67,11 @@ public class Forest extends Resource {
         setForestName(forestName);
     }
 
+    public Forest(String host, String forestName) {
+    	setHost(host);
+    	setForestName(forestName);
+	}
+
     @Override
     protected String getResourceLabel() {
         return getForestName();

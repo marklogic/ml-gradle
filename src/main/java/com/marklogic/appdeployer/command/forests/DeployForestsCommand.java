@@ -13,7 +13,6 @@ import com.marklogic.mgmt.mapper.ResourceMapper;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.forests.ForestManager;
 import com.marklogic.mgmt.resource.hosts.DefaultHostNameProvider;
-import com.marklogic.mgmt.resource.hosts.HostManager;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
@@ -114,18 +113,28 @@ public class DeployForestsCommand extends AbstractCommand {
 	 * @return
 	 */
 	public List<Forest> buildForests(CommandContext context, boolean includeReplicas) {
-		String template = buildForestTemplate(context, new ForestManager(context.getManageClient()));
-
-		final List<String> allHostNames = new HostManager(context.getManageClient()).getHostNames();
-		ForestHostNames forestHostNames = determineHostNamesForForest(context, allHostNames);
-
 		// Need to know what primary forests exist already in case more need to be added, or a new host has been added
-		List<Forest> forests = getExistingPrimaryForests(context, this.databaseName);
+		List<Forest> existingPrimaryForests = getExistingPrimaryForests(context, this.databaseName);
+		return buildForests(context, includeReplicas, existingPrimaryForests);
+	}
+
+	/**
+	 *
+	 * @param context
+	 * @param includeReplicas
+	 * @param existingPrimaryForests
+	 * @return
+	 */
+	protected List<Forest> buildForests(CommandContext context, boolean includeReplicas, List<Forest> existingPrimaryForests) {
+		ForestHostNames forestHostNames = determineHostNamesForForest(context, existingPrimaryForests);
+
+		final String template = buildForestTemplate(context, new ForestManager(context.getManageClient()));
+
 		ForestPlan forestPlan = new ForestPlan(this.databaseName, forestHostNames.getPrimaryForestHostNames())
 			.withReplicaHostNames(forestHostNames.getReplicaForestHostNames())
 			.withTemplate(template)
 			.withForestsPerDataDirectory(this.forestsPerHost)
-			.withExistingForests(forests);
+			.withExistingForests(existingPrimaryForests);
 
 		if (includeReplicas) {
 			Map<String, Integer> map = context.getAppConfig().getDatabaseNamesAndReplicaCounts();
@@ -182,12 +191,12 @@ public class DeployForestsCommand extends AbstractCommand {
 
 	/**
 	 * @param context
-	 * @param allHostNames
+	 * @param existingPrimaryForests
 	 * @return a ForestHostNames instance that defines the list of host names that can be used for primary forests and
 	 * that can be used for replica forests. As of 4.1.0, the only reason these will differ is when a database is
 	 * configured to only have forests on one host, or when the deprecated setCreateForestsOnOneHost method is used.
 	 */
-	protected ForestHostNames determineHostNamesForForest(CommandContext context, final List<String> allHostNames) {
+	protected ForestHostNames determineHostNamesForForest(CommandContext context, List<Forest> existingPrimaryForests) {
 		Set<String> databaseNames = context.getAppConfig().getDatabasesWithForestsOnOneHost();
 		boolean onlyOnOneHost = databaseNames != null && databaseNames.contains(this.databaseName);
 
@@ -200,9 +209,16 @@ public class DeployForestsCommand extends AbstractCommand {
 		List<String> primaryForestHostNames = new ArrayList<>();
 
 		if (!createForestsOnEachHost || onlyOnOneHost) {
-			String first = allHostNames.get(0);
-			logger.info(format("Only creating forests on the first host: " + first));
-			primaryForestHostNames.add(first);
+			// If the database should only have forests on one host and such forests already exist, then use the host
+			// that the forests exist on
+			if (!existingPrimaryForests.isEmpty()) {
+				primaryForestHostNames.add(existingPrimaryForests.get(0).getHost());
+			}
+			else {
+				String first = candidateHostNames.get(0);
+				logger.info(format("Only creating forests on the first host: " + first));
+				primaryForestHostNames.add(first);
+			}
 		} else {
 			primaryForestHostNames.addAll(candidateHostNames);
 		}

@@ -26,7 +26,7 @@ public class CreateForestsOnSpecificHostsTest  {
 
 		command.setHostCalculator(new DefaultHostCalculator(new TestHostNameProvider(fakeHostNames.toArray(new String[]{}))));
 		// Verify we get all 3 hosts back when nothing special is configured
-		ForestHostNames hostNames = command.determineHostNamesForForest(context, fakeHostNames);
+		ForestHostNames hostNames = command.determineHostNamesForForest(context, new ArrayList<>());
 		assertEquals(3, hostNames.getPrimaryForestHostNames().size());
 		assertEquals(3, hostNames.getReplicaForestHostNames().size());
 
@@ -37,7 +37,7 @@ public class CreateForestsOnSpecificHostsTest  {
 		appConfig = factory.newAppConfig();
 		context = new CommandContext(appConfig, null, null);
 
-		hostNames = command.determineHostNamesForForest(context, fakeHostNames);
+		hostNames = command.determineHostNamesForForest(context, new ArrayList<>());
 		assertEquals(2, hostNames.getPrimaryForestHostNames().size());
 		assertEquals(2, hostNames.getReplicaForestHostNames().size());
 		assertTrue(hostNames.getPrimaryForestHostNames().contains("host1"));
@@ -47,7 +47,7 @@ public class CreateForestsOnSpecificHostsTest  {
 		props.setProperty("mlDatabaseHosts", "some-other-db,host2,test-db,bad-host|host2");
 		appConfig = factory.newAppConfig();
 		context = new CommandContext(appConfig, null, null);
-		hostNames = command.determineHostNamesForForest(context, fakeHostNames);
+		hostNames = command.determineHostNamesForForest(context, new ArrayList<>());
 		assertEquals(1, hostNames.getPrimaryForestHostNames().size());
 		assertEquals(1, hostNames.getReplicaForestHostNames().size());
 		assertTrue(hostNames.getPrimaryForestHostNames().contains("host2"));

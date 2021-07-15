@@ -100,8 +100,8 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.getConfigurations().create("mlRestApi")
 
 		// No group or description on these so they don't show up in "gradle tasks"
-		project.task("mlDeployApp", type: DeployAppTask, dependsOn: ["mlDeleteModuleTimestampsFile", "mlPrepareBundles"])
-		project.task("mlUndeployApp", type: UndeployAppTask, dependsOn: ["mlPrepareBundles"])
+		project.task("mlDeployApp", type: DeployAppTask, dependsOn: ["mlDeleteModuleTimestampsFile"])
+		project.task("mlUndeployApp", type: UndeployAppTask)
 
 		String deployGroup = "ml-gradle Deploy"
 		project.task("mlPostDeploy", group: deployGroup, description: "Add dependsOn to this task to add tasks at the end of mlDeploy").mustRunAfter(["mlDeployApp"])
@@ -151,7 +151,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 			"Note that this includes those created via the deployment of resources such as temporal collections and view schemas. You may want to use mlDeleteUserSchemas instead.")
 		project.task("mlClearTriggersDatabase", type: ClearTriggersDatabaseTask, group: dbGroup, description: "Deletes all documents in the triggers database")
 		project.task("mlDeleteDatabase", type: DeleteDatabaseTask, group: dbGroup, description: "Delete a database along with all of its forests and any replicas; requires -Pconfirm=true to be set so this isn't accidentally executed")
-		project.task("mlDeployDatabases", type: DeployDatabasesTask, group: dbGroup, dependsOn: "mlPrepareBundles", description: "Deploy each database, updating it if it exists, in the configuration directory")
+		project.task("mlDeployDatabases", type: DeployDatabasesTask, group: dbGroup, description: "Deploy each database, updating it if it exists, in the configuration directory")
 		project.task("mlMergeContentDatabase", type: MergeContentDatabaseTask, group: dbGroup, description: "Merge the database named by mlAppConfig.contentDatabaseName")
 		project.task("mlMergeDatabase", type: MergeDatabaseTask, group: dbGroup, description: "Merge the database named by the project property dbName; e.g. gradle mlMergeDatabase -PdbName=my-database")
 		project.task("mlReindexContentDatabase", type: ReindexContentDatabaseTask, group: dbGroup, description: "Reindex the database named by mlAppConfig.contentDatabaseName")
@@ -262,7 +262,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlReloadSchemas", dependsOn: ["mlDeleteUserSchemas", "mlLoadSchemas"], group: schemasGroup, description: "Deletes user schemas via mlDeleteUserSchemas and then loads schemas via mlLoadSchemas")
 
 		String serverGroup = "ml-gradle Server"
-		project.task("mlDeployServers", type: DeployServersTask, group: serverGroup, dependsOn: "mlPrepareBundles", description: "Updates the REST API server (if it exists) and deploys each other server, updating it if it exists, in the configuration directory ")
+		project.task("mlDeployServers", type: DeployServersTask, group: serverGroup, description: "Updates the REST API server (if it exists) and deploys each other server, updating it if it exists, in the configuration directory ")
 		project.task("mlUndeployOtherServers", type: UndeployOtherServersTask, group: serverGroup, description: "Delete any non-REST API servers (e.g. ODBC and XBC servers) defined by server files in the configuration directory")
 
 		String securityGroup = "ml-gradle Security"
@@ -327,6 +327,14 @@ class MarkLogicPlugin implements Plugin<Project> {
 			"Use -PunitTestResultsPath to override where test result files are written, which defaults to build/test-results/marklogic-unit-test. " +
 			"Use -PrunCodeCoverage to enable code coverage support when running the tests. " +
 			"Use -PrunTeardown and -PrunSuiteTeardown to control whether teardown and suite teardown scripts are run; these default to 'true' and can be set to 'false' instead. ")
+
+		// Any granular task that deploys/undeploys resources may need to do so for a resource in a bundle, so these
+		// tasks must all depend on mlPrepareBundles
+		project.tasks.each { task ->
+			if (task.name.startsWith("mlDeploy") || task.name.startsWith("mlUndeploy")) {
+				task.dependsOn("mlPrepareBundles")
+			}
+		}
 
 		logger.info("Finished initializing ml-gradle\n")
 	}

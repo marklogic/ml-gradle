@@ -1,5 +1,7 @@
 package com.marklogic.gradle.task.client
 
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 
 import com.marklogic.gradle.task.MarkLogicTask
@@ -84,6 +86,8 @@ declare function delete(
 </metadata>
 '''
 
+	@Input
+	@Optional
     String servicesDir
 
     @TaskAction

@@ -1,10 +1,17 @@
 package com.marklogic.gradle.task.roxy
 
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 
 class RoxyMigratePropertiesTask extends RoxyTask {
 
+	@Input
+	@Optional
 	def roxyPropertyFiles = ["default.properties", "build.properties"]
+
+	@Input
+	@Optional
 	def roxyGradleMapping = [
 		"app-name"                : "mlAppName",
 		"app-port"                : "mlRestPort",

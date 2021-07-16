@@ -2,6 +2,8 @@ package com.marklogic.gradle.task.client
 
 import com.marklogic.client.DatabaseClient
 import com.marklogic.gradle.task.MarkLogicTask
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -10,10 +12,20 @@ import org.gradle.api.tasks.TaskAction
  */
 class CopySearchOptionsTask extends MarkLogicTask {
 
+	@Input
+	@Optional
 	DatabaseClient client
+
+	@Input
 	String group = "Default"
+
+	@Input
 	String sourceServer
+
+	@Input
 	String targetServer
+
+	@Input
 	String optionsFilename
 
 	@TaskAction

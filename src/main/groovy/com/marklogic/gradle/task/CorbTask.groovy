@@ -1,13 +1,15 @@
 package com.marklogic.gradle.task
 
-import org.gradle.api.Task
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.JavaExec
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 
 import java.lang.reflect.Modifier
 
 class CorbTask extends JavaExec {
 
+	@Input
   def corbOptions = [:]
 
   //default CORB option list
@@ -80,18 +82,27 @@ XQUERY-MODULE".tokenize(',')
   // prefix for corb project properties, to ensure no conflicts with other project properties
   private static final String CORB_PROPERTY_PREFIX = "corb"
 
+	@Input
+	@Optional
   String xccUrl //same as xccConnectionUri
   // It's common practice for the uris/transform modules to have the same prefix, so just set this if that's the
   // case - e.g. convert-uris.xqy and convert-transform.xqy
+	@Input
+	@Optional
   String modulePrefix
   // Otherwise, set processModule (formerly transformModule) and urisModule
+	@Input
+	@Optional
   String transformModule //same as processModule
 
+	@Input
   def install = false // INSTALL
 
+	@Input
   String moduleRoot = "/"  // MODULE-ROOT
 
   // corb defaults to 1, but 8 seems like a more common default
+	@Input
   def threadCount = 8 // THREAD-COUNT
 
 	@TaskAction

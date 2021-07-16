@@ -1,10 +1,14 @@
 package com.marklogic.gradle.task
 
 import com.marklogic.appdeployer.command.ResourceFileManagerImpl
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 
 class DeleteResourceTimestampsFileTask extends MarkLogicTask {
 
+	@Input
+	@Optional
 	String filePath
 
 	@TaskAction

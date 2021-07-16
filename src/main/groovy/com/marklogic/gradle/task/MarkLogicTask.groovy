@@ -1,49 +1,56 @@
 package com.marklogic.gradle.task
 
-import org.gradle.api.DefaultTask
-
-import com.marklogic.client.DatabaseClient
 import com.marklogic.appdeployer.AppConfig
 import com.marklogic.appdeployer.AppDeployer
 import com.marklogic.appdeployer.command.Command
 import com.marklogic.appdeployer.command.CommandContext
 import com.marklogic.appdeployer.impl.SimpleAppDeployer
+import com.marklogic.client.DatabaseClient
 import com.marklogic.mgmt.ManageClient
 import com.marklogic.mgmt.admin.AdminManager
+import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.Internal
 
 /**
  * Base class that provides easy access to all of the resources setup by MarkLogicPlugin.
  */
 class MarkLogicTask extends DefaultTask {
 
+	@Internal
     AppConfig getAppConfig() {
         getProject().property("mlAppConfig")
     }
 
+	@Internal
     CommandContext getCommandContext() {
         getProject().property("mlCommandContext")
     }
 
+	@Internal
     ManageClient getManageClient() {
         getProject().property("mlManageClient")
     }
 
+	@Internal
     AppDeployer getAppDeployer() {
         getProject().property("mlAppDeployer")
     }
 
+	@Internal
     AdminManager getAdminManager() {
         getProject().property("mlAdminManager")
     }
 
 	// TODO Should remove this as "mlSecurityUsername" is preferred, and this is now specific to InstallAdminTask
 	@Deprecated
+	@Internal
     String getAdminUsername() {
         project.hasProperty("mlAdminUsername") ? project.property("mlAdminUsername") : project.property("mlUsername")
     }
 
 	// TODO Should remove this as "mlSecurityUsername" is preferred, and this is now specific to InstallAdminTask
 	@Deprecated
+	@Internal
 	String getAdminPassword() {
 		project.hasProperty("mlAdminPassword") ? project.property("mlAdminPassword") : project.property("mlPassword")
 	}

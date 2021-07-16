@@ -1,6 +1,8 @@
 buildscript {
   repositories {
+		// Still need jcenter until marklogic-unit-test is published to Maven Central
     jcenter()
+		mavenCentral()
 	  mavenLocal()
   }
   dependencies {
@@ -13,6 +15,7 @@ apply plugin: "java"
 apply plugin: "com.marklogic.ml-gradle"
 
 repositories {
+	mavenCentral()
 	jcenter()
 }
 
@@ -20,6 +23,6 @@ dependencies {
 	mlBundle "com.marklogic:marklogic-unit-test-modules:${marklogicUnitTestVersion}"
 
 	// For running marklogic-unit-test tests via JUnit
-	testCompile "com.marklogic:marklogic-unit-test-client:${marklogicUnitTestVersion}"
-	testCompile "junit:junit:4.12"
+	testImplementation "com.marklogic:marklogic-unit-test-client:${marklogicUnitTestVersion}"
+	testImplementation "junit:junit:4.12"
 }

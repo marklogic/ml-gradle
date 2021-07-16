@@ -1,6 +1,8 @@
 package com.marklogic.gradle.task.client
 
-import com.marklogic.gradle.task.MarkLogicTask
+
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 
 class CreateTransformTask extends AbstractModuleCreationTask {
@@ -22,7 +24,7 @@ declare function transform(
 	final static String SJS_TEMPLATE =
 '''function transform(context, params, content)
 {
-  // Must return the result of the transform 
+  // Must return the result of the transform
 };
 exports.transform = transform;
 '''
@@ -46,6 +48,8 @@ exports.transform = transform;
 </metadata>
 '''
 
+	@Input
+	@Optional
     String transformsDir
 
     @TaskAction

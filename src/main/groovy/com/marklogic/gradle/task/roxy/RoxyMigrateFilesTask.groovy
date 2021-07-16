@@ -1,10 +1,14 @@
 package com.marklogic.gradle.task.roxy
 
 import org.apache.commons.io.FileUtils
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 
 class RoxyMigrateFilesTask extends RoxyTask {
 
+	@Input
+	@Optional
 	def roxyFolderMapping = [
 								"src" : "/root",
 								"rest-api/config/options" : "/options",

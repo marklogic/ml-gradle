@@ -6,7 +6,9 @@ import com.marklogic.contentpump.bean.MlcpBean
 import org.gradle.api.Task
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.JavaExec
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 
 import com.marklogic.appdeployer.AppConfig
@@ -23,13 +25,19 @@ import com.marklogic.appdeployer.AppConfig
  */
 class MlcpTask extends JavaExec {
 
+	// This isn't yet working on Gradle 7; see https://github.com/marklogic-community/ml-gradle/issues/595
+	@Input
 	@Delegate
 	MlcpBean mlcpBean = new MlcpBean();
 
 	// Set this to define a URI in your content database for mlcp output to be written to as a text document
+	@Input
+	@Optional
 	String logOutputUri
 
 	// Allow the user to provide a custom DatabaseClient for logging mlcp output
+	@Input
+	@Optional
 	DatabaseClient logClient
 
 	Logger getLogger() {

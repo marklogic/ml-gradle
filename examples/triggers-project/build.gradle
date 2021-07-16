@@ -1,6 +1,14 @@
-plugins {
-  id "com.marklogic.ml-gradle" version "3.6.0"
+buildscript {
+	repositories {
+		mavenCentral()
+		mavenLocal()
+	}
+	dependencies {
+		classpath "com.marklogic:ml-gradle:4.3.0"
+	}
 }
+
+apply plugin: "com.marklogic.ml-gradle"
 
 /**
  * Starting with MarkLogic 8.0-4, triggers can be added via configuration files in the src/main/ml-config/triggers

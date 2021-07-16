@@ -2,6 +2,8 @@ package com.marklogic.gradle.task
 
 import com.marklogic.xcc.ContentSource
 import com.marklogic.xcc.SecurityOptions
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 
 import com.marklogic.gradle.xcc.XccHelper
@@ -11,10 +13,19 @@ import com.marklogic.gradle.xcc.XccHelper
  */
 class XccTask extends MarkLogicTask {
 
-    String xquery
+	@Input
+	String xquery
 
-    String xccUrl
+	@Input
+	@Optional
+	String xccUrl
+
+	@Input
+	@Optional
 	SecurityOptions securityOptions
+
+	@Input
+	@Optional
 	ContentSource contentSource
 
     @TaskAction

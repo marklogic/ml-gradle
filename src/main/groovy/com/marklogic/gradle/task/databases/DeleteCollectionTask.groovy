@@ -1,11 +1,17 @@
 package com.marklogic.gradle.task.databases
 
 import com.marklogic.gradle.task.MarkLogicTask
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 
 class DeleteCollectionTask extends MarkLogicTask {
 
+	@Input
+	@Optional
 	String collection
+
+	@Input
 	boolean showEstimate = true
 
 	@TaskAction

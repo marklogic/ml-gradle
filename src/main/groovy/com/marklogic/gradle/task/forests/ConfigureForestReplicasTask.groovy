@@ -1,9 +1,10 @@
 package com.marklogic.gradle.task.forests
 
-import org.gradle.api.tasks.TaskAction
-
 import com.marklogic.appdeployer.command.forests.ConfigureForestReplicasCommand
 import com.marklogic.gradle.task.MarkLogicTask
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.TaskAction
 
 /**
  * Task for executing an instance of ConfigureForestReplicasCommand. The command is exposed as a task attribute so
@@ -11,10 +12,12 @@ import com.marklogic.gradle.task.MarkLogicTask
  */
 class ConfigureForestReplicasTask extends MarkLogicTask {
 
-    ConfigureForestReplicasCommand command = new ConfigureForestReplicasCommand()
+	@Input
+	@Optional
+	ConfigureForestReplicasCommand command = new ConfigureForestReplicasCommand()
 
-    @TaskAction
-    void configureForestReplicas() {
-        command.execute(getCommandContext())
-    }
+	@TaskAction
+	void configureForestReplicas() {
+		command.execute(getCommandContext())
+	}
 }

@@ -10,6 +10,8 @@ import com.marklogic.client.ext.modulesloader.impl.DefaultModulesFinder
 import com.marklogic.client.ext.modulesloader.impl.DefaultModulesLoader
 import com.marklogic.client.ext.modulesloader.impl.PropertiesModuleManager
 import com.marklogic.gradle.task.MarkLogicTask
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.gradle.internal.impldep.bsh.This
 import org.springframework.core.io.Resource
@@ -25,12 +27,17 @@ import java.util.function.Consumer
  */
 class WatchTask extends MarkLogicTask {
 
+	@Input
 	long sleepTime = 1000
 
 	// Hook for after one or more modules have been loaded
+	@Input
+	@Optional
 	Consumer<Set<Resource>> onModulesLoaded
 
 	// Hook for after zero or more modules have been loaded, and after onModulesLoader has been invoked
+	@Input
+	@Optional
 	Consumer<ModuleWatchingContext> afterModulesLoadedCallback
 
 	@TaskAction

@@ -7,7 +7,7 @@ import com.marklogic.gradle.task.MarkLogicTask
 class DeployTemporalTask extends MarkLogicTask {
 
 	@TaskAction
-	void deployCpf() {
+	void deployTemporal() {
 		deployWithCommandListProperty("mlTemporalCommands")
 	}
 }

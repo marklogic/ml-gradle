@@ -1,6 +1,7 @@
 package com.marklogic.gradle.task.test
 
 import com.marklogic.gradle.task.MarkLogicTask
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 
 class GenerateUnitTestSuiteTask extends MarkLogicTask {
@@ -19,12 +20,12 @@ test:log("\$testName COMPLETE....")"""
 
 import module namespace test = 'http://marklogic.com/test' at '/test/test-helper.xqy';
 
-(: 
+(:
    This module will be run before each test in your suite.
    Here you might insert a document into the test database that each of your tests will modify.
    If no test-specific setup is required, this file may be deleted.
    Each setup runs in its own transaction.
-:) 
+:)
 test:log("\$testName Setup COMPLETE....")"""
 	}
 
@@ -66,7 +67,8 @@ import module namespace test = 'http://marklogic.com/test' at '/test/test-helper
 test:log("\$suiteName Suite Teardown ENDING....")"""
 	}
 
-    CommandLineArguments arguments
+	@Internal
+	CommandLineArguments arguments
 
     @TaskAction
     void generateTestSuite() {

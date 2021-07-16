@@ -7,6 +7,8 @@ import com.marklogic.test.unit.JUnitTestSuite
 import com.marklogic.test.unit.TestManager
 import org.apache.commons.io.FileUtils
 import org.gradle.api.GradleException
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -15,6 +17,8 @@ import org.gradle.api.tasks.TaskAction
  */
 class UnitTestTask extends MarkLogicTask {
 
+	@Input
+	@Optional
 	DatabaseClientConfig databaseClientConfig = new DatabaseClientConfig()
 
 	@TaskAction

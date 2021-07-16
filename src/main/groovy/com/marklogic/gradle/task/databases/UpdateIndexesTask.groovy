@@ -3,6 +3,8 @@ package com.marklogic.gradle.task.databases
 
 import com.marklogic.appdeployer.command.Command
 import com.marklogic.gradle.task.MarkLogicTask
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -10,6 +12,8 @@ import org.gradle.api.tasks.TaskAction
  */
 class UpdateIndexesTask extends MarkLogicTask {
 
+	@Input
+	@Optional
 	Command command
 
 	@TaskAction

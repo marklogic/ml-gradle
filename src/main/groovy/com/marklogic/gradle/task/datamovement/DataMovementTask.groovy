@@ -10,6 +10,8 @@ import com.marklogic.client.ext.datamovement.job.QueryBatcherJob
 import com.marklogic.client.ext.datamovement.listener.SimpleBatchLoggingListener
 import com.marklogic.gradle.task.MarkLogicTask
 import org.gradle.api.GradleException
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 
 /**
  * The "client" field in this task allows a user to provide a custom DatabaseClient while declaring an instance of
@@ -17,6 +19,8 @@ import org.gradle.api.GradleException
  */
 class DataMovementTask extends MarkLogicTask {
 
+	@Input
+	@Optional
 	DatabaseClient client
 
 	void runQueryBatcherJob(QueryBatcherJob job) {

@@ -1,9 +1,11 @@
 package com.marklogic.gradle.task.roxy
 
 import com.marklogic.gradle.task.MarkLogicTask
+import org.gradle.api.tasks.Internal
 
 class RoxyTask extends MarkLogicTask {
 
+	@Internal
 	String getRoxyProjectPath() {
 		project.hasProperty("roxyProjectPath") ? project.property("roxyProjectPath") : null
 	}

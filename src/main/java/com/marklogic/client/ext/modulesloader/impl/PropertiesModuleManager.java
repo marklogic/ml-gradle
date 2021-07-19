@@ -114,18 +114,10 @@ public class PropertiesModuleManager extends LoggingObject implements ModulesMan
 	public void saveLastLoadedTimestamp(File file, Date date) {
         String key = buildKey(file);
         props.setProperty(key, date.getTime() + "");
-        FileWriter fw = null;
-        try {
-            fw = new FileWriter(new File(propertiesFilePath));
+        try (FileWriter fw = new FileWriter(propertiesFilePath)) {
             props.store(fw, "");
         } catch (Exception e) {
             logger.warn("Unable to store properties, cause: " + e.getMessage());
-        } finally {
-            try {
-                fw.close();
-            } catch (Exception e) {
-                logger.warn(e.getMessage());
-            }
         }
     }
 

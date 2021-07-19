@@ -71,16 +71,10 @@ public abstract class PropertiesDrivenDocumentFileProcessor extends LoggingObjec
 		}
 
 		props = new Properties();
-		FileReader reader = null;
-		try {
-			reader = new FileReader(propertiesFile);
+		try (FileReader reader = new FileReader(propertiesFile)) {
 			props.load(reader);
 			propertiesCache.put(propertiesFile, props);
 			return props;
-		} finally {
-			if (reader != null) {
-				reader.close();
-			}
 		}
 	}
 

@@ -18,12 +18,12 @@ import java.util.Set;
 public interface ModulesLoader {
 
 	/**
-	 * Load modules from the given directory, and return the set of resources containing all modules written.
+	 * Load modules from the given directory
 	 *
 	 * @param directory
 	 * @param modulesFinder
 	 * @param client the DatabaseClient to use for loading REST extensions
-	 * @return
+	 * @return the set of resources containing all modules written
 	 */
 	Set<Resource> loadModules(String directory, ModulesFinder modulesFinder, DatabaseClient client);
 
@@ -34,7 +34,7 @@ public interface ModulesLoader {
 	 * @param client
 	 * @param modulesFinder
 	 * @param paths the DatabaseClient to use for loading REST extensions
-	 * @return
+	 * @return the set of resources containing all modules written
 	 */
 	Set<Resource> loadModules(DatabaseClient client, ModulesFinder modulesFinder, String... paths);
 }

@@ -83,7 +83,7 @@ public class PropertiesModuleManager extends LoggingObject implements ModulesMan
 	/**
 	 *
 	 * @param file
-	 * @return
+	 * @return true if file has been modified
 	 */
 	@Override
 	public boolean hasFileBeenModifiedSinceLastLoaded(File file) {
@@ -127,7 +127,7 @@ public class PropertiesModuleManager extends LoggingObject implements ModulesMan
      * differing in some cases, but I'm not sure why anyone would do that.
      *
      * @param file
-     * @return
+     * @return a string that can be used as a key for a Properties object
      */
     protected String buildKey(File file) {
         String path = file.getAbsolutePath().toLowerCase();

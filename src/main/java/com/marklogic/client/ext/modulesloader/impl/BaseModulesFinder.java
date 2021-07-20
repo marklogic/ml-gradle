@@ -97,7 +97,7 @@ public abstract class BaseModulesFinder extends LoggingObject implements Modules
 	 * test cases to know that this is safe for sure.
 	 *
 	 * @param resourceFile
-	 * @return
+	 * @return decoded resource path
 	 */
 	protected String decodeAssetDirectoryResource(String resourceFile) {
 	    if (resourceFile.contains("%20")) {
@@ -143,7 +143,7 @@ public abstract class BaseModulesFinder extends LoggingObject implements Modules
 	 * @param moduleType used for a log message
 	 * @param basePath
 	 * @param paths
-	 * @return
+	 * @return list of resources
 	 */
 	protected List<Resource> findResources(String moduleType, String basePath, String... paths) {
 		List<Resource> list = new ArrayList<>();

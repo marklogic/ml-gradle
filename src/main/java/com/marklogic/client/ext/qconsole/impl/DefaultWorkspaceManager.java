@@ -108,9 +108,7 @@ public class DefaultWorkspaceManager extends LoggingObject implements WorkspaceM
 	}
 
 	/**
-	 * Defaults to ~/.qconsole/workspaces.
-	 *
-	 * @return
+	 * @return defaults to ~/.qconsole/workspaces
 	 */
 	protected File getDefaultWorkspacesDir() {
 		File homeDir = new File(System.getProperty("user.home"));

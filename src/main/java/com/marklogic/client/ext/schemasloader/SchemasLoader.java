@@ -11,7 +11,7 @@ public interface SchemasLoader {
 	 * path, along with how to load them.
 	 *
 	 * @param paths
-	 * @return
+	 * @return a DocumentFile for each file that was loaded from the given paths
 	 */
 	List<DocumentFile> loadSchemas(String... paths);
 }

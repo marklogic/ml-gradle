@@ -42,7 +42,7 @@ public class DefaultDocumentWriteOperationAdapter implements DocumentWriteOperat
 	 * TODO Only adapts collections, quality, format, and permissions so far.
 	 *
 	 * @param handle
-	 * @return
+	 * @return a ContentCreateOptions based on the given metadata object
 	 */
 	protected ContentCreateOptions adaptMetadata(DocumentMetadataWriteHandle handle) {
 		ContentCreateOptions options = new ContentCreateOptions();

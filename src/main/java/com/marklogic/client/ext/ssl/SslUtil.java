@@ -17,7 +17,7 @@ public abstract class SslUtil {
 	 * Configure an SSLContext and X509TrustManager with TLSv1.2 as the default protocol and the default algorithm of
 	 * TrustManagerFactory.
 	 *
-	 * @return
+	 * @return an SslConfig object based on default settings
 	 */
 	public static SslConfig configureUsingTrustManagerFactory() {
 		return configureUsingTrustManagerFactory(DEFAULT_SSL_PROTOCOL, null);
@@ -29,7 +29,7 @@ public abstract class SslUtil {
 	 * @param protocol  the protocol to use when getting an instance of an SSLContext
 	 * @param algorithm an optional algorithm to use for getting an instance of TrustManagerFactory; if not specified,
 	 *                  the default algorithm of TrustManagerFactory is used
-	 * @return
+	 * @return an SslConfig based on the given inputs
 	 */
 	public static SslConfig configureUsingTrustManagerFactory(String protocol, String algorithm) {
 		SSLContext sslContext;

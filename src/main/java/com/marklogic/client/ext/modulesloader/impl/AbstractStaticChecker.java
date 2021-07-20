@@ -85,7 +85,7 @@ public abstract class AbstractStaticChecker extends LoggingObject implements Sta
 	 * in construct that statement, it cannot be distinguished from an error in the actual module. To turn this behavior
 	 * off, set "staticCheckLibraryModules" to false.
 	 *
-	 * @return
+	 * @return XQuery script
 	 */
 	protected String buildXqueryForStaticallyCheckingModule() {
 		String xquery =

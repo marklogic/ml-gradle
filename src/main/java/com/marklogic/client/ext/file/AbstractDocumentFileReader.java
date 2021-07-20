@@ -20,11 +20,9 @@ public abstract class AbstractDocumentFileReader extends LoggingObject {
 	}
 
 	/**
-	 * Retrieves a DocumentFileProcessor with the given short class name. Useful for when you want to customize a
-	 * particular processor.
-	 *
 	 * @param classShortName
-	 * @return
+	 * @return Retrieves a DocumentFileProcessor with the given short class name. Useful for when you want to customize a
+	 * particular processor.
 	 */
 	public DocumentFileProcessor getDocumentFileProcessor(String classShortName) {
 		for (DocumentFileProcessor processor : documentFileProcessors) {
@@ -47,7 +45,7 @@ public abstract class AbstractDocumentFileReader extends LoggingObject {
 	 * in 3.11.0, it defaults to false, as an exception typically indicates that the processing should stop.
 	 *
 	 * @param documentFile
-	 * @return
+	 * @return the result of processing the given DocumentFile; may return null
 	 */
 	protected DocumentFile processDocumentFile(DocumentFile documentFile) {
 		for (DocumentFileProcessor processor : documentFileProcessors) {

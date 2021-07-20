@@ -16,7 +16,7 @@ public class SimpleX509TrustManager implements X509TrustManager {
 	/**
 	 * Factory method for creating a simple SSLContext that uses this class as its TrustManager.
 	 *
-	 * @return
+	 * @return a default trust-everything SSLContext
 	 */
 	public static SSLContext newSSLContext() {
 		return newSSLContext(SslUtil.DEFAULT_SSL_PROTOCOL);

@@ -60,6 +60,8 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 	from javadoc
 }
 javadoc.failOnError = false
+// Ignores warnings on params that don't have descriptions, which is a little too noisy
+javadoc.options.addStringOption('Xdoclint:none', '-quiet')
 
 artifacts {
 	archives javadocJar, sourcesJar

@@ -49,7 +49,7 @@ public class JarDocumentFileReader extends AbstractDocumentFileReader implements
 	 *
 	 * @param basePath
 	 * @param paths
-	 * @return
+	 * @return list of resources
 	 */
 	protected List<Resource> findResources(String basePath, String... paths) {
 		List<Resource> list = new ArrayList<>();
@@ -77,10 +77,8 @@ public class JarDocumentFileReader extends AbstractDocumentFileReader implements
 	}
 
 	/**
-	 * Uses the list of FilenameFilter objects to determine if a document can be read from the given resource.
-	 *
 	 * @param r
-	 * @return
+	 * @return true if a document can be read from the given resource based on the list of FilenameFilter objects
 	 */
 	protected boolean canReadResource(Resource r) {
 		if (r == null) {

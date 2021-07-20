@@ -37,7 +37,7 @@ public class DefaultDocumentFileReader extends AbstractDocumentFileReader implem
 	 * DocumentFile that is constructed by a File.
 	 *
 	 * @param paths
-	 * @return
+	 * @return list of DocumentFile objects in the given paths
 	 */
 	public List<DocumentFile> readDocumentFiles(String... paths) {
 		documentFiles = new ArrayList<>();
@@ -67,7 +67,7 @@ public class DefaultDocumentFileReader extends AbstractDocumentFileReader implem
 	 * will try to resolve the path from its daemon directory.
 	 *
 	 * @param path
-	 * @return
+	 * @return a Path object based on the given string path
 	 */
 	protected Path constructPath(String path) {
 		File f;
@@ -128,11 +128,9 @@ public class DefaultDocumentFileReader extends AbstractDocumentFileReader implem
 	}
 
 	/**
-	 * If any of the configured FileFilter objects do not accept the Path, then it is not accepted.
-	 *
 	 * @param path
 	 * @param attrs
-	 * @return
+	 * @return false if any of the configured FileFilter objects do not accept the Path, else true
 	 */
 	protected boolean acceptPath(Path path, BasicFileAttributes attrs) {
 		if (fileFilters != null) {

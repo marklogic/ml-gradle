@@ -74,7 +74,7 @@ public class DefaultSchemasLoader extends GenericFileLoader implements SchemasLo
 	 * return the result.
 	 *
 	 * @param paths
-	 * @return
+	 * @return a DocumentFile for each file that was loaded as a schema
 	 */
 	@Override
 	public List<DocumentFile> loadSchemas(String... paths) {

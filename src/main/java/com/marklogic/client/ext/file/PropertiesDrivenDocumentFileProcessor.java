@@ -37,7 +37,7 @@ public abstract class PropertiesDrivenDocumentFileProcessor extends LoggingObjec
 
 	/**
 	 * @param documentFile
-	 * @return
+	 * @return null if the file is not accepted, else the incoming DocumentFile
 	 */
 	@Override
 	public DocumentFile processDocumentFile(DocumentFile documentFile) {

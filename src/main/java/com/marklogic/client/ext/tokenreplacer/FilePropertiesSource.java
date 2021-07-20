@@ -28,10 +28,8 @@ public class FilePropertiesSource extends LoggingObject implements PropertiesSou
 	}
 
 	/**
-	 * Return a Properties instance based on properties from the given File.
-	 *
 	 * @param file
-	 * @return
+	 * @return a Properties instance based on properties from the given File.
 	 */
 	protected Properties loadPropertiesFromFile(File file) {
 		Properties properties = new Properties();

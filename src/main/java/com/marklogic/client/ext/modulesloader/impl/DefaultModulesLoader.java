@@ -159,7 +159,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	 * @param baseDir
 	 * @param modulesFinder
 	 * @param client
-	 * @return
+	 * @return the set of resources capturing each module that was written
 	 */
 	public Set<Resource> loadModules(String baseDir, ModulesFinder modulesFinder, DatabaseClient client) {
 		return loadModules(client, modulesFinder, baseDir);
@@ -502,7 +502,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	 * @param r
 	 * @param metadata
 	 * @param methodParams
-	 * @return
+	 * @return the resource is one was installed, else null
 	 */
 	public Resource installService(Resource r, final ExtensionMetadata metadata, final MethodParameters... methodParams) {
 		if (!hasFileBeenModified(r) || ignoreResource(r)) {
@@ -531,7 +531,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	/**
 	 * @param r
 	 * @param metadata
-	 * @return
+	 * @return the resource is one was installed, else null
 	 */
 	public Resource installTransform(Resource r, final ExtensionMetadata metadata) {
 		if (!hasFileBeenModified(r) || ignoreResource(r)) {
@@ -562,7 +562,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 
 	/**
 	 * @param r
-	 * @return
+	 * @return the resource is one was installed, else null
 	 */
 	public Resource installQueryOptions(Resource r) {
 		if (!hasFileBeenModified(r) || ignoreResource(r)) {
@@ -628,7 +628,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 
 	/**
 	 * @param r
-	 * @return
+	 * @return the resource if one is installed, else null
 	 */
 	public Resource installNamespace(Resource r) {
 		if (!hasFileBeenModified(r) || ignoreResource(r)) {
@@ -658,7 +658,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 
 	/**
 	 * @param r
-	 * @return
+	 * @return the extension name if one exists; if not, then the filename
 	 */
 	protected String getExtensionNameFromFile(Resource r) {
 		String name = r.getFilename();
@@ -674,7 +674,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	 * resolved, then false is returned.
 	 *
 	 * @param r
-	 * @return
+	 * @return true if resource should be ignored
 	 */
 	protected boolean ignoreResource(Resource r) {
 		if (includeFilenamePattern != null) {
@@ -776,11 +776,9 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	}
 
 	/**
-	 * Returns a string that is useful for logging information about the DatabaseClient connection before a call is
-	 * made to load a REST extension.
-	 *
 	 * @param client
-	 * @return
+	 * @return a string that is useful for logging information about the DatabaseClient connection before a call is
+	 * made to load a REST extension.
 	 */
 	protected String getDatabaseClientInfo(DatabaseClient client) {
 		String info = format("port: %d", client.getPort());

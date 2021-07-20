@@ -15,11 +15,9 @@ public class DefaultFileFilter implements FileFilter, FilenameFilter {
     }
 
 	/**
-	 * Ignores the directory, returns false if the name starts with ".".
-	 *
 	 * @param dir
 	 * @param name
-	 * @return
+	 * @return Ignores the directory, returns false if the name starts with ".", otherwise true
 	 */
 	@Override
 	public boolean accept(File dir, String name) {

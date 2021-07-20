@@ -68,7 +68,7 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 	 * If a DocumentFileReader has not been set yet, then one will be constructed before any files are read.
 	 *
 	 * @param paths
-	 * @return
+	 * @return list of files from the given paths
 	 */
 	public List<DocumentFile> loadFiles(String... paths) {
 		batchWriter.initialize();
@@ -199,9 +199,7 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 	}
 
 	/**
-	 * Builds a set of DocumentFileProcessor objects based on how this class has been configured.
-	 *
-	 * @return
+	 * @return a set of DocumentFileProcessor objects based on how this class has been configured.
 	 */
 	protected List<DocumentFileProcessor> buildDocumentFileProcessors() {
 		List<DocumentFileProcessor> processors = new ArrayList<>();

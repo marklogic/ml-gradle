@@ -26,7 +26,7 @@ public class EntityServicesManager {
 	/**
 	 * @param moduleName      appended to the baseUri to determine the model definition URI
 	 * @param modelDefinition JSON or XML
-	 * @return
+	 * @return the URI of the loaded model
 	 */
 	public String loadModel(String moduleName, String modelDefinition) {
 		GenericDocumentManager mgr = client.newDocumentManager();

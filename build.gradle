@@ -17,30 +17,29 @@ repositories {
 }
 
 dependencies {
-  api ('com.marklogic:marklogic-client-api:5.4.0') {
-		// This isn't available via mavenCentral with its 2.3 coordinates, so it's excluded
-		// and then depended on below via its 2.5 coordinates
-		exclude module: "okhttp-digest"
-	}
-	implementation 'io.github.rburgst:okhttp-digest:2.5'
-
-  api 'com.marklogic:marklogic-xcc:10.0.6.2'
-  api 'org.springframework:spring-context:5.3.7'
+  api 'com.marklogic:marklogic-client-api:5.5.0'
+  api 'com.marklogic:marklogic-xcc:10.0.7'
+  api 'org.springframework:spring-context:5.3.9'
 
   implementation 'org.jdom:jdom2:2.0.6'
-	implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.1'
-	implementation 'org.slf4j:slf4j-api:1.7.30'
 
-  testImplementation "org.junit.jupiter:junit-jupiter:5.7.1"
-	testImplementation 'org.springframework:spring-test:5.3.7'
+	// This isn't the latest release, but it matches what is used by the ML Java Client
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.1'
+
+	// This is currently an implementation dependency, though perhaps should be an api dependency due to its usage in
+	// LoggingObject; not clear yet on whether the protected Logger in that class should make this an api dependency or not
+	implementation 'org.slf4j:slf4j-api:1.7.31'
+
+  testImplementation "org.junit.jupiter:junit-jupiter:5.7.2"
+	testImplementation 'org.springframework:spring-test:5.3.9'
 
   // Used for testing loading modules from the classpath
   testImplementation files("lib/modules.jar")
 
 	// Forcing Spring to use logback instead of commons-logging
-	testImplementation "ch.qos.logback:logback-classic:1.2.3"
-	testImplementation "org.slf4j:jcl-over-slf4j:1.7.30"
-	testImplementation "org.slf4j:slf4j-api:1.7.30"
+	testImplementation "ch.qos.logback:logback-classic:1.2.4"
+	testImplementation "org.slf4j:jcl-over-slf4j:1.7.31"
+	testImplementation "org.slf4j:slf4j-api:1.7.31"
 }
 
 test {

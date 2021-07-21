@@ -113,6 +113,10 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlRedeploy", group: deployGroup, dependsOn: ["mlClearModulesDatabase", "mlDeploy", "mlDeleteResourceTimestampsFile"], description: "Clears the modules database and then deploys the application")
 		project.task("mlDeleteResourceTimestampsFile", type: DeleteResourceTimestampsFileTask, group: deployGroup, description: "Delete the properties file in the build directory (stored there by default) that keeps track of when each resource was last deployed; the file path can be overridden by setting the filePath property of this class")
 		project.task("mlPreviewDeploy", type: PreviewDeployTask, group: deployGroup, description: "Preview a deployment without making any changes")
+		project.task("mlDeployToReplica", type: DeployToReplicaTask, group: deployGroup,
+			description: "Deploys application resources in the same manner as mlDeploy, but will not deploy anything that " +
+				"involves writing data to a database - such as modules, schemas, and triggers - thus making it safe for use " +
+				"when deploying an application to a replica cluster")
 
 		String adminGroup = "ml-gradle Admin"
 		project.task("mlInit", type: InitTask, group: adminGroup, description: "Perform a one-time initialization of a MarkLogic server; uses the properties 'mlLicenseKey' and 'mlLicensee'")

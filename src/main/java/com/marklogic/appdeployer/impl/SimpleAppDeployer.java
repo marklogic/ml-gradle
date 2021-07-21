@@ -19,6 +19,10 @@ public class SimpleAppDeployer extends AbstractAppDeployer {
 		buildModifiableCommandList(commandArray);
 	}
 
+	public SimpleAppDeployer(List<Command> commands) {
+		this.commands = commands;
+	}
+
 	public SimpleAppDeployer(ManageClient manageClient, AdminManager adminManager, Command... commandArray) {
 		super(manageClient, adminManager);
 		buildModifiableCommandList(commandArray);

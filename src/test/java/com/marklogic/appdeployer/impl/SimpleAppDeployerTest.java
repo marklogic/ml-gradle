@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
 public class SimpleAppDeployerTest  {
 
     private SimpleAppDeployer deployer;
@@ -40,5 +42,17 @@ public class SimpleAppDeployerTest  {
 		assertEquals(1, deployer.getCommands().size());
 		assertEquals(dbCommand, deployer.removeCommand("DeployOtherDatabasesCommand"));
 		assertTrue(deployer.getCommands().isEmpty());
+	}
+
+	@Test
+	void constructWithList() {
+    	deployer = new SimpleAppDeployer(Arrays.asList(new DeployOtherDatabasesCommand()));
+    	assertEquals(1, deployer.getCommands().size());
+	}
+
+	@Test
+	void constructWithArray() {
+    	deployer = new SimpleAppDeployer(new DeployOtherDatabasesCommand());
+    	assertEquals(1, deployer.getCommands().size());
 	}
 }

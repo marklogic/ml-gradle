@@ -51,10 +51,92 @@ import java.util.Map;
  */
 public class CommandMapBuilder {
 
+	/**
+	 * @return a map of all commands relevant to deploying an application, including those that can write data to a
+	 * database and thus should only be run against a cluster that is not a replica cluster
+	 */
 	public Map<String, List<Command>> buildCommandMap() {
 		Map<String, List<Command>> map = new HashMap<>();
+		addCommandsThatDoNotWriteToDatabases(map);
+		addCommandsThatWriteToDatabases(map);
+		return map;
+	}
 
-		// Security
+	/**
+	 * For deploying to a replica cluster, care must be taken not to run any command that will write to a database that
+	 * is likely to have database replication configured for it. This then returns a map of commands that are known not
+	 * to write any data to databases. The security commands are an exception though, as it's typical for the Security
+	 * database to not have database replication configured for it. If this is not the case for a user, the user can
+	 * still use this method and simply remove the commands that write to the Security database.
+	 *
+	 * @return
+	 */
+	public Map<String, List<Command>> buildCommandMapForReplicaCluster() {
+		Map<String, List<Command>> map = new HashMap<>();
+		addCommandsThatDoNotWriteToDatabases(map);
+		return map;
+	}
+
+	/**
+	 * Same as buildCommandMapForReplicaCluster, but returns a list of all the commands.
+	 *
+	 * @return
+	 */
+	public List<Command> getCommandsForReplicaCluster() {
+		return buildCommandMapForReplicaCluster()
+			.values()
+			.stream().reduce(new ArrayList<>(), (a, b) -> {
+				a.addAll(b);
+				return a;
+			});
+	}
+
+	private void addCommandsThatDoNotWriteToDatabases(Map<String, List<Command>> map) {
+		List<Command> clusterCommands = new ArrayList<Command>();
+		clusterCommands.add(new ModifyLocalClusterCommand());
+		map.put("mlClusterCommands", clusterCommands);
+
+		List<Command> configurationCommands = new ArrayList<>();
+		configurationCommands.add(new DeployConfigurationsCommand());
+		map.put("mlConfigurationCommands", configurationCommands);
+
+		List<Command> dbCommands = new ArrayList<Command>();
+		dbCommands.add(new DeployOtherDatabasesCommand());
+		map.put("mlDatabaseCommands", dbCommands);
+
+		List<Command> forestCommands = new ArrayList<Command>();
+		forestCommands.add(new DeployCustomForestsCommand());
+		map.put("mlForestCommands", forestCommands);
+
+		List<Command> replicaCommands = new ArrayList<Command>();
+		replicaCommands.add(new ConfigureForestReplicasCommand());
+		map.put("mlForestReplicaCommands", replicaCommands);
+
+		List<Command> groupCommands = new ArrayList<Command>();
+		groupCommands.add(new DeployGroupsCommand());
+		map.put("mlGroupCommands", groupCommands);
+
+		List<Command> hostCommands = new ArrayList<Command>();
+		hostCommands.add(new AssignHostsToGroupsCommand());
+		map.put("mlHostCommands", hostCommands);
+
+		List<Command> mimetypeCommands = new ArrayList<Command>();
+		mimetypeCommands.add(new DeployMimetypesCommand());
+		map.put("mlMimetypeCommands", mimetypeCommands);
+
+		List<Command> pluginCommands = new ArrayList<>();
+		pluginCommands.add(new InstallPluginsCommand());
+		map.put("mlPluginCommands", pluginCommands);
+
+		List<Command> rebalancerCommands = new ArrayList<>();
+		rebalancerCommands.add(new DeployPartitionsCommand());
+		rebalancerCommands.add(new DeployPartitionQueriesCommand());
+		map.put("mlRebalancerCommands", rebalancerCommands);
+
+		List<Command> restApiCommands = new ArrayList<>();
+		restApiCommands.add(new DeployRestApiServersCommand());
+		map.put("mlRestApiCommands", restApiCommands);
+
 		List<Command> securityCommands = new ArrayList<Command>();
 		securityCommands.add(new DeployRolesCommand());
 		securityCommands.add(new DeployUsersCommand());
@@ -70,128 +152,61 @@ public class CommandMapBuilder {
 		securityCommands.add(new DeployQueryRolesetsCommand());
 		map.put("mlSecurityCommands", securityCommands);
 
-		// Cluster
-		List<Command> clusterCommands = new ArrayList<Command>();
-		clusterCommands.add(new ModifyLocalClusterCommand());
-		map.put("mlClusterCommands", clusterCommands);
-
-		// Configurations
-		List<Command> configurationCommands = new ArrayList<>();
-		configurationCommands.add(new DeployConfigurationsCommand());
-		map.put("mlConfigurationCommands", configurationCommands);
-
-		// Databases
-		List<Command> dbCommands = new ArrayList<Command>();
-		dbCommands.add(new DeployOtherDatabasesCommand());
-		map.put("mlDatabaseCommands", dbCommands);
-
-		// Database rebalancer
-		List<Command> rebalancerCommands = new ArrayList<>();
-		rebalancerCommands.add(new DeployPartitionsCommand());
-		rebalancerCommands.add(new DeployPartitionQueriesCommand());
-		map.put("mlRebalancerCommands", rebalancerCommands);
-
-		// Schemas
-		List<Command> schemaCommands = new ArrayList<>();
-		schemaCommands.add(new LoadSchemasCommand());
-		map.put("mlSchemaCommands", schemaCommands);
-
-		// REST API instance creation
-		List<Command> restApiCommands = new ArrayList<>();
-		restApiCommands.add(new DeployRestApiServersCommand());
-		map.put("mlRestApiCommands", restApiCommands);
-
-		// App servers
 		List<Command> serverCommands = new ArrayList<>();
 		serverCommands.add(new DeployOtherServersCommand());
 		serverCommands.add(new UpdateRestApiServersCommand());
 		map.put("mlServerCommands", serverCommands);
 
-		// Modules
-		List<Command> moduleCommands = new ArrayList<>();
-		moduleCommands.add(new LoadModulesCommand());
-		moduleCommands.add(new DeleteTestModulesCommand());
-		map.put("mlModuleCommands", moduleCommands);
+		List<Command> taskCommands = new ArrayList<Command>();
+		taskCommands.add(new DeployScheduledTasksCommand());
+		taskCommands.add(new UpdateTaskServerCommand());
+		map.put("mlTaskCommands", taskCommands);
+	}
 
-		// Alerting
+	private void addCommandsThatWriteToDatabases(Map<String, List<Command>> map) {
 		List<Command> alertCommands = new ArrayList<Command>();
 		alertCommands.add(new DeployAlertConfigsCommand());
 		alertCommands.add(new DeployAlertActionsCommand());
 		alertCommands.add(new DeployAlertRulesCommand());
 		map.put("mlAlertCommands", alertCommands);
 
-		// CPF
 		List<Command> cpfCommands = new ArrayList<Command>();
 		cpfCommands.add(new DeployCpfConfigsCommand());
 		cpfCommands.add(new DeployDomainsCommand());
 		cpfCommands.add(new DeployPipelinesCommand());
 		map.put("mlCpfCommands", cpfCommands);
 
-		// Data
 		List<Command> dataCommands = new ArrayList<>();
 		dataCommands.add(new LoadDataCommand());
 		map.put("mlDataCommands", dataCommands);
 
-		// Flexrep
 		List<Command> flexrepCommands = new ArrayList<Command>();
 		flexrepCommands.add(new DeployConfigsCommand());
 		flexrepCommands.add(new DeployTargetsCommand());
 		flexrepCommands.add(new DeployFlexrepCommand());
 		map.put("mlFlexrepCommands", flexrepCommands);
 
-		// Groups
-		List<Command> groupCommands = new ArrayList<Command>();
-		groupCommands.add(new DeployGroupsCommand());
-		map.put("mlGroupCommands", groupCommands);
+		List<Command> moduleCommands = new ArrayList<>();
+		moduleCommands.add(new LoadModulesCommand());
+		moduleCommands.add(new DeleteTestModulesCommand());
+		map.put("mlModuleCommands", moduleCommands);
 
-		List<Command> mimetypeCommands = new ArrayList<Command>();
-		mimetypeCommands.add(new DeployMimetypesCommand());
-		map.put("mlMimetypeCommands", mimetypeCommands);
+		List<Command> schemaCommands = new ArrayList<>();
+		schemaCommands.add(new LoadSchemasCommand());
+		map.put("mlSchemaCommands", schemaCommands);
 
-		// Hosts
-		List<Command> hostCommands = new ArrayList<Command>();
-		hostCommands.add(new AssignHostsToGroupsCommand());
-		map.put("mlAssignHostsToGroups", hostCommands);
-
-		// Forests
-		List<Command> forestCommands = new ArrayList<Command>();
-		forestCommands.add(new DeployCustomForestsCommand());
-		map.put("mlForestCommands", forestCommands);
-
-		// Forest replicas
-		List<Command> replicaCommands = new ArrayList<Command>();
-		replicaCommands.add(new ConfigureForestReplicasCommand());
-		map.put("mlForestReplicaCommands", replicaCommands);
-
-		// Plugins
-		List<Command> pluginCommands = new ArrayList<>();
-		pluginCommands.add(new InstallPluginsCommand());
-		map.put("mlPluginCommands", pluginCommands);
-
-		// Tasks
-		List<Command> taskCommands = new ArrayList<Command>();
-		taskCommands.add(new DeployScheduledTasksCommand());
-		taskCommands.add(new UpdateTaskServerCommand());
-		map.put("mlTaskCommands", taskCommands);
-
-		// Temporal
 		List<Command> temporalCommands = new ArrayList<>();
 		temporalCommands.add(new DeployTemporalAxesCommand());
 		temporalCommands.add(new DeployTemporalCollectionsCommand());
 		temporalCommands.add(new DeployTemporalCollectionsLSQTCommand());
 		map.put("mlTemporalCommands", temporalCommands);
 
-		// Triggers
 		List<Command> triggerCommands = new ArrayList<Command>();
 		triggerCommands.add(new DeployTriggersCommand());
 		map.put("mlTriggerCommands", triggerCommands);
 
-
-		// SQL Views
 		List<Command> viewCommands = new ArrayList<Command>();
 		viewCommands.add(new DeployViewSchemasCommand());
 		map.put("mlViewCommands", viewCommands);
-
-		return map;
 	}
 }

@@ -9,10 +9,10 @@ include this by default (not every ml-gradle user will use marklogic-unit-test),
 
     buildscript {
       repositories {
-        jcenter()
+        mavenCentral()
       }
       dependencies {
-        classpath "com.marklogic:marklogic-unit-test-client:1.0.0"
+        classpath "com.marklogic:marklogic-unit-test-client:1.1.0"
       }
     }
 
@@ -20,11 +20,11 @@ Next, the marklogic-unit-test framework is depended on and installed as an "mlBu
 is a feature of ml-gradle for depending on packages of MarkLogic modules):
 
     repositories {
-      jcenter()
+      mavenCentral()
     }
       
     dependencies {
-      mlBundle "com.marklogic:marklogic-unit-test-modules:1.0.0"
+      mlBundle "com.marklogic:marklogic-unit-test-modules:1.1.0"
     }
 
 ## Running unit tests
@@ -34,32 +34,35 @@ determine which MarkLogic app server to connect to - see below for how to custom
 
 First, deploy the application:
 
-    gradle mlDeploy
+    ./gradlew mlDeploy
     
 This will deploy the application along with the marklogic-unit-test modules.
 
 Then, run the tests:
 
-    gradle mlUnitTest
+    ./gradlew mlUnitTest
 
 Two tests are run, and one should fail, so you can see what a failed test looks like. 
 
 This project includes the Gradle Java plugin, which allows you to run tests under src/test/java. This project includes
-an example of a JUnit Parameterized test that invokes each marklogic-unit-test module separately - you can try it like this:
+an example of a test that invokes each marklogic-unit-test module separately - you can try it like this:
 
-    gradle test
+    ./gradlew test
 
-Again, two tests will run, and one will intentionally fail. The Parameterized test can be run in an IDE as well, allowing
-you to take advantage of your IDE's support for JUnit tests.
+Again, two tests will run, and one will intentionally fail. The test can be run in an IDE as well, allowing
+you to take advantage of your IDE's support for JUnit tests. The test depends on the marklogic-junit5 library from the
+marklogic-unit-test project. This library provides support for writing JUnit 5 tests, including running all of your 
+marklogic-unit-test modules. See [the marklogic-junit5 project](https://github.com/marklogic-community/marklogic-unit-test/tree/master/marklogic-junit5)
+for more information.
 
 You can also access the marklogic-unit-test REST endpoints directly:
 
-- List the tests - http://localhost:8135/v1/resources/marklogic-unit-test
-- Run a test suite - http://localhost:8135/v1/resources/marklogic-unit-test?rs:func=run&rs:suite=My%20Tests
+- List the tests - http://localhost:8015/v1/resources/marklogic-unit-test
+- Run a test suite - http://localhost:8015/v1/resources/marklogic-unit-test?rs:func=run&rs:suite=My%20Tests
 
 And you can run the original UI test runner by going to:
 
-- http://localhost:8135/test/default.xqy
+- http://localhost:8015/test/default.xqy
 
 ## Configuring which server mlUnitTest connects to 
 

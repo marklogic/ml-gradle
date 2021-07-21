@@ -1,35 +1,18 @@
-buildscript {
-	repositories {
-		jcenter()
-		// Needed for mlcp dependency: XCC
-		maven { url "http://developer.marklogic.com/maven2/" }
-	}
-	dependencies {
-		classpath "com.marklogic:marklogic-contentpump:9.0.3"
-		classpath "com.marklogic:ml-gradle:3.6.0"
-	}
+plugins {
+	id "com.marklogic.ml-gradle" version "4.2.1"
 }
 
-apply plugin: "com.marklogic.ml-gradle"
-
 repositories {
-	jcenter()
-	// Needed for mlcp dependency
-	maven { url "http://developer.marklogic.com/maven2/" }
-	maven { url "http://repository.cloudera.com/artifactory/cloudera-repos/" }
+	mavenCentral()
 }
 
 configurations {
-	mlcp {
-		resolutionStrategy {
-			force "xml-apis:xml-apis:1.4.01"
-		}
-	}
+	mlcp
 }
 
 
 dependencies {
-	mlcp "com.marklogic:mlcp:9.0.3"
+	mlcp "com.marklogic:mlcp:10.0.6.2"
 	mlcp files("lib")
 }
 
@@ -47,7 +30,7 @@ task importSampleRedactionData(type: com.marklogic.gradle.task.MlcpTask) {
 	classpath = configurations.mlcp
 	command = "IMPORT"
 	database = mlAppConfig.contentDatabaseName
-	input_file_path = "data/import"
+	input_file_path = "./data/import"
 	output_collections = "security-rules,pii-rules,email-rules"
 	output_permissions = "rest-reader,read,rest-writer,update"
 	output_uri_replace = ".*import,'/import'"
@@ -63,12 +46,12 @@ task importSampleRedactionData(type: com.marklogic.gradle.task.MlcpTask) {
 * */
 task exportSampleRedactionData(type: JavaExec) {
 	classpath = configurations.mlcp
-	main = 'com.marklogic.contentpump.ContentPump'
+	mainClass = 'com.marklogic.contentpump.ContentPump'
 
 	args = [
 		"EXPORT",
 		"-host", "${mlHost}",
-		"-port", "8130",
+		"-port", "${mlRestPort}",
 		"-username", "${mlUsername}",
 		"-password", "${mlPassword}",
 		"-database", mlAppConfig.contentDatabaseName,

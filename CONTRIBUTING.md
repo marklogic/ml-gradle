@@ -37,7 +37,7 @@ Then pick a project under ./examples, and replace the "plugins" block with the f
     buildscript {
       repositories {
         mavenLocal() 
-        jcenter()
+        mavenCentral()
       } 
       dependencies {
         classpath "com.marklogic:ml-gradle:(the version number you chose)"
@@ -45,8 +45,8 @@ Then pick a project under ./examples, and replace the "plugins" block with the f
     }
     apply plugin: "com.marklogic.ml-gradle"
 
-The above unfortunately has to be done because while the "plugins" DSL in Gradle is very concise and automatically 
-includes jcenter() as a repository, it can't be used for finding plugins in your local Maven repository. So we have to
+The above unfortunately has to be done because while the "plugins" DSL in Gradle is very concise, 
+it can't be used for finding plugins in your local Maven repository. So we have to
 replace it with the much more verbose syntax. Of course, after you're done testing with this, change the Gradle file
 back to just use the plugins DSL.
 

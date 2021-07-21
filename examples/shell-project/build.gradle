@@ -3,7 +3,9 @@ plugins {
 }
 
 repositories {
+	// Needed for ml-groovysh
   jcenter()
+
 	mavenCentral()
 	mavenLocal()
 }

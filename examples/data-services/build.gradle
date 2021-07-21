@@ -1,11 +1,9 @@
 plugins {
 	id "java"
-	id "net.saliman.properties" version "1.4.6"
-	id "com.marklogic.ml-gradle" version "3.14.0"
-	id 'com.marklogic.ml-development-tools' version '4.2.0'
+	id "net.saliman.properties" version "1.5.1"
+	id "com.marklogic.ml-gradle" version "4.2.1"
+	id 'com.marklogic.ml-development-tools' version '5.5.0'
 }
-
-// apply plugin : 'eclipse'
 
 task generateHelloWorld(type: com.marklogic.client.tools.gradle.EndpointProxiesGenTask) {
 	description = "This task is used to generate the src/main/java/com/acme/HelloWorld.java class"
@@ -13,7 +11,7 @@ task generateHelloWorld(type: com.marklogic.client.tools.gradle.EndpointProxiesG
 }
 
 repositories {
-	jcenter()
+	mavenCentral()
 }
 
 test {
@@ -21,14 +19,13 @@ test {
 }
 
 dependencies {
-	implementation 'org.slf4j:slf4j-api:1.7.21'
-	implementation 'com.marklogic:marklogic-client-api:4.2.0'
+	implementation 'org.slf4j:slf4j-api:1.7.31'
+	implementation 'com.marklogic:marklogic-client-api:5.5.0'
 
-	testImplementation "org.junit.jupiter:junit-jupiter-api:5.4.1"
-	testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.4.1"
+	testImplementation "org.junit.jupiter:junit-jupiter:5.7.2"
 
 	// Force usage of logback for logging
-	testRuntimeOnly "ch.qos.logback:logback-classic:1.1.8"
-	testRuntimeOnly group: "org.slf4j", name: "jcl-over-slf4j", version: "1.7.22"
-	testRuntimeOnly group: "org.slf4j", name: "slf4j-api", version: "1.7.22"
+	testImplementation "ch.qos.logback:logback-classic:1.2.4"
+	testImplementation "org.slf4j:jcl-over-slf4j:1.7.31"
+	testImplementation "org.slf4j:slf4j-api:1.7.31"
 }

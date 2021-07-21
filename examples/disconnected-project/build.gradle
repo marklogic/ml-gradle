@@ -1,16 +1,16 @@
 /*
- * This Gradle file shows one approach for supporting a "disconnected" build - i.e. one that doesn't use any 
+ * This Gradle file shows one approach for supporting a "disconnected" build - i.e. one that doesn't use any
  * repositories, but rather finds dependencies in a directory structure. You can run "gradle buildMlDeployer", and then
- * unzip that file anywhere and run all the ml-gradle tasks as you normally would. 
- * 
- * The presence of a property named "disconnected" is what tells the build file to run in disconnected mode. It is 
+ * unzip that file anywhere and run all the ml-gradle tasks as you normally would.
+ *
+ * The presence of a property named "disconnected" is what tells the build file to run in disconnected mode. It is
  * automatically set to true in the gradle.properties file that's included in the zip produced by "buildMlDeployer".
- * 
- * There are other ways to solve the problem of running Gradle when it's not possible to connect to artifact 
+ *
+ * There are other ways to solve the problem of running Gradle when it's not possible to connect to artifact
  * repositories - this is just one approach.
  *
  * I think the old "apply" approach for plugins is needed here, I don't think the plugins DSL will work
- * against a file tree. 
+ * against a file tree.
  */
 buildscript {
     if (project.hasProperty("disconnected")) {
@@ -20,7 +20,7 @@ buildscript {
     }
     else {
         repositories {
-            jcenter()
+            mavenCentral()
         }
         dependencies {
             classpath mlGradleDependency
@@ -60,7 +60,7 @@ if (project.hasProperty("disconnected")) {
  */
 else {
     repositories {
-        jcenter()
+			mavenCentral()
         maven {url "http://developer.marklogic.com/maven2/"}
         maven {url "http://repository.cloudera.com/artifactory/cloudera-repos/" }
     }

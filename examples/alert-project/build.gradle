@@ -1,7 +1,19 @@
 plugins {
   id "java"
   id "eclipse"
-  id "com.marklogic.ml-gradle" version "3.6.0"
+  id "com.marklogic.ml-gradle" version "4.2.1"
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	testImplementation "com.marklogic:marklogic-junit5:1.1.0"
+}
+
+test {
+	useJUnitPlatform()
 }
 
 /**
@@ -12,12 +24,4 @@ plugins {
  */
 ext {
   mlAppDeployer.commands.add(new com.marklogic.appdeployer.command.cpf.DeployDefaultPipelinesCommand())
-}
-
-repositories {
-  jcenter()
-}
-
-dependencies {
-  testCompile "com.marklogic:ml-junit:3.0.0"
 }

@@ -6,7 +6,7 @@ buildscript {
 			maven { url uri(projectMavenRepo) }
 		} else {
 			println "Using online buildscript dependency repositories"
-			jcenter()
+			mavenCentral()
 			maven { url "http://developer.marklogic.com/maven2/" }
 		}
 	}
@@ -14,8 +14,8 @@ buildscript {
 
 plugins {
 	id 'java' //optional - delete if not needed
-	id 'net.saliman.properties' version '1.4.6'
-	id 'com.marklogic.ml-gradle' version '3.7.1'
+	id 'net.saliman.properties' version '1.5.1'
+	id 'com.marklogic.ml-gradle' version '4.2.1'
 }
 
 repositories {
@@ -25,7 +25,7 @@ repositories {
 		maven { url uri(projectMavenRepo) }
 	} else {
 		println "Using online dependency repositories"
-		jcenter()
+		mavenCentral()
 		maven { url "http://developer.marklogic.com/maven2/" }
 	}
 }
@@ -36,10 +36,10 @@ configurations {
 
 dependencies {
 	// sample java compile dependency. Remove if not required
-	compile 'com.marklogic:marklogic-xcc:9.0.7'
+	compile 'com.marklogic:marklogic-xcc:10.0.7'
 
 	//sample mlcp dependency. Remove if not required
-	mlcp "com.marklogic:mlcp:9.0.7"
+	mlcp "com.marklogic:mlcp:10.0.6.2"
 }
 
 /**

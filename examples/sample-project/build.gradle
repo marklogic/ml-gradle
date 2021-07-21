@@ -5,7 +5,6 @@
 buildscript {
 	repositories {
 		mavenLocal()
-		jcenter()
 		mavenCentral()
 	}
 	dependencies {
@@ -38,7 +37,7 @@ apply plugin: "com.marklogic.ml-gradle"
  * dependencies expressed below.
  */
 repositories {
-	jcenter()
+	mavenCentral()
 	mavenLocal()
 }
 
@@ -55,18 +54,14 @@ configurations {
  * using that library in tests that must invoke MarkLogic HTTP endpoints.
  */
 dependencies {
-	// Needed to compile and run the JUnit tests
-	// Note that ml-junit has been deprecated and replaced by marklogic-unit-test + marklogic-junit
-	testImplementation "com.marklogic:ml-junit:3.2.0"
+	testImplementation "com.marklogic:marklogic-junit5:1.1.0"
 	testImplementation "com.jayway.restassured:rest-assured:2.4.1"
 
-	// Required for Java 11
-	testImplementation "javax.xml.bind:jaxb-api:2.3.1"
-	testImplementation "com.sun.xml.bind:jaxb-core:2.3.0.1"
-	testImplementation "com.sun.xml.bind:jaxb-impl:2.3.2"
-
-	// corb jar available from jcenter
 	corb "com.marklogic:marklogic-corb:2.4.5"
+}
+
+test {
+	useJUnitPlatform()
 }
 
 /*

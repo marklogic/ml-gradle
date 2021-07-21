@@ -1,14 +1,18 @@
 plugins {
-  id "java"
-  id "eclipse"
-  id "com.marklogic.ml-gradle" version "3.6.0"
+	id "java"
+	id "eclipse"
+	id "com.marklogic.ml-gradle" version "4.2.1"
 }
 
 repositories {
-    jcenter()
+	mavenCentral()
+	mavenLocal()
 }
 
 dependencies {
-    testCompile "com.marklogic:ml-junit:3.0.0"
-    testCompile "com.jayway.restassured:rest-assured:2.4.1"
+	testImplementation "com.marklogic:marklogic-junit5:1.1.0"
+}
+
+test {
+	useJUnitPlatform()
 }

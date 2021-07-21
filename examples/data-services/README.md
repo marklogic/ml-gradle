@@ -20,7 +20,7 @@ This creates an app server suitable for Data Services - i.e. one without a rewri
 To generate the `org.example.HelloWorld` proxy class, run:
 
 ```shell
-gradle generateHelloWorld
+./gradlew generateHelloWorld
 ```
 
 Take a look at `build.gradle` to see how this task is implemented using `com.marklogic.client.tools.gradle.EndpointProxiesGenTask`.

@@ -25,10 +25,10 @@ repositories {
 dependencies {
   implementation gradleApi()
 	implementation localGroovy()
-	api "com.marklogic:ml-app-deployer:4.3.0-SNAPSHOT"
+	api "com.marklogic:ml-app-deployer:4.3.0"
 	implementation "com.marklogic:mlcp-util:1.0"
-	implementation "com.marklogic:marklogic-data-movement-components:2.3.0"
-	implementation "commons-io:commons-io:2.8.0"
+	implementation "com.marklogic:marklogic-data-movement-components:2.4.0"
+	implementation "commons-io:commons-io:2.11.0"
 
 	compileOnly "com.marklogic:marklogic-unit-test-client:1.1.0"
 

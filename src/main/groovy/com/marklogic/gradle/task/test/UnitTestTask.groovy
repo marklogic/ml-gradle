@@ -70,22 +70,29 @@ class UnitTestTask extends MarkLogicTask {
 			def report = new DefaultJUnitTestReporter().reportOnJUnitTestSuites(suites)
 			println report
 
-			String resultsPath = "build/test-results/marklogic-unit-test"
+			File resultsDir = new File(getProject().getProjectDir(), "build/test-results/marklogic-unit-test")
 			String resultProperty = "unitTestResultsPath"
 			if (project.hasProperty(resultProperty)) {
-				resultsPath = project.property(resultProperty)
+				resultsDir = new File(project.property(resultProperty))
 			}
 
-			File resultsDir = new File(resultsPath)
 			if (resultsDir.exists()) {
 				try {
-					FileUtils.cleanDirectory(resultsDir)
+					FileUtils.deleteDirectory(resultsDir)
 					println "Deleted existing results directory: " + resultsDir
 				} catch (Exception e) {
 					println "Unable to delete test results directory: " + resultsDir
 				}
 			}
-			resultsDir.mkdirs()
+
+			// The resultsDir may exist in case the call to delete it failed, in which case the exception is logged
+			// but not rethrown. In that case, we don't need to try to make the directory.
+			if (!resultsDir.exists()) {
+				if (!resultsDir.mkdirs()) {
+					throw new GradleException("Unable to run tests; unable to create results directory at: " + resultsDir +
+						"; please ensure you have write permission to this directory")
+				}
+			}
 
 			int fileCount = 0;
 			boolean testsFailed = false
@@ -99,12 +106,11 @@ class UnitTestTask extends MarkLogicTask {
 				fileCount++;
 			}
 
-			println "\n" + fileCount + " test result files were written to: " + resultsPath
+			println "\n" + fileCount + " test result files were written to: " + resultsDir
 
 			if (testsFailed) {
-				throw new GradleException("There were failing tests. See the test results at: " + resultsPath)
+				throw new GradleException("There were failing tests. See the test results at: " + resultsDir)
 			}
-
 		} finally {
 			client.release()
 		}

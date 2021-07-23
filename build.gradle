@@ -62,6 +62,20 @@ signing {
 	sign configurations.archives
 }
 
+task generatePomForDependencyGraph(dependsOn: "generatePomFileForMainJavaPublication") {
+	description = "Prepare for a release by making a copy of the generated pom file in the root directory so that it " +
+		"can enable Github's Dependency Graph feature, which does not yet support Gradle"
+	doLast {
+		def preamble = '<?xml version="1.0" encoding="UTF-8"?>'
+		def comment = "<!--\n" +
+			"This file was generated via Gradle and is being used primarily for github's Dependency Graph feature.\n" +
+			"It is not intended to be used to build this project.\n" +
+			"-->"
+		def fileText = file("build/publications/mainJava/pom-default.xml").getText()
+		file("pom.xml").setText(fileText.replace(preamble, preamble + comment))
+	}
+}
+
 publishing {
 	publications {
 		mainJava(MavenPublication) {

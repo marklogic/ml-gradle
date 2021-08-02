@@ -12,7 +12,7 @@ It is not intended to be used to build this project.
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.marklogic</groupId>
   <artifactId>ml-gradle</artifactId>
-  <version>4.3.0</version>
+  <version>4.3.1</version>
   <name>com.marklogic:ml-gradle</name>
   <description>Gradle plugin for automating everything involving MarkLogic</description>
   <url>https://github.com/marklogic-community/ml-gradle</url>
@@ -40,7 +40,7 @@ It is not intended to be used to build this project.
     <dependency>
       <groupId>com.marklogic</groupId>
       <artifactId>ml-app-deployer</artifactId>
-      <version>4.3.0</version>
+      <version>4.3.1</version>
       <scope>compile</scope>
     </dependency>
     <dependency>

@@ -21,6 +21,7 @@ public class ManageAmpsTest extends AbstractManageResourceTest {
 
 	@Test
 	public void ampLoadedBeforeModules() {
+		appConfig.setRestPort(8004);
 		appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/real-amp")));
 
 		initializeAppDeployer(new DeployUsersCommand(), new DeployRestApiServersCommand(true),

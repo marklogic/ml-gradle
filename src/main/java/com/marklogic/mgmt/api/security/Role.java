@@ -36,6 +36,10 @@ public class Role extends Resource {
 	@XmlElementWrapper(name = "collections")
 	private List<String> collection;
 
+	// This does not yet have an XmlElementWrapper on it as CapabilityQuery does not yet support XML marshalling;
+	// unclear how to use e.g. XmlAnyElement on the query portion of it
+	private List<CapabilityQuery> capabilityQuery;
+
 	public Role() {
 	}
 
@@ -203,4 +207,11 @@ public class Role extends Resource {
 		this.collection = collection;
 	}
 
+	public List<CapabilityQuery> getCapabilityQuery() {
+		return capabilityQuery;
+	}
+
+	public void setCapabilityQuery(List<CapabilityQuery> capabilityQuery) {
+		this.capabilityQuery = capabilityQuery;
+	}
 }

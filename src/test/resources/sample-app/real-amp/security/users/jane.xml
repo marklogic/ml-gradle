@@ -1,0 +1,9 @@
+<user-properties xmlns="http://marklogic.com/manage">
+	<user-name>sample-app-jane</user-name>
+	<password>password</password>
+	<roles>
+		<role>rest-admin</role>
+		<!-- Using temporal-admin to gain xdmp:xdbc, which allows for using /v1/eval -->
+		<role>temporal-admin</role>
+	</roles>
+</user-properties>

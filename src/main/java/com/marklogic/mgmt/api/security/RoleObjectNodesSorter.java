@@ -22,21 +22,36 @@ public class RoleObjectNodesSorter implements ObjectNodesSorter {
 	 */
 	@Override
 	public List<ObjectNode> sortObjectNodes(List<ObjectNode> objectNodes) {
+		// Construct a list of roles so they can be sorted
 		List<Role> roles = new ArrayList<>();
+
+		// Construct a map of roles to object nodes so that the original object nodes can be added to the list.
+		// This is to resolve bug #441, where capability-query's are being dropped because the Role class doesn't
+		// support them. It may be better to refactor this to not deserialize into Role instances so that ObjectNodes
+		// are used the entire time, even though we'd lose some of the convenience methods provided by the Role class.
+		final Map<String, ObjectNode> roleMap = new HashMap();
+
 		ObjectReader reader = ObjectMapperFactory.getObjectMapper().readerFor(Role.class);
-		for (ObjectNode node : objectNodes) {
+		for (ObjectNode objectNode : objectNodes) {
 			try {
-				roles.add(reader.readValue(node));
+				Role role = reader.readValue(objectNode);
+				roles.add(role);
+				roleMap.put(role.getRoleName(), objectNode);
 			} catch (IOException e) {
-				throw new RuntimeException("Unable to read ObjectNode into Role; node: " + node, e);
+				throw new RuntimeException("Unable to read ObjectNode into Role; JSON: " + objectNode, e);
 			}
 		}
 
 		roles = sortRoles(roles);
 
-		List<ObjectNode> newList = new ArrayList<>();
-		roles.forEach(role -> newList.add(role.toObjectNode()));
-		return newList;
+		List<ObjectNode> sortedNodes = new ArrayList<>();
+		roles.forEach(role -> {
+			// Sanity check; we don't ever expect to get back a role in the sorted list that isn't in the roleMap
+			if (roleMap.containsKey(role.getRoleName())) {
+				sortedNodes.add(roleMap.get(role.getRoleName()));
+			}
+		});
+		return sortedNodes;
 	}
 
 

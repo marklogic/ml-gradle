@@ -27,6 +27,7 @@ public class ClearDatabaseTest extends AbstractAppDeployerTest {
     public void modulesDatabase() {
         initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
 
+        appConfig.setRestPort(8004);
         appDeployer.deploy(appConfig);
 
         DatabaseManager mgr = new DatabaseManager(manageClient);

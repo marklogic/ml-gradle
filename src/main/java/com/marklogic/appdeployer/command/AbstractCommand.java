@@ -532,7 +532,7 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 				logger.info("Found database file with same name, minus its extension, as the database resource directory; " +
 					"file: " + f);
 				String payload = copyFileToString(f, context);
-				String databaseName = new PayloadParser().getPayloadFieldValue(payload, "database-name");
+				String databaseName = payloadParser.getPayloadFieldValue(payload, "database-name");
 				logger.info("Associating database resource directory with database: " + databaseName);
 				return databaseName;
 			}
@@ -588,5 +588,9 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 
 	public void setSupportsResourceMerging(boolean supportsResourceMerging) {
 		this.supportsResourceMerging = supportsResourceMerging;
+	}
+
+	protected PayloadParser getPayloadParser() {
+		return payloadParser;
 	}
 }

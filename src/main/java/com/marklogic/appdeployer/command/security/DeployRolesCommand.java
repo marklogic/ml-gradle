@@ -36,6 +36,11 @@ public class DeployRolesCommand extends AbstractResourceCommand implements Suppo
 	private ObjectNodesSorter objectNodesSorter = new RoleObjectNodesSorter();
 	private Set<String> defaultRolesToNotUndeploy;
 
+	// Keeps track of the original payloads (after token parsing) for XML files. These are needed to account for
+	// data that is dropped when a payload is deserialized into a Role class, such as "capability-queries". When
+	// the role is actually saved, this payload will be used instead of the serialization of the associated Role instance.
+	private Map<String, String> roleNamesAndXmlPayloads = new HashMap<>();
+
 	public DeployRolesCommand() {
 		setExecuteSortOrder(SortOrderConstants.DEPLOY_ROLES);
 		setUndoSortOrder(SortOrderConstants.DELETE_ROLES);
@@ -61,6 +66,14 @@ public class DeployRolesCommand extends AbstractResourceCommand implements Suppo
 		return true;
 	}
 
+	/**
+	 * Similar to useCmaForDeployingResources, this tells the parent class to always build a Configuration, even if
+	 * CMA isn't available. And when it's time to deploy the configuration, a check is made to see if CMA is really
+	 * available and if it's configured to be used.
+	 *
+	 * @param context
+	 * @return
+	 */
 	@Override
 	public boolean cmaShouldBeUsed(CommandContext context) {
 		return true;
@@ -90,7 +103,7 @@ public class DeployRolesCommand extends AbstractResourceCommand implements Suppo
 			return;
 		}
 
-		if (objectNodesSorter != null) {
+		if (objectNodesSorter != null && roleNodes.size() > 1) {
 			logger.info("Sorting roles before they are saved");
 			roleNodes = objectNodesSorter.sortObjectNodes(roleNodes);
 			config.setRoles(roleNodes);
@@ -121,9 +134,30 @@ public class DeployRolesCommand extends AbstractResourceCommand implements Suppo
 		});
 
 		roleNodes.forEach(roleNode -> {
-			SaveReceipt receipt = saveResource(roleManager, context, roleNode.toString());
+			String roleName = roleNode.get("role-name").asText();
+			String payload = this.roleNamesAndXmlPayloads.containsKey(roleName) ? this.roleNamesAndXmlPayloads.get(roleName) : roleNode.toString();
+			SaveReceipt receipt = saveResource(roleManager, context, payload);
 			afterResourceSaved(roleManager, context, null, receipt);
 		});
+	}
+
+	/**
+	 * Overridden so that an XML payload can be saved so that it can be used later when the role is actually saved as
+	 * opposed to the serialization of a Role instance, which as of 4.3.x will not include "capability-queries" for an
+	 * XML payload.
+	 *
+	 * @param context
+	 * @param f
+	 * @return
+	 */
+	@Override
+	protected String readResourceFromFile(CommandContext context, File f) {
+		String payload = super.readResourceFromFile(context, f);
+		if (!getPayloadParser().isJsonPayload(payload)) {
+			String roleName = getPayloadParser().getPayloadFieldValue(payload, "role-name");
+			this.roleNamesAndXmlPayloads.put(roleName, payload);
+		}
+		return payload;
 	}
 
 	/**

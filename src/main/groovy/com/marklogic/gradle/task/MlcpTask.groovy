@@ -1,5 +1,6 @@
 package com.marklogic.gradle.task
 
+import com.marklogic.appdeployer.AppConfig
 import com.marklogic.client.DatabaseClient
 import com.marklogic.client.io.FileHandle
 import com.marklogic.contentpump.bean.MlcpBean
@@ -7,17 +8,18 @@ import org.gradle.api.Task
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 
-import com.marklogic.appdeployer.AppConfig
-
-
 /**
- * Delegates properties to an instance of MlcpBean, which has properties for all MLCP arguments (and if it's out of date
- * and missing one, you can pass them via this class's args property that's inherited from JavaExec). This task
- * will also default the host/port to the values defined in the mlAppConfig instance populated by the plugin.
+ * As of version 4.3.1, this no longer uses "@Delegate" and an instance of MlcpBean, which no longer works in Gradle 7.
+ * See issue #595 for more details.
+ *
+ * Instead, this task now has each property that MlcpBean has. And when the task is run, each property is copied onto
+ * an instance of MlcpBean, and the task otherwise functions the same as it used to. This of course makes little reuse
+ * of MlcpBean, but it's not clear how to do that anymore in Gradle 7.
  *
  * Note that this defaults to using appConfig.restAdminUsername and appConfig.restAdminPassword. That user may not
  * have permission to perform the mlcp operation you wish to perform. In that case, just set the username/password
@@ -25,27 +27,116 @@ import com.marklogic.appdeployer.AppConfig
  */
 class MlcpTask extends JavaExec {
 
-	// This isn't yet working on Gradle 7; see https://github.com/marklogic-community/ml-gradle/issues/595
-	@Input
-	@Delegate
-	MlcpBean mlcpBean = new MlcpBean();
+	@Input String command = "IMPORT"
+	@Input @Optional String host
+	@Input @Optional Integer port
+	@Input @Optional String username
+	@Input @Optional String password
+	@Input @Optional String database
+	@Input @Optional String input_host
+	@Input @Optional Integer input_port
+	@Input @Optional String input_username
+	@Input @Optional String input_password
+	@Input @Optional String input_database
+	@Input @Optional String output_host
+	@Input @Optional Integer output_port
+	@Input @Optional String output_username
+	@Input @Optional String output_password
+	@Input @Optional String output_database
+	@Input @Optional String aggregate_record_element
+	@Input @Optional String aggregate_record_namespace
+	@Input @Optional Boolean archive_metadata_optional
+	@Input @Optional Integer batch_size
+	@Input @Optional String collection_filter
+	@Input @Optional Boolean compress
+	@Input @Optional String conf
+	@Input @Optional String content_encoding
+	@Input @Optional String copy_collections
+	@Input @Optional String copy_metadata
+	@Input @Optional String copy_permissions
+	@Input @Optional String copy_properties
+	@Input @Optional String copy_quality
+	@Input @Optional String data_type
+	@Input @Optional String delimiter
+	@Input @Optional String delimited_root_name
+	@Input @Optional String directory_filter
+	@Input @Optional String document_selector
+	@Input @Optional String document_type
+	@Input @Optional Boolean fastload
+	@Input @Optional String filename_as_collection
+	@Input @Optional Boolean generate_uri
+	@Input @Optional String hadoop_conf_dir
+	@Input @Optional Boolean indented
+	@Input @Optional Boolean input_compressed
+	@Input @Optional String input_compression_codec
+	@Input @Optional String input_file_path
+	@Input @Optional String input_file_pattern
+	@Input @Optional String input_file_type
+	@Input @Optional Boolean input_ssl
+	@Input @Optional Integer max_split_size
+	@Input @Optional Integer min_split_size
+	@Input @Optional String mode
+	@Input @Optional String modules
+	@Input @Optional String modules_root
+	@Input @Optional String namespace
+	@Input @Optional String options_file
+	@Input @Optional Boolean output_cleandir
+	@Input @Optional String output_collections
+	@Input @Optional String output_directory
+	@Input @Optional String output_file_path
+	@Input @Optional String output_graph
+	@Input @Optional String output_language
+	@Input @Optional String output_override_graph
+	@Input @Optional String output_partition
+	@Input @Optional String output_permissions
+	@Input @Optional String output_quality
+	@Input @Optional Boolean output_ssl
+	@Input @Optional String output_type
+	@Input @Optional String output_uri_prefix
+	@Input @Optional String output_uri_replace
+	@Input @Optional String output_uri_suffix
+	@Input @Optional String path_namespace
+	@Input @Optional String query_filter
+	@Input @Optional String redaction
+	@Input @Optional Boolean restrict_hosts
+	@Input @Optional Boolean restrict_input_hosts
+	@Input @Optional Boolean restrict_output_hosts
+	@Input @Optional String sequencefile_key_class
+	@Input @Optional String sequencefile_value_class
+	@Input @Optional String sequencefile_value_type
+	@Input @Optional Boolean snapshot
+	@Input @Optional Boolean split_input
+	@Input @Optional Boolean ssl
+	@Input @Optional Boolean streaming
+	@Input @Optional String temporal_collection
+	@Input @Optional Integer thread_count
+	@Input @Optional Integer thread_count_per_split
+	@Input @Optional Boolean tolerate_errors
+	@Input @Optional String transform_function
+	@Input @Optional String transform_module
+	@Input @Optional String transform_namespace
+	@Input @Optional String transform_param
+	@Input @Optional Integer transaction_size
+	@Input @Optional String type_filter
+	@Input @Optional String uri_id
+	@Input @Optional String xml_repair_level
 
 	// Set this to define a URI in your content database for mlcp output to be written to as a text document
-	@Input
-	@Optional
-	String logOutputUri
+	@Input @Optional String logOutputUri
 
 	// Allow the user to provide a custom DatabaseClient for logging mlcp output
-	@Input
-	@Optional
-	DatabaseClient logClient
+	@Input @Optional DatabaseClient logClient
 
+	@Override @Internal
 	Logger getLogger() {
 		return Logging.getLogger(MlcpTask.class)
 	}
 
-	MlcpTask() {
-		mainClass.set("com.marklogic.contentpump.ContentPump")
+	// Starting in Gradle 6.4, setMain must be called here instead of in a TaskAction method
+	@Override
+	Task configure(Closure closure) {
+		setMain("com.marklogic.contentpump.ContentPump")
+		return super.configure(closure)
 	}
 
 	@TaskAction
@@ -56,24 +147,15 @@ class MlcpTask extends JavaExec {
 		List<String> newArgs = new ArrayList<>()
 		newArgs.add(command)
 
+		MlcpBean mlcpBean = new MlcpBean()
+		applyTaskPropertiesToMlcpBean(mlcpBean)
+
 		mlcpBean.properties.each { prop, val ->
 			def propVal
 			if (val) {
 				switch (prop) {
-					case "host":
-						propVal = (val ? val : config.getHost())
-						break
-					case "port":
-						propVal = (val ? val : 8000)
-						break
-					case "username":
-						propVal = (val ? val : config.getRestAdminUsername())
-						break
 					case ["class", "logger", "command", "password"]:
-						// skip for now
-						return
-					case "additionalOptions":
-						// Not supported by this task; use JavaExec's args instead
+						// skip, as these aren't MLCP key/value args, and we don't want password to be shown below
 						return
 					default:
 						propVal = val
@@ -144,5 +226,100 @@ class MlcpTask extends JavaExec {
 			databaseClient.newDocumentManager().write(logOutputUri, new FileHandle(logOutputFile))
 			println "Wrote mlcp log output to URI: " + logOutputUri
 		}
+	}
+
+	void applyTaskPropertiesToMlcpBean(MlcpBean mlcpBean) {
+		mlcpBean.setHost(host)
+		mlcpBean.setPort(port)
+		mlcpBean.setUsername(username)
+		mlcpBean.setPassword(password)
+		mlcpBean.setDatabase(database)
+		mlcpBean.setInput_host(input_host)
+		mlcpBean.setInput_port(input_port)
+		mlcpBean.setInput_username(input_username)
+		mlcpBean.setInput_password(input_password)
+		mlcpBean.setInput_database(input_database)
+		mlcpBean.setOutput_host(output_host)
+		mlcpBean.setOutput_port(output_port)
+		mlcpBean.setOutput_username(output_username)
+		mlcpBean.setOutput_password(output_password)
+		mlcpBean.setOutput_database(output_database)
+		mlcpBean.setAggregate_record_element(aggregate_record_element)
+		mlcpBean.setAggregate_record_namespace(aggregate_record_namespace)
+		mlcpBean.setArchive_metadata_optional(archive_metadata_optional)
+		mlcpBean.setBatch_size(batch_size)
+		mlcpBean.setCollection_filter(collection_filter)
+		mlcpBean.setCompress(compress)
+		mlcpBean.setConf(conf)
+		mlcpBean.setContent_encoding(content_encoding)
+		mlcpBean.setCopy_collections(copy_collections)
+		mlcpBean.setCopy_metadata(copy_metadata)
+		mlcpBean.setCopy_permissions(copy_permissions)
+		mlcpBean.setCopy_properties(copy_properties)
+		mlcpBean.setCopy_quality(copy_quality)
+		mlcpBean.setData_type(data_type)
+		mlcpBean.setDelimiter(delimiter)
+		mlcpBean.setDelimited_root_name(delimited_root_name)
+		mlcpBean.setDirectory_filter(directory_filter)
+		mlcpBean.setDocument_selector(document_selector)
+		mlcpBean.setDocument_type(document_type)
+		mlcpBean.setFastload(fastload)
+		mlcpBean.setFilename_as_collection(filename_as_collection)
+		mlcpBean.setGenerate_uri(generate_uri)
+		mlcpBean.setHadoop_conf_dir(hadoop_conf_dir)
+		mlcpBean.setIndented(indented)
+		mlcpBean.setInput_compressed(input_compressed)
+		mlcpBean.setInput_compression_codec(input_compression_codec)
+		mlcpBean.setInput_file_path(input_file_path)
+		mlcpBean.setInput_file_pattern(input_file_pattern)
+		mlcpBean.setInput_file_type(input_file_type)
+		mlcpBean.setInput_ssl(input_ssl)
+		mlcpBean.setMax_split_size(max_split_size)
+		mlcpBean.setMin_split_size(min_split_size)
+		mlcpBean.setMode(mode)
+		mlcpBean.setModules(modules)
+		mlcpBean.setModules_root(modules_root)
+		mlcpBean.setNamespace(namespace)
+		mlcpBean.setOptions_file(options_file)
+		mlcpBean.setOutput_cleandir(output_cleandir)
+		mlcpBean.setOutput_collections(output_collections)
+		mlcpBean.setOutput_directory(output_directory)
+		mlcpBean.setOutput_file_path(output_file_path)
+		mlcpBean.setOutput_graph(output_graph)
+		mlcpBean.setOutput_language(output_language)
+		mlcpBean.setOutput_override_graph(output_override_graph)
+		mlcpBean.setOutput_partition(output_partition)
+		mlcpBean.setOutput_permissions(output_permissions)
+		mlcpBean.setOutput_quality(output_quality)
+		mlcpBean.setOutput_ssl(output_ssl)
+		mlcpBean.setOutput_type(output_type)
+		mlcpBean.setOutput_uri_prefix(output_uri_prefix)
+		mlcpBean.setOutput_uri_replace(output_uri_replace)
+		mlcpBean.setOutput_uri_suffix(output_uri_suffix)
+		mlcpBean.setPath_namespace(path_namespace)
+		mlcpBean.setQuery_filter(query_filter)
+		mlcpBean.setRedaction(redaction)
+		mlcpBean.setRestrict_hosts(restrict_hosts)
+		mlcpBean.setRestrict_input_hosts(restrict_input_hosts)
+		mlcpBean.setRestrict_output_hosts(restrict_output_hosts)
+		mlcpBean.setSequencefile_key_class(sequencefile_key_class)
+		mlcpBean.setSequencefile_value_class(sequencefile_value_class)
+		mlcpBean.setSequencefile_value_type(sequencefile_value_type)
+		mlcpBean.setSnapshot(snapshot)
+		mlcpBean.setSplit_input(split_input)
+		mlcpBean.setSsl(ssl)
+		mlcpBean.setStreaming(streaming)
+		mlcpBean.setTemporal_collection(temporal_collection)
+		mlcpBean.setThread_count(thread_count)
+		mlcpBean.setThread_count_per_split(thread_count_per_split)
+		mlcpBean.setTolerate_errors(tolerate_errors)
+		mlcpBean.setTransform_function(transform_function)
+		mlcpBean.setTransform_module(transform_module)
+		mlcpBean.setTransform_namespace(transform_namespace)
+		mlcpBean.setTransform_param(transform_param)
+		mlcpBean.setTransaction_size(transaction_size)
+		mlcpBean.setType_filter(type_filter)
+		mlcpBean.setUri_id(uri_id)
+		mlcpBean.setXml_repair_level(xml_repair_level)
 	}
 }

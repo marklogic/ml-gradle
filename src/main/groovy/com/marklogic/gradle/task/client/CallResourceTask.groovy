@@ -1,6 +1,8 @@
 package com.marklogic.gradle.task.client
 
 import com.marklogic.gradle.task.MarkLogicTask
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -8,12 +10,25 @@ import org.gradle.api.tasks.TaskAction
  */
 class CallResourceTask extends MarkLogicTask {
 
+	@Input @Optional
 	def params = [:]
+
+	@Input
 	def method = "GET"
+
+	@Input @Optional
 	def client = null
+
+	@Input
 	def mimeType = "application/json"
+
+	@Input
 	String resourceName
+
+	@Input @Optional
 	String body
+
+	@Input @Optional
 	String outputFilePath
 
 	@TaskAction

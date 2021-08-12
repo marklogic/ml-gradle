@@ -4,14 +4,9 @@ import com.marklogic.appdeployer.AppConfig
 import com.marklogic.client.DatabaseClient
 import com.marklogic.client.io.FileHandle
 import com.marklogic.contentpump.bean.MlcpBean
-import org.gradle.api.Task
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.JavaExec
-import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 
 /**
  * As of version 4.3.1, this no longer uses "@Delegate" and an instance of MlcpBean, which no longer works in Gradle 7.
@@ -132,11 +127,8 @@ class MlcpTask extends JavaExec {
 		return Logging.getLogger(MlcpTask.class)
 	}
 
-	// Starting in Gradle 6.4, setMain must be called here instead of in a TaskAction method
-	@Override
-	Task configure(Closure closure) {
-		setMain("com.marklogic.contentpump.ContentPump")
-		return super.configure(closure)
+	MlcpTask() {
+		super.getMainClass().set("com.marklogic.contentpump.ContentPump")
 	}
 
 	@TaskAction

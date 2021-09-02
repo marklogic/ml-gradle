@@ -5,15 +5,16 @@
 
 ml-app-deployer is a Java library that provides two capabilities:
 
-1. A client library for the new [Management REST API](http://docs.marklogic.com/REST/management) in MarkLogic 8. 
-1. A command-driven approach for deploying and undeploying an application to MarkLogic that depends on the management client library.
+1. A client library for the [MarkLogic Management REST API](http://docs.marklogic.com/REST/management) 
+1. A command-driven approach for deploying and undeploying an application to MarkLogic that depends on the management client library
 
 If you're just looking for a Java library for interacting with the Management REST API, you can certainly use ml-app-deployer. 
-The deployer/command library is mostly a thin layer around the management client library and can be safely ignored if you don't need it. 
+The deployer/command library can be safely ignored if you don't need it. 
 
 ### What does ml-app-deployer depend on? 
 
-ml-app-deployer depends on MarkLogic 8 and Java 1.7+.
+ml-app-deployer depends on MarkLogic 10 and Java 1.8+. Earlier versions of MarkLogic may work, but due to improvements 
+and bug fixes in the MarkLogic Management REST API across versions 8, 9, and 10, it is recommended to use MarkLogic 10.
 
 Under the hood, it depends on Spring's [RestTemplate](http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html) for interacting with the Management REST API. 
 It also depends on [ml-javaclient-util](https://github.com/marklogic-community/ml-javaclient-util) for loading modules, which is done via the MarkLogic Client REST API. 

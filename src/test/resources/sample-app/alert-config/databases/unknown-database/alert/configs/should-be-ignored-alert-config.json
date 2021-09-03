@@ -1,0 +1,9 @@
+{
+  "uri": "should-be-ignored-alert-config",
+  "name": "Should Be Ignored Alerting App",
+  "description": "This should be ignored since the parent directory of 'unknown-database' doesn't match an existing ML database",
+  "trigger": [],
+  "domain": [],
+  "action": [],
+  "option": []
+}

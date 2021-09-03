@@ -29,7 +29,9 @@ public class DeployTemporalCollectionsCommand extends AbstractResourceCommand {
 			deployTemporalCollections(context, configDir, appConfig.getContentDatabaseName());
 			for (File dir : configDir.getDatabaseResourceDirectories()) {
 				String databaseName = determineDatabaseNameForDatabaseResourceDirectory(context, configDir, dir);
-				deployTemporalCollections(context, new ConfigDir(dir), databaseName);
+				if (databaseName != null) {
+					deployTemporalCollections(context, new ConfigDir(dir), databaseName);
+				}
 			}
 		}
 	}

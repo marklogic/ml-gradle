@@ -27,7 +27,9 @@ public class DeployPartitionsCommand extends AbstractResourceCommand {
 		for (ConfigDir configDir : appConfig.getConfigDirs()) {
 			for (File dir : configDir.getDatabaseResourceDirectories()) {
 				String databaseName = determineDatabaseNameForDatabaseResourceDirectory(context, configDir, dir);
-				deployPartitions(context, new ConfigDir(dir), databaseName);
+				if (databaseName != null) {
+					deployPartitions(context, new ConfigDir(dir), databaseName);
+				}
 			}
 		}
 	}

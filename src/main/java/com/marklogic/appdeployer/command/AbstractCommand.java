@@ -509,7 +509,10 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 	 * within the directory should be associated with. But starting in 3.16.0, if the name of the directory doesn't
 	 * match that of an existing database, then a check is made to see if there's a database file in the given ConfigDir
 	 * that has the same name, minus its extension, as the database directory name. If so, then the database-name is
-	 * extracted from that file and used as the database name. If not, an exception is thrown.
+	 * extracted from that file and used as the database name. If not, a warning is logged and null is returned.
+	 * Previously, an exception was thrown if the database-name could not be determined, but this raised problems for
+	 * users that had directory names like ".svn" that they could not easily remove (and we can't eagerly ignore certain
+	 * names since something like ".svn" is a valid ML database name).
 	 *
 	 * @param context
 	 * @param configDir
@@ -538,8 +541,10 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 			}
 		}
 
-		throw new RuntimeException("Could not determine database to associate with database resource directory: " +
-			databaseResourceDir);
+		logger.warn("Could not determine database to associate with database resource directory: " +
+			databaseResourceDir + "; will not process any resource files in that directory");
+
+		return null;
 	}
 
 	public void setPayloadTokenReplacer(PayloadTokenReplacer payloadTokenReplacer) {

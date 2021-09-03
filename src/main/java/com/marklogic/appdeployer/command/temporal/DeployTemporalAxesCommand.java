@@ -28,7 +28,9 @@ public class DeployTemporalAxesCommand extends AbstractResourceCommand {
 			deployTemporalAxes(context, configDir, appConfig.getContentDatabaseName());
 			for (File dir : configDir.getDatabaseResourceDirectories()) {
 				String databaseName = determineDatabaseNameForDatabaseResourceDirectory(context, configDir, dir);
-				deployTemporalAxes(context, new ConfigDir(dir), databaseName);
+				if (databaseName != null) {
+					deployTemporalAxes(context, new ConfigDir(dir), databaseName);
+				}
 			}
 		}
 	}

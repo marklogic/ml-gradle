@@ -35,7 +35,9 @@ public class DeployAlertActionsCommand extends AbstractCommand {
 			deployActions(context, configDir, appConfig.getContentDatabaseName());
 			for (File dir : configDir.getDatabaseResourceDirectories()) {
 				String databaseName = determineDatabaseNameForDatabaseResourceDirectory(context, configDir, dir);
-				deployActions(context, new ConfigDir(dir), databaseName);
+				if (databaseName != null) {
+					deployActions(context, new ConfigDir(dir), databaseName);
+				}
 			}
 		}
 	}

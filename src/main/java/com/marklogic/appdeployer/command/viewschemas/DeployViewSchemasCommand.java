@@ -41,7 +41,9 @@ public class DeployViewSchemasCommand extends AbstractResourceCommand {
 			deployViewSchemas(context, configDir, appConfig.getContentDatabaseName());
 			for (File dir : configDir.getDatabaseResourceDirectories()) {
 				String databaseName = determineDatabaseNameForDatabaseResourceDirectory(context, configDir, dir);
-				deployViewSchemas(context, new ConfigDir(dir), databaseName);
+				if (databaseName != null) {
+					deployViewSchemas(context, new ConfigDir(dir), databaseName);
+				}
 			}
 		}
 	}

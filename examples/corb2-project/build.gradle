@@ -11,13 +11,13 @@
  * (possibly outdated) set of CoRB options will be applied to the CorbTask.
  */
 buildscript {
-  repositories {
-		mavenCentral()
-  }
-  dependencies {
-    //Needed for CorbTask to dynamically generate properties from CORB Options class
-    classpath "com.marklogic:marklogic-corb:${corbVersion}"
-  }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        //Needed for CorbTask to dynamically generate properties from CoRB Options class
+        classpath "com.marklogic:marklogic-corb:${corbVersion}"
+    }
 }
 
 plugins {
@@ -25,19 +25,24 @@ plugins {
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 configurations {
-    // This configuration captures the dependencies for running corb (Content Reprocessing in Bulk).
+    // This configuration captures the dependencies for running CoRB (Content Reprocessing in Bulk).
     // This is only needed if you want to run corb via Gradle tasks.
     // If you do, using com.marklogic.gradle.task.CorbTask is a useful starting point, as shown below.
-    corb
+    corb {
+        attributes {
+            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, Usage.JAVA_RUNTIME))
+        }
+    }
 }
 
 dependencies {
     // required to run CoRB2
     corb "com.marklogic:marklogic-corb:${corbVersion}"
+    corb 'com.marklogic:marklogic-xcc:10.0.8'
     // optional
     //corb 'org.jasypt:jasypt:1.9.2' // would be necessary to leverage JasyptDecrypter
 }
@@ -73,11 +78,11 @@ ext {
  */
 task corb(type: com.marklogic.gradle.task.CorbTask) {
     /* Either uncomment and set the xccConnectionUri below and set an appropriate XCC connection string,
-     * or specify on the commandline as a project property: -PcorbXccConnectionUri=xcc://user:pass@host:port/content-database
-     * or specify as a System property: -DXCC-CONNECTION-URI=xcc://user:pass@host:port/content-database
-     * or instread of setting the XCC-CONNECTION-URI, set the individual XCC options
-     * (XCC-HOSTNAME, XCC-PORT, XCC-USERNAME, XCC-PASSWORD, XCC-DBNAME)
-     */
+    * or specify on the commandline as a project property: -PcorbXccConnectionUri=xcc://user:pass@host:port/content-database
+    * or specify as a System property: -DXCC-CONNECTION-URI=xcc://user:pass@host:port/content-database
+    * or instread of setting the XCC-CONNECTION-URI, set the individual XCC options
+    * (XCC-HOSTNAME, XCC-PORT, XCC-USERNAME, XCC-PASSWORD, XCC-DBNAME)
+    */
     xccConnectionUri = contentXccUrl
 }
 
@@ -92,7 +97,7 @@ task corb(type: com.marklogic.gradle.task.CorbTask) {
  * the transform.xqy module to perform any action that you would like - this is just to show how to invoke corb from Gradle.
  */
 task corbAdhoc(type: com.marklogic.gradle.task.CorbTask) {
-		xccConnectionUri = contentXccUrl
+    xccConnectionUri = contentXccUrl
     urisModule = "src/main/ml-modules/ext/corb2-project/corb/uris.xqy|ADHOC"
     processModule = "src/main/ml-modules/ext/corb2-project/corb/transform.xqy|ADHOC"
 }

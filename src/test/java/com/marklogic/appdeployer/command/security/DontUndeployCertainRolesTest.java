@@ -2,7 +2,6 @@ package com.marklogic.appdeployer.command.security;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.mgmt.resource.security.RoleManager;
-import com.marklogic.mgmt.resource.security.UserManager;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;

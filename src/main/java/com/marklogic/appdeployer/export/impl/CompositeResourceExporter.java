@@ -7,6 +7,7 @@ import com.marklogic.client.ext.helper.LoggingObject;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -21,9 +22,7 @@ public class CompositeResourceExporter extends LoggingObject implements Resource
 
 	public CompositeResourceExporter(ResourceExporter... resourceExporters) {
 		this.resourceExporters = new ArrayList<>();
-		for (ResourceExporter exporter : resourceExporters) {
-			this.resourceExporters.add(exporter);
-		}
+		this.resourceExporters.addAll(Arrays.asList(resourceExporters));
 	}
 
 	public void add(ResourceExporter exporter) {

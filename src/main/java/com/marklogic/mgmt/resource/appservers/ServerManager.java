@@ -1,6 +1,5 @@
 package com.marklogic.mgmt.resource.appservers;
 
-import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.resource.AbstractResourceManager;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.rest.util.Fragment;

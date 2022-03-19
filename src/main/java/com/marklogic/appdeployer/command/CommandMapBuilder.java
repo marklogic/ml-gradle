@@ -92,7 +92,7 @@ public class CommandMapBuilder {
 	}
 
 	private void addCommandsThatDoNotWriteToDatabases(Map<String, List<Command>> map) {
-		List<Command> clusterCommands = new ArrayList<Command>();
+		List<Command> clusterCommands = new ArrayList<>();
 		clusterCommands.add(new ModifyLocalClusterCommand());
 		map.put("mlClusterCommands", clusterCommands);
 
@@ -100,27 +100,27 @@ public class CommandMapBuilder {
 		configurationCommands.add(new DeployConfigurationsCommand());
 		map.put("mlConfigurationCommands", configurationCommands);
 
-		List<Command> dbCommands = new ArrayList<Command>();
+		List<Command> dbCommands = new ArrayList<>();
 		dbCommands.add(new DeployOtherDatabasesCommand());
 		map.put("mlDatabaseCommands", dbCommands);
 
-		List<Command> forestCommands = new ArrayList<Command>();
+		List<Command> forestCommands = new ArrayList<>();
 		forestCommands.add(new DeployCustomForestsCommand());
 		map.put("mlForestCommands", forestCommands);
 
-		List<Command> replicaCommands = new ArrayList<Command>();
+		List<Command> replicaCommands = new ArrayList<>();
 		replicaCommands.add(new ConfigureForestReplicasCommand());
 		map.put("mlForestReplicaCommands", replicaCommands);
 
-		List<Command> groupCommands = new ArrayList<Command>();
+		List<Command> groupCommands = new ArrayList<>();
 		groupCommands.add(new DeployGroupsCommand());
 		map.put("mlGroupCommands", groupCommands);
 
-		List<Command> hostCommands = new ArrayList<Command>();
+		List<Command> hostCommands = new ArrayList<>();
 		hostCommands.add(new AssignHostsToGroupsCommand());
 		map.put("mlHostCommands", hostCommands);
 
-		List<Command> mimetypeCommands = new ArrayList<Command>();
+		List<Command> mimetypeCommands = new ArrayList<>();
 		mimetypeCommands.add(new DeployMimetypesCommand());
 		map.put("mlMimetypeCommands", mimetypeCommands);
 
@@ -137,7 +137,7 @@ public class CommandMapBuilder {
 		restApiCommands.add(new DeployRestApiServersCommand());
 		map.put("mlRestApiCommands", restApiCommands);
 
-		List<Command> securityCommands = new ArrayList<Command>();
+		List<Command> securityCommands = new ArrayList<>();
 		securityCommands.add(new DeployRolesCommand());
 		securityCommands.add(new DeployUsersCommand());
 		securityCommands.add(new DeployAmpsCommand());
@@ -157,20 +157,20 @@ public class CommandMapBuilder {
 		serverCommands.add(new UpdateRestApiServersCommand());
 		map.put("mlServerCommands", serverCommands);
 
-		List<Command> taskCommands = new ArrayList<Command>();
+		List<Command> taskCommands = new ArrayList<>();
 		taskCommands.add(new DeployScheduledTasksCommand());
 		taskCommands.add(new UpdateTaskServerCommand());
 		map.put("mlTaskCommands", taskCommands);
 	}
 
 	private void addCommandsThatWriteToDatabases(Map<String, List<Command>> map) {
-		List<Command> alertCommands = new ArrayList<Command>();
+		List<Command> alertCommands = new ArrayList<>();
 		alertCommands.add(new DeployAlertConfigsCommand());
 		alertCommands.add(new DeployAlertActionsCommand());
 		alertCommands.add(new DeployAlertRulesCommand());
 		map.put("mlAlertCommands", alertCommands);
 
-		List<Command> cpfCommands = new ArrayList<Command>();
+		List<Command> cpfCommands = new ArrayList<>();
 		cpfCommands.add(new DeployCpfConfigsCommand());
 		cpfCommands.add(new DeployDomainsCommand());
 		cpfCommands.add(new DeployPipelinesCommand());
@@ -180,7 +180,7 @@ public class CommandMapBuilder {
 		dataCommands.add(new LoadDataCommand());
 		map.put("mlDataCommands", dataCommands);
 
-		List<Command> flexrepCommands = new ArrayList<Command>();
+		List<Command> flexrepCommands = new ArrayList<>();
 		flexrepCommands.add(new DeployConfigsCommand());
 		flexrepCommands.add(new DeployTargetsCommand());
 		flexrepCommands.add(new DeployFlexrepCommand());
@@ -201,11 +201,11 @@ public class CommandMapBuilder {
 		temporalCommands.add(new DeployTemporalCollectionsLSQTCommand());
 		map.put("mlTemporalCommands", temporalCommands);
 
-		List<Command> triggerCommands = new ArrayList<Command>();
+		List<Command> triggerCommands = new ArrayList<>();
 		triggerCommands.add(new DeployTriggersCommand());
 		map.put("mlTriggerCommands", triggerCommands);
 
-		List<Command> viewCommands = new ArrayList<Command>();
+		List<Command> viewCommands = new ArrayList<>();
 		viewCommands.add(new DeployViewSchemasCommand());
 		map.put("mlViewCommands", viewCommands);
 	}

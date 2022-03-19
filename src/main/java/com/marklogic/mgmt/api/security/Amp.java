@@ -53,7 +53,7 @@ public class Amp extends Resource {
 
 	public void addRole(String r) {
 		if (role == null) {
-			role = new ArrayList<String>();
+			role = new ArrayList<>();
 		}
 		role.add(r);
 	}

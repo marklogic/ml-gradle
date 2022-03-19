@@ -122,7 +122,7 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
 
 		List<Command> commands = getCommands();
 
-		List<UndoableCommand> undoableCommands = new ArrayList<UndoableCommand>();
+		List<UndoableCommand> undoableCommands = new ArrayList<>();
 		for (Command command : commands) {
 			if (command instanceof UndoableCommand) {
 				undoableCommands.add((UndoableCommand) command);

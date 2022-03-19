@@ -200,22 +200,24 @@ public abstract class AbstractResourceManager extends AbstractManager implements
      */
     protected String appendParamsAndValuesToPath(String path, String... paramsAndValues) {
         if (paramsAndValues != null && paramsAndValues.length > 0) {
+			StringBuilder pathBuilder = new StringBuilder(path);
             if (path.contains("?")) {
-                path += "&";
+				pathBuilder.append("&");
             } else {
-                path += "?";
+				pathBuilder.append("?");
             }
-            for (int i = 0; i < paramsAndValues.length; i += 2) {
+			for (int i = 0; i < paramsAndValues.length; i += 2) {
                 String name = paramsAndValues[i];
                 String value = paramsAndValues[i + 1];
                 if (name != null && value != null) {
                     if (i > 0) {
-                        path += "&";
+                        pathBuilder.append("&");
                     }
-                    path += name + "=" + value;
+                    pathBuilder.append(name).append("=").append(value);
                 }
             }
-        }
+			path = pathBuilder.toString();
+		}
         return path;
     }
 

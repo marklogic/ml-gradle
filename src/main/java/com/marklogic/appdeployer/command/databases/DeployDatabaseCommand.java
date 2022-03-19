@@ -8,7 +8,6 @@ import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.appdeployer.command.UndoableCommand;
 import com.marklogic.appdeployer.command.forests.DeployForestsCommand;
 import com.marklogic.mgmt.PayloadParser;
-import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.api.database.Database;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 

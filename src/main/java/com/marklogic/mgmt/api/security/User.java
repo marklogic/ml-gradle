@@ -59,7 +59,7 @@ public class User extends Resource {
 
 	public void addRole(String r) {
 		if (role == null) {
-			role = new ArrayList<String>();
+			role = new ArrayList<>();
 		}
 		role.add(r);
 	}
@@ -73,7 +73,7 @@ public class User extends Resource {
 
 	public void addCollection(String c) {
 		if (collection == null) {
-			collection = new ArrayList<String>();
+			collection = new ArrayList<>();
 		}
 		collection.add(c);
 	}

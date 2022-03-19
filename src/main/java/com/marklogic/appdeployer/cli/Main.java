@@ -102,11 +102,8 @@ public class Main {
 			if (logger.isInfoEnabled()) {
 				logger.info("Reading properties from file path: " + propertiesFilePath);
 			}
-			FileInputStream fis = new FileInputStream(propertiesFilePath);
-			try {
+			try (FileInputStream fis = new FileInputStream(propertiesFilePath)) {
 				props.load(fis);
-			} finally {
-				fis.close();
 			}
 
 			// Dynamic params override what's in the properties file

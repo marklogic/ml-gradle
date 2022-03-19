@@ -1,7 +1,5 @@
 package com.marklogic.rest.util;
 
-import java.util.List;
-
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 

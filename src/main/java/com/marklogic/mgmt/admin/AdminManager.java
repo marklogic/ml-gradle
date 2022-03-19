@@ -63,7 +63,7 @@ public class AdminManager extends AbstractManager {
             public boolean execute() {
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
-                HttpEntity<String> entity = new HttpEntity<String>(payload, headers);
+                HttpEntity<String> entity = new HttpEntity<>(payload, headers);
                 try {
                     ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.POST, entity, String.class);
                     logger.info("Initialization response: " + response);
@@ -113,7 +113,7 @@ public class AdminManager extends AbstractManager {
             public boolean execute() {
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
-                HttpEntity<String> entity = new HttpEntity<String>(payload, headers);
+                HttpEntity<String> entity = new HttpEntity<>(payload, headers);
                 try {
                     ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.POST, entity, String.class);
                     logger.info("Admin installation response: " + response);
@@ -193,10 +193,10 @@ public class AdminManager extends AbstractManager {
                         adminConfig.getUsername(), adminConfig.getPassword());
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-                MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+                MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
                 map.add("xquery", xquery);
-                HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<MultiValueMap<String, String>>(map,
-                        headers);
+                HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map,
+					headers);
                 String url = format("http://%s:%d/v1/eval", adminConfig.getHost(), appServicesPort);
                 if (logger.isInfoEnabled()) {
                     logger.info("Setting SSL FIPS enabled: " + enabled);
@@ -242,14 +242,14 @@ public class AdminManager extends AbstractManager {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+		MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
 		map.add("group", group);
 		if(zone != null && !zone.isEmpty()){
 			map.add("zone", zone);
 		}
 		map.add("server-config", joiningHostConfig.getPrettyXml());
 
-		HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+		HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
 
 		URI url = adminConfig.buildUri("/admin/v1/cluster-config");
 		ResponseEntity<byte[]> bytes = restTemplate.exchange(url, HttpMethod.POST, entity, byte[].class);
@@ -268,7 +268,7 @@ public class AdminManager extends AbstractManager {
 
 		URI clusterConfigUri = adminConfig.buildUri("/admin/v1/cluster-config");
 
-		HttpEntity<Resource> resourceEntity = new HttpEntity<Resource>(new ByteArrayResource(clusterConfigZipBytes), headers);
+		HttpEntity<Resource> resourceEntity = new HttpEntity<>(new ByteArrayResource(clusterConfigZipBytes), headers);
 		ResponseEntity<String> response = restTemplate.exchange(clusterConfigUri, HttpMethod.POST, resourceEntity, String.class);
 		if(response.getStatusCode().value() == 202){
 			waitForRestart();

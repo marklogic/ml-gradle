@@ -12,7 +12,6 @@ import com.marklogic.client.ext.modulesloader.impl.DefaultModulesFinder;
 import com.marklogic.client.ext.modulesloader.impl.DefaultModulesLoader;
 import com.marklogic.mgmt.util.SystemPropertySource;
 
-import java.io.File;
 import java.util.List;
 
 /**

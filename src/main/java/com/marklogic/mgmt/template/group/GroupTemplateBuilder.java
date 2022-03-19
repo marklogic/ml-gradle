@@ -1,6 +1,5 @@
 package com.marklogic.mgmt.template.group;
 
-import com.marklogic.mgmt.api.Resource;
 import com.marklogic.mgmt.api.group.Group;
 import com.marklogic.mgmt.template.GenericTemplateBuilder;
 

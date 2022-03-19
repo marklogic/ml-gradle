@@ -15,7 +15,7 @@ import com.marklogic.client.ext.helper.LoggingObject;
  */
 public class CustomDifferenceListener extends LoggingObject implements DifferenceListener {
 
-	private List<Difference> differences = new ArrayList<Difference>();
+	private List<Difference> differences = new ArrayList<>();
 
 	@Override
 	public int differenceFound(Difference difference) {

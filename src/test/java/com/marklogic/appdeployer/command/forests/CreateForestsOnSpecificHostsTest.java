@@ -6,7 +6,6 @@ import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.mgmt.util.SimplePropertySource;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
-import org.springframework.core.env.PropertiesPropertySource;
 
 import java.util.*;
 

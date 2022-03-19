@@ -75,9 +75,7 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 				} else {
 					set = new HashSet<>();
 				}
-				for (String f : filenames) {
-					set.add(f);
-				}
+				set.addAll(Arrays.asList(filenames));
 				rff.setFilenamesToIgnore(set);
 			} else {
 				logger.warn("resourceFilenameFilter is not an instanceof ResourceFilenameFilter, so unable to set resource filenames to ignore");

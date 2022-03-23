@@ -20,13 +20,13 @@ repositories {
 
 dependencies {
   api 'com.marklogic:ml-javaclient-util:4.3.0'
-  api 'org.springframework:spring-web:5.3.9'
-	// Match the version of what Java Client 5.5.0 expects
-	api 'com.fasterxml.jackson.core:jackson-databind:2.11.1'
+  api 'org.springframework:spring-web:5.3.17'
+	// Match the version of what Java Client 5.5.2 expects
+	api 'com.fasterxml.jackson.core:jackson-databind:2.12.4'
 
 	implementation 'jaxen:jaxen:1.2.0'
 	implementation 'org.apache.httpcomponents:httpclient:4.5.13'
-	implementation 'org.jdom:jdom2:2.0.6'
+	implementation 'org.jdom:jdom2:2.0.6.1'
 
 	// Forcing httpclient to use this to address https://snyk.io/vuln/SNYK-JAVA-COMMONSCODEC-561518
 	implementation 'commons-codec:commons-codec:1.15'
@@ -35,7 +35,7 @@ dependencies {
 	implementation "org.apache.commons:commons-lang3:3.12.0"
 
 	// For PreviewInterceptor; can be excluded if that feature is not used
-	implementation("com.flipkart.zjsonpatch:zjsonpatch:0.4.11") {
+	implementation("com.flipkart.zjsonpatch:zjsonpatch:0.4.12") {
 		// Prefer the api version declared above
 		exclude module: "jackson-databind"
 	}
@@ -43,21 +43,21 @@ dependencies {
 	// Required for Java 11
 	implementation "javax.xml.bind:jaxb-api:2.3.1"
 	implementation "com.sun.xml.bind:jaxb-core:2.3.0.1"
-	implementation "com.sun.xml.bind:jaxb-impl:2.3.3"
+	implementation "com.sun.xml.bind:jaxb-impl:2.3.6"
 
 	// Don't want to include this in the published jar, just the executable jar
-	compileOnly "com.beust:jcommander:1.78"
-	compileOnly "ch.qos.logback:logback-classic:1.2.4"
+	compileOnly "com.beust:jcommander:1.82"
+	compileOnly "ch.qos.logback:logback-classic:1.2.11"
 
 	testImplementation "org.junit.jupiter:junit-jupiter:5.7.2"
-	testImplementation 'org.springframework:spring-test:5.3.9'
+	testImplementation 'org.springframework:spring-test:5.3.17'
 	testImplementation 'commons-io:commons-io:2.11.0'
 	testImplementation 'xmlunit:xmlunit:1.6'
 
 	// Forcing Spring to use logback for testing instead of commons-logging
-	testImplementation "ch.qos.logback:logback-classic:1.2.4"
-	testImplementation "org.slf4j:jcl-over-slf4j:1.7.31"
-	testImplementation "org.slf4j:slf4j-api:1.7.31"
+	testImplementation "ch.qos.logback:logback-classic:1.2.11"
+	testImplementation "org.slf4j:jcl-over-slf4j:1.7.36"
+	testImplementation "org.slf4j:slf4j-api:1.7.36"
 }
 
 // This ensures that Gradle includes in the published jar any non-java files under src/main/java

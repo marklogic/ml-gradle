@@ -3,8 +3,8 @@ plugins {
   id "maven-publish"
 	id "signing"
 
-  id "com.github.jk1.dependency-license-report" version "1.17"
-  id "com.gradle.plugin-publish" version "0.15.0"
+  id "com.github.jk1.dependency-license-report" version "2.1"
+  id "com.gradle.plugin-publish" version "0.20.0"
 	id "java-gradle-plugin"
 
 	id "net.saliman.properties" version "1.5.1"
@@ -34,11 +34,11 @@ dependencies {
 
 	testImplementation localGroovy()
 	testImplementation gradleTestKit()
-	testImplementation 'xmlunit:xmlunit:1.3'
+	testImplementation 'xmlunit:xmlunit:1.6'
 
-	// Force spock-core to use 4.13.1 to avoid security issue in 4.11
-	testImplementation 'junit:junit:4.13.1'
-	testImplementation('org.spockframework:spock-core:1.1-groovy-2.4') {
+	// Force spock-core to use 4.13.2 to avoid security issue in 4.11
+	testImplementation 'junit:junit:4.13.2'
+	testImplementation('org.spockframework:spock-core:2.1-groovy-3.0') {
 		exclude module: 'groovy-all'
 	}
 }

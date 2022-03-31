@@ -21,8 +21,7 @@ repositories {
 dependencies {
   api 'com.marklogic:ml-javaclient-util:4.3.0'
   api 'org.springframework:spring-web:5.3.18'
-	// Match the version of what Java Client 5.5.2 expects
-	api 'com.fasterxml.jackson.core:jackson-databind:2.12.4'
+	api 'com.fasterxml.jackson.core:jackson-databind:2.13.2.2'
 
 	implementation 'jaxen:jaxen:1.2.0'
 	implementation 'org.apache.httpcomponents:httpclient:4.5.13'

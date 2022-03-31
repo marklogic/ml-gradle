@@ -20,7 +20,7 @@ repositories {
 
 dependencies {
   api 'com.marklogic:ml-javaclient-util:4.3.0'
-  api 'org.springframework:spring-web:5.3.17'
+  api 'org.springframework:spring-web:5.3.18'
 	// Match the version of what Java Client 5.5.2 expects
 	api 'com.fasterxml.jackson.core:jackson-databind:2.12.4'
 
@@ -50,7 +50,7 @@ dependencies {
 	compileOnly "ch.qos.logback:logback-classic:1.2.11"
 
 	testImplementation "org.junit.jupiter:junit-jupiter:5.7.2"
-	testImplementation 'org.springframework:spring-test:5.3.17'
+	testImplementation 'org.springframework:spring-test:5.3.18'
 	testImplementation 'commons-io:commons-io:2.11.0'
 	testImplementation 'xmlunit:xmlunit:1.6'
 

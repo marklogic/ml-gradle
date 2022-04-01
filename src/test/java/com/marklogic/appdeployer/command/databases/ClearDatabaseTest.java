@@ -7,6 +7,7 @@ import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ClearDatabaseTest extends AbstractAppDeployerTest {
@@ -34,6 +35,6 @@ public class ClearDatabaseTest extends AbstractAppDeployerTest {
         mgr.clearDatabase(appConfig.getModulesDatabaseName());
 
         String uris = newModulesXccTemplate().executeAdhocQuery("cts:uris((), (), cts:and-query(()))");
-        assertTrue(uris.length() == 0, "The modules database should have been cleared");
+		assertEquals(0, uris.length(), "The modules database should have been cleared");
     }
 }

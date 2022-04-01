@@ -125,17 +125,9 @@ public class ForestBuilder extends LoggingObject {
 				dataDirectory = "";
 			}
 
-			Map<String, List<Forest>> dataDirectoryMap = existingForestsMap.get(host);
-			if (dataDirectoryMap == null) {
-				dataDirectoryMap = new LinkedHashMap<>();
-				existingForestsMap.put(host, dataDirectoryMap);
-			}
+			Map<String, List<Forest>> dataDirectoryMap = existingForestsMap.computeIfAbsent(host, k -> new LinkedHashMap<>());
 
-			List<Forest> list = dataDirectoryMap.get(dataDirectory);
-			if (list == null) {
-				list = new ArrayList<>();
-				dataDirectoryMap.put(dataDirectory, list);
-			}
+			List<Forest> list = dataDirectoryMap.computeIfAbsent(dataDirectory, k -> new ArrayList<>());
 			list.add(f);
 		}
 		return existingForestsMap;
@@ -236,8 +228,7 @@ public class ForestBuilder extends LoggingObject {
 		Map<String, List<String>> replicaDataDirectoryMap = appConfig.getDatabaseReplicaDataDirectories();
 		final String databaseName = forestPlan.getDatabaseName();
 		if (replicaDataDirectoryMap != null && replicaDataDirectoryMap.containsKey(databaseName)) {
-			replicaDataDirectories = new ArrayList<>();
-			replicaDataDirectories.addAll(replicaDataDirectoryMap.get(databaseName));
+			replicaDataDirectories = new ArrayList<>(replicaDataDirectoryMap.get(databaseName));
 		}
 
 		return replicaDataDirectories;

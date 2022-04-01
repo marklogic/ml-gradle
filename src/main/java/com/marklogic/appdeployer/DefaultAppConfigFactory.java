@@ -457,9 +457,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			logger.info("Databases that will have their forest(s) created on a single host: " + prop);
 			String[] names = prop.split(",");
 			Set<String> set = new HashSet<>();
-			for (String name : names) {
-				set.add(name);
-			}
+			set.addAll(Arrays.asList(names));
 			config.setDatabasesWithForestsOnOneHost(set);
 		});
 
@@ -904,9 +902,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			String dbName = tokens[i];
 			String[] hostNames = tokens[i + 1].split("\\|");
 			List<String> names = new ArrayList<>();
-			for (String name : hostNames) {
-				names.add(name);
-			}
+			names.addAll(Arrays.asList(hostNames));
 			map.put(dbName, names);
 		}
 		return map;

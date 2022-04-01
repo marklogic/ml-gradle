@@ -20,7 +20,7 @@ public class DistributedReplicaBuilderStrategy extends AbstractReplicaBuilderStr
 		final List<String> hostNames = forestPlan.getReplicaHostNames();
 		final int replicaCount = forestPlan.getReplicaCount();
 
-		HashMap<String, List<Forest>> hostToForests = new HashMap<String, List<Forest>>();
+		HashMap<String, List<Forest>> hostToForests = new HashMap<>();
 
 		for (Forest f : forests) {
 			String host = f.getHost();
@@ -28,7 +28,7 @@ public class DistributedReplicaBuilderStrategy extends AbstractReplicaBuilderStr
 				hostToForests.get(host).add(f);
 			}
 			else {
-				ArrayList<Forest> hostForests = new ArrayList<Forest>();
+				ArrayList<Forest> hostForests = new ArrayList<>();
 				hostForests.add(f);
 				hostToForests.put(host, hostForests);
 			}
@@ -41,7 +41,7 @@ public class DistributedReplicaBuilderStrategy extends AbstractReplicaBuilderStr
 			// the forest lives. We also want to have the hosts in different order as we assign replicas to hosts, so
 			// that we don't overload any of them. So if we have five hosts, and we're looking to build replicas for
 			// the forests on host 2, this list will be [host3, host4, host5, host1].
-			List<String> availableHosts = new ArrayList<String>();
+			List<String> availableHosts = new ArrayList<>();
 			int hostIndex = hostNames.indexOf(host);
 			if (hostIndex != -1 && hostIndex < hostNames.size()) {
 				availableHosts.addAll(hostNames.subList(hostIndex + 1, hostNames.size()));

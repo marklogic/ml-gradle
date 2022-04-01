@@ -96,7 +96,7 @@ public class AmpManager extends AbstractResourceManager {
 
 	@Override
 	protected String[] getUpdateResourceParams(String payload) {
-		List<String> params = new ArrayList<String>();
+		List<String> params = new ArrayList<>();
 		AmpParams ampParams = getAmpParams(payload);
 		params.add("document-uri");
 		params.add(ampParams.documentUri);
@@ -121,7 +121,7 @@ public class AmpManager extends AbstractResourceManager {
 	 */
 	@Override
 	protected String[] getDeleteResourceParams(String payload) {
-		List<String> params = new ArrayList<String>();
+		List<String> params = new ArrayList<>();
 		AmpParams ampParams = getAmpParams(payload);
 		params.add("document-uri");
 		params.add(ampParams.documentUri);

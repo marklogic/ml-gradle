@@ -3,6 +3,7 @@ package com.marklogic.appdeployer.command;
 import com.marklogic.client.ext.helper.LoggingObject;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -38,9 +39,7 @@ public class ResourceFilenameFilter extends LoggingObject implements Incremental
 	public ResourceFilenameFilter(String... filenamesToIgnore) {
 		this();
 		this.filenamesToIgnore = new HashSet<>();
-		for (String f : filenamesToIgnore) {
-			this.filenamesToIgnore.add(f);
-		}
+		this.filenamesToIgnore.addAll(Arrays.asList(filenamesToIgnore));
 	}
 
 	public ResourceFilenameFilter(Set<String> filenamesToIgnore) {

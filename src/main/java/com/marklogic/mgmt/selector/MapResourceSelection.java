@@ -1,7 +1,5 @@
 package com.marklogic.mgmt.selector;
 
-import com.marklogic.mgmt.api.security.Amp;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,11 +19,7 @@ public class MapResourceSelection implements ResourceSelection {
 	 * @param value
 	 */
 	public void select(String type, String value) {
-		List<String> names = selections.get(type);
-		if (names == null) {
-			names = new ArrayList<>();
-			selections.put(type, names);
-		}
+		List<String> names = selections.computeIfAbsent(type, k -> new ArrayList<>());
 		names.add(value);
 	}
 

@@ -1,7 +1,5 @@
 package com.marklogic.appdeployer.command.alert;
 
-import java.io.File;
-
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractCommand;

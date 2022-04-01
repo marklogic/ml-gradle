@@ -24,7 +24,7 @@ public class CertificateAuthorityManager extends AbstractManager {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.TEXT_PLAIN);
 
-        HttpEntity<String> entity = new HttpEntity<String>(payload, headers);
+        HttpEntity<String> entity = new HttpEntity<>(payload, headers);
         ResponseEntity<String> response = t.exchange(manageClient.buildUri("/manage/v2/certificate-authorities"),
                 HttpMethod.POST, entity, String.class);
         return response;

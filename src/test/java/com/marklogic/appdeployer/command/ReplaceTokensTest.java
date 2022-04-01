@@ -8,7 +8,6 @@ import com.marklogic.appdeployer.util.SimplePropertiesSource;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.ext.modulesloader.impl.DefaultModulesLoader;
 import com.marklogic.client.io.BytesHandle;
-import com.marklogic.client.io.StringHandle;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;

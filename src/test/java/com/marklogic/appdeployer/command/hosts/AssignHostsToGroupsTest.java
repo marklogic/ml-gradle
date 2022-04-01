@@ -27,7 +27,7 @@ public class AssignHostsToGroupsTest extends AbstractAppDeployerTest {
 		final String otherGroup = "sample-app-other-group";
 		final String hostname = hostManager.getHostNames().get(0);
 
-		Map<String, String> hostGroups = new HashMap<String, String>();
+		Map<String, String> hostGroups = new HashMap<>();
 		hostGroups.put(hostname, otherGroup);
 		appConfig.setHostGroups(hostGroups);
 

@@ -1,6 +1,5 @@
 package com.marklogic.mgmt.admin;
 
-import com.marklogic.mgmt.ManageConfig;
 import com.marklogic.mgmt.util.PropertySource;
 import com.marklogic.mgmt.util.PropertySourceFactory;
 

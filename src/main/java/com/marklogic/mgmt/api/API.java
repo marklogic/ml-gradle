@@ -34,6 +34,7 @@ import com.marklogic.mgmt.util.SystemPropertySource;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -243,9 +244,7 @@ public class API extends LoggingObject {
 
     public QueryRoleset queryRoleset(String... roleNames) {
 	    List<String> names = new ArrayList<>();
-	    for (String name : roleNames) {
-	    	names.add(name);
-	    }
+		names.addAll(Arrays.asList(roleNames));
     	QueryRoleset roleset = new QueryRoleset();
 	    roleset.setApi(this);
 	    roleset.setRoleName(names);

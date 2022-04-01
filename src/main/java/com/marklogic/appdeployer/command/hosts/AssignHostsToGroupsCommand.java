@@ -5,10 +5,6 @@ import java.util.Map;
 import com.marklogic.appdeployer.command.AbstractUndoableCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
-import com.marklogic.mgmt.api.server.AppServicesServer;
-import com.marklogic.mgmt.api.server.ManageServer;
-import com.marklogic.mgmt.api.server.Server;
-import com.marklogic.mgmt.resource.appservers.ServerManager;
 import com.marklogic.mgmt.resource.hosts.HostManager;
 
 public class AssignHostsToGroupsCommand extends AbstractUndoableCommand {

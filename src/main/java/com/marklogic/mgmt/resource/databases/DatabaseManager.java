@@ -101,14 +101,14 @@ public class DatabaseManager extends AbstractResourceManager {
      * @param subDbNames
      */
     public void attachSubDatabases(String databaseIdOrName, List<String> subDbNames){
-    	String payload = format("{\"database-name\":\"%s\", \"subdatabase\": [", databaseIdOrName);
+    	StringBuilder payload = new StringBuilder(format("{\"database-name\":\"%s\", \"subdatabase\": [", databaseIdOrName));
     	for(int index = 0; index < subDbNames.size(); index++){
-    		if(index > 0){ payload += ","; }
-    		payload += format("{\"database-name\":\"%s\"}", subDbNames.get(index));
+    		if(index > 0){ payload.append(","); }
+    		payload.append(format("{\"database-name\":\"%s\"}", subDbNames.get(index)));
     	}
-    	payload += "]}";
+    	payload.append("]}");
     	logger.info("Attaching sub-databases to database: " + databaseIdOrName + ", using configured payload: " + payload);
-    	save(payload);
+    	save(payload.toString());
     	logger.info("Finished attaching sub-databases to database: " + databaseIdOrName);
 
     }

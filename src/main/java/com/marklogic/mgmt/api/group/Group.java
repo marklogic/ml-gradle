@@ -232,9 +232,7 @@ public class Group extends Resource {
 		if (event == null) {
 			event = new ArrayList<>();
 		}
-		for (String e : events) {
-			event.add(e);
-		}
+		event.addAll(Arrays.asList(events));
 	}
 
 	public void removeEvents(String... events) {

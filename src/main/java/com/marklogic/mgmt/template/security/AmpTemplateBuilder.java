@@ -1,6 +1,5 @@
 package com.marklogic.mgmt.template.security;
 
-import com.marklogic.mgmt.api.Resource;
 import com.marklogic.mgmt.api.security.Amp;
 import com.marklogic.mgmt.template.GenericTemplateBuilder;
 

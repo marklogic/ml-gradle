@@ -5,6 +5,7 @@ import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.admin.AdminManager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -35,12 +36,10 @@ public class SimpleAppDeployer extends AbstractAppDeployer {
 	 */
 	protected void buildModifiableCommandList(Command... commandArray) {
 		if (commandArray != null) {
-			commands = new ArrayList<Command>(commandArray.length);
-			for (Command c : commandArray) {
-				commands.add(c);
-			}
+			commands = new ArrayList<>(commandArray.length);
+			commands.addAll(Arrays.asList(commandArray));
 		} else {
-			commands = new ArrayList<Command>();
+			commands = new ArrayList<>();
 		}
 	}
 

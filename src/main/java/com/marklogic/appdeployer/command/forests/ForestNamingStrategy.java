@@ -1,7 +1,6 @@
 package com.marklogic.appdeployer.command.forests;
 
 import com.marklogic.appdeployer.AppConfig;
-import com.marklogic.mgmt.api.forest.Forest;
 
 public interface ForestNamingStrategy {
 

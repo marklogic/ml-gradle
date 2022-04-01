@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.marklogic.mgmt.resource.AbstractResourceManager;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.rest.util.Fragment;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -141,21 +140,21 @@ public class ForestManager extends AbstractResourceManager {
      *            A map where each key is a replica forest name, and its value is the host ID of that forest
      */
     public void setReplicas(String forestIdOrName, Map<String, String> replicaNamesAndHostIds) {
-        String json = "{\"forest-replica\":[";
+        StringBuilder json = new StringBuilder("{\"forest-replica\":[");
         boolean firstOne = true;
         for (String replicaName : replicaNamesAndHostIds.keySet()) {
             if (!firstOne) {
-                json += ",";
+                json.append(",");
             }
             String hostId = replicaNamesAndHostIds.get(replicaName);
-            json += format("{\"replica-name\":\"%s\", \"host\":\"%s\"}", replicaName, hostId);
+            json.append(format("{\"replica-name\":\"%s\", \"host\":\"%s\"}", replicaName, hostId));
             firstOne = false;
         }
-        json += "]}";
+        json.append("]}");
         if (logger.isInfoEnabled()) {
-            logger.info(format("Setting replicas for forest %s, JSON: %s", forestIdOrName, json));
+            logger.info(format("Setting replicas for forest %s, JSON: %s", forestIdOrName, json.toString()));
         }
-        getManageClient().putJson(getPropertiesPath(forestIdOrName), json);
+        getManageClient().putJson(getPropertiesPath(forestIdOrName), json.toString());
         if (logger.isInfoEnabled()) {
             logger.info(format("Finished setting replicas for forest %s", forestIdOrName));
         }
@@ -168,7 +167,7 @@ public class ForestManager extends AbstractResourceManager {
      * @param forestIdOrName
      */
     public void setReplicasToNone(String forestIdOrName) {
-        setReplicas(forestIdOrName, new HashMap<String, String>());
+        setReplicas(forestIdOrName, new HashMap<>());
     }
 
     /**

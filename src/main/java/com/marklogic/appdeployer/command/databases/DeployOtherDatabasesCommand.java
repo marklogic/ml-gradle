@@ -249,7 +249,7 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 		ObjectReader objectReader = ObjectMapperFactory.getObjectMapper().readerFor(Database.class);
 
 		List<DatabasePlan> databasePlanList = new ArrayList<>();
-		databasePlans.getDatabasePlanMap().values().forEach(ref -> databasePlanList.add(ref));
+		databasePlanList.addAll(databasePlans.getDatabasePlanMap().values());
 
 		DatabasePlan testDatabasePlan = null;
 

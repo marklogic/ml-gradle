@@ -145,11 +145,11 @@ public class ManageClient extends LoggingObject {
         logRequest(path, "form", "POST");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         for (int i = 0; i < params.length; i += 2) {
             map.add(params[i], params[i + 1]);
         }
-        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
         return restTemplate.exchange(buildUri(path), HttpMethod.POST, entity, String.class);
     }
 
@@ -160,7 +160,7 @@ public class ManageClient extends LoggingObject {
 
     public Fragment getXml(String path, String... namespacePrefixesAndUris) {
         String xml = getXmlString(path);
-        List<Namespace> list = new ArrayList<Namespace>();
+        List<Namespace> list = new ArrayList<>();
         for (int i = 0; i < namespacePrefixesAndUris.length; i += 2) {
             list.add(Namespace.getNamespace(namespacePrefixesAndUris[i], namespacePrefixesAndUris[i + 1]));
         }
@@ -174,7 +174,7 @@ public class ManageClient extends LoggingObject {
 
 	public Fragment getXmlAsSecurityUser(String path, String... namespacePrefixesAndUris) {
 		String xml = getXmlStringAsSecurityUser(path);
-		List<Namespace> list = new ArrayList<Namespace>();
+		List<Namespace> list = new ArrayList<>();
 		for (int i = 0; i < namespacePrefixesAndUris.length; i += 2) {
 			list.add(Namespace.getNamespace(namespacePrefixesAndUris[i], namespacePrefixesAndUris[i + 1]));
 		}
@@ -235,7 +235,7 @@ public class ManageClient extends LoggingObject {
         if (manageConfig != null && manageConfig.isCleanJsonPayloads()) {
         	json = cleanJsonPayload(json);
         }
-        return new HttpEntity<String>(json, headers);
+        return new HttpEntity<>(json, headers);
     }
 
 	/**
@@ -261,7 +261,7 @@ public class ManageClient extends LoggingObject {
 	public HttpEntity<String> buildXmlEntity(String xml) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_XML);
-        return new HttpEntity<String>(xml, headers);
+        return new HttpEntity<>(xml, headers);
     }
 
     protected void logRequest(String path, String contentType, String method) {

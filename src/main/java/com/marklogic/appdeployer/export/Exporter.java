@@ -6,7 +6,6 @@ import com.marklogic.appdeployer.export.cpf.DomainExporter;
 import com.marklogic.appdeployer.export.cpf.PipelineExporter;
 import com.marklogic.appdeployer.export.databases.DatabaseExporter;
 import com.marklogic.appdeployer.export.groups.GroupExporter;
-import com.marklogic.appdeployer.export.impl.AbstractNamedResourceExporter;
 import com.marklogic.appdeployer.export.impl.CompositeResourceExporter;
 import com.marklogic.appdeployer.export.security.AmpExporter;
 import com.marklogic.appdeployer.export.security.PrivilegeExporter;

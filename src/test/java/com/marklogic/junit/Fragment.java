@@ -76,7 +76,7 @@ public class Fragment {
 
 	public List<Fragment> getFragments(String xpath) {
 		List<Element> elements = evaluateForElements(xpath);
-		List<Fragment> fragments = new ArrayList<Fragment>();
+		List<Fragment> fragments = new ArrayList<>();
 		for (Element el : elements) {
 			fragments.add(new Fragment(el, this.namespaces));
 		}
@@ -138,7 +138,7 @@ public class Fragment {
 
 	private void assertElementListHasOneElement(String message, List<Element> list, String xpath) {
 		int size = list.size();
-		assertTrue(size == 1, message + ";\nExpected 1 element, but found " + size + "; xpath: " + xpath);
+		assertEquals(1, size, message + ";\nExpected 1 element, but found " + size + "; xpath: " + xpath);
 	}
 
 	public void assertElementExists(String xpath) {
@@ -162,7 +162,7 @@ public class Fragment {
 
 	protected List<Element> evaluateForElements(String xpath) {
 		XPathFactory f = XPathFactory.instance();
-		XPathExpression<Element> expr = f.compile(xpath, Filters.element(), new HashMap<String, Object>(), namespaces);
+		XPathExpression<Element> expr = f.compile(xpath, Filters.element(), new HashMap<>(), namespaces);
 		return expr.evaluate(internalDoc);
 	}
 

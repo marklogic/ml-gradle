@@ -12,6 +12,7 @@ import org.jdom2.xpath.XPathFactory;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -28,7 +29,7 @@ public class Fragment {
     public Fragment(String xml, Namespace... namespaces) {
         try {
             internalDoc = new SAXBuilder().build(new StringReader(xml));
-            List<Namespace> list = new ArrayList<Namespace>();
+            List<Namespace> list = new ArrayList<>();
 	        list.add(Namespace.getNamespace("arp", "http://marklogic.com/manage/alert-rule/properties"));
             list.add(Namespace.getNamespace("c", "http://marklogic.com/manage/clusters"));
 			list.add(Namespace.getNamespace("cert", "http://marklogic.com/xdmp/x509"));
@@ -47,9 +48,7 @@ public class Fragment {
             list.add(Namespace.getNamespace("sec", "http://marklogic.com/xdmp/security"));
 			list.add(Namespace.getNamespace("ts", "http://marklogic.com/manage/task-server"));
 	        list.add(Namespace.getNamespace("t", "http://marklogic.com/manage/tasks"));
-            for (Namespace n : namespaces) {
-                list.add(n);
-            }
+			list.addAll(Arrays.asList(namespaces));
             this.namespaces = list.toArray(new Namespace[] {});
         } catch (Exception e) {
             throw new RuntimeException(String.format("Unable to parse XML, cause: %s; XML: %s", e.getMessage(), xml), e);
@@ -69,7 +68,7 @@ public class Fragment {
     }
 
     public List<String> getElementValues(String xpath) {
-        List<String> values = new ArrayList<String>();
+        List<String> values = new ArrayList<>();
         for (Element el : evaluateForElements(xpath)) {
             values.add(el.getText());
         }
@@ -87,7 +86,7 @@ public class Fragment {
 
     protected List<Element> evaluateForElements(String xpath) {
         XPathFactory f = XPathFactory.instance();
-        XPathExpression<Element> expr = f.compile(xpath, Filters.element(), new HashMap<String, Object>(), namespaces);
+        XPathExpression<Element> expr = f.compile(xpath, Filters.element(), new HashMap<>(), namespaces);
         return expr.evaluate(internalDoc);
     }
 

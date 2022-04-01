@@ -20,7 +20,9 @@ public class DeployTemporalCollectionsLSQTCommand extends AbstractCommand {
 			deployTemporalCollectionsLsqt(context, configDir, appConfig.getContentDatabaseName());
 			for (File dir : configDir.getDatabaseResourceDirectories()) {
 				String databaseName = determineDatabaseNameForDatabaseResourceDirectory(context, configDir, dir);
-				deployTemporalCollectionsLsqt(context, new ConfigDir(dir), databaseName);
+				if (databaseName != null) {
+					deployTemporalCollectionsLsqt(context, new ConfigDir(dir), databaseName);
+				}
 			}
 		}
 	}

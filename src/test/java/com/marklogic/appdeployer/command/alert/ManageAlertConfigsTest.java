@@ -8,6 +8,11 @@ import com.marklogic.mgmt.resource.alert.AlertConfigManager;
 
 import java.io.File;
 
+/**
+ * This test is also expected to verify the fix for #442, which is that when a database resource directory - in this
+ * case, sample-app/alert-configs/databases/unknown-database - cannot be associated with an existing ML database, an
+ * exception is NOT thrown but rather a warning is logged. The fact that the test succeeds is evidence of this.
+ */
 public class ManageAlertConfigsTest extends AbstractManageResourceTest {
 
 	@Override

@@ -33,7 +33,9 @@ public class DeployConfigsCommand extends AbstractResourceCommand {
 			deployConfigs(context, configDir, appConfig.getContentDatabaseName());
 			for (File dir : configDir.getDatabaseResourceDirectories()) {
 				String databaseName = determineDatabaseNameForDatabaseResourceDirectory(context, configDir, dir);
-				deployConfigs(context, new ConfigDir(dir), databaseName);
+				if (databaseName != null) {
+					deployConfigs(context, new ConfigDir(dir), databaseName);
+				}
 			}
 		}
 	}

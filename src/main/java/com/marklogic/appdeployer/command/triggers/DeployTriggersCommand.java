@@ -37,7 +37,9 @@ public class DeployTriggersCommand extends AbstractResourceCommand {
 			deployTriggers(context, configDir, initialTriggersDatabaseName);
 			for (File dir : configDir.getDatabaseResourceDirectories()) {
 				String databaseName = determineDatabaseNameForDatabaseResourceDirectory(context, configDir, dir);
-				deployTriggers(context, new ConfigDir(dir), databaseName);
+				if (databaseName != null) {
+					deployTriggers(context, new ConfigDir(dir), databaseName);
+				}
 			}
 		}
 	}

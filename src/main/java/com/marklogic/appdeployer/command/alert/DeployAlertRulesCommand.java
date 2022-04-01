@@ -28,7 +28,9 @@ public class DeployAlertRulesCommand extends AbstractCommand {
 			deployRules(context, configDir, appConfig.getContentDatabaseName());
 			for (File dir : configDir.getDatabaseResourceDirectories()) {
 				String databaseName = determineDatabaseNameForDatabaseResourceDirectory(context, configDir, dir);
-				deployRules(context, new ConfigDir(dir), databaseName);
+				if (databaseName != null) {
+					deployRules(context, new ConfigDir(dir), databaseName);
+				}
 			}
 		}
 	}

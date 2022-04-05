@@ -1,7 +1,7 @@
 function insertTimestamp(context, params, content)
 {
   if (context.inputType.search('json') >= 0) {
-    var result = content.toObject();
+    let result = content.toObject();
     if (context.acceptTypes) {                 /* read */
       result.readTimestamp = fn.currentDateTime();
     } else {                                   /* write */
@@ -12,6 +12,6 @@ function insertTimestamp(context, params, content)
     /* Pass thru for non-JSON documents */
     return content;
   }
-};
+}
 
 exports.transform = insertTimestamp;

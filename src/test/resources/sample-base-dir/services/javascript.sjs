@@ -8,9 +8,9 @@
 // - Setting additional response headers
 //
 function get(context, params) {
-  var results = [];
+  let results = [];
   context.outputTypes = [];
-  for (var pname in params) {
+  for (const pname in params) {
     if (params.hasOwnProperty(pname)) {
       results.push({name: pname, value: params[pname]});
       context.outputTypes.push('application/json');
@@ -28,7 +28,7 @@ function get(context, params) {
 
   // Return a Sequence to return multiple documents
   return Sequence.from(results);
-};
+}
 
 // PUT
 //
@@ -49,8 +49,8 @@ function get(context, params) {
 //
 function put(context, params, input) {
   // normalize the inputs so we don't care whether we have 1 or many
-  var docs = normalizeInput(input);
-  var basenames = params.basename instanceof Array
+  const docs = normalizeInput(input);
+  const basenames = params.basename instanceof Array
                   ? params.basename: [ params.basename ];
 
   // Validate inputs.
@@ -62,9 +62,9 @@ function put(context, params, input) {
   }
 
   // Do something with the input documents
-  var i = 0;
-  var uris = [];
-  for (var doc of docs) {
+  let i = 0;
+  const uris = [];
+  for (const doc of docs) {
     uris.push( doSomething(
         doc, context.inputTypes[i], basenames[i++]
     ));
@@ -73,17 +73,17 @@ function put(context, params, input) {
   // Set the response body MIME type and return the response data.
   context.outputTypes = ['application/json'];
   return { written: uris };
-};
+}
 
 function post(context, params, input) {
   xdmp.log('POST invoked');
   return null;
-};
+}
 
 function deleteFunction(context, params) {
   xdmp.log('POST invoked');
   return null;
-};
+}
 
 // PUT helper func that demonstrates working with input documents.
 //
@@ -99,10 +99,10 @@ function deleteFunction(context, params) {
 //
 function doSomething(doc, docType, basename)
 {
-  var uri = '/extensions/' + basename;
+  let uri = '/extensions/' + basename;
   if (docType == 'application/json') {
     // create a mutable version of the doc so we can modify it
-    var mutableDoc = doc.toObject();
+    const mutableDoc = doc.toObject();
     uri += '.json';
 
     // add a JSON property to the input content
@@ -117,7 +117,7 @@ function doSomething(doc, docType, basename)
   } else {
     return '(skipped)';
   }
-};
+}
 
 // Helper function that demonstrates how to normalize inputs
 // that may or may not be multi-valued, such as the 'input'
@@ -132,7 +132,7 @@ function normalizeInput(item)
   return (item instanceof Sequence)
          ? item                        // many
          : Sequence.from([item]);      // one
-};
+}
 
 // Helper function that demonstrates how to return an error response
 // to the client.
@@ -145,7 +145,7 @@ function returnErrToClient(statusCode, statusMsg, body)
   fn.error(null, 'RESTAPI-SRVEXERR',
            Sequence.from([statusCode, statusMsg, body]));
   // unreachable - control does not return from fn.error.
-};
+}
 
 
 // Include an export for each method supported by your extension.

@@ -2,12 +2,12 @@ plugins {
 	id "java-library"
 	id "maven-publish"
 	id "signing"
-	id "com.github.jk1.dependency-license-report" version "1.3"
+	id "com.github.jk1.dependency-license-report" version "2.1"
 	id "io.snyk.gradle.plugin.snykplugin" version "0.4"
 }
 
 group = "com.marklogic"
-version = "4.3.0"
+version = "4.3.1"
 
 sourceCompatibility = "8"
 targetCompatibility = "8"
@@ -17,30 +17,29 @@ repositories {
 }
 
 dependencies {
-  api 'com.marklogic:marklogic-client-api:5.5.0'
-  api 'com.marklogic:marklogic-xcc:10.0.7'
-  api 'org.springframework:spring-context:5.3.9'
+  api 'com.marklogic:marklogic-client-api:5.5.3'
+  api 'com.marklogic:marklogic-xcc:10.0.9'
+  api 'org.springframework:spring-context:5.3.18'
 
-  implementation 'org.jdom:jdom2:2.0.6'
+  implementation 'org.jdom:jdom2:2.0.6.1'
 
-	// This isn't the latest release, but it matches what is used by the ML Java Client
-	implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.1'
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.6.1'
 
 	// This is currently an implementation dependency, though perhaps should be an api dependency due to its usage in
 	// LoggingObject; not clear yet on whether the protected Logger in that class should make this an api dependency or not
-	implementation 'org.slf4j:slf4j-api:1.7.31'
+	implementation 'org.slf4j:slf4j-api:1.7.36'
 
   testImplementation "org.junit.jupiter:junit-jupiter:5.7.2"
-  testImplementation 'org.springframework:spring-test:5.3.9'
-  testImplementation 'org.mockito:mockito-core:2.1.0'
+	testImplementation 'org.springframework:spring-test:5.3.18'
+	testImplementation 'org.mockito:mockito-core:2.1.0'
 
   // Used for testing loading modules from the classpath
   testImplementation files("lib/modules.jar")
 
 	// Forcing Spring to use logback instead of commons-logging
-	testImplementation "ch.qos.logback:logback-classic:1.2.4"
-	testImplementation "org.slf4j:jcl-over-slf4j:1.7.31"
-	testImplementation "org.slf4j:slf4j-api:1.7.31"
+	testImplementation "ch.qos.logback:logback-classic:1.2.11"
+	testImplementation "org.slf4j:jcl-over-slf4j:1.7.36"
+	testImplementation "org.slf4j:slf4j-api:1.7.36"
 }
 
 test {

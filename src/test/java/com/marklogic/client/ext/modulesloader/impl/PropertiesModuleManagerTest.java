@@ -1,11 +1,11 @@
 package com.marklogic.client.ext.modulesloader.impl;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.nio.file.Path;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -21,7 +21,7 @@ public class PropertiesModuleManagerTest {
 		when(mockPath.getRoot()).thenReturn(mockPath);
 		when(mockFile.toPath()).thenReturn(mockPath);
 
-		assertEquals("Drive letter is lower-cased", "c:\\temp", moduleManager.normalizeDriveLetter(mockFile));
+		assertEquals("c:\\temp", moduleManager.normalizeDriveLetter(mockFile), "Drive letter is lower-cased");
 	}
 
 	@Test
@@ -34,6 +34,6 @@ public class PropertiesModuleManagerTest {
 		when(mockPath.getRoot()).thenReturn(null);
 		when(mockFile.toPath()).thenReturn(mockPath);
 
-		assertEquals("Since getRoot() was null, original path is returned", moduleManager.normalizeDriveLetter(mockFile));
+		assertEquals("Temp", moduleManager.normalizeDriveLetter(mockFile),"Since getRoot() was null, original path is returned");
 	}
 }

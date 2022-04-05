@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.marklogic"
-version = "4.3.2"
+version = "4.3.3"
 
 sourceCompatibility = "8"
 targetCompatibility = "8"
@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-  api 'com.marklogic:ml-javaclient-util:4.3.0'
+  api 'com.marklogic:ml-javaclient-util:4.3.1'
   api 'org.springframework:spring-web:5.3.18'
 	api 'com.fasterxml.jackson.core:jackson-databind:2.13.2.2'
 
@@ -153,6 +153,7 @@ test {
 task executableJar(type: Jar) {
 	description = "Construct an executable jar for executing ml-app-deployer commands via the command line"
 	archiveBaseName = "deployer"
+	duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 	manifest {
 		attributes("Main-Class": "com.marklogic.appdeployer.cli.Main")
 	}

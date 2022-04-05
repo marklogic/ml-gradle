@@ -56,14 +56,11 @@ public class XccTemplate {
     }
 
     public <T> T execute(XccCallback<T> callback) {
-        Session session = contentSource.newSession();
-        try {
-            return callback.execute(session);
-        } catch (RequestException re) {
-            throw new RuntimeException(re);
-        } finally {
-            session.close();
-        }
+		try (Session session = contentSource.newSession()) {
+			return callback.execute(session);
+		} catch (RequestException re) {
+			throw new RuntimeException(re);
+		}
     }
 
     /**

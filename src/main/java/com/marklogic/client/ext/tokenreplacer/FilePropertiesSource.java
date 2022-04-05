@@ -34,9 +34,7 @@ public class FilePropertiesSource extends LoggingObject implements PropertiesSou
 	protected Properties loadPropertiesFromFile(File file) {
 		Properties properties = new Properties();
 		if (file.exists()) {
-			FileReader reader = null;
-			try {
-				reader = new FileReader(file);
+			try (FileReader reader = new FileReader(file)) {
 				if (logger.isDebugEnabled()) {
 					logger.debug("Loading properties from: " + file.getAbsolutePath());
 				}
@@ -45,15 +43,8 @@ public class FilePropertiesSource extends LoggingObject implements PropertiesSou
 				logger.warn(
 					"Unable to load properties from file " + file.getAbsolutePath() + "; cause: " + ex.getMessage(),
 					ex);
-			} finally {
-				if (reader != null) {
-					try {
-						reader.close();
-					} catch (IOException ie) {
-						// Ignore
-					}
-				}
 			}
+			// Ignore
 		}
 		return properties;
 	}

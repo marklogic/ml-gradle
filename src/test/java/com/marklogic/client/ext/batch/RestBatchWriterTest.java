@@ -18,7 +18,7 @@ import org.springframework.core.io.Resource;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,7 +33,7 @@ public class RestBatchWriterTest extends AbstractIntegrationTest {
 			"/test.xml", null, new StringHandle("<hello>world</hello>asdf"));
 
 		writer.initialize();
-		writer.write(Arrays.asList(op));
+		writer.write(Collections.singletonList(op));
 
 		try {
 			writer.waitForCompletion();
@@ -53,7 +53,7 @@ public class RestBatchWriterTest extends AbstractIntegrationTest {
 			"/test.xml", null, new StringHandle("<hello>world</hello>asdf"));
 
 		writer.initialize();
-		writer.write(Arrays.asList(op));
+		writer.write(Collections.singletonList(op));
 		writer.waitForCompletion();
 
 		Throwable caughtError = testWriteListener.caughtError;
@@ -78,7 +78,7 @@ public class RestBatchWriterTest extends AbstractIntegrationTest {
 		writer.setServerTransform(new ServerTransform("simple"));
 		writer.setContentFormat(Format.XML);
 		writer.initialize();
-		writer.write(Arrays.asList(op));
+		writer.write(Collections.singletonList(op));
 		writer.waitForCompletion();
 
 		client = newClient("Documents");

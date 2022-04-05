@@ -5,6 +5,7 @@ import com.marklogic.client.io.Format;
 import org.springframework.core.io.Resource;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -22,15 +23,9 @@ public class DefaultDocumentFormatGetter implements FormatGetter {
 	private List<String> jsonExtensions = new ArrayList<>();
 
 	public DefaultDocumentFormatGetter() {
-		for (String ext : DEFAULT_BINARY_EXTENSIONS) {
-			binaryExtensions.add(ext);
-		}
-		for (String ext : DEFAULT_XML_EXTENSIONS) {
-			xmlExtensions.add(ext);
-		}
-		for (String ext : DEFAULT_JSON_EXTENSIONS) {
-			jsonExtensions.add(ext);
-		}
+		binaryExtensions.addAll(Arrays.asList(DEFAULT_BINARY_EXTENSIONS));
+		xmlExtensions.addAll(Arrays.asList(DEFAULT_XML_EXTENSIONS));
+		jsonExtensions.addAll(Arrays.asList(DEFAULT_JSON_EXTENSIONS));
 	}
 
 	@Override

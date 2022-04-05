@@ -213,9 +213,7 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 			processors.add(new TokenReplacerDocumentFileProcessor(tokenReplacer));
 		}
 		if (documentFileProcessors != null) {
-			for (DocumentFileProcessor dfp : documentFileProcessors) {
-				processors.add(dfp);
-			}
+			processors.addAll(documentFileProcessors);
 		}
 		return processors;
 	}

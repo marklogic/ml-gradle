@@ -3,7 +3,6 @@ package com.marklogic.client.ext.modulesloader.impl;
 import com.marklogic.client.ext.modulesloader.Modules;
 import com.marklogic.client.ext.modulesloader.ModulesFinder;
 
-
 /**
  * Default implementation that loads all of the different kinds of REST modules.
  */

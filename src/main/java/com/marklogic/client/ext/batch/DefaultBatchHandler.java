@@ -35,9 +35,7 @@ public class DefaultBatchHandler extends LoggingObject implements BatchHandler {
 		}
 
 		DocumentWriteSet set = mgr.newWriteSet();
-		for (DocumentWriteOperation item : items) {
-			set.add(item);
-		}
+		set.addAll(items);
 
 		int count = set.size();
 		String connectionInfo = format("port: %d", client.getPort());

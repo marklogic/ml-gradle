@@ -75,7 +75,7 @@ public abstract class BaseModulesFinder extends LoggingObject implements Modules
 				if (!(isRecognized || hasWeirdWarPath)) {
 					boolean isDir = (resource instanceof FileSystemResource && f.isDirectory());
 					boolean isUrlResource = (resource instanceof UrlResource);
-					boolean notInList = dirs.indexOf(resource) < 0;
+					boolean notInList = !dirs.contains(resource);
 					if ((isDir || isUrlResource) && notInList) {
 						dirs.add(resource);
 					}

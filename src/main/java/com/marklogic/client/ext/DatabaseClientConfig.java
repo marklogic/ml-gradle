@@ -47,7 +47,7 @@ public class DatabaseClientConfig {
 
 	@Override
 	public String toString() {
-		return String.format("[%s@%s:%d]", username, host, port, username);
+		return String.format("[%s@%s:%d]", username, host, port);
 	}
 
 	public String getHost() {

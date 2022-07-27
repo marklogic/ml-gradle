@@ -72,9 +72,7 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 	 */
 	public List<DocumentFile> loadFiles(String... paths) {
 		batchWriter.initialize();
-		initializeDocumentFileReader();
-
-		List<DocumentFile> documentFiles = documentFileReader.readDocumentFiles(paths);
+		List<DocumentFile> documentFiles = getDocumentFiles(paths);
 		if (documentFiles != null && !documentFiles.isEmpty()) {
 			writeBatchOfDocuments(documentFiles, 0);
 			if (waitForCompletion) {
@@ -82,6 +80,11 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 			}
 		}
 		return documentFiles;
+	}
+
+	public List<DocumentFile> getDocumentFiles(String... paths) {
+		initializeDocumentFileReader();
+		return documentFileReader.readDocumentFiles(paths);
 	}
 
 	/**

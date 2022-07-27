@@ -30,4 +30,17 @@ public class LoadSchemasTest extends AbstractSchemasTest {
 		assertTrue(uris.contains("/parent.tdex"));
 		assertTrue(uris.contains("/tde/ruleset.txt"));
 	}
+
+	@Test
+	public void testTemplateBatchInsert() {
+		DefaultSchemasLoader loader = new DefaultSchemasLoader(client, "Documents");
+		List<DocumentFile> files = loader.loadSchemas(Paths.get("src", "test", "resources", "good-schemas", "originals").toString());
+		assertEquals(2, files.size());
+
+		ClientHelper helper = new ClientHelper(client);
+		List<String> uris = helper.getUrisInCollection("http://marklogic.com/xdmp/tde");
+		assertEquals(2, uris.size());
+		assertTrue(uris.contains("/tde/good-schema.json"));
+		assertTrue(uris.contains("/tde/good-schema.xml"));
+	}
 }

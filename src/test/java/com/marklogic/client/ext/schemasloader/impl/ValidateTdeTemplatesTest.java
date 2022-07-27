@@ -1,5 +1,6 @@
 package com.marklogic.client.ext.schemasloader.impl;
 
+import com.marklogic.client.FailedRequestException;
 import com.marklogic.client.ext.file.DocumentFile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,14 +27,9 @@ public class ValidateTdeTemplatesTest extends AbstractSchemasTest {
 
 	@Test
 	public void badJsonFile() {
-		try {
-			loader.loadSchemas(Paths.get("src", "test", "resources", "bad-schemas", "bad-json").toString());
-			fail("The bad-template.json file should have failed processing because it has a duplicate column in it");
-		} catch (RuntimeException ex) {
-			String message = ex.getCause().getMessage();
-			assertTrue(message.startsWith("TDE template failed validation"));
-			assertTrue(message.contains("TDE-REPEATEDCOLUMN"));
-		}
+		FailedRequestException ex = assertThrows(FailedRequestException.class, () ->
+			loader.loadSchemas(Paths.get("src", "test", "resources", "bad-schemas", "bad-json").toString()));
+		logger.info(ex.getMessage());
 	}
 
 	@Test
@@ -50,21 +46,16 @@ public class ValidateTdeTemplatesTest extends AbstractSchemasTest {
 
 	@Test
 	public void badXmlFile() {
-		try {
-			loader.loadSchemas(Paths.get("src", "test", "resources", "bad-schemas", "bad-xml").toString());
-			fail("The bad-template.xml file should have failed processing because it has a duplicate column in it");
-		} catch (RuntimeException ex) {
-			String message = ex.getCause().getMessage();
-			assertTrue(message.startsWith("TDE template failed validation"));
-			assertTrue(message.contains("TDE-REPEATEDCOLUMN"));
-		}
+		FailedRequestException ex = assertThrows(FailedRequestException.class, () ->
+			loader.loadSchemas(Paths.get("src", "test", "resources", "bad-schemas", "bad-xml").toString()));
+		logger.info(ex.getMessage());
 	}
 
 	@Test
 	public void badJsonFileInNonTdeDirectory() {
-		List<DocumentFile> files = loader.loadSchemas(Paths.get("src", "test", "resources", "bad-schemas", "otherpath").toString());
-		assertEquals(1, files.size(), "The file in the otherpath directory is a TDE template, but it's not under /tde/, so it's not " +
-			"validated as a TDE template");
+		FailedRequestException ex = assertThrows(FailedRequestException.class, () ->
+			loader.loadSchemas(Paths.get("src", "test", "resources", "bad-schemas", "otherpath").toString()));
+		logger.info(ex.getMessage());
 	}
 
 	@Test

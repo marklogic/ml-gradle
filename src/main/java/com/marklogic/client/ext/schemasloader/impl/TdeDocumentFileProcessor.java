@@ -5,6 +5,7 @@ import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.eval.ServerEvaluationCall;
 import com.marklogic.client.ext.file.DocumentFile;
 import com.marklogic.client.ext.file.DocumentFileProcessor;
+import com.marklogic.client.ext.helper.ClientHelper;
 import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.client.io.Format;
 import com.marklogic.client.io.JacksonHandle;
@@ -37,6 +38,7 @@ public class TdeDocumentFileProcessor extends LoggingObject implements DocumentF
 
 	@Override
 	public DocumentFile processDocumentFile(DocumentFile documentFile) {
+		ClientHelper helper = new ClientHelper(databaseClient);
 		String uri = documentFile.getUri();
 		String extension = documentFile.getFileExtension();
 		if (extension != null) {
@@ -54,8 +56,16 @@ public class TdeDocumentFileProcessor extends LoggingObject implements DocumentF
 			documentFile.setFormat(Format.XML);
 		}
 
+		if(isTdeTemplate) {
+			return documentFile;
+		}
+
 		if (isTdeTemplate) {
-			validateTdeTemplate(documentFile);
+			if(helper.getMLEffectiveVersion() >= 10000900 && tdeValidationDatabase != null && !tdeValidationDatabase.isEmpty()) {
+				return documentFile;
+			} else {
+				validateTdeTemplate(documentFile);
+			}
 		}
 
 		return documentFile;

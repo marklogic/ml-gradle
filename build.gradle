@@ -19,7 +19,7 @@ repositories {
 dependencies {
   api 'com.marklogic:marklogic-client-api:5.5.3'
   api 'com.marklogic:marklogic-xcc:10.0.9'
-  api 'org.springframework:spring-context:5.3.18'
+  api 'org.springframework:spring-context:5.3.22'
 
   implementation 'org.jdom:jdom2:2.0.6.1'
 
@@ -29,9 +29,9 @@ dependencies {
 	// LoggingObject; not clear yet on whether the protected Logger in that class should make this an api dependency or not
 	implementation 'org.slf4j:slf4j-api:1.7.36'
 
-  testImplementation "org.junit.jupiter:junit-jupiter:5.7.2"
-	testImplementation 'org.springframework:spring-test:5.3.18'
-	testImplementation 'org.mockito:mockito-core:2.1.0'
+  testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
+	testImplementation 'org.springframework:spring-test:5.3.22'
+	testImplementation 'org.mockito:mockito-core:4.6.1'
 
   // Used for testing loading modules from the classpath
   testImplementation files("lib/modules.jar")

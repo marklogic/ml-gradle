@@ -52,7 +52,7 @@ It is not intended to be used to build this project.
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
-      <version>5.3.18</version>
+      <version>5.3.22</version>
       <scope>compile</scope>
     </dependency>
     <dependency>

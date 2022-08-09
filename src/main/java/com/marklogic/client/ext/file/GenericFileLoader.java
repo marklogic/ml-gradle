@@ -73,18 +73,22 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 	public List<DocumentFile> loadFiles(String... paths) {
 		batchWriter.initialize();
 		List<DocumentFile> documentFiles = getDocumentFiles(paths);
+		writeDocumentFiles(documentFiles);
+		return documentFiles;
+	}
+
+	protected final List<DocumentFile> getDocumentFiles(String... paths) {
+		initializeDocumentFileReader();
+		return documentFileReader.readDocumentFiles(paths);
+	}
+
+	protected final void writeDocumentFiles(List<DocumentFile> documentFiles) {
 		if (documentFiles != null && !documentFiles.isEmpty()) {
 			writeBatchOfDocuments(documentFiles, 0);
 			if (waitForCompletion) {
 				batchWriter.waitForCompletion();
 			}
 		}
-		return documentFiles;
-	}
-
-	public List<DocumentFile> getDocumentFiles(String... paths) {
-		initializeDocumentFileReader();
-		return documentFileReader.readDocumentFiles(paths);
 	}
 
 	/**

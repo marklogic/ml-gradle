@@ -5,11 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.marklogic.client.DatabaseClient;
-import com.marklogic.client.eval.ServerEvaluationCall;
 import com.marklogic.client.io.DocumentMetadataHandle;
 import com.marklogic.client.io.DocumentMetadataHandle.DocumentCollections;
 import com.marklogic.client.io.SearchHandle;
-import com.marklogic.client.io.StringHandle;
 import com.marklogic.client.query.MatchDocumentSummary;
 import com.marklogic.client.query.QueryManager;
 import com.marklogic.client.query.StringQueryDefinition;
@@ -68,14 +66,4 @@ public class ClientHelper extends LoggingObject {
         return getClient().newServerEval().xquery(expr).evalAs(String.class);
     }
 
-    public int getMLEffectiveVersion() {
-		int version = -1;
-		StringBuilder script = new StringBuilder("xdmp.effectiveVersion();");
-		ServerEvaluationCall call = client.newServerEval().javascript(script.toString());
-		if (call != null) {
-			String node = call.eval(new StringHandle()).get();
-			version = Integer.parseInt(node);
-		}
-		return version;
-	}
 }

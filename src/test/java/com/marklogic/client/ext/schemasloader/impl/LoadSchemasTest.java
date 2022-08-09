@@ -8,7 +8,8 @@ import org.junit.jupiter.api.Test;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class LoadSchemasTest extends AbstractSchemasTest {
 
@@ -23,7 +24,7 @@ public class LoadSchemasTest extends AbstractSchemasTest {
 		assertEquals(5, files.size());
 
 		ClientHelper helper = new ClientHelper(client);
-		List<String> uris = helper.getUrisInCollection("http://marklogic.com/xdmp/tde");
+		List<String> uris = helper.getUrisInCollection(TdeUtil.TDE_COLLECTION);
 		assertEquals(4, uris.size(), "The non-tde/ruleset.txt file should not be in the TDE collection");
 		assertTrue(uris.contains("/child/child.tdej"));
 		assertTrue(uris.contains("/child/grandchild/grandchild.tdex"));
@@ -38,7 +39,7 @@ public class LoadSchemasTest extends AbstractSchemasTest {
 		assertEquals(2, files.size());
 
 		ClientHelper helper = new ClientHelper(client);
-		List<String> uris = helper.getUrisInCollection("http://marklogic.com/xdmp/tde");
+		List<String> uris = helper.getUrisInCollection(TdeUtil.TDE_COLLECTION);
 		assertEquals(2, uris.size());
 		assertTrue(uris.contains("/tde/good-schema.json"));
 		assertTrue(uris.contains("/tde/good-schema.xml"));

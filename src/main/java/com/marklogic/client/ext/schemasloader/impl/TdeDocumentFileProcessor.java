@@ -19,6 +19,7 @@ public class TdeDocumentFileProcessor extends LoggingObject implements DocumentF
 
 	private DatabaseClient databaseClient;
 	private String tdeValidationDatabase;
+	private Boolean templateBatchInsertSupported;
 
 	/**
 	 * Use this constructor when you don't want any TDE validation to occur.
@@ -38,7 +39,6 @@ public class TdeDocumentFileProcessor extends LoggingObject implements DocumentF
 
 	@Override
 	public DocumentFile processDocumentFile(DocumentFile documentFile) {
-		ClientHelper helper = new ClientHelper(databaseClient);
 		String uri = documentFile.getUri();
 		String extension = documentFile.getFileExtension();
 		if (extension != null) {
@@ -47,7 +47,8 @@ public class TdeDocumentFileProcessor extends LoggingObject implements DocumentF
 
 		boolean isTdeTemplate = ("tdej".equals(extension) || "tdex".equals(extension)) || (uri != null && uri.startsWith("/tde"));
 		if (isTdeTemplate) {
-			documentFile.getDocumentMetadata().withCollections("http://marklogic.com/xdmp/tde");
+			documentFile.getDocumentMetadata().withCollections(TdeUtil.TDE_COLLECTION);
+			validateTdeTemplate(documentFile);
 		}
 
 		if ("tdej".equals(extension) || "json".equals(extension)) {
@@ -56,19 +57,16 @@ public class TdeDocumentFileProcessor extends LoggingObject implements DocumentF
 			documentFile.setFormat(Format.XML);
 		}
 
-		if(isTdeTemplate) {
-			return documentFile;
-		}
-
-		if (isTdeTemplate) {
-			if(helper.getMLEffectiveVersion() >= 10000900 && tdeValidationDatabase != null && !tdeValidationDatabase.isEmpty()) {
-				return documentFile;
-			} else {
-				validateTdeTemplate(documentFile);
-			}
-		}
-
 		return documentFile;
+	}
+
+	private boolean isTemplateBatchInsertSupported() {
+		if (this.templateBatchInsertSupported == null) {
+			// Memoize this to avoid repeated calls; the result will always be the same unless the databaseClient is
+			// modified, in which case templateBatchInsertSupported is set to null
+			this.templateBatchInsertSupported = TdeUtil.templateBatchInsertSupported(databaseClient);
+		}
+		return this.templateBatchInsertSupported;
 	}
 
 	protected void validateTdeTemplate(DocumentFile documentFile) {
@@ -77,6 +75,8 @@ public class TdeDocumentFileProcessor extends LoggingObject implements DocumentF
 			logger.info("No DatabaseClient provided for TDE validation, so will not validate TDE templates");
 		} else if (tdeValidationDatabase == null) {
 			logger.info("No TDE validation database specified, so will not validate TDE templates");
+		} else if (isTemplateBatchInsertSupported()) {
+			logger.debug("Not performing TDE validation; it will be performed automatically via tde.templateBatchInsert");
 		} else {
 			String fileContent = null;
 			try {
@@ -133,6 +133,7 @@ public class TdeDocumentFileProcessor extends LoggingObject implements DocumentF
 
 	public void setDatabaseClient(DatabaseClient databaseClient) {
 		this.databaseClient = databaseClient;
+		this.templateBatchInsertSupported = null;
 	}
 
 	public String getTdeValidationDatabase() {

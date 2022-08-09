@@ -55,7 +55,7 @@ public abstract class AbstractDocumentFileReader extends LoggingObject {
 				}
 				documentFile = processor.processDocumentFile(documentFile);
 			} catch (Exception e) {
-				final String message = "Error while processing document file: " + documentFile.getFile();
+				final String message = "Error while processing file: " + documentFile.getFile() + "; cause: " + e.getMessage();
 				if (catchProcessingError) {
 					logger.error(message, e);
 				} else {

@@ -7,7 +7,6 @@ import com.marklogic.client.io.Format;
 import com.marklogic.client.io.InputStreamHandle;
 import com.marklogic.client.io.StringHandle;
 import com.marklogic.client.io.marker.AbstractWriteHandle;
-import com.marklogic.client.io.marker.DocumentMetadataWriteHandle;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
@@ -65,7 +64,7 @@ public class DocumentFile {
 		return DocumentWriteOperation.OperationType.DOCUMENT_WRITE;
 	}
 
-	public DocumentMetadataWriteHandle getMetadata() {
+	public DocumentMetadataHandle getMetadata() {
 		return documentMetadata;
 	}
 

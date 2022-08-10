@@ -12,7 +12,7 @@ It is not intended to be used to build this project.
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.marklogic</groupId>
   <artifactId>ml-javaclient-util</artifactId>
-  <version>4.3.2</version>
+  <version>4.3.3</version>
   <name>com.marklogic:ml-javaclient-util</name>
   <description>Library that adds functionality on top of the MarkLogic Java Client</description>
   <url>https://github.com/marklogic-community/ml-javaclient-util</url>

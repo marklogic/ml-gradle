@@ -1,7 +1,6 @@
 package com.marklogic.client.ext.schemasloader.impl;
 
 import com.marklogic.client.DatabaseClient;
-import com.marklogic.client.eval.ServerEvaluationCall;
 import com.marklogic.client.ext.batch.BatchWriter;
 import com.marklogic.client.ext.batch.RestBatchWriter;
 import com.marklogic.client.ext.file.DocumentFile;
@@ -10,6 +9,7 @@ import com.marklogic.client.ext.helper.ClientHelper;
 import com.marklogic.client.ext.modulesloader.impl.DefaultFileFilter;
 import com.marklogic.client.ext.schemasloader.SchemasLoader;
 import com.marklogic.client.io.DocumentMetadataHandle;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,13 +84,33 @@ public class DefaultSchemasLoader extends GenericFileLoader implements SchemasLo
 	 */
 	@Override
 	public List<DocumentFile> loadSchemas(String... paths) {
-		ClientHelper helper = new ClientHelper(schemasDatabaseClient);
-		if (helper.getMLEffectiveVersion() >= 10000900 && tdeValidationDatabase != null && !tdeValidationDatabase.isEmpty()) {
-			logger.info("Installing tde's using tde.templateBatchInsert");
-			List<DocumentFile> documentFiles = super.getDocumentFiles(paths);
-			buildTemplateBatchInsertCall(documentFiles).eval().close();
+		if (TdeUtil.templateBatchInsertSupported(schemasDatabaseClient) && StringUtils.hasText(tdeValidationDatabase)) {
+			final List<DocumentFile> documentFiles = super.getDocumentFiles(paths);
+			final List<DocumentFile> tdeFiles = new ArrayList<>();
+			final List<DocumentFile> nonTdeFiles = new ArrayList<>();
+
+			for (DocumentFile file : documentFiles) {
+				DocumentMetadataHandle metadata = file.getMetadata();
+				if (metadata != null && metadata.getCollections().contains(TdeUtil.TDE_COLLECTION)) {
+					tdeFiles.add(file);
+				} else {
+					nonTdeFiles.add(file);
+				}
+			}
+
+			if (!tdeFiles.isEmpty()) {
+				loadTdeTemplatesViaBatchInsert(tdeFiles);
+			}
+			if (!nonTdeFiles.isEmpty()) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("Non-TDE files: " + nonTdeFiles);
+				}
+				super.writeDocumentFiles(nonTdeFiles);
+			}
+
 			return documentFiles;
 		}
+
 		return super.loadFiles(paths);
 	}
 
@@ -102,15 +122,27 @@ public class DefaultSchemasLoader extends GenericFileLoader implements SchemasLo
 		this.tdeValidationDatabase = tdeValidationDatabase;
 	}
 
-	protected ServerEvaluationCall buildTemplateBatchInsertCall(List<DocumentFile> documentFiles) {
-		String tdeTemplate = getTdeBatchInsertQuery(documentFiles);
+	private void loadTdeTemplatesViaBatchInsert(List<DocumentFile> tdeFiles) {
+		logger.info("Loading and validating TDE templates via tde.templateBatchInsert; templates: " +
+			tdeFiles.stream().map(documentFile -> documentFile.getFile().getName()).collect(Collectors.toList()));
+
+		String query = buildTdeBatchInsertQuery(tdeFiles);
 		StringBuilder script = new StringBuilder("declareUpdate(); xdmp.invokeFunction(function() {var tde = require('/MarkLogic/tde.xqy');");
-		script.append(tdeTemplate);
+		script.append(query);
 		script.append(format("}, {database: xdmp.database('%s')})", tdeValidationDatabase));
-		return schemasDatabaseClient.newServerEval().javascript(script.toString());
+		try {
+			schemasDatabaseClient.newServerEval().javascript(script.toString()).eval().close();
+		} catch (Exception ex) {
+			throw new RuntimeException("Unable to load and validate TDE templates via tde.templateBatchInsert; cause: " + ex.getMessage(), ex);
+		}
 	}
 
-	private String getTdeBatchInsertQuery(List<DocumentFile> documentFiles) {
+	/**
+	 *
+	 * @param documentFiles
+	 * @return a JavaScript query that uses the tde.templateBatchInsert function introduced in ML 10.0-9
+	 */
+	private String buildTdeBatchInsertQuery(List<DocumentFile> documentFiles) {
 		List<String> templateInfoList = new ArrayList<>();
 		for (DocumentFile doc : documentFiles) {
 			String uri = doc.getUri();

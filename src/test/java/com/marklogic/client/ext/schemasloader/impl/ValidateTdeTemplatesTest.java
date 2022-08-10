@@ -27,9 +27,20 @@ public class ValidateTdeTemplatesTest extends AbstractSchemasTest {
 
 	@Test
 	public void badJsonFile() {
-		FailedRequestException ex = assertThrows(FailedRequestException.class, () ->
-			loader.loadSchemas(Paths.get("src", "test", "resources", "bad-schemas", "bad-json").toString()));
-		logger.info(ex.getMessage());
+		final String path = Paths.get("src", "test", "resources", "bad-schemas", "bad-json").toString();
+		if (TdeUtil.templateBatchInsertSupported(client)) {
+			FailedRequestException ex = assertThrows(FailedRequestException.class, () -> loader.loadSchemas(path));
+			logger.info(ex.getMessage());
+		} else {
+			try {
+				loader.loadSchemas(path);
+				fail("The bad-template.json file should have failed processing because it has a duplicate column in it");
+			} catch (RuntimeException ex) {
+				String message = ex.getCause().getMessage();
+				assertTrue(message.startsWith("TDE template failed validation"));
+				assertTrue(message.contains("TDE-REPEATEDCOLUMN"));
+			}
+		}
 	}
 
 	@Test
@@ -46,16 +57,28 @@ public class ValidateTdeTemplatesTest extends AbstractSchemasTest {
 
 	@Test
 	public void badXmlFile() {
-		FailedRequestException ex = assertThrows(FailedRequestException.class, () ->
-			loader.loadSchemas(Paths.get("src", "test", "resources", "bad-schemas", "bad-xml").toString()));
-		logger.info(ex.getMessage());
+		final String path = Paths.get("src", "test", "resources", "bad-schemas", "bad-xml").toString();
+		if (TdeUtil.templateBatchInsertSupported(client)) {
+			FailedRequestException ex = assertThrows(FailedRequestException.class, () -> loader.loadSchemas(path));
+			logger.info(ex.getMessage());
+		} else {
+			try {
+				loader.loadSchemas(path);
+				fail("The bad-template.xml file should have failed processing because it has a duplicate column in it");
+			} catch (RuntimeException ex) {
+				String message = ex.getCause().getMessage();
+				assertTrue(message.startsWith("TDE template failed validation"));
+				assertTrue(message.contains("TDE-REPEATEDCOLUMN"));
+			}
+		}
 	}
 
 	@Test
 	public void badJsonFileInNonTdeDirectory() {
-		FailedRequestException ex = assertThrows(FailedRequestException.class, () ->
-			loader.loadSchemas(Paths.get("src", "test", "resources", "bad-schemas", "otherpath").toString()));
-		logger.info(ex.getMessage());
+		final String path = Paths.get("src", "test", "resources", "bad-schemas", "otherpath").toString();
+		List<DocumentFile> files = loader.loadSchemas(path);
+		assertEquals(1, files.size(), "The file in the otherpath directory is a TDE template, but it's not under /tde/, so it's not " +
+			"validated as a TDE template");
 	}
 
 	@Test
@@ -69,5 +92,13 @@ public class ValidateTdeTemplatesTest extends AbstractSchemasTest {
 	public void mixedContent() {
 		List<DocumentFile> files = loader.loadSchemas(Paths.get("src", "test", "resources", "good-schemas", "xml-schemas").toString());
 		assertEquals(1, files.size(), "Verifying that the file still loads correctly even with processing instructions and comments in it");
+	}
+
+	@Test
+	public void schemasThatArentTdeTemplates() {
+		List<DocumentFile> files = loader.loadSchemas(Paths.get("src", "test", "resources", "schemas", "not-tde").toString());
+		assertEquals(1, files.size());
+		assertEquals("ruleset.txt", files.get(0).getFile().getName(), "The loader should recognize" +
+			"that the file is not a TDE, and thus it should not be loaded via templateBatchInsert");
 	}
 }

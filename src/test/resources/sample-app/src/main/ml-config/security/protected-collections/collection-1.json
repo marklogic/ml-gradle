@@ -1,5 +1,5 @@
 {
-  "collection": "sample-app-collection",
+  "collection": "sample-app-collection#stuff",
   "permission": [
     {
       "role-name": "view-admin",

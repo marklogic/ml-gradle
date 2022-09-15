@@ -1,5 +1,7 @@
 package com.marklogic.appdeployer.command.security;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
@@ -8,15 +10,56 @@ import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.mgmt.ManageClient;
+import com.marklogic.mgmt.api.API;
+import com.marklogic.mgmt.api.security.Amp;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.security.AmpManager;
+import com.marklogic.mgmt.util.ObjectMapperFactory;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ManageAmpsTest extends AbstractManageResourceTest {
+
+	@Test
+	void updateAndDeleteJavascriptAmp() throws Exception {
+		Amp amp = new Amp(new API(manageClient), "aaa-function");
+		amp.setDocumentUri("/some/module.sjs");
+		amp.setModulesDatabase("Modules");
+		amp.addRole("rest-reader");
+
+		AmpManager mgr = new AmpManager(manageClient);
+		assertFalse(mgr.ampExists(amp.getJson()));
+
+		mgr.save(amp.getJson());
+		assertTrue(mgr.ampExists(amp.getJson()));
+
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			JsonNode ampJson = mapper.readTree(mgr.getAsJson("aaa-function", "document-uri", "/some/module.sjs", "modules-database", "Modules"));
+			assertEquals(1, ampJson.get("role").size());
+			assertEquals("rest-reader", ampJson.get("role").get(0).asText());
+
+			amp.getRole().add("rest-writer");
+			mgr.save(amp.getJson());
+
+			ampJson = mapper.readTree(mgr.getAsJson("aaa-function", "document-uri", "/some/module.sjs", "modules-database", "Modules"));
+			assertEquals(2, ampJson.get("role").size());
+
+			ampJson.get("role").iterator().forEachRemaining(node -> {
+				String role = node.asText();
+				assertTrue("rest-reader".equals(role) || "rest-writer".equals(role));
+			});
+		} finally {
+			mgr.delete(amp.getJson());
+			assertFalse(mgr.ampExists(amp.getJson()), "The amp should have been deleted, even though it does not have a " +
+				"namespace value. Per the Manage API docs, namespace is a required parameter and thus it must still be " +
+				"defined as 'namespace='.");
+		}
+	}
 
 	@Test
 	public void ampLoadedBeforeModules() {

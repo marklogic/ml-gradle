@@ -100,6 +100,9 @@ public class AmpManager extends AbstractResourceManager {
 		AmpParams ampParams = getAmpParams(payload);
 		params.add("document-uri");
 		params.add(ampParams.documentUri);
+		// Building params for a DELETE requires namespace= in case namespace does not exist, but testing shows that
+		// this is not required for an update, even though the docs for a PUT on an amp indicate that namespace is
+		// required. The ManageAmpsTest suggests otherwise.
 		if (ampParams.namespace != null) {
 			params.add("namespace");
 			params.add(ampParams.namespace);
@@ -125,9 +128,13 @@ public class AmpManager extends AbstractResourceManager {
 		AmpParams ampParams = getAmpParams(payload);
 		params.add("document-uri");
 		params.add(ampParams.documentUri);
+		// The DELETE endpoint requires 'namespace=' to be passed in case no namespace is set for an amp, which will
+		// always be the case for an amp on a JS function
+		params.add("namespace");
 		if (ampParams.namespace != null) {
-			params.add("namespace");
 			params.add(ampParams.namespace);
+		} else {
+			params.add("");
 		}
 		if (ampParams.modulesDatabase != null) {
 			params.add("modules-database");

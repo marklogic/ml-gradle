@@ -46,7 +46,6 @@ public class PartitionManager extends AbstractResourceManager {
 
 	public PartitionProperties getPartitionProperties(String partitionName) {
 		JsonNode json = getManageClient().getJsonNode(getPropertiesPath(partitionName));
-		System.out.println("JSON: " + json);
 		if (json != null && json.has("partition-properties")) {
 			JsonNode props = json.get("partition-properties");
 			try {

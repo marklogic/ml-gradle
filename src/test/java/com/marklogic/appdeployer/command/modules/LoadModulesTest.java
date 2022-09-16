@@ -88,15 +88,15 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 	public void loadModulesFromMultiplePaths() {
 		// Setting batch size just to verify that nothing blows up when doing so
 		appConfig.setModulesLoaderBatchSize(1);
-		appConfig.getModulePaths().add("src/test/resources/sample-app/build/mlRestApi/some-library/ml-modules");
+		appConfig.getModulePaths().add("src/test/resources/sample-app/other-modules");
 
 		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
 		appDeployer.deploy(appConfig);
 
 		assertModuleExistsWithDefaultPermissions("sample-lib is loaded from /ext in the default path",
 			"/ext/sample-lib.xqy");
-		assertModuleExistsWithDefaultPermissions("some-lib.xqy is loaded from the path added at the start of the test",
-			"/ext/some-lib.xqy");
+		assertModuleExistsWithDefaultPermissions("other-lib.xqy is loaded from the path added at the start of the test",
+			"/other-lib.xqy");
 	}
 
 	@Test

@@ -5,6 +5,7 @@ import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.FailedRequestException;
 import com.marklogic.client.document.GenericDocumentManager;
 import com.marklogic.client.document.JSONDocumentManager;
 import com.marklogic.client.io.DocumentMetadataHandle;
@@ -37,7 +38,7 @@ public class InstallPluginsTest extends AbstractAppDeployerTest {
 
 		deploySampleApp();
 
-		DatabaseClient contentClient = appConfig.newAppServicesDatabaseClient(appConfig.getContentDatabaseName());
+		DatabaseClient contentClient = appConfig.newDatabaseClient();
 		assertNotNull(contentClient.newDocumentManager().exists("/com.marklogic/plugins/varianceplugin.zip"),
 			"The plugin zip should have been written to the content database so that it can be installed");
 
@@ -60,7 +61,18 @@ public class InstallPluginsTest extends AbstractAppDeployerTest {
 		object.put("amount", 30);
 		jsonDocumentManager.write("test3.json", new JacksonHandle(object));
 
-		assertTrue(invokePlugin(contentClient).startsWith("22.22"));
+		try {
+			String pluginResponse = invokePlugin(contentClient);
+			assertTrue(pluginResponse.startsWith("22.22"), "Unexpected plugin response: " + pluginResponse);
+		} catch (FailedRequestException ex) {
+			String message = ex.getMessage();
+			if (message.contains("invalid ELF header")) {
+				logger.warn("Could not verify that the plugin works as the platform that the plugin was built on does " +
+					"not match that of the platform running MarkLogic; error: " + message);
+			} else {
+				throw ex;
+			}
+		}
 
 		// Now uninstall the plugin and make sure the plugin can't be invoked
 		initializeAppDeployer(new InstallPluginsCommand());

@@ -113,8 +113,7 @@ public class ManageAmpsTest extends AbstractManageResourceTest {
 			"  \"role\": [\"rest-writer\"]\n" +
 			"}";
 
-		ManageClient client = new ManageClient();
-		AmpManager mgr = new AmpManager(client);
+		AmpManager mgr = new AmpManager(super.manageClient);
 
 		try {
 			// Create and verify

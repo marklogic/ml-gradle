@@ -29,8 +29,11 @@ public class ValidateTdeTemplatesTest extends AbstractSchemasTest {
 	public void badJsonFile() {
 		final String path = Paths.get("src", "test", "resources", "bad-schemas", "bad-json").toString();
 		if (TdeUtil.templateBatchInsertSupported(client)) {
-			FailedRequestException ex = assertThrows(FailedRequestException.class, () -> loader.loadSchemas(path));
-			logger.info(ex.getMessage());
+			RuntimeException ex = assertThrows(RuntimeException.class, () -> loader.loadSchemas(path));
+			FailedRequestException fre = (FailedRequestException)ex.getCause();
+			assertTrue(fre.getMessage().contains("failed to apply resource at eval: Internal Server Error"),
+				"Unfortunately, the FailedRequestException does not capture why the tde.templateBatchInsert failed; " +
+					"JAVA-224 has been opened to improve this; unexpected message: " + fre.getMessage());
 		} else {
 			try {
 				loader.loadSchemas(path);
@@ -59,8 +62,12 @@ public class ValidateTdeTemplatesTest extends AbstractSchemasTest {
 	public void badXmlFile() {
 		final String path = Paths.get("src", "test", "resources", "bad-schemas", "bad-xml").toString();
 		if (TdeUtil.templateBatchInsertSupported(client)) {
-			FailedRequestException ex = assertThrows(FailedRequestException.class, () -> loader.loadSchemas(path));
-			logger.info(ex.getMessage());
+			RuntimeException ex = assertThrows(RuntimeException.class, () -> loader.loadSchemas(path));
+			FailedRequestException fre = (FailedRequestException)ex.getCause();
+			assertTrue(fre.getMessage().contains("failed to apply resource at eval: Internal Server Error"),
+				"Unfortunately, the FailedRequestException does not capture why the tde.templateBatchInsert failed; " +
+					"JAVA-224 has been opened to improve this; unexpected message: " + fre.getMessage());
+
 		} else {
 			try {
 				loader.loadSchemas(path);

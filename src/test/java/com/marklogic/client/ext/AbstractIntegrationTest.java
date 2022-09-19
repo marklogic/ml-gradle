@@ -54,7 +54,7 @@ public abstract class AbstractIntegrationTest {
 
 @Configuration
 @Import(value = {SpringDatabaseClientConfig.class})
-@PropertySource("classpath:application.properties")
+@PropertySource(value = { "classpath:test.properties", "classpath:user.properties" }, ignoreResourceNotFound = true)
 class TestConfig {
 
 	/**

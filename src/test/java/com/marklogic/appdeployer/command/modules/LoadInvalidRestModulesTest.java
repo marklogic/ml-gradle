@@ -32,8 +32,7 @@ public class LoadInvalidRestModulesTest extends AbstractAppDeployerTest {
 			deploySampleApp();
 			fail("The invalid search options file should have caused the LoadModulesCommand to fail");
 		} catch (RuntimeException re) {
-			logger.info("Caught expected error: " + re.getMessage());
-			assertTrue(re.getMessage().contains("Unexpected character"));
+			assertTrue(re.getMessage().contains("RESTAPI-INVALIDCONTENT"), "Unexpected message: " + re.getMessage());
 		} finally {
 			undeploySampleApp();
 		}

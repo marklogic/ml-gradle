@@ -118,9 +118,13 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 			deploySampleApp();
 			fail("The deploy should have failed because of a bad TDE template");
 		} catch (Exception ex) {
+			// With tde.templateBatchInsert being used starting with ML 10.0-9, we unfortunately do not get an error
+			// message that is helpful at all. JAVA-224 has been created to capture this.
 			String message = ex.getCause().getMessage();
-			assertTrue(message.startsWith("TDE template failed validation"));
-			assertTrue(message.contains("TDE-REPEATEDCOLUMN"));
+			assertTrue(message.contains("failed to apply resource at eval: Internal Server Error"), "Unexpected message: " + message);
+			// Previous assertions for < ML 10.0-9
+			// assertTrue(message.startsWith("TDE template failed validation"), "Unexpected message: " + message);
+			// assertTrue(message.contains("TDE-REPEATEDCOLUMN"), "Unexpected message: " + message);
 		}
 	}
 

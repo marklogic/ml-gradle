@@ -38,8 +38,7 @@ public class ExportAmpsTest extends AbstractExportTest {
 			"  \"role\": [\"rest-writer\"]\n" +
 			"}";
 
-		ManageClient client = new ManageClient();
-		AmpManager mgr = new AmpManager(client);
+		AmpManager mgr = new AmpManager(super.manageClient);
 
 		try {
 			mgr.save(amp1);

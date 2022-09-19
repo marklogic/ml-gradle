@@ -20,8 +20,8 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
 
     public final static String SAMPLE_APP_NAME = "sample-app";
 
-    protected final static Integer SAMPLE_APP_REST_PORT = 8540;
-    protected final static Integer SAMPLE_APP_TEST_REST_PORT = 8541;
+    protected final static Integer SAMPLE_APP_REST_PORT = 8004;
+    protected final static Integer SAMPLE_APP_TEST_REST_PORT = 8005;
 
     // Intended to be used by subclasses
     protected AppDeployer appDeployer;
@@ -38,13 +38,15 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
 
     protected void initializeAppConfig(File projectDir) {
 	    appConfig = new AppConfig(projectDir);
-
+		appConfig.setHost(this.manageConfig.getHost());
 	    appConfig.setName(SAMPLE_APP_NAME);
 	    appConfig.setRestPort(SAMPLE_APP_REST_PORT);
 
 	    // Assume that the manager user can also be used as the REST admin user
 	    appConfig.setRestAdminUsername(manageConfig.getUsername());
 	    appConfig.setRestAdminPassword(manageConfig.getPassword());
+		appConfig.setAppServicesUsername(manageConfig.getUsername());
+		appConfig.setAppServicesPassword(manageConfig.getPassword());
     }
 
     /**

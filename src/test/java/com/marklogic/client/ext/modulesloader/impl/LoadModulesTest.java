@@ -133,7 +133,8 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 			modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
 			fail("Loading modules should have failed because of an invalid REST options file");
 		} catch (RuntimeException re) {
-			assertTrue(re.getMessage().contains("Unexpected character"));
+			assertTrue(re.getMessage().contains("RESTAPI-INVALIDCONTENT"),
+				"Unexpected message: " + re.getMessage());
 		}
 
 		// This should now succeed since DefaultModulesLoader won't rethrow the REST module failure

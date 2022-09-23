@@ -155,7 +155,7 @@ public class DefaultSchemasLoader extends GenericFileLoader implements SchemasLo
 				Set<DocumentMetadataHandle.Capability> values = documentPermissions.get(key);
 				values.forEach(value -> permissionList.add(String.format("xdmp.permission('%s', '%s')", key, value)));
 			});
-			String permissions = "[".concat(permissionList.stream().collect(Collectors.joining(", "))).concat("]");
+			String permissions = "[".concat(permissionList.stream().map(String::toLowerCase).collect(Collectors.joining(", "))).concat("]");
 
 			// Collections
 			List<String> collectionsList = new ArrayList<>();

@@ -3,6 +3,7 @@ package com.marklogic.client.ext.schemasloader.impl;
 import com.marklogic.client.ext.batch.RestBatchWriter;
 import com.marklogic.client.ext.file.DocumentFile;
 import com.marklogic.client.ext.helper.ClientHelper;
+import com.marklogic.client.io.DocumentMetadataHandle;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Paths;
@@ -43,5 +44,17 @@ public class LoadSchemasTest extends AbstractSchemasTest {
 		assertEquals(2, uris.size());
 		assertTrue(uris.contains("/tde/good-schema.json"));
 		assertTrue(uris.contains("/tde/good-schema.xml"));
+
+		DocumentMetadataHandle handle = helper.getMetadata("/tde/good-schema.json");
+		assertTrue(handle.getPermissions().get("rest-reader").contains(DocumentMetadataHandle.Capability.READ),
+			"Permissions defined in permissions.properties should be applied on the document");
+		assertTrue(handle.getPermissions().get("rest-writer").contains(DocumentMetadataHandle.Capability.UPDATE),
+			"Permissions defined in permissions.properties should be applied on the document");
+
+		handle = helper.getMetadata("/tde/good-schema.xml");
+		assertTrue(handle.getPermissions().get("rest-reader").contains(DocumentMetadataHandle.Capability.READ),
+			"Permissions defined in permissions.properties should be applied on the document");
+		assertTrue(handle.getPermissions().get("rest-writer").contains(DocumentMetadataHandle.Capability.UPDATE),
+			"Permissions defined in permissions.properties should be applied on the document");
 	}
 }

@@ -30,6 +30,8 @@ public class ValidateTdeTemplatesTest extends AbstractSchemasTest {
 		final String path = Paths.get("src", "test", "resources", "bad-schemas", "bad-json").toString();
 		if (TdeUtil.templateBatchInsertSupported(client)) {
 			RuntimeException ex = assertThrows(RuntimeException.class, () -> loader.loadSchemas(path));
+			assertTrue(ex.getMessage().contains("the following script can be run in Query Console against your content " +
+				"database to see the TDE validation error"), "Unexpected message: " + ex.getMessage());
 			FailedRequestException fre = (FailedRequestException)ex.getCause();
 			assertTrue(fre.getMessage().contains("failed to apply resource at eval: Internal Server Error"),
 				"Unfortunately, the FailedRequestException does not capture why the tde.templateBatchInsert failed; " +
@@ -63,6 +65,8 @@ public class ValidateTdeTemplatesTest extends AbstractSchemasTest {
 		final String path = Paths.get("src", "test", "resources", "bad-schemas", "bad-xml").toString();
 		if (TdeUtil.templateBatchInsertSupported(client)) {
 			RuntimeException ex = assertThrows(RuntimeException.class, () -> loader.loadSchemas(path));
+			assertTrue(ex.getMessage().contains("the following script can be run in Query Console against your content " +
+				"database to see the TDE validation error"), "Unexpected message: " + ex.getMessage());
 			FailedRequestException fre = (FailedRequestException)ex.getCause();
 			assertTrue(fre.getMessage().contains("failed to apply resource at eval: Internal Server Error"),
 				"Unfortunately, the FailedRequestException does not capture why the tde.templateBatchInsert failed; " +

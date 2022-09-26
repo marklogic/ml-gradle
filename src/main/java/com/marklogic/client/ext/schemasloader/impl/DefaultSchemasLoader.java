@@ -133,7 +133,9 @@ public class DefaultSchemasLoader extends GenericFileLoader implements SchemasLo
 		try {
 			schemasDatabaseClient.newServerEval().javascript(script.toString()).eval().close();
 		} catch (Exception ex) {
-			throw new RuntimeException("Unable to load and validate TDE templates via tde.templateBatchInsert; cause: " + ex.getMessage(), ex);
+			throw new RuntimeException("Unable to load and validate TDE templates via tde.templateBatchInsert; " +
+				"cause: " + ex.getMessage() + "; the following script can be run in Query Console against your content " +
+				"database to see the TDE validation error:\n" + script, ex);
 		}
 	}
 

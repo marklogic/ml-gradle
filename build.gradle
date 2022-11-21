@@ -17,27 +17,27 @@ repositories {
 }
 
 dependencies {
-  api 'com.marklogic:marklogic-client-api:5.5.3'
-  api 'com.marklogic:marklogic-xcc:10.0.9'
-  api 'org.springframework:spring-context:5.3.22'
+  api 'com.marklogic:marklogic-client-api:5.5.4'
+  api 'com.marklogic:marklogic-xcc:10.0.9.5'
+  api 'org.springframework:spring-context:5.3.24'
 
   implementation 'org.jdom:jdom2:2.0.6.1'
 
-	implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.6.1'
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.7.1'
 
 	// This is currently an implementation dependency, though perhaps should be an api dependency due to its usage in
 	// LoggingObject; not clear yet on whether the protected Logger in that class should make this an api dependency or not
 	implementation 'org.slf4j:slf4j-api:1.7.36'
 
   testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
-	testImplementation 'org.springframework:spring-test:5.3.22'
-	testImplementation 'org.mockito:mockito-core:4.6.1'
+	testImplementation 'org.springframework:spring-test:5.3.24'
+	testImplementation 'org.mockito:mockito-core:4.9.0'
 
   // Used for testing loading modules from the classpath
   testImplementation files("lib/modules.jar")
 
 	// Forcing Spring to use logback instead of commons-logging
-	testImplementation "ch.qos.logback:logback-classic:1.2.11"
+	testImplementation "ch.qos.logback:logback-classic:1.4.5"
 	testImplementation "org.slf4j:jcl-over-slf4j:1.7.36"
 	testImplementation "org.slf4j:slf4j-api:1.7.36"
 }

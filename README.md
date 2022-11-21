@@ -35,7 +35,7 @@ ml-gradle 4.3.0 is the first version that can run on Gradle 7.
 
 Then, in an empty directory, create a file named "build.gradle" with your favorite text editor and enter the following:
 
-    plugins { id "com.marklogic.ml-gradle" version "4.3.6" }
+    plugins { id "com.marklogic.ml-gradle" version "4.3.7" }
     
 Then run:
 

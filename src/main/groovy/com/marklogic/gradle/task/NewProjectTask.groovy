@@ -89,11 +89,11 @@ class NewProjectTask extends MarkLogicTask {
 	}
 
 	void writeFile(String filename, String text) {
-		File file = new File(filename);
+		File file = new File(getProject().getProjectDir(), filename);
 		if (file.exists()) {
 			new File("backup-" + filename).write(file.text)
 		}
-		println "Writing: " + filename
+		println "Writing: " + file.getAbsolutePath()
 		file.write(text)
 	}
 }

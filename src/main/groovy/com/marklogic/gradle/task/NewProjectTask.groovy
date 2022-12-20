@@ -8,8 +8,10 @@ class NewProjectTask extends MarkLogicTask {
 
 	@TaskAction
 	void newProject() {
-		println "Welcome to the new project wizard. Please answer the following questions to start a new project."
-		println "Note that this will overwrite your current build.gradle and gradle.properties files, and backup copies of each will be made."
+		println "\nWelcome to the new project wizard. Please respond to each of the following prompts to start a new project.\n"
+		println "Each prompt below begins with '[ant:input]'; type your response for each prompt on the blank line, or press 'Enter' to " +
+			"accept the default value or values in the brackets.\n"
+		println "Note that this will overwrite your current build.gradle and gradle.properties files, and backup copies of each will be made.\n"
 		ant.input(message: "Application name:", addproperty: "mlAppName", defaultvalue: "myApp")
 		ant.input(message: "Host to deploy to:", addproperty: "mlHost", defaultvalue: "localhost")
 		ant.input(message: "MarkLogic admin username:", addproperty: "mlUsername", defaultvalue: "admin")

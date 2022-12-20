@@ -9,6 +9,7 @@ import com.marklogic.client.DatabaseClient
 import com.marklogic.mgmt.ManageClient
 import com.marklogic.mgmt.admin.AdminManager
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.tasks.Internal
 
 /**
@@ -101,13 +102,22 @@ class MarkLogicTask extends DefaultTask {
 		return deployer
 	}
 
+	Command getCommandWithClassName(String className) {
+		SimpleAppDeployer d = (SimpleAppDeployer)getAppDeployer()
+		Command command = d.getCommand(className)
+		// New in 4.4.0 - before, null was returned and no command was run, which would be very unexpected when the
+		// caller is asking to run a specific command.
+		if (command == null) {
+			throw new GradleException("No command found with class name: " + className)
+		}
+		return command
+	}
+
     void invokeDeployerCommandWithClassName(String className) {
-        SimpleAppDeployer d = (SimpleAppDeployer)getAppDeployer()
-        new SimpleAppDeployer(getManageClient(), getAdminManager(), d.getCommand(className)).deploy(getAppConfig())
+        new SimpleAppDeployer(getManageClient(), getAdminManager(), getCommandWithClassName(className)).deploy(getAppConfig())
     }
 
     void undeployWithCommandWithClassName(String className) {
-        SimpleAppDeployer d = (SimpleAppDeployer)getAppDeployer()
-        new SimpleAppDeployer(getManageClient(), getAdminManager(), d.getCommand(className)).undeploy(getAppConfig())
+        new SimpleAppDeployer(getManageClient(), getAdminManager(), getCommandWithClassName(className)).undeploy(getAppConfig())
     }
 }

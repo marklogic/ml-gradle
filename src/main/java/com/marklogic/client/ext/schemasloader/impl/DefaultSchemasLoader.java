@@ -84,8 +84,12 @@ public class DefaultSchemasLoader extends GenericFileLoader implements SchemasLo
 	 */
 	@Override
 	public List<DocumentFile> loadSchemas(String... paths) {
+		final List<DocumentFile> documentFiles = super.getDocumentFiles(paths);
+		if (documentFiles.isEmpty()) {
+			return documentFiles;
+		}
+
 		if (TdeUtil.templateBatchInsertSupported(schemasDatabaseClient) && StringUtils.hasText(tdeValidationDatabase)) {
-			final List<DocumentFile> documentFiles = super.getDocumentFiles(paths);
 			final List<DocumentFile> tdeFiles = new ArrayList<>();
 			final List<DocumentFile> nonTdeFiles = new ArrayList<>();
 
@@ -111,7 +115,8 @@ public class DefaultSchemasLoader extends GenericFileLoader implements SchemasLo
 			return documentFiles;
 		}
 
-		return super.loadFiles(paths);
+		writeDocumentFiles(documentFiles);
+		return documentFiles;
 	}
 
 	public String getTdeValidationDatabase() {

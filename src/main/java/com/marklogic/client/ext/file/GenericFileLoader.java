@@ -71,7 +71,6 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 	 * @return list of files from the given paths
 	 */
 	public List<DocumentFile> loadFiles(String... paths) {
-		batchWriter.initialize();
 		List<DocumentFile> documentFiles = getDocumentFiles(paths);
 		writeDocumentFiles(documentFiles);
 		return documentFiles;
@@ -84,6 +83,7 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 
 	protected final void writeDocumentFiles(List<DocumentFile> documentFiles) {
 		if (documentFiles != null && !documentFiles.isEmpty()) {
+			batchWriter.initialize();
 			writeBatchOfDocuments(documentFiles, 0);
 			if (waitForCompletion) {
 				batchWriter.waitForCompletion();

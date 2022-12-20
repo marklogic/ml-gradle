@@ -17,6 +17,7 @@ public abstract class SortOrderConstants {
 	public static Integer INSERT_HOST_CERTIFICATES = 28;
 
 	public static Integer DEPLOY_EXTERNAL_SECURITY = 35;
+	public static Integer DEPLOY_SECURE_CREDENTIALS = 36;
 	public static Integer DEPLOY_PROTECTED_COLLECTIONS = 40;
 	public static Integer DEPLOY_MIMETYPES = 45;
 

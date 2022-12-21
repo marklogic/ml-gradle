@@ -274,6 +274,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlDeployCertificateAuthorities", type: DeployCertificateAuthoritiesTask, group: securityGroup, description: "Deploy each certificate authority, updating it if it exists, in the configuration directory")
 		project.task("mlDeployCertificateTemplates", type: DeployCertificateTemplatesTask, group: securityGroup, description: "Deploy each certificate template, updating it if it exists, in the configuration directory")
 		project.task("mlDeployExternalSecurity", type: DeployExternalSecurityTask, group: securityGroup, description: "Deploy external security configurations, updating each if it exists, in the configuration directory")
+		project.task("mlDeployHostCertificateTemplates", type: DeployHostCertificateTemplatesTask, group: securityGroup, description: "Deploy host certificate templates, updating each if it exists, in the configuration directory")
 		project.task("mlDeploySecureCredentials", type: DeploySecureCredentialsTask, group: securityGroup, description: "Deploy secure credentials configurations, updating each if it exists, in the configuration directory")
 		project.task("mlDeployPrivileges", type: DeployPrivilegesTask, group: securityGroup, description: "Deploy each privilege, updating it if it exists, in the configuration directory")
 		project.task("mlDeployProtectedCollections", type: DeployProtectedCollectionsTask, group: securityGroup, description: "Deploy each protected collection, updating it if it exists, in the configuration directory")

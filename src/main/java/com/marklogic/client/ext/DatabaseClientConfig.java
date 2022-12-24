@@ -29,18 +29,20 @@ public class DatabaseClientConfig {
 	private X509TrustManager trustManager;
 	private DatabaseClient.ConnectionType connectionType;
 
+	private String cloudApiKey;
+	private String basePath;
 
 	public DatabaseClientConfig() {
 	}
 
 	public DatabaseClientConfig(String host, int port) {
+		this();
 		this.host = host;
 		this.port = port;
 	}
 
 	public DatabaseClientConfig(String host, int port, String username, String password) {
-		this.host = host;
-		this.port = port;
+		this(host, port);
 		this.username = username;
 		this.password = password;
 	}
@@ -168,5 +170,37 @@ public class DatabaseClientConfig {
 
 	public void setTrustManagementAlgorithm(String trustManagementAlgorithm) {
 		this.trustManagementAlgorithm = trustManagementAlgorithm;
+	}
+
+	/**
+	 * @return
+	 * @since 4.5.0
+	 */
+	public String getCloudApiKey() {
+		return cloudApiKey;
+	}
+
+	/**
+	 * @param cloudApiKey
+	 * @since 4.5.0
+	 */
+	public void setCloudApiKey(String cloudApiKey) {
+		this.cloudApiKey = cloudApiKey;
+	}
+
+	/**
+	 * @return
+	 * @since 4.5.0
+	 */
+	public String getBasePath() {
+		return basePath;
+	}
+
+	/**
+	 * @param basePath
+	 * @since 4.5.0
+	 */
+	public void setBasePath(String basePath) {
+		this.basePath = basePath;
 	}
 }

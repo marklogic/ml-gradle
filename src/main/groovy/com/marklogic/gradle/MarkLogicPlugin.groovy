@@ -344,7 +344,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 		String unitTestGroup = "ml-gradle Unit Test"
 		project.task("mlGenerateUnitTestSuite", type: GenerateUnitTestSuiteTask, group: unitTestGroup,
 			description: "Generate a marklogic-unit-test test suite. The test suite files are written to src/test/ml-modules/root/test/suites by default; use -PsuitesPath to override this. " +
-				"Can use -PsuiteName to override the name of the test suite, and -PtestName to override the name of the test module.")
+				"Can use -PsuiteName to override the name of the test suite, -PtestName to override the name of the test module, and -Planguage to specify \"sjs\" or \"xqy\" test code.")
 		project.task("mlUnitTest", type: UnitTestTask, group: unitTestGroup, description: "Run tests found under /test/suites in the modules database. " +
 			"Connects to MarkLogic via the REST API server defined by mlTestRestPort (or by mlRestPort if mlTestRestPort is not set), and uses mlRest* properties for authentication. " +
 			"Use -PunitTestResultsPath to override where test result files are written, which defaults to build/test-results/marklogic-unit-test. " +

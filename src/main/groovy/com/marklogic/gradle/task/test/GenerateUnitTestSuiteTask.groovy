@@ -21,17 +21,31 @@ import org.gradle.api.tasks.TaskAction
 
 class GenerateUnitTestSuiteTask extends MarkLogicTask {
 
-	static String getSampleTestsXqy() {
-		return """xquery version '1.0-ml';
+	abstract class GenerateTestSuite {
+		abstract String getSampleTests();
+		abstract String getSetup();
+		abstract String getSetupName();
+		abstract String getTeardown();
+		abstract String getTeardownName();
+		abstract String getSuiteSetup();
+		abstract String getSuiteSetupName();
+		abstract String getSuiteTeardown();
+		abstract String getSuiteTeardownName();
+		abstract String getExtension();
+	}
+
+	class XQueryTestSuite extends GenerateTestSuite {
+		String getSampleTests() {
+			return """xquery version '1.0-ml';
 
 import module namespace test = 'http://marklogic.com/test' at '/test/test-helper.xqy';
 
-test:assert-true(fn:true()),
+test:success(),
 test:log("\$testName COMPLETE....")"""
-	}
+		}
 
-	static String getSetupXqy() {
-		return """xquery version '1.0-ml';
+		String getSetup() {
+			return """xquery version '1.0-ml';
 
 import module namespace test = 'http://marklogic.com/test' at '/test/test-helper.xqy';
 
@@ -42,10 +56,14 @@ import module namespace test = 'http://marklogic.com/test' at '/test/test-helper
    Each setup runs in its own transaction.
 :)
 test:log("\$testName Setup COMPLETE....")"""
-	}
+		}
 
-	static String getTeardownXqy() {
-		return """xquery version '1.0-ml';
+		String getSetupName() {
+			return "/setup.xqy";
+		}
+
+		String getTeardown() {
+			return """xquery version '1.0-ml';
 
 import module namespace test = 'http://marklogic.com/test' at '/test/test-helper.xqy';
 
@@ -55,10 +73,14 @@ import module namespace test = 'http://marklogic.com/test' at '/test/test-helper
    If no test-specific teardown is required, this file may be deleted.
 :)
 test:log("\$testName Teardown COMPLETE....")"""
-	}
+		}
 
-	static String getSuiteSetupXqy() {
-		return """xquery version '1.0-ml';
+		String getTeardownName() {
+			return "/teardown.xqy";
+		}
+
+		String getSuiteSetup() {
+			return """xquery version '1.0-ml';
 
 import module namespace test = 'http://marklogic.com/test' at '/test/test-helper.xqy';
 
@@ -68,10 +90,14 @@ import module namespace test = 'http://marklogic.com/test' at '/test/test-helper
    If no suite-specific setup is required, this file may be deleted.
 :)
 test:log("\$suiteName Suite Setup COMPLETE....")"""
-	}
+		}
 
-	static String getSuiteTeardownXqy() {
-		return """xquery version '1.0-ml';
+		String getSuiteSetupName() {
+			return "/suite-setup.xqy";
+		}
+
+		String getSuiteTeardown() {
+			return """xquery version '1.0-ml';
 
 import module namespace test = 'http://marklogic.com/test' at '/test/test-helper.xqy';
 
@@ -80,60 +106,169 @@ import module namespace test = 'http://marklogic.com/test' at '/test/test-helper
    If no suite-specific teardown is required, this file may be deleted.
 :)
 test:log("\$suiteName Suite Teardown ENDING....")"""
+		}
+
+		String getSuiteTeardownName() {
+			return "/suite-teardown.xqy";
+		}
+
+		String getExtension() {
+			return ".xqy";
+		}
+
+	}
+
+	class JavaScriptTestSuite extends GenerateTestSuite {
+		String getSampleTests() {
+			return """"use strict";
+
+const test = require('/test/test-helper.xqy');
+
+test.success(),
+test.log("\$testName COMPLETE....")"""
+		}
+
+		String getSetup() {
+			return """"use strict";
+
+const test = require('/test/test-helper.xqy');
+
+declareUpdate();
+
+/*
+   This module will be run before each test in your suite.
+   Here you might insert a document into the test database that each of your tests will modify.
+   If no test-specific setup is required, this file may be deleted.
+   Each setup runs in its own transaction.
+*/
+test.log("\$testName Setup COMPLETE....")"""
+		}
+
+		String getSetupName() {
+			return "/setup.sjs";
+		}
+
+		String getTeardown() {
+			return """"use strict";
+
+const test = require('/test/test-helper.xqy');
+
+declareUpdate();
+
+/*
+   This module will run after each test in your suite.
+   You might use this module to remove the document inserted by the test setup module.
+   If no test-specific teardown is required, this file may be deleted.
+*/
+test.log("\$testName Teardown COMPLETE....")"""
+		}
+
+		String getTeardownName() {
+			return "/teardown.sjs";
+		}
+
+		String getSuiteSetup() {
+			return """"use strict";
+
+const test = require('/test/test-helper.xqy');
+
+declareUpdate();
+
+/*
+   Runs once when your suite is started.
+   You can use this to insert some data that will not be modified over the course of the suite's tests.
+   If no suite-specific setup is required, this file may be deleted.
+*/
+test.log("\$suiteName Suite Setup COMPLETE....")"""
+		}
+
+		String getSuiteSetupName() {
+			return "/suiteSetup.sjs";
+		}
+
+		String getSuiteTeardown() {
+			return """"use strict";
+
+const test = require('/test/test-helper.xqy');
+
+declareUpdate();
+
+/*
+   Runs once when your suite is finished, to clean up after the suite's tests.
+   If no suite-specific teardown is required, this file may be deleted.
+*/
+test.log("\$suiteName Suite Teardown ENDING....")"""
+		}
+
+		String getSuiteTeardownName() {
+			return "/suiteTeardown.sjs";
+		}
+
+		String getExtension() {
+			return ".sjs";
+		}
+
 	}
 
 	@Internal
 	CommandLineArguments arguments
 
-    @TaskAction
-    void generateTestSuite() {
-        this.arguments = new CommandLineArguments()
+	@TaskAction
+	void generateTestSuite() {
+		this.arguments = new CommandLineArguments()
+		GenerateTestSuite generator = this.arguments.lang == CommandLineArguments.Language.JAVASCRIPT ? new JavaScriptTestSuite() : new XQueryTestSuite();
 
-        def binding = ["testName":arguments.testName, "suiteName":arguments.suiteName]
-        def engine = new groovy.text.SimpleTemplateEngine()
+		def binding = ["testName":arguments.testName, "suiteName":arguments.suiteName]
+		def engine = new groovy.text.SimpleTemplateEngine()
 
-        project.file(arguments.suitePath).mkdirs()
-        def sampleTestsXqyString = getSampleTestsXqy()
-        processTemplateString(engine, binding, arguments.suitePath, "/" + arguments.testName + ".xqy", sampleTestsXqyString)
-        def suiteSetupXqyString = getSuiteSetupXqy()
-        processTemplateString(engine, binding, arguments.suitePath, "/suite-setup.xqy", suiteSetupXqyString)
-        def suiteTeardownXqyString = getSuiteTeardownXqy()
-        processTemplateString(engine, binding, arguments.suitePath, "/suite-teardown.xqy", suiteTeardownXqyString)
-        def setupXqyString = getSetupXqy()
-        processTemplateString(engine, binding, arguments.suitePath, "/setup.xqy", setupXqyString)
-        def teardownXqyString = getTeardownXqy()
-        processTemplateString(engine, binding, arguments.suitePath, "/teardown.xqy", teardownXqyString)
+		project.file(arguments.suitePath).mkdirs()
+		processTemplateString(engine, binding, arguments.suitePath, "/" + arguments.testName + generator.getExtension(), generator.getSampleTests())
+		processTemplateString(engine, binding, arguments.suitePath, generator.getSuiteSetupName(), generator.getSuiteSetup())
+		processTemplateString(engine, binding, arguments.suitePath, generator.getSuiteTeardownName(), generator.getSuiteTeardown())
+		processTemplateString(engine, binding, arguments.suitePath, generator.getSetupName(), generator.getSetup())
+		processTemplateString(engine, binding, arguments.suitePath, generator.getTeardownName(), generator.getTeardown())
 
-	    println "Finished generating test suite."
-    }
+		println "Finished generating test suite."
+	}
 
-    def processTemplateString(engine, binding, targetBaseDir, templateFilePath, templateString) {
-        def template = engine.createTemplate(templateString).make(binding)
-        def templateResult = template.toString()
-        def targetFilepath = targetBaseDir + templateFilePath
-        project.file(targetFilepath).write(templateResult)
+	def processTemplateString(engine, binding, targetBaseDir, templateFilePath, templateString) {
+		def template = engine.createTemplate(templateString).make(binding)
+		def templateResult = template.toString()
+		def targetFilepath = targetBaseDir + templateFilePath
+		project.file(targetFilepath).write(templateResult)
 		println "Generated test suite file: " + targetFilepath
-    }
+	}
 
-    class CommandLineArguments {
-        String suitesPath = "src/test/ml-modules/root/test/suites"
-        String suiteName = 'SampleTestSuite'
-        String suitePath
-        String testName = 'sample-tests'
+	class CommandLineArguments {
+		public enum Language { XQUERY, JAVASCRIPT }
+		String suitesPath = "src/test/ml-modules/root/test/suites"
+		String suiteName = 'SampleTestSuite'
+		String suitePath
+		String testName = 'sample-tests'
+		Language lang
 
-        CommandLineArguments() {
-	        if (project.hasProperty("suitesPath")) {
-		        this.suitesPath = project.property("suitesPath")
-	        }
-            if (project.hasProperty('suiteName')) {
-                this.suiteName = project.property('suiteName')
-            }
-            this.suitePath = this.suitesPath + '/' + suiteName
-            if (project.hasProperty('testName')) {
-                this.testName = project.property('testName')
-            }
+		CommandLineArguments() {
+			if (project.hasProperty("suitesPath")) {
+				this.suitesPath = project.property("suitesPath")
+			}
+			if (project.hasProperty('suiteName')) {
+				this.suiteName = project.property('suiteName')
+			}
+			this.suitePath = this.suitesPath + '/' + suiteName
+			if (project.hasProperty('testName')) {
+				this.testName = project.property('testName')
+			}
+			if (project.hasProperty('language')) {
+				if (project.property('language').equals('sjs')) {
+					lang = Language.JAVASCRIPT
+				} else {
+					lang = Language.XQUERY
+				}
+			} else {
+				lang = Language.XQUERY
+			}
 
-	        suitePath = suitesPath + "/" + suiteName
-        }
-    }
+			suitePath = suitesPath + "/" + suiteName
+		}
+	}
 }

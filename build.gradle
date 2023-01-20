@@ -146,15 +146,24 @@ publishing {
 	}
 	repositories {
 		maven {
-			name = "central"
-			url = mavenCentralUrl
-			credentials {
-				username mavenCentralUsername
-				password mavenCentralPassword
+			if (project.hasProperty("mavenUser")) {
+				credentials {
+					username mavenUser
+					password mavenPassword
+				}
+				url publishUrl
+			} else {
+				name = "central"
+				url = mavenCentralUrl
+				credentials {
+					username mavenCentralUsername
+					password mavenCentralPassword
+				}
 			}
 		}
 	}
 }
+
 
 // See https://github.com/snyk/gradle-plugin for more information
 snyk {

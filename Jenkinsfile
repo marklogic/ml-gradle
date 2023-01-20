@@ -26,5 +26,21 @@ pipeline{
         junit '**/build/**/*.xml'
       }
     }
+    stage('publish'){
+			when {
+      	branch 'develop'
+
+      }
+      steps{
+      	sh label:'publish', script: '''#!/bin/bash
+        	export JAVA_HOME=$JAVA_HOME_DIR
+          export GRADLE_USER_HOME=$WORKSPACE/$GRADLE_DIR
+          export PATH=$GRADLE_USER_HOME:$JAVA_HOME/bin:$PATH
+          cp ~/.gradle/gradle.properties $GRADLE_USER_HOME;
+          cd ml-javaclient-util
+           ./gradlew publish
+        '''
+      }
+    }
   }
 }

@@ -30,13 +30,15 @@ configurations.all {
 }
 
 dependencies {
-	api ('com.marklogic:ml-javaclient-util:4.5-SNAPSHOT') {
+	api('com.marklogic:ml-javaclient-util:4.5-SNAPSHOT') {
 		changing = true
 	}
-  api 'org.springframework:spring-web:5.3.24'
+	api 'org.springframework:spring-web:5.3.24'
 	api 'com.fasterxml.jackson.core:jackson-databind:2.14.1'
 
 	implementation 'jaxen:jaxen:1.2.0'
+	implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+	implementation 'io.github.rburgst:okhttp-digest:2.7'
 	implementation 'org.apache.httpcomponents:httpclient:4.5.13'
 	implementation 'org.jdom:jdom2:2.0.6.1'
 

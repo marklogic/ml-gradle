@@ -9,7 +9,10 @@ import org.junit.jupiter.api.Test;
 
 import javax.net.ssl.SSLContext;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Many of these tests are just smoke tests that can be used to inspect logging as well. Ideally, they can soon depend
@@ -23,18 +26,24 @@ public class RestTemplateUtilTest extends BaseTestHelper {
 	private ManageConfig manageConfig = new ManageConfig();
 
 	@Test
+	@Deprecated
 	public void configurerList() {
 		assertEquals(4, RestTemplateUtil.DEFAULT_CONFIGURERS.size());
 
 		assertFalse(configurerInvoked);
-		RestTemplateUtil.DEFAULT_CONFIGURERS.add((restConfig, builder) -> {
+		HttpClientBuilderConfigurer configurer = (restConfig, builder) -> {
 			logger.info("Just a test of adding a configurer");
 			configurerInvoked = true;
 			return builder;
-		});
+		};
 
 		new ManageClient(manageConfig);
-		assertTrue(configurerInvoked);
+		assertFalse(configurerInvoked, "The configurer should not be invoked now that ManageClient uses OkHttp " +
+			"instead of Apache HTTP");
+
+		RestTemplateUtil.newRestTemplate(manageConfig, configurer);
+		assertTrue(configurerInvoked, "The configurer should have been invoked since a deprecated newRestTemplate " +
+			"method was used that still honors HttpClientBuilderConfigurer instances");
 	}
 
 	@Test

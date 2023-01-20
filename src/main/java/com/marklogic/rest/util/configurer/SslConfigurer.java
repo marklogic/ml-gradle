@@ -11,6 +11,10 @@ import org.apache.http.impl.client.HttpClientBuilder;
 
 import javax.net.ssl.SSLContext;
 
+/**
+ * @deprecated since 4.5.0; OkHttp is now the preferred client
+ */
+@Deprecated
 public class SslConfigurer extends LoggingObject implements HttpClientBuilderConfigurer {
 
 	/**

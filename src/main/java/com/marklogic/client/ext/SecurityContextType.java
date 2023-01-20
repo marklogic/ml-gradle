@@ -8,7 +8,12 @@ public enum SecurityContextType {
 
 	BASIC,
 	CERTIFICATE,
+	/**
+	 * @since 4.5.0
+	 */
+	CLOUD,
 	DIGEST,
 	KERBEROS,
+	@Deprecated // Deprecated in 4.5.0; the Java Client requires a SecurityContext
 	NONE
 }

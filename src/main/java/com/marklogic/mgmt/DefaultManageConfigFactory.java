@@ -72,6 +72,16 @@ public class DefaultManageConfigFactory extends PropertySourceFactory implements
 		    }
 	    });
 
+		propertyConsumerMap.put("mlCloudApiKey", (config, prop) -> {
+			logger.info("Setting cloud API key");
+			config.setCloudApiKey(prop);
+		});
+
+		propertyConsumerMap.put("mlManageBasePath", (config, prop) -> {
+			logger.info("Manage base path: " + prop);
+			config.setBasePath(prop);
+		});
+
 	    propertyConsumerMap.put("mlManageScheme", (config, prop) -> {
 		    logger.info("Manage scheme: " + prop);
 		    config.setScheme(prop);

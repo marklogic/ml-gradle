@@ -71,6 +71,7 @@ public class AppConfig {
 	public static final String DEFAULT_PASSWORD = "admin";
 
 	private String host = DEFAULT_HOST;
+	private String cloudApiKey;
 
 	private boolean catchDeployExceptions = false;
 	private boolean catchUndeployExceptions = false;
@@ -97,9 +98,11 @@ public class AppConfig {
 	private boolean restUseDefaultKeystore;
 	private String restSslProtocol;
 	private String restTrustManagementAlgorithm;
+	private String restBasePath;
 
 	private Integer restPort = DEFAULT_PORT;
 	private Integer testRestPort;
+	private String testRestBasePath;
 
 	// Connection info for using the App Services client REST API - e.g. to load non-REST API modules
 	private DatabaseClient.ConnectionType appServicesConnectionType;
@@ -116,6 +119,7 @@ public class AppConfig {
 	private boolean appServicesUseDefaultKeystore;
 	private String appServicesSslProtocol;
 	private String appServicesTrustManagementAlgorithm;
+	private String appServicesBasePath;
 
 	// These can all be set to override the default names that are generated off of the "name" attribute.
 	private String groupName = DEFAULT_GROUP;
@@ -367,7 +371,11 @@ public class AppConfig {
 	 * @return
 	 */
 	public DatabaseClient newTestDatabaseClient() {
-		return configuredDatabaseClientFactory.newDatabaseClient(newRestDatabaseClientConfig(getTestRestPort()));
+		DatabaseClientConfig config = newRestDatabaseClientConfig(getTestRestPort());
+		if (StringUtils.hasText(getTestRestBasePath())) {
+			config.setBasePath(getTestRestBasePath());
+		}
+		return configuredDatabaseClientFactory.newDatabaseClient(config);
 	}
 
 	public DatabaseClientConfig newRestDatabaseClientConfig(int port) {
@@ -377,6 +385,8 @@ public class AppConfig {
 		config.setConnectionType(restConnectionType);
 		config.setExternalName(restExternalName);
 		config.setSecurityContextType(restSecurityContextType);
+		config.setCloudApiKey(cloudApiKey);
+		config.setBasePath(restBasePath);
 
 		if (restUseDefaultKeystore) {
 		    config.setSslProtocol(StringUtils.hasText(restSslProtocol) ? restSslProtocol : SslUtil.DEFAULT_SSL_PROTOCOL);
@@ -417,6 +427,8 @@ public class AppConfig {
 		config.setDatabase(databaseName);
 		config.setExternalName(appServicesExternalName);
 		config.setSecurityContextType(appServicesSecurityContextType);
+		config.setCloudApiKey(cloudApiKey);
+		config.setBasePath(appServicesBasePath);
 
 		if (appServicesUseDefaultKeystore) {
 		    config.setSslProtocol(StringUtils.hasText(appServicesSslProtocol) ? appServicesSslProtocol : SslUtil.DEFAULT_SSL_PROTOCOL);
@@ -1450,5 +1462,37 @@ public class AppConfig {
 
 	public void setModuleUriPrefix(String moduleUriPrefix) {
 		this.moduleUriPrefix = moduleUriPrefix;
+	}
+
+	public String getCloudApiKey() {
+		return cloudApiKey;
+	}
+
+	public void setCloudApiKey(String cloudApiKey) {
+		this.cloudApiKey = cloudApiKey;
+	}
+
+	public String getRestBasePath() {
+		return restBasePath;
+	}
+
+	public void setRestBasePath(String restBasePath) {
+		this.restBasePath = restBasePath;
+	}
+
+	public String getAppServicesBasePath() {
+		return appServicesBasePath;
+	}
+
+	public void setAppServicesBasePath(String appServicesBasePath) {
+		this.appServicesBasePath = appServicesBasePath;
+	}
+
+	public String getTestRestBasePath() {
+		return testRestBasePath;
+	}
+
+	public void setTestRestBasePath(String testRestBasePath) {
+		this.testRestBasePath = testRestBasePath;
 	}
 }

@@ -18,6 +18,8 @@ public class RestConfig {
 	private int port;
 	private String username;
 	private String password;
+	private String cloudApiKey;
+	private String basePath;
 	private String scheme = "http";
 
 	private boolean configureSimpleSsl;
@@ -45,6 +47,9 @@ public class RestConfig {
 			this.scheme = other.scheme;
 		}
 
+		this.cloudApiKey = other.cloudApiKey;
+		this.basePath = other.basePath;
+
 		this.configureSimpleSsl = other.configureSimpleSsl;
 		this.useDefaultKeystore = other.useDefaultKeystore;
 		this.sslProtocol = other.sslProtocol;
@@ -58,10 +63,12 @@ public class RestConfig {
 		DatabaseClientBuilder builder = new DatabaseClientBuilder()
 			.withHost(getHost())
 			.withPort(getPort())
+			.withBasePath(getBasePath())
 			// TODO Will support all types before the 4.5.0 release
-			.withSecurityContextType("digest")
+			.withSecurityContextType(StringUtils.hasText(getCloudApiKey()) ? "cloud" : "digest")
 			.withUsername(getUsername())
-			.withPassword(getPassword());
+			.withPassword(getPassword())
+			.withCloudApiKey(getCloudApiKey());
 
 		if (getSslContext() != null) {
 			builder.withSSLContext(getSslContext());
@@ -105,8 +112,18 @@ public class RestConfig {
 	 * @return
 	 */
 	public URI buildUri(String path) {
+		String basePathToAppend = "";
+		if (basePath != null) {
+			if (!basePath.startsWith("/")) {
+				basePathToAppend = "/";
+			}
+			basePathToAppend += basePath;
+			if (path.startsWith("/") && basePathToAppend.endsWith("/")) {
+				basePathToAppend = basePathToAppend.substring(0, basePathToAppend.length() - 1);
+			}
+		}
 		try {
-			return new URI(String.format("%s://%s:%d%s", getScheme(), getHost(), getPort(), path.replace(" ", "+")));
+			return new URI(String.format("%s://%s:%d%s%s", getScheme(), getHost(), getPort(), basePathToAppend, path.replace(" ", "+")));
 		} catch (URISyntaxException ex) {
 			throw new RuntimeException("Unable to build URI for path: " + path + "; cause: " + ex.getMessage(), ex);
 		}
@@ -212,5 +229,21 @@ public class RestConfig {
 
 	public void setSslHostnameVerifier(DatabaseClientFactory.SSLHostnameVerifier sslHostnameVerifier) {
 		this.sslHostnameVerifier = sslHostnameVerifier;
+	}
+
+	public String getCloudApiKey() {
+		return cloudApiKey;
+	}
+
+	public void setCloudApiKey(String cloudApiKey) {
+		this.cloudApiKey = cloudApiKey;
+	}
+
+	public String getBasePath() {
+		return basePath;
+	}
+
+	public void setBasePath(String basePath) {
+		this.basePath = basePath;
 	}
 }

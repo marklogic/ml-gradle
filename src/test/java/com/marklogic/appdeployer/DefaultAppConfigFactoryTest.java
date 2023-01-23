@@ -648,4 +648,19 @@ public class DefaultAppConfigFactoryTest  {
 		assertEquals("SSLv3", config.getAppServicesSslProtocol());
 		assertEquals("PKIX", config.getAppServicesTrustManagementAlgorithm());
 	}
+
+	@Test
+	void cloudApiKeyAndBasePath() {
+		AppConfig config = new DefaultAppConfigFactory(new SimplePropertySource(
+			"mlCloudApiKey", "my-key",
+			"mlRestBasePath", "/rest/path",
+			"mlAppServicesBasePath", "/app/path",
+			"mlTestRestBasePath", "/test/path"
+		)).newAppConfig();
+
+		assertEquals("my-key", config.getCloudApiKey());
+		assertEquals("/rest/path", config.getRestBasePath());
+		assertEquals("/app/path", config.getAppServicesBasePath());
+		assertEquals("/test/path", config.getTestRestBasePath());
+	}
 }

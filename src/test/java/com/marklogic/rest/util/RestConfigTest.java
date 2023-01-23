@@ -4,7 +4,11 @@ import com.marklogic.client.ext.modulesloader.ssl.SimpleX509TrustManager;
 import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RestConfigTest {
 
@@ -18,6 +22,8 @@ public class RestConfigTest {
 		first.setSslProtocol("TLSv1.3");
 		first.setTrustManagementAlgorithm("something");
 		first.setUseDefaultKeystore(true);
+		first.setCloudApiKey("my-key");
+		first.setBasePath("/my/path");
 
 		RestConfig second = new RestConfig(first);
 		assertEquals("host", second.getHost());
@@ -31,5 +37,24 @@ public class RestConfigTest {
 		assertEquals("TLSv1.3", second.getSslProtocol());
 		assertEquals("something", second.getTrustManagementAlgorithm());
 		assertTrue(second.isUseDefaultKeystore());
+		assertEquals("my-key", second.getCloudApiKey());
+		assertEquals("/my/path", second.getBasePath());
+	}
+
+	@Test
+	void buildUriWithBasePath() {
+		final String targetPath = "/target/path";
+		RestConfig config = new RestConfig("somehost", 8002, "doesnt", "matter");
+		assertEquals("http://somehost:8002/target/path", config.buildUri(targetPath).toString());
+
+		Stream.of("/my/base", "/my/base/", "my/base", "my/base/").forEach(basePath -> {
+			config.setBasePath(basePath);
+			assertEquals("http://somehost:8002/my/base/target/path", config.buildUri(targetPath).toString(),
+				"Unexpected response using basePath: " + basePath);
+		});
+
+		config.setScheme("https");
+		config.setBasePath("/secure");
+		assertEquals("https://somehost:8002/secure/target/path", config.buildUri(targetPath).toString());
 	}
 }

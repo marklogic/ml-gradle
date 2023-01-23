@@ -62,15 +62,12 @@ public class ManageClient extends LoggingObject {
 			    logger.info(format("Initializing separate connection to Manage API with user '%s' that should have the 'manage-admin' and 'security' roles", securityUsername));
 		    }
 
-		    RestConfig rc = new RestConfig(config.getHost(), config.getPort(), securityUsername, config.getSecurityPassword());
-		    rc.setScheme(config.getScheme());
-		    rc.setConfigureSimpleSsl(config.isConfigureSimpleSsl());
-		    rc.setHostnameVerifier(config.getHostnameVerifier());
-
+			RestConfig rc = new RestConfig(config);
+			// Override settings based on the 3 "security user"-specific properties known by ManageConfig
+			rc.setUsername(config.getSecurityUsername());
+			rc.setPassword(config.getSecurityPassword());
 		    if (config.getSecuritySslContext() != null) {
 		    	rc.setSslContext(config.getSecuritySslContext());
-		    } else {
-		    	rc.setSslContext(config.getSslContext());
 		    }
 
 		    this.securityUserRestTemplate = RestTemplateUtil.newRestTemplate(rc);
@@ -267,14 +264,14 @@ public class ManageClient extends LoggingObject {
     protected void logRequest(String path, String contentType, String method) {
         if (logger.isInfoEnabled()) {
         	String username = manageConfig != null ? manageConfig.getUsername() : "(unknown)";
-            logger.info(String.format("Sending %s %s request as user '%s' to path: %s", contentType, method, username, path));
+            logger.info(String.format("Sending %s %s request as user '%s' to path: %s", contentType, method, username, buildUri(path)));
         }
     }
 
     protected void logSecurityUserRequest(String path, String contentType, String method) {
         if (logger.isInfoEnabled()) {
             logger.info(String.format("Sending %s %s request as user '%s' (who should have the 'manage-admin' and 'security' roles) to path: %s",
-	            contentType, method, determineUsernameForSecurityUserRequest(), path));
+	            contentType, method, determineUsernameForSecurityUserRequest(), buildUri(path)));
         }
     }
 

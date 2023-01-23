@@ -1,5 +1,7 @@
 package com.marklogic.mgmt.admin;
 
+import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.DefaultAppConfigFactory;
 import com.marklogic.mgmt.util.SimplePropertySource;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
@@ -53,6 +55,17 @@ public class DefaultAdminConfigFactoryTest  {
 		assertEquals("TLSv1.2", config.getSslProtocol());
 		assertTrue(config.isUseDefaultKeystore());
 		assertEquals("PKIX", config.getTrustManagementAlgorithm());
+	}
+
+	@Test
+	void cloudApiKeyAndBasePath() {
+		AdminConfig config = new DefaultAdminConfigFactory(new SimplePropertySource(
+			"mlCloudApiKey", "my-key",
+			"mlAdminBasePath", "/admin/path"
+		)).newAdminConfig();
+
+		assertEquals("my-key", config.getCloudApiKey());
+		assertEquals("/admin/path", config.getBasePath());
 	}
 
 	private AdminConfig configure(String... properties) {

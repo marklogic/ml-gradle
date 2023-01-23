@@ -1,5 +1,7 @@
 package com.marklogic.mgmt;
 
+import com.marklogic.mgmt.admin.AdminConfig;
+import com.marklogic.mgmt.admin.DefaultAdminConfigFactory;
 import com.marklogic.mgmt.util.SimplePropertySource;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
@@ -97,6 +99,16 @@ public class DefaultManageConfigFactoryTest  {
 		assertEquals("host2", config.getHost());
 	}
 
+	@Test
+	void cloudApiKeyAndBasePath() {
+		ManageConfig config = configure(
+			"mlCloudApiKey", "my-key",
+			"mlManageBasePath", "/manage/path"
+		);
+
+		assertEquals("my-key", config.getCloudApiKey());
+		assertEquals("/manage/path", config.getBasePath());
+	}
 
 	private ManageConfig configure(String... properties) {
 		return new DefaultManageConfigFactory(new SimplePropertySource(properties)).newManageConfig();

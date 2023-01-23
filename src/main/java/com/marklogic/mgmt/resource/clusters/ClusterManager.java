@@ -2,10 +2,12 @@ package com.marklogic.mgmt.resource.clusters;
 
 import com.marklogic.mgmt.AbstractManager;
 import com.marklogic.mgmt.ManageClient;
+import com.marklogic.mgmt.ManageConfig;
 import com.marklogic.mgmt.admin.ActionRequiringRestart;
 import com.marklogic.mgmt.admin.AdminConfig;
 import com.marklogic.mgmt.admin.AdminManager;
 import com.marklogic.rest.util.Fragment;
+import com.marklogic.rest.util.RestConfig;
 import org.springframework.web.client.ResourceAccessException;
 
 public class ClusterManager extends AbstractManager {
@@ -85,7 +87,8 @@ public class ClusterManager extends AbstractManager {
     public void addHost(AdminManager adminManager, String hostname, String group, String zone) throws Exception{
     	AdminConfig adminConfig = adminManager.getAdminConfig();
 
-		AdminConfig joiningHostAdminConfig = new AdminConfig(hostname, 8001, adminConfig.getUsername(), adminConfig.getPassword());
+		AdminConfig joiningHostAdminConfig = new AdminConfig(adminConfig);
+		joiningHostAdminConfig.setHost(hostname);
 		AdminManager joiningHostAdminManager = new AdminManager(joiningHostAdminConfig);
 
 		// get the joining host's configuration
@@ -111,13 +114,17 @@ public class ClusterManager extends AbstractManager {
 
 	/**
 	 * Removes the specified host from the cluster. Assumes connection information is of the host to remove
+	 *
 	 * @param hostname hostname of the server to remove from the cluster
 	 */
-	public void removeHost(String hostname){
-		AdminConfig adminConfig = new AdminConfig(hostname, 8001, manageClient.getManageConfig().getUsername(), manageClient.getManageConfig().getPassword());
-		AdminManager adminManager = new AdminManager(adminConfig);
-		adminManager.leaveCluster();
-
+	public void removeHost(String hostname) {
+		removeHost(hostname, 8001);
 	}
 
+	public void removeHost(String hostname, int adminPort) {
+		AdminConfig removeConfig = new AdminConfig(manageClient.getManageConfig());
+		removeConfig.setHost(hostname);
+		removeConfig.setPort(adminPort);
+		new AdminManager(removeConfig).leaveCluster();
+	}
 }

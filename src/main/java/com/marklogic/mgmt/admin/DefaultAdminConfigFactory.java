@@ -68,7 +68,17 @@ public class DefaultAdminConfigFactory extends PropertySourceFactory implements 
 		    }
 	    });
 
-	    propertyConsumerMap.put("mlAdminScheme", (config, prop) -> {
+		propertyConsumerMap.put("mlCloudApiKey", (config, prop) -> {
+			logger.info("Setting cloud API key");
+			config.setCloudApiKey(prop);
+		});
+
+		propertyConsumerMap.put("mlAdminBasePath", (config, prop) -> {
+			logger.info("Admin base path: " + prop);
+			config.setBasePath(prop);
+		});
+
+		propertyConsumerMap.put("mlAdminScheme", (config, prop) -> {
 		    logger.info("Admin interface scheme: " + prop);
 		    config.setScheme(prop);
 	    });

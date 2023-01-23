@@ -20,7 +20,13 @@ public class AdminConfig extends RestConfig {
         super(host, port, username, password);
     }
 
-    public AdminConfig(AdminConfig other) {
+	/**
+	 * Because this class adds no state and only sets sensible default values for connecting to MarkLogic's Admin app
+	 * server, this copy constructor only requires an instance of {@code RestConfig}.
+	 *
+	 * @param other
+	 */
+    public AdminConfig(RestConfig other) {
     	super(other);
 	}
 }

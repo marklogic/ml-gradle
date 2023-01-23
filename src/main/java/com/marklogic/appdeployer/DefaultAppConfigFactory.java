@@ -184,6 +184,11 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			config.setHost(prop);
 		});
 
+		propertyConsumerMap.put("mlCloudApiKey", (config, prop) -> {
+			logger.info("Setting cloud API key");
+			config.setCloudApiKey(prop);
+		});
+
 		/**
 		 * Defaults to port 8000. In rare cases, the ML App-Services app server will have been changed to listen on a
 		 * different port, in which case you can set this to that port.
@@ -251,6 +256,11 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			config.setAppServicesTrustManagementAlgorithm(prop);
 		});
 
+		propertyConsumerMap.put("mlAppServicesBasePath", (config, prop) -> {
+			logger.info("App-Services base path: " + prop);
+			config.setAppServicesBasePath(prop);
+		});
+
 		/**
 		 * Set this to true to prevent creating a REST API server by default.
 		 */
@@ -303,6 +313,14 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		propertyConsumerMap.put("mlRestExternalName", (config, prop) -> {
 			logger.info("REST external name: " + prop);
 			config.setRestExternalName(prop);
+		});
+		propertyConsumerMap.put("mlRestBasePath", (config, prop) -> {
+			logger.info("REST base path: " + prop);
+			config.setRestBasePath(prop);
+		});
+		propertyConsumerMap.put("mlTestRestBasePath", (config, prop) -> {
+			logger.info("Test REST base path: " + prop);
+			config.setTestRestBasePath(prop);
 		});
 
 		/**
@@ -373,7 +391,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		 * If a test REST API server is created, it will use the following port.
 		 */
 		propertyConsumerMap.put("mlTestRestPort", (config, prop) -> {
-			logger.info("App test REST port: " + prop);
+			logger.info("Test REST port: " + prop);
 			config.setTestRestPort(Integer.parseInt(prop));
 		});
 

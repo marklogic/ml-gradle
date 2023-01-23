@@ -2,6 +2,7 @@ package com.marklogic.mgmt.admin;
 
 import com.marklogic.mgmt.AbstractManager;
 import com.marklogic.rest.util.Fragment;
+import com.marklogic.rest.util.RestConfig;
 import com.marklogic.rest.util.RestTemplateUtil;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -189,19 +190,21 @@ public class AdminManager extends AbstractManager {
         invokeActionRequiringRestart(new ActionRequiringRestart() {
             @Override
             public boolean execute() {
-                RestTemplate rt = RestTemplateUtil.newRestTemplate(adminConfig.getHost(), appServicesPort,
-                        adminConfig.getUsername(), adminConfig.getPassword());
+				RestConfig evalConfig = new RestConfig(adminConfig);
+				evalConfig.setPort(appServicesPort);
+
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
                 MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
                 map.add("xquery", xquery);
                 HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map,
 					headers);
-                String url = format("http://%s:%d/v1/eval", adminConfig.getHost(), appServicesPort);
+
                 if (logger.isInfoEnabled()) {
                     logger.info("Setting SSL FIPS enabled: " + enabled);
                 }
-                rt.exchange(url, HttpMethod.POST, entity, String.class);
+				URI url = evalConfig.buildUri("/v1/eval");
+				RestTemplateUtil.newRestTemplate(evalConfig).exchange(url, HttpMethod.POST, entity, String.class);
                 if (logger.isInfoEnabled()) {
                     logger.info("Finished setting SSL FIPS enabled: " + enabled);
                 }

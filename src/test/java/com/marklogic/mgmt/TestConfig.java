@@ -17,13 +17,31 @@ import com.marklogic.mgmt.admin.AdminConfig;
 public class TestConfig {
 
     @Value("${mlManageHost:localhost}")
-    private String mlManageHost;
+    private String host;
+
+	@Value("${mlManagePort:8002}")
+	private Integer managePort;
+
+	@Value("${mlAdminPort:8001}")
+	private Integer adminPort;
 
     @Value("${mlManageUsername:admin}")
-    private String mlManageUsername;
+    private String username;
 
-    @Value("${mlManagePassword}")
-    private String mlManagePassword;
+    @Value("${mlManagePassword:}")
+    private String password;
+
+	@Value("${mlBasePath:}")
+	private String basePath;
+
+	@Value("${mlCloudApiKey:}")
+	private String cloudApiKey;
+
+	@Value("${mlScheme:http}")
+	private String scheme;
+
+	@Value("${mlSimpleSsl:false}")
+	private boolean simpleSsl;
 
     /**
      * Has to be static so that Spring instantiates it first.
@@ -37,8 +55,13 @@ public class TestConfig {
 
     @Bean
     public ManageConfig manageConfig() {
-        ManageConfig config = new ManageConfig(getMlManageHost(), 8002, getMlManageUsername(), getMlManagePassword());
-
+        ManageConfig config = new ManageConfig(host, managePort, username, password);
+		config.setBasePath(basePath);
+		config.setCloudApiKey(cloudApiKey);
+		config.setScheme(scheme);
+		if (simpleSsl) {
+			config.setConfigureSimpleSsl(true);
+		}
         // Clean the JSON by default
 	    config.setCleanJsonPayloads(true);
 	    return config;
@@ -49,19 +72,13 @@ public class TestConfig {
      */
     @Bean
     public AdminConfig adminConfig() {
-        return new AdminConfig(getMlManageHost(), 8001, getMlManageUsername(), getMlManagePassword());
-    }
-
-
-    public String getMlManageHost() {
-        return mlManageHost;
-    }
-
-    public String getMlManageUsername() {
-        return mlManageUsername;
-    }
-
-    public String getMlManagePassword() {
-        return mlManagePassword;
+        AdminConfig config = new AdminConfig(host, adminPort, username, password);
+		config.setBasePath(basePath);
+		config.setCloudApiKey(cloudApiKey);
+		config.setScheme(scheme);
+		if (simpleSsl) {
+			config.setConfigureSimpleSsl(true);
+		}
+		return config;
     }
 }

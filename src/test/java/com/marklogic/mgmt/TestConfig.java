@@ -1,5 +1,7 @@
 package com.marklogic.mgmt;
 
+import com.marklogic.mgmt.admin.DefaultAdminConfigFactory;
+import com.marklogic.mgmt.util.SimplePropertySource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,32 +18,32 @@ import com.marklogic.mgmt.admin.AdminConfig;
 @PropertySource(value = { "classpath:test.properties", "classpath:user.properties" }, ignoreResourceNotFound = true)
 public class TestConfig {
 
-    @Value("${mlManageHost:localhost}")
+    @Value("${mlHost:localhost}")
     private String host;
 
-	@Value("${mlManagePort:8002}")
+	@Value("${mlManagePort:#{NULL}}")
 	private Integer managePort;
 
-	@Value("${mlAdminPort:8001}")
+	@Value("${mlAdminPort:#{NULL}}")
 	private Integer adminPort;
 
-    @Value("${mlManageUsername:admin}")
+    @Value("${mlUsername:#{NULL}}")
     private String username;
 
-    @Value("${mlManagePassword:}")
+    @Value("${mlPassword:#{NULL}}")
     private String password;
 
-	@Value("${mlBasePath:}")
+	@Value("${mlBasePath:#{NULL}}")
 	private String basePath;
 
-	@Value("${mlCloudApiKey:}")
+	@Value("${mlCloudApiKey:#{NULL}}")
 	private String cloudApiKey;
 
-	@Value("${mlScheme:http}")
+	@Value("${mlScheme:#{NULL}}")
 	private String scheme;
 
-	@Value("${mlSimpleSsl:false}")
-	private boolean simpleSsl;
+	@Value("${mlSimpleSsl:#{NULL}}")
+	private Boolean simpleSsl;
 
     /**
      * Has to be static so that Spring instantiates it first.
@@ -55,13 +57,16 @@ public class TestConfig {
 
     @Bean
     public ManageConfig manageConfig() {
-        ManageConfig config = new ManageConfig(host, managePort, username, password);
-		config.setBasePath(basePath);
-		config.setCloudApiKey(cloudApiKey);
-		config.setScheme(scheme);
-		if (simpleSsl) {
-			config.setConfigureSimpleSsl(true);
-		}
+		ManageConfig config = new DefaultManageConfigFactory(new SimplePropertySource(
+			"mlHost", host,
+			"mlManagePort", managePort != null ? managePort.toString() : null,
+			"mlUsername", username,
+			"mlPassword", password,
+			"mlManageBasePath", basePath,
+			"mlCloudApiKey", cloudApiKey,
+			"mlManageScheme", scheme,
+			"mlManageSimpleSsl", simpleSsl != null ? simpleSsl.toString() : null
+		)).newManageConfig();
         // Clean the JSON by default
 	    config.setCleanJsonPayloads(true);
 	    return config;
@@ -72,13 +77,15 @@ public class TestConfig {
      */
     @Bean
     public AdminConfig adminConfig() {
-        AdminConfig config = new AdminConfig(host, adminPort, username, password);
-		config.setBasePath(basePath);
-		config.setCloudApiKey(cloudApiKey);
-		config.setScheme(scheme);
-		if (simpleSsl) {
-			config.setConfigureSimpleSsl(true);
-		}
-		return config;
+		return new DefaultAdminConfigFactory(new SimplePropertySource(
+			"mlHost", host,
+			"mlAdminPort", adminPort != null ? adminPort.toString() : null,
+			"mlUsername", username,
+			"mlPassword", password,
+			"mlAdminBasePath", basePath,
+			"mlCloudApiKey", cloudApiKey,
+			"mlAdminScheme", scheme,
+			"mlAdminSimpleSsl", simpleSsl != null ? simpleSsl.toString() : null
+		)).newAdminConfig();
     }
 }

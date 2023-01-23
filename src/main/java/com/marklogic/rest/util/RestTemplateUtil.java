@@ -66,7 +66,7 @@ public class RestTemplateUtil {
 	public static RestTemplate newRestTemplate(RestConfig config) {
 		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
 		OkHttpClient client = OkHttpClientBuilderFactory
-			.newOkHttpClientBuilder(bean.getHost(), bean.getPort(), bean.getSecurityContext())
+			.newOkHttpClientBuilder(bean.getHost(), bean.getSecurityContext())
 			.build();
 
 		RestTemplate rt = new RestTemplate(new OkHttp3ClientHttpRequestFactory(client));

@@ -9,7 +9,10 @@ public class SimplePropertySource implements PropertySource {
     public SimplePropertySource(String... propNamesAndValues) {
         props = new Properties();
         for (int i = 0; i < propNamesAndValues.length; i += 2) {
-            props.setProperty(propNamesAndValues[i], propNamesAndValues[i + 1]);
+			final String value = propNamesAndValues[i + 1];
+			if (value != null) {
+				props.setProperty(propNamesAndValues[i], value);
+			}
         }
     }
 

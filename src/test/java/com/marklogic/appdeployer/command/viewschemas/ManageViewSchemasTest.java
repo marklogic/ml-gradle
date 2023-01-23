@@ -8,6 +8,7 @@ import com.marklogic.junit.Fragment;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.clusters.ClusterManager;
 import com.marklogic.mgmt.resource.viewschemas.ViewSchemaManager;
+import com.marklogic.rest.util.RestConfig;
 import com.marklogic.rest.util.RestTemplateUtil;
 import org.jdom2.Namespace;
 import org.springframework.http.ResponseEntity;
@@ -56,8 +57,9 @@ public class ManageViewSchemasTest extends AbstractManageResourceTest {
 	 */
 	@Override
 	protected void afterResourcesCreated() {
-		RestTemplate clientTemplate = RestTemplateUtil.newRestTemplate(appConfig.getHost(), appConfig.getRestPort(),
+		RestConfig restConfig = new RestConfig(appConfig.getHost(), appConfig.getRestPort(),
 			appConfig.getRestAdminUsername(), appConfig.getRestAdminPassword());
+		RestTemplate clientTemplate = RestTemplateUtil.newRestTemplate(restConfig);
 
 		String baseUrl = format("http://%s:%d", appConfig.getHost(), appConfig.getRestPort());
 

@@ -9,6 +9,7 @@ public class ManageClientTest  {
 	public void determineUsernameForSecurityUserRequest() {
 		ManageConfig config = new ManageConfig();
 		config.setSecurityUsername("admin");
+		config.setSecurityPassword("admin");
 		config.setUsername("someone");
 
 		ManageClient client = new ManageClient(config);

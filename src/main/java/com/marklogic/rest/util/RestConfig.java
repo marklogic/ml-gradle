@@ -1,6 +1,12 @@
 package com.marklogic.rest.util;
 
+import com.marklogic.client.DatabaseClientBuilder;
+import com.marklogic.client.DatabaseClientFactory;
+import com.marklogic.client.ext.modulesloader.ssl.SimpleX509TrustManager;
+import com.marklogic.client.ext.ssl.SslConfig;
+import com.marklogic.client.ext.ssl.SslUtil;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
+import org.springframework.util.StringUtils;
 
 import javax.net.ssl.SSLContext;
 import java.net.URI;
@@ -18,8 +24,9 @@ public class RestConfig {
 	private boolean useDefaultKeystore;
 	private String sslProtocol;
 	private String trustManagementAlgorithm;
-
+	private DatabaseClientFactory.SSLHostnameVerifier sslHostnameVerifier;
 	private SSLContext sslContext;
+	@Deprecated
 	private X509HostnameVerifier hostnameVerifier;
 
 	public RestConfig() {
@@ -37,12 +44,50 @@ public class RestConfig {
 		if (other.scheme != null) {
 			this.scheme = other.scheme;
 		}
+
 		this.configureSimpleSsl = other.configureSimpleSsl;
 		this.useDefaultKeystore = other.useDefaultKeystore;
 		this.sslProtocol = other.sslProtocol;
 		this.trustManagementAlgorithm = other.trustManagementAlgorithm;
 		this.sslContext = other.sslContext;
 		this.hostnameVerifier = other.hostnameVerifier;
+		this.sslHostnameVerifier = other.sslHostnameVerifier;
+	}
+
+	public DatabaseClientBuilder newDatabaseClientBuilder() {
+		DatabaseClientBuilder builder = new DatabaseClientBuilder()
+			.withHost(getHost())
+			.withPort(getPort())
+			// TODO Will support all types before the 4.5.0 release
+			.withSecurityContextType("digest")
+			.withUsername(getUsername())
+			.withPassword(getPassword());
+
+		if (getSslContext() != null) {
+			builder.withSSLContext(getSslContext());
+		} else {
+			String sslProtocol = getSslProtocol();
+			// The MarkLogic Java Client will default to using the JVM's default trust manager if none is specified.
+			// This block though honors the existing "use default keystore" option, which allows for the user to also
+			// specify a trust management algorithm.
+			if (isUseDefaultKeystore()) {
+				sslProtocol = StringUtils.hasText(sslProtocol) ? sslProtocol : SslUtil.DEFAULT_SSL_PROTOCOL;
+				SslConfig sslConfig = SslUtil.configureUsingTrustManagerFactory(sslProtocol, getTrustManagementAlgorithm());
+				builder
+					.withSSLContext(sslConfig.getSslContext())
+					.withTrustManager(sslConfig.getTrustManager());
+			} else if (isConfigureSimpleSsl()) {
+				builder
+					.withSSLContext(StringUtils.hasText(sslProtocol) ?
+						SimpleX509TrustManager.newSSLContext(sslProtocol) :
+						SimpleX509TrustManager.newSSLContext())
+					.withTrustManager(new SimpleX509TrustManager());
+			} else {
+				builder.withSSLProtocol(sslProtocol);
+			}
+		}
+
+		return builder;
 	}
 
 	@Override
@@ -127,10 +172,12 @@ public class RestConfig {
 		this.sslContext = sslContext;
 	}
 
+	@Deprecated
 	public X509HostnameVerifier getHostnameVerifier() {
 		return hostnameVerifier;
 	}
 
+	@Deprecated
 	public void setHostnameVerifier(X509HostnameVerifier hostnameVerifier) {
 		this.hostnameVerifier = hostnameVerifier;
 	}
@@ -157,5 +204,13 @@ public class RestConfig {
 
 	public void setUseDefaultKeystore(boolean useDefaultKeystore) {
 		this.useDefaultKeystore = useDefaultKeystore;
+	}
+
+	public DatabaseClientFactory.SSLHostnameVerifier getSslHostnameVerifier() {
+		return sslHostnameVerifier;
+	}
+
+	public void setSslHostnameVerifier(DatabaseClientFactory.SSLHostnameVerifier sslHostnameVerifier) {
+		this.sslHostnameVerifier = sslHostnameVerifier;
 	}
 }

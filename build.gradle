@@ -16,8 +16,10 @@ java {
 }
 
 repositories {
-	mavenLocal()
 	mavenCentral()
+	maven {
+		url "https://nexus.marklogic.com/repository/maven-snapshots/"
+	}
 }
 
 // Do not cache changing modules

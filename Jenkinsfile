@@ -28,8 +28,7 @@ pipeline{
     }
     stage('publish'){
 			when {
-      	branch 'develop'
-
+      	branch 'dev'
       }
       steps{
       	sh label:'publish', script: '''#!/bin/bash

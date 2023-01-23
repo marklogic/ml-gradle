@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.marklogic"
-version = "4.4.0"
+version = "4.5-SNAPSHOT"
 
 java {
 	sourceCompatibility = 1.8
@@ -20,10 +20,19 @@ repositories {
 	mavenCentral()
 }
 
+// Do not cache changing modules
+configurations.all {
+	resolutionStrategy {
+		cacheChangingModulesFor 0, 'seconds'
+	}
+}
+
 dependencies {
-  api 'com.marklogic:ml-javaclient-util:4.4.0'
+	api ('com.marklogic:ml-javaclient-util:4.5-SNAPSHOT') {
+		changing = true
+	}
   api 'org.springframework:spring-web:5.3.24'
-	api 'com.fasterxml.jackson.core:jackson-databind:2.13.4.2'
+	api 'com.fasterxml.jackson.core:jackson-databind:2.14.1'
 
 	implementation 'jaxen:jaxen:1.2.0'
 	implementation 'org.apache.httpcomponents:httpclient:4.5.13'

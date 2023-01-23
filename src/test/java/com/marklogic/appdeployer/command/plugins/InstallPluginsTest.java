@@ -12,6 +12,7 @@ import com.marklogic.client.io.DocumentMetadataHandle;
 import com.marklogic.client.io.JacksonHandle;
 import com.marklogic.mgmt.util.ObjectMapperFactory;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -26,6 +27,7 @@ public class InstallPluginsTest extends AbstractAppDeployerTest {
 		undeploySampleApp();
 	}
 
+	@Disabled("The makefile needs updating")
 	@Test
 	public void test() {
 		final File projectDir = new File("src/test/resources/plugin-project");

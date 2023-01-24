@@ -219,7 +219,8 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlDeleteForestReplicas", type: DeleteForestReplicasTask, group: forestGroup, description: "Deprecated - delete forest replicas via the command.forestNamesAndReplicaCounts map; requires -Pconfirm=true to be set so this isn't accidentally executed")
 		project.task("mlDeployCustomForests", type: DeployCustomForestsTask, group: forestGroup, description: "Deploy custom forests as defined in subdirectories of the forests configuration directory")
 		project.task("mlDeployForestReplicas", type: DeployForestReplicasTask, group: forestGroup, description: "Prefer this over mlConfigureForestReplicas; it does the same thing, but uses the ConfigureForestReplicasCommand that is used by mlDeploy")
-		project.task("mlPrintForestPlan", type: PrintForestPlanTask, group: forestGroup, description: "Print a list of primary forests to be created for a database specified by -Pdatabase=(name of database) when the database is next deployed")
+		project.task("mlPrintForestPlan", type: PrintForestPlanTask, group: forestGroup, description: "Print a list of primary forests to be created for a database specified by -Pdatabase=(name of database) when the database is next deployed. " +
+			"This is only intended to be used when forests are created dynamically via properties.")
 
 		String groupsGroup = "ml-gradle Group"
 		project.task("mlDeployGroups", type: DeployGroupsTask, group: groupsGroup, description: "Deploy each group, updating it if it exists, in the configuration directory")

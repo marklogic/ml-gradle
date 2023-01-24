@@ -3,12 +3,19 @@ package com.marklogic.gradle.task.forests
 import com.marklogic.appdeployer.command.databases.DatabasePlan
 import com.marklogic.appdeployer.command.databases.DeployDatabaseCommand
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand
+import com.marklogic.appdeployer.command.forests.DeployForestsCommand
 import com.marklogic.appdeployer.impl.SimpleAppDeployer
 import com.marklogic.gradle.task.MarkLogicTask
 import com.marklogic.mgmt.api.forest.Forest
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 
+/**
+ * This is only intended for use when creating forests via properties. The goal is to look at the properties defined by
+ * a user and preview what forests will be created based on those properties. If a user is explicitly defining forests
+ * via payloads instead of properties, the expectation is that a user can simply look at what forests already exist and
+ * compare those to the files in their project.
+ */
 class PrintForestPlanTask extends MarkLogicTask {
 
 	@TaskAction
@@ -36,16 +43,15 @@ class PrintForestPlanTask extends MarkLogicTask {
 			throw new GradleException("Did not find any database plan with a database name of: " + database)
 		}
 
-		/**
-		 * Now that we have a command, use it to build its command for deploying forests, and then use that to build
-		 * the list of forests that will be created.
-		 */
-		List<Forest> forests = deployDatabaseCommand.buildDeployForestsCommand(
-			database, getCommandContext()).buildForests(getCommandContext(), true)
-
+		DeployForestsCommand deployForestsCommand = deployDatabaseCommand.buildDeployForestsCommand(database, getCommandContext())
+		List<Forest> forests = deployForestsCommand != null ?
+			deployForestsCommand.buildForests(getCommandContext(), true) :
+			new ArrayList<>()
 
 		if (forests.isEmpty()) {
-			println "\nNo primary forests will be created the next time the database '" + database + "' is deployed; this is likely because it already has all of the primary desired forests based on the configuration settings."
+			println "\nNo primary forests will be created the next time the database '" + database + "' is deployed. This is " +
+				"likely because it already has all of the primary desired forests based on the configuration settings, or because " +
+				"you are explicitly defining forests to create instead of creating forests dynamically via properties."
 			println "\nIf replicas have been configured for the database - e.g. via mlDatabaseNamesAndReplicaCounts - and these do not exist yet, " +
 				"then replicas will be created the next time either the mlDeploy task or mlConfigureForestReplicas task is run."
 		} else {

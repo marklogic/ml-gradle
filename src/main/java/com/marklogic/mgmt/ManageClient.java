@@ -63,7 +63,10 @@ public class ManageClient extends LoggingObject {
 		    }
 
 			RestConfig rc = new RestConfig(config);
-			// Override settings based on the 3 "security user"-specific properties known by ManageConfig
+			// Override settings based on the 3 "security user"-specific properties known by ManageConfig.
+			// Note that in 4.5.0, with the addition of cloud/certificate/kerberos/saml auth, this will only have any
+			// impact if the user is using digest or basic auth. There's no equivalent of a separate "security" user
+			// yet for the other 4 authentication types.
 			rc.setUsername(config.getSecurityUsername());
 			rc.setPassword(config.getSecurityPassword());
 		    if (config.getSecuritySslContext() != null) {

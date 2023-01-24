@@ -43,6 +43,11 @@ public class DefaultManageConfigFactory extends PropertySourceFactory implements
 		    config.setPort(Integer.parseInt(prop));
 	    });
 
+		propertyConsumerMap.put("mlManageAuthentication", (config, prop) -> {
+			logger.info("Manage authentication: " + prop);
+			config.setSecurityContextType(prop);
+		});
+
 	    propertyConsumerMap.put("mlManageUsername", (config, prop) -> {
 		    logger.info("Manage username: " + prop);
 		    config.setUsername(prop);
@@ -71,6 +76,21 @@ public class DefaultManageConfigFactory extends PropertySourceFactory implements
 		    	config.setSecurityPassword(prop);
 		    }
 	    });
+
+		propertyConsumerMap.put("mlManageCertFile", (config, prop) -> {
+			logger.info("Manage certificate file: " + prop);
+			config.setCertFile(prop);
+		});
+		propertyConsumerMap.put("mlManageCertPassword", (config, prop) -> {
+			config.setCertPassword(prop);
+		});
+		propertyConsumerMap.put("mlManageExternalName", (config, prop) -> {
+			logger.info("Manage external name: " + prop);
+			config.setExternalName(prop);
+		});
+		propertyConsumerMap.put("mlManageSamlToken", (config, prop) -> {
+			config.setSamlToken(prop);
+		});
 
 		propertyConsumerMap.put("mlManageBasePath", (config, prop) -> {
 			logger.info("Manage base path: " + prop);

@@ -42,6 +42,11 @@ public class DefaultAdminConfigFactory extends PropertySourceFactory implements 
 		    config.setPort(Integer.parseInt(prop));
 	    });
 
+		propertyConsumerMap.put("mlAdminAuthentication", (config, prop) -> {
+			logger.info("Admin authentication: " + prop);
+			config.setSecurityContextType(prop);
+		});
+
 	    /**
 	     * The Manage API endpoints in the Admin interface still just require the manage-admin role, so the value of
 	     * mlManageUsername should work for these calls.
@@ -67,6 +72,21 @@ public class DefaultAdminConfigFactory extends PropertySourceFactory implements 
 			    config.setPassword(prop);
 		    }
 	    });
+
+		propertyConsumerMap.put("mlAdminCertFile", (config, prop) -> {
+			logger.info("Admin certificate file: " + prop);
+			config.setCertFile(prop);
+		});
+		propertyConsumerMap.put("mlAdminCertPassword", (config, prop) -> {
+			config.setCertPassword(prop);
+		});
+		propertyConsumerMap.put("mlAdminExternalName", (config, prop) -> {
+			logger.info("Admin external name: " + prop);
+			config.setExternalName(prop);
+		});
+		propertyConsumerMap.put("mlAdminSamlToken", (config, prop) -> {
+			config.setSamlToken(prop);
+		});
 
 		propertyConsumerMap.put("mlAdminBasePath", (config, prop) -> {
 			logger.info("Admin base path: " + prop);

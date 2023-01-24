@@ -1,9 +1,12 @@
 package com.marklogic.mgmt.admin;
 
+import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.mgmt.util.SimplePropertySource;
+import com.marklogic.rest.util.RestTemplateUtil;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DefaultAdminConfigFactoryTest  {
@@ -59,17 +62,65 @@ public class DefaultAdminConfigFactoryTest  {
 
 	@Test
 	void cloudApiKeyAndBasePath() {
-		AdminConfig config = new DefaultAdminConfigFactory(new SimplePropertySource(
+		AdminConfig config = configure(
 			"mlCloudApiKey", "my-key",
+			"mlAdminAuthentication", "cloud",
 			"mlAdminBasePath", "/admin/path",
 			"mlAdminPort", "8001",
 			"mlAdminScheme", "http"
-		)).newAdminConfig();
+		);
 
 		assertEquals("my-key", config.getCloudApiKey());
 		assertEquals("/admin/path", config.getBasePath());
 		assertEquals(443, config.getPort(), "When a cloud API key is provided, https and 443 should be assumed");
 		assertEquals("https", config.getScheme());
+
+		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
+		assertTrue(bean.getSecurityContext() instanceof DatabaseClientFactory.MarkLogicCloudAuthContext);
+		assertEquals("my-key", ((DatabaseClientFactory.MarkLogicCloudAuthContext)bean.getSecurityContext()).getKey());
+	}
+
+	@Test
+	void certificateAuth() {
+		AdminConfig config = configure(
+			"mlAdminAuthentication", "certificate",
+			"mlAdminCertFile", "my-file.crt",
+			"mlAdminCertPassword", "passwd"
+		);
+
+		assertEquals("certificate", config.getSecurityContextType());
+		assertEquals("my-file.crt", config.getCertFile());
+		assertEquals("passwd", config.getCertPassword());
+	}
+
+	@Test
+	void kerberosAuth() {
+		AdminConfig config = configure(
+			"mlAdminAuthentication", "kerberos",
+			"mlAdminExternalName", "my-name"
+		);
+
+		assertEquals("kerberos", config.getSecurityContextType());
+		assertEquals("my-name", config.getExternalName());
+
+		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
+		assertTrue(bean.getSecurityContext() instanceof DatabaseClientFactory.KerberosAuthContext);
+		assertEquals("my-name", ((DatabaseClientFactory.KerberosAuthContext)bean.getSecurityContext()).getKrbOptions().get("principal"));
+	}
+
+	@Test
+	void samlAuth() {
+		AdminConfig config = configure(
+			"mlAdminAuthentication", "saml",
+			"mlAdminSamlToken", "my-token"
+		);
+
+		assertEquals("saml", config.getSecurityContextType());
+		assertEquals("my-token", config.getSamlToken());
+
+		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
+		assertTrue(bean.getSecurityContext() instanceof DatabaseClientFactory.SAMLAuthContext);
+		assertEquals("my-token", ((DatabaseClientFactory.SAMLAuthContext)bean.getSecurityContext()).getToken());
 	}
 
 	private AdminConfig configure(String... properties) {

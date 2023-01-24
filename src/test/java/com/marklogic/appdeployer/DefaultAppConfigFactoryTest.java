@@ -5,7 +5,6 @@ import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.ext.SecurityContextType;
 import com.marklogic.client.ext.modulesloader.impl.PropertiesModuleManager;
 import com.marklogic.mgmt.util.SimplePropertySource;
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -14,7 +13,14 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-public class DefaultAppConfigFactoryTest  {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
+public class DefaultAppConfigFactoryTest {
 
 	private DefaultAppConfigFactory sut;
 
@@ -662,5 +668,30 @@ public class DefaultAppConfigFactoryTest  {
 		assertEquals("/rest/path", config.getRestBasePath());
 		assertEquals("/app/path", config.getAppServicesBasePath());
 		assertEquals("/test/path", config.getTestRestBasePath());
+	}
+
+	@Test
+	void samlTokens() {
+		AppConfig config = new DefaultAppConfigFactory(new SimplePropertySource(
+			"mlRestAuthentication", "saml",
+			"mlRestSamlToken", "my-rest-token",
+			"mlAppServicesAuthentication", "saml",
+			"mlAppServicesSamlToken", "my-app-token"
+		)).newAppConfig();
+
+		assertEquals(SecurityContextType.SAML, config.getRestSecurityContextType());
+		assertEquals("my-rest-token", config.getRestSamlToken());
+		assertEquals(SecurityContextType.SAML, config.getAppServicesSecurityContextType());
+		assertEquals("my-app-token", config.getAppServicesSamlToken());
+
+		// It's possible to create a client with a SAML token, as no attempt is made by the Java Client to verify or
+		// use the token. So we can verify that the client is created correctly.
+		DatabaseClientFactory.SecurityContext context = config.newDatabaseClient().getSecurityContext();
+		assertTrue(context instanceof DatabaseClientFactory.SAMLAuthContext);
+		assertEquals("my-rest-token", ((DatabaseClientFactory.SAMLAuthContext) context).getToken());
+
+		context = config.newAppServicesDatabaseClient("Documents").getSecurityContext();
+		assertTrue(context instanceof DatabaseClientFactory.SAMLAuthContext);
+		assertEquals("my-app-token", ((DatabaseClientFactory.SAMLAuthContext) context).getToken());
 	}
 }

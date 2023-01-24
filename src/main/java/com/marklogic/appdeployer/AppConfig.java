@@ -94,6 +94,7 @@ public class AppConfig {
 	private String restCertFile;
 	private String restCertPassword;
 	private String restExternalName;
+	private String restSamlToken;
 	private X509TrustManager restTrustManager;
 	private boolean restUseDefaultKeystore;
 	private String restSslProtocol;
@@ -115,6 +116,7 @@ public class AppConfig {
 	private String appServicesCertFile;
 	private String appServicesCertPassword;
 	private String appServicesExternalName;
+	private String appServicesSamlToken;
 	private X509TrustManager appServicesTrustManager;
 	private boolean appServicesUseDefaultKeystore;
 	private String appServicesSslProtocol;
@@ -384,6 +386,7 @@ public class AppConfig {
 		config.setCertPassword(restCertPassword);
 		config.setConnectionType(restConnectionType);
 		config.setExternalName(restExternalName);
+		config.setSamlToken(restSamlToken);
 		config.setSecurityContextType(restSecurityContextType);
 		config.setCloudApiKey(cloudApiKey);
 		config.setBasePath(restBasePath);
@@ -426,6 +429,7 @@ public class AppConfig {
 		config.setConnectionType(appServicesConnectionType);
 		config.setDatabase(databaseName);
 		config.setExternalName(appServicesExternalName);
+		config.setSamlToken(appServicesSamlToken);
 		config.setSecurityContextType(appServicesSecurityContextType);
 		config.setCloudApiKey(cloudApiKey);
 		config.setBasePath(appServicesBasePath);
@@ -1494,5 +1498,21 @@ public class AppConfig {
 
 	public void setTestRestBasePath(String testRestBasePath) {
 		this.testRestBasePath = testRestBasePath;
+	}
+
+	public String getRestSamlToken() {
+		return restSamlToken;
+	}
+
+	public void setRestSamlToken(String restSamlToken) {
+		this.restSamlToken = restSamlToken;
+	}
+
+	public String getAppServicesSamlToken() {
+		return appServicesSamlToken;
+	}
+
+	public void setAppServicesSamlToken(String appServicesSamlToken) {
+		this.appServicesSamlToken = appServicesSamlToken;
 	}
 }

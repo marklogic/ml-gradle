@@ -1,10 +1,10 @@
 package com.marklogic.mgmt.admin;
 
-import com.marklogic.appdeployer.AppConfig;
-import com.marklogic.appdeployer.DefaultAppConfigFactory;
 import com.marklogic.mgmt.util.SimplePropertySource;
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DefaultAdminConfigFactoryTest  {
 
@@ -61,11 +61,15 @@ public class DefaultAdminConfigFactoryTest  {
 	void cloudApiKeyAndBasePath() {
 		AdminConfig config = new DefaultAdminConfigFactory(new SimplePropertySource(
 			"mlCloudApiKey", "my-key",
-			"mlAdminBasePath", "/admin/path"
+			"mlAdminBasePath", "/admin/path",
+			"mlAdminPort", "8001",
+			"mlAdminScheme", "http"
 		)).newAdminConfig();
 
 		assertEquals("my-key", config.getCloudApiKey());
 		assertEquals("/admin/path", config.getBasePath());
+		assertEquals(443, config.getPort(), "When a cloud API key is provided, https and 443 should be assumed");
+		assertEquals("https", config.getScheme());
 	}
 
 	private AdminConfig configure(String... properties) {

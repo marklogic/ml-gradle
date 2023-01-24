@@ -1,10 +1,10 @@
 package com.marklogic.mgmt;
 
-import com.marklogic.mgmt.admin.AdminConfig;
-import com.marklogic.mgmt.admin.DefaultAdminConfigFactory;
 import com.marklogic.mgmt.util.SimplePropertySource;
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DefaultManageConfigFactoryTest  {
 
@@ -103,11 +103,16 @@ public class DefaultManageConfigFactoryTest  {
 	void cloudApiKeyAndBasePath() {
 		ManageConfig config = configure(
 			"mlCloudApiKey", "my-key",
-			"mlManageBasePath", "/manage/path"
+			"mlManageBasePath", "/manage/path",
+			"mlManagePort", "8002",
+			"mlManageScheme", "http"
 		);
 
 		assertEquals("my-key", config.getCloudApiKey());
 		assertEquals("/manage/path", config.getBasePath());
+		assertEquals(443, config.getPort(), "When a cloud API key is provided, the mlManagePort and mlManageScheme " +
+			"options should be overridden since https/443 are guaranteed to be the correct values");
+		assertEquals("https", config.getScheme());
 	}
 
 	private ManageConfig configure(String... properties) {

@@ -68,11 +68,6 @@ public class DefaultAdminConfigFactory extends PropertySourceFactory implements 
 		    }
 	    });
 
-		propertyConsumerMap.put("mlCloudApiKey", (config, prop) -> {
-			logger.info("Setting cloud API key");
-			config.setCloudApiKey(prop);
-		});
-
 		propertyConsumerMap.put("mlAdminBasePath", (config, prop) -> {
 			logger.info("Admin base path: " + prop);
 			config.setBasePath(prop);
@@ -102,7 +97,15 @@ public class DefaultAdminConfigFactory extends PropertySourceFactory implements 
 		    logger.info("Using trust management algorithm for SSL for Admin app server: " + prop);
 		    config.setTrustManagementAlgorithm(prop);
 	    });
-    }
+
+		// Processed last so that it can override scheme/port
+		propertyConsumerMap.put("mlCloudApiKey", (config, prop) -> {
+			logger.info("Setting Admin cloud API key and forcing scheme to HTTPS and port to 443");
+			config.setCloudApiKey(prop);
+			config.setPort(443);
+			config.setScheme("https");
+		});
+	}
 
     @Override
     public AdminConfig newAdminConfig() {

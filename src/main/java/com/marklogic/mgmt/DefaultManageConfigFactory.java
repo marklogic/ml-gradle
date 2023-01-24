@@ -72,11 +72,6 @@ public class DefaultManageConfigFactory extends PropertySourceFactory implements
 		    }
 	    });
 
-		propertyConsumerMap.put("mlCloudApiKey", (config, prop) -> {
-			logger.info("Setting cloud API key");
-			config.setCloudApiKey(prop);
-		});
-
 		propertyConsumerMap.put("mlManageBasePath", (config, prop) -> {
 			logger.info("Manage base path: " + prop);
 			config.setBasePath(prop);
@@ -130,7 +125,15 @@ public class DefaultManageConfigFactory extends PropertySourceFactory implements
 	    propertyConsumerMap.put("mlSecurityPassword", (config, prop) -> {
 		    config.setSecurityPassword(prop);
 	    });
-    }
+
+		// Processed last so that it can override scheme/port
+		propertyConsumerMap.put("mlCloudApiKey", (config, prop) -> {
+			logger.info("Setting Manage cloud API key and forcing scheme to HTTPS and port to 443");
+			config.setCloudApiKey(prop);
+			config.setScheme("https");
+			config.setPort(443);
+		});
+	}
 
     @Override
     public ManageConfig newManageConfig() {

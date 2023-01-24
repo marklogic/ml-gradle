@@ -16,10 +16,11 @@ java {
 }
 
 repositories {
-	mavenCentral()
+	mavenLocal()
 	maven {
 		url "https://nexus.marklogic.com/repository/maven-snapshots/"
 	}
+	mavenCentral()
 }
 
 // Do not cache changing modules
@@ -30,6 +31,9 @@ configurations.all {
 }
 
 dependencies {
+	api('com.marklogic:marklogic-client-api:6.1-SNAPSHOT') {
+		changing = true
+	}
 	api('com.marklogic:ml-javaclient-util:4.5-SNAPSHOT') {
 		changing = true
 	}

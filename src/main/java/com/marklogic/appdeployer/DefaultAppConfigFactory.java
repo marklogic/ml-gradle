@@ -227,6 +227,10 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			logger.info("App Services external name: " + prop);
 			config.setAppServicesExternalName(prop);
 		});
+		propertyConsumerMap.put("mlAppServicesSamlToken", (config, prop) -> {
+			logger.info("App Services SAML token: " + prop);
+			config.setAppServicesSamlToken(prop);
+		});
 
 		propertyConsumerMap.put("mlAppServicesSimpleSsl", (config, prop) -> {
 			if (StringUtils.hasText(prop) && !"false".equalsIgnoreCase(prop)) {
@@ -313,6 +317,10 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		propertyConsumerMap.put("mlRestExternalName", (config, prop) -> {
 			logger.info("REST external name: " + prop);
 			config.setRestExternalName(prop);
+		});
+		propertyConsumerMap.put("mlRestSamlToken", (config, prop) -> {
+			logger.info("REST SAML token: " + prop);
+			config.setRestSamlToken(prop);
 		});
 		propertyConsumerMap.put("mlRestBasePath", (config, prop) -> {
 			logger.info("REST base path: " + prop);

@@ -137,7 +137,6 @@ public class DefaultAppConfigFactoryTest {
 		sut = new DefaultAppConfigFactory(new SimplePropertySource("foo.mlHost", "host", "foo.mlUsername", "user"));
 		AppConfig config = sut.newAppConfig();
 		assertEquals("localhost", config.getHost(), "Should use default");
-		assertEquals(AppConfig.DEFAULT_USERNAME, config.getRestAdminUsername(), "Should use default");
 	}
 
 	@Test

@@ -15,11 +15,21 @@ public class SimpleAppDeployer extends AbstractAppDeployer {
 
 	private List<Command> commands;
 
+	/**
+	 * @param commandArray
+	 * @deprecated since 4.5.0; avoid using since it assumes the use of default passwords
+	 */
+	@Deprecated
 	public SimpleAppDeployer(Command... commandArray) {
 		super();
 		buildModifiableCommandList(commandArray);
 	}
 
+	/**
+	 * @param commands
+	 * @deprecated since 4.5.0; avoid using since it assumes the use of default passwords
+	 */
+	@Deprecated
 	public SimpleAppDeployer(List<Command> commands) {
 		this.commands = commands;
 	}

@@ -5,6 +5,7 @@ import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.ManageConfig;
 import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 import org.apache.http.conn.ssl.SSLContextBuilder;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.net.ssl.SSLContext;
@@ -24,6 +25,12 @@ public class RestTemplateUtilTest extends BaseTestHelper {
 
 	private boolean configurerInvoked = false;
 	private ManageConfig manageConfig = new ManageConfig();
+
+	@BeforeEach
+	void setup() {
+		manageConfig.setUsername("someuser");
+		manageConfig.setPassword("someword");
+	}
 
 	@Test
 	@Deprecated

@@ -4,12 +4,14 @@ import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.appdeployer.command.security.DeployUsersCommand;
 import static org.junit.jupiter.api.Assertions.*;
+
+import com.marklogic.mgmt.AbstractMgmtTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-public class SimpleAppDeployerTest  {
+public class SimpleAppDeployerTest extends AbstractMgmtTest {
 
     private SimpleAppDeployer deployer;
     private DeployRestApiServersCommand restApiCommand;
@@ -19,7 +21,7 @@ public class SimpleAppDeployerTest  {
     public void setup() {
         restApiCommand = new DeployRestApiServersCommand();
         dbCommand = new DeployOtherDatabasesCommand();
-        deployer = new SimpleAppDeployer(restApiCommand, dbCommand);
+        deployer = new SimpleAppDeployer(manageClient, null, restApiCommand, dbCommand);
     }
 
     @Test
@@ -52,7 +54,7 @@ public class SimpleAppDeployerTest  {
 
 	@Test
 	void constructWithArray() {
-    	deployer = new SimpleAppDeployer(new DeployOtherDatabasesCommand());
+    	deployer = new SimpleAppDeployer(manageClient, null, new DeployOtherDatabasesCommand());
     	assertEquals(1, deployer.getCommands().size());
 	}
 }

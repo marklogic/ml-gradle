@@ -21,11 +21,12 @@ public class AdminManager extends AbstractManager {
     private RestTemplate restTemplate;
     private AdminConfig adminConfig;
 
-    /**
-     * Can use this constructor when the default values in AdminConfig will work.
-     */
+	/**
+	 * Creates an uninitialized instance that requires a {@code AdminConfig} to be provided in order to be operable.
+	 *
+	 * @deprecated since 4.5.0; will be removed in 5.0.0
+	 */
     public AdminManager() {
-        this(new AdminConfig());
     }
 
     public AdminManager(AdminConfig adminConfig) {

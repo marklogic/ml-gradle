@@ -8,12 +8,15 @@ import com.marklogic.rest.util.RestConfig;
  */
 public class AdminConfig extends RestConfig {
 
+	/**
+	 * Assumes the usage of "localhost" and 8001 as the host and port.
+	 */
     public AdminConfig() {
-        super("localhost", 8001, "admin", "admin");
+        super("localhost", 8001, null, null);
     }
 
     public AdminConfig(String host, String password) {
-        super(host, 8001, "admin", password);
+        super(host, 8001, null, password);
     }
 
     public AdminConfig(String host, int port, String username, String password) {

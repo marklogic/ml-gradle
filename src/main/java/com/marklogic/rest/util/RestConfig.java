@@ -16,9 +16,16 @@ public class RestConfig {
 
 	private String host;
 	private int port;
+	// Defaulting this for backwards-compatibility reasons in 4.5.0
+	private String securityContextType = "digest";
 	private String username;
 	private String password;
 	private String cloudApiKey;
+	private String certFile;
+	private String certPassword;
+	private String externalName;
+	private String samlToken;
+
 	private String basePath;
 	private String scheme = "http";
 
@@ -64,11 +71,14 @@ public class RestConfig {
 			.withHost(getHost())
 			.withPort(getPort())
 			.withBasePath(getBasePath())
-			// TODO Will support all types before the 4.5.0 release
-			.withSecurityContextType(StringUtils.hasText(getCloudApiKey()) ? "cloud" : "digest")
+			.withSecurityContextType(getSecurityContextType())
 			.withUsername(getUsername())
 			.withPassword(getPassword())
-			.withCloudApiKey(getCloudApiKey());
+			.withCloudApiKey(getCloudApiKey())
+			.withCertificateFile(getCertFile())
+			.withCertificatePassword(getCertPassword())
+			.withKerberosPrincipal(getExternalName())
+			.withSAMLToken(getSamlToken());
 
 		if (getSslContext() != null) {
 			builder.withSSLContext(getSslContext());
@@ -245,5 +255,45 @@ public class RestConfig {
 
 	public void setBasePath(String basePath) {
 		this.basePath = basePath;
+	}
+
+	public String getSecurityContextType() {
+		return securityContextType;
+	}
+
+	public void setSecurityContextType(String securityContextType) {
+		this.securityContextType = securityContextType;
+	}
+
+	public String getCertFile() {
+		return certFile;
+	}
+
+	public void setCertFile(String certFile) {
+		this.certFile = certFile;
+	}
+
+	public String getCertPassword() {
+		return certPassword;
+	}
+
+	public void setCertPassword(String certPassword) {
+		this.certPassword = certPassword;
+	}
+
+	public String getExternalName() {
+		return externalName;
+	}
+
+	public void setExternalName(String externalName) {
+		this.externalName = externalName;
+	}
+
+	public String getSamlToken() {
+		return samlToken;
+	}
+
+	public void setSamlToken(String samlToken) {
+		this.samlToken = samlToken;
 	}
 }

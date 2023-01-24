@@ -1,5 +1,7 @@
 package com.marklogic.mgmt;
 
+import com.marklogic.client.DatabaseClientFactory;
+import com.marklogic.mgmt.admin.AdminConfig;
 import com.marklogic.mgmt.util.SimplePropertySource;
 import org.junit.jupiter.api.Test;
 
@@ -103,6 +105,7 @@ public class DefaultManageConfigFactoryTest  {
 	void cloudApiKeyAndBasePath() {
 		ManageConfig config = configure(
 			"mlCloudApiKey", "my-key",
+			"mlManageAuthentication", "cloud",
 			"mlManageBasePath", "/manage/path",
 			"mlManagePort", "8002",
 			"mlManageScheme", "http"
@@ -113,6 +116,53 @@ public class DefaultManageConfigFactoryTest  {
 		assertEquals(443, config.getPort(), "When a cloud API key is provided, the mlManagePort and mlManageScheme " +
 			"options should be overridden since https/443 are guaranteed to be the correct values");
 		assertEquals("https", config.getScheme());
+
+		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
+		assertTrue(bean.getSecurityContext() instanceof DatabaseClientFactory.MarkLogicCloudAuthContext);
+		assertEquals("my-key", ((DatabaseClientFactory.MarkLogicCloudAuthContext)bean.getSecurityContext()).getKey());
+	}
+
+	@Test
+	void certificateAuth() {
+		ManageConfig config = configure(
+			"mlManageAuthentication", "certificate",
+			"mlManageCertFile", "my-file.crt",
+			"mlManageCertPassword", "passwd"
+		);
+
+		assertEquals("certificate", config.getSecurityContextType());
+		assertEquals("my-file.crt", config.getCertFile());
+		assertEquals("passwd", config.getCertPassword());
+	}
+
+	@Test
+	void kerberosAuth() {
+		ManageConfig config = configure(
+			"mlManageAuthentication", "kerberos",
+			"mlManageExternalName", "my-name"
+		);
+
+		assertEquals("kerberos", config.getSecurityContextType());
+		assertEquals("my-name", config.getExternalName());
+
+		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
+		assertTrue(bean.getSecurityContext() instanceof DatabaseClientFactory.KerberosAuthContext);
+		assertEquals("my-name", ((DatabaseClientFactory.KerberosAuthContext)bean.getSecurityContext()).getKrbOptions().get("principal"));
+	}
+
+	@Test
+	void samlAuth() {
+		ManageConfig config = configure(
+			"mlManageAuthentication", "saml",
+			"mlManageSamlToken", "my-token"
+		);
+
+		assertEquals("saml", config.getSecurityContextType());
+		assertEquals("my-token", config.getSamlToken());
+
+		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
+		assertTrue(bean.getSecurityContext() instanceof DatabaseClientFactory.SAMLAuthContext);
+		assertEquals("my-token", ((DatabaseClientFactory.SAMLAuthContext)bean.getSecurityContext()).getToken());
 	}
 
 	private ManageConfig configure(String... properties) {

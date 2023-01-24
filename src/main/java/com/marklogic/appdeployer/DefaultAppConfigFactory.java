@@ -213,7 +213,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			config.setAppServicesSecurityContextType(SecurityContextType.valueOf(prop.toUpperCase()));
 		});
 		propertyConsumerMap.put("mlAppServicesCertFile", (config, prop) -> {
-			logger.info("App Services cert file: " + prop);
+			logger.info("App Services certificate file: " + prop);
 			config.setAppServicesCertFile(prop);
 		});
 		propertyConsumerMap.put("mlAppServicesCertPassword", (config, prop) -> {
@@ -228,7 +228,6 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			config.setAppServicesExternalName(prop);
 		});
 		propertyConsumerMap.put("mlAppServicesSamlToken", (config, prop) -> {
-			logger.info("App Services SAML token: " + prop);
 			config.setAppServicesSamlToken(prop);
 		});
 
@@ -307,11 +306,10 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			config.setRestSecurityContextType(SecurityContextType.valueOf(prop.toUpperCase()));
 		});
 		propertyConsumerMap.put("mlRestCertFile", (config, prop) -> {
-			logger.info("REST cert file: " + prop);
+			logger.info("REST certificate file: " + prop);
 			config.setRestCertFile(prop);
 		});
 		propertyConsumerMap.put("mlRestCertPassword", (config, prop) -> {
-			logger.info("REST cert password: " + prop);
 			config.setRestCertPassword(prop);
 		});
 		propertyConsumerMap.put("mlRestExternalName", (config, prop) -> {
@@ -319,7 +317,6 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			config.setRestExternalName(prop);
 		});
 		propertyConsumerMap.put("mlRestSamlToken", (config, prop) -> {
-			logger.info("REST SAML token: " + prop);
 			config.setRestSamlToken(prop);
 		});
 		propertyConsumerMap.put("mlRestBasePath", (config, prop) -> {

@@ -88,11 +88,9 @@ public class API extends LoggingObject {
 	    if (logger.isInfoEnabled()) {
 		    logger.info("Connecting to host: " + host);
 	    }
-	    SimplePropertySource sps = new SimplePropertySource("mlHost", host, "mlManageUsername", mc.getUsername(),
-		    "mlManagePassword", mc.getPassword(), "mlManageSimpleSsl", mc.isConfigureSimpleSsl() + "",
-		    "mlManageScheme", mc.getScheme(), "mlManagePort", mc.getPort() + "",
-		    "mlSecurityUsername", mc.getSecurityUsername(), "mlSecurityPassword", mc.getSecurityPassword());
-	    this.manageClient = new ManageClient(new DefaultManageConfigFactory(sps).newManageConfig());
+		ManageConfig newConfig = new ManageConfig(mc);
+		newConfig.setHost(host);
+	    this.manageClient = new ManageClient(newConfig);
 	    if (logger.isInfoEnabled()) {
 		    logger.info("Connected to host: " + host);
 	    }

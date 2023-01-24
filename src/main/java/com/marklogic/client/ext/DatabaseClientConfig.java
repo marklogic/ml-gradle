@@ -26,6 +26,8 @@ public class DatabaseClientConfig {
 	private String certFile;
 	private String certPassword;
 	private String externalName;
+	private String samlToken;
+
 	private X509TrustManager trustManager;
 	private DatabaseClient.ConnectionType connectionType;
 
@@ -202,5 +204,21 @@ public class DatabaseClientConfig {
 	 */
 	public void setBasePath(String basePath) {
 		this.basePath = basePath;
+	}
+
+	/**
+	 * @return
+	 * @since 4.5.0
+	 */
+	public String getSamlToken() {
+		return samlToken;
+	}
+
+	/**
+	 * @param samlToken
+	 * @since 4.5.0
+	 */
+	public void setSamlToken(String samlToken) {
+		this.samlToken = samlToken;
 	}
 }

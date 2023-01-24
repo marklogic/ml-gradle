@@ -20,10 +20,11 @@ java {
 }
 
 repositories {
-	mavenCentral()
+	mavenLocal()
 	maven {
 		url "https://nexus.marklogic.com/repository/maven-snapshots/"
 	}
+	mavenCentral()
 }
 
 // Do not cache changing modules
@@ -36,9 +37,20 @@ configurations.all {
 dependencies {
   implementation gradleApi()
 	implementation localGroovy()
+
+	// Temporarily adding these until ready to release
+	api('com.marklogic:marklogic-client-api:6.1-SNAPSHOT') {
+		changing = true
+	}
+	api('com.marklogic:ml-javaclient-util:4.5-SNAPSHOT') {
+		changing = true
+	}
+
+	// Will update this when ready to release
 	api('com.marklogic:ml-app-deployer:4.5-SNAPSHOT') {
 		changing = true
 	}
+
 	implementation "com.marklogic:mlcp-util:1.0.1"
 	// TODO Will need to update this to 2.6.0 once it's released; the only planned change for this is to bump up the
 	// Java Client to 6.1.0

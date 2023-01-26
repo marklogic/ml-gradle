@@ -1,5 +1,6 @@
 package com.marklogic.mgmt.admin;
 
+import com.marklogic.appdeployer.util.JavaClientUtil;
 import com.marklogic.mgmt.util.PropertySource;
 import com.marklogic.mgmt.util.PropertySourceFactory;
 
@@ -107,6 +108,11 @@ public class DefaultAdminConfigFactory extends PropertySourceFactory implements 
 		    logger.info("Using SSL protocol for Admin app server: " + prop);
 		    config.setSslProtocol(prop);
 	    });
+
+		propertyConsumerMap.put("mlAdminSslHostnameVerifier", (config, prop) -> {
+			logger.info("Admin SSL hostname verifier: " + prop);
+			config.setSslHostnameVerifier(JavaClientUtil.toSSLHostnameVerifier(prop));
+		});
 
 	    propertyConsumerMap.put("mlAdminUseDefaultKeystore", (config, prop) -> {
 		    logger.info("Using default JVM keystore for SSL for Admin app server: " + prop);

@@ -78,7 +78,8 @@ public class RestConfig {
 			.withCertificateFile(getCertFile())
 			.withCertificatePassword(getCertPassword())
 			.withKerberosPrincipal(getExternalName())
-			.withSAMLToken(getSamlToken());
+			.withSAMLToken(getSamlToken())
+			.withSSLHostnameVerifier(getSslHostnameVerifier());
 
 		if (getSslContext() != null) {
 			builder.withSSLContext(getSslContext());

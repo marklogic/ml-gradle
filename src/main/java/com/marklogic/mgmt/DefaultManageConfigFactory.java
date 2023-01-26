@@ -1,5 +1,6 @@
 package com.marklogic.mgmt;
 
+import com.marklogic.appdeployer.util.JavaClientUtil;
 import com.marklogic.mgmt.util.PropertySource;
 import com.marklogic.mgmt.util.PropertySourceFactory;
 import org.springframework.util.StringUtils;
@@ -111,6 +112,11 @@ public class DefaultManageConfigFactory extends PropertySourceFactory implements
 		    logger.info("Using SSL protocol for Manage app server: " + prop);
 		    config.setSslProtocol(prop);
 	    });
+
+		propertyConsumerMap.put("mlManageSslHostnameVerifier", (config, prop) -> {
+			logger.info("Manage SSL hostname verifier: " + prop);
+			config.setSslHostnameVerifier(JavaClientUtil.toSSLHostnameVerifier(prop));
+		});
 
 	    propertyConsumerMap.put("mlManageUseDefaultKeystore", (config, prop) -> {
 	    	logger.info("Using default JVM keystore for SSL for Manage app server: " + prop);

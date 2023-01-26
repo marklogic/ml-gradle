@@ -6,6 +6,7 @@ import com.marklogic.mgmt.util.SimplePropertySource;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DefaultManageConfigFactoryTest  {
@@ -163,6 +164,20 @@ public class DefaultManageConfigFactoryTest  {
 		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
 		assertTrue(bean.getSecurityContext() instanceof DatabaseClientFactory.SAMLAuthContext);
 		assertEquals("my-token", ((DatabaseClientFactory.SAMLAuthContext)bean.getSecurityContext()).getToken());
+	}
+
+	@Test
+	void sslHostnameVerifier() {
+		ManageConfig config = configure("mlManageSslHostnameVerifier", "common");
+		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.COMMON, config.getSslHostnameVerifier());
+
+		config = configure("mlManageSslHostnameVerifier", "ANY");
+		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.ANY, config.getSslHostnameVerifier());
+
+		config = configure("mlManageSslHostnameVerifier", "strICT");
+		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.STRICT, config.getSslHostnameVerifier());
+
+		assertThrows(IllegalArgumentException.class, () -> configure("mlManageSslHostnameVerifier", "bogus"));
 	}
 
 	private ManageConfig configure(String... properties) {

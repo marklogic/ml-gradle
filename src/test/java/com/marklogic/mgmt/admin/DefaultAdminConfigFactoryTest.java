@@ -1,12 +1,14 @@
 package com.marklogic.mgmt.admin;
 
 import com.marklogic.client.DatabaseClientFactory;
+import com.marklogic.mgmt.ManageConfig;
 import com.marklogic.mgmt.util.SimplePropertySource;
 import com.marklogic.rest.util.RestTemplateUtil;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DefaultAdminConfigFactoryTest  {
@@ -121,6 +123,20 @@ public class DefaultAdminConfigFactoryTest  {
 		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
 		assertTrue(bean.getSecurityContext() instanceof DatabaseClientFactory.SAMLAuthContext);
 		assertEquals("my-token", ((DatabaseClientFactory.SAMLAuthContext)bean.getSecurityContext()).getToken());
+	}
+
+	@Test
+	void sslHostnameVerifier() {
+		AdminConfig config = configure("mlAdminSslHostnameVerifier", "common");
+		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.COMMON, config.getSslHostnameVerifier());
+
+		config = configure("mlAdminSslHostnameVerifier", "ANY");
+		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.ANY, config.getSslHostnameVerifier());
+
+		config = configure("mlAdminSslHostnameVerifier", "strICT");
+		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.STRICT, config.getSslHostnameVerifier());
+
+		assertThrows(IllegalArgumentException.class, () -> configure("mlAdminSslHostnameVerifier", "bogus"));
 	}
 
 	private AdminConfig configure(String... properties) {

@@ -1,6 +1,8 @@
 package com.marklogic.appdeployer;
 
+import com.marklogic.appdeployer.util.JavaClientUtil;
 import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.ext.SecurityContextType;
 import com.marklogic.mgmt.util.PropertySource;
 import com.marklogic.mgmt.util.PropertySourceFactory;
@@ -249,6 +251,11 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			config.setAppServicesSslProtocol(prop);
 		});
 
+		propertyConsumerMap.put("mlAppServicesSslHostnameVerifier", (config, prop) -> {
+			logger.info("App-Services SSL hostname verifier: " + prop);
+			config.setAppServicesSslHostnameVerifier(JavaClientUtil.toSSLHostnameVerifier(prop));
+		});
+
 		propertyConsumerMap.put("mlAppServicesUseDefaultKeystore", (config, prop) -> {
 			logger.info("Using default JVM keystore for SSL for App-Services server: " + prop);
 			config.setAppServicesUseDefaultKeystore(Boolean.parseBoolean(prop));
@@ -348,6 +355,11 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		propertyConsumerMap.put("mlRestSslProtocol", (config, prop) -> {
 			logger.info("Using SSL protocol for client REST API server: " + prop);
 			config.setRestSslProtocol(prop);
+		});
+
+		propertyConsumerMap.put("mlRestSslHostnameVerifier", (config, prop) -> {
+			logger.info("REST SSL hostname verifier: " + prop);
+			config.setRestSslHostnameVerifier(JavaClientUtil.toSSLHostnameVerifier(prop));
 		});
 
 		propertyConsumerMap.put("mlRestUseDefaultKeystore", (config, prop) -> {

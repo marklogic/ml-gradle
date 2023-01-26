@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -668,6 +669,31 @@ public class DefaultAppConfigFactoryTest {
 		assertEquals("/rest/path", config.getRestBasePath());
 		assertEquals("/app/path", config.getAppServicesBasePath());
 		assertEquals("/test/path", config.getTestRestBasePath());
+	}
+
+	@Test
+	void sslHostnameVerifier() {
+		AppConfig config = new DefaultAppConfigFactory(new SimplePropertySource(
+			"mlRestSslHostnameVerifier", "any",
+			"mlAppServicesSslHostnameVerifier", "COMmon"
+		)).newAppConfig();
+
+		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.ANY, config.getRestSslHostnameVerifier());
+		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.COMMON, config.getAppServicesSslHostnameVerifier());
+
+		config = new DefaultAppConfigFactory(new SimplePropertySource(
+			"mlRestSslHostnameVerifier", "STRICT",
+			"mlAppServicesSslHostnameVerifier", "ANY"
+		)).newAppConfig();
+
+		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.STRICT, config.getRestSslHostnameVerifier());
+		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.ANY, config.getAppServicesSslHostnameVerifier());
+
+		IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+			new DefaultAppConfigFactory(new SimplePropertySource("mlRestSslHostnameVerifier", "bogus")).newAppConfig());
+		assertEquals("Unable to parse value 'bogus' for property 'mlRestSslHostnameVerifier'; " +
+				"cause: Unrecognized SSLHostnameVerifier type: bogus",
+			ex.getMessage());
 	}
 
 	@Test

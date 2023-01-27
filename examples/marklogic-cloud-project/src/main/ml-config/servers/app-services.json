@@ -1,0 +1,5 @@
+{
+	"server-name": "App-Services",
+	"group-name": "Default",
+	"authentication": "digestbasic"
+}

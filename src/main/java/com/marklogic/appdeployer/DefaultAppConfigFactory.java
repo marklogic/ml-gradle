@@ -309,7 +309,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			config.setRestConnectionType(DatabaseClient.ConnectionType.valueOf(prop));
 		});
 		propertyConsumerMap.put("mlRestAuthentication", (config, prop) -> {
-			logger.info("App REST authentication: " + prop);
+			logger.info("REST authentication: " + prop);
 			config.setRestSecurityContextType(SecurityContextType.valueOf(prop.toUpperCase()));
 		});
 		propertyConsumerMap.put("mlRestCertFile", (config, prop) -> {
@@ -333,6 +333,29 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		propertyConsumerMap.put("mlTestRestBasePath", (config, prop) -> {
 			logger.info("Test REST base path: " + prop);
 			config.setTestRestBasePath(prop);
+		});
+
+		// Need this to be after mlRestAuthentication and mlAppServicesAuthentication are processed so
+		// that it doesn't override those values.
+		propertyConsumerMap.put("mlAuthentication", (config, prop) -> {
+			if (!propertyExists("mlAppServicesAuthentication")) {
+				logger.info("App Services authentication: " + prop);
+				config.setAppServicesSecurityContextType(SecurityContextType.valueOf(prop.toUpperCase()));
+			}
+			if (!propertyExists("mlRestAuthentication")) {
+				logger.info("REST authentication: " + prop);
+				config.setRestSecurityContextType(SecurityContextType.valueOf(prop.toUpperCase()));
+			}
+		});
+		propertyConsumerMap.put("mlSslHostnameVerifier", (config, prop) -> {
+			if (!propertyExists("mlAppServicesSslHostnameVerifier")) {
+				logger.info("App-Services SSL hostname verifier: " + prop);
+				config.setAppServicesSslHostnameVerifier(JavaClientUtil.toSSLHostnameVerifier(prop));
+			}
+			if (!propertyExists("mlRestSslHostnameVerifier")) {
+				logger.info("REST SSL hostname verifier: " + prop);
+				config.setRestSslHostnameVerifier(JavaClientUtil.toSSLHostnameVerifier(prop));
+			}
 		});
 
 		/**

@@ -139,6 +139,30 @@ public class DefaultAdminConfigFactoryTest  {
 		assertThrows(IllegalArgumentException.class, () -> configure("mlAdminSslHostnameVerifier", "bogus"));
 	}
 
+	@Test
+	void mlSslHostnameVerifier() {
+		AdminConfig config = configure("mlSslHostnameVerifier", "any");
+		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.ANY, config.getSslHostnameVerifier());
+
+		config = configure(
+			"mlSslHostnameVerifier", "any",
+			"mlAdminSslHostnameVerifier", "strict"
+		);
+		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.STRICT, config.getSslHostnameVerifier());
+	}
+
+	@Test
+	void mlAuthentication() {
+		AdminConfig config = configure("mlAuthentication", "cloud");
+		assertEquals("cloud", config.getSecurityContextType());
+
+		config = configure(
+			"mlAuthentication", "cloud",
+			"mlAdminAuthentication", "basic"
+		);
+		assertEquals("basic", config.getSecurityContextType());
+	}
+
 	private AdminConfig configure(String... properties) {
 		return new DefaultAdminConfigFactory(new SimplePropertySource(properties)).newAdminConfig();
 	}

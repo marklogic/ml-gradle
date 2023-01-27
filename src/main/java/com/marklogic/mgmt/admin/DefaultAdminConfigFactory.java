@@ -48,6 +48,13 @@ public class DefaultAdminConfigFactory extends PropertySourceFactory implements 
 			config.setSecurityContextType(prop);
 		});
 
+		propertyConsumerMap.put("mlAuthentication", (config, prop) -> {
+			if (!propertyExists("mlAdminAuthentication")) {
+				logger.info("Admin authentication: " + prop);
+				config.setSecurityContextType(prop);
+			}
+		});
+
 	    /**
 	     * The Manage API endpoints in the Admin interface still just require the manage-admin role, so the value of
 	     * mlManageUsername should work for these calls.
@@ -112,6 +119,12 @@ public class DefaultAdminConfigFactory extends PropertySourceFactory implements 
 		propertyConsumerMap.put("mlAdminSslHostnameVerifier", (config, prop) -> {
 			logger.info("Admin SSL hostname verifier: " + prop);
 			config.setSslHostnameVerifier(JavaClientUtil.toSSLHostnameVerifier(prop));
+		});
+		propertyConsumerMap.put("mlSslHostnameVerifier", (config, prop) -> {
+			if (!propertyExists("mlAdminSslHostnameVerifier")) {
+				logger.info("Admin SSL hostname verifier: " + prop);
+				config.setSslHostnameVerifier(JavaClientUtil.toSSLHostnameVerifier(prop));
+			}
 		});
 
 	    propertyConsumerMap.put("mlAdminUseDefaultKeystore", (config, prop) -> {

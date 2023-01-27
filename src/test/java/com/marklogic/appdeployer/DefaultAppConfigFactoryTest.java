@@ -697,6 +697,32 @@ public class DefaultAppConfigFactoryTest {
 	}
 
 	@Test
+	void mlSslHostnameVerifier() {
+		AppConfig config = new DefaultAppConfigFactory(new SimplePropertySource(
+			"mlSslHostnameVerifier", "ANY"
+		)).newAppConfig();
+
+		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.ANY, config.getRestSslHostnameVerifier());
+		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.ANY, config.getAppServicesSslHostnameVerifier());
+
+		config = new DefaultAppConfigFactory(new SimplePropertySource(
+			"mlSslHostnameVerifier", "ANY",
+			"mlRestSslHostnameVerifier", "STRICT"
+		)).newAppConfig();
+
+		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.STRICT, config.getRestSslHostnameVerifier());
+		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.ANY, config.getAppServicesSslHostnameVerifier());
+
+		config = new DefaultAppConfigFactory(new SimplePropertySource(
+			"mlSslHostnameVerifier", "ANY",
+			"mlAppServicesSslHostnameVerifier", "STRICT"
+		)).newAppConfig();
+
+		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.ANY, config.getRestSslHostnameVerifier());
+		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.STRICT, config.getAppServicesSslHostnameVerifier());
+	}
+
+	@Test
 	void samlTokens() {
 		AppConfig config = new DefaultAppConfigFactory(new SimplePropertySource(
 			"mlRestAuthentication", "saml",
@@ -719,5 +745,37 @@ public class DefaultAppConfigFactoryTest {
 		context = config.newAppServicesDatabaseClient("Documents").getSecurityContext();
 		assertTrue(context instanceof DatabaseClientFactory.SAMLAuthContext);
 		assertEquals("my-app-token", ((DatabaseClientFactory.SAMLAuthContext) context).getToken());
+	}
+
+	@Test
+	void mlAuthentication() {
+		AppConfig config = new DefaultAppConfigFactory(new SimplePropertySource(
+			"mlAuthentication", "cloud"
+		)).newAppConfig();
+
+		assertEquals(SecurityContextType.CLOUD, config.getRestSecurityContextType());
+		assertEquals(SecurityContextType.CLOUD, config.getAppServicesSecurityContextType());
+	}
+
+	@Test
+	void mlAuthenticationAndRestOverridden() {
+		AppConfig config = new DefaultAppConfigFactory(new SimplePropertySource(
+			"mlAuthentication", "cloud",
+			"mlRestAuthentication", "basic"
+		)).newAppConfig();
+
+		assertEquals(SecurityContextType.BASIC, config.getRestSecurityContextType());
+		assertEquals(SecurityContextType.CLOUD, config.getAppServicesSecurityContextType());
+	}
+
+	@Test
+	void mlAuthenticationAndAppServicesOverridden() {
+		AppConfig config = new DefaultAppConfigFactory(new SimplePropertySource(
+			"mlAuthentication", "cloud",
+			"mlAppServicesAuthentication", "saml"
+		)).newAppConfig();
+
+		assertEquals(SecurityContextType.CLOUD, config.getRestSecurityContextType());
+		assertEquals(SecurityContextType.SAML, config.getAppServicesSecurityContextType());
 	}
 }

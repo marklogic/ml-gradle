@@ -49,7 +49,14 @@ public class DefaultManageConfigFactory extends PropertySourceFactory implements
 			config.setSecurityContextType(prop);
 		});
 
-	    propertyConsumerMap.put("mlManageUsername", (config, prop) -> {
+		propertyConsumerMap.put("mlAuthentication", (config, prop) -> {
+			if (!propertyExists("mlManageAuthentication")) {
+				logger.info("Manage authentication: " + prop);
+				config.setSecurityContextType(prop);
+			}
+		});
+
+		propertyConsumerMap.put("mlManageUsername", (config, prop) -> {
 		    logger.info("Manage username: " + prop);
 		    config.setUsername(prop);
 	    });
@@ -116,6 +123,12 @@ public class DefaultManageConfigFactory extends PropertySourceFactory implements
 		propertyConsumerMap.put("mlManageSslHostnameVerifier", (config, prop) -> {
 			logger.info("Manage SSL hostname verifier: " + prop);
 			config.setSslHostnameVerifier(JavaClientUtil.toSSLHostnameVerifier(prop));
+		});
+		propertyConsumerMap.put("mlSslHostnameVerifier", (config, prop) -> {
+			if (!propertyExists("mlManageSslHostnameVerifier")) {
+				logger.info("Manage SSL hostname verifier: " + prop);
+				config.setSslHostnameVerifier(JavaClientUtil.toSSLHostnameVerifier(prop));
+			}
 		});
 
 	    propertyConsumerMap.put("mlManageUseDefaultKeystore", (config, prop) -> {

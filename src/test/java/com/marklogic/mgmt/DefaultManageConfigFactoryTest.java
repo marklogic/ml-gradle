@@ -180,6 +180,30 @@ public class DefaultManageConfigFactoryTest  {
 		assertThrows(IllegalArgumentException.class, () -> configure("mlManageSslHostnameVerifier", "bogus"));
 	}
 
+	@Test
+	void mlSslHostnameVerifier() {
+		ManageConfig config = configure("mlSslHostnameVerifier", "any");
+		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.ANY, config.getSslHostnameVerifier());
+
+		config = configure(
+			"mlSslHostnameVerifier", "any",
+			"mlManageSslHostnameVerifier", "strict"
+		);
+		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.STRICT, config.getSslHostnameVerifier());
+	}
+
+	@Test
+	void mlAuthentication() {
+		ManageConfig config = configure("mlAuthentication", "cloud");
+		assertEquals("cloud", config.getSecurityContextType());
+
+		config = configure(
+			"mlAuthentication", "cloud",
+			"mlManageAuthentication", "basic"
+		);
+		assertEquals("basic", config.getSecurityContextType());
+	}
+
 	private ManageConfig configure(String... properties) {
 		return new DefaultManageConfigFactory(new SimplePropertySource(properties)).newManageConfig();
 	}

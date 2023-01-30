@@ -1,0 +1,5 @@
+{
+	"server-name": "Admin",
+	"group-name": "Default",
+	"authentication": "digestbasic"
+}

@@ -1,0 +1,18 @@
+buildscript {
+  repositories {
+	  mavenLocal()
+		maven {
+			url "https://nexus.marklogic.com/repository/maven-snapshots/"
+		}
+		mavenCentral()
+  }
+  dependencies {
+    classpath "com.marklogic:ml-gradle:${mlGradleVersion}"
+  }
+}
+
+plugins {
+	id "net.saliman.properties" version "1.5.1"
+}
+
+apply plugin: "com.marklogic.ml-gradle"

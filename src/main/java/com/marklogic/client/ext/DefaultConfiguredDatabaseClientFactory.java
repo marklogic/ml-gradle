@@ -36,7 +36,7 @@ public class DefaultConfiguredDatabaseClientFactory implements ConfiguredDatabas
 			.withSSLHostnameVerifier(config.getSslHostnameVerifier());
 
 		if (config.getSecurityContextType() != null) {
-			builder.withSecurityContextType(config.getSecurityContextType().name());
+			builder.withAuthType(config.getSecurityContextType().name());
 		}
 
 		SslConfig sslConfig = determineSslConfig(config);

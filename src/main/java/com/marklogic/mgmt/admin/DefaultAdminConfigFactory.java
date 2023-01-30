@@ -3,6 +3,7 @@ package com.marklogic.mgmt.admin;
 import com.marklogic.appdeployer.util.JavaClientUtil;
 import com.marklogic.mgmt.util.PropertySource;
 import com.marklogic.mgmt.util.PropertySourceFactory;
+import org.springframework.util.StringUtils;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -96,9 +97,16 @@ public class DefaultAdminConfigFactory extends PropertySourceFactory implements 
 			config.setSamlToken(prop);
 		});
 
+		propertyConsumerMap.put("mlCloudBasePath", (config, prop) -> {
+			String defaultAdminPath = prop + "/admin";
+			logger.info("Admin base path: " + defaultAdminPath);
+			config.setBasePath(defaultAdminPath);
+		});
 		propertyConsumerMap.put("mlAdminBasePath", (config, prop) -> {
-			logger.info("Admin base path: " + prop);
-			config.setBasePath(prop);
+			String cloudBasePath = getProperty("mlCloudBasePath");
+			String adminPath = StringUtils.hasText(cloudBasePath) ? cloudBasePath + prop : prop;
+			logger.info("Admin base path: " + adminPath);
+			config.setBasePath(adminPath);
 		});
 
 		propertyConsumerMap.put("mlAdminScheme", (config, prop) -> {

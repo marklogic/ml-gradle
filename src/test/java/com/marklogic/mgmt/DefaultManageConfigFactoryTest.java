@@ -204,6 +204,42 @@ public class DefaultManageConfigFactoryTest  {
 		assertEquals("basic", config.getSecurityContextType());
 	}
 
+	@Test
+	void mlManageBasePath() {
+		ManageConfig config = configure(
+			"mlManageBasePath", "/my/custom/manage/path"
+		);
+		assertEquals("/my/custom/manage/path", config.getBasePath(),
+			"If a user only specifies mlManageBasePath, then the assumption is that they're using a reverse proxy and " +
+				"have defined their own custom path for the Manage app server. They could be using ML Cloud, but " +
+				"that's not likely as it would make more sense to still define mlCloudBasePath and then set " +
+				"mlManageBasePath to the custom Manage part (as a user is not allowed to setup a base path in ML Cloud " +
+				"that doesn't begin with their common base path).");
+	}
+
+	@Test
+	void mlCloudBasePath() {
+		ManageConfig config = configure(
+			"mlCloudBasePath", "/my/domain"
+		);
+		assertEquals("/my/domain/manage", config.getBasePath(),
+			"If a user only specifies mlCloudBasePath, then the assumption is that they're good to go with the default " +
+				"Manage base path setup in ML Cloud, and so they only need to define the 'cloud base path' that occurs " +
+				"before '/manage'");
+	}
+
+	@Test
+	void mlCloudBasePathWithManageBasePath() {
+		ManageConfig config = configure(
+			"mlCloudBasePath", "/my/domain",
+			"mlManageBasePath", "/my-custom-manage-path"
+		);
+		assertEquals("/my/domain/my-custom-manage-path", config.getBasePath(),
+			"If a user specifies both mlCloudBasePath and mlManageBasePath, then the assumption is that they've " +
+				"changed the default Manage base path but it still begins with the common base path defined by " +
+				"mlCloudBasePath.");
+	}
+
 	private ManageConfig configure(String... properties) {
 		return new DefaultManageConfigFactory(new SimplePropertySource(properties)).newManageConfig();
 	}

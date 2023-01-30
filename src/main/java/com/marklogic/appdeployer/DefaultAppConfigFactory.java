@@ -266,9 +266,16 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			config.setAppServicesTrustManagementAlgorithm(prop);
 		});
 
+		propertyConsumerMap.put("mlCloudBasePath", (config, prop) -> {
+			String defaultPath = prop + "/app-services";
+			logger.info("App-Services base path: " + defaultPath);
+			config.setAppServicesBasePath(defaultPath);
+		});
 		propertyConsumerMap.put("mlAppServicesBasePath", (config, prop) -> {
-			logger.info("App-Services base path: " + prop);
-			config.setAppServicesBasePath(prop);
+			String cloudBasePath = getProperty("mlCloudBasePath");
+			String appServicesPath = StringUtils.hasText(cloudBasePath) ? cloudBasePath + prop : prop;
+			logger.info("App-Services base path: " + appServicesPath);
+			config.setAppServicesBasePath(appServicesPath);
 		});
 
 		/**
@@ -327,12 +334,16 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			config.setRestSamlToken(prop);
 		});
 		propertyConsumerMap.put("mlRestBasePath", (config, prop) -> {
-			logger.info("REST base path: " + prop);
-			config.setRestBasePath(prop);
+			String cloudBasePath = getProperty("mlCloudBasePath");
+			String restPath = StringUtils.hasText(cloudBasePath) ? cloudBasePath + prop : prop;
+			logger.info("REST base path: " + restPath);
+			config.setRestBasePath(restPath);
 		});
 		propertyConsumerMap.put("mlTestRestBasePath", (config, prop) -> {
-			logger.info("Test REST base path: " + prop);
-			config.setTestRestBasePath(prop);
+			String cloudBasePath = getProperty("mlCloudBasePath");
+			String testRestPath = StringUtils.hasText(cloudBasePath) ? cloudBasePath + prop : prop;
+			logger.info("Test REST base path: " + testRestPath);
+			config.setTestRestBasePath(testRestPath);
 		});
 
 		// Need this to be after mlRestAuthentication and mlAppServicesAuthentication are processed so

@@ -46,13 +46,13 @@ public class DefaultAdminConfigFactory extends PropertySourceFactory implements 
 
 		propertyConsumerMap.put("mlAdminAuthentication", (config, prop) -> {
 			logger.info("Admin authentication: " + prop);
-			config.setSecurityContextType(prop);
+			config.setAuthType(prop);
 		});
 
 		propertyConsumerMap.put("mlAuthentication", (config, prop) -> {
 			if (!propertyExists("mlAdminAuthentication")) {
 				logger.info("Admin authentication: " + prop);
-				config.setSecurityContextType(prop);
+				config.setAuthType(prop);
 			}
 		});
 

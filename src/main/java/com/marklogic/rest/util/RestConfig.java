@@ -17,7 +17,7 @@ public class RestConfig {
 	private String host;
 	private int port;
 	// Defaulting this for backwards-compatibility reasons in 4.5.0
-	private String securityContextType = "digest";
+	private String authType = "digest";
 	private String username;
 	private String password;
 	private String cloudApiKey;
@@ -71,7 +71,7 @@ public class RestConfig {
 			.withHost(getHost())
 			.withPort(getPort())
 			.withBasePath(getBasePath())
-			.withSecurityContextType(getSecurityContextType())
+			.withAuthType(getAuthType())
 			.withUsername(getUsername())
 			.withPassword(getPassword())
 			.withCloudApiKey(getCloudApiKey())
@@ -258,12 +258,12 @@ public class RestConfig {
 		this.basePath = basePath;
 	}
 
-	public String getSecurityContextType() {
-		return securityContextType;
+	public String getAuthType() {
+		return authType;
 	}
 
-	public void setSecurityContextType(String securityContextType) {
-		this.securityContextType = securityContextType;
+	public void setAuthType(String authType) {
+		this.authType = authType;
 	}
 
 	public String getCertFile() {

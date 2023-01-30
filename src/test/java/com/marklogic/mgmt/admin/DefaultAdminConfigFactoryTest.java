@@ -163,6 +163,42 @@ public class DefaultAdminConfigFactoryTest  {
 		assertEquals("basic", config.getSecurityContextType());
 	}
 
+	@Test
+	void mlAdminBasePath() {
+		AdminConfig config = configure(
+			"mlAdminBasePath", "/my/custom/admin/path"
+		);
+		assertEquals("/my/custom/admin/path", config.getBasePath(),
+			"If a user only specifies mlAdminBasePath, then the assumption is that they're using a reverse proxy and " +
+				"have defined their own custom path for the Admin app server. They could be using ML Cloud, but " +
+				"that's not likely as it would make more sense to still define mlCloudBasePath and then set " +
+				"mlAdminBasePath to the custom Admin part (as a user is not allowed to setup a base path in ML Cloud " +
+				"that doesn't begin with their common base path).");
+	}
+
+	@Test
+	void mlCloudBasePath() {
+		AdminConfig config = configure(
+			"mlCloudBasePath", "/my/domain"
+		);
+		assertEquals("/my/domain/admin", config.getBasePath(),
+			"If a user only specifies mlCloudBasePath, then the assumption is that they're good to go with the default " +
+				"Admin base path setup in ML Cloud, and so they only need to define the 'cloud base path' that occurs " +
+				"before '/admin'");
+	}
+
+	@Test
+	void mlCloudBasePathWithAdminBasePath() {
+		AdminConfig config = configure(
+			"mlCloudBasePath", "/my/domain",
+			"mlAdminBasePath", "/my-custom-admin-path"
+		);
+		assertEquals("/my/domain/my-custom-admin-path", config.getBasePath(),
+			"If a user specifies both mlCloudBasePath and mlAdminBasePath, then the assumption is that they've " +
+				"changed the default Admin base path but it still begins with the common base path defined by " +
+				"mlCloudBasePath.");
+	}
+
 	private AdminConfig configure(String... properties) {
 		return new DefaultAdminConfigFactory(new SimplePropertySource(properties)).newAdminConfig();
 	}

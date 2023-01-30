@@ -4,6 +4,8 @@ import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.ext.SecurityContextType;
 import com.marklogic.client.ext.modulesloader.impl.PropertiesModuleManager;
+import com.marklogic.mgmt.DefaultManageConfigFactory;
+import com.marklogic.mgmt.ManageConfig;
 import com.marklogic.mgmt.util.SimplePropertySource;
 import org.junit.jupiter.api.Test;
 
@@ -566,9 +568,7 @@ public class DefaultAppConfigFactoryTest {
 
 	@Test
 	public void mlUsernameAndPassword() {
-		sut = new DefaultAppConfigFactory(
-			new SimplePropertySource("mlUsername", "customuser", "mlPassword", "custompassword"));
-		AppConfig config = sut.newAppConfig();
+		AppConfig config = configure("mlUsername", "customuser", "mlPassword", "custompassword");
 
 		assertEquals("customuser", config.getRestAdminUsername(),
 			"When mlRestAdminUsername is not set, mlUsername should be used");
@@ -581,8 +581,7 @@ public class DefaultAppConfigFactoryTest {
 
 	@Test
 	public void dontModifySetOfDatabasesWithForestsOnOneHostIfItsBeenConfigured() {
-		sut = new DefaultAppConfigFactory(new SimplePropertySource("mlAppName", "example", "mlDatabasesWithForestsOnOneHost", "db1,db2"));
-		AppConfig config = sut.newAppConfig();
+		AppConfig config = configure("mlAppName", "example", "mlDatabasesWithForestsOnOneHost", "db1,db2");
 
 		Set<String> set = config.getDatabasesWithForestsOnOneHost();
 		assertEquals(2, set.size());
@@ -596,16 +595,16 @@ public class DefaultAppConfigFactoryTest {
 
 	@Test
 	public void appServicesSimpleSsl() {
-		AppConfig config = new DefaultAppConfigFactory(new SimplePropertySource("mlAppServicesSimpleSsl", "true")).newAppConfig();
+		AppConfig config = configure("mlAppServicesSimpleSsl", "true");
 		assertEquals("TLSv1.2", config.getAppServicesSslContext().getProtocol());
 
-		config = new DefaultAppConfigFactory(new SimplePropertySource("mlAppServicesSimpleSsl", "TLSv1.2")).newAppConfig();
+		config = configure("mlAppServicesSimpleSsl", "TLSv1.2");
 		assertEquals("TLSv1.2", config.getAppServicesSslContext().getProtocol());
 
-		config = new DefaultAppConfigFactory(new SimplePropertySource("mlAppServicesSimpleSsl", "TLSv1.1")).newAppConfig();
+		config = configure("mlAppServicesSimpleSsl", "TLSv1.1");
 		assertEquals("TLSv1.1", config.getAppServicesSslContext().getProtocol());
 
-		config = new DefaultAppConfigFactory(new SimplePropertySource("mlAppServicesSimpleSsl", "false")).newAppConfig();
+		config = configure("mlAppServicesSimpleSsl", "false");
 		assertNull(config.getAppServicesSslContext());
 
 		config = new DefaultAppConfigFactory(new SimplePropertySource()).newAppConfig();
@@ -614,16 +613,16 @@ public class DefaultAppConfigFactoryTest {
 
 	@Test
 	public void restSimpleSsl() {
-		AppConfig config = new DefaultAppConfigFactory(new SimplePropertySource("mlSimpleSsl", "true")).newAppConfig();
+		AppConfig config = configure("mlSimpleSsl", "true");
 		assertEquals("TLSv1.2", config.getRestSslContext().getProtocol());
 
-		config = new DefaultAppConfigFactory(new SimplePropertySource("mlSimpleSsl", "TLSv1.2")).newAppConfig();
+		config = configure("mlSimpleSsl", "TLSv1.2");
 		assertEquals("TLSv1.2", config.getRestSslContext().getProtocol());
 
-		config = new DefaultAppConfigFactory(new SimplePropertySource("mlSimpleSsl", "TLSv1.1")).newAppConfig();
+		config = configure("mlSimpleSsl", "TLSv1.1");
 		assertEquals("TLSv1.1", config.getRestSslContext().getProtocol());
 
-		config = new DefaultAppConfigFactory(new SimplePropertySource("mlSimpleSsl", "false")).newAppConfig();
+		config = configure("mlSimpleSsl", "false");
 		assertNull(config.getRestSslContext());
 
 		config = new DefaultAppConfigFactory(new SimplePropertySource()).newAppConfig();
@@ -632,11 +631,11 @@ public class DefaultAppConfigFactoryTest {
 
 	@Test
 	public void restUseDefaultKeystore() {
-		AppConfig config = new DefaultAppConfigFactory(new SimplePropertySource(
+		AppConfig config = configure(
 			"mlRestUseDefaultKeystore", "true",
 			"mlRestSslProtocol", "SSLv3",
 			"mlRestTrustManagementAlgorithm", "PKIX"
-		)).newAppConfig();
+		);
 
 		assertTrue(config.isRestUseDefaultKeystore());
 		assertEquals("SSLv3", config.getRestSslProtocol());
@@ -645,11 +644,11 @@ public class DefaultAppConfigFactoryTest {
 
 	@Test
 	public void appServicesUseDefaultKeystore() {
-		AppConfig config = new DefaultAppConfigFactory(new SimplePropertySource(
+		AppConfig config = configure(
 			"mlAppServicesUseDefaultKeystore", "true",
 			"mlAppServicesSslProtocol", "SSLv3",
 			"mlAppServicesTrustManagementAlgorithm", "PKIX"
-		)).newAppConfig();
+		);
 
 		assertTrue(config.isAppServicesUseDefaultKeystore());
 		assertEquals("SSLv3", config.getAppServicesSslProtocol());
@@ -658,12 +657,12 @@ public class DefaultAppConfigFactoryTest {
 
 	@Test
 	void cloudApiKeyAndBasePath() {
-		AppConfig config = new DefaultAppConfigFactory(new SimplePropertySource(
+		AppConfig config = configure(
 			"mlCloudApiKey", "my-key",
 			"mlRestBasePath", "/rest/path",
 			"mlAppServicesBasePath", "/app/path",
 			"mlTestRestBasePath", "/test/path"
-		)).newAppConfig();
+		);
 
 		assertEquals("my-key", config.getCloudApiKey());
 		assertEquals("/rest/path", config.getRestBasePath());
@@ -673,10 +672,10 @@ public class DefaultAppConfigFactoryTest {
 
 	@Test
 	void sslHostnameVerifier() {
-		AppConfig config = new DefaultAppConfigFactory(new SimplePropertySource(
+		AppConfig config = configure(
 			"mlRestSslHostnameVerifier", "any",
 			"mlAppServicesSslHostnameVerifier", "COMmon"
-		)).newAppConfig();
+		);
 
 		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.ANY, config.getRestSslHostnameVerifier());
 		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.COMMON, config.getAppServicesSslHostnameVerifier());
@@ -698,25 +697,25 @@ public class DefaultAppConfigFactoryTest {
 
 	@Test
 	void mlSslHostnameVerifier() {
-		AppConfig config = new DefaultAppConfigFactory(new SimplePropertySource(
+		AppConfig config = configure(
 			"mlSslHostnameVerifier", "ANY"
-		)).newAppConfig();
+		);
 
 		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.ANY, config.getRestSslHostnameVerifier());
 		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.ANY, config.getAppServicesSslHostnameVerifier());
 
-		config = new DefaultAppConfigFactory(new SimplePropertySource(
+		config = configure(
 			"mlSslHostnameVerifier", "ANY",
 			"mlRestSslHostnameVerifier", "STRICT"
-		)).newAppConfig();
+		);
 
 		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.STRICT, config.getRestSslHostnameVerifier());
 		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.ANY, config.getAppServicesSslHostnameVerifier());
 
-		config = new DefaultAppConfigFactory(new SimplePropertySource(
+		config = configure(
 			"mlSslHostnameVerifier", "ANY",
 			"mlAppServicesSslHostnameVerifier", "STRICT"
-		)).newAppConfig();
+		);
 
 		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.ANY, config.getRestSslHostnameVerifier());
 		assertEquals(DatabaseClientFactory.SSLHostnameVerifier.STRICT, config.getAppServicesSslHostnameVerifier());
@@ -724,12 +723,12 @@ public class DefaultAppConfigFactoryTest {
 
 	@Test
 	void samlTokens() {
-		AppConfig config = new DefaultAppConfigFactory(new SimplePropertySource(
+		AppConfig config = configure(
 			"mlRestAuthentication", "saml",
 			"mlRestSamlToken", "my-rest-token",
 			"mlAppServicesAuthentication", "saml",
 			"mlAppServicesSamlToken", "my-app-token"
-		)).newAppConfig();
+		);
 
 		assertEquals(SecurityContextType.SAML, config.getRestSecurityContextType());
 		assertEquals("my-rest-token", config.getRestSamlToken());
@@ -749,9 +748,9 @@ public class DefaultAppConfigFactoryTest {
 
 	@Test
 	void mlAuthentication() {
-		AppConfig config = new DefaultAppConfigFactory(new SimplePropertySource(
+		AppConfig config = configure(
 			"mlAuthentication", "cloud"
-		)).newAppConfig();
+		);
 
 		assertEquals(SecurityContextType.CLOUD, config.getRestSecurityContextType());
 		assertEquals(SecurityContextType.CLOUD, config.getAppServicesSecurityContextType());
@@ -759,10 +758,10 @@ public class DefaultAppConfigFactoryTest {
 
 	@Test
 	void mlAuthenticationAndRestOverridden() {
-		AppConfig config = new DefaultAppConfigFactory(new SimplePropertySource(
+		AppConfig config = configure(
 			"mlAuthentication", "cloud",
 			"mlRestAuthentication", "basic"
-		)).newAppConfig();
+		);
 
 		assertEquals(SecurityContextType.BASIC, config.getRestSecurityContextType());
 		assertEquals(SecurityContextType.CLOUD, config.getAppServicesSecurityContextType());
@@ -770,12 +769,68 @@ public class DefaultAppConfigFactoryTest {
 
 	@Test
 	void mlAuthenticationAndAppServicesOverridden() {
-		AppConfig config = new DefaultAppConfigFactory(new SimplePropertySource(
+		AppConfig config = configure(
 			"mlAuthentication", "cloud",
 			"mlAppServicesAuthentication", "saml"
-		)).newAppConfig();
+		);
 
 		assertEquals(SecurityContextType.CLOUD, config.getRestSecurityContextType());
 		assertEquals(SecurityContextType.SAML, config.getAppServicesSecurityContextType());
+	}
+
+	@Test
+	void mlAppServicesBasePath() {
+		AppConfig config = configure(
+			"mlAppServicesBasePath", "/my/custom/app-services/path"
+		);
+		assertEquals("/my/custom/app-services/path", config.getAppServicesBasePath(),
+			"If a user only specifies mlAppServicesBasePath, then the assumption is that they're using a reverse proxy and " +
+				"have defined their own custom path for the App-Services app server. They could be using ML Cloud, but " +
+				"that's not likely as it would make more sense to still define mlCloudBasePath and then set " +
+				"mlAppServicesBasePath to the custom App-Services part (as a user is not allowed to setup a base path in ML Cloud " +
+				"that doesn't begin with their common base path).");
+	}
+
+	@Test
+	void mlCloudBasePath() {
+		AppConfig config = configure(
+			"mlCloudBasePath", "/my/domain"
+		);
+		assertEquals("/my/domain/app-services", config.getAppServicesBasePath(),
+			"If a user only specifies mlCloudBasePath, then the assumption is that they're good to go with the default " +
+				"App-Services base path setup in ML Cloud, and so they only need to define the 'cloud base path' that occurs " +
+				"before '/app-services'");
+
+		String message = "mlCloudBasePath only sets default values for the Admin, Manage, and " +
+			"App-Services servers; it's up to the user to define the base path for their custom REST server";
+		assertNull(config.getRestBasePath(), message);
+		assertNull(config.getTestRestBasePath(), message);
+	}
+
+	@Test
+	void mlCloudBasePathWithAppServicesBasePath() {
+		AppConfig config = configure(
+			"mlCloudBasePath", "/my/domain",
+			"mlAppServicesBasePath", "/my-custom-app-services-path"
+		);
+		assertEquals("/my/domain/my-custom-app-services-path", config.getAppServicesBasePath(),
+			"If a user specifies both mlCloudBasePath and mlAppServicesBasePath, then the assumption is that they've " +
+				"changed the default App-Services base path but it still begins with the common base path defined by " +
+				"mlCloudBasePath.");
+	}
+
+	@Test
+	void mlCloudBasePathAndMlRestBasePath() {
+		AppConfig config = configure(
+			"mlCloudBasePath", "/my/domain",
+			"mlRestBasePath", "/my/rest/server",
+			"mlTestRestBasePath", "/my/test/server"
+		);
+		assertEquals("/my/domain/my/rest/server", config.getRestBasePath());
+		assertEquals("/my/domain/my/test/server", config.getTestRestBasePath());
+	}
+
+	private AppConfig configure(String... properties) {
+		return new DefaultAppConfigFactory(new SimplePropertySource(properties)).newAppConfig();
 	}
 }

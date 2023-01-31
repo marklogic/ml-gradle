@@ -7,7 +7,6 @@ buildscript {
 		} else {
 			println "Using online buildscript dependency repositories"
 			mavenCentral()
-			maven { url "http://developer.marklogic.com/maven2/" }
 		}
 	}
 }
@@ -26,7 +25,6 @@ repositories {
 	} else {
 		println "Using online dependency repositories"
 		mavenCentral()
-		maven { url "http://developer.marklogic.com/maven2/" }
 	}
 }
 
@@ -35,9 +33,6 @@ configurations {
 }
 
 dependencies {
-	// sample java compile dependency. Remove if not required
-	compile 'com.marklogic:marklogic-xcc:10.0.7'
-
 	//sample mlcp dependency. Remove if not required
 	mlcp "com.marklogic:mlcp:10.0.6.2"
 }
@@ -60,9 +55,8 @@ task downloadToProjectMavenRepo(type: Copy) {
 	/*
 	 * Include any configuration dependencies here that you want to copy the dependencies for.
 	 * These are defined in the 'dependencies' block. E.g. you need to include
-	 * configurations.compile.files if you want your java 'compile' dependencies downloaded
+	 * configurations.implementation.files if you want your java 'implementation' dependencies downloaded
 	 */
-	configurations.compile.files //includes 'java' compile dependencies. Remove if not needed
 	configurations.mlcp.files //includes 'mlcp' dependencies. Remove if not needed
 
 	from new File(gradle.gradleUserHomeDir, 'caches/modules-2/files-2.1') // correct as of gradle 4.7

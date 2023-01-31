@@ -1,15 +1,9 @@
 plugins {
-  id "com.marklogic.ml-gradle" version "3.6.0"
+  id "com.marklogic.ml-gradle" version "4.4.0"
 }
 
 ext {
     mlAppConfig {
         modulesDatabaseName = "Modules"
     }
-
-    // Gotta tell ml-gradle not to delete the modules database when we undeploy this
-    mlAppDeployer.getCommand("DeployRestApiServersCommand").setDeleteModulesDatabase(false)
-
-    // Here's an example of not creating a REST API server at all - just remove the command
-    //mlAppDeployer.getCommands().remove(mlAppDeployer.getCommand("DeployRestApiServersCommand"))
 }

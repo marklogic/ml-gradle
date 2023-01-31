@@ -30,11 +30,12 @@ public class ManageClient extends LoggingObject {
 	private RestTemplate securityUserRestTemplate;
 	private PayloadParser payloadParser;
 
-    /**
-     * Can use this constructor when the default values in ManageConfig will work.
-     */
+	/**
+	 * Creates an uninitialized instance that requires a {@code ManageConfig} to be provided in order to be operable.
+	 *
+	 * @deprecated since 4.5.0; will be removed in 5.0.0
+	 */
     public ManageClient() {
-        this(new ManageConfig());
     }
 
     public ManageClient(ManageConfig config) {
@@ -266,23 +267,27 @@ public class ManageClient extends LoggingObject {
 
     protected void logRequest(String path, String contentType, String method) {
         if (logger.isInfoEnabled()) {
-        	String username = manageConfig != null ? manageConfig.getUsername() : "(unknown)";
-            logger.info(String.format("Sending %s %s request as user '%s' to path: %s", contentType, method, username, buildUri(path)));
+        	String username = manageConfig != null ?
+				String.format("as user '%s' ", manageConfig.getUsername()) : "";
+            logger.info("Sending {} {} request {}to path: {}", contentType, method, username, buildUri(path));
         }
     }
 
     protected void logSecurityUserRequest(String path, String contentType, String method) {
         if (logger.isInfoEnabled()) {
-            logger.info(String.format("Sending %s %s request as user '%s' (who should have the 'manage-admin' and 'security' roles) to path: %s",
-	            contentType, method, determineUsernameForSecurityUserRequest(), buildUri(path)));
+			String username = determineUsernameForSecurityUserRequest();
+			if (!"".equals(username)) {
+				username = String.format("as user '%s' (who should have the 'manage-admin' and 'security' roles) ", username);
+			}
+            logger.info("Sending {} {} request {}to path: {}", contentType, method, username, buildUri(path));
         }
     }
 
     protected String determineUsernameForSecurityUserRequest() {
-	    String username = "(unknown)";
+	    String username = "";
 	    if (manageConfig != null) {
 		    username = manageConfig.getSecurityUsername();
-		    if (StringUtils.isEmpty(username)) {
+		    if (!StringUtils.hasText(username)) {
 			    username = manageConfig.getUsername();
 		    }
 	    }

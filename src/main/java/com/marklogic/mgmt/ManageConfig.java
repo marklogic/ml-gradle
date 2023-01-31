@@ -16,10 +16,15 @@ import javax.net.ssl.SSLContext;
 public class ManageConfig extends RestConfig {
 
 	/**
-	 * These are assumed as sensible defaults in a development environment, where teams often use admin/admin for the
-	 * admin login. They are of course expected to change in a real environment.
+	 * @deprecated since 4.5.0; will be removed in 5.0.0
 	 */
+	@Deprecated
 	public static final String DEFAULT_USERNAME = "admin";
+
+	/**
+	 * @deprecated since 4.5.0; will be removed in 5.0.0
+	 */
+	@Deprecated
 	public static final String DEFAULT_PASSWORD = "admin";
 
 	private String securityUsername;
@@ -27,12 +32,21 @@ public class ManageConfig extends RestConfig {
 	private SSLContext securitySslContext;
 	private boolean cleanJsonPayloads = false;
 
+	/**
+	 * Assumes the use of "localhost" and 8002 as the host and port.
+	 */
 	public ManageConfig() {
-		this("localhost", DEFAULT_PASSWORD);
+		this("localhost", null);
 	}
 
+	/**
+	 * Assumes the use of 8002 as the port.
+	 *
+	 * @param host
+	 * @param password
+	 */
 	public ManageConfig(String host, String password) {
-		super(host, 8002, DEFAULT_USERNAME, password);
+		super(host, 8002, null, password);
 	}
 
 	public ManageConfig(String host, int port, String username, String password) {

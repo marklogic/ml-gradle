@@ -7,10 +7,9 @@ public class ManageClientTest  {
 
 	@Test
 	public void determineUsernameForSecurityUserRequest() {
-		ManageConfig config = new ManageConfig();
+		ManageConfig config = new ManageConfig("localhost", 8002, "someone", "someword");
 		config.setSecurityUsername("admin");
 		config.setSecurityPassword("admin");
-		config.setUsername("someone");
 
 		ManageClient client = new ManageClient(config);
 		assertEquals("admin", client.determineUsernameForSecurityUserRequest());

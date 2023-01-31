@@ -64,10 +64,15 @@ public class AppConfig {
 	private String name = DEFAULT_APP_NAME;
 
 	/**
-	 * These are assumed as sensible defaults in a development environment, where teams often use admin/admin for the
-	 * admin login. They are of course expected to change in a real environment.
+	 * @deprecated since 4.5.0; will be removed in 5.0.0
 	 */
+	@Deprecated
 	public static final String DEFAULT_USERNAME = "admin";
+
+	/**
+	 * @deprecated since 4.5.0; will be removed in 5.0.0
+	 */
+	@Deprecated
 	public static final String DEFAULT_PASSWORD = "admin";
 
 	private String host = DEFAULT_HOST;
@@ -87,8 +92,8 @@ public class AppConfig {
 	// Connection info for using the client REST API - e.g. to load modules
 	private DatabaseClient.ConnectionType restConnectionType;
 	private SecurityContextType restSecurityContextType = SecurityContextType.DIGEST;
-	private String restAdminUsername = DEFAULT_USERNAME;
-	private String restAdminPassword = DEFAULT_PASSWORD;
+	private String restAdminUsername;
+	private String restAdminPassword;
 	private SSLContext restSslContext;
 	private SSLHostnameVerifier restSslHostnameVerifier;
 	private String restCertFile;
@@ -108,8 +113,8 @@ public class AppConfig {
 	// Connection info for using the App Services client REST API - e.g. to load non-REST API modules
 	private DatabaseClient.ConnectionType appServicesConnectionType;
 	private SecurityContextType appServicesSecurityContextType = SecurityContextType.DIGEST;
-	private String appServicesUsername = DEFAULT_USERNAME;
-	private String appServicesPassword = DEFAULT_PASSWORD;
+	private String appServicesUsername;
+	private String appServicesPassword;
 	private Integer appServicesPort = 8000;
 	private SSLContext appServicesSslContext;
 	private SSLHostnameVerifier appServicesSslHostnameVerifier;

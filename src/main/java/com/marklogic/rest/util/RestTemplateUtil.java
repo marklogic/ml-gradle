@@ -64,10 +64,15 @@ public class RestTemplateUtil {
 	 * @return
 	 */
 	public static RestTemplate newRestTemplate(RestConfig config) {
-		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
-		OkHttpClient client = OkHttpClientBuilderFactory
-			.newOkHttpClientBuilder(bean.getHost(), bean.getSecurityContext())
-			.build();
+		OkHttpClient client;
+		try {
+			DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
+			client = OkHttpClientBuilderFactory
+				.newOkHttpClientBuilder(bean.getHost(), bean.getSecurityContext())
+				.build();
+		} catch (RuntimeException ex) {
+			throw new RuntimeException(String.format("Unable to connect to the MarkLogic app server at %s; cause: %s", config.toString(), ex.getMessage()));
+		}
 
 		RestTemplate rt = new RestTemplate(new OkHttp3ClientHttpRequestFactory(client));
 		rt.setErrorHandler(new MgmtResponseErrorHandler());

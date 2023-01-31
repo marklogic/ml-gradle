@@ -62,11 +62,6 @@ public class ManageConfig extends RestConfig {
 		this.securitySslContext = other.securitySslContext;
 		this.cleanJsonPayloads = other.cleanJsonPayloads;
 	}
-	@Override
-	public String toString() {
-		return String.format("[ManageConfig host: %s, port: %d, username: %s, security username: %s]", getHost(),
-			getPort(), getUsername(), getSecurityUsername());
-	}
 
 	public boolean isCleanJsonPayloads() {
 		return cleanJsonPayloads;

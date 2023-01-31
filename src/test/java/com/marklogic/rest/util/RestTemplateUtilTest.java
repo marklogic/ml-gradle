@@ -12,6 +12,7 @@ import javax.net.ssl.SSLContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -116,5 +117,18 @@ public class RestTemplateUtilTest extends BaseTestHelper {
 		} catch (Exception ex) {
 			logger.info("Caught expected exception: " + ex.getMessage());
 		}
+	}
+
+	@Test
+	void noUsername() {
+		manageConfig.setUsername(null);
+		RuntimeException ex = assertThrows(RuntimeException.class,
+			() -> RestTemplateUtil.newRestTemplate(manageConfig));
+
+		assertEquals("Unable to connect to the MarkLogic app server at http://localhosthost:8002; cause: username must be of type String",
+			ex.getMessage(),
+			"As of 4.5.0, since auth strategies other than basic/digest are now supported, the error message is expected " +
+				"to identify which MarkLogic app server is being accessed but not any authentication details. This is " +
+				"due to a change to toString of RestConfig/ManageConfig so that a username is not logged.");
 	}
 }

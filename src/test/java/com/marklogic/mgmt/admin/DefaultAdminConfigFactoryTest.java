@@ -1,9 +1,7 @@
 package com.marklogic.mgmt.admin;
 
 import com.marklogic.client.DatabaseClientFactory;
-import com.marklogic.mgmt.ManageConfig;
 import com.marklogic.mgmt.util.SimplePropertySource;
-import com.marklogic.rest.util.RestTemplateUtil;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -79,7 +77,7 @@ public class DefaultAdminConfigFactoryTest  {
 
 		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
 		assertTrue(bean.getSecurityContext() instanceof DatabaseClientFactory.MarkLogicCloudAuthContext);
-		assertEquals("my-key", ((DatabaseClientFactory.MarkLogicCloudAuthContext)bean.getSecurityContext()).getKey());
+		assertEquals("my-key", ((DatabaseClientFactory.MarkLogicCloudAuthContext)bean.getSecurityContext()).getApiKey());
 	}
 
 	@Test
@@ -90,7 +88,7 @@ public class DefaultAdminConfigFactoryTest  {
 			"mlAdminCertPassword", "passwd"
 		);
 
-		assertEquals("certificate", config.getSecurityContextType());
+		assertEquals("certificate", config.getAuthType());
 		assertEquals("my-file.crt", config.getCertFile());
 		assertEquals("passwd", config.getCertPassword());
 	}
@@ -102,7 +100,7 @@ public class DefaultAdminConfigFactoryTest  {
 			"mlAdminExternalName", "my-name"
 		);
 
-		assertEquals("kerberos", config.getSecurityContextType());
+		assertEquals("kerberos", config.getAuthType());
 		assertEquals("my-name", config.getExternalName());
 
 		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
@@ -117,7 +115,7 @@ public class DefaultAdminConfigFactoryTest  {
 			"mlAdminSamlToken", "my-token"
 		);
 
-		assertEquals("saml", config.getSecurityContextType());
+		assertEquals("saml", config.getAuthType());
 		assertEquals("my-token", config.getSamlToken());
 
 		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
@@ -154,13 +152,13 @@ public class DefaultAdminConfigFactoryTest  {
 	@Test
 	void mlAuthentication() {
 		AdminConfig config = configure("mlAuthentication", "cloud");
-		assertEquals("cloud", config.getSecurityContextType());
+		assertEquals("cloud", config.getAuthType());
 
 		config = configure(
 			"mlAuthentication", "cloud",
 			"mlAdminAuthentication", "basic"
 		);
-		assertEquals("basic", config.getSecurityContextType());
+		assertEquals("basic", config.getAuthType());
 	}
 
 	@Test

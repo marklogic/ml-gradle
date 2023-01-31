@@ -46,13 +46,13 @@ public class DefaultManageConfigFactory extends PropertySourceFactory implements
 
 		propertyConsumerMap.put("mlManageAuthentication", (config, prop) -> {
 			logger.info("Manage authentication: " + prop);
-			config.setSecurityContextType(prop);
+			config.setAuthType(prop);
 		});
 
 		propertyConsumerMap.put("mlAuthentication", (config, prop) -> {
 			if (!propertyExists("mlManageAuthentication")) {
 				logger.info("Manage authentication: " + prop);
-				config.setSecurityContextType(prop);
+				config.setAuthType(prop);
 			}
 		});
 

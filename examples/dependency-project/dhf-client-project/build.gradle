@@ -11,7 +11,7 @@ buildscript {
 }
 
 plugins {
-	id 'net.saliman.properties' version '1.4.6'
+	id 'net.saliman.properties' version '1.5.1'
 }
 
 apply plugin: "com.marklogic.ml-data-hub"

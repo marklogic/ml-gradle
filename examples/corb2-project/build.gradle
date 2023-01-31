@@ -21,7 +21,7 @@ buildscript {
 }
 
 plugins {
-    id "com.marklogic.ml-gradle" version "4.1.0"
+    id "com.marklogic.ml-gradle" version "4.4.0"
 }
 
 repositories {

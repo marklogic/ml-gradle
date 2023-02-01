@@ -68,10 +68,9 @@ public class ValidateTdeTemplatesTest extends AbstractSchemasTest {
 			assertTrue(ex.getMessage().contains("the following script can be run in Query Console against your content " +
 				"database to see the TDE validation error"), "Unexpected message: " + ex.getMessage());
 			FailedRequestException fre = (FailedRequestException)ex.getCause();
-			assertTrue(fre.getMessage().contains("failed to apply resource at eval: Internal Server Error"),
-				"Unfortunately, the FailedRequestException does not capture why the tde.templateBatchInsert failed; " +
-					"JAVA-224 has been opened to improve this; unexpected message: " + fre.getMessage());
-
+			assertTrue(fre.getServerMessage().contains("TDE-REPEATEDCOLUMN"), "As of Java Client 6.1.0, errors from " +
+				"the /v1/eval endpoint are expected to be processed correctly by the Java Client so that the user sees " +
+				"the actual error; actual error message: " + fre.getServerMessage());
 		} else {
 			try {
 				loader.loadSchemas(path);

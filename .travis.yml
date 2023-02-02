@@ -1,9 +1,0 @@
-language: java
-jdk:
-  - oraclejdk8
-sudo: true
-script:
-  - ./.travis/run-tests.sh
-branches:
-  only:
-    - master

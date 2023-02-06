@@ -3,7 +3,8 @@ plugins {
   id "maven-publish"
 	id "signing"
 
-  id "com.github.jk1.dependency-license-report" version "2.1"
+	// Ignored as it depends on Java 11; can uncomment and use Java 11 when it needs to be run
+	//  id "com.github.jk1.dependency-license-report" version "2.1"
   id "com.gradle.plugin-publish" version "0.20.0"
 	id "java-gradle-plugin"
 
@@ -12,7 +13,7 @@ plugins {
 }
 
 group = "com.marklogic"
-version = "4.5-SNAPSHOT"
+version = "4.5.0"
 
 java {
 	sourceCompatibility = 1.8
@@ -20,41 +21,16 @@ java {
 }
 
 repositories {
-	mavenLocal()
-	maven {
-		url "https://nexus.marklogic.com/repository/maven-snapshots/"
-	}
 	mavenCentral()
-}
-
-// Do not cache changing modules
-configurations.all {
-	resolutionStrategy {
-		cacheChangingModulesFor 0, 'seconds'
-	}
 }
 
 dependencies {
   implementation gradleApi()
 	implementation localGroovy()
 
-	// Temporarily adding these until ready to release
-	api('com.marklogic:marklogic-client-api:6.1-SNAPSHOT') {
-		changing = true
-	}
-	api('com.marklogic:ml-javaclient-util:4.5-SNAPSHOT') {
-		changing = true
-	}
-
-	// Will update this when ready to release
-	api('com.marklogic:ml-app-deployer:4.5-SNAPSHOT') {
-		changing = true
-	}
-
+	api 'com.marklogic:ml-app-deployer:4.5.0'
 	implementation "com.marklogic:mlcp-util:1.0.1"
-	// TODO Will need to update this to 2.6.0 once it's released; the only planned change for this is to bump up the
-	// Java Client to 6.1.0
-	implementation "com.marklogic:marklogic-data-movement-components:2.5.0"
+	implementation "com.marklogic:marklogic-data-movement-components:2.6.0"
 	implementation "commons-io:commons-io:2.11.0"
 
 	compileOnly "com.marklogic:marklogic-unit-test-client:1.2.1"

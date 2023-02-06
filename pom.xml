@@ -12,7 +12,7 @@ It is not intended to be used to build this project.
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.marklogic</groupId>
   <artifactId>ml-app-deployer</artifactId>
-  <version>4.4.0</version>
+  <version>4.5.0</version>
   <name>com.marklogic:ml-app-deployer</name>
   <description>Java client for the MarkLogic REST Management API and for deploying applications to MarkLogic</description>
   <url>https://github.com/marklogic-community/ml-app-deployer</url>
@@ -40,7 +40,7 @@ It is not intended to be used to build this project.
     <dependency>
       <groupId>com.marklogic</groupId>
       <artifactId>ml-javaclient-util</artifactId>
-      <version>4.4.0</version>
+      <version>4.5.0</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -52,7 +52,7 @@ It is not intended to be used to build this project.
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.13.4.2</version>
+      <version>2.14.1</version>
       <scope>compile</scope>
     </dependency>
     <dependency>

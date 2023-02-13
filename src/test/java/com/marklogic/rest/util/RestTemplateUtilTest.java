@@ -72,22 +72,23 @@ public class RestTemplateUtilTest extends BaseTestHelper {
 	@Test
 	public void configureSimpleSsl() {
 		manageConfig.setConfigureSimpleSsl(true);
-		new ManageClient(manageConfig);
+		new ManageClient(manageConfig).getRestTemplate();
 	}
 
 	@Test
 	public void simpleSslWithCustomProtocol() {
 		manageConfig.setConfigureSimpleSsl(true);
 		manageConfig.setSslProtocol("SSLv3");
-		new ManageClient(manageConfig);
+		new ManageClient(manageConfig).getRestTemplate();
 	}
 
 	@Test
 	public void simpleSslWithInvalidProtocol() {
 		manageConfig.setConfigureSimpleSsl(true);
 		manageConfig.setSslProtocol("invalid");
+		ManageClient client = new ManageClient(manageConfig);
 		try {
-			new ManageClient(manageConfig);
+			client.getRestTemplate();
 			fail("Expected failure due to invalid protocol");
 		} catch (Exception ex) {
 			logger.info("Caught expected exception: " + ex.getMessage());
@@ -101,21 +102,22 @@ public class RestTemplateUtilTest extends BaseTestHelper {
 		manageConfig.setSslContext(sslContext);
 		manageConfig.setHostnameVerifier(new AllowAllHostnameVerifier());
 
-		new ManageClient(manageConfig);
+		new ManageClient(manageConfig).getRestTemplate();
 	}
 
 	@Test
 	public void useDefaultKeystore() {
 		manageConfig.setUseDefaultKeystore(true);
-		new ManageClient(manageConfig);
+		new ManageClient(manageConfig).getRestTemplate();
 	}
 
 	@Test
 	public void defaultKeystoreWithInvalidProtocol() {
 		manageConfig.setUseDefaultKeystore(true);
 		manageConfig.setSslProtocol("invalid");
+		ManageClient client = new ManageClient(manageConfig);
 		try {
-			new ManageClient(manageConfig);
+			client.getRestTemplate();
 			fail("Expected failure due to invalid protocol");
 		} catch (Exception ex) {
 			logger.info("Caught expected exception: " + ex.getMessage());
@@ -126,8 +128,9 @@ public class RestTemplateUtilTest extends BaseTestHelper {
 	public void defaultKeystoreWithInvalidAlgorithm() {
 		manageConfig.setUseDefaultKeystore(true);
 		manageConfig.setTrustManagementAlgorithm("invalid");
+		ManageClient client = new ManageClient(manageConfig);
 		try {
-			new ManageClient(manageConfig);
+			client.getRestTemplate();
 			fail("Expected failure due to invalid algorithm");
 		} catch (Exception ex) {
 			logger.info("Caught expected exception: " + ex.getMessage());

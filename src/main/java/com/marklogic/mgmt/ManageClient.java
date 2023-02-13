@@ -70,29 +70,6 @@ public class ManageClient extends LoggingObject {
 	    if (logger.isInfoEnabled()) {
 		    logger.info("Initializing ManageClient with manage config of: " + config);
 	    }
-	    this.restTemplate = RestTemplateUtil.newRestTemplate(config);
-
-	    String securityUsername = config.getSecurityUsername();
-	    if (securityUsername != null && securityUsername.trim().length() > 0 && !securityUsername.equals(config.getUsername())) {
-		    if (logger.isInfoEnabled()) {
-			    logger.info(format("Initializing separate connection to Manage API with user '%s' that should have the 'manage-admin' and 'security' roles", securityUsername));
-		    }
-
-			RestConfig rc = new RestConfig(config);
-			// Override settings based on the 3 "security user"-specific properties known by ManageConfig.
-			// Note that in 4.5.0, with the addition of cloud/certificate/kerberos/saml auth, this will only have any
-			// impact if the user is using digest or basic auth. There's no equivalent of a separate "security" user
-			// yet for the other 4 authentication types.
-			rc.setUsername(config.getSecurityUsername());
-			rc.setPassword(config.getSecurityPassword());
-		    if (config.getSecuritySslContext() != null) {
-		    	rc.setSslContext(config.getSecuritySslContext());
-		    }
-
-		    this.securityUserRestTemplate = RestTemplateUtil.newRestTemplate(rc);
-	    } else {
-		    this.securityUserRestTemplate = restTemplate;
-	    }
     }
 
 	/**
@@ -119,42 +96,42 @@ public class ManageClient extends LoggingObject {
 
     public ResponseEntity<String> putJson(String path, String json) {
         logRequest(path, "JSON", "PUT");
-        return restTemplate.exchange(buildUri(path), HttpMethod.PUT, buildJsonEntity(json), String.class);
+        return getRestTemplate().exchange(buildUri(path), HttpMethod.PUT, buildJsonEntity(json), String.class);
     }
 
 	public ResponseEntity<String> putJsonAsSecurityUser(String path, String json) {
 		logSecurityUserRequest(path, "JSON", "PUT");
-		return securityUserRestTemplate.exchange(buildUri(path), HttpMethod.PUT, buildJsonEntity(json), String.class);
+		return getSecurityUserRestTemplate().exchange(buildUri(path), HttpMethod.PUT, buildJsonEntity(json), String.class);
 	}
 
     public ResponseEntity<String> putXml(String path, String xml) {
         logRequest(path, "XML", "PUT");
-        return restTemplate.exchange(buildUri(path), HttpMethod.PUT, buildXmlEntity(xml), String.class);
+        return getRestTemplate().exchange(buildUri(path), HttpMethod.PUT, buildXmlEntity(xml), String.class);
     }
 
 	public ResponseEntity<String> putXmlAsSecurityUser(String path, String xml) {
 		logSecurityUserRequest(path, "XML", "PUT");
-		return securityUserRestTemplate.exchange(buildUri(path), HttpMethod.PUT, buildXmlEntity(xml), String.class);
+		return getSecurityUserRestTemplate().exchange(buildUri(path), HttpMethod.PUT, buildXmlEntity(xml), String.class);
 	}
 
     public ResponseEntity<String> postJson(String path, String json) {
         logRequest(path, "JSON", "POST");
-        return restTemplate.exchange(buildUri(path), HttpMethod.POST, buildJsonEntity(json), String.class);
+        return getRestTemplate().exchange(buildUri(path), HttpMethod.POST, buildJsonEntity(json), String.class);
     }
 
 	public ResponseEntity<String> postJsonAsSecurityUser(String path, String json) {
 		logSecurityUserRequest(path, "JSON", "POST");
-		return securityUserRestTemplate.exchange(buildUri(path), HttpMethod.POST, buildJsonEntity(json), String.class);
+		return getSecurityUserRestTemplate().exchange(buildUri(path), HttpMethod.POST, buildJsonEntity(json), String.class);
 	}
 
     public ResponseEntity<String> postXml(String path, String xml) {
         logRequest(path, "XML", "POST");
-        return restTemplate.exchange(buildUri(path), HttpMethod.POST, buildXmlEntity(xml), String.class);
+        return getRestTemplate().exchange(buildUri(path), HttpMethod.POST, buildXmlEntity(xml), String.class);
     }
 
 	public ResponseEntity<String> postXmlAsSecurityUser(String path, String xml) {
 		logSecurityUserRequest(path, "XML", "POST");
-		return securityUserRestTemplate.exchange(buildUri(path), HttpMethod.POST, buildXmlEntity(xml), String.class);
+		return getSecurityUserRestTemplate().exchange(buildUri(path), HttpMethod.POST, buildXmlEntity(xml), String.class);
 	}
 
 	public ResponseEntity<String> postForm(String path, String... params) {
@@ -166,7 +143,7 @@ public class ManageClient extends LoggingObject {
             map.add(params[i], params[i + 1]);
         }
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
-        return restTemplate.exchange(buildUri(path), HttpMethod.POST, entity, String.class);
+        return getRestTemplate().exchange(buildUri(path), HttpMethod.POST, entity, String.class);
     }
 
     public String getXmlString(String path) {
@@ -185,7 +162,7 @@ public class ManageClient extends LoggingObject {
 
 	public String getXmlStringAsSecurityUser(String path) {
 		logSecurityUserRequest(path, "XML", "GET");
-		return securityUserRestTemplate.getForObject(buildUri(path), String.class);
+		return getSecurityUserRestTemplate().getForObject(buildUri(path), String.class);
 	}
 
 	public Fragment getXmlAsSecurityUser(String path, String... namespacePrefixesAndUris) {
@@ -223,18 +200,18 @@ public class ManageClient extends LoggingObject {
 		logSecurityUserRequest(path, "JSON", "GET");
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
-		return securityUserRestTemplate.exchange(buildUri(path), HttpMethod.GET, new HttpEntity<>(headers), String.class)
+		return getSecurityUserRestTemplate().exchange(buildUri(path), HttpMethod.GET, new HttpEntity<>(headers), String.class)
 			.getBody();
 	}
 
 	public void delete(String path) {
         logRequest(path, "", "DELETE");
-        restTemplate.delete(buildUri(path));
+        getRestTemplate().delete(buildUri(path));
     }
 
     public void deleteAsSecurityUser(String path) {
 	    logSecurityUserRequest(path, "", "DELETE");
-	    securityUserRestTemplate.delete(buildUri(path));
+	    getSecurityUserRestTemplate().delete(buildUri(path));
     }
 
 	/**
@@ -309,12 +286,38 @@ public class ManageClient extends LoggingObject {
 	    return username;
     }
 
+	private void initializeSecurityUserRestTemplate() {
+		String securityUsername = this.manageConfig.getSecurityUsername();
+		if (securityUsername != null && securityUsername.trim().length() > 0 && !securityUsername.equals(this.manageConfig.getUsername())) {
+			if (logger.isInfoEnabled()) {
+				logger.info(format("Initializing separate connection to Manage API with user '%s' that should have the 'manage-admin' and 'security' roles", securityUsername));
+			}
+
+			RestConfig rc = new RestConfig(this.manageConfig);
+			// Override settings based on the 3 "security user"-specific properties known by ManageConfig.
+			// Note that in 4.5.0, with the addition of cloud/certificate/kerberos/saml auth, this will only have any
+			// impact if the user is using digest or basic auth. There's no equivalent of a separate "security" user
+			// yet for the other 4 authentication types.
+			rc.setUsername(this.manageConfig.getSecurityUsername());
+			rc.setPassword(this.manageConfig.getSecurityPassword());
+			if (this.manageConfig.getSecuritySslContext() != null) {
+				rc.setSslContext(this.manageConfig.getSecuritySslContext());
+			}
+			this.securityUserRestTemplate = RestTemplateUtil.newRestTemplate(rc);
+		} else {
+			this.securityUserRestTemplate = getRestTemplate();
+		}
+	}
+
 	public URI buildUri(String path) {
         return manageConfig.buildUri(path);
     }
 
     public RestTemplate getRestTemplate() {
-        return restTemplate;
+        if (this.restTemplate == null) {
+			this.restTemplate = RestTemplateUtil.newRestTemplate(this.manageConfig);
+		}
+		return restTemplate;
     }
 
     public ManageConfig getManageConfig() {
@@ -326,6 +329,9 @@ public class ManageClient extends LoggingObject {
 	}
 
 	public RestTemplate getSecurityUserRestTemplate() {
+		if (this.securityUserRestTemplate == null) {
+			initializeSecurityUserRestTemplate();
+		}
 		return securityUserRestTemplate;
 	}
 

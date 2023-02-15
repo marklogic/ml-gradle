@@ -56,7 +56,6 @@ public class AdminManager extends AbstractManager {
 	 */
 	public void setAdminConfig(AdminConfig adminConfig) {
 	    this.adminConfig = adminConfig;
-	    this.restTemplate = RestTemplateUtil.newRestTemplate(adminConfig);
     }
 
     public void init() {
@@ -82,7 +81,7 @@ public class AdminManager extends AbstractManager {
                 headers.setContentType(MediaType.APPLICATION_JSON);
                 HttpEntity<String> entity = new HttpEntity<>(payload, headers);
                 try {
-                    ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.POST, entity, String.class);
+                    ResponseEntity<String> response = getRestTemplate().exchange(uri, HttpMethod.POST, entity, String.class);
                     logger.info("Initialization response: " + response);
                     // According to http://docs.marklogic.com/REST/POST/admin/v1/init, a 202 is sent back in the event a
                     // restart is needed. A 400 or 401 will be thrown as an error by RestTemplate.
@@ -132,7 +131,7 @@ public class AdminManager extends AbstractManager {
                 headers.setContentType(MediaType.APPLICATION_JSON);
                 HttpEntity<String> entity = new HttpEntity<>(payload, headers);
                 try {
-                    ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.POST, entity, String.class);
+                    ResponseEntity<String> response = getRestTemplate().exchange(uri, HttpMethod.POST, entity, String.class);
                     logger.info("Admin installation response: " + response);
                     // According to http://docs.marklogic.com/REST/POST/admin/v1/init, a 202 is sent back in the event a
                     // restart is needed. A 400 or 401 will be thrown as an error by RestTemplate.
@@ -166,7 +165,7 @@ public class AdminManager extends AbstractManager {
     }
 
     public String getLastRestartTimestamp() {
-        return restTemplate.getForEntity(adminConfig.buildUri("/admin/v1/timestamp"), String.class).getBody();
+        return getRestTemplate().getForEntity(adminConfig.buildUri("/admin/v1/timestamp"), String.class).getBody();
     }
 
     public void waitForRestart() {
@@ -230,7 +229,7 @@ public class AdminManager extends AbstractManager {
     }
 
     public Fragment getServerConfig() {
-        return new Fragment(restTemplate.getForObject(adminConfig.buildUri("/admin/v1/server-config"), String.class));
+        return new Fragment(getRestTemplate().getForObject(adminConfig.buildUri("/admin/v1/server-config"), String.class));
     }
 
     public String getServerVersion() {
@@ -271,7 +270,7 @@ public class AdminManager extends AbstractManager {
 		HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
 
 		URI url = adminConfig.buildUri("/admin/v1/cluster-config");
-		ResponseEntity<byte[]> bytes = restTemplate.exchange(url, HttpMethod.POST, entity, byte[].class);
+		ResponseEntity<byte[]> bytes = getRestTemplate().exchange(url, HttpMethod.POST, entity, byte[].class);
 		return bytes.getBody();
 	}
 
@@ -288,7 +287,7 @@ public class AdminManager extends AbstractManager {
 		URI clusterConfigUri = adminConfig.buildUri("/admin/v1/cluster-config");
 
 		HttpEntity<Resource> resourceEntity = new HttpEntity<>(new ByteArrayResource(clusterConfigZipBytes), headers);
-		ResponseEntity<String> response = restTemplate.exchange(clusterConfigUri, HttpMethod.POST, resourceEntity, String.class);
+		ResponseEntity<String> response = getRestTemplate().exchange(clusterConfigUri, HttpMethod.POST, resourceEntity, String.class);
 		if(response.getStatusCode().value() == 202){
 			waitForRestart();
 		}
@@ -299,7 +298,7 @@ public class AdminManager extends AbstractManager {
 	 * Note that once it does so, the server will need to be initialized again
 	 */
 	public void leaveCluster() {
-		ResponseEntity<String> response = restTemplate.exchange(adminConfig.buildUri("/admin/v1/host-config"), HttpMethod.DELETE, null, String.class);
+		ResponseEntity<String> response = getRestTemplate().exchange(adminConfig.buildUri("/admin/v1/host-config"), HttpMethod.DELETE, null, String.class);
 		if (response.getStatusCode().value() == 202) {
 			waitForRestart();
 		}
@@ -310,6 +309,9 @@ public class AdminManager extends AbstractManager {
 	}
 
 	public RestTemplate getRestTemplate() {
-		return restTemplate;
+		if (this.restTemplate == null) {
+			this.restTemplate = RestTemplateUtil.newRestTemplate(adminConfig);
+		}
+		return this.restTemplate;
 	}
 }

@@ -13,7 +13,7 @@ plugins {
 }
 
 group = "com.marklogic"
-version = "4.5-SNAPSHOT"
+version = "4.5.1"
 
 java {
 	sourceCompatibility = 1.8
@@ -28,7 +28,7 @@ dependencies {
   implementation gradleApi()
 	implementation localGroovy()
 
-	api 'com.marklogic:ml-app-deployer:4.5-SNAPSHOT'
+	api 'com.marklogic:ml-app-deployer:4.5.1'
 	implementation "com.marklogic:mlcp-util:1.0.1"
 	implementation "com.marklogic:marklogic-data-movement-components:2.6.0"
 	implementation "commons-io:commons-io:2.11.0"

@@ -10,7 +10,7 @@
 
 plugins {
 	id "net.saliman.properties" version "1.5.1"
-	id "com.marklogic.ml-gradle" version "4.5.0"
+	id "com.marklogic.ml-gradle" version "4.5.1"
 }
 
 //apply plugin: "com.marklogic.ml-gradle"

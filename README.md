@@ -37,14 +37,14 @@ running Gradle 7 or higher, you'll need to use ml-gradle 4.3.0 or higher.
 
 Then, in an empty directory, create a file named "build.gradle" with your favorite text editor and enter the following:
 
-    plugins { id "com.marklogic.ml-gradle" version "4.5.0" }
+    plugins { id "com.marklogic.ml-gradle" version "4.5.1" }
     
 Then run:
 
     gradle mlNewProject
 
-(If you are trying ml-gradle 4.5.0 specifically, you will need to do `gradle -PmlUsername= -PmlPassword= mlNewProject` 
-due to a bug that will be fixed very soon in ml-gradle 4.5.1).
+(If you are trying ml-gradle 4.5.0, you will need to do `gradle -PmlUsername= -PmlPassword= mlNewProject` 
+due to a bug that has been fixed in ml-gradle 4.5.1).
 
 This starts a project wizard to stub out files for your new application. You can accept all the defaults, but be sure to
 enter a valid port number for the "REST API port" question. ml-gradle will then print the following logging:

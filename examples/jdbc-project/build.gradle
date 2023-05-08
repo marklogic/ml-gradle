@@ -8,7 +8,7 @@ repositories {
 }
 
 dependencies {
-	implementation "org.springframework:spring-jdbc:5.0.1.RELEASE"
+	implementation "org.springframework:spring-jdbc:5.3.27"
 
 	/**
 	 * 42.1.4 is the latest version that works.

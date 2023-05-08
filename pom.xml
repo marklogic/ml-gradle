@@ -15,7 +15,7 @@ It is not intended to be used to build this project.
   <version>4.5.2</version>
   <name>com.marklogic:ml-app-deployer</name>
   <description>Java client for the MarkLogic REST Management API and for deploying applications to MarkLogic</description>
-  <url>https://github.com/marklogic-community/ml-app-deployer</url>
+  <url>https://github.com/marklogic/ml-app-deployer</url>
   <licenses>
     <license>
       <name>The Apache License, Version 2.0</name>
@@ -32,9 +32,9 @@ It is not intended to be used to build this project.
     </developer>
   </developers>
   <scm>
-    <connection>scm:git@github.com:marklogic-community/ml-app-deployer.git</connection>
-    <developerConnection>scm:git@github.com:marklogic-community/ml-app-deployer.git</developerConnection>
-    <url>git@github.com:marklogic-community/ml-app-deployer.git</url>
+    <connection>scm:git@github.com:marklogic/ml-app-deployer.git</connection>
+    <developerConnection>scm:git@github.com:marklogic/ml-app-deployer.git</developerConnection>
+    <url>git@github.com:marklogic/ml-app-deployer.git</url>
   </scm>
   <dependencies>
     <dependency>

@@ -89,7 +89,7 @@ publishing {
 				name = "${group}:${project.name}"
 				description = "Gradle plugin for automating everything involving MarkLogic"
 				packaging = "jar"
-				url = "https://github.com/marklogic-community/${project.name}"
+				url = "https://github.com/marklogic/${project.name}"
 				licenses {
 					license {
 						name = "The Apache License, Version 2.0"
@@ -106,9 +106,9 @@ publishing {
 					}
 				}
 				scm {
-					url = "git@github.com:marklogic-community/${project.name}.git"
-					connection = "scm:git@github.com:marklogic-community/${project.name}.git"
-					developerConnection = "scm:git@github.com:marklogic-community/${project.name}.git"
+					url = "git@github.com:marklogic/${project.name}.git"
+					connection = "scm:git@github.com:marklogic/${project.name}.git"
+					developerConnection = "scm:git@github.com:marklogic/${project.name}.git"
 				}
 			}
 			from components.java
@@ -138,7 +138,7 @@ publishing {
 
 pluginBundle {
   website = 'https://www.marklogic.com/'
-  vcsUrl = 'https://github.com/marklogic-community/' + project.name + '.git'
+  vcsUrl = 'https://github.com/marklogic/' + project.name + '.git'
   description = 'Publishes ml-gradle'
   tags = ['marklogic']
 

@@ -44,6 +44,6 @@ class PrintPropertiesTask extends MarkLogicTask {
 
 		println "\nThe Manage server connection properties, Admin server connection properties, and " +
 			"application properties are listed above, with each set in alphabetical order. \nFor a list of " +
-			"all properties with documentation, see https://github.com/marklogic-community/ml-gradle/wiki/Property-reference ."
+			"all properties with documentation, see https://github.com/marklogic/ml-gradle/wiki/Property-reference ."
 	}
 }

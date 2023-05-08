@@ -18,7 +18,7 @@ To try this example out, first deploy the application:
 This will result in 3 forests - one "default" forest with no partition assigned, and then two forests based on 
 partitions - "myDate-2011" and "myDate-2012". Note also that the "mlAddHostNameTokens" property is set so that the 
 partition files can refer to a host name dynamically via the "mlHostName1" token as opposed to being hardcoded to a 
-specific host name. See these [ml-app-deployer docs](https://github.com/marklogic-community/ml-app-deployer/wiki/Scheduled-Tasks#referring-to-host-names-in-scheduled-task-files) for more information. 
+specific host name. See these [ml-app-deployer docs](https://github.com/marklogic/ml-app-deployer/wiki/Scheduled-Tasks#referring-to-host-names-in-scheduled-task-files) for more information. 
 
 You can then insert documents via qconsole (or any other ML interface) to test out the range assignments - e.g.
 

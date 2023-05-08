@@ -81,7 +81,7 @@ task importRdf(type: com.marklogic.gradle.task.MlcpTask) {
 
 /**
  * Example of importing semicolon-delimited text, in reference to:
- * https://github.com/marklogic-community/ml-gradle/issues/90
+ * https://github.com/marklogic/ml-gradle/issues/90
  */
 task importSemicolonDelimitedText(type: com.marklogic.gradle.task.MlcpTask) {
 	classpath = configurations.mlcp

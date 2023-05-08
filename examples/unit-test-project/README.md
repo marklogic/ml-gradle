@@ -69,7 +69,7 @@ And you can run the original UI test runner by going to:
 Prior to ml-gradle 3.8.1, the mlUnitTest task will connect to mlTestRestPort if it's set, else mlRestPort. 
 
 Starting in release 3.8.1, you can configure which REST API server mlUnitTest will connect to. The mlUnitTest task now
-exposes a property of type [DatabaseClientConfig](https://github.com/marklogic-community/ml-javaclient-util/blob/master/src/main/java/com/marklogic/client/ext/DatabaseClientConfig.java). 
+exposes a property of type [DatabaseClientConfig](https://github.com/marklogic/ml-javaclient-util/blob/master/src/main/java/com/marklogic/client/ext/DatabaseClientConfig.java). 
 You can configure the properties of this object, and mlUnitTest will use it for creating a connection to MarkLogic. 
 
 Below is an example of configuring the mlUnitTest task in build.gradle - note that you need to configure every property necessary for the type of connection you want, as 

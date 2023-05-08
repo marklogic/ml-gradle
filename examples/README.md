@@ -21,5 +21,5 @@ After you've deployed and examined/tested the application, you can undeploy it v
     ./gradlew -i -Pconfirm=true mlUndeploy
 
 Please note that these example projects are not re-tested with every ml-gradle release. If you run into a problem with 
-any of them, please file an [issue with ml-gradle](https://github.com/marklogic-community/ml-gradle/wiki).
+any of them, please file an [issue with ml-gradle](https://github.com/marklogic/ml-gradle/wiki).
 

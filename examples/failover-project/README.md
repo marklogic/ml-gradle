@@ -1,5 +1,5 @@
 This project shows an example of configuring replica forests for the out-of-the-box databases that are typically worth 
-enabling failover. See https://github.com/marklogic-community/ml-gradle/wiki/Property-reference for more properties
+enabling failover. See https://github.com/marklogic/ml-gradle/wiki/Property-reference for more properties
 for configuring the replica forests that are created.
 
 Note that you'll need to run this against a cluster with at least two nodes (failover requires three nodes, but you

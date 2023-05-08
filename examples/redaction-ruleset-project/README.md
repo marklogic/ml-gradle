@@ -10,6 +10,6 @@ These files contain the definitions for the applicable collections to be applied
 
 ***Note***: Rulesets must have a .json or .xml file extension.
 
-See [Specifying collections and permissions](https://github.com/marklogic-community/ml-javaclient-util/wiki/Loading-files#specifying-collections-and-permissions) for information on how to apply the collections and permission when the rulesets are loaded
+See [Specifying collections and permissions](https://github.com/marklogic/ml-javaclient-util/wiki/Loading-files#specifying-collections-and-permissions) for information on how to apply the collections and permission when the rulesets are loaded
 
 See [Redacting Document Content](http://docs.marklogic.com/guide/app-dev/redaction) for more information on redacting content

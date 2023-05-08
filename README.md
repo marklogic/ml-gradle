@@ -1,7 +1,7 @@
-![GitHub release](https://img.shields.io/github/release/marklogic-community/ml-gradle.svg)
-![GitHub last commit](https://img.shields.io/github/last-commit/marklogic-community/ml-gradle.svg)
+![GitHub release](https://img.shields.io/github/release/marklogic/ml-gradle.svg)
+![GitHub last commit](https://img.shields.io/github/last-commit/marklogic/ml-gradle.svg)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Known Vulnerabilities](https://snyk.io/test/github/marklogic-community/ml-gradle/badge.svg)](https://snyk.io/test/github/marklogic-community/ml-gradle)
+[![Known Vulnerabilities](https://snyk.io/test/github/marklogic/ml-gradle/badge.svg)](https://snyk.io/test/github/marklogic/ml-gradle)
 
 Automate everything involving MarkLogic with Gradle
 =========
@@ -14,11 +14,11 @@ ml-gradle either automates it already or can be extended to do so.
 
 You can use ml-gradle right away with the simple tutorial below, or learn more:
 
-- The [ml-gradle Wiki](https://github.com/marklogic-community/ml-gradle/wiki) guides you through all of the ml-gradle documentation
-- Read the [Getting Started guide](https://github.com/marklogic-community/ml-gradle/wiki/Getting-started) for more details on setting up a new project
-- Browse the [example projects](https://github.com/marklogic-community/ml-gradle/tree/master/examples) for working examples of different ml-gradle features
+- The [ml-gradle Wiki](https://github.com/marklogic/ml-gradle/wiki) guides you through all of the ml-gradle documentation
+- Read the [Getting Started guide](https://github.com/marklogic/ml-gradle/wiki/Getting-started) for more details on setting up a new project
+- Browse the [example projects](https://github.com/marklogic/ml-gradle/tree/master/examples) for working examples of different ml-gradle features
 
-**Don't want to use Gradle?** Then consider using [the ml-app-deployer Java library](https://github.com/marklogic-community/ml-app-deployer) 
+**Don't want to use Gradle?** Then consider using [the ml-app-deployer Java library](https://github.com/marklogic/ml-app-deployer) 
 on which ml-gradle depends. ml-app-deployer provides most of the functionality within ml-gradle without having any dependency on Gradle or 
 Groovy - ml-gradle is then a fairly thin wrapper around ml-app-deployer to expose its functionality within a Gradle environment.
 

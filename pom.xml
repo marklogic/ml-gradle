@@ -15,7 +15,7 @@ It is not intended to be used to build this project.
   <version>4.5.2</version>
   <name>com.marklogic:ml-gradle</name>
   <description>Gradle plugin for automating everything involving MarkLogic</description>
-  <url>https://github.com/marklogic-community/ml-gradle</url>
+  <url>https://github.com/marklogic/ml-gradle</url>
   <licenses>
     <license>
       <name>The Apache License, Version 2.0</name>
@@ -32,9 +32,9 @@ It is not intended to be used to build this project.
     </developer>
   </developers>
   <scm>
-    <connection>scm:git@github.com:marklogic-community/ml-gradle.git</connection>
-    <developerConnection>scm:git@github.com:marklogic-community/ml-gradle.git</developerConnection>
-    <url>git@github.com:marklogic-community/ml-gradle.git</url>
+    <connection>scm:git@github.com:marklogic/ml-gradle.git</connection>
+    <developerConnection>scm:git@github.com:marklogic/ml-gradle.git</developerConnection>
+    <url>git@github.com:marklogic/ml-gradle.git</url>
   </scm>
   <dependencies>
     <dependency>

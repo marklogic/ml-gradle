@@ -107,7 +107,7 @@ Which should return:
 66.6666666666667
 ```
 
-See [Loading data](https://github.com/marklogic-community/ml-app-deployer/wiki/Loading-data) for more
+See [Loading data](https://github.com/marklogic/ml-app-deployer/wiki/Loading-data) for more
 information on configuring how data is loaded during a deployment.
 
 

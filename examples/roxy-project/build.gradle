@@ -4,7 +4,7 @@ buildscript {
 		mavenLocal()
 	}
 	dependencies {
-		classpath "com.marklogic:ml-gradle:4.5.1"
+		classpath "com.marklogic:ml-gradle:4.5.2"
 	}
 }
 

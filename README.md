@@ -37,7 +37,7 @@ running Gradle 7 or higher, you'll need to use ml-gradle 4.3.0 or higher.
 
 Then, in an empty directory, create a file named "build.gradle" with your favorite text editor and enter the following:
 
-    plugins { id "com.marklogic.ml-gradle" version "4.5.1" }
+    plugins { id "com.marklogic.ml-gradle" version "4.5.2" }
     
 Then run:
 

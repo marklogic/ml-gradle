@@ -15,7 +15,7 @@ It is not intended to be used to build this project.
   <version>4.5.1</version>
   <name>com.marklogic:ml-javaclient-util</name>
   <description>Library that adds functionality on top of the MarkLogic Java Client</description>
-  <url>https://github.com/marklogic-community/ml-javaclient-util</url>
+  <url>https://github.com/marklogic/ml-javaclient-util</url>
   <licenses>
     <license>
       <name>The Apache License, Version 2.0</name>
@@ -32,9 +32,9 @@ It is not intended to be used to build this project.
     </developer>
   </developers>
   <scm>
-    <connection>scm:git@github.com:marklogic-community/ml-javaclient-util.git</connection>
-    <developerConnection>scm:git@github.com:marklogic-community/ml-javaclient-util.git</developerConnection>
-    <url>git@github.com:marklogic-community/ml-javaclient-util.git</url>
+    <connection>scm:git@github.com:marklogic/ml-javaclient-util.git</connection>
+    <developerConnection>scm:git@github.com:marklogic/ml-javaclient-util.git</developerConnection>
+    <url>git@github.com:marklogic/ml-javaclient-util.git</url>
   </scm>
   <dependencies>
     <dependency>

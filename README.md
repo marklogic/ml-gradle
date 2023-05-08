@@ -1,7 +1,7 @@
-![GitHub release](https://img.shields.io/github/release/marklogic-community/ml-javaclient-util.svg)
-![GitHub last commit](https://img.shields.io/github/last-commit/marklogic-community/ml-javaclient-util.svg)
+![GitHub release](https://img.shields.io/github/release/marklogic/ml-javaclient-util.svg)
+![GitHub last commit](https://img.shields.io/github/last-commit/marklogic/ml-javaclient-util.svg)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Known Vulnerabilities](https://snyk.io/test/github/marklogic-community/ml-javaclient-util/badge.svg)](https://snyk.io/test/github/marklogic-community/ml-javaclient-util)
+[![Known Vulnerabilities](https://snyk.io/test/github/marklogic/ml-javaclient-util/badge.svg)](https://snyk.io/test/github/marklogic/ml-javaclient-util)
 
 ml-javaclient-util is a library of Java classes that provide some useful functionality on top of 
 the [MarkLogic Java Client API](http://docs.marklogic.com/guide/java). Those features include:
@@ -18,6 +18,6 @@ and [ml-gradle](https://github.com/rjrudin/ml-gradle) and [ml-junit](https://git
 
 See the following Wiki pages for more information on some of the main features in this library:
 
-1. [Loading files](https://github.com/marklogic-community/ml-javaclient-util/wiki/Loading-files), including modules
-1. [DMSDK Support](https://github.com/marklogic-community/ml-javaclient-util/wiki/DMSDK-Support)
-1. [Writing documents in batches](https://github.com/marklogic-community/ml-javaclient-util/wiki/Writing-documents-in-batches)
+1. [Loading files](https://github.com/marklogic/ml-javaclient-util/wiki/Loading-files), including modules
+1. [DMSDK Support](https://github.com/marklogic/ml-javaclient-util/wiki/DMSDK-Support)
+1. [Writing documents in batches](https://github.com/marklogic/ml-javaclient-util/wiki/Writing-documents-in-batches)

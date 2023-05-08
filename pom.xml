@@ -12,7 +12,7 @@ It is not intended to be used to build this project.
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.marklogic</groupId>
   <artifactId>ml-app-deployer</artifactId>
-  <version>4.5.1</version>
+  <version>4.5.2</version>
   <name>com.marklogic:ml-app-deployer</name>
   <description>Java client for the MarkLogic REST Management API and for deploying applications to MarkLogic</description>
   <url>https://github.com/marklogic-community/ml-app-deployer</url>
@@ -40,13 +40,13 @@ It is not intended to be used to build this project.
     <dependency>
       <groupId>com.marklogic</groupId>
       <artifactId>ml-javaclient-util</artifactId>
-      <version>4.5.0</version>
+      <version>4.5.1</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
-      <version>5.3.24</version>
+      <version>5.3.27</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -64,7 +64,7 @@ It is not intended to be used to build this project.
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
-      <version>4.5.13</version>
+      <version>4.5.14</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -88,7 +88,7 @@ It is not intended to be used to build this project.
     <dependency>
       <groupId>com.flipkart.zjsonpatch</groupId>
       <artifactId>zjsonpatch</artifactId>
-      <version>0.4.12</version>
+      <version>0.4.14</version>
       <scope>runtime</scope>
       <exclusions>
         <exclusion>

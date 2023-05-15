@@ -10,15 +10,13 @@ and do the following:
 	 `gradle-local.properties` and set both `mlUsername` and `mlPassword` in that file.
 2. If the project has any ports defined in `gradle.properties`, verify that those ports are open and available on the 
 	 machine that is running MarkLogic.
-3. Most projects have the [Gradle wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html) setup, in 
-	 which case you can deploy the project to your MarkLogic instance via `./gradlew -i mlDeploy`. If the project does 
-	 not have the Gradle wrapper (you can tell by checking for a "gradlew" file in the project directory), then you'll 
-	 need to have [Gradle installed](https://gradle.org/install/). After installing Gradle, you can run `./gradle -i 
-	 mldeploy`.
+3. Each project can use the [Gradle wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html) instance 
+	 within this directory by running `../gradlew` from the example project directory. The project can thus be 
+	 deployed via `../gradlew -i mlDeploy`.
 
 After you've deployed and examined/tested the application, you can undeploy it via:
 
-    ./gradlew -i -Pconfirm=true mlUndeploy
+    ../gradlew -i -Pconfirm=true mlUndeploy
 
 Please note that these example projects are not re-tested with every ml-gradle release. If you run into a problem with 
 any of them, please file an [issue with ml-gradle](https://github.com/marklogic/ml-gradle/wiki).

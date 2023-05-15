@@ -36,7 +36,7 @@ Installation steps (once off)
 ```
 3. Execute (this will download all required gradle dependencies)
 ```
-    ./gradlew build 
+    ../../gradlew build 
 ```
 
 ___
@@ -44,19 +44,19 @@ ___
 
 Cluster Setup
 -------------
-1. ./gradlew mlDockerDeploy
+1. ../../gradlew mlDockerDeploy
 
 Cluster Start
 -------------
-1. ./gradlew mlDockerStart
+1. ../../gradlew mlDockerStart
 
 Cluster Stop
 -------------
-1. ./gradlew mlDockerStop
+1. ../../gradlew mlDockerStop
 
 Cluster Tear Down
 ----------------
-1. ./gradlew mlDockerTeardown
+1. ../../gradlew mlDockerTeardown
 
 
 ___

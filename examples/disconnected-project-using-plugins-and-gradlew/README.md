@@ -8,13 +8,13 @@ Summary of the steps required. See sections below for more detailed steps
 
 1. Create standalone deployer zip
 ```
-./gradlew makeOfflineZip 
+../gradlew makeOfflineZip 
 ```
 2. Copy zip (build/distributions/offline.zip) to desired location / server and unzip
 
 3. Run disconnected tasks from unzip location
 ```
-./gradlew mlDeploy -Pdisconnected=true
+../gradlew mlDeploy -Pdisconnected=true
 ```
 
 
@@ -58,13 +58,13 @@ This project will:
 #### Linux / Mac
 
 ```
-./gradlew makeOfflineZip 
+../gradlew makeOfflineZip 
 ```
 
 #### Windows
 
 ```
-gradlew makeOfflineZip 
+../gradlew makeOfflineZip 
 ```
 
 
@@ -81,7 +81,7 @@ unzip offline.zip
 From the directory that you have unzipped the offline.zip file into 
 
 ```
-./gradlew mlDeploy -Pdisconnected=true
+../gradlew mlDeploy -Pdisconnected=true
 ```
 
 This will use the jars that you have already downloaded to 'build/offline/maven-repo'

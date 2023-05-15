@@ -9,7 +9,7 @@ rewriter and REST modules to perform any kind of pre-processing that you need.
 To try this out locally, first run the custom Gradle task for generating a copy of every REST API dispatch modules and
 a custom REST XML rewriter that invokes each of the dispatch modules:
 
-    ./gradlew generateCustomRewriterModules
+    ../gradlew generateCustomRewriterModules
     
 This will write several dozen modules to src/main/ml-modules/root/custom-rest-rewriter (which is gitignore'd so that you
 can generate these yourself). If you look at one of the modules, you'll see the following code:
@@ -37,7 +37,7 @@ update the Gradle task to account for any changes you make.
 
 Next, deploy the application:
 
-     ./gradlew -i mlDeploy
+     ../gradlew -i mlDeploy
 
 The application deploys two REST servers - a standard one on port 8228 that uses digest authentication, and then a
 "no authentication" one on port 8229 that uses application layer authentication and the custom rewriter. 
@@ -73,4 +73,4 @@ is that this project shows an easy to insert that pre-processing into an XML rew
 
 After you finish testing this out, you can get rid of the app:
 
-    ./gradlew -Pconfirm=true -i mlUndeploy
+    ../gradlew -Pconfirm=true -i mlUndeploy

@@ -34,20 +34,20 @@ determine which MarkLogic app server to connect to - see below for how to custom
 
 First, deploy the application:
 
-    ./gradlew mlDeploy
+    ../gradlew mlDeploy
     
 This will deploy the application along with the marklogic-unit-test modules.
 
 Then, run the tests:
 
-    ./gradlew mlUnitTest
+    ../gradlew mlUnitTest
 
 Two tests are run, and one should fail, so you can see what a failed test looks like. 
 
 This project includes the Gradle Java plugin, which allows you to run tests under src/test/java. This project includes
 an example of a test that invokes each marklogic-unit-test module separately - you can try it like this:
 
-    ./gradlew test
+    ../gradlew test
 
 Again, two tests will run, and one will intentionally fail. The test can be run in an IDE as well, allowing
 you to take advantage of your IDE's support for JUnit tests. The test depends on the marklogic-junit5 library from the

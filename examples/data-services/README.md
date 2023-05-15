@@ -11,7 +11,7 @@ To try this out, first modify gradle-local.properties and set appropriate values
 Next, run the following Gradle task to deploy the example application:
 
 ```shell
-./gradlew mlDeploy
+../gradlew mlDeploy
 ```
 
 This creates an app server suitable for Data Services - i.e. one without a rewriter. It also creates a user named 
@@ -20,7 +20,7 @@ This creates an app server suitable for Data Services - i.e. one without a rewri
 To generate the `org.example.HelloWorld` proxy class, run:
 
 ```shell
-./gradlew generateHelloWorld
+../gradlew generateHelloWorld
 ```
 
 Take a look at `build.gradle` to see how this task is implemented using `com.marklogic.client.tools.gradle.EndpointProxiesGenTask`.
@@ -28,7 +28,7 @@ Take a look at `build.gradle` to see how this task is implemented using `com.mar
 You can then test the application either by running the following Gradle task:
 
 ```shell
-./gradlew -i test
+../gradlew -i test
 ```
 
 Or by importing this project into your favorite IDE and running the tests under src/test/java. 

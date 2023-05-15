@@ -82,8 +82,12 @@ class UnitTestTask extends MarkLogicTask {
 			long start = System.currentTimeMillis()
 			def suites = testManager.runAllSuites(runTeardown, runSuiteTeardown, runCoverage)
 			println "Done running all suites; time: " + (System.currentTimeMillis() - start) + "ms"
-			def report = new DefaultJUnitTestReporter().reportOnJUnitTestSuites(suites)
-			println report
+
+			def reporter = new DefaultJUnitTestReporter()
+			if (runCoverage) {
+				println reporter.reportOnJUnitTestSuitesCoverage(suites)
+			}
+			println reporter.reportOnJUnitTestSuites(suites)
 
 			File resultsDir = new File(getProject().getProjectDir(), "build/test-results/marklogic-unit-test")
 			String resultProperty = "unitTestResultsPath"

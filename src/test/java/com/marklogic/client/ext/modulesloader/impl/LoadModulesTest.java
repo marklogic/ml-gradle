@@ -22,6 +22,7 @@ import com.marklogic.client.ext.modulesloader.Modules;
 import com.marklogic.client.ext.modulesloader.ModulesFinder;
 import com.marklogic.client.ext.tokenreplacer.DefaultTokenReplacer;
 import com.marklogic.client.io.BytesHandle;
+import com.marklogic.client.io.DocumentMetadataHandle;
 import com.marklogic.client.io.StringHandle;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -256,6 +257,33 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 
 		files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
 		assertEquals(0, files.size(), "No files should have been loaded since none were new or modified");
+	}
+
+	@Test
+	public void withPropertiesFiles() {
+		AssetFileLoader fileLoader = new AssetFileLoader(modulesClient);
+		fileLoader.setPermissions("rest-extension-user,read,rest-extension-user,update,rest-extension-user,execute");
+		modulesLoader.setAssetFileLoader(fileLoader);
+
+		String dir = Paths.get("src", "test", "resources", "base-dir-with-properties-files").toString();
+		Set<Resource> files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
+		assertEquals(2, files.size());
+
+		DocumentMetadataHandle metadata = new DocumentMetadataHandle();
+
+		modulesClient.newDocumentManager().readMetadata("/root.sjs", metadata);
+		assertEquals(1, metadata.getCollections().size());
+		assertEquals("parent", metadata.getCollections().iterator().next());
+		DocumentMetadataHandle.DocumentPermissions perms = metadata.getPermissions();
+		assertEquals(DocumentMetadataHandle.Capability.READ, perms.get("qconsole-user").iterator().next());
+		assertEquals(3, perms.get("rest-extension-user").size());
+
+		modulesClient.newDocumentManager().readMetadata("/lib/lib.sjs", metadata);
+		assertEquals(1, metadata.getCollections().size());
+		assertEquals("lib", metadata.getCollections().iterator().next());
+		perms = metadata.getPermissions();
+		assertEquals(DocumentMetadataHandle.Capability.UPDATE, perms.get("app-user").iterator().next());
+		assertEquals(3, perms.get("rest-extension-user").size());
 	}
 
 	@Test

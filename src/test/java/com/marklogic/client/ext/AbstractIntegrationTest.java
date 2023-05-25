@@ -19,8 +19,6 @@ import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.ext.spring.SpringDatabaseClientConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,18 +32,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ContextConfiguration(classes = {TestConfig.class})
 public abstract class AbstractIntegrationTest {
 
-	protected Logger logger = LoggerFactory.getLogger(getClass());
-
 	@Autowired
 	protected DatabaseClientConfig clientConfig;
 	protected DatabaseClient client;
 
 	protected ConfiguredDatabaseClientFactory configuredDatabaseClientFactory = new DefaultConfiguredDatabaseClientFactory();
-
-	protected DatabaseClient newClient() {
-		client = configuredDatabaseClientFactory.newDatabaseClient(clientConfig);
-		return client;
-	}
 
 	@AfterEach
 	public void releaseClientOnTearDown() {

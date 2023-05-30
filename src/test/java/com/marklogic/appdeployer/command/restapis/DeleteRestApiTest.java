@@ -18,9 +18,13 @@ package com.marklogic.appdeployer.command.restapis;
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
+import com.marklogic.mgmt.api.API;
+import com.marklogic.mgmt.api.database.Database;
+import com.marklogic.mgmt.api.server.Server;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.restapis.RestApiManager;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -49,6 +53,28 @@ public class DeleteRestApiTest extends AbstractAppDeployerTest {
         assertFalse(mgr.restApiServerExists(SAMPLE_APP_NAME), "The REST API server should have been deleted");
         assertFalse(serverMgr.exists(SAMPLE_APP_NAME), "The REST API app server have been deleted");
     }
+
+	@Test
+	@Disabled("This fails due to a server bug - BUG-60358")
+	void deleteWithFilesystemAsModulesDatabase() {
+		initializeAppDeployer(new DeployRestApiServersCommand(true));
+		appDeployer.deploy(appConfig);
+
+		API api = new API(manageClient);
+
+		// Set the modules-database to the "filesystem", which will cause the DELETE to /v1/rest-apis/to fail due to
+		// the server bug.
+		Server server = new Server(api, appConfig.getRestServerName());
+		server.setModulesDatabase("0");
+		server.save();
+
+		try {
+			appDeployer.undeploy(appConfig);
+		} finally {
+			// Delete the modules-database to ensure it's not left around
+			new Database(api, appConfig.getModulesDatabaseName()).delete();
+		}
+	}
 
     @Test
     public void contentDatabaseCommandAndRestApiCommandConfiguredToDeleteContent() {

@@ -20,7 +20,6 @@ import com.marklogic.client.ext.batch.BatchWriter;
 import com.marklogic.client.ext.batch.RestBatchWriter;
 import com.marklogic.client.ext.file.DocumentFile;
 import com.marklogic.client.ext.file.GenericFileLoader;
-import com.marklogic.client.ext.helper.ClientHelper;
 import com.marklogic.client.ext.modulesloader.impl.DefaultFileFilter;
 import com.marklogic.client.ext.schemasloader.SchemasLoader;
 import com.marklogic.client.io.DocumentMetadataHandle;
@@ -75,7 +74,10 @@ public class DefaultSchemasLoader extends GenericFileLoader implements SchemasLo
 	 * Assumes that the BatchWriter has already been initialized.
 	 *
 	 * @param batchWriter
+	 * @deprecated Since 4.6.0; this class needs a DatabaseClient for the schemas database passed to it so that it can
+	 * pass that client on to specific file processors.
 	 */
+	@Deprecated
 	public DefaultSchemasLoader(BatchWriter batchWriter) {
 		super(batchWriter);
 		initializeDefaultSchemasLoader();
@@ -100,46 +102,45 @@ public class DefaultSchemasLoader extends GenericFileLoader implements SchemasLo
 	@Override
 	public List<DocumentFile> loadSchemas(String... paths) {
 		final List<DocumentFile> documentFiles = super.getDocumentFiles(paths);
-		if (documentFiles.isEmpty()) {
-			return documentFiles;
+
+		if (!documentFiles.isEmpty()) {
+			if (TdeUtil.templateBatchInsertSupported(schemasDatabaseClient) && StringUtils.hasText(tdeValidationDatabase)) {
+				SchemaFiles schemaFiles = readSchemaFiles(documentFiles);
+				if (!schemaFiles.tdeFiles.isEmpty()) {
+					loadTdeTemplatesViaBatchInsert(schemaFiles.tdeFiles);
+				}
+				if (!schemaFiles.nonTdeFiles.isEmpty()) {
+					if (logger.isDebugEnabled()) {
+						logger.debug("Non-TDE files: " + schemaFiles.nonTdeFiles);
+					}
+					super.writeDocumentFiles(schemaFiles.nonTdeFiles);
+				}
+			} else {
+				writeDocumentFiles(documentFiles);
+			}
 		}
 
-		if (TdeUtil.templateBatchInsertSupported(schemasDatabaseClient) && StringUtils.hasText(tdeValidationDatabase)) {
-			final List<DocumentFile> tdeFiles = new ArrayList<>();
-			final List<DocumentFile> nonTdeFiles = new ArrayList<>();
-
-			for (DocumentFile file : documentFiles) {
-				DocumentMetadataHandle metadata = file.getMetadata();
-				if (metadata != null && metadata.getCollections().contains(TdeUtil.TDE_COLLECTION)) {
-					tdeFiles.add(file);
-				} else {
-					nonTdeFiles.add(file);
-				}
-			}
-
-			if (!tdeFiles.isEmpty()) {
-				loadTdeTemplatesViaBatchInsert(tdeFiles);
-			}
-			if (!nonTdeFiles.isEmpty()) {
-				if (logger.isDebugEnabled()) {
-					logger.debug("Non-TDE files: " + nonTdeFiles);
-				}
-				super.writeDocumentFiles(nonTdeFiles);
-			}
-
-			return documentFiles;
-		}
-
-		writeDocumentFiles(documentFiles);
 		return documentFiles;
 	}
 
-	public String getTdeValidationDatabase() {
-		return tdeValidationDatabase;
-	}
+	/**
+	 * @param documentFiles
+	 * @return a SchemaFiles instance that captures a list of TDE files (if any) and a list of all other files found
+	 * that are not TDEs (may also be empty).
+	 */
+	private SchemaFiles readSchemaFiles(List<DocumentFile> documentFiles) {
+		List<DocumentFile> tdeFiles = new ArrayList<>();
+		List<DocumentFile> nonTdeFiles = new ArrayList<>();
 
-	public void setTdeValidationDatabase(String tdeValidationDatabase) {
-		this.tdeValidationDatabase = tdeValidationDatabase;
+		for (DocumentFile file : documentFiles) {
+			DocumentMetadataHandle metadata = file.getMetadata();
+			if (metadata != null && metadata.getCollections().contains(TdeUtil.TDE_COLLECTION)) {
+				tdeFiles.add(file);
+			} else {
+				nonTdeFiles.add(file);
+			}
+		}
+		return new SchemaFiles(tdeFiles, nonTdeFiles);
 	}
 
 	private void loadTdeTemplatesViaBatchInsert(List<DocumentFile> tdeFiles) {
@@ -160,7 +161,6 @@ public class DefaultSchemasLoader extends GenericFileLoader implements SchemasLo
 	}
 
 	/**
-	 *
 	 * @param documentFiles
 	 * @return a JavaScript query that uses the tde.templateBatchInsert function introduced in ML 10.0-9
 	 */
@@ -201,5 +201,28 @@ public class DefaultSchemasLoader extends GenericFileLoader implements SchemasLo
 			.concat(templateInfoList.stream().collect(Collectors.joining(",")))
 			.concat("]);");
 		return templateString;
+	}
+
+	private static class SchemaFiles {
+		private final List<DocumentFile> tdeFiles;
+		private final List<DocumentFile> nonTdeFiles;
+
+		public SchemaFiles(List<DocumentFile> tdeFiles, List<DocumentFile> nonTdeFiles) {
+			this.tdeFiles = tdeFiles;
+			this.nonTdeFiles = nonTdeFiles;
+		}
+	}
+
+	public String getTdeValidationDatabase() {
+		return tdeValidationDatabase;
+	}
+
+	/**
+	 * @param tdeValidationDatabase
+	 * @deprecated Should be set via the constructor and not modified.
+	 */
+	@Deprecated
+	public void setTdeValidationDatabase(String tdeValidationDatabase) {
+		this.tdeValidationDatabase = tdeValidationDatabase;
 	}
 }

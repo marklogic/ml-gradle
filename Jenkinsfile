@@ -21,6 +21,8 @@ pipeline{
           export GRADLE_USER_HOME=$WORKSPACE/$GRADLE_DIR
           export PATH=$GRADLE_USER_HOME:$JAVA_HOME/bin:$PATH
           cd ml-javaclient-util
+          echo "mlPassword=admin" > gradle-local.properties
+          ./gradlew -i mlDeploy
           ./gradlew test  || true
         '''
         junit '**/build/**/*.xml'

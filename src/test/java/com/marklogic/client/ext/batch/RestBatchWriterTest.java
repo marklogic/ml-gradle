@@ -42,7 +42,7 @@ public class RestBatchWriterTest extends AbstractIntegrationTest {
 
 	@Test
 	public void failureTest() {
-		RestBatchWriter writer = new RestBatchWriter(newClient("Documents"));
+		RestBatchWriter writer = new RestBatchWriter(newClient(CONTENT_DATABASE));
 
 		DocumentWriteOperation op = new DocumentWriteOperationImpl(DocumentWriteOperation.OperationType.DOCUMENT_WRITE,
 			"/test.xml", null, new StringHandle("<hello>world</hello>asdf"));
@@ -60,7 +60,7 @@ public class RestBatchWriterTest extends AbstractIntegrationTest {
 
 	@Test
 	public void failureTestWithCustomListener() {
-		RestBatchWriter writer = new RestBatchWriter(newClient("Documents"));
+		RestBatchWriter writer = new RestBatchWriter(newClient(CONTENT_DATABASE));
 		TestWriteListener testWriteListener = new TestWriteListener();
 		writer.setWriteListener(testWriteListener);
 
@@ -78,7 +78,7 @@ public class RestBatchWriterTest extends AbstractIntegrationTest {
 
 	@Test
 	public void writeDocumentWithTransform() throws IOException {
-		DatabaseClient client = newClient("Documents");
+		DatabaseClient client = newClient(CONTENT_DATABASE);
 		Resource transform = new FileSystemResource(Paths.get("src", "test", "resources", "transform", "simple.xqy").toString());
 		TransformExtensionsManager transMgr = client.newServerConfigManager().newTransformExtensionsManager();
 		FileHandle fileHandle = new FileHandle(transform.getFile());
@@ -96,7 +96,7 @@ public class RestBatchWriterTest extends AbstractIntegrationTest {
 		writer.write(Collections.singletonList(op));
 		writer.waitForCompletion();
 
-		client = newClient("Documents");
+		client = newClient(CONTENT_DATABASE);
 		XMLDocumentManager docMgr = client.newXMLDocumentManager();
 		DocumentPage page = docMgr.read("/test.xml");
 		StringHandle handle = page.nextContent(new StringHandle());

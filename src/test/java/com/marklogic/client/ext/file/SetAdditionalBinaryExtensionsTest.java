@@ -28,7 +28,7 @@ public class SetAdditionalBinaryExtensionsTest extends AbstractIntegrationTest {
 
 	@Test
 	public void test() {
-		client = newClient("Documents");
+		client = newClient(CONTENT_DATABASE);
 		client.newServerEval().xquery("cts:uris((), (), cts:true-query()) ! xdmp:document-delete(.)").eval();
 
 		GenericFileLoader loader = new GenericFileLoader(client);

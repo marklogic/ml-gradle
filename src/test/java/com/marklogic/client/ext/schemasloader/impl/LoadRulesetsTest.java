@@ -30,7 +30,7 @@ public class LoadRulesetsTest extends AbstractSchemasTest {
 	@Test
 	public void test() {
 		// Pass in a TDE validation database to ensure that TDE validation doesn't happen for these files
-		DefaultSchemasLoader loader = new DefaultSchemasLoader(client, "Documents");
+		DefaultSchemasLoader loader = new DefaultSchemasLoader(client, CONTENT_DATABASE);
 		List<DocumentFile> files = loader.loadSchemas(Paths.get("src", "test", "resources", "rulesets", "collection-test").toString());
 		assertEquals(2, files.size());
 

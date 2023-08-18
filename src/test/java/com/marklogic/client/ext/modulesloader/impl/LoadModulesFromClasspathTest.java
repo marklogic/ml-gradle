@@ -36,7 +36,7 @@ public class LoadModulesFromClasspathTest extends AbstractIntegrationTest {
 
 	@BeforeEach
 	public void setup() {
-		client = newClient("Modules");
+		client = newClient(MODULES_DATABASE);
 		modulesClient = client;
 		modulesClient.newServerEval().xquery("cts:uris((), (), cts:true-query()) ! xdmp:document-delete(.)").eval();
 	}

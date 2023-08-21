@@ -26,20 +26,20 @@ repositories {
 }
 
 dependencies {
-	api 'com.marklogic:marklogic-client-api:6.2.0'
-	api 'com.marklogic:marklogic-xcc:11.0.2'
-	api 'org.springframework:spring-context:5.3.27'
+	api 'com.marklogic:marklogic-client-api:6.2.2'
+	api 'com.marklogic:marklogic-xcc:11.0.3'
+	api 'org.springframework:spring-context:5.3.29'
 
 	implementation 'org.jdom:jdom2:2.0.6.1'
 
-	implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.1'
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.3'
 
 	// This is currently an implementation dependency, though perhaps should be an api dependency due to its usage in
 	// LoggingObject; not clear yet on whether the protected Logger in that class should make this an api dependency or not
 	implementation 'org.slf4j:slf4j-api:1.7.36'
 
-	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
-	testImplementation 'org.springframework:spring-test:5.3.27'
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+	testImplementation 'org.springframework:spring-test:5.3.29'
 	testImplementation 'org.mockito:mockito-core:4.11.0'
 
 	// Used for testing loading modules from the classpath
@@ -57,7 +57,7 @@ dependencies {
 
 	// Including the "new" JAXB libraries to verify that their presence doesn't cause the "old" JAXB libraries to fail
 	testImplementation "jakarta.xml.bind:jakarta.xml.bind-api:4.0.0"
-	testImplementation "com.sun.xml.bind:jaxb-impl:4.0.1"
+	testImplementation "com.sun.xml.bind:jaxb-impl:4.0.3"
 }
 
 test {

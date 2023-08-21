@@ -236,6 +236,15 @@ public class AdminManager extends AbstractManager {
         return getServerConfig().getElementValue("/m:host/m:version");
     }
 
+	/**
+	 *
+	 * @return
+	 * @since 4.6.0
+	 */
+	public String getServerTimestamp() {
+		return getServerConfig().getElementValue("/m:host/m:timestamp");
+	}
+
     public void setWaitForRestartCheckInterval(int waitForRestartCheckInterval) {
         this.waitForRestartCheckInterval = waitForRestartCheckInterval;
     }

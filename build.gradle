@@ -7,6 +7,10 @@ plugins {
 	// This plugin requires Java 11; keeping it commented out so that this project can be built and tested via
 	// Java 8, 11 or 17; to use this plugin, uncomment this line and use java 11 or higher
 	//	id "com.github.jk1.dependency-license-report" version "2.1"
+
+	// For deploying the test app.
+	id 'net.saliman.properties' version '1.5.2'
+	id "com.marklogic.ml-gradle" version "4.5.2"
 }
 
 group = "com.marklogic"

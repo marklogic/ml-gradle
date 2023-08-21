@@ -16,13 +16,12 @@
 package com.marklogic.client.ext;
 
 import com.marklogic.client.DatabaseClient;
-import com.marklogic.client.ext.spring.SpringDatabaseClientConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.test.context.ContextConfiguration;
@@ -31,6 +30,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestConfig.class})
 public abstract class AbstractIntegrationTest {
+
+	protected final static String CONTENT_DATABASE = "ml-javaclient-util-test-content";
+	protected final static String MODULES_DATABASE = "ml-javaclient-util-test-modules";
 
 	@Autowired
 	protected DatabaseClientConfig clientConfig;
@@ -59,9 +61,17 @@ public abstract class AbstractIntegrationTest {
 }
 
 @Configuration
-@Import(value = {SpringDatabaseClientConfig.class})
-@PropertySource(value = { "classpath:test.properties", "classpath:user.properties" }, ignoreResourceNotFound = true)
-class TestConfig {
+@PropertySource(value = {"file:gradle.properties", "file:gradle-local.properties"}, ignoreResourceNotFound = true)
+class TestConfig extends DatabaseClientConfig {
+
+	@Autowired
+	public TestConfig(
+		@Value("${mlHost}") String host,
+		@Value("${mlRestPort}") int port,
+		@Value("${mlUsername}") String username,
+		@Value("${mlPassword}") String password) {
+		super(host, port, username, password);
+	}
 
 	/**
 	 * Ensures that placeholders are replaced with property values

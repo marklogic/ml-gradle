@@ -50,7 +50,7 @@ public class LoadSchemasTest extends AbstractSchemasTest {
 
 	@Test
 	public void testTemplateBatchInsert() {
-		DefaultSchemasLoader loader = new DefaultSchemasLoader(client, "Documents");
+		DefaultSchemasLoader loader = new DefaultSchemasLoader(client, CONTENT_DATABASE);
 		List<DocumentFile> files = loader.loadSchemas(Paths.get("src", "test", "resources", "good-schemas", "originals").toString());
 		assertEquals(2, files.size());
 

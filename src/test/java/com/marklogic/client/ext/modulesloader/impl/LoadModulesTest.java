@@ -45,14 +45,15 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 
 	@BeforeEach
 	public void setup() {
-		client = newClient("Modules");
+		client = newClient(MODULES_DATABASE);
 		client.newServerEval().xquery("cts:uris((), (), cts:true-query()) ! xdmp:document-delete(.)").eval();
 		modulesClient = client;
 		assertEquals(0, getUriCountInModulesDatabase(), "No new modules should have been created");
 
 		/**
 		 * Odd - the Client REST API doesn't allow for loading namespaces when the DatabaseClient has a database
-		 * specified, so we construct a DatabaseClient without a database and assume we get "Documents".
+		 * specified, so we construct a DatabaseClient without a database and assume we get the expected content
+		 * database.
 		 */
 		String currentDatabase = clientConfig.getDatabase();
 		clientConfig.setDatabase(null);
@@ -88,7 +89,7 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 			assertTrue(StringUtils.isEmpty(mgr.getDefaultDocumentReadTransform()));
 			assertTrue(mgr.getDefaultDocumentReadTransformAll());
 		} finally {
-			set8000RestPropertiesToMarkLogicDefaults();
+			setRestPropertiesToMarkLogicDefaults();
 		}
 	}
 
@@ -112,11 +113,11 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 			assertTrue(StringUtils.isEmpty(mgr.getDefaultDocumentReadTransform()));
 			assertTrue(mgr.getDefaultDocumentReadTransformAll());
 		} finally {
-			set8000RestPropertiesToMarkLogicDefaults();
+			setRestPropertiesToMarkLogicDefaults();
 		}
 	}
 
-	private void set8000RestPropertiesToMarkLogicDefaults() {
+	private void setRestPropertiesToMarkLogicDefaults() {
 		ServerConfigurationManager mgr = client.newServerConfigManager();
 		mgr.setQueryValidation(false);
 		mgr.setQueryOptionValidation(true);
@@ -192,7 +193,7 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 		modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
 
 		String optionsXml = modulesClient.newXMLDocumentManager().read(
-			"/Default/App-Services/rest-api/options/sample-options.xml", new StringHandle()).get();
+			"/Default/ml-javaclient-util-test/rest-api/options/sample-options.xml", new StringHandle()).get();
 		assertTrue(optionsXml.contains("fn:collection('hello-world')"));
 
 		String serviceText = new String(modulesClient.newDocumentManager().read(

@@ -35,6 +35,7 @@ public class DefaultSchemasLoader extends GenericFileLoader implements SchemasLo
 
 	private DatabaseClient schemasDatabaseClient;
 	private String tdeValidationDatabase;
+	protected QbvDocumentFileProcessor qbvDocumentFileProcessor;
 
 	/**
 	 * Simplest constructor for using this class. Just provide a DatabaseClient, and this will use sensible defaults for
@@ -88,7 +89,9 @@ public class DefaultSchemasLoader extends GenericFileLoader implements SchemasLo
 	 * a DocumentFileReader by the parent class.
 	 */
 	protected void initializeDefaultSchemasLoader() {
+		this.qbvDocumentFileProcessor = new QbvDocumentFileProcessor(this.schemasDatabaseClient, this.tdeValidationDatabase);
 		addDocumentFileProcessor(new TdeDocumentFileProcessor(this.schemasDatabaseClient, this.tdeValidationDatabase));
+		addDocumentFileProcessor(this.qbvDocumentFileProcessor);
 		addFileFilter(new DefaultFileFilter());
 	}
 
@@ -119,6 +122,7 @@ public class DefaultSchemasLoader extends GenericFileLoader implements SchemasLo
 				writeDocumentFiles(documentFiles);
 			}
 		}
+		this.qbvDocumentFileProcessor.processQbvFiles();
 
 		return documentFiles;
 	}

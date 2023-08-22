@@ -22,11 +22,12 @@ java {
 }
 
 repositories {
+	mavenLocal()
 	mavenCentral()
 }
 
 dependencies {
-	api 'com.marklogic:marklogic-client-api:6.2.2'
+	api 'com.marklogic:marklogic-client-api:6.3-SNAPSHOT'
 	api 'com.marklogic:marklogic-xcc:11.0.3'
 	api 'org.springframework:spring-context:5.3.29'
 

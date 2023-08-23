@@ -19,6 +19,8 @@ import com.marklogic.appdeployer.command.AbstractUndoableCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.api.API;
+import com.marklogic.mgmt.api.configuration.Configuration;
+import com.marklogic.mgmt.api.configuration.Configurations;
 import com.marklogic.mgmt.api.forest.Forest;
 import com.marklogic.mgmt.mapper.DefaultResourceMapper;
 import com.marklogic.mgmt.mapper.ResourceMapper;
@@ -28,7 +30,11 @@ import com.marklogic.mgmt.resource.forests.ForestStatus;
 import com.marklogic.mgmt.resource.groups.GroupManager;
 import com.marklogic.mgmt.resource.hosts.HostManager;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Command for configuring - i.e. creating and setting - replica forests for existing databases.
@@ -131,19 +137,37 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 		List<String> dataDirectories = forestBuilder.determineDataDirectories(databaseName, context.getAppConfig());
 		forestBuilder.addReplicasToForests(forestsNeedingReplicas, forestPlan, context.getAppConfig(), dataDirectories);
 
-		// TODO Use CMA here in the future? Need to test to see if a forest name + replicas are allowable
-		ForestManager forestManager = new ForestManager(context.getManageClient());
-		for (Forest forest : forestsNeedingReplicas) {
-			final String forestName = forest.getForestName();
-
+		List<Forest> forestsWithOnlyReplicas = forestsNeedingReplicas.stream().map(forest -> {
 			Forest forestWithOnlyReplicas = new Forest();
+			forestWithOnlyReplicas.setForestName(forest.getForestName());
 			forestWithOnlyReplicas.setForestReplica(forest.getForestReplica());
-			String json = forestWithOnlyReplicas.getJson();
+			return forestWithOnlyReplicas;
+		}).collect(Collectors.toList());
 
-			logger.info(format("Creating forest replicas for primary forest %s", forestName));
-			context.getManageClient().putJson(forestManager.getPropertiesPath(forestName), json);
-			logger.info(format("Finished creating forest replicas for primary forest %s", forestName));
+		// As of 4.5.3, try CMA first so that this can be done in a single request instead of one request per forest.
+		if (context.getAppConfig().getCmaConfig().isDeployForests()) {
+			try {
+				Configuration config = new Configuration();
+				forestsWithOnlyReplicas.forEach(forest -> {
+					config.addForest(forest.toObjectNode());
+				});
+				new Configurations(config).submit(context.getManageClient());
+				return;
+			} catch (Exception ex) {
+				logger.warn("Unable to create forest replicas via CMA; cause: " + ex.getMessage() + "; will " +
+					"fall back to using /manage/v2.");
+			}
 		}
+
+		// If we get here, either CMA usage is disabled or an error occurred with CMA. Just use /manage/v2 to submit
+		// each forest one-by-one.
+		ForestManager forestManager = new ForestManager(context.getManageClient());
+		forestsWithOnlyReplicas.forEach(forest -> {
+			String forestName = forest.getForestName();
+			logger.info(format("Creating forest replicas for primary forest %s", forestName));
+			context.getManageClient().putJson(forestManager.getPropertiesPath(forestName), forest.getJson());
+			logger.info(format("Finished creating forest replicas for primary forest %s", forestName));
+		});
 	}
 
 	/**

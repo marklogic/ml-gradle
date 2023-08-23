@@ -128,12 +128,25 @@ public class DeployForestsCommand extends AbstractCommand {
 	 */
 	public List<Forest> buildForests(CommandContext context, boolean includeReplicas) {
 		// Need to know what primary forests exist already in case more need to be added, or a new host has been added
-		List<Forest> existingPrimaryForests = getExistingPrimaryForests(context, this.databaseName);
+		List<Forest> existingPrimaryForests = null;
+
+		// As of 4.5.3, if CMA is enabled, then the context should contain a map of all the forests for each database
+		// being deployed. If it's not there, then /manage/v2 will be used instead.
+		if (context.getAppConfig().getCmaConfig().isDeployForests()) {
+			Map<String, List<Forest>> map = (Map<String, List<Forest>>) context.getContextMap().get("ml-app-deployer-forestMap");
+			if (map != null && map.containsKey(this.databaseName)) {
+				existingPrimaryForests = map.get(this.databaseName);
+			}
+		}
+
+		if (existingPrimaryForests == null) {
+			existingPrimaryForests = getExistingPrimaryForests(context, this.databaseName);
+		}
+
 		return buildForests(context, includeReplicas, existingPrimaryForests);
 	}
 
 	/**
-	 *
 	 * @param context
 	 * @param includeReplicas
 	 * @param existingPrimaryForests
@@ -163,6 +176,14 @@ public class DeployForestsCommand extends AbstractCommand {
 		return forestBuilder.buildForests(forestPlan, context.getAppConfig());
 	}
 
+	/**
+	 * @param context
+	 * @param databaseName
+	 * @return
+	 * @deprecated in 4.5.3, as getting forest details one at a time can be very slow for applications with a large
+	 * number of forests.
+	 */
+	@Deprecated
 	protected List<Forest> getExistingPrimaryForests(CommandContext context, String databaseName) {
 		List<String> forestIds = new DatabaseManager(context.getManageClient()).getPrimaryForestIds(databaseName);
 		ForestManager forestMgr = new ForestManager(context.getManageClient());
@@ -259,6 +280,7 @@ public class DeployForestsCommand extends AbstractCommand {
 
 	/**
 	 * Use appConfig.setDatabasesWithForestsOnOneHost
+	 *
 	 * @param createForestsOnEachHost
 	 */
 	@Deprecated

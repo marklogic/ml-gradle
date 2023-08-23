@@ -34,13 +34,22 @@ import com.marklogic.mgmt.api.forest.Forest;
 import com.marklogic.mgmt.mapper.DefaultResourceMapper;
 import com.marklogic.mgmt.mapper.ResourceMapper;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
+import com.marklogic.mgmt.resource.forests.ForestManager;
 import com.marklogic.mgmt.util.ObjectMapperFactory;
 import com.marklogic.rest.util.JsonNodeUtil;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * As of release 3.14.0, this now handles all databases, not just "databases other than the default content database".
@@ -161,7 +170,7 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 	/**
 	 * If no database files are found, may still need to delete the content database in case no file exists for it.
 	 * That's because the command for creating a REST API server will not delete the content database by default.
-	 *
+	 * <p>
 	 * Per ticket #404, this will now do a check to see if the default content database filename is ignored. If so,
 	 * and there are no database files found, then the content database will not be deleted.
 	 *
@@ -392,6 +401,8 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 	 * @param databasePlans
 	 */
 	protected void deployDatabasesAndForestsViaCma(CommandContext context, List<DatabasePlan> databasePlans) {
+		addForestMapToCommandContext(context, databasePlans);
+
 		Configuration dbConfig = new Configuration();
 		// Forests must be included in a separate configuration object
 		Configuration forestConfig = new Configuration();
@@ -413,6 +424,28 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 		databasePlans.forEach(plan -> {
 			plan.getDeployDatabaseCommand().deploySubDatabases(plan.getDatabaseName(), context);
 		});
+	}
+
+	/**
+	 * Added to greatly speed up performance when getting details about all the existing primary forests for each
+	 * database referenced by a plan. In the event that anything fails, the map won't be added to the command context
+	 * and any code expecting to use the map will just have to fall back to use /manage/v2.
+	 *
+	 * @param context
+	 * @param databasePlans
+	 */
+	private void addForestMapToCommandContext(CommandContext context, List<DatabasePlan> databasePlans) {
+		try {
+			Set<String> dbNames = databasePlans.stream().map(plan -> plan.getDatabaseName()).collect(Collectors.toSet());
+			logger.info("Retrieving all forest details via CMA");
+			long start = System.currentTimeMillis();
+			Map<String, List<Forest>> forestMap = new ForestManager(context.getManageClient()).getPrimaryForestsForDatabases(dbNames.toArray(new String[]{}));
+			logger.info("Finished retrieving all forests details via CMA; duration: " + (System.currentTimeMillis() - start));
+			context.getContextMap().put("ml-app-deployer-forestMap", forestMap);
+		} catch (Exception ex) {
+			logger.warn("Unable to retrieve all forest details, cause: " + ex.getMessage() + "; will fall back to " +
+				"using /manage/v2 when needed for getting details for a forest.");
+		}
 	}
 
 	/**

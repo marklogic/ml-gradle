@@ -3,7 +3,7 @@ plugins {
 	// processing the gradle-(environmentName).properties files.
 	id "net.saliman.properties" version "1.4.6"
 
-	id "com.marklogic.ml-gradle" version "4.5.2"
+	id "com.marklogic.ml-gradle" version "4.5.3"
 }
 
 task printHost {

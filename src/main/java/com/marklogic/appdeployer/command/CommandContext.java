@@ -20,8 +20,13 @@ import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.admin.AdminManager;
 import com.marklogic.mgmt.api.configuration.Configuration;
 import com.marklogic.mgmt.api.configuration.Configurations;
+import com.marklogic.mgmt.api.forest.Forest;
+import com.marklogic.mgmt.resource.forests.ForestManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -58,6 +63,36 @@ public class CommandContext {
 			contextMap.put(COMBINED_CMA_REQUEST_KEY, new Configurations(configuration));
 		} else {
 			configs.addConfig(configuration);
+		}
+	}
+
+	/**
+	 * Added to greatly speed up performance when getting details about all the existing primary forests for each
+	 * database in the cluster. In the event that anything fails while getting the forest details, the map won't be
+	 * added to the context and any code expecting to use the map will have to fall back to using /manage/v2.
+	 *
+	 * @since 4.5.3
+	 */
+	public Map<String, List<Forest>> getMapOfPrimaryForests() {
+		if (!appConfig.getCmaConfig().isDeployForests()) {
+			return null;
+		}
+		final String key = "ml-app-deployer-mapOfPrimaryForests";
+		if (contextMap.containsKey(key)) {
+			return (Map<String, List<Forest>>) contextMap.get(key);
+		}
+		Logger logger = LoggerFactory.getLogger(getClass());
+		try {
+			logger.info("Retrieving all forest details via CMA");
+			long start = System.currentTimeMillis();
+			Map<String, List<Forest>> mapOfPrimaryForests = new ForestManager(manageClient).getMapOfPrimaryForests();
+			logger.info("Finished retrieving all forests details via CMA; duration: " + (System.currentTimeMillis() - start));
+			contextMap.put(key, mapOfPrimaryForests);
+			return mapOfPrimaryForests;
+		} catch (Exception ex) {
+			logger.warn("Unable to retrieve all forest details, cause: " + ex.getMessage() + "; will fall back to " +
+				"using /manage/v2 when needed for getting details for a forest.");
+			return null;
 		}
 	}
 

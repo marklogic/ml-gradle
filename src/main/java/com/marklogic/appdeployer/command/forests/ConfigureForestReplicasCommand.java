@@ -185,22 +185,41 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 		ResourceMapper resourceMapper = new DefaultResourceMapper(api);
 
 		List<Forest> forestsNeedingReplicas = new ArrayList<>();
+		Map<String, List<Forest>> mapOfPrimaryForests = context.getMapOfPrimaryForests();
 
-		for (String forestName : dbMgr.getForestNames(databaseName)) {
-			logger.info(format("Checking the status of forest %s to determine if it is a primary forest and whether or not it has replicas already.", forestName));
-			ForestStatus status = forestManager.getForestStatus(forestName);
-			if (!status.isPrimary()) {
-				logger.info(format("Forest %s is not a primary forest, so not configuring replica forests", forestName));
-				continue;
-			}
-			if (status.hasReplicas()) {
-				logger.info(format("Forest %s already has replicas, so not configuring replica forests", forestName));
-				continue;
-			}
+		/**
+		 * In both blocks below, a forest is not included if it already has replicas. This logic dates back to 2015,
+		 * and is likely due to uncertainty over the various scenarios that can occur if a forest does already have
+		 * replicas. At least as of August 2023, MarkLogic recommends a single replica per forest. Given that no users
+		 * have asked for this check to not be performed and based on MarkLogic's recommendation, it seems reasonable
+		 * to leave this check in for now. However, some ad hoc testing has indicated that this check is unnecessary
+		 * and that it appears to safe to vary the number of replicas per forest. So it likely would be beneficial to
+		 * remove this check at some point.
+		 */
+		if (mapOfPrimaryForests != null && mapOfPrimaryForests.containsKey(databaseName)) {
+			mapOfPrimaryForests.get(databaseName).forEach(forest -> {
+				boolean forestHasReplicasAlready = forest.getForestReplica() != null && !forest.getForestReplica().isEmpty();
+				if (!forestHasReplicasAlready) {
+					forestsNeedingReplicas.add(forest);
+				}
+			});
+		} else {
+			for (String forestName : dbMgr.getForestNames(databaseName)) {
+				logger.info(format("Checking the status of forest %s to determine if it is a primary forest and whether or not it has replicas already.", forestName));
+				ForestStatus status = forestManager.getForestStatus(forestName);
+				if (!status.isPrimary()) {
+					logger.info(format("Forest %s is not a primary forest, so not configuring replica forests", forestName));
+					continue;
+				}
+				if (status.hasReplicas()) {
+					logger.info(format("Forest %s already has replicas, so not configuring replica forests", forestName));
+					continue;
+				}
 
-			String forestJson = forestManager.getPropertiesAsJson(forestName);
-			Forest forest = resourceMapper.readResource(forestJson, Forest.class);
-			forestsNeedingReplicas.add(forest);
+				String forestJson = forestManager.getPropertiesAsJson(forestName);
+				Forest forest = resourceMapper.readResource(forestJson, Forest.class);
+				forestsNeedingReplicas.add(forest);
+			}
 		}
 
 		return forestsNeedingReplicas;

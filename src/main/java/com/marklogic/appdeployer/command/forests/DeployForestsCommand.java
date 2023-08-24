@@ -132,11 +132,9 @@ public class DeployForestsCommand extends AbstractCommand {
 
 		// As of 4.5.3, if CMA is enabled, then the context should contain a map of all the forests for each database
 		// being deployed. If it's not there, then /manage/v2 will be used instead.
-		if (context.getAppConfig().getCmaConfig().isDeployForests()) {
-			Map<String, List<Forest>> map = (Map<String, List<Forest>>) context.getContextMap().get("ml-app-deployer-forestMap");
-			if (map != null && map.containsKey(this.databaseName)) {
-				existingPrimaryForests = map.get(this.databaseName);
-			}
+		Map<String, List<Forest>> mapOfPrimaryForests = context.getMapOfPrimaryForests();
+		if (mapOfPrimaryForests != null && mapOfPrimaryForests.containsKey(this.databaseName)) {
+			existingPrimaryForests = mapOfPrimaryForests.get(this.databaseName);
 		}
 
 		if (existingPrimaryForests == null) {

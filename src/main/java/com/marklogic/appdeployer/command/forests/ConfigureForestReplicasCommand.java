@@ -19,6 +19,8 @@ import com.marklogic.appdeployer.command.AbstractUndoableCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.api.API;
+import com.marklogic.mgmt.api.configuration.Configuration;
+import com.marklogic.mgmt.api.configuration.Configurations;
 import com.marklogic.mgmt.api.forest.Forest;
 import com.marklogic.mgmt.mapper.DefaultResourceMapper;
 import com.marklogic.mgmt.mapper.ResourceMapper;
@@ -28,7 +30,11 @@ import com.marklogic.mgmt.resource.forests.ForestStatus;
 import com.marklogic.mgmt.resource.groups.GroupManager;
 import com.marklogic.mgmt.resource.hosts.HostManager;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Command for configuring - i.e. creating and setting - replica forests for existing databases.
@@ -131,19 +137,37 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 		List<String> dataDirectories = forestBuilder.determineDataDirectories(databaseName, context.getAppConfig());
 		forestBuilder.addReplicasToForests(forestsNeedingReplicas, forestPlan, context.getAppConfig(), dataDirectories);
 
-		// TODO Use CMA here in the future? Need to test to see if a forest name + replicas are allowable
-		ForestManager forestManager = new ForestManager(context.getManageClient());
-		for (Forest forest : forestsNeedingReplicas) {
-			final String forestName = forest.getForestName();
-
+		List<Forest> forestsWithOnlyReplicas = forestsNeedingReplicas.stream().map(forest -> {
 			Forest forestWithOnlyReplicas = new Forest();
+			forestWithOnlyReplicas.setForestName(forest.getForestName());
 			forestWithOnlyReplicas.setForestReplica(forest.getForestReplica());
-			String json = forestWithOnlyReplicas.getJson();
+			return forestWithOnlyReplicas;
+		}).collect(Collectors.toList());
 
-			logger.info(format("Creating forest replicas for primary forest %s", forestName));
-			context.getManageClient().putJson(forestManager.getPropertiesPath(forestName), json);
-			logger.info(format("Finished creating forest replicas for primary forest %s", forestName));
+		// As of 4.5.3, try CMA first so that this can be done in a single request instead of one request per forest.
+		if (context.getAppConfig().getCmaConfig().isDeployForests()) {
+			try {
+				Configuration config = new Configuration();
+				forestsWithOnlyReplicas.forEach(forest -> {
+					config.addForest(forest.toObjectNode());
+				});
+				new Configurations(config).submit(context.getManageClient());
+				return;
+			} catch (Exception ex) {
+				logger.warn("Unable to create forest replicas via CMA; cause: " + ex.getMessage() + "; will " +
+					"fall back to using /manage/v2.");
+			}
 		}
+
+		// If we get here, either CMA usage is disabled or an error occurred with CMA. Just use /manage/v2 to submit
+		// each forest one-by-one.
+		ForestManager forestManager = new ForestManager(context.getManageClient());
+		forestsWithOnlyReplicas.forEach(forest -> {
+			String forestName = forest.getForestName();
+			logger.info(format("Creating forest replicas for primary forest %s", forestName));
+			context.getManageClient().putJson(forestManager.getPropertiesPath(forestName), forest.getJson());
+			logger.info(format("Finished creating forest replicas for primary forest %s", forestName));
+		});
 	}
 
 	/**
@@ -161,22 +185,41 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 		ResourceMapper resourceMapper = new DefaultResourceMapper(api);
 
 		List<Forest> forestsNeedingReplicas = new ArrayList<>();
+		Map<String, List<Forest>> mapOfPrimaryForests = context.getMapOfPrimaryForests();
 
-		for (String forestName : dbMgr.getForestNames(databaseName)) {
-			logger.info(format("Checking the status of forest %s to determine if it is a primary forest and whether or not it has replicas already.", forestName));
-			ForestStatus status = forestManager.getForestStatus(forestName);
-			if (!status.isPrimary()) {
-				logger.info(format("Forest %s is not a primary forest, so not configuring replica forests", forestName));
-				continue;
-			}
-			if (status.hasReplicas()) {
-				logger.info(format("Forest %s already has replicas, so not configuring replica forests", forestName));
-				continue;
-			}
+		/**
+		 * In both blocks below, a forest is not included if it already has replicas. This logic dates back to 2015,
+		 * and is likely due to uncertainty over the various scenarios that can occur if a forest does already have
+		 * replicas. At least as of August 2023, MarkLogic recommends a single replica per forest. Given that no users
+		 * have asked for this check to not be performed and based on MarkLogic's recommendation, it seems reasonable
+		 * to leave this check in for now. However, some ad hoc testing has indicated that this check is unnecessary
+		 * and that it appears to safe to vary the number of replicas per forest. So it likely would be beneficial to
+		 * remove this check at some point.
+		 */
+		if (mapOfPrimaryForests != null && mapOfPrimaryForests.containsKey(databaseName)) {
+			mapOfPrimaryForests.get(databaseName).forEach(forest -> {
+				boolean forestHasReplicasAlready = forest.getForestReplica() != null && !forest.getForestReplica().isEmpty();
+				if (!forestHasReplicasAlready) {
+					forestsNeedingReplicas.add(forest);
+				}
+			});
+		} else {
+			for (String forestName : dbMgr.getForestNames(databaseName)) {
+				logger.info(format("Checking the status of forest %s to determine if it is a primary forest and whether or not it has replicas already.", forestName));
+				ForestStatus status = forestManager.getForestStatus(forestName);
+				if (!status.isPrimary()) {
+					logger.info(format("Forest %s is not a primary forest, so not configuring replica forests", forestName));
+					continue;
+				}
+				if (status.hasReplicas()) {
+					logger.info(format("Forest %s already has replicas, so not configuring replica forests", forestName));
+					continue;
+				}
 
-			String forestJson = forestManager.getPropertiesAsJson(forestName);
-			Forest forest = resourceMapper.readResource(forestJson, Forest.class);
-			forestsNeedingReplicas.add(forest);
+				String forestJson = forestManager.getPropertiesAsJson(forestName);
+				Forest forest = resourceMapper.readResource(forestJson, Forest.class);
+				forestsNeedingReplicas.add(forest);
+			}
 		}
 
 		return forestsNeedingReplicas;

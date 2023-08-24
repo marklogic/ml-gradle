@@ -28,7 +28,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -61,40 +60,36 @@ public class ForestManager extends AbstractResourceManager {
 	}
 
 	/**
-	 * Uses CMA to get back all forests in the cluster. Then returns a map where keys are the given database names,
+	 * Uses CMA to get back all forests in the cluster. Then returns a map where keys are the database names,
 	 * and each key has a list of primary forests for that database.
 	 *
-	 * @param databaseNames
 	 * @return
 	 * @since 4.5.3
 	 */
-	public Map<String, List<Forest>> getPrimaryForestsForDatabases(String... databaseNames) {
+	public Map<String, List<Forest>> getMapOfPrimaryForests() {
 		String uri = UriComponentsBuilder.fromUri(getManageClient().buildUri("/manage/v3"))
 			.queryParam("format", "json").queryParam("resource-type", "forest")
 			.encode().toUriString();
 
 		JsonNode json = getManageClient().getRestTemplate().exchange(uri, HttpMethod.GET, null, JsonNode.class).getBody();
-		// Config is an array of objects, and it should have a single object based on our request.
+		// Config is an array of objects, and it will have a single object based on our request.
 		ArrayNode allPrimaryForests = (ArrayNode) json.get("config").get(0).get("forest");
 		ResourceMapper mapper = new DefaultResourceMapper(new API(getManageClient()));
 
-		List<String> dbNames = Arrays.asList(databaseNames);
-		Map<String, List<Forest>> forestMap = new HashMap<>();
+		Map<String, List<Forest>> mapOfPrimaryForests = new HashMap<>();
 		allPrimaryForests.iterator().forEachRemaining(forest -> {
 			if (forest.has("database")) {
 				String db = forest.get("database").asText();
-				if (dbNames.contains(db)) {
-					List<Forest> forests = forestMap.get(db);
-					if (forests == null) {
-						forests = new ArrayList<>();
-						forestMap.put(db, forests);
-					}
-					forests.add(mapper.readResource(forest.toString(), Forest.class));
+				List<Forest> databaseForests = mapOfPrimaryForests.get(db);
+				if (databaseForests == null) {
+					databaseForests = new ArrayList<>();
+					mapOfPrimaryForests.put(db, databaseForests);
 				}
+				databaseForests.add(mapper.readResource(forest.toString(), Forest.class));
 			}
 		});
-		
-		return forestMap;
+
+		return mapOfPrimaryForests;
 	}
 
 	public void createJsonForestWithName(String name, String host) {

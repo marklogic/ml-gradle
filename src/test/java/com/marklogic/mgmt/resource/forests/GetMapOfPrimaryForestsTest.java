@@ -8,10 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class GetPrimaryForestsTest extends AbstractMgmtTest {
+public class GetMapOfPrimaryForestsTest extends AbstractMgmtTest {
 
 	/**
 	 * Simple test for verifying this method works for a couple OOTB databases. It is expected that the app-deployer
@@ -20,14 +19,12 @@ public class GetPrimaryForestsTest extends AbstractMgmtTest {
 	 */
 	@Test
 	void test() {
-		Map<String, List<Forest>> forestMap = new ForestManager(manageClient)
-			.getPrimaryForestsForDatabases("App-Services", "Documents");
+		Map<String, List<Forest>> mapOfPrimaryForests = new ForestManager(manageClient).getMapOfPrimaryForests();
 
-		Set<String> dbNames = forestMap.keySet();
+		Set<String> dbNames = mapOfPrimaryForests.keySet();
 		assertTrue(dbNames.contains("App-Services"));
 		assertTrue(dbNames.contains("Documents"));
-		assertEquals(2, dbNames.size());
-		assertTrue(forestMap.get("App-Services").size() > 0);
-		assertTrue(forestMap.get("Documents").size() > 0);
+		assertTrue(mapOfPrimaryForests.get("App-Services").size() > 0);
+		assertTrue(mapOfPrimaryForests.get("Documents").size() > 0);
 	}
 }

@@ -20,7 +20,7 @@ import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.eval.ServerEvaluationCall;
 import com.marklogic.client.ext.file.DocumentFile;
 import com.marklogic.client.ext.file.DocumentFileProcessor;
-import com.marklogic.client.ext.helper.ClientHelper;
+import com.marklogic.client.ext.helper.FilenameUtil;
 import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.client.io.Format;
 import com.marklogic.client.io.JacksonHandle;
@@ -32,7 +32,7 @@ import java.io.IOException;
 
 public class TdeDocumentFileProcessor extends LoggingObject implements DocumentFileProcessor {
 
-	private DatabaseClient databaseClient;
+	private DatabaseClient schemasDatabaseClient;
 	private String tdeValidationDatabase;
 	private Boolean templateBatchInsertSupported;
 
@@ -45,31 +45,34 @@ public class TdeDocumentFileProcessor extends LoggingObject implements DocumentF
 	/**
 	 * Use this constructor when you want to validate a TDE template before writing it to MarkLogic.
 	 *
-	 * @param databaseClient
+	 * @param schemasDatabaseClient database client for the application's schemas database
+	 * @param tdeValidationDatabase the database to run a script against for validating a TDE
 	 */
-	public TdeDocumentFileProcessor(DatabaseClient databaseClient, String tdeValidationDatabase) {
-		this.databaseClient = databaseClient;
+	public TdeDocumentFileProcessor(DatabaseClient schemasDatabaseClient, String tdeValidationDatabase) {
+		this.schemasDatabaseClient = schemasDatabaseClient;
 		this.tdeValidationDatabase = tdeValidationDatabase;
 	}
 
 	@Override
 	public DocumentFile processDocumentFile(DocumentFile documentFile) {
 		String uri = documentFile.getUri();
-		String extension = documentFile.getFileExtension();
-		if (extension != null) {
-			extension = extension.toLowerCase();
-		}
+		String filename = documentFile.getFile() != null ? documentFile.getFile().getName() : null;
+		boolean isTdeUri = (uri != null && uri.startsWith("/tde"));
+		boolean isJsonTde = (isTdeUri && FilenameUtil.endsWithExtension(filename, ".json"))
+			|| FilenameUtil.endsWithExtension(filename, ".tdej");
+		boolean isXmlTde = (isTdeUri && FilenameUtil.endsWithExtension(filename, ".xml"))
+			|| FilenameUtil.endsWithExtension(filename, ".tdex");
 
-		boolean isTdeTemplate = ("tdej".equals(extension) || "tdex".equals(extension)) || (uri != null && uri.startsWith("/tde"));
-		if (isTdeTemplate) {
+		// We have a test suggesting that a TDE may not be JSON or XML; that doesn't seem likely, but it also does not
+		// appear to cause any issues.
+		if (isTdeUri || isJsonTde || isXmlTde) {
 			documentFile.getDocumentMetadata().withCollections(TdeUtil.TDE_COLLECTION);
 			validateTdeTemplate(documentFile);
-		}
-
-		if ("tdej".equals(extension) || "json".equals(extension)) {
-			documentFile.setFormat(Format.JSON);
-		} else if ("tdex".equals(extension) || "xml".equals(extension)) {
-			documentFile.setFormat(Format.XML);
+			if (isJsonTde) {
+				documentFile.setFormat(Format.JSON);
+			} else if (isXmlTde) {
+				documentFile.setFormat(Format.XML);
+			}
 		}
 
 		return documentFile;
@@ -79,14 +82,14 @@ public class TdeDocumentFileProcessor extends LoggingObject implements DocumentF
 		if (this.templateBatchInsertSupported == null) {
 			// Memoize this to avoid repeated calls; the result will always be the same unless the databaseClient is
 			// modified, in which case templateBatchInsertSupported is set to null
-			this.templateBatchInsertSupported = TdeUtil.templateBatchInsertSupported(databaseClient);
+			this.templateBatchInsertSupported = TdeUtil.templateBatchInsertSupported(schemasDatabaseClient);
 		}
 		return this.templateBatchInsertSupported;
 	}
 
 	protected void validateTdeTemplate(DocumentFile documentFile) {
 		final File file = documentFile.getFile();
-		if (databaseClient == null) {
+		if (schemasDatabaseClient == null) {
 			logger.info("No DatabaseClient provided for TDE validation, so will not validate TDE templates");
 		} else if (tdeValidationDatabase == null) {
 			logger.info("No TDE validation database specified, so will not validate TDE templates");
@@ -127,7 +130,7 @@ public class TdeDocumentFileProcessor extends LoggingObject implements DocumentF
 			"\nreturn tde.validate([xdmp.toJSON(template)], ['%s'])}, {database: xdmp.database('%s')})",
 			documentFile.getUri(), tdeValidationDatabase
 		));
-		return databaseClient.newServerEval().javascript(script.toString())
+		return schemasDatabaseClient.newServerEval().javascript(script.toString())
 			.addVariable("template", new StringHandle(fileContent).withFormat(Format.JSON));
 	}
 
@@ -139,22 +142,42 @@ public class TdeDocumentFileProcessor extends LoggingObject implements DocumentF
 			"\ntde:validate($template, '%s')}, <options xmlns='xdmp:eval'><database>{xdmp:database('%s')}</database></options>)",
 			documentFile.getUri(), tdeValidationDatabase
 		));
-		return databaseClient.newServerEval().xquery(script.toString()).addVariable("template", new StringHandle(fileContent).withFormat(Format.XML));
+		return schemasDatabaseClient.newServerEval().xquery(script.toString()).addVariable("template", new StringHandle(fileContent).withFormat(Format.XML));
 	}
 
+	/**
+	 * @return
+	 * @deprecated since 4.6.0, will be removed in 5.0.0
+	 */
+	@Deprecated
 	public DatabaseClient getDatabaseClient() {
-		return databaseClient;
+		return schemasDatabaseClient;
 	}
 
+	/**
+	 * @param databaseClient
+	 * @deprecated since 4.6.0, will be removed in 5.0.0
+	 */
+	@Deprecated
 	public void setDatabaseClient(DatabaseClient databaseClient) {
-		this.databaseClient = databaseClient;
+		this.schemasDatabaseClient = databaseClient;
 		this.templateBatchInsertSupported = null;
 	}
 
+	/**
+	 * @return
+	 * @deprecated since 4.6.0, will be removed in 5.0.0
+	 */
+	@Deprecated
 	public String getTdeValidationDatabase() {
 		return tdeValidationDatabase;
 	}
 
+	/**
+	 * @param tdeValidationDatabase
+	 * @deprecated since 4.6.0, will be removed in 5.0.0
+	 */
+	@Deprecated
 	public void setTdeValidationDatabase(String tdeValidationDatabase) {
 		this.tdeValidationDatabase = tdeValidationDatabase;
 	}

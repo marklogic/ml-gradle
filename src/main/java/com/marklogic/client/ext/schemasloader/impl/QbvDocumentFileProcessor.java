@@ -20,6 +20,7 @@ import com.marklogic.client.document.XMLDocumentManager;
 import com.marklogic.client.eval.ServerEvaluationCall;
 import com.marklogic.client.ext.file.DocumentFile;
 import com.marklogic.client.ext.file.DocumentFileProcessor;
+import com.marklogic.client.ext.helper.FilenameUtil;
 import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.client.extra.jdom.JDOMHandle;
 import com.marklogic.client.io.Format;
@@ -29,32 +30,41 @@ import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 import org.springframework.util.FileCopyUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @since 4.6.0
+ */
 public class QbvDocumentFileProcessor extends LoggingObject implements DocumentFileProcessor {
 
 	public static final String QBV_COLLECTION = "http://marklogic.com/xdmp/qbv";
 	private static final String QBV_XML_PLAN_NAMESPACE = "http://marklogic.com/plan";
 	private static final String QBV_XML_ROOT_ELEMENT = "query-based-view";
-	private static final String JAVASCRIPT_EVAL_TEMPLATE = "declareUpdate(); xdmp.invokeFunction(function() {'use strict'; const op = require('/MarkLogic/optic'); return %s }, {database: xdmp.database('%s')})";
-	private static final String XQUERY_EVAL_TEMPLATE = "xquery version \"1.0-ml\"; import module namespace op=\"http://marklogic.com/optic\" at \"/MarkLogic/optic.xqy\"; xdmp:invoke-function(function() {%s},<options xmlns=\"xdmp:eval\"><database>{xdmp:database('%s')}</database></options>)";
+	private static final String JAVASCRIPT_EVAL_TEMPLATE = "declareUpdate(); " +
+		"xdmp.invokeFunction(function() {'use strict'; const op = require('/MarkLogic/optic'); return %s }, " +
+		"{database: xdmp.database('%s')})";
+	private static final String XQUERY_EVAL_TEMPLATE = "xquery version \"1.0-ml\"; " +
+		"import module namespace op=\"http://marklogic.com/optic\" at \"/MarkLogic/optic.xqy\"; " +
+		"xdmp:invoke-function(function() {%s},<options xmlns=\"xdmp:eval\"><database>{xdmp:database('%s')}</database></options>)";
 
-	final private DatabaseClient databaseClient;
+	final private DatabaseClient schemasDatabaseClient;
 	final private String qbvGeneratorDatabaseName;
-	final protected List<DocumentFile> qbvFiles = new ArrayList<>();
+	final private List<DocumentFile> qbvFiles = new ArrayList<>();
 	final private XMLDocumentManager docMgr;
 
 
 	/**
-	 * @param databaseClient - a MarkLogic DatabaseClient object for the Schemas database
+	 * @param schemasDatabaseClient database client for the application's schemas database
+	 * @param qbvGeneratorDatabaseName the database to run a script against for generating a QBV
 	 */
-	public QbvDocumentFileProcessor(DatabaseClient databaseClient, String qbvGeneratorDatabaseName) {
-		this.databaseClient = databaseClient;
+	public QbvDocumentFileProcessor(DatabaseClient schemasDatabaseClient, String qbvGeneratorDatabaseName) {
+		this.schemasDatabaseClient = schemasDatabaseClient;
 		this.qbvGeneratorDatabaseName = qbvGeneratorDatabaseName;
-		this.docMgr = databaseClient.newXMLDocumentManager();
+		this.docMgr = schemasDatabaseClient.newXMLDocumentManager();
 	}
 
 	@Override
@@ -70,17 +80,11 @@ public class QbvDocumentFileProcessor extends LoggingObject implements DocumentF
 
 	private boolean isQbvQuery(DocumentFile documentFile) {
 		String uri = documentFile.getUri();
-		if (uri != null && uri.startsWith("/qbv")) {
-			String extension = documentFile.getFileExtension();
-			if (extension != null) {
-				extension = extension.toLowerCase();
-			}
-			return
-				"sjs".equals(extension)
-					|| "js".equals(extension)
-					|| "xqy".equals(extension)
-					|| "xq".equals(extension);
-		} else return false;
+		File file = documentFile.getFile();
+		return uri != null
+			&& uri.startsWith("/qbv")
+			&& file != null
+			&& (FilenameUtil.isXqueryFile(file.getName()) || FilenameUtil.isJavascriptFile(file.getName()));
 	}
 
 	public void processQbvFiles() {
@@ -125,24 +129,18 @@ public class QbvDocumentFileProcessor extends LoggingObject implements DocumentF
 		} catch (IOException e) {
 			throw new RuntimeException(format("Unable to generate Query-Based View; could not read from file %s; cause: %s", qbvFile.getFile().getAbsolutePath(), e.getMessage()));
 		}
-		String extension = qbvFile.getFileExtension();
-		if (extension != null) {
-			extension = extension.toLowerCase();
-		}
-		if (("xqy".equals(extension)) || ("xq".equals(extension))) {
-			return buildXqueryCall(fileContent);
-		} else {
-			return buildJavascriptCall(fileContent);
-		}
+		return FilenameUtil.isXqueryFile(qbvFile.getFile().getName()) ?
+			buildXqueryCall(fileContent) :
+			buildJavascriptCall(fileContent);
 	}
 
 	private ServerEvaluationCall buildJavascriptCall(String fileContent) {
 		String script = format(JAVASCRIPT_EVAL_TEMPLATE, fileContent, qbvGeneratorDatabaseName);
-		return databaseClient.newServerEval().javascript(script);
+		return schemasDatabaseClient.newServerEval().javascript(script);
 	}
 
 	private ServerEvaluationCall buildXqueryCall(String fileContent) {
 		String script = format(XQUERY_EVAL_TEMPLATE, fileContent, qbvGeneratorDatabaseName);
-		return databaseClient.newServerEval().xquery(script);
+		return schemasDatabaseClient.newServerEval().xquery(script);
 	}
 }

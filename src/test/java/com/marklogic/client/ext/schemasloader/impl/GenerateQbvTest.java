@@ -3,6 +3,7 @@ package com.marklogic.client.ext.schemasloader.impl;
 import com.marklogic.client.ext.file.DocumentFile;
 import com.marklogic.client.ext.helper.ClientHelper;
 import com.marklogic.client.io.DocumentMetadataHandle;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
@@ -14,9 +15,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class GenerateQbvTest extends AbstractSchemasTest {
 
+	private DefaultSchemasLoader loader;
+
+	@BeforeEach
+	void beforeEach() {
+		loader = new DefaultSchemasLoader(client, CONTENT_DATABASE);
+	}
+
 	@Test
 	public void test() {
-		DefaultSchemasLoader loader = new DefaultSchemasLoader(client, "Documents");
 		Path path = Paths.get("src", "test", "resources", "qbv-schemas");
 		List<DocumentFile> files = loader.loadSchemas(path.toString());
 		assertEquals(3, files.size(),
@@ -52,7 +59,6 @@ public class GenerateQbvTest extends AbstractSchemasTest {
 
 	@Test
 	public void loadBadOptic() {
-		DefaultSchemasLoader loader = new DefaultSchemasLoader(client, "Documents");
 		Path path = Paths.get("src", "test", "resources", "qbv-bad-schemas");
 		RuntimeException ex = assertThrows(RuntimeException.class, () -> loader.loadSchemas(path.toString()));
 		assertTrue(ex.getMessage().contains("Query-Based View generation failed for file:"), "Unexpected message: " + ex.getMessage());
@@ -62,7 +68,6 @@ public class GenerateQbvTest extends AbstractSchemasTest {
 
 	@Test
 	public void schemaViewDoesNotExist() {
-		DefaultSchemasLoader loader = new DefaultSchemasLoader(client, "Documents");
 		Path path = Paths.get("src", "test", "resources", "qbv-no-tde-schemas");
 		RuntimeException ex = assertThrows(RuntimeException.class, () -> loader.loadSchemas(path.toString()));
 		assertTrue(ex.getMessage().contains("Query-Based View generation failed for file:"), "Unexpected message: " + ex.getMessage());
@@ -72,7 +77,6 @@ public class GenerateQbvTest extends AbstractSchemasTest {
 
 	@Test
 	public void emptyDirectories() {
-		DefaultSchemasLoader loader = new DefaultSchemasLoader(client, "Documents");
 		Path path = Paths.get("src", "test", "resources", "qbv-empty-schemas");
 		List<DocumentFile> files = loader.loadSchemas(path.toString());
 		assertEquals(0, files.size());

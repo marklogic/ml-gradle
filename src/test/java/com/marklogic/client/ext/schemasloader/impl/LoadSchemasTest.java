@@ -25,7 +25,9 @@ import org.junit.jupiter.api.Test;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class LoadSchemasTest extends AbstractSchemasTest {
 
@@ -45,6 +47,9 @@ public class LoadSchemasTest extends AbstractSchemasTest {
 		assertTrue(uris.contains("/child/child.tdej"));
 		assertTrue(uris.contains("/child/grandchild/grandchild.tdex"));
 		assertTrue(uris.contains("/parent.tdex"));
+
+		// This assertion seems a little off - a TDE should be either a JSON or XML file. This doesn't seem to cause
+		// any problems, but it also doesn't seem to make sense.
 		assertTrue(uris.contains("/tde/ruleset.txt"));
 	}
 

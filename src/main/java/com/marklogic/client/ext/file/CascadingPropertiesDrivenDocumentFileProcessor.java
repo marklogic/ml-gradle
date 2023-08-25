@@ -17,21 +17,27 @@ package com.marklogic.client.ext.file;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Properties;
 import java.util.Stack;
 
 /**
- * Adds a stack to store Properties objects while traversing a directory tree.
+ * Adds a stack to store Properties objects while traversing a directory tree. Implements {@code FileVisitor} so that
+ * it can be informed when {@code DefaultDocumentFileReader} is entering and exiting a directory.
  */
-abstract class CascadingPropertiesDrivenDocumentFileProcessor extends PropertiesDrivenDocumentFileProcessor {
+abstract class CascadingPropertiesDrivenDocumentFileProcessor extends PropertiesDrivenDocumentFileProcessor implements FileVisitor<Path> {
+
 	final private Stack<Properties> propertiesStack = new Stack<>();
 
 	protected CascadingPropertiesDrivenDocumentFileProcessor(String propertiesFilename) {
 		super(propertiesFilename);
 	}
 
-	protected void preVisitDirectory(Path dir) throws IOException {
+	@Override
+	public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
 		File collectionsPropertiesFile = new File(dir.toFile(), this.getPropertiesFilename());
 		if (collectionsPropertiesFile.exists()) {
 			this.loadProperties(collectionsPropertiesFile);
@@ -43,12 +49,25 @@ abstract class CascadingPropertiesDrivenDocumentFileProcessor extends Properties
 			}
 		}
 		propertiesStack.push(this.getProperties());
+		return FileVisitResult.CONTINUE;
 	}
 
-	protected void postVisitDirectory() {
+	@Override
+	public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
 		propertiesStack.pop();
 		if (!propertiesStack.isEmpty()) {
 			this.setProperties(propertiesStack.peek());
 		}
+		return FileVisitResult.CONTINUE;
+	}
+
+	@Override
+	public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+		return FileVisitResult.CONTINUE;
+	}
+
+	@Override
+	public FileVisitResult visitFileFailed(Path file, IOException exc) {
+		return FileVisitResult.CONTINUE;
 	}
 }

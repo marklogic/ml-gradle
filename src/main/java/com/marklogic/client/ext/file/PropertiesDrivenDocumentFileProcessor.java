@@ -28,7 +28,8 @@ import java.util.Properties;
  * Base class for processors that look for a special file in each directory and intend to perform some processing based
  * on the contents of that file. By default, that special file is NOT loaded into MarkLogic.
  */
-public abstract class PropertiesDrivenDocumentFileProcessor extends LoggingObject implements DocumentFileProcessor, FileFilter {
+public abstract class PropertiesDrivenDocumentFileProcessor extends LoggingObject
+	implements DocumentFileProcessor, FileFilter, SupportsTokenReplacer {
 
 	protected final static String WILDCARD_KEY = "*";
 
@@ -83,6 +84,7 @@ public abstract class PropertiesDrivenDocumentFileProcessor extends LoggingObjec
 		return propertiesFilename;
 	}
 
+	@Override
 	public void setTokenReplacer(TokenReplacer tokenReplacer) {
 		this.tokenReplacer = tokenReplacer;
 	}
@@ -90,7 +92,7 @@ public abstract class PropertiesDrivenDocumentFileProcessor extends LoggingObjec
 	protected TokenReplacer getTokenReplacer() {
 		return tokenReplacer;
 	}
-
+	
 	protected void setProperties(Properties properties) {
 		this.properties = properties;
 	}

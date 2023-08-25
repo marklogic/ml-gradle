@@ -24,7 +24,6 @@ import com.marklogic.client.ext.tokenreplacer.TokenReplacer;
 
 import java.io.FileFilter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -178,46 +177,27 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 	 * @param reader
 	 */
 	public void prepareAbstractDocumentFileReader(AbstractDocumentFileReader reader) {
-		for (DocumentFileProcessor processor : buildDocumentFileProcessors()) {
-			reader.addDocumentFileProcessor(processor);
-		}
+		buildDocumentFileProcessors().forEach(processor -> reader.addDocumentFileProcessor(processor));
 
-		applyTokenReplacerOnKnownDocumentProcessors(reader);
-
-		if (additionalBinaryExtensions != null) {
-			FormatDocumentFileProcessor processor = reader.getFormatDocumentFileProcessor();
-			FormatGetter formatGetter = processor.getFormatGetter();
-			if (formatGetter instanceof DefaultDocumentFormatGetter) {
-				DefaultDocumentFormatGetter ddfg = (DefaultDocumentFormatGetter) formatGetter;
-				for (String ext : additionalBinaryExtensions) {
-					ddfg.getBinaryExtensions().add(ext);
-				}
-			} else {
-				logger.warn("FormatGetter is not an instanceof DefaultDocumentFormatGetter, " +
-					"so unable to add additionalBinaryExtensions: " + Arrays.asList(additionalBinaryExtensions));
+		reader.getDocumentFileProcessors().forEach(processor -> {
+			if (tokenReplacer != null && processor instanceof SupportsTokenReplacer) {
+				((SupportsTokenReplacer) processor).setTokenReplacer(tokenReplacer);
 			}
-		}
+			if (additionalBinaryExtensions != null && processor instanceof SupportsAdditionalBinaryExtensions) {
+				((SupportsAdditionalBinaryExtensions) processor).setAdditionalBinaryExtensions(additionalBinaryExtensions);
+			}
+		});
 	}
 
 	/**
-	 * If this is an instance of DefaultDocumentFileReader and a TokenReplacer has been set on the instance of this
-	 * class, then pass the TokenReplacer along to the known processors in the reader so that those processors
-	 * can replace token occurrences in property values.
-	 *
 	 * @param reader
+	 * @deprecated since 4.6.0, will be removed in 5.0.0.
 	 */
+	@Deprecated
 	protected void applyTokenReplacerOnKnownDocumentProcessors(AbstractDocumentFileReader reader) {
-		if (reader instanceof DefaultDocumentFileReader && tokenReplacer != null) {
-			DefaultDocumentFileReader defaultReader = (DefaultDocumentFileReader) reader;
-			CollectionsFileDocumentFileProcessor cp = defaultReader.getCollectionsFileDocumentFileProcessor();
-			if (cp != null) {
-				cp.setTokenReplacer(tokenReplacer);
-			}
-			PermissionsFileDocumentFileProcessor pp = defaultReader.getPermissionsFileDocumentFileProcessor();
-			if (pp != null) {
-				pp.setTokenReplacer(tokenReplacer);
-			}
-		}
+		// The logic previously performed here is now handled via prepareAbstractDocumentFileReader . This is being
+		// kept here solely to avoid any compilation issues in case this class was extended and this method was
+		// overridden.
 	}
 
 	/**

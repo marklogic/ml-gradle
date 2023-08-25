@@ -16,6 +16,7 @@
 package com.marklogic.client.ext;
 
 import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.io.DocumentMetadataHandle;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,12 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.util.Set;
+import java.util.function.Consumer;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestConfig.class})
@@ -57,6 +64,36 @@ public abstract class AbstractIntegrationTest {
 		client = configuredDatabaseClientFactory.newDatabaseClient(clientConfig);
 		clientConfig.setDatabase(currentDatabase);
 		return client;
+	}
+
+	protected final void verifyMetadata(String uri, Consumer<DocumentMetadataHandle> verifier) {
+		verifier.accept(client.newJSONDocumentManager().readMetadata(uri, new DocumentMetadataHandle()));
+	}
+
+	protected final void verifyCollections(String uri, String... collections) {
+		verifyMetadata(uri, metadata -> {
+			assertEquals(collections.length, metadata.getCollections().size());
+			for (String collection : collections) {
+				assertTrue(metadata.getCollections().contains(collection), "Did not find expected collection: " +
+					collection + "; actual collections: " + metadata.getCollections());
+			}
+		});
+	}
+
+	protected final void verifyPermissions(String uri, String... permissionsRolesAndCapabilities) {
+		verifyMetadata(uri, metadata -> {
+			for (int i = 0; i < permissionsRolesAndCapabilities.length; i += 2) {
+				String role = permissionsRolesAndCapabilities[i];
+				assertTrue(metadata.getPermissions().containsKey(role), "Did not find permissions with role: " +
+					role + "; actual permissions: " + metadata.getPermissions());
+
+				DocumentMetadataHandle.Capability capability =
+					DocumentMetadataHandle.Capability.valueOf(permissionsRolesAndCapabilities[i + 1].toUpperCase());
+				Set<DocumentMetadataHandle.Capability> capabilities = metadata.getPermissions().get(role);
+				assertTrue(capabilities.contains(capability), "Did not find permission for role: " + role +
+					" with capability: " + capability + "; actual capabilities: " + capabilities);
+			}
+		});
 	}
 }
 

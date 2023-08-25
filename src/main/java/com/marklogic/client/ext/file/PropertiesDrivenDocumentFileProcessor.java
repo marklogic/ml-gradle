@@ -22,8 +22,6 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -34,10 +32,9 @@ public abstract class PropertiesDrivenDocumentFileProcessor extends LoggingObjec
 
 	protected final static String WILDCARD_KEY = "*";
 
-	private String propertiesFilename;
+	private final String propertiesFilename;
 
-	// Used to avoid checking for and loading the properties for every file in a directory
-	private Map<File, Properties> propertiesCache = new HashMap<>();
+	private Properties properties;
 
 	private TokenReplacer tokenReplacer;
 
@@ -60,36 +57,17 @@ public abstract class PropertiesDrivenDocumentFileProcessor extends LoggingObjec
 		if (!accept(file)) {
 			return null;
 		}
-
-		File propertiesFile = new File(file.getParentFile(), propertiesFilename);
-		if (propertiesFile.exists()) {
-			try {
-				Properties props = loadProperties(propertiesFile);
-				processProperties(documentFile, props);
-			} catch (IOException e) {
-				logger.warn("Unable to load properties from file: " + propertiesFile.getAbsolutePath(), e);
-			}
-		}
-
+		processProperties(documentFile, properties);
 		return documentFile;
 	}
 
 	protected abstract void processProperties(DocumentFile documentFile, Properties properties);
 
 	protected Properties loadProperties(File propertiesFile) throws IOException {
-		Properties props = null;
-		if (propertiesCache.containsKey(propertiesFile)) {
-			props = propertiesCache.get(propertiesFile);
-		}
-		if (props != null) {
-			return props;
-		}
-
-		props = new Properties();
+		properties = new Properties();
 		try (FileReader reader = new FileReader(propertiesFile)) {
-			props.load(reader);
-			propertiesCache.put(propertiesFile, props);
-			return props;
+			properties.load(reader);
+			return properties;
 		}
 	}
 
@@ -99,10 +77,6 @@ public abstract class PropertiesDrivenDocumentFileProcessor extends LoggingObjec
 		}
 		String value = properties.getProperty(propertyName);
 		return tokenReplacer != null && value != null ? tokenReplacer.replaceTokens(value) : value;
-	}
-
-	public Map<File, Properties> getPropertiesCache() {
-		return propertiesCache;
 	}
 
 	public String getPropertiesFilename() {
@@ -115,5 +89,13 @@ public abstract class PropertiesDrivenDocumentFileProcessor extends LoggingObjec
 
 	protected TokenReplacer getTokenReplacer() {
 		return tokenReplacer;
+	}
+
+	protected void setProperties(Properties properties) {
+		this.properties = properties;
+	}
+
+	protected Properties getProperties() {
+		return this.properties;
 	}
 }

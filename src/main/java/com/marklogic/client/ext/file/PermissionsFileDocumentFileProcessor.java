@@ -24,7 +24,7 @@ import java.util.Properties;
  * Looks for a special file in each directory - defaults to permissions.properties - that contains properties where the
  * key is the name of a file in the directory, and the value is a comma-delimited list of role,capability,role,capability,etc.
  */
-public class PermissionsFileDocumentFileProcessor extends PropertiesDrivenDocumentFileProcessor {
+public class PermissionsFileDocumentFileProcessor extends CascadingPropertiesDrivenDocumentFileProcessor {
 
 	private DocumentPermissionsParser documentPermissionsParser;
 

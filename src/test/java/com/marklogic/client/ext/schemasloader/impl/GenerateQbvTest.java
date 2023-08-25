@@ -2,16 +2,16 @@ package com.marklogic.client.ext.schemasloader.impl;
 
 import com.marklogic.client.ext.file.DocumentFile;
 import com.marklogic.client.ext.helper.ClientHelper;
-import com.marklogic.client.io.DocumentMetadataHandle;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.function.Consumer;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class GenerateQbvTest extends AbstractSchemasTest {
 
@@ -43,18 +43,9 @@ public class GenerateQbvTest extends AbstractSchemasTest {
 //		PlanBuilder.ModifyPlan plan = rowManager.newPlanBuilder().fromView("alternate", "authors");
 //		rowManager.resultDoc(plan, new JacksonHandle()).get();
 
-		verifyMetadata(qbvUris.get(0), metadata -> {
-			DocumentMetadataHandle.DocumentPermissions perms = metadata.getPermissions();
-			assertPermissionExists(perms, "rest-reader", DocumentMetadataHandle.Capability.READ);
-			assertPermissionExists(perms, "rest-writer", DocumentMetadataHandle.Capability.UPDATE);
-			assertEquals(2, perms.size());
-			DocumentMetadataHandle.DocumentCollections colls = metadata.getCollections();
-			assertTrue(colls.contains("http://marklogic.com/xdmp/qbv"));
-			assertTrue(colls.contains("col1"));
-			assertTrue(colls.contains("col3"));
-			assertEquals(3, colls.size());
-		});
-
+		String uri = qbvUris.get(0);
+		verifyCollections(uri, "http://marklogic.com/xdmp/qbv", "col1", "col3");
+		verifyPermissions(uri, "rest-reader", "read", "rest-writer", "update");
 	}
 
 	@Test
@@ -83,16 +74,5 @@ public class GenerateQbvTest extends AbstractSchemasTest {
 		ClientHelper helper = new ClientHelper(client);
 		List<String> qbvUris = helper.getUrisInCollection(QbvDocumentFileProcessor.QBV_COLLECTION);
 		assertEquals(0, qbvUris.size());
-	}
-
-	private void verifyMetadata(String uri, Consumer<DocumentMetadataHandle> verifier) {
-		verifier.accept(client.newJSONDocumentManager().readMetadata(uri, new DocumentMetadataHandle()));
-	}
-
-	private void assertPermissionExists(DocumentMetadataHandle.DocumentPermissions perms, String role,
-										DocumentMetadataHandle.Capability capability) {
-		assertTrue(perms.containsKey(role), "No permissions for role: " + role);
-		assertTrue(perms.get(role).contains(capability),
-			"Capability " + capability + " for role " + role + " not found");
 	}
 }

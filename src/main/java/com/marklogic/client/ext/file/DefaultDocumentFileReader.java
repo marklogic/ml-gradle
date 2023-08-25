@@ -22,8 +22,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Non-threadsafe implementation that implements FileVisitor as a way of descending one or more file paths.
@@ -105,6 +104,10 @@ public class DefaultDocumentFileReader extends AbstractDocumentFileReader implem
 			if (logger.isDebugEnabled()) {
 				logger.debug("Visiting directory: " + dir);
 			}
+
+			collectionsFileDocumentFileProcessor.preVisitDirectory(dir);
+			permissionsFileDocumentFileProcessor.preVisitDirectory(dir);
+
 			return FileVisitResult.CONTINUE;
 		} else {
 			if (logger.isDebugEnabled()) {
@@ -127,6 +130,10 @@ public class DefaultDocumentFileReader extends AbstractDocumentFileReader implem
 		if (exc != null) {
 			logger.warn("Error in postVisitDirectory: " + exc.getMessage(), exc);
 		}
+
+		collectionsFileDocumentFileProcessor.postVisitDirectory();
+		permissionsFileDocumentFileProcessor.postVisitDirectory();
+
 		return FileVisitResult.CONTINUE;
 	}
 

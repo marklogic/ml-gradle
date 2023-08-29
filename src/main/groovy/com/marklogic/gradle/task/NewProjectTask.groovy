@@ -16,7 +16,6 @@
 package com.marklogic.gradle.task
 
 import com.marklogic.appdeployer.scaffold.ScaffoldGenerator
-import com.marklogic.gradle.task.MarkLogicTask
 import org.gradle.api.tasks.TaskAction
 
 class NewProjectTask extends MarkLogicTask {
@@ -36,7 +35,7 @@ class NewProjectTask extends MarkLogicTask {
 			ant.input(message: "Test REST API port (intended for running automated tests; leave blank for no server):", addproperty: "mlTestRestPort")
 		}
 		ant.input(message: "Do you want support for multiple environments? ", validargs: "y,n", addproperty: "mlPropertiesPlugin", defaultvalue: "y")
-		ant.input(message: "Do you want resource files for a content database and set of users/roles created?", validargs: "y,n", addproperty: "mlScaffold", defaultvalue: "y")
+		ant.input(message: "Do you want a set of users/roles created?", validargs: "y,n", addproperty: "mlScaffoldSecurity", defaultvalue: "y")
 
 		def now = new Date()
 
@@ -80,23 +79,13 @@ class NewProjectTask extends MarkLogicTask {
 		makeDirectory("src/main/ml-config")
 		makeDirectory("src/main/ml-modules")
 
-		if (ant.mlScaffold == "y") {
-			println "Writing project scaffolding files"
-			def appConfig = getAppConfig()
-			appConfig.setName(ant.mlAppName)
-			appConfig.setHost(ant.mlHost)
-			appConfig.setRestAdminUsername(ant.mlUsername)
-			appConfig.setRestAdminPassword(ant.mlPassword)
-			if (ant.mlRestPort) {
-				appConfig.setRestPort(Integer.parseInt(ant.mlRestPort))
-				if (ant.mlTestRestPort) {
-					appConfig.setTestRestPort(Integer.parseInt(ant.mlTestRestPort))
-				}
-			} else {
-				appConfig.setNoRestServer(true)
-			}
-			new ScaffoldGenerator().generateScaffold(getProject().getProjectDir().getAbsolutePath(), appConfig)
+		var scaffoldSecurity = (ant.mlScaffoldSecurity == "y")
+		var scaffoldRestServers = false
+		if (ant.mlRestPort) {
+			scaffoldRestServers = true
 		}
+		ScaffoldGenerator.AppInputs appInputs = new ScaffoldGenerator.AppInputs(ant.mlAppName, scaffoldRestServers, scaffoldSecurity)
+		new ScaffoldGenerator().generateScaffold(getProject().getProjectDir().getAbsolutePath(), appInputs)
 	}
 
 	void makeDirectory(String path) {

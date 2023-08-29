@@ -136,5 +136,9 @@ public class GenerateScaffoldTest extends AbstractAppDeployerTest {
 		assertEquals(shouldExist, new RoleManager(manageClient).exists("sample-app-writer"));
 		assertEquals(shouldExist, new RoleManager(manageClient).exists("sample-app-internal"));
 		assertEquals(shouldExist, new RoleManager(manageClient).exists("sample-app-admin"));
+		if (shouldExist) {
+			assertTrue(new RoleManager(manageClient).getPropertiesAsXmlString("sample-app-reader").contains("http://marklogic.com/xdmp/privileges/rest-reader"));
+			assertTrue(new RoleManager(manageClient).getPropertiesAsXmlString("sample-app-writer").contains("http://marklogic.com/xdmp/privileges/rest-writer"));
+		}
 	}
 }

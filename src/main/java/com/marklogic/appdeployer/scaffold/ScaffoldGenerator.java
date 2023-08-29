@@ -139,8 +139,9 @@ public class ScaffoldGenerator extends LoggingObject {
 		node.put("role-name", appName + "-reader");
 		node.put("description", "Can view documents, but not edit");
 		ArrayNode array = node.putArray("role");
-		array.add("rest-reader");
 		array.add(appName + "-nobody");
+		array = node.putArray("privilege");
+		array.add(buildPrivilege("rest-reader", "http://marklogic.com/xdmp/privileges/rest-reader", "execute"));
 		return node;
 	}
 
@@ -149,9 +150,9 @@ public class ScaffoldGenerator extends LoggingObject {
 		node.put("role-name", appName + "-writer");
 		node.put("description", "Can read and write documents");
 		ArrayNode array = node.putArray("role");
-		array.add("rest-writer");
 		array.add(appName + "-reader");
 		array = node.putArray("privilege");
+		array.add(buildPrivilege("rest-writer", "http://marklogic.com/xdmp/privileges/rest-writer", "execute"));
 		array.add(buildPrivilege("any-uri", "http://marklogic.com/xdmp/privileges/any-uri", "execute"));
 		array.add(buildPrivilege("unprotected-collections", "http://marklogic.com/xdmp/privileges/unprotected-collections", "execute"));
 		return node;

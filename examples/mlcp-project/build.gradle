@@ -65,6 +65,24 @@ task importSampleData(type: com.marklogic.gradle.task.MlcpTask) {
 }
 
 /**
+ * Example of using an options_file with an MlcpTask to import data with mlcp.
+ */
+task importSampleDataWithOptionsFile(type: com.marklogic.gradle.task.MlcpTask) {
+	classpath = configurations.mlcp
+	command = "IMPORT"
+	options_file = "mlcpOptions.txt"
+}
+
+/**
+ * Example of using an JavaExec and an options_file to import data with mlcp.
+ */
+task importSampleDataWithJavaExec(type: JavaExec) {
+	classpath = configurations.mlcp
+	mainClass = 'com.marklogic.contentpump.ContentPump'
+	args = ["IMPORT", "-options_file", "mlcpOptionsHostUsernamePassword.txt"]
+}
+
+/**
  * Example of using mlcp to import RDF data - in this case, World Bank's publicly available topical
  * taxonomy.
  */

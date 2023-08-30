@@ -36,7 +36,7 @@ dependencies {
 
 	implementation 'org.jdom:jdom2:2.0.6.1'
 
-	implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.3'
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
 
 	// This is currently an implementation dependency, though perhaps should be an api dependency due to its usage in
 	// LoggingObject; not clear yet on whether the protected Logger in that class should make this an api dependency or not

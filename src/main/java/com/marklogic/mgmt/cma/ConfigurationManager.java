@@ -15,17 +15,20 @@
  */
 package com.marklogic.mgmt.cma;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.marklogic.mgmt.AbstractManager;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.rest.util.MgmtResponseErrorHandler;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * This doesn't extend AbstractResourceManager because a configuration isn't really a resource, it's a collection of
  * resources.
- *
+ * <p>
  * Currently only supports JSON and XML configuration payloads. Not clear yet from the docs on what the format of a
  * zip should be. The docs also mention a bunch of request parameters, but the examples don't show what the purpose
  * of those are, so those aren't supported yet either.
@@ -48,6 +51,7 @@ public class ConfigurationManager extends AbstractManager {
 	/**
 	 * Returns true if the CMA endpoint exists. This temporarily disables logging in MgmtResponseErrorHandler so that
 	 * a client doesn't see the 404 error being logged, which could be mistakenly perceived as a real error.
+	 *
 	 * @return
 	 */
 	public boolean endpointExists() {
@@ -96,4 +100,19 @@ public class ConfigurationManager extends AbstractManager {
 		return new SaveReceipt(null, payload, PATH, response);
 	}
 
+	/**
+	 * @param resourceType
+	 * @return a JSON response containing details on each resource of the given type
+	 * @since 4.6.0
+	 */
+	public ResponseEntity<JsonNode> getResourcesAsJson(String resourceType) {
+		String uri = UriComponentsBuilder
+			.fromUri(manageClient.buildUri("/manage/v3"))
+			.queryParam("format", "json")
+			.queryParam("resource-type", resourceType)
+			.encode()
+			.toUriString();
+
+		return manageClient.getRestTemplate().exchange(uri, HttpMethod.GET, null, JsonNode.class);
+	}
 }

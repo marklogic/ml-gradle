@@ -132,6 +132,9 @@ class MarkLogicPlugin implements Plugin<Project> {
 			description: "Deploys application resources in the same manner as mlDeploy, but will not deploy anything that " +
 				"involves writing data to a database - such as modules, schemas, and triggers - thus making it safe for use " +
 				"when deploying an application to a replica cluster")
+		project.task("mlTestConnections", type: TestConnectionsTask, group: deployGroup,
+			description: "Test each connection ml-gradle will make to MarkLogic; results of each test will be printed, with " +
+				"an exception being thrown if any connection test fails.")
 
 		String adminGroup = "ml-gradle Admin"
 		project.task("mlInit", type: InitTask, group: adminGroup, description: "Perform a one-time initialization of a MarkLogic server; uses the properties 'mlLicenseKey' and 'mlLicensee'")

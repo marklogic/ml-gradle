@@ -26,7 +26,7 @@ repositories {
 dependencies {
 	api 'com.marklogic:ml-javaclient-util:4.6-SNAPSHOT'
 	api 'org.springframework:spring-web:5.3.29'
-	api 'com.fasterxml.jackson.core:jackson-databind:2.14.3'
+	api 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
 
 	implementation 'jaxen:jaxen:1.2.0'
 

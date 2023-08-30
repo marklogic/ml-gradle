@@ -1,0 +1,16 @@
+-host
+localhost
+-username
+admin
+-password
+admin
+-port
+8000
+-database
+mlcp-project-content
+-output_collections
+sample-import
+-output_permissions
+rest-reader,read,rest-writer,update
+-input_file_path
+data/import

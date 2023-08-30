@@ -156,8 +156,15 @@ class MlcpTask extends JavaExec {
 
 		MlcpBean mlcpBean = new MlcpBean()
 		applyTaskPropertiesToMlcpBean(mlcpBean)
+		var optionsFileFields = []
+		if (options_file != null) {
+			optionsFileFields = loadOptionsFileFields(options_file)
+		}
 
 		mlcpBean.properties.each { prop, val ->
+			if ((["host", "username", "password"].contains(prop)) && optionsFileFields.contains(prop)) {
+				return
+			}
 			def propVal
 			if (val) {
 				switch (prop) {
@@ -177,18 +184,7 @@ class MlcpTask extends JavaExec {
 		// Ensure connection arguments are present, but not if a COPY
 		boolean isCopy = "COPY".equals(command)
 		if (!isCopy) {
-			if (!newArgs.contains("-host")) {
-				newArgs.add("-host")
-				newArgs.add(config.getHost())
-			}
-			if (!newArgs.contains("-port")) {
-				newArgs.add("-port")
-				newArgs.add("8000")
-			}
-			if (!newArgs.contains("-username")) {
-				newArgs.add("-username")
-				newArgs.add(config.getRestAdminUsername())
-			}
+			addArgsFromAppConfig(newArgs, optionsFileFields, config)
 		}
 
 		// Include any args that a user has configured via the args parameter of the Gradle task
@@ -206,11 +202,6 @@ class MlcpTask extends JavaExec {
 			}
 		}
 		println "mlcp arguments, excluding known password arguments: " + safeArgsToPrint
-
-		if (!isCopy) {
-			newArgs.add("-password")
-			newArgs.add(password ? password : config.getRestAdminPassword())
-		}
 
 		setArgs(newArgs)
 
@@ -232,6 +223,25 @@ class MlcpTask extends JavaExec {
 			}
 			databaseClient.newDocumentManager().write(logOutputUri, new FileHandle(logOutputFile))
 			println "Wrote mlcp log output to URI: " + logOutputUri
+		}
+	}
+
+	void addArgsFromAppConfig(List<String> newArgs, List<String> optionsFileFields, AppConfig config ) {
+		if ((!optionsFileFields.contains("host")) && (!newArgs.contains("-host"))) {
+			newArgs.add("-host")
+			newArgs.add(config.getHost())
+		}
+		if (!newArgs.contains("-port")) {
+			newArgs.add("-port")
+			newArgs.add("8000")
+		}
+		if ((!optionsFileFields.contains("username")) && (!newArgs.contains("-username"))) {
+			newArgs.add("-username")
+			newArgs.add(config.getRestAdminUsername())
+		}
+		if (!optionsFileFields.contains("password")) {
+			newArgs.add("-password")
+			newArgs.add(password ? password : config.getRestAdminPassword())
 		}
 	}
 
@@ -328,5 +338,22 @@ class MlcpTask extends JavaExec {
 		mlcpBean.setType_filter(type_filter)
 		mlcpBean.setUri_id(uri_id)
 		mlcpBean.setXml_repair_level(xml_repair_level)
+	}
+
+	List<String> loadOptionsFileFields(options_file) {
+		def optionsFileFields = []
+		try {
+			new File(options_file).eachLine { line ->
+				if (line.startsWith("-")) {
+					optionsFileFields.add(line.substring(1))
+				}
+			}
+		} catch(Exception e) {
+			getLogger().warn("Unable to read the specified options file; cause: " + e.getMessage() + "\nNot passing '-host', '-username', or '-password' to MLCP since they may exist in the options file.")
+			optionsFileFields.add("host")
+			optionsFileFields.add("username")
+			optionsFileFields.add("password")
+		}
+		return optionsFileFields;
 	}
 }

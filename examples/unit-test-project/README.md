@@ -57,12 +57,12 @@ for more information.
 
 You can also access the marklogic-unit-test REST endpoints directly:
 
-- List the tests - http://localhost:8015/v1/resources/marklogic-unit-test
-- Run a test suite - http://localhost:8015/v1/resources/marklogic-unit-test?rs:func=run&rs:suite=My%20Tests
+- List the tests - http://localhost:8115/v1/resources/marklogic-unit-test
+- Run a test suite - http://localhost:8115/v1/resources/marklogic-unit-test?rs:func=run&rs:suite=My%20Tests
 
 And you can run the original UI test runner by going to:
 
-- http://localhost:8015/test/default.xqy
+- http://localhost:8115/test/default.xqy
 
 ## Configuring which server mlUnitTest connects to 
 

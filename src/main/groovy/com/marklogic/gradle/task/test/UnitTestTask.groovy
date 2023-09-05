@@ -106,7 +106,7 @@ class UnitTestTask extends MarkLogicTask {
 			println "\n" + fileCount + " test result files were written to: " + resultsDir
 
 			if (testsFailed) {
-				throw new GradleException("There were failing tests. See the test results at: " + resultsDir)
+				throw new GradleException("There were failing tests. See the test results at: file://" + resultsDir)
 			}
 		} finally {
 			client.release()

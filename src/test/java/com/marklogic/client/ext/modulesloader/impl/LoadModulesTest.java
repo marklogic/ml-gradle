@@ -36,7 +36,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class LoadModulesTest extends AbstractIntegrationTest {
 
@@ -48,7 +50,7 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 		client = newClient(MODULES_DATABASE);
 		client.newServerEval().xquery("cts:uris((), (), cts:true-query()) ! xdmp:document-delete(.)").eval();
 		modulesClient = client;
-		assertEquals(0, getUriCountInModulesDatabase(), "No new modules should have been created");
+		assertEquals(0, getUriCountInModulesDatabase(), "No modules should exist");
 
 		/**
 		 * Odd - the Client REST API doesn't allow for loading namespaces when the DatabaseClient has a database

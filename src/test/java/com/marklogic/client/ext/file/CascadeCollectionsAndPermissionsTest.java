@@ -25,27 +25,31 @@ public class CascadeCollectionsAndPermissionsTest extends AbstractIntegrationTes
 	final private String PARENT_COLLECTION = "ParentCollection";
 	final private String CHILD_COLLECTION = "ChildCollection";
 
+
+	private GenericFileLoader loader;
+
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		client = newClient(MODULES_DATABASE);
 		DatabaseClient modulesClient = client;
 		modulesClient.newServerEval().xquery("cts:uris((), (), cts:true-query()) ! xdmp:document-delete(.)").eval();
+		loader = new GenericFileLoader(client);
+		loader.setCascadeCollections(true);
+		loader.setCascadePermissions(true);
 	}
 
 	@Test
-	public void parentWithBothProperties() {
-		String directory = "src/test/resources/process-files/cascading-metadata-test/parent1-withCP";
-		GenericFileLoader loader = new GenericFileLoader(client);
-		loader.loadFiles(directory);
+	void parentWithBothProperties() {
+		loader.loadFiles("src/test/resources/process-files/cascading-metadata-test/parent1-withCP");
 
-		verifyCollections( "/child1_1-noCP/test.json", PARENT_COLLECTION);
-		verifyPermissions( "/child1_1-noCP/test.json", "rest-writer", "update");
+		verifyCollections("/child1_1-noCP/test.json", PARENT_COLLECTION);
+		verifyPermissions("/child1_1-noCP/test.json", "rest-writer", "update");
 
-		verifyCollections( "/child1_2-withCP/test.json", CHILD_COLLECTION);
-		verifyPermissions( "/child1_2-withCP/test.json", "rest-reader", "read");
+		verifyCollections("/child1_2-withCP/test.json", CHILD_COLLECTION);
+		verifyPermissions("/child1_2-withCP/test.json", "rest-reader", "read");
 
-		verifyCollections( "/child3_1-withCP/grandchild3_1_1-noCP/test.json", CHILD_COLLECTION);
-		verifyPermissions( "/child3_1-withCP/grandchild3_1_1-noCP/test.json", "rest-reader", "read");
+		verifyCollections("/child3_1-withCP/grandchild3_1_1-noCP/test.json", CHILD_COLLECTION);
+		verifyPermissions("/child3_1-withCP/grandchild3_1_1-noCP/test.json", "rest-reader", "read");
 
 		verifyCollections("/child1/child1.json", "ParentCollection");
 		verifyPermissions("/child1/child1.json", "rest-writer", "update");
@@ -58,21 +62,32 @@ public class CascadeCollectionsAndPermissionsTest extends AbstractIntegrationTes
 	}
 
 	@Test
-	public void parentWithNoProperties() {
-		String directory = "src/test/resources/process-files/cascading-metadata-test/parent2-noCP";
-		GenericFileLoader loader = new GenericFileLoader(client);
-		loader.loadFiles(directory);
+	void parentWithNoProperties() {
+		loader.loadFiles("src/test/resources/process-files/cascading-metadata-test/parent2-noCP");
 
-		verifyCollections( "/child2_1-withCP/test.json", CHILD_COLLECTION);
-		verifyPermissions( "/child2_1-withCP/test.json", "rest-reader", "read");
+		verifyCollections("/child2_1-withCP/test.json", CHILD_COLLECTION);
+		verifyPermissions("/child2_1-withCP/test.json", "rest-reader", "read");
 
-		verifyCollections( "/child2_2-noCP/test.json");
-		verifyPermissions( "/child2_2-noCP/test.json");
+		verifyCollections("/child2_2-noCP/test.json");
+		verifyPermissions("/child2_2-noCP/test.json");
 
-		verifyCollections( "/child2_3-withCnoP/test.json", PARENT_COLLECTION);
-		verifyPermissions( "/child2_3-withCnoP/test.json");
+		verifyCollections("/child2_3-withCnoP/test.json", PARENT_COLLECTION);
+		verifyPermissions("/child2_3-withCnoP/test.json");
 
-		verifyCollections( "/child2_3-withCnoP/grandchild2_3_1-withPnoC/test.json", PARENT_COLLECTION);
-		verifyPermissions( "/child2_3-withCnoP/grandchild2_3_1-withPnoC/test.json", "rest-reader", "read");
+		verifyCollections("/child2_3-withCnoP/grandchild2_3_1-withPnoC/test.json", PARENT_COLLECTION);
+		verifyPermissions("/child2_3-withCnoP/grandchild2_3_1-withPnoC/test.json", "rest-reader", "read");
+	}
+
+	/**
+	 * Verifies that by default, cascading is disabled. This is to preserve backwards compatibility in 4.x. We
+	 * expect to change this for 5.0.
+	 */
+	@Test
+	void cascadingDisabled() {
+		loader = new GenericFileLoader(client);
+
+		loader.loadFiles("src/test/resources/process-files/cascading-metadata-test/parent1-withCP");
+		verifyCollections("/child1_1-noCP/test.json");
+		verifyPermissions("/child1_1-noCP/test.json");
 	}
 }

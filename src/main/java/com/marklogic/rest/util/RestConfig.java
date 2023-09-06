@@ -125,7 +125,7 @@ public class RestConfig {
 
 	@Override
 	public String toString() {
-		return String.format("%s://%shost:%d", getScheme(), getHost(), getPort());
+		return String.format("%s://%s:%d", getScheme(), getHost(), getPort());
 	}
 
 	/**

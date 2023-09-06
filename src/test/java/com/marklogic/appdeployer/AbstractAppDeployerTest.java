@@ -144,4 +144,8 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
 		payload.put("server-name", SAMPLE_APP_NAME + "-test");
 		mgr.save(payload.toString());
 	}
+
+	protected final CommandContext newCommandContext() {
+		return new CommandContext(appConfig, manageClient, adminManager);
+	}
 }

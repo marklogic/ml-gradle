@@ -393,6 +393,10 @@ public class DefaultAppConfigFactoryTest {
 
 		p.setProperty("mlUpdateMimetypeWhenPropertiesAreEqual", "true");
 
+		// 4.6.0
+		p.setProperty("mlCascadeCollections", "true");
+		p.setProperty("mlCascadePermissions", "true");
+
 		sut = new DefaultAppConfigFactory(new SimplePropertySource(p));
 		AppConfig config = sut.newAppConfig();
 
@@ -565,6 +569,9 @@ public class DefaultAppConfigFactoryTest {
 		assertEquals("other-group", map.get("host2"));
 
 		assertTrue(config.isUpdateMimetypeWhenPropertiesAreEqual());
+
+		assertTrue(config.isCascadeCollections());
+		assertTrue(config.isCascadePermissions());
 	}
 
 	/**

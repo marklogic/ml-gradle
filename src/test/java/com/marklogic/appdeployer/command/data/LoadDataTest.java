@@ -20,6 +20,7 @@ import com.marklogic.appdeployer.DataConfig;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.document.GenericDocumentManager;
+import com.marklogic.client.ext.file.GenericFileLoader;
 import com.marklogic.client.io.DocumentMetadataHandle;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,11 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class LoadDataTest extends AbstractAppDeployerTest {
 
@@ -91,5 +96,19 @@ public class LoadDataTest extends AbstractAppDeployerTest {
 		assertEquals("Documents", client.getDatabase());
 		assertEquals(appConfig.getAppServicesPort(), client.getPort());
 		client.release();
+	}
+
+	/**
+	 * Just verifies the config; we assume that ml-javaclient-util will work properly if cascade is set to true.
+	 */
+	@Test
+	void cascadeCollectionsAndPermissions() {
+		appConfig.setCascadePermissions(true);
+		appConfig.setCascadeCollections(true);
+
+		GenericFileLoader loader = (GenericFileLoader) new LoadDataCommand().buildFileLoader(appConfig);
+
+		assertTrue(loader.isCascadeCollections());
+		assertTrue(loader.isCascadePermissions());
 	}
 }

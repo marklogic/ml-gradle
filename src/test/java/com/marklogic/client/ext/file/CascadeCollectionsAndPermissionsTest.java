@@ -42,23 +42,32 @@ public class CascadeCollectionsAndPermissionsTest extends AbstractIntegrationTes
 	void parentWithBothProperties() {
 		loader.loadFiles("src/test/resources/process-files/cascading-metadata-test/parent1-withCP");
 
-		verifyCollections("/child1_1-noCP/test.json", PARENT_COLLECTION);
-		verifyPermissions("/child1_1-noCP/test.json", "rest-writer", "update");
+		verifyCollections("/parent.json", PARENT_COLLECTION);
+		verifyPermissions("/parent.json", "rest-writer", "update");
 
-		verifyCollections("/child1_2-withCP/test.json", CHILD_COLLECTION);
-		verifyPermissions("/child1_2-withCP/test.json", "rest-reader", "read");
-
-		verifyCollections("/child3_1-withCP/grandchild3_1_1-noCP/test.json", CHILD_COLLECTION);
-		verifyPermissions("/child3_1-withCP/grandchild3_1_1-noCP/test.json", "rest-reader", "read");
-
-		verifyCollections("/child1/child1.json", "ParentCollection");
+		// Should be same as parent as it doesn't have C/P files.
+		verifyCollections("/child1/child1.json", PARENT_COLLECTION);
 		verifyPermissions("/child1/child1.json", "rest-writer", "update");
 
+		// Differs from parent because it has its own C/P files.
 		verifyCollections("/child2/child2.json", "child2");
 		verifyPermissions("/child2/child2.json", "app-user", "read");
 
-		verifyCollections("/parent.json", "ParentCollection");
-		verifyPermissions("/parent.json", "rest-writer", "update");
+		// Differs from parent because it has its own C/P files.
+		verifyCollections("/child3/child3.json", "child3");
+		verifyPermissions("/child3/child3.json", "rest-reader", "read");
+
+		// Should inherit from child3, not parent.
+		verifyCollections("/child3/grandchild3/grandchild3.json", "child3");
+		verifyPermissions("/child3/grandchild3/grandchild3.json", "rest-reader", "read");
+
+		// Should inherit from parent.
+		verifyCollections("/child4/child4.json", PARENT_COLLECTION);
+		verifyPermissions("/child4/child4.json", "rest-writer", "update");
+
+		// Should override parent.
+		verifyCollections("/child4/grandchild4/grandchild4.json", "grandchild4");
+		verifyPermissions("/child4/grandchild4/grandchild4.json", "qconsole-user", "read");
 	}
 
 	@Test
@@ -87,7 +96,32 @@ public class CascadeCollectionsAndPermissionsTest extends AbstractIntegrationTes
 		loader = new GenericFileLoader(client);
 
 		loader.loadFiles("src/test/resources/process-files/cascading-metadata-test/parent1-withCP");
-		verifyCollections("/child1_1-noCP/test.json");
-		verifyPermissions("/child1_1-noCP/test.json");
+
+		verifyCollections("/parent.json", PARENT_COLLECTION);
+		verifyPermissions("/parent.json", "rest-writer", "update");
+
+		// Has no C/P files.
+		verifyCollections("/child1/child1.json");
+		verifyPermissions("/child1/child1.json");
+
+		// Has C/P files.
+		verifyCollections("/child2/child2.json", "child2");
+		verifyPermissions("/child2/child2.json", "app-user", "read");
+
+		// Has C/P files.
+		verifyCollections("/child3/child3.json", "child3");
+		verifyPermissions("/child3/child3.json", "rest-reader", "read");
+
+		// Has no C/P files.
+		verifyCollections("/child3/grandchild3/grandchild3.json");
+		verifyPermissions("/child3/grandchild3/grandchild3.json");
+
+		// Has no C/P files.
+		verifyCollections("/child4/child4.json");
+		verifyPermissions("/child4/child4.json");
+
+		// Has C/P files.
+		verifyCollections("/child4/grandchild4/grandchild4.json", "grandchild4");
+		verifyPermissions("/child4/grandchild4/grandchild4.json", "qconsole-user", "read");
 	}
 }

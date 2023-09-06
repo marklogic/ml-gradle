@@ -8,7 +8,7 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath "com.marklogic:ml-gradle:4.5.3"
+		classpath "com.marklogic:ml-gradle:4.6.0"
 	}
 }
 
@@ -54,7 +54,7 @@ configurations {
  * using that library in tests that must invoke MarkLogic HTTP endpoints.
  */
 dependencies {
-	testImplementation "com.marklogic:marklogic-junit5:1.1.0"
+	testImplementation "com.marklogic:marklogic-junit5:1.4.0"
 	testImplementation "com.jayway.restassured:rest-assured:2.4.1"
 
 	corb "com.marklogic:marklogic-corb:2.4.5"

@@ -72,4 +72,13 @@ public class RestConfigTest {
 		config.setBasePath("/secure");
 		assertEquals("https://somehost:8002/secure/target/path", config.buildUri(targetPath).toString());
 	}
+
+	@Test
+	void verifyToString() {
+		RestConfig config = new RestConfig("somewhere", 8008, "some", "user");
+		assertEquals("http://somewhere:8008", config.toString());
+
+		config.setScheme("https");
+		assertEquals("https://somewhere:8008", config.toString());
+	}
 }

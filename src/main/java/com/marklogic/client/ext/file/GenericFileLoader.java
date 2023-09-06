@@ -53,6 +53,8 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 	private String[] collections;
 	private TokenReplacer tokenReplacer;
 	private String[] additionalBinaryExtensions;
+	private boolean cascadeCollections;
+	private boolean cascadePermissions;
 
 	/**
 	 * The given DatabaseClient is used to construct a BatchWriter that writes to MarkLogic via the REST API. The
@@ -186,6 +188,15 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 			if (additionalBinaryExtensions != null && processor instanceof SupportsAdditionalBinaryExtensions) {
 				((SupportsAdditionalBinaryExtensions) processor).setAdditionalBinaryExtensions(additionalBinaryExtensions);
 			}
+
+			// Awful hack for 4.6.0. In 5.0, the hope is to replace the processor-specific fields on this class with
+			// a "Config"-type class that can be passed to each processor.
+			if (processor instanceof PermissionsFileDocumentFileProcessor) {
+				((PermissionsFileDocumentFileProcessor)processor).setCascadingEnabled(this.cascadePermissions);
+			}
+			if (processor instanceof CollectionsFileDocumentFileProcessor) {
+				((CollectionsFileDocumentFileProcessor)processor).setCascadingEnabled(this.cascadeCollections);
+			}
 		});
 	}
 
@@ -300,5 +311,37 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 
 	public void setBatchWriter(BatchWriter batchWriter) {
 		this.batchWriter = batchWriter;
+	}
+
+	/**
+	 * @param cascadeCollections
+	 * @since 4.6.0
+	 */
+	public void setCascadeCollections(boolean cascadeCollections) {
+		this.cascadeCollections = cascadeCollections;
+	}
+
+	/**
+	 * @param cascadePermissions
+	 * @since 4.6.0
+	 */
+	public void setCascadePermissions(boolean cascadePermissions) {
+		this.cascadePermissions = cascadePermissions;
+	}
+
+	/**
+	 * @return
+	 * @since 4.6.0
+	 */
+	public boolean isCascadeCollections() {
+		return cascadeCollections;
+	}
+
+	/**
+	 * @return
+	 * @since 4.6.0
+	 */
+	public boolean isCascadePermissions() {
+		return cascadePermissions;
 	}
 }

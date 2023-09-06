@@ -27,10 +27,16 @@ import java.util.Stack;
 /**
  * Adds a stack to store Properties objects while traversing a directory tree. Implements {@code FileVisitor} so that
  * it can be informed when {@code DefaultDocumentFileReader} is entering and exiting a directory.
+ *
+ * To preserve backwards compatibility in subclasses, cascading is disabled by default. This will likely change in 5.0
+ * to be enabled by default.
+ *
+ * @since 4.6.0
  */
 abstract class CascadingPropertiesDrivenDocumentFileProcessor extends PropertiesDrivenDocumentFileProcessor implements FileVisitor<Path> {
 
 	final private Stack<Properties> propertiesStack = new Stack<>();
+	private boolean cascadingEnabled = false;
 
 	protected CascadingPropertiesDrivenDocumentFileProcessor(String propertiesFilename) {
 		super(propertiesFilename);
@@ -42,21 +48,25 @@ abstract class CascadingPropertiesDrivenDocumentFileProcessor extends Properties
 		if (collectionsPropertiesFile.exists()) {
 			this.loadProperties(collectionsPropertiesFile);
 		} else {
-			if (!propertiesStack.isEmpty()) {
+			if (cascadingEnabled && !propertiesStack.isEmpty()) {
 				this.setProperties(propertiesStack.peek());
 			} else {
 				this.setProperties(new Properties());
 			}
 		}
-		propertiesStack.push(this.getProperties());
+		if (cascadingEnabled) {
+			propertiesStack.push(this.getProperties());
+		}
 		return FileVisitResult.CONTINUE;
 	}
 
 	@Override
 	public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
-		propertiesStack.pop();
-		if (!propertiesStack.isEmpty()) {
-			this.setProperties(propertiesStack.peek());
+		if (cascadingEnabled) {
+			propertiesStack.pop();
+			if (!propertiesStack.isEmpty()) {
+				this.setProperties(propertiesStack.peek());
+			}
 		}
 		return FileVisitResult.CONTINUE;
 	}
@@ -69,5 +79,13 @@ abstract class CascadingPropertiesDrivenDocumentFileProcessor extends Properties
 	@Override
 	public FileVisitResult visitFileFailed(Path file, IOException exc) {
 		return FileVisitResult.CONTINUE;
+	}
+
+	public boolean isCascadingEnabled() {
+		return cascadingEnabled;
+	}
+
+	public void setCascadingEnabled(boolean cascadingEnabled) {
+		this.cascadingEnabled = cascadingEnabled;
 	}
 }

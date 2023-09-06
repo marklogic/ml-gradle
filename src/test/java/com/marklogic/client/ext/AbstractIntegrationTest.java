@@ -82,6 +82,11 @@ public abstract class AbstractIntegrationTest {
 
 	protected final void verifyPermissions(String uri, String... permissionsRolesAndCapabilities) {
 		verifyMetadata(uri, metadata -> {
+			// TODO This will likely need to be modified once we shift the tests to not use an admin user, and thus
+			// the user will have to specify at least one update permission.
+			if (permissionsRolesAndCapabilities.length == 0) {
+				assertEquals(0, metadata.getPermissions().size());
+			}
 			for (int i = 0; i < permissionsRolesAndCapabilities.length; i += 2) {
 				String role = permissionsRolesAndCapabilities[i];
 				assertTrue(metadata.getPermissions().containsKey(role), "Did not find permissions with role: " +

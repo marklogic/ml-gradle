@@ -44,29 +44,39 @@ abstract class CascadingPropertiesDrivenDocumentFileProcessor extends Properties
 
 	@Override
 	public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-		File collectionsPropertiesFile = new File(dir.toFile(), this.getPropertiesFilename());
-		if (collectionsPropertiesFile.exists()) {
-			this.loadProperties(collectionsPropertiesFile);
+		// If cascading is disabled, we still use a stack to keep track of whether a directory has properties or not.
+		// We just never grab properties from the stack in case a directory doesn't have properties.
+		if (logger.isDebugEnabled()) {
+			logger.debug(format("Visiting directory: %s", dir.toFile().getAbsolutePath()));
+		}
+		File propertiesFile = new File(dir.toFile(), this.getPropertiesFilename());
+		if (propertiesFile.exists()) {
+			if (logger.isDebugEnabled()) {
+				logger.debug(format("Loading properties from file: %s", propertiesFile.getAbsolutePath()));
+			}
+			this.loadProperties(propertiesFile);
 		} else {
 			if (cascadingEnabled && !propertiesStack.isEmpty()) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("No properties file, and cascading is enabled, so using properties from top of stack.");
+				}
 				this.setProperties(propertiesStack.peek());
 			} else {
+				if (logger.isDebugEnabled()) {
+					logger.debug("No properties file, or cascading is disabled, so using empty properties.");
+				}
 				this.setProperties(new Properties());
 			}
 		}
-		if (cascadingEnabled) {
-			propertiesStack.push(this.getProperties());
-		}
+		propertiesStack.push(this.getProperties());
 		return FileVisitResult.CONTINUE;
 	}
 
 	@Override
 	public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
-		if (cascadingEnabled) {
-			propertiesStack.pop();
-			if (!propertiesStack.isEmpty()) {
-				this.setProperties(propertiesStack.peek());
-			}
+		propertiesStack.pop();
+		if (!propertiesStack.isEmpty()) {
+			this.setProperties(propertiesStack.peek());
 		}
 		return FileVisitResult.CONTINUE;
 	}

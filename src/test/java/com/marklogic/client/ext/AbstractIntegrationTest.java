@@ -58,6 +58,14 @@ public abstract class AbstractIntegrationTest {
 		}
 	}
 
+	protected final DatabaseClient newContentClient() {
+		String currentDatabase = clientConfig.getDatabase();
+		clientConfig.setDatabase(CONTENT_DATABASE);
+		DatabaseClient client = configuredDatabaseClientFactory.newDatabaseClient(clientConfig);
+		clientConfig.setDatabase(currentDatabase);
+		return client;
+	}
+
 	protected DatabaseClient newClient(String database) {
 		String currentDatabase = clientConfig.getDatabase();
 		clientConfig.setDatabase(database);

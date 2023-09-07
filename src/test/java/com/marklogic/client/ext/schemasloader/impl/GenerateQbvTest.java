@@ -19,15 +19,15 @@ public class GenerateQbvTest extends AbstractSchemasTest {
 
 	@BeforeEach
 	void beforeEach() {
-		loader = new DefaultSchemasLoader(client, CONTENT_DATABASE);
+		// As a sanity check, verify that QBVs get generated when we tell DSL not to validate TDEs.
+		loader = new DefaultSchemasLoader(client, newContentClient(), false);
 	}
 
 	@Test
 	public void test() {
 		Path path = Paths.get("src", "test", "resources", "qbv-schemas");
 		List<DocumentFile> files = loader.loadSchemas(path.toString());
-		assertEquals(3, files.size(),
-			"Only the TDE templates should be in this list");
+		assertEquals(2, files.size(), "Only the TDE templates should be in this list");
 
 		ClientHelper helper = new ClientHelper(client);
 		List<String> tdeUris = helper.getUrisInCollection(TdeUtil.TDE_COLLECTION);

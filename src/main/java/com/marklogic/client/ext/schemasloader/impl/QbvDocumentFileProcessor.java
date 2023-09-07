@@ -39,32 +39,24 @@ import java.util.List;
 /**
  * @since 4.6.0
  */
-public class QbvDocumentFileProcessor extends LoggingObject implements DocumentFileProcessor {
+class QbvDocumentFileProcessor extends LoggingObject implements DocumentFileProcessor {
 
 	public static final String QBV_COLLECTION = "http://marklogic.com/xdmp/qbv";
 	private static final String QBV_XML_PLAN_NAMESPACE = "http://marklogic.com/plan";
 	private static final String QBV_XML_ROOT_ELEMENT = "query-based-view";
-	private static final String JAVASCRIPT_EVAL_TEMPLATE = "declareUpdate(); " +
-		"xdmp.invokeFunction(function() {'use strict'; const op = require('/MarkLogic/optic'); return %s }, " +
-		"{database: xdmp.database('%s')})";
-	private static final String XQUERY_EVAL_TEMPLATE = "xquery version \"1.0-ml\"; " +
-		"import module namespace op=\"http://marklogic.com/optic\" at \"/MarkLogic/optic.xqy\"; " +
-		"xdmp:invoke-function(function() {%s},<options xmlns=\"xdmp:eval\"><database>{xdmp:database('%s')}</database></options>)";
 
-	final private DatabaseClient schemasDatabaseClient;
-	final private String qbvGeneratorDatabaseName;
+	final private DatabaseClient contentDatabaseClient;
 	final private List<DocumentFile> qbvFiles = new ArrayList<>();
-	final private XMLDocumentManager docMgr;
+	final private XMLDocumentManager schemasDocumentManager;
 
 
 	/**
-	 * @param schemasDatabaseClient database client for the application's schemas database
-	 * @param qbvGeneratorDatabaseName the database to run a script against for generating a QBV
+	 * @param schemasDatabaseClient used to write the QBV XML document to the application's schemas database
+	 * @param contentDatabaseClient used to generate the QBV based on a user-provided script
 	 */
-	public QbvDocumentFileProcessor(DatabaseClient schemasDatabaseClient, String qbvGeneratorDatabaseName) {
-		this.schemasDatabaseClient = schemasDatabaseClient;
-		this.qbvGeneratorDatabaseName = qbvGeneratorDatabaseName;
-		this.docMgr = schemasDatabaseClient.newXMLDocumentManager();
+	QbvDocumentFileProcessor(DatabaseClient schemasDatabaseClient, DatabaseClient contentDatabaseClient) {
+		this.schemasDocumentManager = schemasDatabaseClient.newXMLDocumentManager();
+		this.contentDatabaseClient = contentDatabaseClient;
 	}
 
 	@Override
@@ -99,29 +91,29 @@ public class QbvDocumentFileProcessor extends LoggingObject implements DocumentF
 		ServerEvaluationCall call = getServerEvaluationCall(qbvFile);
 		if (call != null) {
 			StringHandle handleString = new StringHandle();
+			try {
+				call.eval(handleString);
+			} catch (Exception e) {
+				throw new RuntimeException(format("Query-Based View generation failed for file: %s; cause: %s", qbvFile.getFile().getAbsolutePath(), e.getMessage()));
+			}
+			if (Format.XML.equals(handleString.getFormat())) {
+				Document xmlDocument;
 				try {
-					call.eval(handleString);
+					xmlDocument = new SAXBuilder().build(new StringReader(handleString.get()));
 				} catch (Exception e) {
 					throw new RuntimeException(format("Query-Based View generation failed for file: %s; cause: %s", qbvFile.getFile().getAbsolutePath(), e.getMessage()));
 				}
-				if (Format.XML.equals(handleString.getFormat())) {
-					Document xmlDocument;
-					try {
-						xmlDocument = new SAXBuilder().build(new StringReader(handleString.get()));
-					} catch (Exception e) {
-						throw new RuntimeException(format("Query-Based View generation failed for file: %s; cause: %s", qbvFile.getFile().getAbsolutePath(), e.getMessage()));
-					}
-					Element root = xmlDocument.getRootElement();
-					if (QBV_XML_ROOT_ELEMENT.equals(root.getName()) & (root.getNamespace() != null && root.getNamespace().getURI().equals(QBV_XML_PLAN_NAMESPACE))) {
-						qbvFile.getDocumentMetadata().getCollections().add(QBV_COLLECTION);
-						String uri = qbvFile.getUri() + ".xml";
-						docMgr.write(uri, qbvFile.getDocumentMetadata(), new JDOMHandle(xmlDocument));
-					} else {
-						throw new RuntimeException(format("Query-Based view generation failed for file: %s; received unexpected response from server: %s", qbvFile.getFile().getAbsolutePath(), handleString.get()));
-					}
+				Element root = xmlDocument.getRootElement();
+				if (QBV_XML_ROOT_ELEMENT.equals(root.getName()) & (root.getNamespace() != null && root.getNamespace().getURI().equals(QBV_XML_PLAN_NAMESPACE))) {
+					qbvFile.getDocumentMetadata().getCollections().add(QBV_COLLECTION);
+					String uri = qbvFile.getUri() + ".xml";
+					schemasDocumentManager.write(uri, qbvFile.getDocumentMetadata(), new JDOMHandle(xmlDocument));
 				} else {
-					throw new RuntimeException(format("Query-Based View generation failed for file: %s; ensure your Optic script includes a call to generate a view; received unexpected response from server: %s", qbvFile.getFile().getAbsolutePath(), handleString.get()));
+					throw new RuntimeException(format("Query-Based view generation failed for file: %s; received unexpected response from server: %s", qbvFile.getFile().getAbsolutePath(), handleString.get()));
 				}
+			} else {
+				throw new RuntimeException(format("Query-Based View generation failed for file: %s; ensure your Optic script includes a call to generate a view; received unexpected response from server: %s", qbvFile.getFile().getAbsolutePath(), handleString.get()));
+			}
 		}
 	}
 
@@ -133,17 +125,7 @@ public class QbvDocumentFileProcessor extends LoggingObject implements DocumentF
 			throw new RuntimeException(format("Unable to generate Query-Based View; could not read from file %s; cause: %s", qbvFile.getFile().getAbsolutePath(), e.getMessage()));
 		}
 		return FilenameUtil.isXqueryFile(qbvFile.getFile().getName()) ?
-			buildXqueryCall(fileContent) :
-			buildJavascriptCall(fileContent);
-	}
-
-	private ServerEvaluationCall buildJavascriptCall(String fileContent) {
-		String script = format(JAVASCRIPT_EVAL_TEMPLATE, fileContent, qbvGeneratorDatabaseName);
-		return schemasDatabaseClient.newServerEval().javascript(script);
-	}
-
-	private ServerEvaluationCall buildXqueryCall(String fileContent) {
-		String script = format(XQUERY_EVAL_TEMPLATE, fileContent, qbvGeneratorDatabaseName);
-		return schemasDatabaseClient.newServerEval().xquery(script);
+			contentDatabaseClient.newServerEval().xquery(fileContent) :
+			contentDatabaseClient.newServerEval().javascript(fileContent);
 	}
 }

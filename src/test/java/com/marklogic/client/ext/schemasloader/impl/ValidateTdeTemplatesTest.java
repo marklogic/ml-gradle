@@ -36,8 +36,7 @@ public class ValidateTdeTemplatesTest extends AbstractSchemasTest {
 	@BeforeEach
 	public void setup() {
 		super.setup();
-		// Assumes that Documents points to Schemas as its schemas database
-		loader = new DefaultSchemasLoader(client, CONTENT_DATABASE);
+		loader = new DefaultSchemasLoader(client, newContentClient());
 	}
 
 	@Test

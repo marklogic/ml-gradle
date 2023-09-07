@@ -30,27 +30,17 @@ import org.springframework.util.FileCopyUtils;
 import java.io.File;
 import java.io.IOException;
 
-public class TdeDocumentFileProcessor extends LoggingObject implements DocumentFileProcessor {
+class TdeDocumentFileProcessor extends LoggingObject implements DocumentFileProcessor {
 
-	private DatabaseClient schemasDatabaseClient;
-	private String tdeValidationDatabase;
+	private final DatabaseClient contentDatabaseClient;
 	private Boolean templateBatchInsertSupported;
 
 	/**
-	 * Use this constructor when you don't want any TDE validation to occur.
+	 * @param contentDatabaseClient the database to run a script against for validating a TDE. If null, TDE validation
+	 *                              will not be performed.
 	 */
-	public TdeDocumentFileProcessor() {
-	}
-
-	/**
-	 * Use this constructor when you want to validate a TDE template before writing it to MarkLogic.
-	 *
-	 * @param schemasDatabaseClient database client for the application's schemas database
-	 * @param tdeValidationDatabase the database to run a script against for validating a TDE
-	 */
-	public TdeDocumentFileProcessor(DatabaseClient schemasDatabaseClient, String tdeValidationDatabase) {
-		this.schemasDatabaseClient = schemasDatabaseClient;
-		this.tdeValidationDatabase = tdeValidationDatabase;
+	TdeDocumentFileProcessor(DatabaseClient contentDatabaseClient) {
+		this.contentDatabaseClient = contentDatabaseClient;
 	}
 
 	@Override
@@ -79,22 +69,25 @@ public class TdeDocumentFileProcessor extends LoggingObject implements DocumentF
 	}
 
 	private boolean isTemplateBatchInsertSupported() {
-		if (this.templateBatchInsertSupported == null) {
+		if (this.templateBatchInsertSupported == null && contentDatabaseClient != null) {
 			// Memoize this to avoid repeated calls; the result will always be the same unless the databaseClient is
 			// modified, in which case templateBatchInsertSupported is set to null
-			this.templateBatchInsertSupported = TdeUtil.templateBatchInsertSupported(schemasDatabaseClient);
+			this.templateBatchInsertSupported = TdeUtil.templateBatchInsertSupported(contentDatabaseClient);
 		}
 		return this.templateBatchInsertSupported;
 	}
 
-	protected void validateTdeTemplate(DocumentFile documentFile) {
+	/**
+	 * This mechanism is only needed on older versions of MarkLogic that do not support tde.templateBatchInsert.
+	 *
+	 * @param documentFile
+	 */
+	private void validateTdeTemplate(DocumentFile documentFile) {
 		final File file = documentFile.getFile();
-		if (schemasDatabaseClient == null) {
-			logger.info("No DatabaseClient provided for TDE validation, so will not validate TDE templates");
-		} else if (tdeValidationDatabase == null) {
-			logger.info("No TDE validation database specified, so will not validate TDE templates");
+		if (contentDatabaseClient == null) {
+			logger.info("No content database client provided, so will not validate TDE templates.");
 		} else if (isTemplateBatchInsertSupported()) {
-			logger.debug("Not performing TDE validation; it will be performed automatically via tde.templateBatchInsert");
+			logger.debug("Not performing TDE validation; it will be performed automatically via tde.templateBatchInsert.");
 		} else {
 			String fileContent = null;
 			try {
@@ -124,61 +117,17 @@ public class TdeDocumentFileProcessor extends LoggingObject implements DocumentF
 		}
 	}
 
-	protected ServerEvaluationCall buildJavascriptCall(DocumentFile documentFile, String fileContent) {
-		StringBuilder script = new StringBuilder("var template; xdmp.invokeFunction(function() {var tde = require('/MarkLogic/tde.xqy');");
-		script.append(format(
-			"\nreturn tde.validate([xdmp.toJSON(template)], ['%s'])}, {database: xdmp.database('%s')})",
-			documentFile.getUri(), tdeValidationDatabase
-		));
-		return schemasDatabaseClient.newServerEval().javascript(script.toString())
+	private ServerEvaluationCall buildJavascriptCall(DocumentFile documentFile, String fileContent) {
+		StringBuilder script = new StringBuilder("const tde = require('/MarkLogic/tde.xqy'); var template; ");
+		script.append(format("\ntde.validate([xdmp.toJSON(template)], ['%s'])", documentFile.getUri()));
+		return contentDatabaseClient.newServerEval().javascript(script.toString())
 			.addVariable("template", new StringHandle(fileContent).withFormat(Format.JSON));
 	}
 
-	protected ServerEvaluationCall buildXqueryCall(DocumentFile documentFile, String fileContent) {
+	private ServerEvaluationCall buildXqueryCall(DocumentFile documentFile, String fileContent) {
 		StringBuilder script = new StringBuilder("import module namespace tde = 'http://marklogic.com/xdmp/tde' at '/MarkLogic/tde.xqy'; ");
 		script.append("\ndeclare variable $template external; ");
-		script.append("\nxdmp:invoke-function(function() { ");
-		script.append(format(
-			"\ntde:validate($template, '%s')}, <options xmlns='xdmp:eval'><database>{xdmp:database('%s')}</database></options>)",
-			documentFile.getUri(), tdeValidationDatabase
-		));
-		return schemasDatabaseClient.newServerEval().xquery(script.toString()).addVariable("template", new StringHandle(fileContent).withFormat(Format.XML));
-	}
-
-	/**
-	 * @return
-	 * @deprecated since 4.6.0, will be removed in 5.0.0
-	 */
-	@Deprecated
-	public DatabaseClient getDatabaseClient() {
-		return schemasDatabaseClient;
-	}
-
-	/**
-	 * @param databaseClient
-	 * @deprecated since 4.6.0, will be removed in 5.0.0
-	 */
-	@Deprecated
-	public void setDatabaseClient(DatabaseClient databaseClient) {
-		this.schemasDatabaseClient = databaseClient;
-		this.templateBatchInsertSupported = null;
-	}
-
-	/**
-	 * @return
-	 * @deprecated since 4.6.0, will be removed in 5.0.0
-	 */
-	@Deprecated
-	public String getTdeValidationDatabase() {
-		return tdeValidationDatabase;
-	}
-
-	/**
-	 * @param tdeValidationDatabase
-	 * @deprecated since 4.6.0, will be removed in 5.0.0
-	 */
-	@Deprecated
-	public void setTdeValidationDatabase(String tdeValidationDatabase) {
-		this.tdeValidationDatabase = tdeValidationDatabase;
+		script.append(format("\ntde:validate($template, '%s')", documentFile.getUri()));
+		return contentDatabaseClient.newServerEval().xquery(script.toString()).addVariable("template", new StringHandle(fileContent).withFormat(Format.XML));
 	}
 }

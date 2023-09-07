@@ -124,6 +124,8 @@ public class LoadSchemasCommand extends AbstractCommand {
 		}
 
 		DefaultSchemasLoader schemasLoader = new DefaultSchemasLoader(client, tdeValidationDatabase);
+		schemasLoader.setCascadeCollections(appConfig.isCascadeCollections());
+		schemasLoader.setCascadePermissions(appConfig.isCascadePermissions());
 		FileFilter filter = appConfig.getSchemasFileFilter();
 		if (filter != null) {
 			schemasLoader.addFileFilter(filter);

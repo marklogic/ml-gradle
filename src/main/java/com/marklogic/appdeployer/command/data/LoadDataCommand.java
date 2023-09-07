@@ -70,6 +70,9 @@ public class LoadDataCommand extends AbstractCommand {
 		final DatabaseClient client = determineDatabaseClient(appConfig);
 		final GenericFileLoader loader = new GenericFileLoader(client);
 
+		loader.setCascadeCollections(appConfig.isCascadeCollections());
+		loader.setCascadePermissions(appConfig.isCascadePermissions());
+
 		DataConfig dataConfig = appConfig.getDataConfig();
 
 		final Integer batchSize = dataConfig.getBatchSize();

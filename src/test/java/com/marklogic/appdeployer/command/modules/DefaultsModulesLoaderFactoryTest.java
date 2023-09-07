@@ -21,7 +21,9 @@ import com.marklogic.client.ext.modulesloader.impl.PropertiesModuleManager;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DefaultsModulesLoaderFactoryTest extends AbstractAppDeployerTest {
 
@@ -42,5 +44,21 @@ public class DefaultsModulesLoaderFactoryTest extends AbstractAppDeployerTest {
 		DefaultModulesLoader loader = (DefaultModulesLoader) factory.newModulesLoader(appConfig);
 		PropertiesModuleManager manager = (PropertiesModuleManager) loader.getModulesManager();
 		assertNull(manager.getHost());
+	}
+
+	@Test
+	void cascadeCollectionsAndPermissions() {
+		DefaultModulesLoader loader = (DefaultModulesLoader) factory.newModulesLoader(appConfig);
+
+		// Should default to false in the 4.x timeframe
+		assertFalse(loader.getAssetFileLoader().isCascadeCollections());
+		assertFalse(loader.getAssetFileLoader().isCascadePermissions());
+
+		appConfig.setCascadeCollections(true);
+		appConfig.setCascadePermissions(true);
+
+		loader = (DefaultModulesLoader) factory.newModulesLoader(appConfig);
+		assertTrue(loader.getAssetFileLoader().isCascadeCollections());
+		assertTrue(loader.getAssetFileLoader().isCascadePermissions());
 	}
 }

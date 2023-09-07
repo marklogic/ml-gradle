@@ -791,6 +791,16 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			config.setModulesLoaderBatchSize(Integer.parseInt(prop));
 		});
 
+		propertyConsumerMap.put("mlCascadeCollections", (config, prop) -> {
+			logger.info("Cascade collections.properties configuration when loading data, modules, and schemas: " + prop);
+			config.setCascadeCollections(Boolean.parseBoolean(prop));
+		});
+
+		propertyConsumerMap.put("mlCascadePermissions", (config, prop) -> {
+			logger.info("Cascade permissions.properties configuration when loading data, modules, and schemas: " + prop);
+			config.setCascadePermissions(Boolean.parseBoolean(prop));
+		});
+
 		/**
 		 * The following properties are all for generating Entity Services artifacts.
 		 */

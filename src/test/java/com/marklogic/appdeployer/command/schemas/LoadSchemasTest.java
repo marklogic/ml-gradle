@@ -20,6 +20,7 @@ import com.marklogic.appdeployer.command.Command;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.document.GenericDocumentManager;
+import com.marklogic.client.ext.schemasloader.impl.DefaultSchemasLoader;
 import com.marklogic.client.io.BytesHandle;
 import com.marklogic.client.io.DocumentMetadataHandle;
 import org.junit.jupiter.api.AfterEach;
@@ -28,7 +29,11 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.FileFilter;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class LoadSchemasTest extends AbstractAppDeployerTest {
 
@@ -160,6 +165,21 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 
 		assertTrue(docMgr.readMetadata("/tde/template1.json", new DocumentMetadataHandle()).getCollections().contains("http://marklogic.com/xdmp/tde"));
 		assertTrue(docMgr.readMetadata("/tde/template2.json", new DocumentMetadataHandle()).getCollections().contains("http://marklogic.com/xdmp/tde"));
+	}
+
+	/**
+	 * Just verifies the config; we assume that ml-javaclient-util will work properly if cascade is set to true.
+	 */
+	@Test
+	void cascadeCollectionsAndPermissions() {
+		appConfig.setCascadePermissions(true);
+		appConfig.setCascadeCollections(true);
+
+		DefaultSchemasLoader loader = (DefaultSchemasLoader) new LoadSchemasCommand().buildSchemasLoader(
+			newCommandContext(), appConfig.newSchemasDatabaseClient(), null);
+
+		assertTrue(loader.isCascadeCollections());
+		assertTrue(loader.isCascadePermissions());
 	}
 
 	private Command newCommand() {

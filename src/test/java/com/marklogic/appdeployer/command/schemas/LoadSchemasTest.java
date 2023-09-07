@@ -39,7 +39,7 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 
 	@AfterEach
 	public void cleanup() {
-		undeploySampleApp();
+//		undeploySampleApp();
 	}
 
 	@Test
@@ -153,6 +153,9 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 		File projectDir = new File("src/test/resources/schemas-project");
 
 		initializeAppConfig(projectDir);
+
+		// Turn off TDE validation, just to verify that the QBV still gets processed
+		appConfig.setTdeValidationEnabled(false);
 		appConfig.getSchemaPaths().add(new File(projectDir, "src/main/more-schemas").getAbsolutePath());
 
 		initializeAppDeployer(new DeployOtherDatabasesCommand(1), new LoadSchemasCommand());
@@ -162,9 +165,15 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 		GenericDocumentManager docMgr = client.newDocumentManager();
 		assertNotNull(docMgr.exists("/tde/template1.json"));
 		assertNotNull(docMgr.exists("/tde/template2.json"));
+		assertNotNull(docMgr.exists("/qbv/example.sjs.xml"),
+			"The QBV XML should have been generated, even though TDE validation is disabled.");
 
-		assertTrue(docMgr.readMetadata("/tde/template1.json", new DocumentMetadataHandle()).getCollections().contains("http://marklogic.com/xdmp/tde"));
-		assertTrue(docMgr.readMetadata("/tde/template2.json", new DocumentMetadataHandle()).getCollections().contains("http://marklogic.com/xdmp/tde"));
+		assertTrue(docMgr.readMetadata("/tde/template1.json",
+			new DocumentMetadataHandle()).getCollections().contains("http://marklogic.com/xdmp/tde"));
+		assertTrue(docMgr.readMetadata("/tde/template2.json",
+			new DocumentMetadataHandle()).getCollections().contains("http://marklogic.com/xdmp/tde"));
+		assertTrue(docMgr.readMetadata("/qbv/example.sjs.xml",
+			new DocumentMetadataHandle()).getCollections().contains("http://marklogic.com/xdmp/qbv"));
 	}
 
 	/**

@@ -93,6 +93,9 @@ public class QbvDocumentFileProcessor extends LoggingObject implements DocumentF
 	}
 
 	private void processQbvFile(DocumentFile qbvFile) {
+		if (logger.isInfoEnabled()) {
+			logger.info(format("Generating Query-Based View for file: %s", qbvFile.getFile().getName()));
+		}
 		ServerEvaluationCall call = getServerEvaluationCall(qbvFile);
 		if (call != null) {
 			StringHandle handleString = new StringHandle();

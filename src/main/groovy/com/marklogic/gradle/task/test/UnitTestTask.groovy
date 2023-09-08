@@ -50,7 +50,22 @@ class UnitTestTask extends MarkLogicTask {
 
 		try {
 			def testManager = new TestManager(client)
-			def runParams = buildRunParameters()
+
+			// Initially had the following block in its own method, but that caused issues since
+			// marklogic-unit-test-client is a compileOnly dependency.
+			def runParams = new TestManager.RunParameters()
+			if (project.hasProperty("runTeardown")) {
+				runParams.withRunTeardown(Boolean.parseBoolean(project.property("runTeardown")))
+			}
+			if (project.hasProperty("runSuiteTeardown")) {
+				runParams.withRunSuiteTeardown(Boolean.parseBoolean(project.property("runSuiteTeardown")))
+			}
+			if (project.hasProperty("runCodeCoverage")) {
+				runParams.withCalculateCoverage(Boolean.parseBoolean(project.property("runCodeCoverage")))
+			}
+			if (project.hasProperty("tests")) {
+				runParams.withTestNames(project.property("tests").split(","))
+			}
 
 			def suites
 			long start = System.currentTimeMillis()
@@ -124,23 +139,6 @@ class UnitTestTask extends MarkLogicTask {
 		}
 		println "Constructing DatabaseClient that will connect to port: " + appConfig.getRestPort()
 		return appConfig.newDatabaseClient()
-	}
-
-	TestManager.RunParameters buildRunParameters() {
-		def runParams = new TestManager.RunParameters()
-		if (project.hasProperty("runTeardown")) {
-			runParams.withRunTeardown(Boolean.parseBoolean(project.property("runTeardown")))
-		}
-		if (project.hasProperty("runSuiteTeardown")) {
-			runParams.withRunSuiteTeardown(Boolean.parseBoolean(project.property("runSuiteTeardown")))
-		}
-		if (project.hasProperty("runCodeCoverage")) {
-			runParams.withCalculateCoverage(Boolean.parseBoolean(project.property("runCodeCoverage")))
-		}
-		if (project.hasProperty("tests")) {
-			runParams.withTestNames(project.property("tests").split(","))
-		}
-		return runParams
 	}
 
 	static String escapeFilename(String filename) {

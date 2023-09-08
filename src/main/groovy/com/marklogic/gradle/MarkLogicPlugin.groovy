@@ -132,6 +132,9 @@ class MarkLogicPlugin implements Plugin<Project> {
 			description: "Deploys application resources in the same manner as mlDeploy, but will not deploy anything that " +
 				"involves writing data to a database - such as modules, schemas, and triggers - thus making it safe for use " +
 				"when deploying an application to a replica cluster")
+		project.task("mlTestConnections", type: TestConnectionsTask, group: deployGroup,
+			description: "Test each connection ml-gradle will make to MarkLogic; results of each test will be printed, with " +
+				"an exception being thrown if any connection test fails.")
 
 		String adminGroup = "ml-gradle Admin"
 		project.task("mlInit", type: InitTask, group: adminGroup, description: "Perform a one-time initialization of a MarkLogic server; uses the properties 'mlLicenseKey' and 'mlLicensee'")
@@ -347,6 +350,8 @@ class MarkLogicPlugin implements Plugin<Project> {
 				"Can use -PsuiteName to override the name of the test suite, -PtestName to override the name of the test module, and -Planguage to specify \"sjs\" or \"xqy\" test code.")
 		project.task("mlUnitTest", type: UnitTestTask, group: unitTestGroup, description: "Run tests found under /test/suites in the modules database. " +
 			"Connects to MarkLogic via the REST API server defined by mlTestRestPort (or by mlRestPort if mlTestRestPort is not set), and uses mlRest* properties for authentication. " +
+			"Use -Psuites to specify one or more suite names, separated by commas, to run. If not set, all suites will be run. " +
+			"Use -Ptests to specify one or more test names, separated by commas, to run. If not set, all tests in a suite will be run. " +
 			"Use -PunitTestResultsPath to override where test result files are written, which defaults to build/test-results/marklogic-unit-test. " +
 			"Use -PrunCodeCoverage to enable code coverage support when running the tests. " +
 			"Use -PrunTeardown and -PrunSuiteTeardown to control whether teardown and suite teardown scripts are run; these default to 'true' and can be set to 'false' instead. ")

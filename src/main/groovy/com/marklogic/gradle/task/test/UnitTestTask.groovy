@@ -15,6 +15,7 @@
  */
 package com.marklogic.gradle.task.test
 
+import com.marklogic.client.DatabaseClient
 import com.marklogic.client.ext.DatabaseClientConfig
 import com.marklogic.gradle.task.MarkLogicTask
 import com.marklogic.test.unit.DefaultJUnitTestReporter
@@ -41,47 +42,43 @@ class UnitTestTask extends MarkLogicTask {
 		try {
 			Class.forName("com.marklogic.test.unit.TestManager")
 		} catch (Exception ex) {
-			def message = "This task requires the com.marklogic:marklogic-unit-test-client library to be a buildscript dependency"
+			def message = "This task requires the com.marklogic:marklogic-unit-test-client library to be a buildscript dependency."
 			throw new GradleException(message)
 		}
 
-		def appConfig = getAppConfig()
-
-		def client
-		if (databaseClientConfig.getPort() != null && databaseClientConfig.getPort() > 0) {
-			println "Constructing DatabaseClient based on settings in the databaseClientConfig task property"
-			client = appConfig.configuredDatabaseClientFactory.newDatabaseClient(databaseClientConfig)
-		} else if (appConfig.getTestRestPort() != null) {
-			println "Constructing DatabaseClient that will connect to port: " + appConfig.getTestRestPort()
-			client = appConfig.newTestDatabaseClient()
-		} else {
-			println "Constructing DatabaseClient that will connect to port: " + appConfig.getRestPort()
-			client = appConfig.newDatabaseClient()
-		}
+		def client = createClient()
 
 		try {
 			def testManager = new TestManager(client)
 
-			boolean runTeardown = true
-			boolean runSuiteTeardown = true
-			boolean runCoverage = false
+			// Initially had the following block in its own method, but that caused issues since
+			// marklogic-unit-test-client is a compileOnly dependency.
+			def runParams = new TestManager.RunParameters()
 			if (project.hasProperty("runTeardown")) {
-				runTeardown = Boolean.parseBoolean(project.property("runTeardown"))
+				runParams.withRunTeardown(Boolean.parseBoolean(project.property("runTeardown")))
 			}
 			if (project.hasProperty("runSuiteTeardown")) {
-				runSuiteTeardown = Boolean.parseBoolean(project.property("runSuiteTeardown"))
+				runParams.withRunSuiteTeardown(Boolean.parseBoolean(project.property("runSuiteTeardown")))
 			}
 			if (project.hasProperty("runCodeCoverage")) {
-				runCoverage = Boolean.parseBoolean(project.property("runCodeCoverage"))
+				runParams.withCalculateCoverage(Boolean.parseBoolean(project.property("runCodeCoverage")))
+			}
+			if (project.hasProperty("tests")) {
+				runParams.withTestNames(project.property("tests").split(","))
 			}
 
-			println "Run teardown scripts: " + runTeardown
-			println "Run suite teardown scripts: " + runSuiteTeardown
-			println "Run code coverage: " + runCoverage
-			println "Running all suites..."
+			def suites
 			long start = System.currentTimeMillis()
-			def suites = testManager.runAllSuites(runTeardown, runSuiteTeardown, runCoverage)
-			println "Done running all suites; time: " + (System.currentTimeMillis() - start) + "ms"
+			if (project.hasProperty("suites")) {
+				def suitesToRun = project.hasProperty("suites") ? project.property("suites").split(",").toList() : null
+				println "Running suites: " + suitesToRun
+				suites = testManager.runSuites(suitesToRun, runParams)
+			} else {
+				println "Running all suites"
+				suites = testManager.runAllSuites(runParams)
+			}
+			println "Done running suites; time: " + (System.currentTimeMillis() - start) + "ms"
+
 			def report = new DefaultJUnitTestReporter().reportOnJUnitTestSuites(suites)
 			println report
 
@@ -124,11 +121,24 @@ class UnitTestTask extends MarkLogicTask {
 			println "\n" + fileCount + " test result files were written to: " + resultsDir
 
 			if (testsFailed) {
-				throw new GradleException("There were failing tests. See the test results at: " + resultsDir)
+				throw new GradleException("There were failing tests. See the test results at: file://" + resultsDir)
 			}
 		} finally {
 			client.release()
 		}
+	}
+
+	DatabaseClient createClient() {
+		def appConfig = getAppConfig()
+		if (databaseClientConfig.getPort() != null && databaseClientConfig.getPort() > 0) {
+			println "Constructing DatabaseClient based on settings in the databaseClientConfig task property"
+			return appConfig.configuredDatabaseClientFactory.newDatabaseClient(databaseClientConfig)
+		} else if (appConfig.getTestRestPort() != null) {
+			println "Constructing DatabaseClient that will connect to port: " + appConfig.getTestRestPort()
+			return appConfig.newTestDatabaseClient()
+		}
+		println "Constructing DatabaseClient that will connect to port: " + appConfig.getRestPort()
+		return appConfig.newDatabaseClient()
 	}
 
 	static String escapeFilename(String filename) {

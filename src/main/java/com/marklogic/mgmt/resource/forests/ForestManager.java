@@ -69,7 +69,6 @@ public class ForestManager extends AbstractResourceManager {
 	 */
 	public Map<String, List<Forest>> getMapOfPrimaryForests() {
 		JsonNode json = new ConfigurationManager(getManageClient()).getResourcesAsJson("forest").getBody();
-
 		// Config is an array of objects, and it will have a single object based on our request.
 		ArrayNode allPrimaryForests = (ArrayNode) json.get("config").get(0).get("forest");
 		ResourceMapper mapper = new DefaultResourceMapper(new API(getManageClient()));

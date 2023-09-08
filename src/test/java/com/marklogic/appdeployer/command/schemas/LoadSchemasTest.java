@@ -39,7 +39,7 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 
 	@AfterEach
 	public void cleanup() {
-//		undeploySampleApp();
+		undeploySampleApp();
 	}
 
 	@Test

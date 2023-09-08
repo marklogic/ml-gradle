@@ -114,7 +114,7 @@ public class LoadSchemasCommand extends AbstractCommand {
 			return context.getAppConfig().newAppServicesDatabaseClient(contentDatabase);
 		}
 		logger.warn(format("Unable to find a content database associated with schemas database: %s; this may " +
-			"result in errors when loading TDE templates and Query-Based-View scripts."));
+			"result in errors when loading TDE templates and Query-Based-View scripts.", schemasDatabase));
 		return null;
 	}
 

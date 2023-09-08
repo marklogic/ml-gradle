@@ -15,7 +15,6 @@
  */
 package com.marklogic.client.ext.file;
 
-import com.marklogic.client.ext.util.DefaultDocumentPermissionsParser;
 import com.marklogic.client.ext.util.DocumentPermissionsParser;
 
 import java.util.Properties;
@@ -24,7 +23,7 @@ import java.util.Properties;
  * Looks for a special file in each directory - defaults to permissions.properties - that contains properties where the
  * key is the name of a file in the directory, and the value is a comma-delimited list of role,capability,role,capability,etc.
  */
-public class PermissionsFileDocumentFileProcessor extends PropertiesDrivenDocumentFileProcessor {
+public class PermissionsFileDocumentFileProcessor extends CascadingPropertiesDrivenDocumentFileProcessor {
 
 	private DocumentPermissionsParser documentPermissionsParser;
 
@@ -33,9 +32,15 @@ public class PermissionsFileDocumentFileProcessor extends PropertiesDrivenDocume
 	}
 
 	public PermissionsFileDocumentFileProcessor(String propertiesFilename) {
-		this(propertiesFilename, new DefaultDocumentPermissionsParser());
+		super(propertiesFilename);
 	}
 
+	/**
+	 * @param propertiesFilename
+	 * @param documentPermissionsParser
+	 * @deprecated since 4.6.0
+	 */
+	@Deprecated
 	public PermissionsFileDocumentFileProcessor(String propertiesFilename, DocumentPermissionsParser documentPermissionsParser) {
 		super(propertiesFilename);
 		this.documentPermissionsParser = documentPermissionsParser;
@@ -46,15 +51,25 @@ public class PermissionsFileDocumentFileProcessor extends PropertiesDrivenDocume
 		String name = documentFile.getFile().getName();
 		if (properties.containsKey(name)) {
 			String value = getPropertyValue(properties, name);
-			documentPermissionsParser.parsePermissions(value, documentFile.getDocumentMetadata().getPermissions());
+			if (documentPermissionsParser != null) {
+				documentPermissionsParser.parsePermissions(value, documentFile.getDocumentMetadata().getPermissions());
+			} else {
+				documentFile.getDocumentMetadata().getPermissions().addFromDelimitedString(value);
+			}
+
 		}
 
 		if (properties.containsKey(WILDCARD_KEY)) {
 			String value = getPropertyValue(properties, WILDCARD_KEY);
-			documentPermissionsParser.parsePermissions(value, documentFile.getDocumentMetadata().getPermissions());
+			if (documentPermissionsParser != null) {
+				documentPermissionsParser.parsePermissions(value, documentFile.getDocumentMetadata().getPermissions());
+			} else {
+				documentFile.getDocumentMetadata().getPermissions().addFromDelimitedString(value);
+			}
 		}
 	}
 
+	@Deprecated
 	public void setDocumentPermissionsParser(DocumentPermissionsParser documentPermissionsParser) {
 		this.documentPermissionsParser = documentPermissionsParser;
 	}

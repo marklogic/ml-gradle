@@ -7,10 +7,14 @@ plugins {
 	// This plugin requires Java 11; keeping it commented out so that this project can be built and tested via
 	// Java 8, 11 or 17; to use this plugin, uncomment this line and use java 11 or higher
 	//	id "com.github.jk1.dependency-license-report" version "2.1"
+
+	// For deploying the test app.
+	id 'net.saliman.properties' version '1.5.2'
+	id "com.marklogic.ml-gradle" version "4.5.2"
 }
 
 group = "com.marklogic"
-version = "4.5.1"
+version = "4.6.0"
 
 java {
 	sourceCompatibility = 1.8
@@ -18,24 +22,28 @@ java {
 }
 
 repositories {
+	mavenLocal()
+	maven {
+		url "https://nexus.marklogic.com/repository/maven-snapshots/"
+	}
 	mavenCentral()
 }
 
 dependencies {
-	api 'com.marklogic:marklogic-client-api:6.2.0'
-	api 'com.marklogic:marklogic-xcc:11.0.2'
-	api 'org.springframework:spring-context:5.3.27'
+	api 'com.marklogic:marklogic-client-api:6.3.0'
+	api 'com.marklogic:marklogic-xcc:11.0.3'
+	api 'org.springframework:spring-context:5.3.29'
 
 	implementation 'org.jdom:jdom2:2.0.6.1'
 
-	implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.1'
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
 
 	// This is currently an implementation dependency, though perhaps should be an api dependency due to its usage in
 	// LoggingObject; not clear yet on whether the protected Logger in that class should make this an api dependency or not
 	implementation 'org.slf4j:slf4j-api:1.7.36'
 
-	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
-	testImplementation 'org.springframework:spring-test:5.3.27'
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+	testImplementation 'org.springframework:spring-test:5.3.29'
 	testImplementation 'org.mockito:mockito-core:4.11.0'
 
 	// Used for testing loading modules from the classpath
@@ -53,7 +61,7 @@ dependencies {
 
 	// Including the "new" JAXB libraries to verify that their presence doesn't cause the "old" JAXB libraries to fail
 	testImplementation "jakarta.xml.bind:jakarta.xml.bind-api:4.0.0"
-	testImplementation "com.sun.xml.bind:jaxb-impl:4.0.1"
+	testImplementation "com.sun.xml.bind:jaxb-impl:4.0.3"
 }
 
 test {

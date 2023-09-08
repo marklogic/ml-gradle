@@ -26,7 +26,7 @@ public abstract class AbstractSchemasTest extends AbstractIntegrationTest {
 	 */
 	@BeforeEach
 	public void setup() {
-		client = newClient("Schemas");
+		client = newClient("ml-javaclient-util-test-schemas");
 		client.newServerEval().xquery("cts:uris((), (), cts:true-query()) ! xdmp:document-delete(.)").eval();
 	}
 

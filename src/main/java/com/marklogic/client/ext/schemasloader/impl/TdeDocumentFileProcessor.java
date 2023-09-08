@@ -20,7 +20,7 @@ import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.eval.ServerEvaluationCall;
 import com.marklogic.client.ext.file.DocumentFile;
 import com.marklogic.client.ext.file.DocumentFileProcessor;
-import com.marklogic.client.ext.helper.ClientHelper;
+import com.marklogic.client.ext.helper.FilenameUtil;
 import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.client.io.Format;
 import com.marklogic.client.io.JacksonHandle;
@@ -30,68 +30,64 @@ import org.springframework.util.FileCopyUtils;
 import java.io.File;
 import java.io.IOException;
 
-public class TdeDocumentFileProcessor extends LoggingObject implements DocumentFileProcessor {
+class TdeDocumentFileProcessor extends LoggingObject implements DocumentFileProcessor {
 
-	private DatabaseClient databaseClient;
-	private String tdeValidationDatabase;
+	private final DatabaseClient contentDatabaseClient;
 	private Boolean templateBatchInsertSupported;
 
 	/**
-	 * Use this constructor when you don't want any TDE validation to occur.
+	 * @param contentDatabaseClient the database to run a script against for validating a TDE. If null, TDE validation
+	 *                              will not be performed.
 	 */
-	public TdeDocumentFileProcessor() {
-	}
-
-	/**
-	 * Use this constructor when you want to validate a TDE template before writing it to MarkLogic.
-	 *
-	 * @param databaseClient
-	 */
-	public TdeDocumentFileProcessor(DatabaseClient databaseClient, String tdeValidationDatabase) {
-		this.databaseClient = databaseClient;
-		this.tdeValidationDatabase = tdeValidationDatabase;
+	TdeDocumentFileProcessor(DatabaseClient contentDatabaseClient) {
+		this.contentDatabaseClient = contentDatabaseClient;
 	}
 
 	@Override
 	public DocumentFile processDocumentFile(DocumentFile documentFile) {
 		String uri = documentFile.getUri();
-		String extension = documentFile.getFileExtension();
-		if (extension != null) {
-			extension = extension.toLowerCase();
-		}
+		String filename = documentFile.getFile() != null ? documentFile.getFile().getName() : null;
+		boolean isTdeUri = (uri != null && uri.startsWith("/tde"));
+		boolean isJsonTde = (isTdeUri && FilenameUtil.endsWithExtension(filename, ".json"))
+			|| FilenameUtil.endsWithExtension(filename, ".tdej");
+		boolean isXmlTde = (isTdeUri && FilenameUtil.endsWithExtension(filename, ".xml"))
+			|| FilenameUtil.endsWithExtension(filename, ".tdex");
 
-		boolean isTdeTemplate = ("tdej".equals(extension) || "tdex".equals(extension)) || (uri != null && uri.startsWith("/tde"));
-		if (isTdeTemplate) {
+		// We have a test suggesting that a TDE may not be JSON or XML; that doesn't seem likely, but it also does not
+		// appear to cause any issues.
+		if (isTdeUri || isJsonTde || isXmlTde) {
 			documentFile.getDocumentMetadata().withCollections(TdeUtil.TDE_COLLECTION);
 			validateTdeTemplate(documentFile);
-		}
-
-		if ("tdej".equals(extension) || "json".equals(extension)) {
-			documentFile.setFormat(Format.JSON);
-		} else if ("tdex".equals(extension) || "xml".equals(extension)) {
-			documentFile.setFormat(Format.XML);
+			if (isJsonTde) {
+				documentFile.setFormat(Format.JSON);
+			} else if (isXmlTde) {
+				documentFile.setFormat(Format.XML);
+			}
 		}
 
 		return documentFile;
 	}
 
 	private boolean isTemplateBatchInsertSupported() {
-		if (this.templateBatchInsertSupported == null) {
+		if (this.templateBatchInsertSupported == null && contentDatabaseClient != null) {
 			// Memoize this to avoid repeated calls; the result will always be the same unless the databaseClient is
 			// modified, in which case templateBatchInsertSupported is set to null
-			this.templateBatchInsertSupported = TdeUtil.templateBatchInsertSupported(databaseClient);
+			this.templateBatchInsertSupported = TdeUtil.templateBatchInsertSupported(contentDatabaseClient);
 		}
 		return this.templateBatchInsertSupported;
 	}
 
-	protected void validateTdeTemplate(DocumentFile documentFile) {
+	/**
+	 * This mechanism is only needed on older versions of MarkLogic that do not support tde.templateBatchInsert.
+	 *
+	 * @param documentFile
+	 */
+	private void validateTdeTemplate(DocumentFile documentFile) {
 		final File file = documentFile.getFile();
-		if (databaseClient == null) {
-			logger.info("No DatabaseClient provided for TDE validation, so will not validate TDE templates");
-		} else if (tdeValidationDatabase == null) {
-			logger.info("No TDE validation database specified, so will not validate TDE templates");
+		if (contentDatabaseClient == null) {
+			logger.info("No content database client provided, so will not validate TDE templates.");
 		} else if (isTemplateBatchInsertSupported()) {
-			logger.debug("Not performing TDE validation; it will be performed automatically via tde.templateBatchInsert");
+			logger.debug("Not performing TDE validation; it will be performed automatically via tde.templateBatchInsert.");
 		} else {
 			String fileContent = null;
 			try {
@@ -121,41 +117,17 @@ public class TdeDocumentFileProcessor extends LoggingObject implements DocumentF
 		}
 	}
 
-	protected ServerEvaluationCall buildJavascriptCall(DocumentFile documentFile, String fileContent) {
-		StringBuilder script = new StringBuilder("var template; xdmp.invokeFunction(function() {var tde = require('/MarkLogic/tde.xqy');");
-		script.append(format(
-			"\nreturn tde.validate([xdmp.toJSON(template)], ['%s'])}, {database: xdmp.database('%s')})",
-			documentFile.getUri(), tdeValidationDatabase
-		));
-		return databaseClient.newServerEval().javascript(script.toString())
+	private ServerEvaluationCall buildJavascriptCall(DocumentFile documentFile, String fileContent) {
+		StringBuilder script = new StringBuilder("const tde = require('/MarkLogic/tde.xqy'); var template; ");
+		script.append(format("\ntde.validate([xdmp.toJSON(template)], ['%s'])", documentFile.getUri()));
+		return contentDatabaseClient.newServerEval().javascript(script.toString())
 			.addVariable("template", new StringHandle(fileContent).withFormat(Format.JSON));
 	}
 
-	protected ServerEvaluationCall buildXqueryCall(DocumentFile documentFile, String fileContent) {
+	private ServerEvaluationCall buildXqueryCall(DocumentFile documentFile, String fileContent) {
 		StringBuilder script = new StringBuilder("import module namespace tde = 'http://marklogic.com/xdmp/tde' at '/MarkLogic/tde.xqy'; ");
 		script.append("\ndeclare variable $template external; ");
-		script.append("\nxdmp:invoke-function(function() { ");
-		script.append(format(
-			"\ntde:validate($template, '%s')}, <options xmlns='xdmp:eval'><database>{xdmp:database('%s')}</database></options>)",
-			documentFile.getUri(), tdeValidationDatabase
-		));
-		return databaseClient.newServerEval().xquery(script.toString()).addVariable("template", new StringHandle(fileContent).withFormat(Format.XML));
-	}
-
-	public DatabaseClient getDatabaseClient() {
-		return databaseClient;
-	}
-
-	public void setDatabaseClient(DatabaseClient databaseClient) {
-		this.databaseClient = databaseClient;
-		this.templateBatchInsertSupported = null;
-	}
-
-	public String getTdeValidationDatabase() {
-		return tdeValidationDatabase;
-	}
-
-	public void setTdeValidationDatabase(String tdeValidationDatabase) {
-		this.tdeValidationDatabase = tdeValidationDatabase;
+		script.append(format("\ntde:validate($template, '%s')", documentFile.getUri()));
+		return contentDatabaseClient.newServerEval().xquery(script.toString()).addVariable("template", new StringHandle(fileContent).withFormat(Format.XML));
 	}
 }

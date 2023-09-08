@@ -20,7 +20,11 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.*;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +39,8 @@ public class DefaultDocumentFileReader extends AbstractDocumentFileReader implem
 	private List<DocumentFile> documentFiles;
 	private String uriPrefix = "/";
 
-	// Each of these are eagerly instantiated, and we retain a reference in case a client wants to modify them
+	// As of 4.6.0, these no longer need to be class fields but are being kept for backwards compatibility.
+	// They should be removed in 5.0.0.
 	private CollectionsFileDocumentFileProcessor collectionsFileDocumentFileProcessor;
 	private PermissionsFileDocumentFileProcessor permissionsFileDocumentFileProcessor;
 
@@ -105,6 +110,11 @@ public class DefaultDocumentFileReader extends AbstractDocumentFileReader implem
 			if (logger.isDebugEnabled()) {
 				logger.debug("Visiting directory: " + dir);
 			}
+			for (DocumentFileProcessor processor : getDocumentFileProcessors()) {
+				if (processor instanceof FileVisitor) {
+					((FileVisitor) processor).preVisitDirectory(dir, attrs);
+				}
+			}
 			return FileVisitResult.CONTINUE;
 		} else {
 			if (logger.isDebugEnabled()) {
@@ -115,7 +125,7 @@ public class DefaultDocumentFileReader extends AbstractDocumentFileReader implem
 	}
 
 	@Override
-	public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+	public FileVisitResult visitFileFailed(Path file, IOException exc) {
 		if (exc != null) {
 			logger.warn("Failed visiting file: " + exc.getMessage(), exc);
 		}
@@ -127,11 +137,16 @@ public class DefaultDocumentFileReader extends AbstractDocumentFileReader implem
 		if (exc != null) {
 			logger.warn("Error in postVisitDirectory: " + exc.getMessage(), exc);
 		}
+		for (DocumentFileProcessor processor : getDocumentFileProcessors()) {
+			if (processor instanceof FileVisitor) {
+				((FileVisitor) processor).postVisitDirectory(dir, exc);
+			}
+		}
 		return FileVisitResult.CONTINUE;
 	}
 
 	@Override
-	public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
+	public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
 		if (acceptPath(path, attrs)) {
 			DocumentFile documentFile = buildDocumentFile(path, currentRootPath);
 			documentFile = processDocumentFile(documentFile);
@@ -202,10 +217,21 @@ public class DefaultDocumentFileReader extends AbstractDocumentFileReader implem
 		this.uriPrefix = uriPrefix;
 	}
 
+	/**
+	 *
+	 * @return
+	 * @deprecated since 4.6.0, will be removed in 5.0.0
+	 */
+	@Deprecated
 	public CollectionsFileDocumentFileProcessor getCollectionsFileDocumentFileProcessor() {
 		return collectionsFileDocumentFileProcessor;
 	}
 
+	/**
+	 *
+	 * @return
+	 * @deprecated since 4.6.0, will be removed in 5.0.0
+	 */
 	public PermissionsFileDocumentFileProcessor getPermissionsFileDocumentFileProcessor() {
 		return permissionsFileDocumentFileProcessor;
 	}

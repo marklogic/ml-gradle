@@ -15,9 +15,8 @@
  */
 package com.marklogic.client.ext.file;
 
-import com.marklogic.client.ext.util.DefaultDocumentPermissionsParser;
-import com.marklogic.client.io.DocumentMetadataHandle;
 import com.marklogic.client.ext.util.DocumentPermissionsParser;
+import com.marklogic.client.io.DocumentMetadataHandle;
 
 /**
  * DocumentFileProcessor that uses a DocumentPermissionsParser to parse a string of permissions (typically, a delimited
@@ -25,24 +24,33 @@ import com.marklogic.client.ext.util.DocumentPermissionsParser;
  */
 public class PermissionsDocumentFileProcessor implements DocumentFileProcessor {
 
-	private String permissions;
+	private String commaDelimitedRolesAndCapabilities;
 	private DocumentPermissionsParser documentPermissionsParser;
 
-	public PermissionsDocumentFileProcessor(String permissions) {
-		this(permissions, new DefaultDocumentPermissionsParser());
+	public PermissionsDocumentFileProcessor(String commaDelimitedRolesAndCapabilities) {
+		this.commaDelimitedRolesAndCapabilities = commaDelimitedRolesAndCapabilities;
 	}
 
-	public PermissionsDocumentFileProcessor(String permissions, DocumentPermissionsParser documentPermissionsParser) {
-		this.permissions = permissions;
+	/**
+	 * @param commaDelimitedRolesAndCapabilities
+	 * @param documentPermissionsParser
+	 * @deprecated since 4.6.0
+	 */
+	public PermissionsDocumentFileProcessor(String commaDelimitedRolesAndCapabilities, DocumentPermissionsParser documentPermissionsParser) {
+		this.commaDelimitedRolesAndCapabilities = commaDelimitedRolesAndCapabilities;
 		this.documentPermissionsParser = documentPermissionsParser;
 	}
 
 	@Override
 	public DocumentFile processDocumentFile(DocumentFile documentFile) {
-		if (permissions != null && documentPermissionsParser != null) {
+		if (this.commaDelimitedRolesAndCapabilities != null) {
 			DocumentMetadataHandle metadata = documentFile.getDocumentMetadata();
 			if (metadata != null) {
-				documentPermissionsParser.parsePermissions(permissions, metadata.getPermissions());
+				if (this.documentPermissionsParser != null) {
+					this.documentPermissionsParser.parsePermissions(this.commaDelimitedRolesAndCapabilities, metadata.getPermissions());
+				} else {
+					metadata.getPermissions().addFromDelimitedString(this.commaDelimitedRolesAndCapabilities);
+				}
 			}
 		}
 		return documentFile;

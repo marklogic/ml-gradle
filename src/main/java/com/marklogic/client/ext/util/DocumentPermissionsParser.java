@@ -17,13 +17,19 @@ package com.marklogic.client.ext.util;
 
 import com.marklogic.client.io.DocumentMetadataHandle.DocumentPermissions;
 
+/**
+ * @deprecated since 4.6.0, will be removed in 5.0.0. Can use the new {@code addFromDelimitedString} method in
+ * the Java Client's {@code DocumentPermissions} class in Java Client 6.3.0.
+ */
+@Deprecated
 public interface DocumentPermissionsParser {
 
-    /**
-     * Parse the string and add role/capability sets to the given DocumentPermissions object.
-     *
-     * @param str
-     * @param permissions
-     */
-    void parsePermissions(String str, DocumentPermissions permissions);
+	/**
+	 * Parse the string and add role/capability sets to the given DocumentPermissions object.
+	 *
+	 * @param str
+	 * @param permissions
+	 */
+	@Deprecated
+	void parsePermissions(String str, DocumentPermissions permissions);
 }

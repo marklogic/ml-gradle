@@ -35,7 +35,7 @@ public class StaticCheckModulesTest extends AbstractIntegrationTest {
 	private DefaultModulesLoader modulesLoader;
 	private XccStaticChecker staticChecker;
 
-	private String database = "Modules";
+	private String database = MODULES_DATABASE;
 	private String dir = Paths.get("src", "test", "resources", "static-check").toString();
 
 	@BeforeEach

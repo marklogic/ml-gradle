@@ -20,16 +20,29 @@ import java.io.File;
 public abstract class FilenameUtil {
 
     public static boolean isXslFile(String filename) {
-        return filename.endsWith(".xsl") || filename.endsWith(".xslt");
+		return endsWithExtension(filename, ".xsl", ".xslt");
     }
 
     public static boolean isXqueryFile(String filename) {
-        return filename.endsWith(".xqy") || filename.endsWith(".xq");
+		return endsWithExtension(filename, ".xqy", ".xqy");
     }
 
     public static boolean isJavascriptFile(String filename) {
-        return filename.endsWith(".sjs") || filename.endsWith(".js");
+		return endsWithExtension(filename, ".sjs", ".js");
     }
+
+	public static boolean endsWithExtension(String filename, String... extensions) {
+		if (filename == null || extensions == null) {
+			return false;
+		}
+		filename = filename.toLowerCase();
+		for (String extension : extensions) {
+			if (extension != null && filename.endsWith(extension.toLowerCase())) {
+				return true;
+			}
+		}
+		return false;
+	}
 
     public static String getFileExtension(File f) {
         String[] split = f.getName().split("\\.");

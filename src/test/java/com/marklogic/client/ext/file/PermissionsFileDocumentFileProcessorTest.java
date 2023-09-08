@@ -20,6 +20,7 @@ import com.marklogic.client.io.DocumentMetadataHandle;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,8 +35,11 @@ public class PermissionsFileDocumentFileProcessorTest {
 	 * test.xml=qconsole-user,update
 	 */
 	@Test
-	public void wildcard() {
+	public void wildcard() throws IOException {
 		File testDir = new File("src/test/resources/process-files/wildcard-test");
+
+		File collectionsPropertiesFile = new File(testDir, processor.getPropertiesFilename());
+		processor.loadProperties(collectionsPropertiesFile);
 
 		DocumentFile file = new DocumentFile("/test.json", new File(testDir, "test.json"));
 		processor.processDocumentFile(file);
@@ -55,8 +59,11 @@ public class PermissionsFileDocumentFileProcessorTest {
 	}
 
 	@Test
-	public void replaceTokens() {
+	public void replaceTokens() throws IOException {
 		File testDir = new File("src/test/resources/process-files/token-test");
+
+		File collectionsPropertiesFile = new File(testDir, processor.getPropertiesFilename());
+		processor.loadProperties(collectionsPropertiesFile);
 
 		DefaultTokenReplacer tokenReplacer = new DefaultTokenReplacer();
 		Properties props = new Properties();

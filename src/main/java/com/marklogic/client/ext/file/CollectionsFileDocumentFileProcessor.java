@@ -22,7 +22,7 @@ import java.util.Properties;
  * key is the name of a file in the directory, and the value is a comma-delimited list of collections to load the file
  * into (which means you can't use a comma in any collection name).
  */
-public class CollectionsFileDocumentFileProcessor extends PropertiesDrivenDocumentFileProcessor {
+public class CollectionsFileDocumentFileProcessor extends CascadingPropertiesDrivenDocumentFileProcessor {
 
 	private String delimiter = ",";
 

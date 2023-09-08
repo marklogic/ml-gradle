@@ -52,7 +52,7 @@ public class EntityServicesTest extends AbstractIntegrationTest {
 
 	@BeforeEach
 	public void setup() {
-		client = newClient("Documents");
+		client = newClient(CONTENT_DATABASE);
 	}
 
 	@Test

@@ -20,11 +20,9 @@ import com.marklogic.client.ext.batch.BatchWriter;
 import com.marklogic.client.ext.batch.RestBatchWriter;
 import com.marklogic.client.ext.file.DocumentFile;
 import com.marklogic.client.ext.file.GenericFileLoader;
-import com.marklogic.client.ext.helper.ClientHelper;
 import com.marklogic.client.ext.modulesloader.impl.DefaultFileFilter;
 import com.marklogic.client.ext.schemasloader.SchemasLoader;
 import com.marklogic.client.io.DocumentMetadataHandle;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,29 +32,25 @@ import java.util.stream.Collectors;
 
 public class DefaultSchemasLoader extends GenericFileLoader implements SchemasLoader {
 
-	private DatabaseClient schemasDatabaseClient;
-	private String tdeValidationDatabase;
+	private final DatabaseClient schemasDatabaseClient;
+	private final DatabaseClient contentDatabaseClient;
+	private final boolean validateTdeTemplates;
+	private QbvDocumentFileProcessor qbvDocumentFileProcessor;
 
 	/**
-	 * Simplest constructor for using this class. Just provide a DatabaseClient, and this will use sensible defaults for
-	 * how documents are read and written. Note that the DatabaseClient will not be released after this class is done
-	 * with it, as this class wasn't the one that created it.
-	 *
-	 * @param schemasDatabaseClient
+	 * @param schemasDatabaseClient for loading files into an application's schemas database
+	 * @param contentDatabaseClient for validating TDEs and generating QBVs
 	 */
-	public DefaultSchemasLoader(DatabaseClient schemasDatabaseClient) {
-		this(schemasDatabaseClient, null);
+	public DefaultSchemasLoader(DatabaseClient schemasDatabaseClient, DatabaseClient contentDatabaseClient) {
+		this(schemasDatabaseClient, contentDatabaseClient, true);
 	}
 
 	/**
-	 * If you want to validate TDE templates before they're loaded, you need to provide a second DatabaseClient that
-	 * connects to the content database associated with the schemas database that schemas will be loaded into. This is
-	 * because the "tde.validate" function must run against the content database.
-	 *
-	 * @param schemasDatabaseClient
-	 * @param tdeValidationDatabase
+	 * @param schemasDatabaseClient for loading files into an application's schemas database
+	 * @param contentDatabaseClient for validating TDEs and generating QBVs
+	 * @param validateTdeTemplates if false, TDEs will not be validated nor loaded via tde.templateBatchInsert
 	 */
-	public DefaultSchemasLoader(DatabaseClient schemasDatabaseClient, String tdeValidationDatabase) {
+	public DefaultSchemasLoader(DatabaseClient schemasDatabaseClient, DatabaseClient contentDatabaseClient, boolean validateTdeTemplates) {
 		super(((Supplier<BatchWriter>) () -> {
 			RestBatchWriter writer = new RestBatchWriter(schemasDatabaseClient);
 			// Default this to 1, as it's not typical to have such a large number of schemas to load that multiple threads
@@ -67,26 +61,20 @@ public class DefaultSchemasLoader extends GenericFileLoader implements SchemasLo
 		}).get());
 
 		this.schemasDatabaseClient = schemasDatabaseClient;
-		this.tdeValidationDatabase = tdeValidationDatabase;
-		initializeDefaultSchemasLoader();
-	}
+		this.contentDatabaseClient = contentDatabaseClient;
+		this.validateTdeTemplates = validateTdeTemplates;
 
-	/**
-	 * Assumes that the BatchWriter has already been initialized.
-	 *
-	 * @param batchWriter
-	 */
-	public DefaultSchemasLoader(BatchWriter batchWriter) {
-		super(batchWriter);
-		initializeDefaultSchemasLoader();
-	}
+		if (this.contentDatabaseClient != null) {
+			this.qbvDocumentFileProcessor = new QbvDocumentFileProcessor(this.schemasDatabaseClient, this.contentDatabaseClient);
+			addDocumentFileProcessor(this.qbvDocumentFileProcessor);
+		}
 
-	/**
-	 * Adds the DocumentFileProcessors and FileFilters specific to loading schemas, which will then be used to construct
-	 * a DocumentFileReader by the parent class.
-	 */
-	protected void initializeDefaultSchemasLoader() {
-		addDocumentFileProcessor(new TdeDocumentFileProcessor(this.schemasDatabaseClient, this.tdeValidationDatabase));
+		if (this.validateTdeTemplates && this.contentDatabaseClient != null) {
+			addDocumentFileProcessor(new TdeDocumentFileProcessor(this.contentDatabaseClient));
+		} else {
+			addDocumentFileProcessor(new TdeDocumentFileProcessor(null));
+		}
+
 		addFileFilter(new DefaultFileFilter());
 	}
 
@@ -100,46 +88,49 @@ public class DefaultSchemasLoader extends GenericFileLoader implements SchemasLo
 	@Override
 	public List<DocumentFile> loadSchemas(String... paths) {
 		final List<DocumentFile> documentFiles = super.getDocumentFiles(paths);
-		if (documentFiles.isEmpty()) {
-			return documentFiles;
+
+		if (!documentFiles.isEmpty()) {
+			if (this.validateTdeTemplates && TdeUtil.templateBatchInsertSupported(schemasDatabaseClient) && contentDatabaseClient != null) {
+				SchemaFiles schemaFiles = readSchemaFiles(documentFiles);
+				if (!schemaFiles.tdeFiles.isEmpty()) {
+					loadTdeTemplatesViaBatchInsert(schemaFiles.tdeFiles);
+				}
+				if (!schemaFiles.nonTdeFiles.isEmpty()) {
+					if (logger.isDebugEnabled()) {
+						logger.debug("Non-TDE files: " + schemaFiles.nonTdeFiles);
+					}
+					super.writeDocumentFiles(schemaFiles.nonTdeFiles);
+				}
+			} else {
+				writeDocumentFiles(documentFiles);
+			}
 		}
 
-		if (TdeUtil.templateBatchInsertSupported(schemasDatabaseClient) && StringUtils.hasText(tdeValidationDatabase)) {
-			final List<DocumentFile> tdeFiles = new ArrayList<>();
-			final List<DocumentFile> nonTdeFiles = new ArrayList<>();
-
-			for (DocumentFile file : documentFiles) {
-				DocumentMetadataHandle metadata = file.getMetadata();
-				if (metadata != null && metadata.getCollections().contains(TdeUtil.TDE_COLLECTION)) {
-					tdeFiles.add(file);
-				} else {
-					nonTdeFiles.add(file);
-				}
-			}
-
-			if (!tdeFiles.isEmpty()) {
-				loadTdeTemplatesViaBatchInsert(tdeFiles);
-			}
-			if (!nonTdeFiles.isEmpty()) {
-				if (logger.isDebugEnabled()) {
-					logger.debug("Non-TDE files: " + nonTdeFiles);
-				}
-				super.writeDocumentFiles(nonTdeFiles);
-			}
-
-			return documentFiles;
+		if (this.qbvDocumentFileProcessor != null) {
+			this.qbvDocumentFileProcessor.processQbvFiles();
 		}
 
-		writeDocumentFiles(documentFiles);
 		return documentFiles;
 	}
 
-	public String getTdeValidationDatabase() {
-		return tdeValidationDatabase;
-	}
+	/**
+	 * @param documentFiles
+	 * @return a SchemaFiles instance that captures a list of TDE files (if any) and a list of all other files found
+	 * that are not TDEs (may also be empty).
+	 */
+	private SchemaFiles readSchemaFiles(List<DocumentFile> documentFiles) {
+		List<DocumentFile> tdeFiles = new ArrayList<>();
+		List<DocumentFile> nonTdeFiles = new ArrayList<>();
 
-	public void setTdeValidationDatabase(String tdeValidationDatabase) {
-		this.tdeValidationDatabase = tdeValidationDatabase;
+		for (DocumentFile file : documentFiles) {
+			DocumentMetadataHandle metadata = file.getMetadata();
+			if (metadata != null && metadata.getCollections().contains(TdeUtil.TDE_COLLECTION)) {
+				tdeFiles.add(file);
+			} else {
+				nonTdeFiles.add(file);
+			}
+		}
+		return new SchemaFiles(tdeFiles, nonTdeFiles);
 	}
 
 	private void loadTdeTemplatesViaBatchInsert(List<DocumentFile> tdeFiles) {
@@ -147,11 +138,10 @@ public class DefaultSchemasLoader extends GenericFileLoader implements SchemasLo
 			tdeFiles.stream().map(documentFile -> documentFile.getFile().getName()).collect(Collectors.toList()));
 
 		String query = buildTdeBatchInsertQuery(tdeFiles);
-		StringBuilder script = new StringBuilder("declareUpdate(); xdmp.invokeFunction(function() {var tde = require('/MarkLogic/tde.xqy');");
+		StringBuilder script = new StringBuilder("declareUpdate(); const tde = require('/MarkLogic/tde.xqy'); ");
 		script.append(query);
-		script.append(format("}, {database: xdmp.database('%s')})", tdeValidationDatabase));
 		try {
-			schemasDatabaseClient.newServerEval().javascript(script.toString()).eval().close();
+			contentDatabaseClient.newServerEval().javascript(script.toString()).eval().close();
 		} catch (Exception ex) {
 			throw new RuntimeException("Unable to load and validate TDE templates via tde.templateBatchInsert; " +
 				"cause: " + ex.getMessage() + "; the following script can be run in Query Console against your content " +
@@ -160,7 +150,6 @@ public class DefaultSchemasLoader extends GenericFileLoader implements SchemasLo
 	}
 
 	/**
-	 *
 	 * @param documentFiles
 	 * @return a JavaScript query that uses the tde.templateBatchInsert function introduced in ML 10.0-9
 	 */
@@ -201,5 +190,15 @@ public class DefaultSchemasLoader extends GenericFileLoader implements SchemasLo
 			.concat(templateInfoList.stream().collect(Collectors.joining(",")))
 			.concat("]);");
 		return templateString;
+	}
+
+	private static class SchemaFiles {
+		private final List<DocumentFile> tdeFiles;
+		private final List<DocumentFile> nonTdeFiles;
+
+		public SchemaFiles(List<DocumentFile> tdeFiles, List<DocumentFile> nonTdeFiles) {
+			this.tdeFiles = tdeFiles;
+			this.nonTdeFiles = nonTdeFiles;
+		}
 	}
 }

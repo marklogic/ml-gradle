@@ -22,6 +22,7 @@ import com.marklogic.client.ext.modulesloader.Modules;
 import com.marklogic.client.ext.modulesloader.ModulesFinder;
 import com.marklogic.client.ext.tokenreplacer.DefaultTokenReplacer;
 import com.marklogic.client.io.BytesHandle;
+import com.marklogic.client.io.DocumentMetadataHandle;
 import com.marklogic.client.io.StringHandle;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class LoadModulesTest extends AbstractIntegrationTest {
 
@@ -44,14 +47,15 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 
 	@BeforeEach
 	public void setup() {
-		client = newClient("Modules");
+		client = newClient(MODULES_DATABASE);
 		client.newServerEval().xquery("cts:uris((), (), cts:true-query()) ! xdmp:document-delete(.)").eval();
 		modulesClient = client;
-		assertEquals(0, getUriCountInModulesDatabase(), "No new modules should have been created");
+		assertEquals(0, getUriCountInModulesDatabase(), "No modules should exist");
 
 		/**
 		 * Odd - the Client REST API doesn't allow for loading namespaces when the DatabaseClient has a database
-		 * specified, so we construct a DatabaseClient without a database and assume we get "Documents".
+		 * specified, so we construct a DatabaseClient without a database and assume we get the expected content
+		 * database.
 		 */
 		String currentDatabase = clientConfig.getDatabase();
 		clientConfig.setDatabase(null);
@@ -87,7 +91,7 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 			assertTrue(StringUtils.isEmpty(mgr.getDefaultDocumentReadTransform()));
 			assertTrue(mgr.getDefaultDocumentReadTransformAll());
 		} finally {
-			set8000RestPropertiesToMarkLogicDefaults();
+			setRestPropertiesToMarkLogicDefaults();
 		}
 	}
 
@@ -111,11 +115,11 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 			assertTrue(StringUtils.isEmpty(mgr.getDefaultDocumentReadTransform()));
 			assertTrue(mgr.getDefaultDocumentReadTransformAll());
 		} finally {
-			set8000RestPropertiesToMarkLogicDefaults();
+			setRestPropertiesToMarkLogicDefaults();
 		}
 	}
 
-	private void set8000RestPropertiesToMarkLogicDefaults() {
+	private void setRestPropertiesToMarkLogicDefaults() {
 		ServerConfigurationManager mgr = client.newServerConfigManager();
 		mgr.setQueryValidation(false);
 		mgr.setQueryOptionValidation(true);
@@ -191,7 +195,7 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 		modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
 
 		String optionsXml = modulesClient.newXMLDocumentManager().read(
-			"/Default/App-Services/rest-api/options/sample-options.xml", new StringHandle()).get();
+			"/Default/ml-javaclient-util-test/rest-api/options/sample-options.xml", new StringHandle()).get();
 		assertTrue(optionsXml.contains("fn:collection('hello-world')"));
 
 		String serviceText = new String(modulesClient.newDocumentManager().read(
@@ -256,6 +260,33 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 
 		files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
 		assertEquals(0, files.size(), "No files should have been loaded since none were new or modified");
+	}
+
+	@Test
+	public void withPropertiesFiles() {
+		AssetFileLoader fileLoader = new AssetFileLoader(modulesClient);
+		fileLoader.setPermissions("rest-extension-user,read,rest-extension-user,update,rest-extension-user,execute");
+		modulesLoader.setAssetFileLoader(fileLoader);
+
+		String dir = Paths.get("src", "test", "resources", "base-dir-with-properties-files").toString();
+		Set<Resource> files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
+		assertEquals(2, files.size());
+
+		DocumentMetadataHandle metadata = new DocumentMetadataHandle();
+
+		modulesClient.newDocumentManager().readMetadata("/root.sjs", metadata);
+		assertEquals(1, metadata.getCollections().size());
+		assertEquals("parent", metadata.getCollections().iterator().next());
+		DocumentMetadataHandle.DocumentPermissions perms = metadata.getPermissions();
+		assertEquals(DocumentMetadataHandle.Capability.READ, perms.get("qconsole-user").iterator().next());
+		assertEquals(3, perms.get("rest-extension-user").size());
+
+		modulesClient.newDocumentManager().readMetadata("/lib/lib.sjs", metadata);
+		assertEquals(1, metadata.getCollections().size());
+		assertEquals("lib", metadata.getCollections().iterator().next());
+		perms = metadata.getPermissions();
+		assertEquals(DocumentMetadataHandle.Capability.UPDATE, perms.get("app-user").iterator().next());
+		assertEquals(3, perms.get("rest-extension-user").size());
 	}
 
 	@Test

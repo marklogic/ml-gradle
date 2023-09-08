@@ -25,13 +25,15 @@ import org.junit.jupiter.api.Test;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class LoadSchemasTest extends AbstractSchemasTest {
 
 	@Test
 	public void test() {
-		DefaultSchemasLoader loader = new DefaultSchemasLoader(client);
+		DefaultSchemasLoader loader = new DefaultSchemasLoader(client, null);
 		RestBatchWriter writer = (RestBatchWriter) loader.getBatchWriter();
 		assertEquals(1, writer.getThreadCount(), "Should default to 1 so that any error from loading a document " +
 			"into a schemas database is immediately thrown to the client");
@@ -45,12 +47,15 @@ public class LoadSchemasTest extends AbstractSchemasTest {
 		assertTrue(uris.contains("/child/child.tdej"));
 		assertTrue(uris.contains("/child/grandchild/grandchild.tdex"));
 		assertTrue(uris.contains("/parent.tdex"));
+
+		// This assertion seems a little off - a TDE should be either a JSON or XML file. This doesn't seem to cause
+		// any problems, but it also doesn't seem to make sense.
 		assertTrue(uris.contains("/tde/ruleset.txt"));
 	}
 
 	@Test
 	public void testTemplateBatchInsert() {
-		DefaultSchemasLoader loader = new DefaultSchemasLoader(client, "Documents");
+		DefaultSchemasLoader loader = new DefaultSchemasLoader(client, newContentClient());
 		List<DocumentFile> files = loader.loadSchemas(Paths.get("src", "test", "resources", "good-schemas", "originals").toString());
 		assertEquals(2, files.size());
 
@@ -75,7 +80,7 @@ public class LoadSchemasTest extends AbstractSchemasTest {
 
 	@Test
 	public void invalidClientAndNoFilesToLoad() {
-		DefaultSchemasLoader loader = new DefaultSchemasLoader(newClient("invalid-database-doesnt-exist"));
+		DefaultSchemasLoader loader = new DefaultSchemasLoader(newClient("invalid-database-doesnt-exist"), null);
 		List<DocumentFile> files = loader.loadSchemas(Paths.get("src", "test", "resources", "no-schemas").toString());
 		assertEquals(0, files.size(),
 			"When there aren't any files to load, then no error should be thrown when the client is invalid (which in " +
@@ -84,7 +89,7 @@ public class LoadSchemasTest extends AbstractSchemasTest {
 
 	@Test
 	public void invalidClientWithFilesToLoad() {
-		DefaultSchemasLoader loader = new DefaultSchemasLoader(newClient("invalid-database-doesnt-exist"));
+		DefaultSchemasLoader loader = new DefaultSchemasLoader(newClient("invalid-database-doesnt-exist"), null);
 		FailedRequestException ex = assertThrows(FailedRequestException.class,
 			() -> loader.loadSchemas(Paths.get("src", "test", "resources", "good-schemas").toString()));
 

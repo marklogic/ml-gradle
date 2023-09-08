@@ -1,0 +1,42 @@
+plugins {
+	id "com.marklogic.ml-gradle" version "4.6.0"
+}
+
+repositories {
+	mavenCentral()
+}
+
+configurations {
+	mlcp
+}
+
+dependencies {
+	mlcp 'com.marklogic:mlcp:11.0.3'
+	mlcp files("lib")
+}
+
+/**
+ * Using an MlcpTask to load the data into the content database.
+ * See the mlcp example project (examples/mlcp-project) for more information on this technique.
+ */
+task importEmployeeData(type: com.marklogic.gradle.task.MlcpTask) {
+	classpath = configurations.mlcp
+	command = "IMPORT"
+	database = mlAppConfig.contentDatabaseName
+	output_collections = "sample-import"
+	output_permissions = "rest-reader,read,rest-writer,update"
+	output_uri_replace = ".*import,'/import'"
+	input_file_path = "data"
+	input_file_type = "delimited_text"
+	delimited_root_name = "Employee"
+}
+
+task getEngineeringEmployees(type: com.marklogic.gradle.task.ServerEvalTask) {
+	description = "Using a ServerEvalTask to evaluate a JS script on the server in order to test the Engineering QBV."
+	javascript = "const op = require('/MarkLogic/optic'); op.fromView('HR', 'Engineering').result();"
+}
+
+task getSalesEmployees(type: com.marklogic.gradle.task.ServerEvalTask) {
+	description = "Using a ServerEvalTask to evaluate an XQuery script on the server in order to test the Sales QBV."
+	xquery = 'xquery version "1.0-ml"; import module namespace op="http://marklogic.com/optic" at "/MarkLogic/optic.xqy"; op:from-view("HR", "Sales") => op:result()'
+}

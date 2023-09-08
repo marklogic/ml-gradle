@@ -1,0 +1,33 @@
+{
+	"template": {
+		"context": "/Employee",
+		"rows": [
+			{
+				"schemaName": "HR",
+				"viewName": "employees",
+				"columns": [
+					{
+						"name": "ID",
+						"scalarType": "long",
+						"val": "ID"
+					},
+					{
+						"name": "FirstName",
+						"scalarType": "string",
+						"val": "FirstName"
+					},
+					{
+						"name": "LastName",
+						"scalarType": "string",
+						"val": "LastName"
+					},
+					{
+						"name": "Department",
+						"scalarType": "string",
+						"val": "Department"
+					}
+				]
+			}
+		]
+	}
+}

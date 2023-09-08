@@ -38,6 +38,36 @@ public class ScaffoldGenerator extends LoggingObject {
 	protected ObjectMapper objectMapper;
 	private PrettyPrinter prettyPrinter = new DefaultPrettyPrinter();
 
+	public void generateScaffold(String path, AppInputs appInputs) {
+		if (objectMapper == null) {
+			objectMapper = ObjectMapperFactory.getObjectMapper();
+		}
+		File rootDir = new File(path);
+
+		File configDir = getConfigDir(rootDir);
+		configDir.mkdirs();
+
+		File modulesDir = getModulesDir(rootDir);
+		modulesDir.mkdirs();
+
+		generateDatabaseFiles(configDir);
+		if (appInputs.isWithUsersAndRoles()) {
+			generateSecurityFiles(configDir, appInputs.getAppName());
+		}
+		if (appInputs.isWithRestServer()) {
+			generateRestApiFile(configDir);
+			generateRestPropertiesFile(modulesDir);
+			generateSearchOptions(modulesDir, appInputs.getAppName());
+		}
+	}
+
+	/**
+	 *
+	 * @param path
+	 * @param config
+	 * @deprecated since 4.6.0; use the method using {@code ScaffoldInputs} instead.
+	 */
+	@Deprecated
 	public void generateScaffold(String path, AppConfig config) {
 		if (objectMapper == null) {
 			objectMapper = ObjectMapperFactory.getObjectMapper();
@@ -50,29 +80,28 @@ public class ScaffoldGenerator extends LoggingObject {
 		File modulesDir = getModulesDir(rootDir);
 		modulesDir.mkdirs();
 
-		generateContentDatabaseFile(configDir, config);
-		generateSecurityFiles(configDir, config);
-
+		generateDatabaseFiles(configDir);
+		generateSecurityFiles(configDir, config.getName());
 		if (!config.isNoRestServer()) {
-			generateRestApiFile(configDir, config);
-			generateRestPropertiesFile(modulesDir, config);
-			generateSearchOptions(modulesDir, config);
+			generateRestApiFile(configDir);
+			generateRestPropertiesFile(modulesDir);
+			generateSearchOptions(modulesDir, config.getName());
 		}
 
 	}
 
-	private void generateSearchOptions(File modulesDir, AppConfig config) {
+	private void generateSearchOptions(File modulesDir, String appName) {
 		File optionsDir = new File(modulesDir, "options");
 		optionsDir.mkdirs();
 		String xml = "<options xmlns='http://marklogic.com/appservices/search'>\n  <search-option>unfiltered</search-option>\n  <quality-weight>0</quality-weight>\n</options>";
-		writeFile(xml.getBytes(), new File(optionsDir, config.getName() + "-options.xml"));
+		writeFile(xml.getBytes(), new File(optionsDir, appName + "-options.xml"));
 	}
 
-	protected void generateRestPropertiesFile(File modulesDir, AppConfig config) {
-		writeFile(buildRestPropertiesJson(config), new File(modulesDir, "rest-properties.json"));
+	protected void generateRestPropertiesFile(File modulesDir) {
+		writeFile(buildRestPropertiesJson(), new File(modulesDir, "rest-properties.json"));
 	}
 
-	protected ObjectNode buildRestPropertiesJson(AppConfig config) {
+	protected ObjectNode buildRestPropertiesJson() {
 		ObjectNode node = objectMapper.createObjectNode();
 		node.put("debug", false);
 		node.put("validate-queries", true);
@@ -81,70 +110,71 @@ public class ScaffoldGenerator extends LoggingObject {
 		return node;
 	}
 
-	protected void generateSecurityFiles(File configDir, AppConfig config) {
+	protected void generateSecurityFiles(File configDir, String appName) {
 		File rolesDir = new File(configDir, "security/roles");
 		rolesDir.mkdirs();
-		writeFile(buildNobodyRole(config), new File(rolesDir, "1-" + config.getName() + "-nobody-role.json"));
-		writeFile(buildReaderRole(config), new File(rolesDir, "2-" + config.getName() + "-reader-role.json"));
-		writeFile(buildWriterRole(config), new File(rolesDir, "3-" + config.getName() + "-writer-role.json"));
-		writeFile(buildInternalRole(config), new File(rolesDir, "4-" + config.getName() + "-internal-role.json"));
-		writeFile(buildAdminRole(config), new File(rolesDir, "5-" + config.getName() + "-admin-role.json"));
+		writeFile(buildNobodyRole(appName), new File(rolesDir, "1-" + appName + "-nobody-role.json"));
+		writeFile(buildReaderRole(appName), new File(rolesDir, "2-" + appName + "-reader-role.json"));
+		writeFile(buildWriterRole(appName), new File(rolesDir, "3-" + appName + "-writer-role.json"));
+		writeFile(buildInternalRole(appName), new File(rolesDir, "4-" + appName + "-internal-role.json"));
+		writeFile(buildAdminRole(appName), new File(rolesDir, "5-" + appName + "-admin-role.json"));
 
 		File usersDir = new File(configDir, "security/users");
 		usersDir.mkdirs();
-		writeFile(buildReaderUser(config), new File(usersDir, config.getName() + "-reader-user.json"));
-		writeFile(buildWriterUser(config), new File(usersDir, config.getName() + "-writer-user.json"));
-		writeFile(buildAdminUser(config), new File(usersDir, config.getName() + "-admin-user.json"));
+		writeFile(buildReaderUser(appName), new File(usersDir, appName + "-reader-user.json"));
+		writeFile(buildWriterUser(appName), new File(usersDir, appName + "-writer-user.json"));
+		writeFile(buildAdminUser(appName), new File(usersDir, appName + "-admin-user.json"));
 	}
 
-	protected ObjectNode buildNobodyRole(AppConfig config) {
+	protected ObjectNode buildNobodyRole(String appName) {
 		ObjectNode node = objectMapper.createObjectNode();
-		node.put("role-name", config.getName() + "-nobody");
+		node.put("role-name", appName + "-nobody");
 		node.put("description", "Unauthenticated user");
 		node.putArray("role");
 		return node;
 	}
 
-	protected ObjectNode buildReaderRole(AppConfig config) {
+	protected ObjectNode buildReaderRole(String appName) {
 		ObjectNode node = objectMapper.createObjectNode();
-		node.put("role-name", config.getName() + "-reader");
+		node.put("role-name", appName + "-reader");
 		node.put("description", "Can view documents, but not edit");
 		ArrayNode array = node.putArray("role");
-		array.add("rest-reader");
-		array.add(config.getName() + "-nobody");
+		array.add(appName + "-nobody");
+		array = node.putArray("privilege");
+		array.add(buildPrivilege("rest-reader", "http://marklogic.com/xdmp/privileges/rest-reader", "execute"));
 		return node;
 	}
 
-	protected ObjectNode buildWriterRole(AppConfig config) {
+	protected ObjectNode buildWriterRole(String appName) {
 		ObjectNode node = objectMapper.createObjectNode();
-		node.put("role-name", config.getName() + "-writer");
+		node.put("role-name", appName + "-writer");
 		node.put("description", "Can read and write documents");
 		ArrayNode array = node.putArray("role");
-		array.add("rest-writer");
-		array.add(config.getName() + "-reader");
+		array.add(appName + "-reader");
 		array = node.putArray("privilege");
+		array.add(buildPrivilege("rest-writer", "http://marklogic.com/xdmp/privileges/rest-writer", "execute"));
 		array.add(buildPrivilege("any-uri", "http://marklogic.com/xdmp/privileges/any-uri", "execute"));
 		array.add(buildPrivilege("unprotected-collections", "http://marklogic.com/xdmp/privileges/unprotected-collections", "execute"));
 		return node;
 	}
 
-	protected ObjectNode buildInternalRole(AppConfig config) {
+	protected ObjectNode buildInternalRole(String appName) {
 		ObjectNode node = objectMapper.createObjectNode();
-		node.put("role-name", config.getName() + "-internal");
+		node.put("role-name", appName + "-internal");
 		node.put("description", "Internal role used for amping");
 		ArrayNode array = node.putArray("role");
-		array.add(config.getName() + "-writer");
+		array.add(appName + "-writer");
 		return node;
 	}
 
-	protected ObjectNode buildAdminRole(AppConfig config) {
+	protected ObjectNode buildAdminRole(String appName) {
 		ObjectNode node = objectMapper.createObjectNode();
-		node.put("role-name", config.getName() + "-admin");
+		node.put("role-name", appName + "-admin");
 		node.put("description", "Non-admin administrator");
 		ArrayNode array = node.putArray("role");
 		array.add("rest-admin");
 		array.add("manage-admin");
-		array.add(config.getName() + "-writer");
+		array.add(appName + "-writer");
 		array = node.putArray("privilege");
 		array.add(buildPrivilege("any-uri", "http://marklogic.com/xdmp/privileges/any-uri", "execute"));
 		array.add(buildPrivilege("xdbc:insert-in", "http://marklogic.com/xdmp/privileges/xdbc-insert-in", "execute"));
@@ -160,54 +190,56 @@ public class ScaffoldGenerator extends LoggingObject {
 		return node;
 	}
 
-	protected ObjectNode buildReaderUser(AppConfig config) {
+	protected ObjectNode buildReaderUser(String appName) {
 		ObjectNode node = objectMapper.createObjectNode();
-		String name = config.getName() + "-reader";
+		String name = appName + "-reader";
 		node.put("user-name", name);
 		node.put("password", name);
 		ArrayNode roles = node.putArray("role");
-		roles.add(config.getName() + "-reader");
+		roles.add(appName + "-reader");
 		return node;
 	}
 
-	protected ObjectNode buildWriterUser(AppConfig config) {
+	protected ObjectNode buildWriterUser(String appName) {
 		ObjectNode node = objectMapper.createObjectNode();
-		String name = config.getName() + "-writer";
+		String name = appName + "-writer";
 		node.put("user-name", name);
 		node.put("password", name);
 		ArrayNode roles = node.putArray("role");
-		roles.add(config.getName() + "-writer");
+		roles.add(appName + "-writer");
 		return node;
 	}
 
-	protected ObjectNode buildAdminUser(AppConfig config) {
+	protected ObjectNode buildAdminUser(String appName) {
 		ObjectNode node = objectMapper.createObjectNode();
-		String name = config.getName() + "-admin";
+		String name = appName + "-admin";
 		node.put("user-name", name);
 		node.put("password", name);
 		ArrayNode roles = node.putArray("role");
-		roles.add(config.getName() + "-admin");
+		roles.add(appName + "-admin");
 		return node;
 	}
 
-	protected void generateRestApiFile(File configDir, AppConfig config) {
-		writeFile(buildRestApiJson(config).getBytes(), new File(configDir, "rest-api.json"));
+	protected void generateRestApiFile(File configDir) {
+		writeFile(buildRestApiJson().getBytes(), new File(configDir, "rest-api.json"));
 	}
 
-	protected String buildRestApiJson(AppConfig config) {
+	protected String buildRestApiJson() {
 		return RestApiUtil.buildDefaultRestApiJson();
 	}
 
-	protected void generateContentDatabaseFile(File configDir, AppConfig config) {
+	protected void generateDatabaseFiles(File configDir) {
 		File databasesDir = new File(configDir, "databases");
 		databasesDir.mkdirs();
 
-		writeFile(buildContentDatabaseJson(config), new File(databasesDir, "content-database.json"));
+		writeFile(buildContentDatabaseJson(), new File(databasesDir, "content-database.json"));
+		writeFile(buildSchemasDatabaseJson(), new File(databasesDir, "schemas-database.json"));
 	}
 
-	protected ObjectNode buildContentDatabaseJson(AppConfig config) {
+	protected ObjectNode buildContentDatabaseJson() {
 		ObjectNode node = objectMapper.createObjectNode();
 		node.put("database-name", "%%DATABASE%%");
+		node.put("schema-database", "%%SCHEMAS_DATABASE%%");
 		ArrayNode array = node.putArray("range-element-index");
 		ObjectNode index = array.addObject();
 		index.put("scalar-type", "string");
@@ -216,6 +248,12 @@ public class ScaffoldGenerator extends LoggingObject {
 		index.put("collation", "http://marklogic.com/collation/");
 		index.put("range-value-positions", false);
 		index.put("invalid-values", "reject");
+		return node;
+	}
+
+	protected ObjectNode buildSchemasDatabaseJson() {
+		ObjectNode node = objectMapper.createObjectNode();
+		node.put("database-name", "%%SCHEMAS_DATABASE%%");
 		return node;
 	}
 
@@ -257,5 +295,33 @@ public class ScaffoldGenerator extends LoggingObject {
 
 	public void setPrettyPrinter(PrettyPrinter prettyPrinter) {
 		this.prettyPrinter = prettyPrinter;
+	}
+
+	public static class AppInputs {
+		final private String appName;
+		final private boolean withRestServer;
+		final private boolean withUsersAndRoles;
+
+		public AppInputs(String appName) {
+			this(appName, true, true);
+		}
+
+		public AppInputs(String appName, boolean withRestServer, boolean withUsersAndRoles) {
+			this.appName = appName;
+			this.withRestServer = withRestServer;
+			this.withUsersAndRoles = withUsersAndRoles;
+		}
+
+		public String getAppName() {
+			return appName;
+		}
+
+		public boolean isWithRestServer() {
+			return withRestServer;
+		}
+
+		public boolean isWithUsersAndRoles() {
+			return withUsersAndRoles;
+		}
 	}
 }

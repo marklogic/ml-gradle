@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.forest.Forest;
+import com.marklogic.mgmt.cma.ConfigurationManager;
 import com.marklogic.mgmt.mapper.DefaultResourceMapper;
 import com.marklogic.mgmt.mapper.ResourceMapper;
 import com.marklogic.mgmt.resource.AbstractResourceManager;
@@ -67,11 +68,7 @@ public class ForestManager extends AbstractResourceManager {
 	 * @since 4.5.3
 	 */
 	public Map<String, List<Forest>> getMapOfPrimaryForests() {
-		String uri = UriComponentsBuilder.fromUri(getManageClient().buildUri("/manage/v3"))
-			.queryParam("format", "json").queryParam("resource-type", "forest")
-			.encode().toUriString();
-
-		JsonNode json = getManageClient().getRestTemplate().exchange(uri, HttpMethod.GET, null, JsonNode.class).getBody();
+		JsonNode json = new ConfigurationManager(getManageClient()).getResourcesAsJson("forest").getBody();
 		// Config is an array of objects, and it will have a single object based on our request.
 		ArrayNode allPrimaryForests = (ArrayNode) json.get("config").get(0).get("forest");
 		ResourceMapper mapper = new DefaultResourceMapper(new API(getManageClient()));

@@ -105,13 +105,24 @@ public class RestApiManager extends LoggingObject {
 				PayloadParser parser = new PayloadParser();
 
 				if (request.isIncludeModules()) {
+					boolean includeModules = true;
 					if (request.isDeleteModulesReplicaForests()) {
-						String modulesDatabase = parser.getPayloadFieldValue(payload, "modules-database");
-						if (databaseManager.exists(modulesDatabase)) {
+						String modulesDatabase = null;
+						try {
+							modulesDatabase = parser.getPayloadFieldValue(payload, "modules-database");
+						} catch (Exception e) {
+							logger.warn("Unable to get value of `modules-database`; will not be able to delete " +
+								"modules database. This may be expected if the modules database has been set to " +
+								"'filesystem' for the app server. Error: {}", e.getMessage());
+							includeModules = false;
+						}
+						if (modulesDatabase != null && databaseManager.exists(modulesDatabase)) {
 							databaseManager.deleteReplicaForests(modulesDatabase);
 						}
 					}
-					path += "include=modules&";
+					if (includeModules) {
+						path += "include=modules&";
+					}
 				}
 
 				if (request.isIncludeContent()) {

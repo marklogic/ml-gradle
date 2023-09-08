@@ -155,6 +155,11 @@ public class AppConfig {
 	private String cpfDatabaseName;
 	private String schemasDatabaseName;
 
+	// Since 4.6.0; affects loading of modules, schemas, and data.
+	// Disabled by default for backwards compatibility; will likely default to true in 5.0.0 release.
+	private boolean cascadeCollections;
+	private boolean cascadePermissions;
+
 	private List<String> modulePaths;
 	private boolean staticCheckAssets = false;
 	private boolean staticCheckLibraryAssets = false;
@@ -1534,5 +1539,21 @@ public class AppConfig {
 
 	public void setAppServicesSamlToken(String appServicesSamlToken) {
 		this.appServicesSamlToken = appServicesSamlToken;
+	}
+
+	public boolean isCascadeCollections() {
+		return cascadeCollections;
+	}
+
+	public void setCascadeCollections(boolean cascadeCollections) {
+		this.cascadeCollections = cascadeCollections;
+	}
+
+	public boolean isCascadePermissions() {
+		return cascadePermissions;
+	}
+
+	public void setCascadePermissions(boolean cascadePermissions) {
+		this.cascadePermissions = cascadePermissions;
 	}
 }

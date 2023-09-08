@@ -59,6 +59,8 @@ public class DefaultModulesLoaderFactory extends LoggingObject implements Module
 		RestBatchWriter assetBatchWriter = new RestBatchWriter(modulesDatabaseClient, false);
 		assetBatchWriter.setThreadCount(threadCount);
 		AssetFileLoader assetFileLoader = new AssetFileLoader(assetBatchWriter, modulesManager);
+		assetFileLoader.setCascadeCollections(appConfig.isCascadeCollections());
+		assetFileLoader.setCascadePermissions(appConfig.isCascadePermissions());
 		if (appConfig.getModulesLoaderBatchSize() != null) {
 			assetFileLoader.setBatchSize(appConfig.getModulesLoaderBatchSize());
 		}

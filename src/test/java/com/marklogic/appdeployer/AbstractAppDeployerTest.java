@@ -15,12 +15,17 @@
  */
 package com.marklogic.appdeployer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.appdeployer.command.Command;
+import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.modules.DefaultModulesLoaderFactory;
 import com.marklogic.appdeployer.command.modules.LoadModulesCommand;
+import com.marklogic.appdeployer.command.security.GenerateTemporaryCertificateCommand;
 import com.marklogic.appdeployer.impl.SimpleAppDeployer;
 import com.marklogic.client.ext.modulesloader.impl.DefaultModulesLoader;
 import com.marklogic.mgmt.AbstractMgmtTest;
+import com.marklogic.mgmt.resource.appservers.ServerManager;
 import com.marklogic.xcc.template.XccTemplate;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -108,4 +113,39 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
     protected void setConfigBaseDir(String path) {
         appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/" + path));
     }
+
+	/**
+	 * Intended to simplify testing app servers that require SSL.
+	 */
+	protected final void configureRestServersToRequireSSL() {
+		GenerateTemporaryCertificateCommand gtcc = new GenerateTemporaryCertificateCommand();
+		gtcc.setTemplateIdOrName("sample-app-template");
+		gtcc.execute(new CommandContext(appConfig, manageClient, adminManager));
+
+		ObjectNode payload = new ObjectMapper().createObjectNode()
+			.put("server-name", SAMPLE_APP_NAME)
+			.put("group-name", "Default")
+			.put("ssl-certificate-template", "sample-app-template");
+
+		ServerManager mgr = new ServerManager(manageClient);
+		mgr.save(payload.toString());
+		payload.put("server-name", SAMPLE_APP_NAME + "-test");
+		mgr.save(payload.toString());
+	}
+
+	protected final void configureRestServersToNotRequireSSL() {
+		ObjectNode payload = new ObjectMapper().createObjectNode()
+			.put("server-name", SAMPLE_APP_NAME)
+			.put("group-name", "Default")
+			.put("ssl-certificate-template", "");
+
+		ServerManager mgr = new ServerManager(manageClient);
+		mgr.save(payload.toString());
+		payload.put("server-name", SAMPLE_APP_NAME + "-test");
+		mgr.save(payload.toString());
+	}
+
+	protected final CommandContext newCommandContext() {
+		return new CommandContext(appConfig, manageClient, adminManager);
+	}
 }

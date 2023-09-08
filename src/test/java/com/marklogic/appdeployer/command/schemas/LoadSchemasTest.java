@@ -20,6 +20,7 @@ import com.marklogic.appdeployer.command.Command;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.document.GenericDocumentManager;
+import com.marklogic.client.ext.schemasloader.impl.DefaultSchemasLoader;
 import com.marklogic.client.io.BytesHandle;
 import com.marklogic.client.io.DocumentMetadataHandle;
 import org.junit.jupiter.api.AfterEach;
@@ -28,7 +29,11 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.FileFilter;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class LoadSchemasTest extends AbstractAppDeployerTest {
 
@@ -148,6 +153,9 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 		File projectDir = new File("src/test/resources/schemas-project");
 
 		initializeAppConfig(projectDir);
+
+		// Turn off TDE validation, just to verify that the QBV still gets processed
+		appConfig.setTdeValidationEnabled(false);
 		appConfig.getSchemaPaths().add(new File(projectDir, "src/main/more-schemas").getAbsolutePath());
 
 		initializeAppDeployer(new DeployOtherDatabasesCommand(1), new LoadSchemasCommand());
@@ -157,9 +165,30 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 		GenericDocumentManager docMgr = client.newDocumentManager();
 		assertNotNull(docMgr.exists("/tde/template1.json"));
 		assertNotNull(docMgr.exists("/tde/template2.json"));
+		assertNotNull(docMgr.exists("/qbv/example.sjs.xml"),
+			"The QBV XML should have been generated, even though TDE validation is disabled.");
 
-		assertTrue(docMgr.readMetadata("/tde/template1.json", new DocumentMetadataHandle()).getCollections().contains("http://marklogic.com/xdmp/tde"));
-		assertTrue(docMgr.readMetadata("/tde/template2.json", new DocumentMetadataHandle()).getCollections().contains("http://marklogic.com/xdmp/tde"));
+		assertTrue(docMgr.readMetadata("/tde/template1.json",
+			new DocumentMetadataHandle()).getCollections().contains("http://marklogic.com/xdmp/tde"));
+		assertTrue(docMgr.readMetadata("/tde/template2.json",
+			new DocumentMetadataHandle()).getCollections().contains("http://marklogic.com/xdmp/tde"));
+		assertTrue(docMgr.readMetadata("/qbv/example.sjs.xml",
+			new DocumentMetadataHandle()).getCollections().contains("http://marklogic.com/xdmp/qbv"));
+	}
+
+	/**
+	 * Just verifies the config; we assume that ml-javaclient-util will work properly if cascade is set to true.
+	 */
+	@Test
+	void cascadeCollectionsAndPermissions() {
+		appConfig.setCascadePermissions(true);
+		appConfig.setCascadeCollections(true);
+
+		DefaultSchemasLoader loader = (DefaultSchemasLoader) new LoadSchemasCommand().buildSchemasLoader(
+			newCommandContext(), appConfig.newSchemasDatabaseClient(), null);
+
+		assertTrue(loader.isCascadeCollections());
+		assertTrue(loader.isCascadePermissions());
 	}
 
 	private Command newCommand() {

@@ -80,9 +80,10 @@ public class LoadSchemasCommand extends AbstractCommand {
 
 	protected void loadSchemas(String schemasPath, String schemasDatabaseName, CommandContext context) {
 		logger.info(format("Loading schemas into database %s from: %s", schemasDatabaseName, schemasPath));
-		DatabaseClient client = buildDatabaseClient(schemasDatabaseName, context);
+		DatabaseClient schemasClient = context.getAppConfig().newAppServicesDatabaseClient(schemasDatabaseName);
+		DatabaseClient contentClient = buildContentClient(context, schemasDatabaseName);
 		try {
-			SchemasLoader schemasLoader = buildSchemasLoader(context, client, schemasDatabaseName);
+			SchemasLoader schemasLoader = buildSchemasLoader(context, schemasClient, contentClient);
 			schemasLoader.loadSchemas(schemasPath);
 			logger.info("Finished loading schemas from: " + schemasPath);
 		} catch (FailedRequestException fre) {
@@ -92,12 +93,29 @@ public class LoadSchemasCommand extends AbstractCommand {
 				throw fre;
 			}
 		} finally {
-			client.release();
+			schemasClient.release();
+			if (contentClient != null) {
+				contentClient.release();
+			}
 		}
 	}
 
-	protected DatabaseClient buildDatabaseClient(String schemasDatabaseName, CommandContext context) {
-		return context.getAppConfig().newAppServicesDatabaseClient(schemasDatabaseName);
+	/**
+	 * Construct a content client, for use when validating TDEs and generating QBVs.
+	 *
+	 * @param context
+	 * @param schemasDatabase
+	 * @return
+	 */
+	private DatabaseClient buildContentClient(CommandContext context, String schemasDatabase) {
+		String contentDatabase = findContentDatabaseAssociatedWithSchemasDatabase(context, schemasDatabase);
+		if (contentDatabase != null) {
+			logger.info(format("Will use %s as a content database when loading into schemas database: %s", contentDatabase, schemasDatabase));
+			return context.getAppConfig().newAppServicesDatabaseClient(contentDatabase);
+		}
+		logger.warn(format("Unable to find a content database associated with schemas database: %s; this may " +
+			"result in errors when loading TDE templates and Query-Based-View scripts."));
+		return null;
 	}
 
 	/**
@@ -106,24 +124,12 @@ public class LoadSchemasCommand extends AbstractCommand {
 	 * So given a schemasDatabaseName,
 	 *
 	 * @param context
-	 * @param client
+	 * @param schemasClient
 	 * @return
 	 */
-	protected SchemasLoader buildSchemasLoader(CommandContext context, DatabaseClient client, String schemasDatabaseName) {
+	protected SchemasLoader buildSchemasLoader(CommandContext context, DatabaseClient schemasClient, DatabaseClient contentClient) {
 		AppConfig appConfig = context.getAppConfig();
-
-		String tdeValidationDatabase = null;
-		if (appConfig.isTdeValidationEnabled()) {
-			tdeValidationDatabase = findContentDatabaseAssociatedWithSchemasDatabase(context, schemasDatabaseName);
-			if (tdeValidationDatabase != null) {
-				logger.info(format("TDE templates loaded into %s will be validated against content database %s",
-					schemasDatabaseName, tdeValidationDatabase));
-			}
-		} else {
-			logger.info("TDE validation is disabled");
-		}
-
-		DefaultSchemasLoader schemasLoader = new DefaultSchemasLoader(client, tdeValidationDatabase);
+		DefaultSchemasLoader schemasLoader = new DefaultSchemasLoader(schemasClient, contentClient, context.getAppConfig().isTdeValidationEnabled());
 		schemasLoader.setCascadeCollections(appConfig.isCascadeCollections());
 		schemasLoader.setCascadePermissions(appConfig.isCascadePermissions());
 		FileFilter filter = appConfig.getSchemasFileFilter();

@@ -32,12 +32,12 @@ dependencies {
   implementation gradleApi()
 	implementation localGroovy()
 
-	api 'com.marklogic:ml-app-deployer:4.6-SNAPSHOT'
+	api 'com.marklogic:ml-app-deployer:4.6.0'
 	implementation "com.marklogic:mlcp-util:1.0.1"
-	implementation "com.marklogic:marklogic-data-movement-components:2.6.0"
+	implementation "com.marklogic:marklogic-data-movement-components:2.7.0"
 	implementation "commons-io:commons-io:2.11.0"
 
-	compileOnly "com.marklogic:marklogic-unit-test-client:1.4-SNAPSHOT"
+	compileOnly "com.marklogic:marklogic-unit-test-client:1.4.0"
 
 	testImplementation localGroovy()
 	testImplementation gradleTestKit()

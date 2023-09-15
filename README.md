@@ -22,6 +22,17 @@ You can use ml-gradle right away with the simple tutorial below, or learn more:
 on which ml-gradle depends. ml-app-deployer provides most of the functionality within ml-gradle without having any dependency on Gradle or 
 Groovy - ml-gradle is then a fairly thin wrapper around ml-app-deployer to expose its functionality within a Gradle environment.
 
+Compatibility guidelines
+=========
+
+If you are using ml-gradle 4.6.0 or higher, you must use Gradle 7.6 or higher. 
+
+If you wish to use Gradle 7 or higher, you must use ml-gradle 4.3.0 or higher.
+
+For older versions of ml-gradle, Gradle 6 or higher is recommended.
+
+Note that ml-gradle has not yet been tested on any release of Gradle 8. 
+
 
 Start using ml-gradle
 =========
@@ -32,8 +43,7 @@ application from it. Note that in addition to Java 8, you can use Java 11 or Jav
 [the MarkLogic Java Client documentation](https://github.com/marklogic/java-client-api) for information on dependencies
 you may need when using Java 11 or Java 17. 
 
-First, [install Gradle](https://gradle.org/install/) - it is recommended to use at least Gradle 6, and if you are 
-running Gradle 7 or higher, you'll need to use ml-gradle 4.3.0 or higher. 
+First, [install Gradle](https://gradle.org/install/). 
 
 Then, in an empty directory, create a file named "build.gradle" with your favorite text editor and enter the following:
 

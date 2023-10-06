@@ -15,14 +15,15 @@
  */
 package com.marklogic.mgmt.admin;
 
-import com.marklogic.client.DatabaseClientFactory;
-import com.marklogic.mgmt.util.SimplePropertySource;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
+
+import com.marklogic.client.DatabaseClientFactory;
+import com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier;
+import com.marklogic.mgmt.util.SimplePropertySource;
 
 public class DefaultAdminConfigFactoryTest  {
 
@@ -75,6 +76,19 @@ public class DefaultAdminConfigFactoryTest  {
 		assertEquals("PKIX", config.getTrustManagementAlgorithm());
 	}
 
+	@Test
+	void simpleSsl() {
+		AdminConfig config = configure(
+			"mlAdminSimpleSsl", "true",
+			"mlUsername", "admin", 
+			"mlPassword", "admin"
+		);
+
+		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
+		SSLHostnameVerifier verifier = bean.getSecurityContext().getSSLHostnameVerifier();
+		assertEquals(SSLHostnameVerifier.ANY, verifier, "simpleSsl should default to using the ANY hostname verifier");
+	}
+	
 	@Test
 	void cloudApiKeyAndBasePath() {
 		AdminConfig config = configure(

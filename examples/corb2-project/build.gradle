@@ -32,17 +32,12 @@ configurations {
     // This configuration captures the dependencies for running CoRB (Content Reprocessing in Bulk).
     // This is only needed if you want to run corb via Gradle tasks.
     // If you do, using com.marklogic.gradle.task.CorbTask is a useful starting point, as shown below.
-    corb {
-        attributes {
-            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, Usage.JAVA_RUNTIME))
-        }
-    }
+    corb
 }
 
 dependencies {
     // required to run CoRB2
     corb "com.marklogic:marklogic-corb:${corbVersion}"
-    corb 'com.marklogic:marklogic-xcc:10.0.8'
     // optional
     //corb 'org.jasypt:jasypt:1.9.2' // would be necessary to leverage JasyptDecrypter
 }

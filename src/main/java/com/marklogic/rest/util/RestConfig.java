@@ -17,6 +17,7 @@ package com.marklogic.rest.util;
 
 import com.marklogic.client.DatabaseClientBuilder;
 import com.marklogic.client.DatabaseClientFactory;
+import com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier;
 import com.marklogic.client.ext.modulesloader.ssl.SimpleX509TrustManager;
 import com.marklogic.client.ext.ssl.SslConfig;
 import com.marklogic.client.ext.ssl.SslUtil;
@@ -114,7 +115,8 @@ public class RestConfig {
 					.withSSLContext(StringUtils.hasText(sslProtocol) ?
 						SimpleX509TrustManager.newSSLContext(sslProtocol) :
 						SimpleX509TrustManager.newSSLContext())
-					.withTrustManager(new SimpleX509TrustManager());
+					.withTrustManager(new SimpleX509TrustManager())
+					.withSSLHostnameVerifier(SSLHostnameVerifier.ANY);
 			} else {
 				builder.withSSLProtocol(sslProtocol);
 			}

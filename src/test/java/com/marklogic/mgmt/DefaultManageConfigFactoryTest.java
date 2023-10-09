@@ -16,6 +16,7 @@
 package com.marklogic.mgmt;
 
 import com.marklogic.client.DatabaseClientFactory;
+import com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier;
 import com.marklogic.mgmt.util.SimplePropertySource;
 import org.junit.jupiter.api.Test;
 
@@ -102,6 +103,19 @@ public class DefaultManageConfigFactoryTest  {
 		assertEquals("TLSv1.2", config.getSslProtocol());
 		assertTrue(config.isUseDefaultKeystore());
 		assertEquals("PKIX", config.getTrustManagementAlgorithm());
+	}
+
+	@Test
+	void simpleSsl() {
+		ManageConfig config = configure(
+			"mlManageSimpleSsl", "true",
+			"mlUsername", "admin", 
+			"mlPassword", "admin"
+		);
+
+		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
+		SSLHostnameVerifier verifier = bean.getSecurityContext().getSSLHostnameVerifier();
+		assertEquals(SSLHostnameVerifier.ANY, verifier, "simpleSsl should default to using the ANY hostname verifier");
 	}
 
 	@Test

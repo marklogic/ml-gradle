@@ -28,12 +28,16 @@ class DeleteModuleTimestampsFileTask extends MarkLogicTask {
     @TaskAction
     void deleteFile() {
 	    filePath = getAppConfig().getModuleTimestampsPath()
-        File f = new File(filePath)
-        if (f.exists()) {
-            println "Deleting " + f.getAbsolutePath() + "\n"
-            f.delete()
-        } else {
-	        println "Module timestamps file " + filePath + " does not exist, so not deleting"
-        }
+		if (filePath != null && filePath.trim().length() > 0) {
+			File f = new File(filePath)
+			if (f.exists()) {
+				println "Deleting " + f.getAbsolutePath() + "\n"
+				f.delete()
+			} else {
+				println "Module timestamps file " + filePath + " does not exist, so not deleting"
+			}
+		} else {
+			println "Module timestamps file path is not set, so not attempting to delete"
+		}
     }
 }

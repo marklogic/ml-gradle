@@ -39,6 +39,6 @@ class DeployToReplicaTask extends MarkLogicTask {
 			commandListSupplier.get() :
 			new CommandMapBuilder().getCommandsForReplicaCluster()
 
-		new SimpleAppDeployer(commands).deploy(getAppConfig())
+		newAppDeployer(commands).deploy(getAppConfig())
 	}
 }

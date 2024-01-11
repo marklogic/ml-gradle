@@ -49,27 +49,18 @@ public class DeployCustomForestsCommand extends AbstractCommand {
 
 	@Override
 	public void execute(CommandContext context) {
-		Configuration configuration = null;
-		if (context.getAppConfig().getCmaConfig().isDeployForests()) {
-			configuration = new Configuration();
-		}
-
 		for (ConfigDir configDir : context.getAppConfig().getConfigDirs()) {
 			File dir = new File(configDir.getBaseDir(), customForestsPath);
 			if (dir != null && dir.exists()) {
 				payloadParser = new PayloadParser();
 				for (File f : dir.listFiles()) {
 					if (f.isDirectory()) {
-						processDirectory(f, context, configuration);
+						processDirectory(f, context);
 					}
 				}
 			} else {
 				logResourceDirectoryNotFound(dir);
 			}
-		}
-
-		if (configuration != null) {
-			deployConfiguration(context, configuration);
 		}
 	}
 
@@ -79,7 +70,7 @@ public class DeployCustomForestsCommand extends AbstractCommand {
 	 * @param dir
 	 * @param context
 	 */
-	protected void processDirectory(File dir, CommandContext context, Configuration configuration) {
+	protected void processDirectory(File dir, CommandContext context) {
 		if (logger.isInfoEnabled()) {
 			logger.info("Processing custom forest files in directory: " + dir.getAbsolutePath());
 		}
@@ -90,6 +81,11 @@ public class DeployCustomForestsCommand extends AbstractCommand {
 				logger.info("Processing forests in file: " + f.getAbsolutePath());
 			}
 			String payload = readResourceFromFile(context, f);
+
+			// As of 4.6.1, create a CMA request per file so that the user has control over how many forests are
+			// submitted in a single request, thus avoiding potential timeouts.
+			Configuration configuration = context.getAppConfig().getCmaConfig().isDeployForests() ?
+				new Configuration() : null;
 
 			if (payloadParser.isJsonPayload(payload)) {
 				if (configuration != null) {
@@ -103,6 +99,10 @@ public class DeployCustomForestsCommand extends AbstractCommand {
 				} else {
 					mgr.save(payload);
 				}
+			}
+
+			if (configuration != null) {
+				deployConfiguration(context, configuration);
 			}
 		}
 	}

@@ -51,9 +51,12 @@ public class DeployCustomForestsTest extends AbstractAppDeployerTest {
 		assertTrue(mgr.exists("sample-app-content-custom-3"));
 	}
 
+	/**
+	 * Can examine logging to verify that one request is made per forest.
+	 */
 	@Test
-	public void deployWithCma() {
-		appConfig.getCmaConfig().enableAll();
+	public void deployWithoutCMA() {
+		appConfig.getCmaConfig().setDeployForests(false);
 		test();
 	}
 }

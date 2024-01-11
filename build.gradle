@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.marklogic"
-version = "4.6.1"
+version = "4.7-SNAPSHOT"
 
 java {
 	sourceCompatibility = 1.8

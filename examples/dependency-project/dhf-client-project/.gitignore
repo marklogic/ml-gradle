@@ -1,8 +1,0 @@
-src/main/hub-internal-config
-src/main/ml-config
-gradle
-.gradle
-build
-plugins
-gradlew
-gradlew.bat

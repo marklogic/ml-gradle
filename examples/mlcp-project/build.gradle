@@ -10,7 +10,7 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath "com.marklogic:ml-gradle:4.6.0"
+		classpath "com.marklogic:ml-gradle:4.6.1"
 	}
 }
 
@@ -24,12 +24,19 @@ repositories {
 }
 
 
+// For MLCP 11.1.0 and higher, Gradle needs to be told which version of the guava dependency to use.
+// Per https://stackoverflow.com/questions/76897459/how-can-i-make-gradle-pick-the-right-guava-variant/77399208#77399208,
+// the following will achieve that.
 configurations {
-	mlcp
+	mlcp {
+		attributes {
+			attribute(TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE, objects.named(TargetJvmEnvironment.class, TargetJvmEnvironment.STANDARD_JVM))
+		}
+	}
 }
 
 dependencies {
-	mlcp 'com.marklogic:mlcp:10.0.9.5'
+	mlcp 'com.marklogic:mlcp:11.1.0'
 
 	/**
 	 * mlcp uses logback for logging, and without a logback configuration file, no MLCP logging will appear.

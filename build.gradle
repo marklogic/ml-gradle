@@ -5,7 +5,7 @@ plugins {
 
 	// Ignored as it depends on Java 11; can uncomment and use Java 11 when it needs to be run
 	//  id "com.github.jk1.dependency-license-report" version "2.1"
-  id "com.gradle.plugin-publish" version "0.20.0"
+  id "com.gradle.plugin-publish" version "1.2.1"
 	id "java-gradle-plugin"
 
 	id "net.saliman.properties" version "1.5.1"
@@ -137,24 +137,18 @@ publishing {
 	}
 }
 
-pluginBundle {
+gradlePlugin {
   website = 'https://www.marklogic.com/'
   vcsUrl = 'https://github.com/marklogic/' + project.name + '.git'
-  description = 'Publishes ml-gradle'
-  tags = ['marklogic']
 
   plugins {
     mlgradlePlugin {
       id = 'com.marklogic.ml-gradle'
       displayName = 'ml-gradle for MarkLogic'
       description = 'Gradle plugin for configuring and deploying applications to MarkLogic'
-      tags = ['marklogic']
-      version = project.version
+			tags.set(['marklogic', 'progress'])
+			implementationClass = 'com.marklogic.gradle.MarkLogicPlugin'
     }
-  }
-
-  mavenCoordinates {
-    version = project.version
   }
 }
 

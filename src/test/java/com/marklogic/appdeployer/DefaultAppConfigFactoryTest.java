@@ -851,6 +851,84 @@ public class DefaultAppConfigFactoryTest {
 		assertEquals("/my/domain/my/test/server", config.getTestRestBasePath());
 	}
 
+	@Test
+	void keyStore() {
+		AppConfig config = configure(
+			"mlRestKeyStorePath", "/rest.jks",
+			"mlRestKeyStorePassword", "abc",
+			"mlRestKeyStoreType", "JKS",
+			"mlRestKeyStoreAlgorithm", "SunX509",
+			"mlAppServicesKeyStorePath", "/apps.jks",
+			"mlAppServicesKeyStorePassword", "123",
+			"mlAppServicesKeyStoreType", "JKS2",
+			"mlAppServicesKeyStoreAlgorithm", "SunX5092"
+		);
+
+		assertEquals("/rest.jks", config.getRestKeyStorePath());
+		assertEquals("abc", config.getRestKeyStorePassword());
+		assertEquals("JKS", config.getRestKeyStoreType());
+		assertEquals("SunX509", config.getRestKeyStoreAlgorithm());
+		assertEquals("/apps.jks", config.getAppServicesKeyStorePath());
+		assertEquals("123", config.getAppServicesKeyStorePassword());
+		assertEquals("JKS2", config.getAppServicesKeyStoreType());
+		assertEquals("SunX5092", config.getAppServicesKeyStoreAlgorithm());
+	}
+
+	@Test
+	void trustStore() {
+		AppConfig config = configure(
+			"mlRestTrustStorePath", "/rest.jks",
+			"mlRestTrustStorePassword", "abc",
+			"mlRestTrustStoreType", "JKS",
+			"mlRestTrustStoreAlgorithm", "SunX509",
+			"mlAppServicesTrustStorePath", "/apps.jks",
+			"mlAppServicesTrustStorePassword", "123",
+			"mlAppServicesTrustStoreType", "JKS2",
+			"mlAppServicesTrustStoreAlgorithm", "SunX5092"
+		);
+
+		assertEquals("/rest.jks", config.getRestTrustStorePath());
+		assertEquals("abc", config.getRestTrustStorePassword());
+		assertEquals("JKS", config.getRestTrustStoreType());
+		assertEquals("SunX509", config.getRestTrustStoreAlgorithm());
+		assertEquals("/apps.jks", config.getAppServicesTrustStorePath());
+		assertEquals("123", config.getAppServicesTrustStorePassword());
+		assertEquals("JKS2", config.getAppServicesTrustStoreType());
+		assertEquals("SunX5092", config.getAppServicesTrustStoreAlgorithm());
+	}
+
+	@Test
+	void globalKeyStoreAndTrustStore() {
+		AppConfig config = configure(
+			"mlKeyStorePath", "/key.jks",
+			"mlKeyStorePassword", "abc",
+			"mlKeyStoreType", "JKS1",
+			"mlKeyStoreAlgorithm", "SunX5091",
+			"mlTrustStorePath", "/trust.jks",
+			"mlTrustStorePassword", "123",
+			"mlTrustStoreType", "JKS2",
+			"mlTrustStoreAlgorithm", "SunX5092"
+		);
+
+		assertEquals("/key.jks", config.getRestKeyStorePath());
+		assertEquals("abc", config.getRestKeyStorePassword());
+		assertEquals("JKS1", config.getRestKeyStoreType());
+		assertEquals("SunX5091", config.getRestKeyStoreAlgorithm());
+		assertEquals("/key.jks", config.getAppServicesKeyStorePath());
+		assertEquals("abc", config.getAppServicesKeyStorePassword());
+		assertEquals("JKS1", config.getAppServicesKeyStoreType());
+		assertEquals("SunX5091", config.getAppServicesKeyStoreAlgorithm());
+
+		assertEquals("/trust.jks", config.getRestTrustStorePath());
+		assertEquals("123", config.getRestTrustStorePassword());
+		assertEquals("JKS2", config.getRestTrustStoreType());
+		assertEquals("SunX5092", config.getRestTrustStoreAlgorithm());
+		assertEquals("/trust.jks", config.getAppServicesTrustStorePath());
+		assertEquals("123", config.getAppServicesTrustStorePassword());
+		assertEquals("JKS2", config.getAppServicesTrustStoreType());
+		assertEquals("SunX5092", config.getAppServicesTrustStoreAlgorithm());
+	}
+
 	private AppConfig configure(String... properties) {
 		return new DefaultAppConfigFactory(new SimplePropertySource(properties)).newAppConfig();
 	}

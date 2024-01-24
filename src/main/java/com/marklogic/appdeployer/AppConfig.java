@@ -121,6 +121,16 @@ public class AppConfig {
 	private String restTrustManagementAlgorithm;
 	private String restBasePath;
 
+	// Added in 4.7.0
+	private String restKeyStorePath;
+	private String restKeyStorePassword;
+	private String restKeyStoreType;
+	private String restKeyStoreAlgorithm;
+	private String restTrustStorePath;
+	private String restTrustStorePassword;
+	private String restTrustStoreType;
+	private String restTrustStoreAlgorithm;
+
 	private Integer restPort = DEFAULT_PORT;
 	private Integer testRestPort;
 	private String testRestBasePath;
@@ -142,6 +152,16 @@ public class AppConfig {
 	private String appServicesSslProtocol;
 	private String appServicesTrustManagementAlgorithm;
 	private String appServicesBasePath;
+
+	// Added in 4.7.0
+	private String appServicesKeyStorePath;
+	private String appServicesKeyStorePassword;
+	private String appServicesKeyStoreType;
+	private String appServicesKeyStoreAlgorithm;
+	private String appServicesTrustStorePath;
+	private String appServicesTrustStorePassword;
+	private String appServicesTrustStoreType;
+	private String appServicesTrustStoreAlgorithm;
 
 	// These can all be set to override the default names that are generated off of the "name" attribute.
 	private String groupName = DEFAULT_GROUP;
@@ -416,6 +436,15 @@ public class AppConfig {
 		config.setCloudApiKey(cloudApiKey);
 		config.setBasePath(restBasePath);
 
+		config.setKeyStorePath(restKeyStorePath);
+		config.setKeyStorePassword(restKeyStorePassword);
+		config.setKeyStoreType(restKeyStoreType);
+		config.setKeyStoreAlgorithm(restKeyStoreAlgorithm);
+		config.setTrustStorePath(restTrustStorePath);
+		config.setTrustStorePassword(restTrustStorePassword);
+		config.setTrustStoreType(restTrustStoreType);
+		config.setTrustStoreAlgorithm(restTrustStoreAlgorithm);
+
 		if (restUseDefaultKeystore) {
 		    config.setSslProtocol(StringUtils.hasText(restSslProtocol) ? restSslProtocol : SslUtil.DEFAULT_SSL_PROTOCOL);
 		    config.setTrustManagementAlgorithm(restTrustManagementAlgorithm);
@@ -458,6 +487,15 @@ public class AppConfig {
 		config.setSecurityContextType(appServicesSecurityContextType);
 		config.setCloudApiKey(cloudApiKey);
 		config.setBasePath(appServicesBasePath);
+
+		config.setKeyStorePath(appServicesKeyStorePath);
+		config.setKeyStorePassword(appServicesKeyStorePassword);
+		config.setKeyStoreType(appServicesKeyStoreType);
+		config.setKeyStoreAlgorithm(appServicesKeyStoreAlgorithm);
+		config.setTrustStorePath(appServicesTrustStorePath);
+		config.setTrustStorePassword(appServicesTrustStorePassword);
+		config.setTrustStoreType(appServicesTrustStoreType);
+		config.setTrustStoreAlgorithm(appServicesTrustStoreAlgorithm);
 
 		if (appServicesUseDefaultKeystore) {
 		    config.setSslProtocol(StringUtils.hasText(appServicesSslProtocol) ? appServicesSslProtocol : SslUtil.DEFAULT_SSL_PROTOCOL);
@@ -1555,5 +1593,293 @@ public class AppConfig {
 
 	public void setCascadePermissions(boolean cascadePermissions) {
 		this.cascadePermissions = cascadePermissions;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getRestKeyStorePath() {
+		return restKeyStorePath;
+	}
+
+	/**
+	 *
+	 * @param restKeyStorePath
+	 * @since 4.7.0
+	 */
+	public void setRestKeyStorePath(String restKeyStorePath) {
+		this.restKeyStorePath = restKeyStorePath;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getRestKeyStorePassword() {
+		return restKeyStorePassword;
+	}
+
+	/**
+	 *
+	 * @param restKeyStorePassword
+	 * @since 4.7.0
+	 */
+	public void setRestKeyStorePassword(String restKeyStorePassword) {
+		this.restKeyStorePassword = restKeyStorePassword;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getRestKeyStoreType() {
+		return restKeyStoreType;
+	}
+
+	/**
+	 *
+	 * @param restKeyStoreType
+	 * @since 4.7.0
+	 */
+	public void setRestKeyStoreType(String restKeyStoreType) {
+		this.restKeyStoreType = restKeyStoreType;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getRestKeyStoreAlgorithm() {
+		return restKeyStoreAlgorithm;
+	}
+
+	/**
+	 *
+	 * @param restKeyStoreAlgorithm
+	 * @since 4.7.0
+	 */
+	public void setRestKeyStoreAlgorithm(String restKeyStoreAlgorithm) {
+		this.restKeyStoreAlgorithm = restKeyStoreAlgorithm;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getRestTrustStorePath() {
+		return restTrustStorePath;
+	}
+
+	/**
+	 *
+	 * @param restTrustStorePath
+	 * @since 4.7.0
+	 */
+	public void setRestTrustStorePath(String restTrustStorePath) {
+		this.restTrustStorePath = restTrustStorePath;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getRestTrustStorePassword() {
+		return restTrustStorePassword;
+	}
+
+	/**
+	 *
+	 * @param restTrustStorePassword
+	 * @since 4.7.0
+	 */
+	public void setRestTrustStorePassword(String restTrustStorePassword) {
+		this.restTrustStorePassword = restTrustStorePassword;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getRestTrustStoreType() {
+		return restTrustStoreType;
+	}
+
+	/**
+	 *
+	 * @param restTrustStoreType
+	 * @since 4.7.0
+	 */
+	public void setRestTrustStoreType(String restTrustStoreType) {
+		this.restTrustStoreType = restTrustStoreType;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getRestTrustStoreAlgorithm() {
+		return restTrustStoreAlgorithm;
+	}
+
+	/**
+	 *
+	 * @param restTrustStoreAlgorithm
+	 * @since 4.7.0
+	 */
+	public void setRestTrustStoreAlgorithm(String restTrustStoreAlgorithm) {
+		this.restTrustStoreAlgorithm = restTrustStoreAlgorithm;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getAppServicesKeyStorePath() {
+		return appServicesKeyStorePath;
+	}
+
+	/**
+	 *
+	 * @param appServicesKeyStorePath
+	 * @since 4.7.0
+	 */
+	public void setAppServicesKeyStorePath(String appServicesKeyStorePath) {
+		this.appServicesKeyStorePath = appServicesKeyStorePath;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getAppServicesKeyStorePassword() {
+		return appServicesKeyStorePassword;
+	}
+
+	/**
+	 *
+	 * @param appServicesKeyStorePassword
+	 * @since 4.7.0
+	 */
+	public void setAppServicesKeyStorePassword(String appServicesKeyStorePassword) {
+		this.appServicesKeyStorePassword = appServicesKeyStorePassword;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getAppServicesKeyStoreType() {
+		return appServicesKeyStoreType;
+	}
+
+	/**
+	 *
+	 * @param appServicesKeyStoreType
+	 * @since 4.7.0
+	 */
+	public void setAppServicesKeyStoreType(String appServicesKeyStoreType) {
+		this.appServicesKeyStoreType = appServicesKeyStoreType;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getAppServicesKeyStoreAlgorithm() {
+		return appServicesKeyStoreAlgorithm;
+	}
+
+	/**
+	 *
+	 * @param appServicesKeyStoreAlgorithm
+	 * @since 4.7.0
+	 */
+	public void setAppServicesKeyStoreAlgorithm(String appServicesKeyStoreAlgorithm) {
+		this.appServicesKeyStoreAlgorithm = appServicesKeyStoreAlgorithm;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getAppServicesTrustStorePath() {
+		return appServicesTrustStorePath;
+	}
+
+	/**
+	 *
+	 * @param appServicesTrustStorePath
+	 * @since 4.7.0
+	 */
+	public void setAppServicesTrustStorePath(String appServicesTrustStorePath) {
+		this.appServicesTrustStorePath = appServicesTrustStorePath;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getAppServicesTrustStorePassword() {
+		return appServicesTrustStorePassword;
+	}
+
+	/**
+	 *
+	 * @param appServicesTrustStorePassword
+	 * @since 4.7.0
+	 */
+	public void setAppServicesTrustStorePassword(String appServicesTrustStorePassword) {
+		this.appServicesTrustStorePassword = appServicesTrustStorePassword;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getAppServicesTrustStoreType() {
+		return appServicesTrustStoreType;
+	}
+
+	/**
+	 *
+	 * @param appServicesTrustStoreType
+	 * @since 4.7.0
+	 */
+	public void setAppServicesTrustStoreType(String appServicesTrustStoreType) {
+		this.appServicesTrustStoreType = appServicesTrustStoreType;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getAppServicesTrustStoreAlgorithm() {
+		return appServicesTrustStoreAlgorithm;
+	}
+
+	/**
+	 *
+	 * @param appServicesTrustStoreAlgorithm
+	 * @since 4.7.0
+	 */
+	public void setAppServicesTrustStoreAlgorithm(String appServicesTrustStoreAlgorithm) {
+		this.appServicesTrustStoreAlgorithm = appServicesTrustStoreAlgorithm;
 	}
 }

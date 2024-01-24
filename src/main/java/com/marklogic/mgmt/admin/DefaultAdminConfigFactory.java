@@ -124,19 +124,16 @@ public class DefaultAdminConfigFactory extends PropertySourceFactory implements 
 			config.setBasePath(adminPath);
 		});
 
-		propertyConsumerMap.put("mlAdminScheme", (config, prop) -> {
-		    logger.info("Admin interface scheme: " + prop);
-		    config.setScheme(prop);
-	    });
-
 	    propertyConsumerMap.put("mlAdminSimpleSsl", (config, prop) -> {
 		    logger.info("Use simple SSL for Admin interface: " + prop);
 		    config.setConfigureSimpleSsl(Boolean.parseBoolean(prop));
+			config.setScheme("https");
 	    });
 
 	    propertyConsumerMap.put("mlAdminSslProtocol", (config, prop) -> {
 		    logger.info("Using SSL protocol for Admin app server: " + prop);
 		    config.setSslProtocol(prop);
+			config.setScheme("https");
 	    });
 
 		propertyConsumerMap.put("mlAdminSslHostnameVerifier", (config, prop) -> {
@@ -153,12 +150,84 @@ public class DefaultAdminConfigFactory extends PropertySourceFactory implements 
 	    propertyConsumerMap.put("mlAdminUseDefaultKeystore", (config, prop) -> {
 		    logger.info("Using default JVM keystore for SSL for Admin app server: " + prop);
 		    config.setUseDefaultKeystore(Boolean.parseBoolean(prop));
+			config.setScheme("https");
 	    });
 
 	    propertyConsumerMap.put("mlAdminTrustManagementAlgorithm", (config, prop) -> {
 		    logger.info("Using trust management algorithm for SSL for Admin app server: " + prop);
 		    config.setTrustManagementAlgorithm(prop);
 	    });
+
+		propertyConsumerMap.put("mlKeyStorePath", (config, prop) -> {
+			logger.info("Admin key store path: " + prop);
+			config.setKeyStorePath(prop);
+			config.setScheme("https");
+		});
+		propertyConsumerMap.put("mlKeyStorePassword", (config, prop) -> {
+			config.setKeyStorePassword(prop);
+		});
+		propertyConsumerMap.put("mlKeyStoreType", (config, prop) -> {
+			logger.info("Admin key store type: " + prop);
+			config.setKeyStoreType(prop);
+		});
+		propertyConsumerMap.put("mlKeyStoreAlgorithm", (config, prop) -> {
+			logger.info("Admin key store algorithm: " + prop);
+			config.setKeyStoreAlgorithm(prop);
+		});
+		propertyConsumerMap.put("mlTrustStorePath", (config, prop) -> {
+			logger.info("Admin trust store path: " + prop);
+			config.setTrustStorePath(prop);
+			config.setScheme("https");
+		});
+		propertyConsumerMap.put("mlTrustStorePassword", (config, prop) -> {
+			config.setTrustStorePassword(prop);
+		});
+		propertyConsumerMap.put("mlTrustStoreType", (config, prop) -> {
+			logger.info("Admin trust store type: " + prop);
+			config.setTrustStoreType(prop);
+		});
+		propertyConsumerMap.put("mlTrustStoreAlgorithm", (config, prop) -> {
+			logger.info("Admin trust store algorithm: " + prop);
+			config.setTrustStoreAlgorithm(prop);
+		});
+
+		propertyConsumerMap.put("mlAdminKeyStorePath", (config, prop) -> {
+			logger.info("Admin key store path: " + prop);
+			config.setKeyStorePath(prop);
+			config.setScheme("https");
+		});
+		propertyConsumerMap.put("mlAdminKeyStorePassword", (config, prop) -> {
+			config.setKeyStorePassword(prop);
+		});
+		propertyConsumerMap.put("mlAdminKeyStoreType", (config, prop) -> {
+			logger.info("Admin key store type: " + prop);
+			config.setKeyStoreType(prop);
+		});
+		propertyConsumerMap.put("mlAdminKeyStoreAlgorithm", (config, prop) -> {
+			logger.info("Admin key store algorithm: " + prop);
+			config.setKeyStoreAlgorithm(prop);
+		});
+		propertyConsumerMap.put("mlAdminTrustStorePath", (config, prop) -> {
+			logger.info("Admin trust store path: " + prop);
+			config.setTrustStorePath(prop);
+			config.setScheme("https");
+		});
+		propertyConsumerMap.put("mlAdminTrustStorePassword", (config, prop) -> {
+			config.setTrustStorePassword(prop);
+		});
+		propertyConsumerMap.put("mlAdminTrustStoreType", (config, prop) -> {
+			logger.info("Admin trust store type: " + prop);
+			config.setTrustStoreType(prop);
+		});
+		propertyConsumerMap.put("mlAdminTrustStoreAlgorithm", (config, prop) -> {
+			logger.info("Admin trust store algorithm: " + prop);
+			config.setTrustStoreAlgorithm(prop);
+		});
+
+		propertyConsumerMap.put("mlAdminScheme", (config, prop) -> {
+			logger.info("Admin scheme: " + prop);
+			config.setScheme(prop);
+		});
 
 		// Processed last so that it can override scheme/port
 		propertyConsumerMap.put("mlCloudApiKey", (config, prop) -> {

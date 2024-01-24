@@ -54,6 +54,16 @@ public class RestConfig {
 	@Deprecated
 	private X509HostnameVerifier hostnameVerifier;
 
+	// Added in 4.7.0 for 2-way SSL.
+	private String keyStorePath;
+	private String keyStorePassword;
+	private String keyStoreType;
+	private String keyStoreAlgorithm;
+	private String trustStorePath;
+	private String trustStorePassword;
+	private String trustStoreType;
+	private String trustStoreAlgorithm;
+
 	public RestConfig() {
 	}
 
@@ -73,6 +83,12 @@ public class RestConfig {
 		this.cloudApiKey = other.cloudApiKey;
 		this.basePath = other.basePath;
 
+		this.authType = other.authType;
+		this.certFile = other.certFile;
+		this.certPassword = other.certPassword;
+		this.externalName = other.externalName;
+		this.samlToken = other.samlToken;
+
 		this.configureSimpleSsl = other.configureSimpleSsl;
 		this.useDefaultKeystore = other.useDefaultKeystore;
 		this.sslProtocol = other.sslProtocol;
@@ -80,6 +96,15 @@ public class RestConfig {
 		this.sslContext = other.sslContext;
 		this.hostnameVerifier = other.hostnameVerifier;
 		this.sslHostnameVerifier = other.sslHostnameVerifier;
+
+		this.keyStorePath = other.keyStorePath;
+		this.keyStorePassword = other.keyStorePassword;
+		this.keyStoreAlgorithm = other.keyStoreAlgorithm;
+		this.keyStoreType = other.keyStoreType;
+		this.trustStorePath = other.trustStorePath;
+		this.trustStorePassword = other.trustStorePassword;
+		this.trustStoreType = other.trustStoreType;
+		this.trustStoreAlgorithm = other.trustStoreAlgorithm;
 	}
 
 	public DatabaseClientBuilder newDatabaseClientBuilder() {
@@ -95,7 +120,18 @@ public class RestConfig {
 			.withCertificatePassword(getCertPassword())
 			.withKerberosPrincipal(getExternalName())
 			.withSAMLToken(getSamlToken())
-			.withSSLHostnameVerifier(getSslHostnameVerifier());
+			.withSSLHostnameVerifier(getSslHostnameVerifier())
+			// These 8 were added in 4.7.0. They do not conflict with the SSL config below; if the user is setting
+			// these, they won't have a reason to provide their own SSLContext nor request that the default keystore
+			// be used or simple SSL be used.
+			.withKeyStorePath(getKeyStorePath())
+			.withKeyStorePassword(getKeyStorePassword())
+			.withKeyStoreType(getKeyStoreType())
+			.withKeyStoreAlgorithm(getKeyStoreAlgorithm())
+			.withTrustStorePath(getTrustStorePath())
+			.withTrustStorePassword(getTrustStorePassword())
+			.withTrustStoreType(getTrustStoreType())
+			.withTrustStoreAlgorithm(getTrustStoreAlgorithm());
 
 		if (getSslContext() != null) {
 			builder.withSSLContext(getSslContext());
@@ -313,5 +349,133 @@ public class RestConfig {
 
 	public void setSamlToken(String samlToken) {
 		this.samlToken = samlToken;
+	}
+
+	/**
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getKeyStorePath() {
+		return keyStorePath;
+	}
+
+	/**
+	 * @param keyStorePath
+	 * @since 4.7.0
+	 */
+	public void setKeyStorePath(String keyStorePath) {
+		this.keyStorePath = keyStorePath;
+	}
+
+	/**
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getKeyStorePassword() {
+		return keyStorePassword;
+	}
+
+	/**
+	 * @param keyStorePassword
+	 * @since 4.7.0
+	 */
+	public void setKeyStorePassword(String keyStorePassword) {
+		this.keyStorePassword = keyStorePassword;
+	}
+
+	/**
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getKeyStoreType() {
+		return keyStoreType;
+	}
+
+	/**
+	 * @param keyStoreType
+	 * @since 4.7.0
+	 */
+	public void setKeyStoreType(String keyStoreType) {
+		this.keyStoreType = keyStoreType;
+	}
+
+	/**
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getKeyStoreAlgorithm() {
+		return keyStoreAlgorithm;
+	}
+
+	/**
+	 * @param keyStoreAlgorithm
+	 * @since 4.7.0
+	 */
+	public void setKeyStoreAlgorithm(String keyStoreAlgorithm) {
+		this.keyStoreAlgorithm = keyStoreAlgorithm;
+	}
+
+	/**
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getTrustStorePath() {
+		return trustStorePath;
+	}
+
+	/**
+	 * @param trustStorePath
+	 * @since 4.7.0
+	 */
+	public void setTrustStorePath(String trustStorePath) {
+		this.trustStorePath = trustStorePath;
+	}
+
+	/**
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getTrustStorePassword() {
+		return trustStorePassword;
+	}
+
+	/**
+	 * @param trustStorePassword
+	 * @since 4.7.0
+	 */
+	public void setTrustStorePassword(String trustStorePassword) {
+		this.trustStorePassword = trustStorePassword;
+	}
+
+	/**
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getTrustStoreType() {
+		return trustStoreType;
+	}
+
+	/**
+	 * @param trustStoreType
+	 * @since 4.7.0
+	 */
+	public void setTrustStoreType(String trustStoreType) {
+		this.trustStoreType = trustStoreType;
+	}
+
+	/**
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getTrustStoreAlgorithm() {
+		return trustStoreAlgorithm;
+	}
+
+	/**
+	 * @param trustStoreAlgorithm
+	 * @since 4.7.0
+	 */
+	public void setTrustStoreAlgorithm(String trustStoreAlgorithm) {
+		this.trustStoreAlgorithm = trustStoreAlgorithm;
 	}
 }

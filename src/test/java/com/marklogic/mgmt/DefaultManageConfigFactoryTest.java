@@ -99,6 +99,7 @@ public class DefaultManageConfigFactoryTest  {
 			"mlManageTrustManagementAlgorithm", "PKIX"
 		);
 
+		assertEquals("https", config.getScheme());
 		assertTrue(config.isConfigureSimpleSsl());
 		assertEquals("TLSv1.2", config.getSslProtocol());
 		assertTrue(config.isUseDefaultKeystore());
@@ -109,9 +110,11 @@ public class DefaultManageConfigFactoryTest  {
 	void simpleSsl() {
 		ManageConfig config = configure(
 			"mlManageSimpleSsl", "true",
-			"mlUsername", "admin", 
+			"mlUsername", "admin",
 			"mlPassword", "admin"
 		);
+
+		assertEquals("https", config.getScheme());
 
 		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
 		SSLHostnameVerifier verifier = bean.getSecurityContext().getSSLHostnameVerifier();
@@ -266,6 +269,62 @@ public class DefaultManageConfigFactoryTest  {
 			"If a user specifies both mlCloudBasePath and mlManageBasePath, then the assumption is that they've " +
 				"changed the default Manage base path but it still begins with the common base path defined by " +
 				"mlCloudBasePath.");
+	}
+
+	@Test
+	void keyStore() {
+		ManageConfig config = configure(
+			"mlManageKeyStorePath", "/my.jks",
+			"mlManageKeyStorePassword", "abc123",
+			"mlManageKeyStoreType", "JKS",
+			"mlManageKeyStoreAlgorithm", "SunX509"
+		);
+
+		assertEquals("/my.jks", config.getKeyStorePath());
+		assertEquals("abc123", config.getKeyStorePassword());
+		assertEquals("JKS", config.getKeyStoreType());
+		assertEquals("SunX509", config.getKeyStoreAlgorithm());
+		assertEquals("https", config.getScheme());
+	}
+
+	@Test
+	void trustStore() {
+		ManageConfig config = configure(
+			"mlManageTrustStorePath", "/my.jks",
+			"mlManageTrustStorePassword", "abc123",
+			"mlManageTrustStoreType", "JKS",
+			"mlManageTrustStoreAlgorithm", "SunX509"
+		);
+
+		assertEquals("/my.jks", config.getTrustStorePath());
+		assertEquals("abc123", config.getTrustStorePassword());
+		assertEquals("JKS", config.getTrustStoreType());
+		assertEquals("SunX509", config.getTrustStoreAlgorithm());
+		assertEquals("https", config.getScheme());
+	}
+
+	@Test
+	void globalKeyStoreAndTrustStore() {
+		ManageConfig config = configure(
+			"mlKeyStorePath", "/key.jks",
+			"mlKeyStorePassword", "abc",
+			"mlKeyStoreType", "JKS1",
+			"mlKeyStoreAlgorithm", "SunX5091",
+			"mlTrustStorePath", "/trust.jks",
+			"mlTrustStorePassword", "123",
+			"mlTrustStoreType", "JKS2",
+			"mlTrustStoreAlgorithm", "SunX5092"
+		);
+
+		assertEquals("/key.jks", config.getKeyStorePath());
+		assertEquals("abc", config.getKeyStorePassword());
+		assertEquals("JKS1", config.getKeyStoreType());
+		assertEquals("SunX5091", config.getKeyStoreAlgorithm());
+		assertEquals("/trust.jks", config.getTrustStorePath());
+		assertEquals("123", config.getTrustStorePassword());
+		assertEquals("JKS2", config.getTrustStoreType());
+		assertEquals("SunX5092", config.getTrustStoreAlgorithm());
+		assertEquals("https", config.getScheme());
 	}
 
 	private ManageConfig configure(String... properties) {

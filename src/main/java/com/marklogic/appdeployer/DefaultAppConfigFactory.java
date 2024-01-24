@@ -206,6 +206,45 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			config.setCloudApiKey(prop);
 		});
 
+		propertyConsumerMap.put("mlKeyStorePath", (config, prop) -> {
+			logger.info("REST and App-Services key store path: " + prop);
+			config.setRestKeyStorePath(prop);
+			config.setAppServicesKeyStorePath(prop);
+		});
+		propertyConsumerMap.put("mlKeyStorePassword", (config, prop) -> {
+			config.setRestKeyStorePassword(prop);
+			config.setAppServicesKeyStorePassword(prop);
+		});
+		propertyConsumerMap.put("mlKeyStoreType", (config, prop) -> {
+			logger.info("REST and App-Services key store type: " + prop);
+			config.setRestKeyStoreType(prop);
+			config.setAppServicesKeyStoreType(prop);
+		});
+		propertyConsumerMap.put("mlKeyStoreAlgorithm", (config, prop) -> {
+			logger.info("REST and App-Services key store algorithm: " + prop);
+			config.setRestKeyStoreAlgorithm(prop);
+			config.setAppServicesKeyStoreAlgorithm(prop);
+		});
+		propertyConsumerMap.put("mlTrustStorePath", (config, prop) -> {
+			logger.info("REST and App-Services trust store path: " + prop);
+			config.setRestTrustStorePath(prop);
+			config.setAppServicesTrustStorePath(prop);
+		});
+		propertyConsumerMap.put("mlTrustStorePassword", (config, prop) -> {
+			config.setRestTrustStorePassword(prop);
+			config.setAppServicesTrustStorePassword(prop);
+		});
+		propertyConsumerMap.put("mlTrustStoreType", (config, prop) -> {
+			logger.info("REST and App-Services trust store type: " + prop);
+			config.setRestTrustStoreType(prop);
+			config.setAppServicesTrustStoreType(prop);
+		});
+		propertyConsumerMap.put("mlTrustStoreAlgorithm", (config, prop) -> {
+			logger.info("REST and App-Services trust store algorithm: " + prop);
+			config.setRestTrustStoreAlgorithm(prop);
+			config.setAppServicesTrustStoreAlgorithm(prop);
+		});
+
 		/**
 		 * Defaults to port 8000. In rare cases, the ML App-Services app server will have been changed to listen on a
 		 * different port, in which case you can set this to that port.
@@ -291,6 +330,37 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			String appServicesPath = StringUtils.hasText(cloudBasePath) ? cloudBasePath + prop : prop;
 			logger.info("App-Services base path: " + appServicesPath);
 			config.setAppServicesBasePath(appServicesPath);
+		});
+
+		propertyConsumerMap.put("mlAppServicesKeyStorePath", (config, prop) -> {
+			logger.info("App-Services key store path: " + prop);
+			config.setAppServicesKeyStorePath(prop);
+		});
+		propertyConsumerMap.put("mlAppServicesKeyStorePassword", (config, prop) -> {
+			config.setAppServicesKeyStorePassword(prop);
+		});
+		propertyConsumerMap.put("mlAppServicesKeyStoreType", (config, prop) -> {
+			logger.info("App-Services key store type: " + prop);
+			config.setAppServicesKeyStoreType(prop);
+		});
+		propertyConsumerMap.put("mlAppServicesKeyStoreAlgorithm", (config, prop) -> {
+			logger.info("App-Services key store algorithm: " + prop);
+			config.setAppServicesKeyStoreAlgorithm(prop);
+		});
+		propertyConsumerMap.put("mlAppServicesTrustStorePath", (config, prop) -> {
+			logger.info("App-Services trust store path: " + prop);
+			config.setAppServicesTrustStorePath(prop);
+		});
+		propertyConsumerMap.put("mlAppServicesTrustStorePassword", (config, prop) -> {
+			config.setAppServicesTrustStorePassword(prop);
+		});
+		propertyConsumerMap.put("mlAppServicesTrustStoreType", (config, prop) -> {
+			logger.info("App-Services trust store type: " + prop);
+			config.setAppServicesTrustStoreType(prop);
+		});
+		propertyConsumerMap.put("mlAppServicesTrustStoreAlgorithm", (config, prop) -> {
+			logger.info("App-Services trust store algorithm: " + prop);
+			config.setAppServicesTrustStoreAlgorithm(prop);
 		});
 
 		/**
@@ -419,6 +489,37 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		propertyConsumerMap.put("mlRestTrustManagementAlgorithm", (config, prop) -> {
 			logger.info("Using trust management algorithm for SSL for client REST API server: " + prop);
 			config.setRestTrustManagementAlgorithm(prop);
+		});
+
+		propertyConsumerMap.put("mlRestKeyStorePath", (config, prop) -> {
+			logger.info("REST key store path: " + prop);
+			config.setRestKeyStorePath(prop);
+		});
+		propertyConsumerMap.put("mlRestKeyStorePassword", (config, prop) -> {
+			config.setRestKeyStorePassword(prop);
+		});
+		propertyConsumerMap.put("mlRestKeyStoreType", (config, prop) -> {
+			logger.info("REST key store type: " + prop);
+			config.setRestKeyStoreType(prop);
+		});
+		propertyConsumerMap.put("mlRestKeyStoreAlgorithm", (config, prop) -> {
+			logger.info("REST key store algorithm: " + prop);
+			config.setRestKeyStoreAlgorithm(prop);
+		});
+		propertyConsumerMap.put("mlRestTrustStorePath", (config, prop) -> {
+			logger.info("REST trust store path: " + prop);
+			config.setRestTrustStorePath(prop);
+		});
+		propertyConsumerMap.put("mlRestTrustStorePassword", (config, prop) -> {
+			config.setRestTrustStorePassword(prop);
+		});
+		propertyConsumerMap.put("mlRestTrustStoreType", (config, prop) -> {
+			logger.info("REST trust store type: " + prop);
+			config.setRestTrustStoreType(prop);
+		});
+		propertyConsumerMap.put("mlRestTrustStoreAlgorithm", (config, prop) -> {
+			logger.info("REST trust store algorithm: " + prop);
+			config.setRestTrustStoreAlgorithm(prop);
 		});
 
 

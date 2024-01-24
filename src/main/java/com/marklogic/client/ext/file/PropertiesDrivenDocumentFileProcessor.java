@@ -22,6 +22,10 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.util.Enumeration;
 import java.util.Properties;
 
 /**
@@ -30,8 +34,6 @@ import java.util.Properties;
  */
 public abstract class PropertiesDrivenDocumentFileProcessor extends LoggingObject
 	implements DocumentFileProcessor, FileFilter, SupportsTokenReplacer {
-
-	protected final static String WILDCARD_KEY = "*";
 
 	private final String propertiesFilename;
 
@@ -62,9 +64,39 @@ public abstract class PropertiesDrivenDocumentFileProcessor extends LoggingObjec
 		return documentFile;
 	}
 
-	protected abstract void processProperties(DocumentFile documentFile, Properties properties);
+	/**
+	 * New in 4.7.0 - each pattern in the properties object is now assumed to be a glob pattern; this retains backwards
+	 * compatibility with the previous approach of only supporting "*" and exact filename matches. When a property
+	 * is found to match the given file, then a subclass method is invoked to determine what to do with the value
+	 * associated with the property.
+	 *
+	 * @param documentFile
+	 * @param properties
+	 */
+	private void processProperties(DocumentFile documentFile, Properties properties) {
+		final Path filename = documentFile.getFile().toPath().getFileName();
+		Enumeration patterns = properties.propertyNames();
+		while (patterns.hasMoreElements()) {
+			String pattern = (String) patterns.nextElement();
+			PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + pattern);
+			if (matcher.matches(filename)) {
+				String value = getPropertyValue(properties, pattern);
+				this.applyPropertyMatch(documentFile, pattern, value);
+			}
+		}
+	}
 
-	protected Properties loadProperties(File propertiesFile) throws IOException {
+	/**
+	 * Subclasses must implement this to determine how to apply the value of a matching property to the given
+	 * {@code DocumentFile}.
+	 *
+	 * @param documentFile
+	 * @param pattern
+	 * @param value
+	 */
+	protected abstract void applyPropertyMatch(DocumentFile documentFile, String pattern, String value);
+
+	protected final Properties loadProperties(File propertiesFile) throws IOException {
 		properties = new Properties();
 		try (FileReader reader = new FileReader(propertiesFile)) {
 			properties.load(reader);
@@ -72,7 +104,7 @@ public abstract class PropertiesDrivenDocumentFileProcessor extends LoggingObjec
 		}
 	}
 
-	protected String getPropertyValue(Properties properties, String propertyName) {
+	private String getPropertyValue(Properties properties, String propertyName) {
 		if (properties == null || propertyName == null) {
 			return null;
 		}
@@ -89,10 +121,6 @@ public abstract class PropertiesDrivenDocumentFileProcessor extends LoggingObjec
 		this.tokenReplacer = tokenReplacer;
 	}
 
-	protected TokenReplacer getTokenReplacer() {
-		return tokenReplacer;
-	}
-	
 	protected void setProperties(Properties properties) {
 		this.properties = properties;
 	}

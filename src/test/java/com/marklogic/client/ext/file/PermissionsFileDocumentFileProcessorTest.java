@@ -44,14 +44,25 @@ public class PermissionsFileDocumentFileProcessorTest {
 		DocumentFile file = new DocumentFile("/test.json", new File(testDir, "test.json"));
 		processor.processDocumentFile(file);
 		DocumentMetadataHandle.DocumentPermissions permissions = file.getDocumentMetadata().getPermissions();
+		assertEquals(3, permissions.size(), "test.json should have the *, test.json, and *.json rules applied to it");
 		assertTrue(permissions.get("manage-user").contains(DocumentMetadataHandle.Capability.READ));
 		assertTrue(permissions.get("manage-user").contains(DocumentMetadataHandle.Capability.UPDATE));
 		assertTrue(permissions.get("manage-admin").contains(DocumentMetadataHandle.Capability.UPDATE));
-		assertNull(permissions.get("qconsole-user"));
+		assertTrue(permissions.get("qconsole-user").contains(DocumentMetadataHandle.Capability.READ));
+
+		file = new DocumentFile("/test-1.json", new File(testDir, "test-1.json"));
+		processor.processDocumentFile(file);
+		permissions = file.getDocumentMetadata().getPermissions();
+		assertEquals(2, permissions.size(), "test-1.json should have the * and *.json rules applied to it");
+		assertTrue(permissions.get("manage-user").contains(DocumentMetadataHandle.Capability.READ));
+		assertFalse(permissions.get("manage-user").contains(DocumentMetadataHandle.Capability.UPDATE));
+		assertNull(permissions.get("manage-admin"));
+		assertTrue(permissions.get("qconsole-user").contains(DocumentMetadataHandle.Capability.READ));
 
 		file = new DocumentFile("/test.xml", new File(testDir, "test.xml"));
 		processor.processDocumentFile(file);
 		permissions = file.getDocumentMetadata().getPermissions();
+		assertEquals(2, permissions.size(), "test.xml should have the * and test.xml rules applied to it");
 		assertTrue(permissions.get("manage-user").contains(DocumentMetadataHandle.Capability.READ));
 		assertFalse(permissions.get("manage-user").contains(DocumentMetadataHandle.Capability.UPDATE));
 		assertNull(permissions.get("manage-admin"));

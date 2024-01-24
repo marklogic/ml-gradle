@@ -48,7 +48,16 @@ public class DefaultConfiguredDatabaseClientFactory implements ConfiguredDatabas
 			.withSAMLToken(config.getSamlToken())
 			.withCloudApiKey(config.getCloudApiKey())
 			.withSSLProtocol(config.getSslProtocol())
-			.withSSLHostnameVerifier(config.getSslHostnameVerifier());
+			.withSSLHostnameVerifier(config.getSslHostnameVerifier())
+			// The following 8 were added for 4.7.0 based on Java Client 6.5.0
+			.withKeyStorePath(config.getKeyStorePath())
+			.withKeyStorePassword(config.getKeyStorePassword())
+			.withKeyStoreType(config.getKeyStoreType())
+			.withKeyStoreAlgorithm(config.getKeyStoreAlgorithm())
+			.withTrustStorePath(config.getTrustStorePath())
+			.withTrustStorePassword(config.getTrustStorePassword())
+			.withTrustStoreType(config.getTrustStoreType())
+			.withTrustStoreAlgorithm(config.getTrustStoreAlgorithm());
 
 		if (config.getSecurityContextType() != null) {
 			builder.withAuthType(config.getSecurityContextType().name());

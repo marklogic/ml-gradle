@@ -15,8 +15,6 @@
  */
 package com.marklogic.client.ext.file;
 
-import java.util.Properties;
-
 /**
  * Looks for a special file in each directory - defaults to collections.properties - that contains properties where the
  * key is the name of a file in the directory, and the value is a comma-delimited list of collections to load the file
@@ -34,18 +32,8 @@ public class CollectionsFileDocumentFileProcessor extends CascadingPropertiesDri
 		super(propertiesFilename);
 	}
 
-	@Override
-	protected void processProperties(DocumentFile documentFile, Properties properties) {
-		String name = documentFile.getFile().getName();
-		if (properties.containsKey(name)) {
-			String value = getPropertyValue(properties, name);
-			documentFile.getDocumentMetadata().withCollections(value.split(delimiter));
-		}
-
-		if (properties.containsKey(WILDCARD_KEY)) {
-			String value = getPropertyValue(properties, WILDCARD_KEY);
-			documentFile.getDocumentMetadata().withCollections(value.split(delimiter));
-		}
+	protected void applyPropertyMatch(DocumentFile documentFile, String pattern, String value) {
+		documentFile.getDocumentMetadata().withCollections(value.split(delimiter));
 	}
 
 	public String getDelimiter() {

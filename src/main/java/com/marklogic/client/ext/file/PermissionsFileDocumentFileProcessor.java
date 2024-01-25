@@ -17,6 +17,10 @@ package com.marklogic.client.ext.file;
 
 import com.marklogic.client.ext.util.DocumentPermissionsParser;
 
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.util.Enumeration;
 import java.util.Properties;
 
 /**
@@ -46,26 +50,11 @@ public class PermissionsFileDocumentFileProcessor extends CascadingPropertiesDri
 		this.documentPermissionsParser = documentPermissionsParser;
 	}
 
-	@Override
-	protected void processProperties(DocumentFile documentFile, Properties properties) {
-		String name = documentFile.getFile().getName();
-		if (properties.containsKey(name)) {
-			String value = getPropertyValue(properties, name);
-			if (documentPermissionsParser != null) {
-				documentPermissionsParser.parsePermissions(value, documentFile.getDocumentMetadata().getPermissions());
-			} else {
-				documentFile.getDocumentMetadata().getPermissions().addFromDelimitedString(value);
-			}
-
-		}
-
-		if (properties.containsKey(WILDCARD_KEY)) {
-			String value = getPropertyValue(properties, WILDCARD_KEY);
-			if (documentPermissionsParser != null) {
-				documentPermissionsParser.parsePermissions(value, documentFile.getDocumentMetadata().getPermissions());
-			} else {
-				documentFile.getDocumentMetadata().getPermissions().addFromDelimitedString(value);
-			}
+	protected void applyPropertyMatch(DocumentFile documentFile, String pattern, String value) {
+		if (documentPermissionsParser != null) {
+			documentPermissionsParser.parsePermissions(value, documentFile.getDocumentMetadata().getPermissions());
+		} else {
+			documentFile.getDocumentMetadata().getPermissions().addFromDelimitedString(value);
 		}
 	}
 

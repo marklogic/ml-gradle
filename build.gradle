@@ -1,7 +1,6 @@
 plugins {
   id "groovy"
   id "maven-publish"
-	id "signing"
 
 	// Ignored as it depends on Java 11; can uncomment and use Java 11 when it needs to be run
 	//  id "com.github.jk1.dependency-license-report" version "2.1"
@@ -12,8 +11,13 @@ plugins {
 	id "io.snyk.gradle.plugin.snykplugin" version "0.4"
 }
 
+// Applied conditionally so that it does not take effect when publishing locally.
+if (project.hasProperty("signing.keyId")) {
+	apply plugin: "signing"
+}
+
 group = "com.marklogic"
-version = "4.6.1"
+version = "4.7-SNAPSHOT"
 
 java {
 	sourceCompatibility = 1.8
@@ -24,7 +28,7 @@ repositories {
 	mavenLocal()
 	mavenCentral()
 	maven {
-		url "https://nexus.marklogic.com/repository/maven-snapshots/"
+		url "https://bed-artifactory.bedford.progress.com:443/artifactory/ml-maven-snapshots/"
 	}
 }
 
@@ -32,10 +36,10 @@ dependencies {
   implementation gradleApi()
 	implementation localGroovy()
 
-	api 'com.marklogic:ml-app-deployer:4.6.1'
+	api 'com.marklogic:ml-app-deployer:4.7-SNAPSHOT'
 	implementation "com.marklogic:mlcp-util:1.0.1"
 	implementation "com.marklogic:marklogic-data-movement-components:2.7.0"
-	implementation "commons-io:commons-io:2.11.0"
+	implementation "commons-io:commons-io:2.15.1"
 
 	compileOnly "com.marklogic:marklogic-unit-test-client:1.4.0"
 
@@ -51,22 +55,19 @@ dependencies {
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-  classifier 'sources'
+  archiveClassifier = 'sources'
   from sourceSets.main.allJava
   from sourceSets.main.allGroovy
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-	classifier "javadoc"
+	archiveClassifier = "javadoc"
 	from javadoc
 }
 javadoc.failOnError = false
 
 artifacts {
 	archives javadocJar, sourcesJar
-}
-signing {
-	sign configurations.archives
 }
 
 task generatePomForDependencyGraph(dependsOn: "generatePomFileForMainJavaPublication") {
@@ -113,8 +114,6 @@ publishing {
 				}
 			}
 			from components.java
-			artifact sourcesJar
-			artifact javadocJar
 		}
 	}
 	repositories {

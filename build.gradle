@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "com.marklogic"
-version = "4.7-SNAPSHOT"
+version = "4.7.0"
 
 java {
 	sourceCompatibility = 1.8
@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-	api 'com.marklogic:marklogic-client-api:6.5-SNAPSHOT'
+	api 'com.marklogic:marklogic-client-api:6.5.0'
 	api 'com.marklogic:marklogic-xcc:11.1.0'
 	api 'org.springframework:spring-context:5.3.31'
 

@@ -49,6 +49,15 @@ public class DatabaseClientConfig {
 	private String cloudApiKey;
 	private String basePath;
 
+	private String keyStorePath;
+	private String keyStorePassword;
+	private String keyStoreType;
+	private String keyStoreAlgorithm;
+	private String trustStorePath;
+	private String trustStorePassword;
+	private String trustStoreType;
+	private String trustStoreAlgorithm;
+
 	public DatabaseClientConfig() {
 	}
 
@@ -235,5 +244,149 @@ public class DatabaseClientConfig {
 	 */
 	public void setSamlToken(String samlToken) {
 		this.samlToken = samlToken;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getKeyStorePath() {
+		return keyStorePath;
+	}
+
+	/**
+	 *
+	 * @param keyStorePath
+	 * @since 4.7.0
+	 */
+	public void setKeyStorePath(String keyStorePath) {
+		this.keyStorePath = keyStorePath;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getKeyStorePassword() {
+		return keyStorePassword;
+	}
+
+	/**
+	 *
+	 * @param keyStorePassword
+	 * @since 4.7.0
+	 */
+	public void setKeyStorePassword(String keyStorePassword) {
+		this.keyStorePassword = keyStorePassword;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getKeyStoreType() {
+		return keyStoreType;
+	}
+
+	/**
+	 *
+	 * @param keyStoreType
+	 * @since 4.7.0
+	 */
+	public void setKeyStoreType(String keyStoreType) {
+		this.keyStoreType = keyStoreType;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getKeyStoreAlgorithm() {
+		return keyStoreAlgorithm;
+	}
+
+	/**
+	 *
+	 * @param keyStoreAlgorithm
+	 * @since 4.7.0
+	 */
+	public void setKeyStoreAlgorithm(String keyStoreAlgorithm) {
+		this.keyStoreAlgorithm = keyStoreAlgorithm;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getTrustStorePath() {
+		return trustStorePath;
+	}
+
+	/**
+	 *
+	 * @param trustStorePath
+	 * @since 4.7.0
+	 */
+	public void setTrustStorePath(String trustStorePath) {
+		this.trustStorePath = trustStorePath;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getTrustStorePassword() {
+		return trustStorePassword;
+	}
+
+	/**
+	 *
+	 * @param trustStorePassword
+	 * @since 4.7.0
+	 */
+	public void setTrustStorePassword(String trustStorePassword) {
+		this.trustStorePassword = trustStorePassword;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getTrustStoreType() {
+		return trustStoreType;
+	}
+
+	/**
+	 *
+	 * @param trustStoreType
+	 * @since 4.7.0
+	 */
+	public void setTrustStoreType(String trustStoreType) {
+		this.trustStoreType = trustStoreType;
+	}
+
+	/**
+	 *
+	 * @return
+	 * @since 4.7.0
+	 */
+	public String getTrustStoreAlgorithm() {
+		return trustStoreAlgorithm;
+	}
+
+	/**
+	 *
+	 * @param trustStoreAlgorithm
+	 * @since 4.7.0
+	 */
+	public void setTrustStoreAlgorithm(String trustStoreAlgorithm) {
+		this.trustStoreAlgorithm = trustStoreAlgorithm;
 	}
 }

@@ -14,7 +14,7 @@ pipeline{
   stages{
     stage('tests'){
       steps{
-        copyRPM 'Release','10.0-9.4'
+        copyRPM 'Release','11.1.0'
         setUpML '$WORKSPACE/xdmp/src/Mark*.rpm'
         sh label:'test', script: '''#!/bin/bash
           export JAVA_HOME=$JAVA_HOME_DIR

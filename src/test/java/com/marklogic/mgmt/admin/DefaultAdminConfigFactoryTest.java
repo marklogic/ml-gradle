@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.marklogic.mgmt.ManageConfig;
 import org.junit.jupiter.api.Test;
 
 import com.marklogic.client.DatabaseClientFactory;
@@ -70,6 +71,7 @@ public class DefaultAdminConfigFactoryTest  {
 			"mlAdminTrustManagementAlgorithm", "PKIX"
 		);
 
+		assertEquals("https", config.getScheme());
 		assertTrue(config.isConfigureSimpleSsl());
 		assertEquals("TLSv1.2", config.getSslProtocol());
 		assertTrue(config.isUseDefaultKeystore());
@@ -80,15 +82,17 @@ public class DefaultAdminConfigFactoryTest  {
 	void simpleSsl() {
 		AdminConfig config = configure(
 			"mlAdminSimpleSsl", "true",
-			"mlUsername", "admin", 
+			"mlUsername", "admin",
 			"mlPassword", "admin"
 		);
+
+		assertEquals("https", config.getScheme());
 
 		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
 		SSLHostnameVerifier verifier = bean.getSecurityContext().getSSLHostnameVerifier();
 		assertEquals(SSLHostnameVerifier.ANY, verifier, "simpleSsl should default to using the ANY hostname verifier");
 	}
-	
+
 	@Test
 	void cloudApiKeyAndBasePath() {
 		AdminConfig config = configure(
@@ -224,6 +228,62 @@ public class DefaultAdminConfigFactoryTest  {
 			"If a user specifies both mlCloudBasePath and mlAdminBasePath, then the assumption is that they've " +
 				"changed the default Admin base path but it still begins with the common base path defined by " +
 				"mlCloudBasePath.");
+	}
+
+	@Test
+	void keyStore() {
+		AdminConfig config = configure(
+			"mlAdminKeyStorePath", "/my.jks",
+			"mlAdminKeyStorePassword", "abc123",
+			"mlAdminKeyStoreType", "JKS",
+			"mlAdminKeyStoreAlgorithm", "SunX509"
+		);
+
+		assertEquals("/my.jks", config.getKeyStorePath());
+		assertEquals("abc123", config.getKeyStorePassword());
+		assertEquals("JKS", config.getKeyStoreType());
+		assertEquals("SunX509", config.getKeyStoreAlgorithm());
+		assertEquals("https", config.getScheme());
+	}
+
+	@Test
+	void trustStore() {
+		AdminConfig config = configure(
+			"mlAdminTrustStorePath", "/my.jks",
+			"mlAdminTrustStorePassword", "abc123",
+			"mlAdminTrustStoreType", "JKS",
+			"mlAdminTrustStoreAlgorithm", "SunX509"
+		);
+
+		assertEquals("/my.jks", config.getTrustStorePath());
+		assertEquals("abc123", config.getTrustStorePassword());
+		assertEquals("JKS", config.getTrustStoreType());
+		assertEquals("SunX509", config.getTrustStoreAlgorithm());
+		assertEquals("https", config.getScheme());
+	}
+
+	@Test
+	void globalKeyStoreAndTrustStore() {
+		AdminConfig config = configure(
+			"mlKeyStorePath", "/key.jks",
+			"mlKeyStorePassword", "abc",
+			"mlKeyStoreType", "JKS1",
+			"mlKeyStoreAlgorithm", "SunX5091",
+			"mlTrustStorePath", "/trust.jks",
+			"mlTrustStorePassword", "123",
+			"mlTrustStoreType", "JKS2",
+			"mlTrustStoreAlgorithm", "SunX5092"
+		);
+
+		assertEquals("/key.jks", config.getKeyStorePath());
+		assertEquals("abc", config.getKeyStorePassword());
+		assertEquals("JKS1", config.getKeyStoreType());
+		assertEquals("SunX5091", config.getKeyStoreAlgorithm());
+		assertEquals("/trust.jks", config.getTrustStorePath());
+		assertEquals("123", config.getTrustStorePassword());
+		assertEquals("JKS2", config.getTrustStoreType());
+		assertEquals("SunX5092", config.getTrustStoreAlgorithm());
+		assertEquals("https", config.getScheme());
 	}
 
 	private AdminConfig configure(String... properties) {

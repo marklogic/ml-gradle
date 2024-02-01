@@ -8,7 +8,7 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath "com.marklogic:ml-gradle:4.6.1"
+		classpath "com.marklogic:ml-gradle:4.7.0"
 	}
 }
 

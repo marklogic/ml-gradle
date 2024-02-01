@@ -24,7 +24,7 @@ repositories {
 }
 
 dependencies {
-	api 'com.marklogic:ml-javaclient-util:4.7.0'
+	api 'com.marklogic:ml-javaclient-util:4.7-SNAPSHOT'
 	api 'org.springframework:spring-web:5.3.31'
 	api 'com.fasterxml.jackson.core:jackson-databind:2.15.3'
 

@@ -1,0 +1,21 @@
+{
+  "name": "seth-trigger",
+  "description": "Example trigger for Corticon",
+  "event": {
+    "data-event": {
+      "collection-scope": {
+        "uri": "seth"
+      },
+      "document-content": {
+        "update-kind": "modify"
+      },
+      "when": "pre-commit"
+    }
+  },
+  "module": "/seth/trigger.sjs",
+  "module-db": "%%MODULES_DATABASE%%",
+  "module-root": "/",
+  "enabled": true,
+  "recursive": true,
+  "task-priority": "normal"
+}

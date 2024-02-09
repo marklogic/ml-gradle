@@ -1,0 +1,7 @@
+{
+	"user-name": "seth",
+	"password": "logicmark",
+	"role": [
+		"admin", "rest-reader", "rest-extension-user"
+	]
+}

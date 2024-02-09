@@ -1,0 +1,39 @@
+plugins {
+	id "net.saliman.properties" version "1.5.2"
+	id "com.marklogic.ml-gradle" version "4.7.0"
+}
+
+repositories {
+	mavenCentral()
+}
+
+configurations {
+	mlcp {
+		attributes {
+			attribute(TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE, objects.named(TargetJvmEnvironment.class, TargetJvmEnvironment.STANDARD_JVM))
+		}
+	}
+}
+
+dependencies {
+	mlcp 'com.marklogic:mlcp:11.1.0'
+	mlcp files("lib")
+}
+
+task writeDocument(type: com.marklogic.gradle.task.MlcpTask) {
+	description = "Run this to write a single document to the 'corticon' collection."
+	classpath = configurations.mlcp
+	command = "IMPORT"
+	port = Integer.parseInt(mlRestPort)
+	input_file_path = "data/payload.json"
+	output_collections = "qa-corticon"
+	output_permissions = "rest-reader,read,rest-writer,update"
+	output_uri_replace = ".*data,'/data'"
+}
+
+task deleteCollection(type: com.marklogic.gradle.task.datamovement.DeleteCollectionsTask) {
+	description = "Run this to delete all documents in the collection, allowing you to test with 'writeDocument' again."
+	doFirst {
+		project.ext.collections = "corticon"
+	}
+}

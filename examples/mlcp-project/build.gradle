@@ -86,7 +86,7 @@ task importSampleDataWithOptionsFile(type: com.marklogic.gradle.task.MlcpTask) {
 task importSampleDataWithJavaExec(type: JavaExec) {
 	classpath = configurations.mlcp
 	mainClass = 'com.marklogic.contentpump.ContentPump'
-	args = ["IMPORT", "-options_file", "mlcpOptionsHostUsernamePassword.txt"]
+	args = ["IMPORT", "-options_file", "mlcpOptions.txt"]
 }
 
 /**

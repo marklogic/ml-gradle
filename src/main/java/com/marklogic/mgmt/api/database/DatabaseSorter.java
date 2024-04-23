@@ -43,6 +43,13 @@ public class DatabaseSorter {
 			}
 		}
 
-		return sorter.sort();
+		try {
+			return sorter.sort();
+		} catch (IllegalStateException ex) {
+			throw new IllegalArgumentException("Unable to deploy databases due to circular dependencies " +
+				"between two or more databases; please remove these circular dependencies in order to deploy" +
+				" your databases. An example of a circular dependency is database A depending on database B as its " +
+				"triggers databases, while database B depends on database A as its schemas database.");
+		}
 	}
 }

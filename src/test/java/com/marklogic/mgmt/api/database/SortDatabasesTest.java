@@ -15,18 +15,17 @@
  */
 package com.marklogic.mgmt.api.database;
 
-import com.marklogic.mgmt.api.database.Database;
-import com.marklogic.mgmt.api.database.DatabaseSorter;
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class SortDatabasesTest  {
+import static org.junit.jupiter.api.Assertions.*;
+
+class SortDatabasesTest {
 
 	@Test
-	public void test() {
+	void test() {
 		Database db1 = new Database(null, "db1");
 		Database db2 = new Database(null, "db2");
 		Database triggersDb = new Database(null, "triggers-db");
@@ -43,5 +42,22 @@ public class SortDatabasesTest  {
 		assertEquals("triggers-db", sortedNames[0]);
 		assertEquals("db2", sortedNames[1]);
 		assertEquals("db1", sortedNames[2]);
+	}
+
+	@Test
+	void circularDependencies() {
+		Database db1 = new Database(null, "db1");
+		Database db2 = new Database(null, "db2");
+		db1.setTriggersDatabase(db2.getDatabaseName());
+		db2.setSchemaDatabase(db1.getDatabaseName());
+		List<Database> databases = Arrays.asList(db1, db2);
+
+		DatabaseSorter sorter = new DatabaseSorter();
+		IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+			() -> sorter.sortDatabasesAndReturnNames(databases));
+
+		assertTrue(ex.getMessage().startsWith("Unable to deploy databases due to circular dependencies between " +
+				"two or more databases; please remove these circular dependencies in order to deploy your databases."),
+			"Unexpected error message: " + ex.getMessage());
 	}
 }

@@ -17,6 +17,8 @@ package com.marklogic.client.ext.jaxb;
 
 import com.marklogic.client.io.JAXBHandle;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -33,6 +35,7 @@ public class JAXBHandleTest {
 	 * @throws JAXBException
 	 */
 	@Test
+	@EnabledForJreRange(min = JRE.JAVA_11)
 	void simpleTest() throws JAXBException {
 		JAXBHandle handle = new JAXBHandle(JAXBContext.newInstance(Product.class));
 		Product p = new Product();

@@ -161,7 +161,7 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 	@Test
 	public void testServerExists() {
 		appConfig.getFirstConfigDir().setBaseDir(new File(("src/test/resources/sample-app/db-only-config")));
-		appConfig.setTestRestPort(8541);
+		appConfig.setTestRestPort(8003);
 		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
 
 		appDeployer.deploy(appConfig);

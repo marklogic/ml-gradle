@@ -31,7 +31,9 @@ If you wish to use Gradle 7 or higher, you must use ml-gradle 4.3.0 or higher.
 
 For older versions of ml-gradle, Gradle 6 or higher is recommended.
 
-Note that ml-gradle has not yet been tested on any release of Gradle 8. 
+ml-gradle has been tested and used extensively on multiple versions of Gradle 7 and 8. As described below, 
+both ml-gradle and the [MarkLogic Java Client](https://github.com/marklogic/java-client-api) have been tested on 
+Java 8, 11, and 17.
 
 
 Start using ml-gradle

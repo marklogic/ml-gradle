@@ -22,6 +22,7 @@ import com.marklogic.rest.util.Fragment;
 import com.marklogic.rest.util.RestConfig;
 import com.marklogic.rest.util.RestTemplateUtil;
 import org.jdom2.Namespace;
+import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -204,15 +205,27 @@ public class ManageClient extends LoggingObject {
 			.getBody();
 	}
 
-	public void delete(String path) {
+	public void delete(String path, String... headerNamesAndValues) {
         logRequest(path, "", "DELETE");
-        getRestTemplate().delete(buildUri(path));
+		delete(getRestTemplate(), path, headerNamesAndValues);
     }
 
-    public void deleteAsSecurityUser(String path) {
+    public void deleteAsSecurityUser(String path, String... headerNamesAndValues) {
 	    logSecurityUserRequest(path, "", "DELETE");
-	    getSecurityUserRestTemplate().delete(buildUri(path));
+		delete(getSecurityUserRestTemplate(), path, headerNamesAndValues);
     }
+
+	private void delete(RestTemplate restTemplate, String path, String... headerNamesAndValues) {
+		URI uri = buildUri(path);
+		HttpHeaders headers = new HttpHeaders();
+		if (headerNamesAndValues != null) {
+			for (int i = 0; i < headerNamesAndValues.length; i += 2) {
+				headers.add(headerNamesAndValues[i], headerNamesAndValues[i + 1]);
+			}
+		}
+		HttpEntity<Resource> entity = new HttpEntity<>(null, headers);
+		restTemplate.exchange(uri, HttpMethod.DELETE, entity, String.class);
+	}
 
 	/**
 	 * Per #187 and version 3.1.0, when an HttpEntity is constructed with a JSON payload, this method will check to see

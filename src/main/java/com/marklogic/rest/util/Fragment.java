@@ -63,6 +63,7 @@ public class Fragment {
             list.add(Namespace.getNamespace("sec", "http://marklogic.com/xdmp/security"));
 			list.add(Namespace.getNamespace("ts", "http://marklogic.com/manage/task-server"));
 	        list.add(Namespace.getNamespace("t", "http://marklogic.com/manage/tasks"));
+			list.add(Namespace.getNamespace("creds", "http://marklogic.com/manage/credentials/properties"));
 			list.addAll(Arrays.asList(namespaces));
             this.namespaces = list.toArray(new Namespace[] {});
         } catch (Exception e) {

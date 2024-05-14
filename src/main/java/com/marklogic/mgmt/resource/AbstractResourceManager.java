@@ -32,10 +32,16 @@ public abstract class AbstractResourceManager extends AbstractManager implements
 
     private ManageClient manageClient;
     private boolean updateAllowed = true;
+	protected final boolean usePutForCreate;
 
     public AbstractResourceManager(ManageClient client) {
-        this.manageClient = client;
+		this(client, false);
     }
+
+	public AbstractResourceManager(ManageClient client, boolean usePutForCreate) {
+		this.manageClient = client;
+		this.usePutForCreate = usePutForCreate;
+	}
 
     public String getResourcesPath() {
         return format("/manage/v2/%ss", getResourceName());
@@ -119,7 +125,9 @@ public abstract class AbstractResourceManager extends AbstractManager implements
 		    logger.info(format("Creating %s: %s", label, resourceId));
 	    }
 	    String path = getCreateResourcePath(payload);
-	    ResponseEntity<String> response = postPayload(manageClient, path, payload);
+	    ResponseEntity<String> response = this.usePutForCreate ?
+			putPayload(manageClient, path, payload) :
+			postPayload(manageClient, path, payload);
 	    if (logger.isInfoEnabled()) {
 		    logger.info(format("Created %s: %s", label, resourceId));
 	    }
@@ -194,14 +202,15 @@ public abstract class AbstractResourceManager extends AbstractManager implements
      * Convenience method for performing a delete once the correct path for the resource has been constructed.
      *
      * @param path
+	 * @param headerNamesAndValues optional sequence of header names and values to be included in the DELETE request.
      */
-    public void deleteAtPath(String path) {
+    public void deleteAtPath(String path, String... headerNamesAndValues) {
         String label = getResourceName();
         logger.info(format("Deleting %s at path %s", label, path));
 	    if (useSecurityUser()) {
-		    manageClient.deleteAsSecurityUser(path);
+		    manageClient.deleteAsSecurityUser(path, headerNamesAndValues);
 	    } else {
-		    manageClient.delete(path);
+		    manageClient.delete(path, headerNamesAndValues);
 	    }
 	    logger.info(format("Deleted %s at path %s", label, path));
     }

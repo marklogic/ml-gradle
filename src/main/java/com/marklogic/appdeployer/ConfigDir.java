@@ -262,4 +262,8 @@ public class ConfigDir {
 	public File getSecureCredentialsDir() {
 		return new File(getSecurityDir(), "secure-credentials");
 	}
+
+	public File getCredentialsDir() {
+		return new File(getSecurityDir(), "credentials");
+	}
 }

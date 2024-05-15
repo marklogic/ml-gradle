@@ -19,10 +19,10 @@ import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.ext.SecurityContextType;
 import com.marklogic.client.ext.modulesloader.impl.PropertiesModuleManager;
-import com.marklogic.mgmt.DefaultManageConfigFactory;
-import com.marklogic.mgmt.ManageConfig;
 import com.marklogic.mgmt.util.SimplePropertySource;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.io.File;
 import java.util.List;
@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -927,6 +928,24 @@ public class DefaultAppConfigFactoryTest {
 		assertEquals("123", config.getAppServicesTrustStorePassword());
 		assertEquals("JKS2", config.getAppServicesTrustStoreType());
 		assertEquals("SunX5092", config.getAppServicesTrustStoreAlgorithm());
+	}
+
+	@ParameterizedTest
+	@CsvSource(delimiter = ':', value = {
+		"mlAppServicesPort:NaN",
+		"mlRestPort:NaN",
+		"mlTestRestPort:NaN",
+		"mlContentForestsPerHost:NaN",
+		"mlForestsPerHost:1,NaN,3",
+		"mlDatabaseNamesAndReplicaCounts:1,NaN,3",
+		"mlModulesLoaderThreadCount:NaN",
+		"mlDataBatchSize:NaN"
+	})
+	void numericConfigValues(String propertyName, String propertyValue) {
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+			configure(propertyName, propertyValue);
+		});
+		assertTrue(exception.getMessage().contains(format("The property %s requires a numeric value; invalid value: ‘NaN'", propertyName)));
 	}
 
 	private AppConfig configure(String... properties) {

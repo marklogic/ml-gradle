@@ -56,7 +56,7 @@ public class DefaultAdminConfigFactory extends PropertySourceFactory implements 
 
 	    propertyConsumerMap.put("mlAdminPort", (config, prop) -> {
 		    logger.info("Admin interface port: " + prop);
-		    config.setPort(Integer.parseInt(prop));
+		    config.setPort(propertyToInteger("mlAdminPort", prop));
 	    });
 
 		propertyConsumerMap.put("mlAdminAuthentication", (config, prop) -> {

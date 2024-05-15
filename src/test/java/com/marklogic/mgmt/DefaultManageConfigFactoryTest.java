@@ -327,6 +327,14 @@ public class DefaultManageConfigFactoryTest  {
 		assertEquals("https", config.getScheme());
 	}
 
+	@Test
+	void mlManagePort() {
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+			configure("mlManagePort", "NaN");
+		});
+		assertEquals("The property mlManagePort requires a numeric value; invalid value: ‘NaN'", exception.getMessage());
+	}
+
 	private ManageConfig configure(String... properties) {
 		return new DefaultManageConfigFactory(new SimplePropertySource(properties)).newManageConfig();
 	}

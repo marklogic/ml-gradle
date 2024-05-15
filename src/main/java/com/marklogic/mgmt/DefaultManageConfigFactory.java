@@ -56,7 +56,7 @@ public class DefaultManageConfigFactory extends PropertySourceFactory implements
 
 	    propertyConsumerMap.put("mlManagePort", (config, prop) -> {
 		    logger.info("Manage port: " + prop);
-		    config.setPort(Integer.parseInt(prop));
+		    config.setPort(propertyToInteger("mlManagePort", prop));
 	    });
 
 		propertyConsumerMap.put("mlManageAuthentication", (config, prop) -> {

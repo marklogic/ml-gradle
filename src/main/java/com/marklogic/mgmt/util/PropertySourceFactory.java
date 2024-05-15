@@ -73,4 +73,13 @@ public abstract class PropertySourceFactory extends LoggingObject {
 	public PropertySource getPropertySource() {
 		return propertySource;
 	}
+
+	protected final Integer propertyToInteger(String propertyName, String propertyValue) {
+		try {
+			return Integer.parseInt(propertyValue);
+		} catch (NumberFormatException ex) {
+			throw new IllegalArgumentException(format("The property %s requires a numeric value; invalid value: ‘%s'", propertyName, propertyValue));
+		}
+	}
+
 }

@@ -13,8 +13,8 @@ buildscript {
 
 plugins {
 	id 'java' //optional - delete if not needed
-	id 'net.saliman.properties' version '1.5.1'
-	id 'com.marklogic.ml-gradle' version "4.7.0"
+	id 'net.saliman.properties' version '1.5.2'
+	id 'com.marklogic.ml-gradle' version "4.8.0"
 }
 
 repositories {

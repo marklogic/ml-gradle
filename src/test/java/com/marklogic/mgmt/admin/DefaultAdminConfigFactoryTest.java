@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.marklogic.mgmt.ManageConfig;
 import org.junit.jupiter.api.Test;
 
 import com.marklogic.client.DatabaseClientFactory;
@@ -289,4 +288,13 @@ public class DefaultAdminConfigFactoryTest  {
 	private AdminConfig configure(String... properties) {
 		return new DefaultAdminConfigFactory(new SimplePropertySource(properties)).newAdminConfig();
 	}
+
+	@Test
+	void mlAdminPort() {
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+			configure("mlAdminPort", "NaN");
+		});
+		assertEquals("The property mlAdminPort requires a numeric value; invalid value: ‘NaN'", exception.getMessage());
+	}
 }
+

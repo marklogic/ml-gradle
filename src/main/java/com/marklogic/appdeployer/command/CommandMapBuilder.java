@@ -161,6 +161,7 @@ public class CommandMapBuilder {
 		securityCommands.add(new InsertCertificateHostsTemplateCommand());
 		securityCommands.add(new DeployExternalSecurityCommand());
 		securityCommands.add(new DeploySecureCredentialsCommand());
+		securityCommands.add(new DeployCredentialsCommand());
 		securityCommands.add(new DeployPrivilegesCommand());
 		securityCommands.add(new DeployPrivilegeRolesCommand());
 		securityCommands.add(new DeployProtectedCollectionsCommand());

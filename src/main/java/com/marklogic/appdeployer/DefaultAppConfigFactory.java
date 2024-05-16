@@ -17,7 +17,6 @@ package com.marklogic.appdeployer;
 
 import com.marklogic.appdeployer.util.JavaClientUtil;
 import com.marklogic.client.DatabaseClient;
-import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.ext.SecurityContextType;
 import com.marklogic.mgmt.util.PropertySource;
 import com.marklogic.mgmt.util.PropertySourceFactory;
@@ -250,8 +249,8 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		 * different port, in which case you can set this to that port.
 		 */
 		propertyConsumerMap.put("mlAppServicesPort", (config, prop) -> {
-			logger.info("App services port: " + prop);
-			config.setAppServicesPort(Integer.parseInt(prop));
+			logger.info("App services port: {}", prop);
+			config.setAppServicesPort(propertyToInteger("mlAppServicesPort", prop));
 		});
 		/**
 		 * The username and password for a ML user with the rest-admin role that is used for e.g. loading
@@ -376,7 +375,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		 */
 		propertyConsumerMap.put("mlRestPort", (config, prop) -> {
 			logger.info("App REST port: " + prop);
-			config.setRestPort(Integer.parseInt(prop));
+			config.setRestPort(propertyToInteger("mlRestPort", prop));
 		});
 		/**
 		 * The username and password for a ML user with the rest-admin role. This user is used for operations against the
@@ -559,7 +558,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		 */
 		propertyConsumerMap.put("mlTestRestPort", (config, prop) -> {
 			logger.info("Test REST port: " + prop);
-			config.setTestRestPort(Integer.parseInt(prop));
+			config.setTestRestPort(propertyToInteger("mlTestRestPort", prop));
 		});
 
 		propertyConsumerMap.put("mlTestRestServerName", (config, prop) -> {
@@ -605,7 +604,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 
 		propertyConsumerMap.put("mlContentForestsPerHost", (config, prop) -> {
 			logger.info("Content forests per host: " + prop);
-			config.setContentForestsPerHost(Integer.parseInt(prop));
+			config.setContentForestsPerHost(propertyToInteger("mlContentForestsPerHost", prop));
 		});
 
 		propertyConsumerMap.put("mlCreateForests", (config, prop) -> {
@@ -620,7 +619,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			logger.info("Forests per host: " + prop);
 			String[] tokens = prop.split(",");
 			for (int i = 0; i < tokens.length; i += 2) {
-				config.getForestCounts().put(tokens[i], Integer.parseInt(tokens[i + 1]));
+				config.getForestCounts().put(tokens[i], propertyToInteger("mlForestsPerHost", tokens[i + 1]));
 			}
 		});
 
@@ -633,7 +632,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			String[] tokens = prop.split(",");
 			Map<String, Integer> map = new HashMap<>();
 			for (int i = 0; i < tokens.length; i += 2) {
-				map.put(tokens[i], Integer.parseInt(tokens[i + 1]));
+				map.put(tokens[i], propertyToInteger("mlDatabaseNamesAndReplicaCounts", tokens[i + 1]));
 			}
 			config.setDatabaseNamesAndReplicaCounts(map);
 		});
@@ -884,12 +883,12 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 
 		propertyConsumerMap.put("mlModulesLoaderThreadCount", (config, prop) -> {
 			logger.info("Modules loader thread count: " + prop);
-			config.setModulesLoaderThreadCount(Integer.parseInt(prop));
+			config.setModulesLoaderThreadCount(propertyToInteger("mlModulesLoaderThreadCount", prop));
 		});
 
 		propertyConsumerMap.put("mlModulesLoaderBatchSize", (config, prop) -> {
 			logger.info("Modules loader batch size: " + prop);
-			config.setModulesLoaderBatchSize(Integer.parseInt(prop));
+			config.setModulesLoaderBatchSize(propertyToInteger("mlModulesLoaderBatchSize", prop));
 		});
 
 		propertyConsumerMap.put("mlCascadeCollections", (config, prop) -> {
@@ -1000,7 +999,7 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 	protected void registerDataLoadingProperties() {
 		propertyConsumerMap.put("mlDataBatchSize", (config, prop) -> {
 			logger.info("Batch size for loading data: " + prop);
-			config.getDataConfig().setBatchSize(Integer.parseInt(prop));
+			config.getDataConfig().setBatchSize(propertyToInteger("mlDataBatchSize", prop));
 		});
 
 		propertyConsumerMap.put("mlDataCollections", (config, prop) -> {

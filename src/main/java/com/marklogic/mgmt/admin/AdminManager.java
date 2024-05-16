@@ -19,6 +19,7 @@ import com.marklogic.mgmt.AbstractManager;
 import com.marklogic.rest.util.Fragment;
 import com.marklogic.rest.util.RestConfig;
 import com.marklogic.rest.util.RestTemplateUtil;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
@@ -80,8 +81,9 @@ public class AdminManager extends AbstractManager {
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
                 HttpEntity<String> entity = new HttpEntity<>(payload, headers);
+				ImmutablePair<Boolean, Boolean> credentialsStatus = checkCredentialsAndReplaceNulls(adminConfig);
                 try {
-                    ResponseEntity<String> response = getRestTemplate().exchange(uri, HttpMethod.POST, entity, String.class);
+					ResponseEntity<String> response = getRestTemplate().exchange(uri, HttpMethod.POST, entity, String.class);
                     logger.info("Initialization response: " + response);
                     // According to http://docs.marklogic.com/REST/POST/admin/v1/init, a 202 is sent back in the event a
                     // restart is needed. A 400 or 401 will be thrown as an error by RestTemplate.
@@ -98,12 +100,14 @@ public class AdminManager extends AbstractManager {
                         logger.error("Caught error, response body: " + body);
                         throw hcee;
                     }
-                }
+                } finally {
+					restoreCredentials(adminConfig, credentialsStatus);
+				}
             }
         });
     }
 
-    public void installAdmin() {
+	public void installAdmin() {
         installAdmin(null, null);
     }
 
@@ -130,8 +134,9 @@ public class AdminManager extends AbstractManager {
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
                 HttpEntity<String> entity = new HttpEntity<>(payload, headers);
+				ImmutablePair<Boolean, Boolean> credentialsStatus = checkCredentialsAndReplaceNulls(adminConfig);
                 try {
-                    ResponseEntity<String> response = getRestTemplate().exchange(uri, HttpMethod.POST, entity, String.class);
+					ResponseEntity<String> response = getRestTemplate().exchange(uri, HttpMethod.POST, entity, String.class);
                     logger.info("Admin installation response: " + response);
                     // According to http://docs.marklogic.com/REST/POST/admin/v1/init, a 202 is sent back in the event a
                     // restart is needed. A 400 or 401 will be thrown as an error by RestTemplate.
@@ -143,6 +148,8 @@ public class AdminManager extends AbstractManager {
                         return false;
                     }
                     throw hcee;
+				} finally {
+					restoreCredentials(adminConfig, credentialsStatus);
                 }
             }
         });
@@ -322,5 +329,32 @@ public class AdminManager extends AbstractManager {
 			this.restTemplate = RestTemplateUtil.newRestTemplate(adminConfig);
 		}
 		return this.restTemplate;
+	}
+
+	private ImmutablePair<Boolean, Boolean> checkCredentialsAndReplaceNulls(AdminConfig adminConfig) {
+		boolean setNullUsername = false;
+		boolean setNullPassword = false;
+		if (adminConfig.getUsername() == null) {
+			adminConfig.setUsername("");
+			setNullUsername = true;
+			this.restTemplate = null;
+		}
+		if (adminConfig.getPassword() == null) {
+			adminConfig.setPassword("");
+			setNullPassword = true;
+			this.restTemplate = null;
+		}
+		return new ImmutablePair<>(setNullUsername, setNullPassword);
+	}
+
+	private void restoreCredentials(AdminConfig adminConfig, ImmutablePair<Boolean, Boolean> credentialsStatus) {
+		if (credentialsStatus.getLeft()) {
+			adminConfig.setUsername(null);
+			this.restTemplate = null;
+		}
+		if (credentialsStatus.getRight()) {
+			adminConfig.setPassword(null);
+			this.restTemplate = null;
+		}
 	}
 }

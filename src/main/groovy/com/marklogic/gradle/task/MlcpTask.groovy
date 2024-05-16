@@ -208,7 +208,11 @@ class MlcpTask extends JavaExec {
 		File logOutputFile = null
 		if (logOutputUri) {
 			println "Will write mlcp log output to URI: " + logOutputUri
-			logOutputFile = new File(getProject().getBuildDir(), "mlcp-log-output-" + System.currentTimeMillis() + ".txt")
+			def buildDir = getProject().layout.buildDirectory.asFile.get()
+			if (!buildDir.exists()) {
+				buildDir.mkdir()
+			}
+			logOutputFile = new File(buildDir, "mlcp-log-output-" + System.currentTimeMillis() + ".txt")
 			setStandardOutput(logOutputFile.newOutputStream())
 		}
 

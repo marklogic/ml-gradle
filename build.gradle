@@ -7,7 +7,7 @@ plugins {
   id "com.gradle.plugin-publish" version "1.2.1"
 	id "java-gradle-plugin"
 
-	id "net.saliman.properties" version "1.5.1"
+	id "net.saliman.properties" version "1.5.2"
 	id "io.snyk.gradle.plugin.snykplugin" version "0.4"
 }
 
@@ -17,7 +17,7 @@ if (project.hasProperty("signing.keyId")) {
 }
 
 group = "com.marklogic"
-version = "4.7.0"
+version = "4.8.0"
 
 java {
 	sourceCompatibility = 1.8
@@ -36,10 +36,10 @@ dependencies {
   implementation gradleApi()
 	implementation localGroovy()
 
-	api 'com.marklogic:ml-app-deployer:4.7.0'
+	api 'com.marklogic:ml-app-deployer:4.8.0'
 	implementation "com.marklogic:mlcp-util:1.0.1"
-	implementation "com.marklogic:marklogic-data-movement-components:2.7.0"
-	implementation "commons-io:commons-io:2.15.1"
+	implementation "com.marklogic:marklogic-data-movement-components:2.8.0"
+	implementation "commons-io:commons-io:2.16.1"
 
 	compileOnly "com.marklogic:marklogic-unit-test-client:1.4.0"
 
@@ -49,7 +49,7 @@ dependencies {
 
 	// Force spock-core to use 4.13.2 to avoid security issue in 4.11
 	testImplementation 'junit:junit:4.13.2'
-	testImplementation('org.spockframework:spock-core:2.1-groovy-3.0') {
+	testImplementation('org.spockframework:spock-core:2.3-groovy-3.0') {
 		exclude module: 'groovy-all'
 	}
 }

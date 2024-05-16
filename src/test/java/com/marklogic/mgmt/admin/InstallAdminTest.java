@@ -18,6 +18,9 @@ package com.marklogic.mgmt.admin;
 import org.junit.jupiter.api.Test;
 
 import com.marklogic.mgmt.AbstractMgmtTest;
+import org.springframework.web.client.HttpClientErrorException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class InstallAdminTest extends AbstractMgmtTest {
 
@@ -27,7 +30,33 @@ public class InstallAdminTest extends AbstractMgmtTest {
      * again. Instead, a message should be logged and ML should not be restarted.
      */
     @Test
-    public void adminAlreadyInstalled() {
-        adminManager.installAdmin("admin", "admin");
+    void adminAlreadyInstalled() {
+		assertDoesNotThrow(() -> adminManager.installAdmin("admin", "admin"));
     }
+
+	@Test
+	void withNullUsername() {
+		String originalUsername = adminConfig.getUsername();
+		try {
+			adminConfig.setUsername(null);
+			HttpClientErrorException exception = assertThrows(HttpClientErrorException.class, () -> adminManager.installAdmin("admin", "admin"));
+			assertTrue(exception.getMessage().contains("Unauthorized"));
+			assertEquals(401, exception.getStatusCode().value());
+		} finally {
+			adminConfig.setUsername(originalUsername);
+		}
+	}
+
+	@Test
+	void withNullPassword() {
+		String originalPassword = adminConfig.getPassword();
+		try {
+			adminConfig.setPassword(null);
+			HttpClientErrorException exception = assertThrows(HttpClientErrorException.class, () -> adminManager.installAdmin("admin", "admin"));
+			assertTrue(exception.getMessage().contains("Unauthorized"));
+			assertEquals(401, exception.getStatusCode().value());
+		} finally {
+			adminConfig.setPassword(originalPassword);
+		}
+	}
 }

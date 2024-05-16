@@ -39,6 +39,15 @@ class InitTask extends MarkLogicTask {
 		if (project.hasProperty("mlLicensee")) {
 			licensee = project.property("mlLicensee")
 		}
+
+		// Permit this task to run without having mlUsername and mlPassword defined
+		if (!project.hasProperty("mlUsername")) {
+			getAdminManager().getAdminConfig().setUsername("")
+		}
+		if (!project.hasProperty("mlPassword")) {
+			getAdminManager().getAdminConfig().setPassword("")
+		}
+
         getAdminManager().init(licenseKey, licensee)
     }
 }

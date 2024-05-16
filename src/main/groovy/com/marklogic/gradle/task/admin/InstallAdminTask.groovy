@@ -31,6 +31,15 @@ class InstallAdminTask extends MarkLogicTask {
 		if (getProject().hasProperty("realm")) {
 			realm = project.property("realm")
 		}
+
+		// Permit this task to run without having mlUsername and mlPassword defined
+		if (!project.hasProperty("mlUsername")) {
+			getAdminManager().getAdminConfig().setUsername("")
+		}
+		if (!project.hasProperty("mlPassword")) {
+			getAdminManager().getAdminConfig().setPassword("")
+		}
+
 		if (realm != null) {
 			getAdminManager().installAdmin(getAdminUsername(), getAdminPassword(), realm)
 		} else {

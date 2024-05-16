@@ -18,6 +18,10 @@ package com.marklogic.mgmt.admin;
 import org.junit.jupiter.api.Test;
 
 import com.marklogic.mgmt.AbstractMgmtTest;
+import org.springframework.web.client.HttpClientErrorException;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class InitializeMarkLogicTest extends AbstractMgmtTest {
 
@@ -27,7 +31,33 @@ public class InitializeMarkLogicTest extends AbstractMgmtTest {
      * to ensure no errors are thrown from bad JSON.
      */
     @Test
-    public void initAgainstAnAlreadyInitializedMarkLogic() {
-        adminManager.init();
+    void initAgainstAnAlreadyInitializedMarkLogic() {
+		assertDoesNotThrow(() -> adminManager.init());
     }
+
+	@Test
+	void withNullUsername() {
+		String originalUsername = adminConfig.getUsername();
+		try {
+			adminConfig.setUsername(null);
+			HttpClientErrorException exception = assertThrows(HttpClientErrorException.class, () -> adminManager.init());
+			assertTrue(exception.getMessage().contains("Unauthorized"));
+			assertEquals(401, exception.getStatusCode().value());
+		} finally {
+			adminConfig.setUsername(originalUsername);
+		}
+	}
+
+	@Test
+	void withNullPassword() {
+		String originalPassword = adminConfig.getPassword();
+		try {
+			adminConfig.setPassword(null);
+			HttpClientErrorException exception = assertThrows(HttpClientErrorException.class, () -> adminManager.init());
+			assertTrue(exception.getMessage().contains("Unauthorized"));
+			assertEquals(401, exception.getStatusCode().value());
+		} finally {
+			adminConfig.setPassword(originalPassword);
+		}
+	}
 }

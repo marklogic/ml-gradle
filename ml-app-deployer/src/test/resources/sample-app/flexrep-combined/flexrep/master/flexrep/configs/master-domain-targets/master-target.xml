@@ -1,0 +1,15 @@
+<flexrep-target-properties xmlns="http://marklogic.com/manage/flexrep-target/properties"
+  xmlns:_1="http://marklogic.com/manage/cpf-config/properties" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://marklogic.com/manage/cpf-config/properties manage-cpf-config-properties.xsd">
+  <target-name>master-domain-target</target-name>
+  <retry-seconds-min>60</retry-seconds-min>
+  <retry-seconds-max>300</retry-seconds-max>
+  <immediate-push>true</immediate-push>
+  <documents-per-batch>1</documents-per-batch>
+  <replicate-cpf>false</replicate-cpf>
+  <enabled>true</enabled>
+  <urls>
+    <!-- The HTTP port doesn't matter, as we don't actually test flexrep, just that the config is correct -->
+    <url>http://localhost:8076/</url>
+  </urls>
+</flexrep-target-properties>

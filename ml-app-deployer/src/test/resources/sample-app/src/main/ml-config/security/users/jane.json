@@ -1,0 +1,6 @@
+{
+  "user-name":"sample-app-jane",
+  "password": "password",
+	"description": "temporal-admin is granted so the user can hit /v1/eval, as that grants the xdbc-eval privilege",
+	"role": ["rest-reader", "rest-extension-user", "temporal-admin"]
+}

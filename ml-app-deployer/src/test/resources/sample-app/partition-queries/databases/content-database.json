@@ -1,0 +1,19 @@
+{
+	"database-name": "%%DATABASE%%",
+	"schema-database": "%%SCHEMAS_DATABASE%%",
+	"locking": "strict",
+	"range-element-index": [
+		{
+			"scalar-type": "date",
+			"namespace-uri": "",
+			"localname": "myDate",
+			"collation": "",
+			"range-value-positions": false,
+			"invalid-values": "reject"
+		}
+	],
+	"assignment-policy": {
+		"assignment-policy-name": "query",
+		"default-partition": 2
+	}
+}

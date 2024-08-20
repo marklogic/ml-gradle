@@ -1,0 +1,9 @@
+{
+	"pull-name": "docs2go",
+	"domain-id": "%%flexrep-domains-id-sample-app-domain-1%%",
+	"target-id": "%%flexrep-targets-id-sample-app-domain-1-target%%",
+	"enabled": true,
+	"url": [
+		"http://localhost:8076"
+	]
+}

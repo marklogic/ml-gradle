@@ -1,0 +1,25 @@
+{
+  "database-name": "%%DATABASE%%",
+  "range-element-index": [
+    {
+      "collation": "http://marklogic.com/collation/",
+      "invalid-values": "reject",
+      "localname": "id",
+      "namespace-uri": "urn:sampleapp",
+      "range-value-positions": false,
+      "scalar-type": "string"
+    },
+    {
+      "collation": "",
+      "invalid-values": "reject",
+      "localname": "amount",
+      "namespace-uri": "",
+      "range-value-positions": false,
+      "scalar-type": "int"
+    }
+  ],
+  "triple-index":true,
+  "collection-lexicon":true,
+  "triggers-database": "%%TRIGGERS_DATABASE%%",
+  "schema-database": "%%SCHEMAS_DATABASE%%"
+}

@@ -1,0 +1,16 @@
+{
+  "role-name" : "sampleapp-install",
+  "permission" : [ {
+    "role-name" : "sampleapp-modules",
+    "capability" : "execute"
+  }, {
+    "role-name" : "sampleapp-install",
+    "capability" : "update"
+  }, {
+    "role-name" : "sampleapp-install",
+    "capability" : "insert"
+  }, {
+    "role-name" : "sampleapp-modules",
+    "capability" : "read"
+  } ]
+}

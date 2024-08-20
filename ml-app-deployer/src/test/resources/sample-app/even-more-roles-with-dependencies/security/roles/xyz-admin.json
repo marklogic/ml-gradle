@@ -1,0 +1,4 @@
+{
+  "role-name" : "xyz-admin",
+  "role" : [ "xyz-reader", "xyz-writer", "qconsole-user" ]
+}

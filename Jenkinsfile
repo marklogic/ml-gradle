@@ -14,14 +14,20 @@ pipeline{
   stages{
     stage('tests'){
       steps{
-        copyRPM 'Release','10.0-9.4'
+        copyRPM 'Release','11.3.0'
         setUpML '$WORKSPACE/xdmp/src/Mark*.rpm'
         sh label:'test', script: '''#!/bin/bash
           export JAVA_HOME=$JAVA_HOME_DIR
           export GRADLE_USER_HOME=$WORKSPACE/$GRADLE_DIR
           export PATH=$GRADLE_USER_HOME:$JAVA_HOME/bin:$PATH
           cd ml-gradle
-          ./gradlew test  || true
+          cd ml-javaclient-util-test-app
+          echo "mlPassword=admin" > gradle-local.properties
+          ../gradlew -i mlDeploy
+          cd ..
+          ./gradlew ml-javaclient-util:test || true
+          ./gradlew ml-app-deployer:test || true
+          ./gradlew ml-gradle:test || true
         '''
         junit '**/build/**/*.xml'
       }

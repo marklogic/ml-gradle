@@ -1,0 +1,4 @@
+{
+  "server-name": "%%NAME%%",
+  "url-rewriter": "/my/custom/rewriter.xml"
+}

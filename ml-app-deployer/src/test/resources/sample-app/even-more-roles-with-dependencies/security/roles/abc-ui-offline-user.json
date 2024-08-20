@@ -1,0 +1,4 @@
+{
+  "role-name" : "abc-ui-offline-user",
+  "role" : [ "abc-sss-ui-role" ]
+}

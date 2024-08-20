@@ -1,0 +1,8 @@
+<options xmlns="http://marklogic.com/appservices/search">
+  <searchable-expression>fn:collection('car')</searchable-expression>
+  <constraint name="color">
+    <value>
+      <element ns="urn:sample" name="Color" />
+    </value>
+  </constraint>
+</options>

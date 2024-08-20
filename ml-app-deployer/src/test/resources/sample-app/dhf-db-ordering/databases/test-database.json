@@ -1,0 +1,43 @@
+{
+  "database-name": "%%mlTestDbName%%",
+  "range-element-index": [
+    {
+      "scalar-type": "unsignedLong",
+      "namespace-uri": "http://marklogic.com/xdmp/dls",
+      "localname": "version-id",
+      "collation": "http://marklogic.com/collation/",
+      "range-value-positions": false,
+      "invalid-values": "reject"
+    },
+    {
+      "scalar-type": "dateTime",
+      "namespace-uri": "http://marklogic.com/xdmp/dls",
+      "localname": "created",
+      "collation": "http://marklogic.com/collation/",
+      "range-value-positions": false,
+      "invalid-values": "reject"
+    },
+    {
+      "scalar-type": "dateTime",
+      "namespace-uri": "http://marklogic.com/xdmp/dls",
+      "localname": "replaced",
+      "collation": "http://marklogic.com/collation/",
+      "range-value-positions": false,
+      "invalid-values": "reject"
+    },
+    {
+      "scalar-type": "string",
+      "namespace-uri": "",
+      "localname": "sourceSystemTableFullName",
+      "collation": "http://marklogic.com/collation/codepoint",
+      "range-value-positions": false,
+      "invalid-values": "reject"
+    }
+  ],
+  "schema-database": "%%mlFinalSchemasDbName%%",
+  "triggers-database": "%%mlFinalTriggersDbName%%",
+  "triple-index": true,
+  "collection-lexicon": true,
+  "uri-lexicon": true
+}
+

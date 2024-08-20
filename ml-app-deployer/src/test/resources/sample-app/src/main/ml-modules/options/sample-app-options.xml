@@ -1,0 +1,9 @@
+<options xmlns='http://marklogic.com/appservices/search'>
+  <additional-query>
+    <collection-query xmlns="http://marklogic.com/cts">
+      <uri>sample-app-docs</uri>
+    </collection-query>
+  </additional-query>
+  <search-option>unfiltered</search-option>
+  <quality-weight>0</quality-weight>
+</options>

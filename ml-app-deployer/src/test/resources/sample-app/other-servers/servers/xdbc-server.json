@@ -1,0 +1,9 @@
+{
+  "server-name": "%%NAME%%-xdbc",
+  "server-type": "xdbc",
+  "root": "/",
+  "group-name": "%%GROUP%%",
+  "port": 8049,
+  "modules-database": "Modules",
+  "content-database": "Documents"
+}

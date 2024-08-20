@@ -1,0 +1,10 @@
+{
+  "role-name" : "abc-sss-ui-role",
+  "role" : [ "xyz-reader", "xyz-writer" ],
+	"permission": [
+		{
+			"role-name": "abc-sss-ui-role",
+			"capability": "read"
+		}
+	]
+}

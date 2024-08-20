@@ -1,0 +1,13 @@
+<external-security-properties xmlns="http://marklogic.com/manage">
+  <external-security-name>sample-app-external-security</external-security-name>
+  <description />
+  <authentication>ldap</authentication>
+  <cache-timeout>300</cache-timeout>
+  <authorization>internal</authorization>
+  <ldap-server-uri>ldap://localhost:389</ldap-server-uri>
+  <ldap-base>base</ldap-base>
+  <ldap-attribute>ou</ldap-attribute>
+  <ldap-default-user>guest</ldap-default-user>
+  <ldap-password>password</ldap-password>
+  <ldap-bind-method>MD5</ldap-bind-method>
+</external-security-properties>

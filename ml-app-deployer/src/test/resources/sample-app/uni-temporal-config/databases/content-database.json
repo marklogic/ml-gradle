@@ -1,0 +1,23 @@
+{
+    "database-name": "%%DATABASE%%",
+    "schema-database": "%%SCHEMAS_DATABASE%%",
+      "range-element-index": [
+          {
+              "collation": "",
+              "invalid-values": "reject",
+              "localname": "systemStart",
+              "namespace-uri": "",
+              "range-value-positions": false,
+              "scalar-type": "dateTime"
+          }
+      ,
+          {
+              "collation": "",
+              "invalid-values": "reject",
+              "localname": "systemEnd",
+              "namespace-uri": "",
+              "range-value-positions": false,
+              "scalar-type": "dateTime"
+          }
+      ]
+  }

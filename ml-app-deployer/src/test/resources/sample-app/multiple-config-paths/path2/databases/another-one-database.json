@@ -1,0 +1,15 @@
+{
+	"database-name": "sample-app-one-database",
+	"triple-index": true,
+	"triggers-database": "sample-app-triggers-database",
+	"range-element-index": [
+		{
+			"collation": "http://marklogic.com/collation/",
+			"invalid-values": "reject",
+			"localname": "otherId",
+			"namespace-uri": "",
+			"range-value-positions": false,
+			"scalar-type": "string"
+		}
+	]
+}

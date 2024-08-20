@@ -1,0 +1,21 @@
+<role-properties xmlns="http://marklogic.com/manage">
+	<role-name>a-qbac-xml-role</role-name>
+	<queries>
+		<capability-query>
+			<capability>read</capability>
+			<query>
+				<cts:word-query xmlns:cts="http://marklogic.com/cts">
+					<cts:text xml:lang="en">hello</cts:text>
+				</cts:word-query>
+			</query>
+		</capability-query>
+		<capability-query>
+			<capability>update</capability>
+			<query>
+				<cts:word-query xmlns:cts="http://marklogic.com/cts">
+					<cts:text xml:lang="en">world</cts:text>
+				</cts:word-query>
+			</query>
+		</capability-query>
+	</queries>
+</role-properties>

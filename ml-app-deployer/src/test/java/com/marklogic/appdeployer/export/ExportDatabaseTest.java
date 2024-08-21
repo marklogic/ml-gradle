@@ -21,6 +21,7 @@ import com.marklogic.appdeployer.command.forests.DeployCustomForestsCommand;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.forests.ForestManager;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -36,6 +37,7 @@ public class ExportDatabaseTest extends AbstractExportTest {
 		undeploySampleApp();
 	}
 
+	@Disabled("Failing due to server bug; see MLE-16059")
 	@Test
 	public void exportDatabaseWithTwoForests() throws Exception {
 		// Deploy our simple app

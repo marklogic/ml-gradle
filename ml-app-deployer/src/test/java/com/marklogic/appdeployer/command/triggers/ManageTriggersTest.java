@@ -24,6 +24,7 @@ import com.marklogic.mgmt.api.trigger.Trigger;
 import com.marklogic.mgmt.mapper.DefaultResourceMapper;
 import com.marklogic.mgmt.mapper.ResourceMapper;
 import com.marklogic.mgmt.resource.ResourceManager;
+import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.triggers.TriggerManager;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -74,11 +75,13 @@ public class ManageTriggersTest extends AbstractManageResourceTest {
 		assertEquals("create", t.getEvent().getDataEvent().getDocumentContent().getUpdateKind());
 		assertEquals("post-commit", t.getEvent().getDataEvent().getWhen());
 		assertEquals("/test.xqy", t.getModule());
-		assertEquals("Modules", t.getModuleDb());
 		assertEquals("/modules/", t.getModuleRoot());
 		assertTrue(t.getEnabled());
 		assertTrue(t.getRecursive());
 		assertEquals("normal", t.getTaskPriority());
+
+		String modulesId = new DatabaseManager(manageClient).getAsXml().getIdForNameOrId("Modules");
+		assertEquals(modulesId, t.getModuleDb());
 
 		// Order isn't guaranteed, so check them all
 		boolean foundPermission = false;

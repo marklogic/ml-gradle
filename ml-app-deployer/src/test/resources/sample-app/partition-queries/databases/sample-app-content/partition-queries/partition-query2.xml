@@ -1,0 +1,8 @@
+<partition-query-properties xmlns="http://marklogic.com/manage/partition-query/properties">
+	<partition-number>2</partition-number>
+	<query>
+		<cts:word-query xmlns:cts="http://marklogic.com/cts">
+			<cts:text xml:lang="en">Hello World</cts:text>
+		</cts:word-query>
+	</query>
+</partition-query-properties>

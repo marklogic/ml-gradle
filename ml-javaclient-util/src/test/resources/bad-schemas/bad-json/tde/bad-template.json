@@ -1,0 +1,32 @@
+{
+	"template": {
+		"context": "/example",
+		"description": "This is a description with quotes in it '\"",
+		"collections": [
+			"example"
+		],
+		"rows": [
+			{
+				"schemaName": "Example",
+				"viewName": "default",
+				"columns": [
+					{
+						"name": "Id",
+						"scalarType": "string",
+						"val": "Id"
+					},
+					{
+						"name": "DuplicateColumn",
+						"scalarType": "string",
+						"val": "DuplicateColumn"
+					},
+					{
+						"name": "DuplicateColumn",
+						"scalarType": "string",
+						"val": "DuplicateColumn"
+					}
+				]
+			}
+		]
+	}
+}

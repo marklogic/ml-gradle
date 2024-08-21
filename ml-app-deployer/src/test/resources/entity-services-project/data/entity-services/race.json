@@ -1,0 +1,83 @@
+{
+	"info": {
+		"title": "Race",
+		"version": "0.0.1",
+		"baseUri": "http://grechaw.github.io/entity-types",
+		"description":"This schema represents a Runner who runs Runs and has the potential of winning Races.  We'll start with this entity-type, then decide on and populate instances, tie the data in with an external RDF-based model, and query it.  There are interesting problems with the bare-bones approach in this entity-type."
+	},
+	"definitions": {
+		"Race": {
+			"properties": {
+				"name": {
+					"datatype": "string",
+					"description":"The name of the race."
+				},
+				"comprisedOfRuns": {
+					"datatype": "array",
+					"description":"An array of Runs that comprise the race.",
+					"items":{
+						"$ref": "#/definitions/Run"
+					}
+				},
+				"wonByRunner": {
+					"$ref":"#/definitions/Runner",
+					"description":"The (single) winner of the race.  (rule) Should match the run of shortest duration."
+				},
+				"courseLength": {
+					"datatype":"decimal",
+					"description":"Length of the course in a scalar unit (decimal miles)"
+				}
+			},
+			"primaryKey":"name"
+		},
+		"Run": {
+			"properties": {
+				"id": {
+					"datatype": "string",
+					"description":"A unique id for the run. maybe date/runByRunner (assumes one run per day per person)"
+				},
+				"date": {
+					"datatype": "date",
+					"description":"The date on which the run occurred."
+				},
+				"distance": {
+					"datatype": "decimal",
+					"description":"The distance covered, in a scalar value."
+				},
+				"distanceLabel": {
+					"datatype": "string",
+					"description":"The distance covered, in a conventional notation."
+				},
+				"duration": {
+					"datatype": "dayTimeDuration",
+					"description":"The duration of the run."
+				},
+				"runByRunner": {
+					"$ref": "#/definitions/Runner"
+				}
+			},
+			"primaryKey":"id",
+			"required":["date","distance","duration","runByRunner"],
+			"rangeIndex":["date", "distance", "duration", "runByRunner"]
+		},
+		"Runner": {
+			"properties": {
+				"name": {
+					"datatype": "string",
+					"description":"The name of the runner.  In this early model, unique and a PK."
+				},
+				"age": {
+					"datatype": "int",
+					"description":"age, in years."
+				},
+				"gender" : {
+					"datatype" : "string",
+					"description": "The gender of the runner (for the purposes of race categories.)"
+				}
+			},
+			"primaryKey": "name",
+			"wordLexicon": ["name"],
+			"required": ["name", "age"]
+		}
+	}
+}

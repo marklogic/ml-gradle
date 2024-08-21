@@ -1,0 +1,13 @@
+<protected-collection-properties xmlns="http://marklogic.com/manage">
+  <collection>http://example.org</collection>
+  <permissions>
+    <permission>
+      <role-name>domain-management</role-name>
+      <capability>update</capability>
+    </permission>
+    <permission>
+      <role-name>domain-management</role-name>
+      <capability>read</capability>
+    </permission>
+  </permissions>
+</protected-collection-properties>

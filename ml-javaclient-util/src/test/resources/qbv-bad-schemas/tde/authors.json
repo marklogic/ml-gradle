@@ -1,0 +1,38 @@
+{
+  "template": {
+    "context": "/Citations/Citation/Article/AuthorList/Author",
+    "rows": [
+      {
+        "schemaName": "Medical",
+        "viewName": "Authors",
+        "columns": [
+          {
+            "name": "ID",
+            "scalarType": "long",
+            "val": "../../../ID"
+          },
+          {
+            "name": "LastName",
+            "scalarType": "string",
+            "val": "LastName"
+          },
+          {
+            "name": "ForeName",
+            "scalarType": "string",
+            "val": "ForeName"
+          },
+          {
+            "name": "Date",
+            "scalarType": "date",
+            "val": "../../Journal/JournalIssue/PubDate/Year || '-' || ../../Journal/JournalIssue/PubDate/Month || '-' || ../../Journal/JournalIssue/PubDate/Day"
+          },
+          {
+            "name": "DateTime",
+            "scalarType": "dateTime",
+            "val": "../../Journal/JournalIssue/PubDate/Year || '-' || ../../Journal/JournalIssue/PubDate/Month || '-' || ../../Journal/JournalIssue/PubDate/Day || 'T' || ../../Journal/JournalIssue/PubDate/Time"
+          }
+        ]
+      }
+    ]
+  }
+}

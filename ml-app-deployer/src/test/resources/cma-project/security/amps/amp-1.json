@@ -1,0 +1,9 @@
+{
+	"namespace": "org:example",
+	"local-name": "function1",
+	"document-uri": "/module/path/name1",
+	"modules-database": "%%MODULES_DATABASE%%",
+	"role": [
+		"rest-reader"
+	]
+}

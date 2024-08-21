@@ -1,0 +1,12 @@
+[
+	{
+		"forest-name": "sample-app-content-custom-1",
+		"enabled": true,
+		"database": "%%DATABASE%%"
+	},
+	{
+		"forest-name": "sample-app-content-custom-2",
+		"enabled": true,
+		"database": "%%DATABASE%%"
+	}
+]

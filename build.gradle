@@ -1,161 +1,106 @@
-plugins {
-  id "groovy"
-  id "maven-publish"
+// Defines common configuration for each of the 3 subprojects.
+subprojects {
+	apply plugin: "java-library"
+	apply plugin: "maven-publish"
 
-	// Ignored as it depends on Java 11; can uncomment and use Java 11 when it needs to be run
-	//  id "com.github.jk1.dependency-license-report" version "2.1"
-  id "com.gradle.plugin-publish" version "1.2.1"
-	id "java-gradle-plugin"
+	group = "com.marklogic"
+	version = "4.9-SNAPSHOT"
 
-	id "net.saliman.properties" version "1.5.2"
-	id "io.snyk.gradle.plugin.snykplugin" version "0.4"
-}
-
-// Applied conditionally so that it does not take effect when publishing locally.
-if (project.hasProperty("signing.keyId")) {
-	apply plugin: "signing"
-}
-
-group = "com.marklogic"
-version = "4.9-SNAPSHOT"
-
-java {
-	sourceCompatibility = 1.8
-	targetCompatibility = 1.8
-}
-
-repositories {
-//	mavenLocal()
-	mavenCentral()
-	maven {
-		url "https://bed-artifactory.bedford.progress.com:443/artifactory/ml-maven-snapshots/"
+	java {
+		sourceCompatibility = JavaVersion.VERSION_1_8
+		targetCompatibility = JavaVersion.VERSION_1_8
 	}
-}
 
-dependencies {
-  implementation gradleApi()
-	implementation localGroovy()
-
-	api 'com.marklogic:ml-app-deployer:4.8.0'
-	implementation "com.marklogic:mlcp-util:1.0.1"
-	implementation "com.marklogic:marklogic-data-movement-components:2.8.0"
-	implementation "commons-io:commons-io:2.16.1"
-
-	compileOnly "com.marklogic:marklogic-unit-test-client:1.4.0"
-
-	testImplementation localGroovy()
-	testImplementation gradleTestKit()
-	testImplementation 'xmlunit:xmlunit:1.6'
-
-	// Force spock-core to use 4.13.2 to avoid security issue in 4.11
-	testImplementation 'junit:junit:4.13.2'
-	testImplementation('org.spockframework:spock-core:2.3-groovy-3.0') {
-		exclude module: 'groovy-all'
-	}
-}
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-  archiveClassifier = 'sources'
-  from sourceSets.main.allJava
-  from sourceSets.main.allGroovy
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-	archiveClassifier = "javadoc"
-	from javadoc
-}
-javadoc.failOnError = false
-
-artifacts {
-	archives javadocJar, sourcesJar
-}
-
-task generatePomForDependencyGraph(dependsOn: "generatePomFileForMainJavaPublication") {
-	description = "Prepare for a release by making a copy of the generated pom file in the root directory so that it " +
-		"can enable Github's Dependency Graph feature, which does not yet support Gradle"
-	doLast {
-		def preamble = '<?xml version="1.0" encoding="UTF-8"?>'
-		def comment = "<!--\n" +
-			"This file was generated via Gradle and is being used primarily for github's Dependency Graph feature.\n" +
-			"It is not intended to be used to build this project.\n" +
-			"-->"
-		def fileText = file("build/publications/mainJava/pom-default.xml").getText()
-		file("pom.xml").setText(fileText.replace(preamble, preamble + comment))
-	}
-}
-
-publishing {
-	publications {
-		mainJava(MavenPublication) {
-			pom {
-				name = "${group}:${project.name}"
-				description = "Gradle plugin for automating everything involving MarkLogic"
-				packaging = "jar"
-				url = "https://github.com/marklogic/${project.name}"
-				licenses {
-					license {
-						name = "The Apache License, Version 2.0"
-						url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-					}
-				}
-				developers {
-					developer {
-						id = "marklogic"
-						name = "MarkLogic Github Contributors"
-						email = "general@developer.marklogic.com"
-						organization = "MarkLogic"
-						organizationUrl = "https://www.marklogic.com"
-					}
-				}
-				scm {
-					url = "git@github.com:marklogic/${project.name}.git"
-					connection = "scm:git@github.com:marklogic/${project.name}.git"
-					developerConnection = "scm:git@github.com:marklogic/${project.name}.git"
-				}
-			}
-			from components.java
-		}
-	}
 	repositories {
+		mavenLocal()
+		mavenCentral()
 		maven {
-			if (project.hasProperty("mavenUser")) {
-				credentials {
-					username mavenUser
-					password mavenPassword
+			url "https://bed-artifactory.bedford.progress.com:443/artifactory/ml-maven-snapshots/"
+		}
+	}
+
+	dependencies {
+		// Forcing Spring to use logback instead of commons-logging
+		testImplementation "ch.qos.logback:logback-classic:1.3.14" // Not using 1.4.x yet as it requires Java 11
+		testImplementation 'org.slf4j:jcl-over-slf4j:2.0.13'
+		testImplementation 'org.slf4j:slf4j-api:2.0.13'
+	}
+
+	task javadocJar(type: Jar, dependsOn: javadoc) {
+		archiveClassifier = "javadoc"
+		from javadoc
+	}
+	javadoc.failOnError = false
+	// Ignores warnings on params that don't have descriptions, which is a little too noisy
+	javadoc.options.addStringOption('Xdoclint:none', '-quiet')
+
+	test {
+		useJUnitPlatform()
+		testLogging {
+			events 'started','passed', 'skipped', 'failed'
+			exceptionFormat 'full'
+		}
+	}
+
+	// Publishing setup - see https://docs.gradle.org/current/userguide/publishing_setup.html .
+	java {
+		withJavadocJar()
+		withSourcesJar()
+	}
+
+	publishing {
+		publications {
+			mainJava(MavenPublication) {
+				groupId = group
+				artifactId = project.name
+				version = version
+				from components.java
+				pom {
+					name = "${group}:${project.name}"
+					description = "${projectDescription}"
+					packaging = "jar"
+					url = "https://github.com/marklogic/${project.name}"
+					licenses {
+						license {
+							name = "The Apache License, Version 2.0"
+							url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+						}
+					}
+					developers {
+						developer {
+							id = "marklogic"
+							name = "MarkLogic Github Contributors"
+							email = "general@developer.marklogic.com"
+							organization = "MarkLogic"
+							organizationUrl = "https://www.marklogic.com"
+						}
+					}
+					scm {
+						url = "git@github.com:marklogic/ml-gradle.git"
+						connection = "scm:git@github.com:marklogic/ml-gradle.git"
+						developerConnection = "scm:git@github.com:marklogic/ml-gradle.git"
+					}
 				}
-				url publishUrl
-			} else {
-				name = "central"
-				url = mavenCentralUrl
-				credentials {
-					username mavenCentralUsername
-					password mavenCentralPassword
+			}
+		}
+		repositories {
+			maven {
+				if (project.hasProperty("mavenUser")) {
+					credentials {
+						username mavenUser
+						password mavenPassword
+					}
+					url publishUrl
+					allowInsecureProtocol = true
+				} else {
+					name = "central"
+					url = mavenCentralUrl
+					credentials {
+						username mavenCentralUsername
+						password mavenCentralPassword
+					}
 				}
 			}
 		}
 	}
-}
-
-gradlePlugin {
-  website = 'https://www.marklogic.com/'
-  vcsUrl = 'https://github.com/marklogic/' + project.name + '.git'
-
-  plugins {
-    mlgradlePlugin {
-      id = 'com.marklogic.ml-gradle'
-      displayName = 'ml-gradle for MarkLogic'
-      description = 'Gradle plugin for configuring and deploying applications to MarkLogic'
-			tags.set(['marklogic', 'progress'])
-			implementationClass = 'com.marklogic.gradle.MarkLogicPlugin'
-    }
-  }
-}
-
-// See https://github.com/snyk/gradle-plugin for more information
-snyk {
-	//arguments = '--all-sub-projects'
-	severity = 'low'
-	api = snykToken
-	autoDownload = true
-	autoUpdate = true
 }

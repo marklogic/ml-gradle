@@ -1,0 +1,5 @@
+{
+	"collection-name": "uni-temporal-collection",
+	"system-axis": "system",
+	"option": ["updates-safe"]
+}

@@ -1,0 +1,4 @@
+{
+	"role-name": "admin",
+	"description": "Not clear why someone would try to modify this role, but just in case, we don't want to delete it on undeploy"
+}

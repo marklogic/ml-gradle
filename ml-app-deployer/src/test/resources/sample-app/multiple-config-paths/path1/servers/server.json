@@ -1,0 +1,15 @@
+{
+	"server-name": "sample-app-server",
+	"server-type": "http",
+	"root": "/",
+	"group-name": "Default",
+	"port": 8048,
+	"modules-database": "Modules",
+	"content-database": "Modules",
+	"namespace": [
+		{
+			"prefix": "test1",
+			"namespace-uri": "test1"
+		}
+	]
+}

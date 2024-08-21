@@ -1,0 +1,9 @@
+<rdt:rule xml:lang="zxx" xmlns:rdt="http://marklogic.com/xdmp/redaction">
+	<rdt:path>//name</rdt:path>
+	<rdt:method>
+		<rdt:function>mask-deterministic</rdt:function>
+	</rdt:method>
+	<rdt:options>
+		<length>10</length>
+	</rdt:options>
+</rdt:rule>

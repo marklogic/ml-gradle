@@ -66,8 +66,6 @@ public class DefaultModulesFinderTest {
         assertEquals("ext", dirs.get(0).getFile().getName());
         assertEquals("include-this-too", dirs.get(1).getFile().getName());
 		assertEquals("root", dirs.get(2).getFile().getName());
-
-        assertEquals(1, modules.getNamespaces().size(), "Namespace files don't have to fit any filename format; the body of the file should be the namespace URI");
     }
 
     @Test

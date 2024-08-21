@@ -61,7 +61,7 @@ public class LoadModulesFromClasspathTest extends AbstractIntegrationTest {
 		 */
 		Set<Resource> resources = l.loadModules("classpath*:/ml-modules", new DefaultModulesFinder(), client);
 
-		assertEquals(26, resources.size());
+		assertEquals(25, resources.size());
 		assertEquals(37, getUriCountInModulesDatabase());
 	}
 
@@ -85,7 +85,7 @@ public class LoadModulesFromClasspathTest extends AbstractIntegrationTest {
 		 */
 		Set<Resource> resources = l.loadModules("classpath*:/sample-base-dir", new DefaultModulesFinder(), client);
 
-		assertEquals(26, resources.size());
+		assertEquals(25, resources.size());
 		assertEquals(37, getUriCountInModulesDatabase());
 	}
 

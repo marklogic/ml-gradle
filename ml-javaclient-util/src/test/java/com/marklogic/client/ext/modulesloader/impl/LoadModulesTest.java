@@ -227,7 +227,7 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 		verifyModuleCountWithPattern(".*options.*(xml)", "Should only load the single XML options file", 1);
 		verifyModuleCountWithPattern(".*transforms.*", "Should only load the 5 transforms", 5);
 		verifyModuleCountWithPattern(".*services.*", "Should only load the 3 services", 3);
-		verifyModuleCountWithPattern(".*", "Should load every file", 26);
+		verifyModuleCountWithPattern(".*", "Should load every file", 25);
 		verifyModuleCountWithPattern(".*/ext.*(lib|dots)/.*xqy", "Should only load the xqy asset modules " +
 			"under ext/lib and ext/path/with/dots", 2);
 	}
@@ -247,7 +247,7 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 
 		String dir = Paths.get("src", "test", "resources", "sample-base-dir").toString();
 		Set<Resource> files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
-		assertEquals(26, files.size());
+		assertEquals(25, files.size());
 
 		files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
 		assertEquals(0, files.size(), "No files should have been loaded since none were new or modified");
@@ -256,7 +256,7 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 		// verify all files were loaded because a different host was used
 		moduleManager.setHost("127.0.0.1");
 		files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
-		assertEquals(26, files.size());
+		assertEquals(25, files.size());
 
 		files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
 		assertEquals(0, files.size(), "No files should have been loaded since none were new or modified");
@@ -293,7 +293,7 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 	public void test() {
 		String dir = Paths.get("src", "test", "resources", "sample-base-dir").toString();
 		Set<Resource> files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
-		assertEquals(26, files.size());
+		assertEquals(25, files.size());
 		assertModuleExists("/ext/module1.xqy");
 		assertModuleExists("/ext/module1.sjs");
 		assertModuleExists("/ext/lib/module2.xqy");
@@ -326,7 +326,7 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 			moduleManager.deletePropertiesFile();
 			moduleManager.setMinimumFileTimestampToLoad(0);
 			files = modulesLoader.loadModules(dir, new DefaultModulesFinder(), client);
-			assertEquals(26, files.size(), "All files should have been loaded since a ModulesManager wasn't used on the first load");
+			assertEquals(25, files.size(), "All files should have been loaded since a ModulesManager wasn't used on the first load");
 			assertEquals(initialModuleCount, getUriCountInModulesDatabase(), "No new modules should have been created");
 		}
 

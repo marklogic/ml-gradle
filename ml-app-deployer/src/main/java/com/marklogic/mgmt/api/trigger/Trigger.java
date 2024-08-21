@@ -20,7 +20,7 @@ import com.marklogic.mgmt.api.Resource;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.triggers.TriggerManager;
 
-import javax.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.*;
 import java.util.List;
 
 @XmlRootElement(name = "trigger-properties")

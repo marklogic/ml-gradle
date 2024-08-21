@@ -23,7 +23,7 @@ import com.marklogic.mgmt.api.server.OdbcServer;
 import com.marklogic.mgmt.api.server.Server;
 import com.marklogic.mgmt.api.server.XdbcServer;
 
-import javax.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBContext;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;

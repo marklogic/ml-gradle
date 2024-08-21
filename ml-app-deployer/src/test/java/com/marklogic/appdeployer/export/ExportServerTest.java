@@ -21,9 +21,12 @@ import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.groups.DeployGroupsCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
+import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.groups.GroupManager;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
 
@@ -37,6 +40,7 @@ public class ExportServerTest extends AbstractExportTest {
 		undeploySampleApp();
 	}
 
+	@Disabled("Failing due to server bug; see MLE-16059")
 	@Test
 	public void test() {
 		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/default-modules-database-config"));

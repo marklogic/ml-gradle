@@ -23,7 +23,7 @@ class DeployAppTaskTest extends BaseTest {
 
 	def "deploy barebones app"() {
 		setup:
-		print(runTask('mlUnDeploy',  '-Pconfirm=true').output)
+		print(runTask('mlUndeploy',  '-Pconfirm=true', '-PmlUsername=admin', '-PmlPassword=admin').output)
 
 		expect:
 		def srf = getServerConfig()
@@ -33,7 +33,7 @@ class DeployAppTaskTest extends BaseTest {
 		!drf.resourceExists("my-app-modules")
 
 		when:
-		def result = runTask('mlDeploy')
+		def result = runTask('mlDeploy', '-PmlUsername=admin', '-PmlPassword=admin')
 		print(result.output)
 
 		then:
@@ -46,7 +46,7 @@ class DeployAppTaskTest extends BaseTest {
 		drf2.resourceExists("my-app-modules")
 
 		cleanup:
-		runTask('mlUndeploy',  '-Pconfirm=true')
+		runTask('mlUndeploy',  '-Pconfirm=true', '-PmlUsername=admin', '-PmlPassword=admin')
 	}
 
 }

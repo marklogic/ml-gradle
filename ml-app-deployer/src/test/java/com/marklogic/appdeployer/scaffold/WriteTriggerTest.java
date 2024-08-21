@@ -18,6 +18,7 @@ package com.marklogic.appdeployer.scaffold;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.triggers.DeployTriggersCommand;
 import com.marklogic.mgmt.api.trigger.Trigger;
+import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.triggers.TriggerManager;
 import com.marklogic.mgmt.template.database.DatabaseTemplateBuilder;
 import com.marklogic.mgmt.template.trigger.TriggerTemplateBuilder;
@@ -46,10 +47,12 @@ public class WriteTriggerTest extends AbstractResourceWriterTest {
 		assertEquals("create", t.getEvent().getDataEvent().getDocumentContent().getUpdateKind());
 		assertEquals("pre-commit", t.getEvent().getDataEvent().getWhen());
 		assertEquals("/path/to/module.sjs", t.getModule());
-		assertEquals("Modules", t.getModuleDb());
 		assertEquals("/", t.getModuleRoot());
 		assertTrue(t.getEnabled());
 		assertFalse(t.getRecursive());
 		assertEquals("normal", t.getTaskPriority());
+
+		String modulesId = new DatabaseManager(manageClient).getAsXml().getIdForNameOrId("Modules");
+		assertEquals(modulesId, t.getModuleDb());
 	}
 }

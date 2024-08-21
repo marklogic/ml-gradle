@@ -20,7 +20,7 @@ import com.marklogic.mgmt.util.ObjectMapperFactory;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-import javax.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBContext;
 import java.io.StringWriter;
 
 public class TriggerTest  {

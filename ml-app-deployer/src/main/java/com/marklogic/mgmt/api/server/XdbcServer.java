@@ -17,7 +17,7 @@ package com.marklogic.mgmt.api.server;
 
 import com.marklogic.mgmt.api.API;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "xdbc-server-properties")
 public class XdbcServer extends Server {

@@ -23,7 +23,7 @@ import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import org.springframework.util.StringUtils;
 
-import javax.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -28,8 +28,8 @@ import com.marklogic.mgmt.api.task.Task;
 import com.marklogic.mgmt.api.trigger.Trigger;
 import org.springframework.util.FileCopyUtils;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;

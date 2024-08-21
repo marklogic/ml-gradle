@@ -20,7 +20,7 @@ import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.mimetypes.MimetypeManager;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
-import javax.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.*;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;

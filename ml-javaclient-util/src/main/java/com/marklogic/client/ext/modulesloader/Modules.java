@@ -27,7 +27,6 @@ public class Modules {
 	 */
 	private List<Resource> assets;
 	private List<Resource> assetDirectories;
-	private List<Resource> namespaces;
 	private List<Resource> options;
 	private List<Resource> services;
 	private List<Resource> transforms;
@@ -35,7 +34,6 @@ public class Modules {
 
 	public void addModules(Modules modules) {
 		assetDirectories = addLists(assetDirectories, modules.getAssetDirectories());
-		namespaces = addLists(namespaces, modules.getNamespaces());
 		options = addLists(options, modules.getOptions());
 		services = addLists(services, modules.getServices());
 		transforms = addLists(transforms, modules.getTransforms());
@@ -77,14 +75,6 @@ public class Modules {
 
 	public void setOptions(List<Resource> queryOptions) {
 		this.options = queryOptions;
-	}
-
-	public List<Resource> getNamespaces() {
-		return namespaces;
-	}
-
-	public void setNamespaces(List<Resource> namespaces) {
-		this.namespaces = namespaces;
 	}
 
 	public Resource getPropertiesFile() {

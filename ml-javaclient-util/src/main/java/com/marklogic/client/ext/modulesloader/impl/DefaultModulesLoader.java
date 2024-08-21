@@ -187,7 +187,6 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 
 		Set<Resource> loadedModules = new HashSet<>();
 		loadProperties(modules, loadedModules);
-		loadNamespaces(modules, loadedModules);
 		loadAssets(modules, loadedModules);
 
 		loadQueryOptions(modules, loadedModules);
@@ -498,22 +497,6 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	}
 
 	/**
-	 * @param modules
-	 * @param loadedModules
-	 */
-	protected void loadNamespaces(Modules modules, Set<Resource> loadedModules) {
-		if (modules.getNamespaces() == null) {
-			return;
-		}
-
-		for (Resource r : modules.getNamespaces()) {
-			if (installNamespace(r) != null) {
-				loadedModules.add(r);
-			}
-		}
-	}
-
-	/**
 	 * @param r
 	 * @param metadata
 	 * @param methodParams
@@ -639,36 +622,6 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 				failureListeners.forEach(listener -> listener.processFailure(e, this.client));
 			}
 		});
-	}
-
-	/**
-	 * @param r
-	 * @return the resource if one is installed, else null
-	 */
-	public Resource installNamespace(Resource r) {
-		if (!hasFileBeenModified(r) || ignoreResource(r)) {
-			return null;
-		}
-
-		String prefix = getExtensionNameFromFile(r);
-		String namespaceUri;
-		try {
-			namespaceUri = new String(FileCopyUtils.copyToByteArray(r.getInputStream()));
-		} catch (IOException ie) {
-			logger.error("Unable to install namespace from file: " + r.getFilename(), ie);
-			return null;
-		}
-		NamespacesManager mgr = client.newServerConfigManager().newNamespacesManager();
-		String existingUri = mgr.readPrefix(prefix);
-		if (existingUri != null) {
-			logger.info(String.format("Deleting namespace with prefix of %s and URI of %s", prefix, existingUri));
-			mgr.deletePrefix(prefix);
-		}
-		logger.info(String.format("Adding namespace with prefix of %s and URI of %s", prefix, namespaceUri));
-		mgr.addPrefix(prefix, namespaceUri);
-		updateTimestamp(r);
-
-		return r;
 	}
 
 	/**

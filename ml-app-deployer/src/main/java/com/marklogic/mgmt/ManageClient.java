@@ -46,17 +46,9 @@ public class ManageClient extends LoggingObject {
 	private RestTemplate securityUserRestTemplate;
 	private PayloadParser payloadParser;
 
-	/**
-	 * Creates an uninitialized instance that requires a {@code ManageConfig} to be provided in order to be operable.
-	 *
-	 * @deprecated since 4.5.0; will be removed in 5.0.0
-	 */
-    public ManageClient() {
-    }
-
-    public ManageClient(ManageConfig config) {
-        setManageConfig(config);
-    }
+	public ManageClient(ManageConfig config) {
+		setManageConfig(config);
+	}
 
 	/**
 	 * Uses the given ManageConfig instance to construct a Spring RestTemplate for communicating with the Manage API.
@@ -67,11 +59,11 @@ public class ManageClient extends LoggingObject {
 	 * @param config
 	 */
 	public void setManageConfig(ManageConfig config) {
-	    this.manageConfig = config;
-	    if (logger.isInfoEnabled()) {
-		    logger.info("Initializing ManageClient with manage config of: " + config);
-	    }
-    }
+		this.manageConfig = config;
+		if (logger.isInfoEnabled()) {
+			logger.info("Initializing ManageClient with manage config of: " + config);
+		}
+	}
 
 	/**
 	 * Use this when you want to provide your own RestTemplate as opposed to using the one that's constructed via a
@@ -80,8 +72,8 @@ public class ManageClient extends LoggingObject {
 	 * @param restTemplate
 	 */
 	public ManageClient(RestTemplate restTemplate) {
-    	this(restTemplate, restTemplate);
-    }
+		this(restTemplate, restTemplate);
+	}
 
 	/**
 	 * Use this when you want to provide your own RestTemplate as opposed to using the one that's constructed via a
@@ -91,44 +83,44 @@ public class ManageClient extends LoggingObject {
 	 * @param adminRestTemplate
 	 */
 	public ManageClient(RestTemplate restTemplate, RestTemplate adminRestTemplate) {
-    	this.restTemplate = restTemplate;
-    	this.securityUserRestTemplate = adminRestTemplate;
-    }
+		this.restTemplate = restTemplate;
+		this.securityUserRestTemplate = adminRestTemplate;
+	}
 
-    public ResponseEntity<String> putJson(String path, String json) {
-        logRequest(path, "JSON", "PUT");
-        return getRestTemplate().exchange(buildUri(path), HttpMethod.PUT, buildJsonEntity(json), String.class);
-    }
+	public ResponseEntity<String> putJson(String path, String json) {
+		logRequest(path, "JSON", "PUT");
+		return getRestTemplate().exchange(buildUri(path), HttpMethod.PUT, buildJsonEntity(json), String.class);
+	}
 
 	public ResponseEntity<String> putJsonAsSecurityUser(String path, String json) {
 		logSecurityUserRequest(path, "JSON", "PUT");
 		return getSecurityUserRestTemplate().exchange(buildUri(path), HttpMethod.PUT, buildJsonEntity(json), String.class);
 	}
 
-    public ResponseEntity<String> putXml(String path, String xml) {
-        logRequest(path, "XML", "PUT");
-        return getRestTemplate().exchange(buildUri(path), HttpMethod.PUT, buildXmlEntity(xml), String.class);
-    }
+	public ResponseEntity<String> putXml(String path, String xml) {
+		logRequest(path, "XML", "PUT");
+		return getRestTemplate().exchange(buildUri(path), HttpMethod.PUT, buildXmlEntity(xml), String.class);
+	}
 
 	public ResponseEntity<String> putXmlAsSecurityUser(String path, String xml) {
 		logSecurityUserRequest(path, "XML", "PUT");
 		return getSecurityUserRestTemplate().exchange(buildUri(path), HttpMethod.PUT, buildXmlEntity(xml), String.class);
 	}
 
-    public ResponseEntity<String> postJson(String path, String json) {
-        logRequest(path, "JSON", "POST");
-        return getRestTemplate().exchange(buildUri(path), HttpMethod.POST, buildJsonEntity(json), String.class);
-    }
+	public ResponseEntity<String> postJson(String path, String json) {
+		logRequest(path, "JSON", "POST");
+		return getRestTemplate().exchange(buildUri(path), HttpMethod.POST, buildJsonEntity(json), String.class);
+	}
 
 	public ResponseEntity<String> postJsonAsSecurityUser(String path, String json) {
 		logSecurityUserRequest(path, "JSON", "POST");
 		return getSecurityUserRestTemplate().exchange(buildUri(path), HttpMethod.POST, buildJsonEntity(json), String.class);
 	}
 
-    public ResponseEntity<String> postXml(String path, String xml) {
-        logRequest(path, "XML", "POST");
-        return getRestTemplate().exchange(buildUri(path), HttpMethod.POST, buildXmlEntity(xml), String.class);
-    }
+	public ResponseEntity<String> postXml(String path, String xml) {
+		logRequest(path, "XML", "POST");
+		return getRestTemplate().exchange(buildUri(path), HttpMethod.POST, buildXmlEntity(xml), String.class);
+	}
 
 	public ResponseEntity<String> postXmlAsSecurityUser(String path, String xml) {
 		logSecurityUserRequest(path, "XML", "POST");
@@ -136,30 +128,30 @@ public class ManageClient extends LoggingObject {
 	}
 
 	public ResponseEntity<String> postForm(String path, String... params) {
-        logRequest(path, "form", "POST");
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        for (int i = 0; i < params.length; i += 2) {
-            map.add(params[i], params[i + 1]);
-        }
-        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
-        return getRestTemplate().exchange(buildUri(path), HttpMethod.POST, entity, String.class);
-    }
+		logRequest(path, "form", "POST");
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+		for (int i = 0; i < params.length; i += 2) {
+			map.add(params[i], params[i + 1]);
+		}
+		HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
+		return getRestTemplate().exchange(buildUri(path), HttpMethod.POST, entity, String.class);
+	}
 
-    public String getXmlString(String path) {
-        logRequest(path, "XML", "GET");
-        return getRestTemplate().getForObject(buildUri(path), String.class);
-    }
+	public String getXmlString(String path) {
+		logRequest(path, "XML", "GET");
+		return getRestTemplate().getForObject(buildUri(path), String.class);
+	}
 
-    public Fragment getXml(String path, String... namespacePrefixesAndUris) {
-        String xml = getXmlString(path);
-        List<Namespace> list = new ArrayList<>();
-        for (int i = 0; i < namespacePrefixesAndUris.length; i += 2) {
-            list.add(Namespace.getNamespace(namespacePrefixesAndUris[i], namespacePrefixesAndUris[i + 1]));
-        }
-        return new Fragment(xml, list.toArray(new Namespace[] {}));
-    }
+	public Fragment getXml(String path, String... namespacePrefixesAndUris) {
+		String xml = getXmlString(path);
+		List<Namespace> list = new ArrayList<>();
+		for (int i = 0; i < namespacePrefixesAndUris.length; i += 2) {
+			list.add(Namespace.getNamespace(namespacePrefixesAndUris[i], namespacePrefixesAndUris[i + 1]));
+		}
+		return new Fragment(xml, list.toArray(new Namespace[]{}));
+	}
 
 	public String getXmlStringAsSecurityUser(String path) {
 		logSecurityUserRequest(path, "XML", "GET");
@@ -172,12 +164,12 @@ public class ManageClient extends LoggingObject {
 		for (int i = 0; i < namespacePrefixesAndUris.length; i += 2) {
 			list.add(Namespace.getNamespace(namespacePrefixesAndUris[i], namespacePrefixesAndUris[i + 1]));
 		}
-		return new Fragment(xml, list.toArray(new Namespace[] {}));
+		return new Fragment(xml, list.toArray(new Namespace[]{}));
 	}
 
-    public String getJson(String path) {
+	public String getJson(String path) {
 		return getJson(path, String.class).getBody();
-    }
+	}
 
 	public JsonNode getJsonNode(String path) {
 		return getJson(path, JsonNode.class).getBody();
@@ -190,12 +182,12 @@ public class ManageClient extends LoggingObject {
 		return getRestTemplate().exchange(buildUri(path), HttpMethod.GET, new HttpEntity<>(headers), responseType);
 	}
 
-    public String getJson(URI uri) {
-        logRequest(uri.toString(), "JSON", "GET");
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
-        return getRestTemplate().exchange(uri, HttpMethod.GET, new HttpEntity<>(headers), String.class).getBody();
-    }
+	public String getJson(URI uri) {
+		logRequest(uri.toString(), "JSON", "GET");
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
+		return getRestTemplate().exchange(uri, HttpMethod.GET, new HttpEntity<>(headers), String.class).getBody();
+	}
 
 	public String getJsonAsSecurityUser(String path) {
 		logSecurityUserRequest(path, "JSON", "GET");
@@ -206,14 +198,14 @@ public class ManageClient extends LoggingObject {
 	}
 
 	public void delete(String path, String... headerNamesAndValues) {
-        logRequest(path, "", "DELETE");
+		logRequest(path, "", "DELETE");
 		delete(getRestTemplate(), path, headerNamesAndValues);
-    }
+	}
 
-    public void deleteAsSecurityUser(String path, String... headerNamesAndValues) {
-	    logSecurityUserRequest(path, "", "DELETE");
+	public void deleteAsSecurityUser(String path, String... headerNamesAndValues) {
+		logSecurityUserRequest(path, "", "DELETE");
 		delete(getSecurityUserRestTemplate(), path, headerNamesAndValues);
-    }
+	}
 
 	private void delete(RestTemplate restTemplate, String path, String... headerNamesAndValues) {
 		URI uri = buildUri(path);
@@ -236,17 +228,18 @@ public class ManageClient extends LoggingObject {
 	 * @return
 	 */
 	public HttpEntity<String> buildJsonEntity(String json) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        if (manageConfig != null && manageConfig.isCleanJsonPayloads()) {
-        	json = cleanJsonPayload(json);
-        }
-        return new HttpEntity<>(json, headers);
-    }
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+		if (manageConfig != null && manageConfig.isCleanJsonPayloads()) {
+			json = cleanJsonPayload(json);
+		}
+		return new HttpEntity<>(json, headers);
+	}
 
 	/**
 	 * Per #187, and version 3.1.0, this will also use Jackson to remove any comments in the JSON payload, as Jackson
 	 * is now configured to ignore comments, but we still don't want to include them in the payload sent to MarkLogic.
+	 *
 	 * @param payload
 	 * @return
 	 */
@@ -265,39 +258,39 @@ public class ManageClient extends LoggingObject {
 	}
 
 	public HttpEntity<String> buildXmlEntity(String xml) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_XML);
-        return new HttpEntity<>(xml, headers);
-    }
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_XML);
+		return new HttpEntity<>(xml, headers);
+	}
 
-    protected void logRequest(String path, String contentType, String method) {
-        if (logger.isInfoEnabled()) {
-        	String username = manageConfig != null ?
+	protected void logRequest(String path, String contentType, String method) {
+		if (logger.isInfoEnabled()) {
+			String username = manageConfig != null ?
 				String.format("as user '%s' ", manageConfig.getUsername()) : "";
-            logger.info("Sending {} {} request {}to path: {}", contentType, method, username, buildUri(path));
-        }
-    }
+			logger.info("Sending {} {} request {}to path: {}", contentType, method, username, buildUri(path));
+		}
+	}
 
-    protected void logSecurityUserRequest(String path, String contentType, String method) {
-        if (logger.isInfoEnabled()) {
+	protected void logSecurityUserRequest(String path, String contentType, String method) {
+		if (logger.isInfoEnabled()) {
 			String username = determineUsernameForSecurityUserRequest();
 			if (!"".equals(username)) {
 				username = String.format("as user '%s' (who should have the 'manage-admin' and 'security' roles) ", username);
 			}
-            logger.info("Sending {} {} request {}to path: {}", contentType, method, username, buildUri(path));
-        }
-    }
+			logger.info("Sending {} {} request {}to path: {}", contentType, method, username, buildUri(path));
+		}
+	}
 
-    protected String determineUsernameForSecurityUserRequest() {
-	    String username = "";
-	    if (manageConfig != null) {
-		    username = manageConfig.getSecurityUsername();
-		    if (!StringUtils.hasText(username)) {
-			    username = manageConfig.getUsername();
-		    }
-	    }
-	    return username;
-    }
+	protected String determineUsernameForSecurityUserRequest() {
+		String username = "";
+		if (manageConfig != null) {
+			username = manageConfig.getSecurityUsername();
+			if (!StringUtils.hasText(username)) {
+				username = manageConfig.getUsername();
+			}
+		}
+		return username;
+	}
 
 	private void initializeSecurityUserRestTemplate() {
 		String securityUsername = this.manageConfig.getSecurityUsername();
@@ -323,19 +316,19 @@ public class ManageClient extends LoggingObject {
 	}
 
 	public URI buildUri(String path) {
-        return manageConfig.buildUri(path);
-    }
+		return manageConfig.buildUri(path);
+	}
 
-    public RestTemplate getRestTemplate() {
-        if (this.restTemplate == null) {
+	public RestTemplate getRestTemplate() {
+		if (this.restTemplate == null) {
 			this.restTemplate = RestTemplateUtil.newRestTemplate(this.manageConfig);
 		}
 		return restTemplate;
-    }
+	}
 
-    public ManageConfig getManageConfig() {
-        return manageConfig;
-    }
+	public ManageConfig getManageConfig() {
+		return manageConfig;
+	}
 
 	public void setRestTemplate(RestTemplate restTemplate) {
 		this.restTemplate = restTemplate;

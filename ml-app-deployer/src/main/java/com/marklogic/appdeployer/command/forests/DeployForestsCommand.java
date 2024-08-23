@@ -58,9 +58,6 @@ public class DeployForestsCommand extends AbstractCommand {
 	private String forestFilename;
 	private String forestPayload;
 
-	@Deprecated
-	private boolean createForestsOnEachHost = true;
-
 	private HostCalculator hostCalculator;
 
 	private ForestBuilder forestBuilder = new ForestBuilder();
@@ -175,13 +172,14 @@ public class DeployForestsCommand extends AbstractCommand {
 	}
 
 	/**
+	 * In 4.5.3, this was marked as deprecated. But it can't be removed yet since it's a fall back for when the user
+	 * has requested not to use CMA. Getting forest details one at a time can be very slow for applications, but
+	 * we have to leave this here until we're certain CMA can be used in all cases.
+	 *
 	 * @param context
 	 * @param databaseName
 	 * @return
-	 * @deprecated in 4.5.3, as getting forest details one at a time can be very slow for applications with a large
-	 * number of forests.
 	 */
-	@Deprecated
 	protected List<Forest> getExistingPrimaryForests(CommandContext context, String databaseName) {
 		List<String> forestIds = new DatabaseManager(context.getManageClient()).getPrimaryForestIds(databaseName);
 		ForestManager forestMgr = new ForestManager(context.getManageClient());
@@ -234,12 +232,6 @@ public class DeployForestsCommand extends AbstractCommand {
 			hostCalculator = new DefaultHostCalculator(new DefaultHostNameProvider(context.getManageClient()));
 		}
 
-		// If this deprecated feature is used, then configure the AppConfig object so that the hostCalculator can be
-		// aware of it.
-		if (!createForestsOnEachHost) {
-			context.getAppConfig().addDatabaseWithForestsOnOneHost(this.databaseName);
-		}
-
 		return hostCalculator.calculateHostNames(this.databaseName, context, existingPrimaryForests);
 	}
 
@@ -269,21 +261,6 @@ public class DeployForestsCommand extends AbstractCommand {
 
 	public void setForestPayload(String forestPayload) {
 		this.forestPayload = forestPayload;
-	}
-
-	@Deprecated
-	public boolean isCreateForestsOnEachHost() {
-		return createForestsOnEachHost;
-	}
-
-	/**
-	 * Use appConfig.setDatabasesWithForestsOnOneHost
-	 *
-	 * @param createForestsOnEachHost
-	 */
-	@Deprecated
-	public void setCreateForestsOnEachHost(boolean createForestsOnEachHost) {
-		this.createForestsOnEachHost = createForestsOnEachHost;
 	}
 
 	public void setHostCalculator(HostCalculator hostCalculator) {

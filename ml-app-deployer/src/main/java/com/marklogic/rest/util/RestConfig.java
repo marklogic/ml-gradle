@@ -21,7 +21,6 @@ import com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier;
 import com.marklogic.client.ext.modulesloader.ssl.SimpleX509TrustManager;
 import com.marklogic.client.ext.ssl.SslConfig;
 import com.marklogic.client.ext.ssl.SslUtil;
-import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.springframework.util.StringUtils;
 
 import javax.net.ssl.SSLContext;
@@ -51,8 +50,6 @@ public class RestConfig {
 	private String trustManagementAlgorithm;
 	private DatabaseClientFactory.SSLHostnameVerifier sslHostnameVerifier;
 	private SSLContext sslContext;
-	@Deprecated
-	private X509HostnameVerifier hostnameVerifier;
 
 	// Added in 4.7.0 for 2-way SSL.
 	private String keyStorePath;
@@ -94,7 +91,6 @@ public class RestConfig {
 		this.sslProtocol = other.sslProtocol;
 		this.trustManagementAlgorithm = other.trustManagementAlgorithm;
 		this.sslContext = other.sslContext;
-		this.hostnameVerifier = other.hostnameVerifier;
 		this.sslHostnameVerifier = other.sslHostnameVerifier;
 
 		this.keyStorePath = other.keyStorePath;
@@ -251,16 +247,6 @@ public class RestConfig {
 
 	public void setSslContext(SSLContext sslContext) {
 		this.sslContext = sslContext;
-	}
-
-	@Deprecated
-	public X509HostnameVerifier getHostnameVerifier() {
-		return hostnameVerifier;
-	}
-
-	@Deprecated
-	public void setHostnameVerifier(X509HostnameVerifier hostnameVerifier) {
-		this.hostnameVerifier = hostnameVerifier;
 	}
 
 	public String getSslProtocol() {

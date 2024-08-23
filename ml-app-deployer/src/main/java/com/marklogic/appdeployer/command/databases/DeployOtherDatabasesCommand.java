@@ -353,7 +353,6 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 		databasePlans.forEach(databasePlan -> {
 			DeployDatabaseCommand command = deployDatabaseCommandFactory.newDeployDatabaseCommand(databasePlan.getLastFile());
 			command.setCheckForCustomForests(isCheckForCustomForests());
-			command.setCreateForestsOnEachHost(isCreateForestsOnEachHost());
 			command.setDatabasesToNotUndeploy(this.getDefaultDatabasesToNotUndeploy());
 
 			if (databasePlan.isMainContentDatabase() || databasePlan.isTestContentDatabase()) {

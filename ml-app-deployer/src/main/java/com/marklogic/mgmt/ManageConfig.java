@@ -30,18 +30,6 @@ import javax.net.ssl.SSLContext;
  */
 public class ManageConfig extends RestConfig {
 
-	/**
-	 * @deprecated since 4.5.0; will be removed in 5.0.0
-	 */
-	@Deprecated
-	public static final String DEFAULT_USERNAME = "admin";
-
-	/**
-	 * @deprecated since 4.5.0; will be removed in 5.0.0
-	 */
-	@Deprecated
-	public static final String DEFAULT_PASSWORD = "admin";
-
 	private String securityUsername;
 	private String securityPassword;
 	private SSLContext securitySslContext;

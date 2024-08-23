@@ -61,35 +61,6 @@ public class ScaffoldGenerator extends LoggingObject {
 		}
 	}
 
-	/**
-	 *
-	 * @param path
-	 * @param config
-	 * @deprecated since 4.6.0; use the method using {@code ScaffoldInputs} instead.
-	 */
-	@Deprecated
-	public void generateScaffold(String path, AppConfig config) {
-		if (objectMapper == null) {
-			objectMapper = ObjectMapperFactory.getObjectMapper();
-		}
-		File rootDir = new File(path);
-
-		File configDir = getConfigDir(rootDir);
-		configDir.mkdirs();
-
-		File modulesDir = getModulesDir(rootDir);
-		modulesDir.mkdirs();
-
-		generateDatabaseFiles(configDir);
-		generateSecurityFiles(configDir, config.getName());
-		if (!config.isNoRestServer()) {
-			generateRestApiFile(configDir);
-			generateRestPropertiesFile(modulesDir);
-			generateSearchOptions(modulesDir, config.getName());
-		}
-
-	}
-
 	private void generateSearchOptions(File modulesDir, String appName) {
 		File optionsDir = new File(modulesDir, "options");
 		optionsDir.mkdirs();

@@ -28,7 +28,6 @@ import com.marklogic.gradle.task.MarkLogicTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
-import org.gradle.internal.impldep.bsh.This
 import org.springframework.core.io.Resource
 
 import java.util.function.Consumer
@@ -117,24 +116,11 @@ class WatchTask extends MarkLogicTask {
 				afterModulesLoadedCallback.accept(moduleWatchingContext)
 			}
 
-			// Kept here for legacy purposes
-			afterModulesLoaded()
-
 			try {
 				Thread.sleep(sleepTime);
 			} catch (InterruptedException ie) {
 				// Ignore
 			}
 		}
-	}
-
-	/**
-	 * Exists primarily so that DHF's extension of this class can invoke DHF-specific logic for loading modules.
-	 *
-	 * Now deprecated in 3.16.3 in favor of setting afterModulesLoaderCallback
-	 */
-	@Deprecated
-	void afterModulesLoaded() {
-
 	}
 }

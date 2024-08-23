@@ -15,7 +15,6 @@
  */
 package com.marklogic.client.ext.file;
 
-import com.marklogic.client.ext.util.DocumentPermissionsParser;
 import com.marklogic.client.io.DocumentMetadataHandle;
 
 /**
@@ -25,20 +24,9 @@ import com.marklogic.client.io.DocumentMetadataHandle;
 public class PermissionsDocumentFileProcessor implements DocumentFileProcessor {
 
 	private String commaDelimitedRolesAndCapabilities;
-	private DocumentPermissionsParser documentPermissionsParser;
 
 	public PermissionsDocumentFileProcessor(String commaDelimitedRolesAndCapabilities) {
 		this.commaDelimitedRolesAndCapabilities = commaDelimitedRolesAndCapabilities;
-	}
-
-	/**
-	 * @param commaDelimitedRolesAndCapabilities
-	 * @param documentPermissionsParser
-	 * @deprecated since 4.6.0
-	 */
-	public PermissionsDocumentFileProcessor(String commaDelimitedRolesAndCapabilities, DocumentPermissionsParser documentPermissionsParser) {
-		this.commaDelimitedRolesAndCapabilities = commaDelimitedRolesAndCapabilities;
-		this.documentPermissionsParser = documentPermissionsParser;
 	}
 
 	@Override
@@ -46,11 +34,7 @@ public class PermissionsDocumentFileProcessor implements DocumentFileProcessor {
 		if (this.commaDelimitedRolesAndCapabilities != null) {
 			DocumentMetadataHandle metadata = documentFile.getDocumentMetadata();
 			if (metadata != null) {
-				if (this.documentPermissionsParser != null) {
-					this.documentPermissionsParser.parsePermissions(this.commaDelimitedRolesAndCapabilities, metadata.getPermissions());
-				} else {
-					metadata.getPermissions().addFromDelimitedString(this.commaDelimitedRolesAndCapabilities);
-				}
+				metadata.getPermissions().addFromDelimitedString(this.commaDelimitedRolesAndCapabilities);
 			}
 		}
 		return documentFile;

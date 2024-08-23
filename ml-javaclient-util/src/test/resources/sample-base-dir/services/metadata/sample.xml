@@ -1,0 +1,18 @@
+<metadata>
+  <title>Sample Service</title>
+  <description>
+    <p>You can use <b>HTML</b> in this or any other XML that you like.</p>
+  </description>
+  <method name="GET">
+    <param name="id" />
+    <param name="format" />
+  </method>
+  <method name="POST">
+    <param name="sourceId" />
+    <param name="edit" type="xs:boolean" />
+  </method>
+  <method name="POST">
+    <param name="id" />
+    <param name="sourceId" />
+  </method>
+</metadata>

@@ -1,0 +1,7 @@
+{
+  "user-name":"sample-app-jane", 
+  "password": "password",
+	"role": [
+		"manage-user", "sample-app-role2"
+	]
+}

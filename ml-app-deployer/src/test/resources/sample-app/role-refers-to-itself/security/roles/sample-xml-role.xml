@@ -1,0 +1,9 @@
+<role-properties xmlns="http://marklogic.com/manage">
+	<role-name>sample-app-xml-role</role-name>
+	<permissions>
+		<permission>
+			<role-name>sample-app-xml-role</role-name>
+			<capability>read</capability>
+		</permission>
+	</permissions>
+</role-properties>

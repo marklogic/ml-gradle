@@ -1,0 +1,23 @@
+{
+  "database-name": "mysuperdb",
+  "triggers-database": "%%TRIGGERS_DATABASE%%",
+  "schema-database": "%%SCHEMAS_DATABASE%%",
+  "range-element-index" : [
+	{
+     	"invalid-values" : "reject",
+        "collation" : "http://marklogic.com/collation/",
+        "localname" : "FirstName",
+        "namespace-uri" : "http://person",
+        "range-value-positions" : false,
+        "scalar-type" : "string"
+    },
+    {
+    	"invalid-values" : "reject",
+        "collation" : "",
+        "localname" : "BirthDate",
+        "namespace-uri" : "http://person",
+        "range-value-positions" : false,
+        "scalar-type" : "dateTime"
+    }
+  ]  
+}

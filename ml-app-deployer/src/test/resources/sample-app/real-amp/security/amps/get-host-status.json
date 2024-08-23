@@ -1,0 +1,7 @@
+{
+	"namespace": "urn:sampleapp",
+	"local-name": "get-host-status",
+	"document-uri": "/ext/sample-lib.xqy",
+	"modules-database": "%%MODULES_DATABASE%%",
+	"role": ["admin"]
+}

@@ -1,0 +1,13 @@
+{
+	"database-name": "%%DATABASE%%",
+	"range-element-index": [
+		{
+			"collation": "",
+			"invalid-values": "reject",
+			"localname": "amount",
+			"namespace-uri": "",
+			"range-value-positions": false,
+			"scalar-type": "double"
+		}
+	]
+}

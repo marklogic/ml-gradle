@@ -1,0 +1,8 @@
+<user-properties xmlns="http://marklogic.com/manage">
+	<user-name>sample-app-john</user-name>
+	<password>password</password>
+	<roles>
+		<role>rest-reader</role>
+		<role>sample-app-role1</role>
+	</roles>
+</user-properties>

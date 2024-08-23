@@ -1,0 +1,5 @@
+<flexrep-config-properties xmlns="http://marklogic.com/manage/flexrep-config/properties"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://marklogic.com/manage/flexrep-config/properties manage-flexrep-config-properties.xsd">
+  <domain-name>replica-domain</domain-name>
+  <alerting-uri />
+</flexrep-config-properties>

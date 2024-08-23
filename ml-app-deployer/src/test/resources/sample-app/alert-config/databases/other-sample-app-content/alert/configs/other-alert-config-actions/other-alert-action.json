@@ -1,0 +1,8 @@
+{
+  "name": "xdmp:log3",
+  "description": "log to ErrorLog.txt1",
+  "module": "/alert-action.xqy",
+  "module-db": "Modules",
+  "module-root": "/",
+  "option": []
+}

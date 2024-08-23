@@ -1,0 +1,10 @@
+{
+   "domain-name": "replica-domain",
+   "description": "Test domain for sample app",
+   "scope": "directory",
+   "uri": "/replica/",
+   "depth": "infinity",
+   "eval-module": "Modules",
+   "eval-root": "/",
+   "pipeline": ["Status Change Handling", "Flexible Replication"]
+ }

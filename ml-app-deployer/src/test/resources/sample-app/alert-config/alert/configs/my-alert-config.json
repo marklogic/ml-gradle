@@ -1,0 +1,9 @@
+{
+  "uri": "my-alert-config",
+  "name": "My Alerting App",
+  "description": "Alerting config for my app",
+  "trigger": [],
+  "domain": [],
+  "action": [],
+  "option": []
+}

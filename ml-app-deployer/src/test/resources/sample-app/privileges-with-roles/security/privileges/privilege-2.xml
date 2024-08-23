@@ -1,0 +1,9 @@
+<privilege-properties xmlns="http://marklogic.com/manage">
+	<privilege-name>sample-app-xml-privilege</privilege-name>
+	<action>urn:sample-app:privilege:xml</action>
+	<kind>execute</kind>
+	<roles>
+		<role>sample-app-role1</role>
+		<role>rest-admin</role>
+	</roles>
+</privilege-properties>

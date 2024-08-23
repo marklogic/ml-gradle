@@ -1,0 +1,22 @@
+{
+  "name": "my-trigger",
+  "description": "my trigger",
+  "event": {
+    "data-event": {
+      "directory-scope": {
+        "uri": "/myDir/",
+        "depth": "1"
+      },
+      "document-content": {
+        "update-kind": "create"
+      },
+      "when": "post-commit"
+    }
+  },
+  "module": "/test.xqy",
+  "module-db": "Modules",
+  "module-root": "/modules/",
+  "enabled": true,
+  "recursive": true,
+  "task-priority": "normal"
+}

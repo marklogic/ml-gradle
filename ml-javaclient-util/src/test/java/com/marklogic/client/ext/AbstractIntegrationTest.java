@@ -111,7 +111,11 @@ public abstract class AbstractIntegrationTest {
 }
 
 @Configuration
-@PropertySource(value = {"file:gradle.properties", "file:gradle-local.properties"}, ignoreResourceNotFound = true)
+@PropertySource(value = {
+	"file:../ml-javaclient-util-test-app/gradle.properties",
+	"file:../ml-javaclient-util-test-app/gradle-local.properties"},
+	ignoreResourceNotFound = true
+)
 class TestConfig extends DatabaseClientConfig {
 
 	@Autowired

@@ -4,7 +4,7 @@ subprojects {
 	apply plugin: "maven-publish"
 
 	group = "com.marklogic"
-	version = "4.9-SNAPSHOT"
+	version = "5.0-SNAPSHOT"
 
 	java {
 		sourceCompatibility = JavaVersion.VERSION_1_8

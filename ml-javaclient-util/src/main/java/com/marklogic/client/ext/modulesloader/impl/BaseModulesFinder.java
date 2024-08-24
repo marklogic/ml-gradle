@@ -128,10 +128,6 @@ public abstract class BaseModulesFinder extends LoggingObject implements Modules
         return Arrays.asList(optionsPath, servicesPath, transformsPath, namespacesPath, schemasPath);
     }
 
-	protected void addNamespaces(Modules modules, String baseDir) {
-		modules.setNamespaces(findResources("namespaces", baseDir, namespacesPath + "/*.*"));
-	}
-
 	protected void addOptions(Modules modules, String baseDir) {
         modules.setOptions(findResources("options modules", baseDir,
 	        optionsPath + "/*.xml",

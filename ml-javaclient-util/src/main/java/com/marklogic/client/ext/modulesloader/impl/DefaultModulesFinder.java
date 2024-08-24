@@ -19,7 +19,7 @@ import com.marklogic.client.ext.modulesloader.Modules;
 import com.marklogic.client.ext.modulesloader.ModulesFinder;
 
 /**
- * Default implementation that loads all of the different kinds of REST modules.
+ * Default implementation that loads all the different kinds of REST modules.
  */
 public class DefaultModulesFinder extends BaseModulesFinder implements ModulesFinder {
 
@@ -30,7 +30,6 @@ public class DefaultModulesFinder extends BaseModulesFinder implements ModulesFi
         addServices(modules, baseDir);
         addOptions(modules, baseDir);
         addTransforms(modules, baseDir);
-        addNamespaces(modules, baseDir);
         addPropertiesFile(modules, baseDir);
         return modules;
     }

@@ -22,7 +22,7 @@ import com.marklogic.mgmt.api.Resource;
 import com.marklogic.mgmt.api.group.Group;
 import com.marklogic.mgmt.resource.tasks.TaskManager;
 
-import javax.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.*;
 import java.util.List;
 
 @XmlRootElement(name = "task-properties")

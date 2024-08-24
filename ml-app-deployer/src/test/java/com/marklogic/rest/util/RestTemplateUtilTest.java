@@ -143,7 +143,8 @@ public class RestTemplateUtilTest extends BaseTestHelper {
 		RuntimeException ex = assertThrows(RuntimeException.class,
 			() -> RestTemplateUtil.newRestTemplate(manageConfig));
 
-		assertEquals("Unable to connect to the MarkLogic app server at http://localhost:8002; cause: username must be of type String",
+		assertEquals("Unable to connect to the MarkLogic app server at http://localhost:8002; cause: " +
+				"Must specify a username when using digest authentication.",
 			ex.getMessage(),
 			"As of 4.5.0, since auth strategies other than basic/digest are now supported, the error message is expected " +
 				"to identify which MarkLogic app server is being accessed but not any authentication details. This is " +

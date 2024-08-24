@@ -22,7 +22,7 @@ import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.security.QueryRolesetManager;
 import com.marklogic.mgmt.util.ObjectMapperFactory;
 
-import javax.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.*;
 import java.util.List;
 
 @XmlRootElement(name = "query-roleset-properties")

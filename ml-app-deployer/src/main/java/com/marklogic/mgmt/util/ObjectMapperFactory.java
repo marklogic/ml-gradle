@@ -19,8 +19,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.marklogic.mgmt.api.LowerCaseWithHyphensStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,13 +50,17 @@ public abstract class ObjectMapperFactory {
 	}
 
 	/**
-	 * All of the default settings here originated in the API.java class. Then #187 resulted in comments being allowed.
+	 * All the default settings here originated in the API.java class. Then #187 resulted in comments being allowed.
 	 * Most of the settings only matter for when Resource objects are being written to JSON via Jackson annotations.
 	 */
 	private static void initializeObjectMapper() {
 		objectMapper = new ObjectMapper();
 		objectMapper.enable(JsonParser.Feature.ALLOW_COMMENTS);
-		objectMapper.setPropertyNamingStrategy(new LowerCaseWithHyphensStrategy());
+
+		// We want lower-case-hyphenated ("kebab") for all JSON field names, as that's what the Manage API
+		// standardizes on.
+		objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.KEBAB_CASE);
+
 		objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

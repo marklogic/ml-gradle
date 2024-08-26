@@ -16,7 +16,6 @@
 package com.marklogic.mgmt.admin;
 
 import com.marklogic.client.ext.modulesloader.ssl.SimpleX509TrustManager;
-import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,7 +27,6 @@ public class AdminConfigTest {
 		AdminConfig first = new AdminConfig("host", 8003, "user", "pwd");
 		first.setScheme("https");
 		first.setConfigureSimpleSsl(true);
-		first.setHostnameVerifier(new AllowAllHostnameVerifier());
 		first.setSslContext(SimpleX509TrustManager.newSSLContext());
 		first.setSslProtocol("TLSv1.3");
 		first.setTrustManagementAlgorithm("something");
@@ -41,7 +39,6 @@ public class AdminConfigTest {
 		assertEquals("pwd", second.getPassword());
 		assertEquals("https", second.getScheme());
 		assertTrue(second.isConfigureSimpleSsl());
-		assertNotNull(second.getHostnameVerifier());
 		assertNotNull(second.getSslContext());
 		assertEquals("TLSv1.3", second.getSslProtocol());
 		assertEquals("something", second.getTrustManagementAlgorithm());

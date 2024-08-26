@@ -192,23 +192,12 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 			// Awful hack for 4.6.0. In 5.0, the hope is to replace the processor-specific fields on this class with
 			// a "Config"-type class that can be passed to each processor.
 			if (processor instanceof PermissionsFileDocumentFileProcessor) {
-				((PermissionsFileDocumentFileProcessor)processor).setCascadingEnabled(this.cascadePermissions);
+				((PermissionsFileDocumentFileProcessor) processor).setCascadingEnabled(this.cascadePermissions);
 			}
 			if (processor instanceof CollectionsFileDocumentFileProcessor) {
-				((CollectionsFileDocumentFileProcessor)processor).setCascadingEnabled(this.cascadeCollections);
+				((CollectionsFileDocumentFileProcessor) processor).setCascadingEnabled(this.cascadeCollections);
 			}
 		});
-	}
-
-	/**
-	 * @param reader
-	 * @deprecated since 4.6.0, will be removed in 5.0.0.
-	 */
-	@Deprecated
-	protected void applyTokenReplacerOnKnownDocumentProcessors(AbstractDocumentFileReader reader) {
-		// The logic previously performed here is now handled via prepareAbstractDocumentFileReader . This is being
-		// kept here solely to avoid any compilation issues in case this class was extended and this method was
-		// overridden.
 	}
 
 	/**

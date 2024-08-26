@@ -14,12 +14,6 @@ dependencies {
 	// that requires OkHttp for compilation.
 	implementation 'com.squareup.okhttp3:okhttp:4.12.0'
 
-	// Can remove this if we do a 5.0, as its use is deprecated.
-	implementation 'org.apache.httpcomponents:httpclient:4.5.14'
-	// Forcing httpclient to use this to address https://snyk.io/vuln/SNYK-JAVA-COMMONSCODEC-561518
-	// This can go away too once httpclient is dropped.
-	implementation 'commons-codec:commons-codec:1.17.1'
-
 	// For parsing/manipulating XML.
 	implementation 'org.jdom:jdom2:2.0.6.1'
 

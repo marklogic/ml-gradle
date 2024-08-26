@@ -81,7 +81,7 @@ public class DefaultManageConfigFactory extends PropertySourceFactory implements
 			    logger.info("Manage username: " + prop);
 			    config.setUsername(prop);
 		    }
-		    if (!propertyExists("mlSecurityUsername") && !propertyExists("mlAdminUsername")) {
+		    if (!propertyExists("mlSecurityUsername")) {
 			    logger.info("Manage user with security role: " + prop);
 			    config.setSecurityUsername(prop);
 		    }
@@ -95,7 +95,7 @@ public class DefaultManageConfigFactory extends PropertySourceFactory implements
 		    if (!propertyExists("mlManagePassword")) {
 			    config.setPassword(prop);
 		    }
-		    if (!propertyExists("mlSecurityPassword") && !propertyExists("mlAdminPassword")) {
+		    if (!propertyExists("mlSecurityPassword")) {
 		    	config.setSecurityPassword(prop);
 		    }
 	    });
@@ -230,16 +230,6 @@ public class DefaultManageConfigFactory extends PropertySourceFactory implements
 	    propertyConsumerMap.put("mlManageCleanJsonPayloads", (config, prop) -> {
 		    logger.info("Cleaning Management API JSON payloads: " + prop);
 		    config.setCleanJsonPayloads(Boolean.parseBoolean(prop));
-	    });
-
-	    propertyConsumerMap.put("mlAdminUsername", (config, prop) -> {
-		    logger.info("mlAdminUsername is deprecated; please use mlSecurityUsername instead; Manage user with security role: " + prop);
-		    config.setSecurityUsername(prop);
-	    });
-
-	    propertyConsumerMap.put("mlAdminPassword", (config, prop) -> {
-		    logger.info("mlAdminPassword is deprecated; please use mlSecurityPassword instead");
-		    config.setSecurityPassword(prop);
 	    });
 
 	    propertyConsumerMap.put("mlSecurityUsername", (config, prop) -> {

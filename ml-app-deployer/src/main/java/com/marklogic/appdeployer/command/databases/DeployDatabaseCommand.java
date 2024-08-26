@@ -77,13 +77,6 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
      */
     private int forestsPerHost = 1;
 
-    /**
-     * Passed on to DeployForestsCommand. If forests are to be created, controls whether forests on created on every
-     * host or only one one host.
-     */
-    @Deprecated
-    private boolean createForestsOnEachHost = true;
-
     private int undoSortOrder;
 
     private boolean subDatabase = false;
@@ -359,7 +352,6 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
     	if (shouldCreateForests(databaseName, context)) {
 		    DeployForestsCommand c = new DeployForestsCommand(databaseName);
 		    c.setForestsPerHost(getForestsPerHost());
-		    c.setCreateForestsOnEachHost(createForestsOnEachHost);
 		    c.setForestFilename(forestFilename);
 		    return c;
 	    }
@@ -412,20 +404,6 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 
     public void setDatabaseName(String databaseName) {
         this.databaseName = databaseName;
-    }
-
-    @Deprecated
-    public boolean isCreateForestsOnEachHost() {
-        return createForestsOnEachHost;
-    }
-
-	/**
-	 * Use appConfig.setDatabasesWithForestsOnOneHost
-	 * @param createForestsOnEachHost
-	 */
-	@Deprecated
-    public void setCreateForestsOnEachHost(boolean createForestsOnEachHost) {
-        this.createForestsOnEachHost = createForestsOnEachHost;
     }
 
     public boolean isCheckForCustomForests() {

@@ -40,14 +40,6 @@ public abstract class AbstractAppDeployer extends LoggingObject implements AppDe
 	private AdminManager adminManager;
 	private List<DeployerListener> deployerListeners;
 
-	/**
-	 * @deprecated since 4.5.0; avoid using since it assumes the use of default passwords
-	 */
-	@Deprecated
-	public AbstractAppDeployer() {
-		this(new ManageClient(), new AdminManager());
-	}
-
 	public AbstractAppDeployer(ManageClient manageClient, AdminManager adminManager) {
 		super();
 		this.manageClient = manageClient;

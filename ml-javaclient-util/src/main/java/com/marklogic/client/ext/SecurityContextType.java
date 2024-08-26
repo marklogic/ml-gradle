@@ -32,7 +32,5 @@ public enum SecurityContextType {
 	/**
 	 * @since 4.5.0
 	 */
-	SAML,
-	@Deprecated // Deprecated in 4.5.0; the Java Client requires a SecurityContext
-	NONE
+	SAML
 }

@@ -50,30 +50,6 @@ public class CreateForestsOnOneHostTest {
 		assertEquals(3, hostNames.getReplicaForestHostNames().size());
 	}
 
-	@Test
-	void deprecatedWayOfCreatingForestsOnOneHost() {
-		AppConfig appConfig = new AppConfig();
-		CommandContext context = new CommandContext(appConfig, null, null);
-
-		DeployForestsCommand command = new DeployForestsCommand("test-db");
-
-		HostCalculator hostCalculator = new DefaultHostCalculator(new TestHostNameProvider("host1", "host2", "host3"));
-		command.setHostCalculator(hostCalculator);
-
-		command.setCreateForestsOnEachHost(true);
-		ForestHostNames hostNames = command.determineHostNamesForForest(context, new ArrayList<>());
-		assertEquals(3, hostNames.getPrimaryForestHostNames().size());
-		assertEquals(3, hostNames.getReplicaForestHostNames().size());
-
-		command.setCreateForestsOnEachHost(false);
-		hostNames = command.determineHostNamesForForest(context, new ArrayList<>());
-		assertEquals(1, hostNames.getPrimaryForestHostNames().size());
-		assertEquals("host1", hostNames.getPrimaryForestHostNames().get(0));
-		assertEquals(3, hostNames.getReplicaForestHostNames().size(),
-			"When forests aren't created on each host, all hosts should still be available for replica forests, " +
-				"with the expectation that the primary forest host will still not be used");
-	}
-
 	/**
 	 * Added for ticket #439, where the wrong host was being selected when forests already exist on a host that isn'
 	 * the first one in the list.

@@ -77,19 +77,6 @@ public class AppConfig {
 	public final static String DEFAULT_GROUP = "Default";
 
 	private String name = DEFAULT_APP_NAME;
-
-	/**
-	 * @deprecated since 4.5.0; will be removed in 5.0.0
-	 */
-	@Deprecated
-	public static final String DEFAULT_USERNAME = "admin";
-
-	/**
-	 * @deprecated since 4.5.0; will be removed in 5.0.0
-	 */
-	@Deprecated
-	public static final String DEFAULT_PASSWORD = "admin";
-
 	private String host = DEFAULT_HOST;
 	private String cloudApiKey;
 

@@ -268,16 +268,6 @@ public class TaskManager extends AbstractResourceManager {
 		deleteAllScheduledTasks();
 	}
 
-	/**
-	 * @param taskPath
-	 */
-	// Deprecated since 4.0.2, as the taskPath may not suffice for uniquely identifying a task.
-	// This now assumes a task root of '/' to at least avoid an error being thrown.
-	@Deprecated
-	public void deleteTaskWithPath(String taskPath) {
-		deleteTaskWithPath(taskPath, "/");
-	}
-
 	public void deleteTaskWithPath(String taskPath, String taskRoot) {
 		String json = format("{\"task-path\":\"%s\", \"task-root\":\"%s\"}", taskPath, taskRoot);
 		delete(json, "group-id", groupName);

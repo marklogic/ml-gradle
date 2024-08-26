@@ -74,23 +74,6 @@ public class DefaultManageConfigFactoryTest  {
 	}
 
 	@Test
-	public void mlAdminUsername() {
-		ManageConfig config = configure(
-			"mlUsername", "jane",
-			"mlPassword", "janepwd",
-			"mlManageUsername", "sally",
-			"mlManagePassword", "sallypwd",
-			"mlAdminUsername", "bob",
-			"mlAdminPassword", "bobpwd"
-		);
-
-		assertEquals("sally", config.getUsername());
-		assertEquals("bob", config.getSecurityUsername());
-		assertEquals("sallypwd", config.getPassword());
-		assertEquals("bobpwd", config.getSecurityPassword());
-	}
-
-	@Test
 	public void sslProperties() {
 		ManageConfig config = configure(
 			"mlManageSimpleSsl", "true",

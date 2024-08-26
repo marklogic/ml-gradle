@@ -18,18 +18,10 @@ package com.marklogic.rest.util;
 import com.marklogic.junit.BaseTestHelper;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.ManageConfig;
-import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
-import org.apache.http.conn.ssl.SSLContextBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.net.ssl.SSLContext;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Many of these tests are just smoke tests that can be used to inspect logging as well. Ideally, they can soon depend
@@ -46,27 +38,6 @@ public class RestTemplateUtilTest extends BaseTestHelper {
 	void setup() {
 		manageConfig.setUsername("someuser");
 		manageConfig.setPassword("someword");
-	}
-
-	@Test
-	@Deprecated
-	public void configurerList() {
-		assertEquals(4, RestTemplateUtil.DEFAULT_CONFIGURERS.size());
-
-		assertFalse(configurerInvoked);
-		HttpClientBuilderConfigurer configurer = (restConfig, builder) -> {
-			logger.info("Just a test of adding a configurer");
-			configurerInvoked = true;
-			return builder;
-		};
-
-		new ManageClient(manageConfig);
-		assertFalse(configurerInvoked, "The configurer should not be invoked now that ManageClient uses OkHttp " +
-			"instead of Apache HTTP");
-
-		RestTemplateUtil.newRestTemplate(manageConfig, configurer);
-		assertTrue(configurerInvoked, "The configurer should have been invoked since a deprecated newRestTemplate " +
-			"method was used that still honors HttpClientBuilderConfigurer instances");
 	}
 
 	@Test
@@ -93,16 +64,6 @@ public class RestTemplateUtilTest extends BaseTestHelper {
 		} catch (Exception ex) {
 			logger.info("Caught expected exception: " + ex.getMessage());
 		}
-	}
-
-	@Test
-	public void customSslContextAndHostnameVerifier() throws Exception {
-		SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, (chain, authType) -> true).build();
-
-		manageConfig.setSslContext(sslContext);
-		manageConfig.setHostnameVerifier(new AllowAllHostnameVerifier());
-
-		new ManageClient(manageConfig).getRestTemplate();
 	}
 
 	@Test

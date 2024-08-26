@@ -216,23 +216,4 @@ public class DefaultDocumentFileReader extends AbstractDocumentFileReader implem
 	public void setUriPrefix(String uriPrefix) {
 		this.uriPrefix = uriPrefix;
 	}
-
-	/**
-	 *
-	 * @return
-	 * @deprecated since 4.6.0, will be removed in 5.0.0
-	 */
-	@Deprecated
-	public CollectionsFileDocumentFileProcessor getCollectionsFileDocumentFileProcessor() {
-		return collectionsFileDocumentFileProcessor;
-	}
-
-	/**
-	 *
-	 * @return
-	 * @deprecated since 4.6.0, will be removed in 5.0.0
-	 */
-	public PermissionsFileDocumentFileProcessor getPermissionsFileDocumentFileProcessor() {
-		return permissionsFileDocumentFileProcessor;
-	}
 }

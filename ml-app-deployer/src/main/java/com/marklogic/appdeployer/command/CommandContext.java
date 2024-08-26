@@ -119,13 +119,4 @@ public class CommandContext {
 	public Map<String, Object> getContextMap() {
 		return contextMap;
 	}
-
-	/**
-	 * @param contextMap
-	 * @deprecated since 4.6.0, will be removed in 5.0.0; the contextMap is not intended to be replaced.
-	 */
-	@Deprecated
-	public void setContextMap(Map<String, Object> contextMap) {
-		this.contextMap = contextMap;
-	}
 }

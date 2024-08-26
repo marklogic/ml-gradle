@@ -31,10 +31,12 @@ class InstallAdminTask extends MarkLogicTask {
 		if (getProject().hasProperty("realm")) {
 			realm = project.property("realm")
 		}
+		String username = project.property("mlUsername")
+		String password = project.property("mlPassword")
 		if (realm != null) {
-			getAdminManager().installAdmin(getAdminUsername(), getAdminPassword(), realm)
+			getAdminManager().installAdmin(username, password, realm)
 		} else {
-			getAdminManager().installAdmin(getAdminUsername(), getAdminPassword())
+			getAdminManager().installAdmin(username, password)
 		}
 	}
 }

@@ -21,7 +21,10 @@ dependencies {
 	implementation "commons-io:commons-io:2.16.1"
 
 	// For UnitTestTask.
-	compileOnly "com.marklogic:marklogic-unit-test-client:1.4.0"
+	compileOnly ("com.marklogic:marklogic-unit-test-client:1.4.0") {
+		// Prefer the Java Client version coming from ml-javaclient-util.
+		exclude module: "marklogic-client-api"
+	}
 
 	testImplementation localGroovy()
 	testImplementation gradleTestKit()

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?><!--
-This file was generated via Gradle and is being used primarily for github's Dependency Graph feature.
+This file was generated via Gradle and is being used for github's Dependency Graph feature.
 It is not intended to be used to build this project.
 -->
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
@@ -12,7 +12,7 @@ It is not intended to be used to build this project.
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.marklogic</groupId>
   <artifactId>ml-javaclient-util</artifactId>
-  <version>4.8.0</version>
+  <version>5.0.0</version>
   <name>com.marklogic:ml-javaclient-util</name>
   <description>Library that adds functionality on top of the MarkLogic Java Client</description>
   <url>https://github.com/marklogic/ml-javaclient-util</url>
@@ -40,19 +40,19 @@ It is not intended to be used to build this project.
     <dependency>
       <groupId>com.marklogic</groupId>
       <artifactId>marklogic-client-api</artifactId>
-      <version>6.6.0</version>
+      <version>7.0.0</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>com.marklogic</groupId>
       <artifactId>marklogic-xcc</artifactId>
-      <version>11.2.0</version>
+      <version>11.3.0</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
-      <version>5.3.34</version>
+      <version>5.3.39</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -64,13 +64,13 @@ It is not intended to be used to build this project.
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.15.3</version>
+      <version>2.17.2</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>2.0.13</version>
+      <version>2.0.16</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

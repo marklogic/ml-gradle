@@ -26,7 +26,7 @@ import java.security.NoSuchAlgorithmException;
 
 public abstract class SslUtil {
 
-	public final static String DEFAULT_SSL_PROTOCOL = "TLSv1.2";
+	public final static String DEFAULT_SSL_PROTOCOL = "TLSv1.3";
 
 	/**
 	 * Configure an SSLContext and X509TrustManager with TLSv1.2 as the default protocol and the default algorithm of

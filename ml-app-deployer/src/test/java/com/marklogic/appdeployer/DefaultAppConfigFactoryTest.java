@@ -618,7 +618,7 @@ public class DefaultAppConfigFactoryTest {
 	@Test
 	public void appServicesSimpleSsl() {
 		AppConfig config = configure("mlAppServicesSimpleSsl", "true");
-		assertEquals("TLSv1.2", config.getAppServicesSslContext().getProtocol());
+		assertEquals("TLSv1.3", config.getAppServicesSslContext().getProtocol());
 
 		config = configure("mlAppServicesSimpleSsl", "TLSv1.2");
 		assertEquals("TLSv1.2", config.getAppServicesSslContext().getProtocol());
@@ -636,7 +636,7 @@ public class DefaultAppConfigFactoryTest {
 	@Test
 	public void restSimpleSsl() {
 		AppConfig config = configure("mlSimpleSsl", "true");
-		assertEquals("TLSv1.2", config.getRestSslContext().getProtocol());
+		assertEquals("TLSv1.3", config.getRestSslContext().getProtocol());
 
 		config = configure("mlSimpleSsl", "TLSv1.2");
 		assertEquals("TLSv1.2", config.getRestSslContext().getProtocol());

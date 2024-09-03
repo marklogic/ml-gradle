@@ -31,7 +31,7 @@ public class SslUtilTest {
 		assertTrue(certs.length > 0);
 
 		SSLContext context = config.getSslContext();
-		assertEquals("TLSv1.2", context.getProtocol());
+		assertEquals("TLSv1.3", context.getProtocol());
 	}
 
 	@Test

@@ -79,7 +79,6 @@ import com.marklogic.gradle.task.schemas.LoadSchemasTask
 import com.marklogic.gradle.task.security.*
 import com.marklogic.gradle.task.servers.DeployServersTask
 import com.marklogic.gradle.task.servers.UndeployOtherServersTask
-import com.marklogic.gradle.task.shell.ShellTask
 import com.marklogic.gradle.task.tasks.DeleteAllTasksTask
 import com.marklogic.gradle.task.tasks.DeployTasksTask
 import com.marklogic.gradle.task.tasks.DisableAllTasksTask
@@ -332,9 +331,6 @@ class MarkLogicPlugin implements Plugin<Project> {
 
 		String triggerGroup = "ml-gradle Trigger"
 		project.task("mlDeployTriggers", type: DeployTriggersTask, group: triggerGroup, description: "Deploy each trigger, updating it if it exists, in the configuration directory")
-
-		String shellGroup = "ml-gradle Shell"
-		project.task("mlShell", type: ShellTask, group: shellGroup, description: "Run groovysh with MarkLogic-specific support built in")
 
 		String roxyGroup = "ml-gradle Roxy";
 		project.task("mlRoxyMigrateBuildSteps", type: RoxyMigrateBuildStepsTask, group: roxyGroup, description: "Migrate build steps from deploy/app_specific.rb into custom Gradle tasks. " +

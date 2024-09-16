@@ -1,2 +1,1 @@
-//include "ml-javaclient-util", "ml-app-deployer", "ml-gradle"
-include "ml-gradle"
+include "ml-javaclient-util", "ml-app-deployer", "ml-gradle"

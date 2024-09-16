@@ -6,7 +6,7 @@ plugins {
 dependencies {
 	implementation localGroovy()
 
-	api project(":ml-app-deployer")
+	api "com.marklogic:ml-app-deployer:5.0.0"
 
 	// For MlcpTask
 	implementation "com.marklogic:mlcp-util:1.0.1"

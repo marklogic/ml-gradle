@@ -1,0 +1,16 @@
+{
+  "role-name" : "sample-app-role",
+  "role" : [ "rest-admin", "rest-writer", "rest-reader" ],
+  "privilege": [
+    {
+      "privilege-name": "xdmp:eval-in",
+      "action": "http://marklogic.com/xdmp/privileges/xdmp-eval-in",
+      "kind": "execute"
+    },
+    {
+      "privilege-name": "any-uri",
+      "action": "http://marklogic.com/xdmp/privileges/any-uri",
+      "kind": "execute"
+    }
+  ]
+}

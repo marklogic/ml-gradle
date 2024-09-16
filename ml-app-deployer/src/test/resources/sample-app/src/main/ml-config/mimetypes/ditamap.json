@@ -1,0 +1,5 @@
+{
+  "name":"application/ditamap+xml", 
+  "extension":["ditamap"], 
+  "format":"xml"
+}

@@ -1,0 +1,4 @@
+{
+  "role-name" : "abc-ui-admin",
+  "role" : [ "abc-ui-offline-admin", "flexrep-admin" ]
+}

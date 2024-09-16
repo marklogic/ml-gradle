@@ -1,0 +1,53 @@
+plugins {
+  id "groovy"
+  id "com.gradle.plugin-publish" version "1.2.1"
+}
+
+dependencies {
+	implementation localGroovy()
+
+	api "com.marklogic:ml-app-deployer:5.0.0"
+
+	// For MlcpTask
+	implementation "com.marklogic:mlcp-util:1.0.1"
+
+	// For the data movement tasks.
+	implementation ("com.marklogic:marklogic-data-movement-components:2.8.0") {
+		// Prefer the Java Client version coming from ml-javaclient-util.
+		exclude module: "marklogic-client-api"
+	}
+
+	// For tasks that need to fiddle with the filesystem.
+	implementation "commons-io:commons-io:2.16.1"
+
+	// For UnitTestTask.
+	compileOnly ("com.marklogic:marklogic-unit-test-client:1.4.0") {
+		// Prefer the Java Client version coming from ml-javaclient-util.
+		exclude module: "marklogic-client-api"
+	}
+
+	testImplementation localGroovy()
+	testImplementation gradleTestKit()
+	testImplementation 'xmlunit:xmlunit:1.6'
+
+	// Force spock-core to use 4.13.2 to avoid security issue in 4.11
+	testImplementation 'junit:junit:4.13.2'
+	testImplementation('org.spockframework:spock-core:2.3-groovy-3.0') {
+		exclude module: 'groovy-all'
+	}
+}
+
+gradlePlugin {
+  website = 'https://www.marklogic.com/'
+  vcsUrl = 'https://github.com/marklogic/ml-gradle.git'
+
+  plugins {
+    mlgradlePlugin {
+      id = 'com.marklogic.ml-gradle'
+      displayName = 'ml-gradle for MarkLogic'
+      description = 'Gradle plugin for configuring and deploying applications to MarkLogic'
+			tags.set(['marklogic', 'progress'])
+			implementationClass = 'com.marklogic.gradle.MarkLogicPlugin'
+    }
+  }
+}

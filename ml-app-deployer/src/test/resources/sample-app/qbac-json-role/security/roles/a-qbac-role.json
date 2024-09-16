@@ -1,0 +1,28 @@
+{
+	"role-name": "a-qbac-role",
+	"description": "testing",
+	"capability-query": [
+		{
+			"capability": "read",
+			"query": {
+				"word-query": {
+					"text": {
+						"lang": "en",
+						"_value": "hello"
+					}
+				}
+			}
+		},
+		{
+			"capability": "update",
+			"query": {
+				"word-query": {
+					"text": {
+						"lang": "en",
+						"_value": "world"
+					}
+				}
+			}
+		}
+	]
+}

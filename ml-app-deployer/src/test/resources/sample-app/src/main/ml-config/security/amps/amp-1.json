@@ -1,0 +1,7 @@
+{
+	"namespace": "http://example.com/uri",
+	"local-name": "ml-app-deployer-test-1",
+	"document-uri": "/module/path/name",
+	"modules-database": "Modules",
+	"role": ["app-user"]
+}

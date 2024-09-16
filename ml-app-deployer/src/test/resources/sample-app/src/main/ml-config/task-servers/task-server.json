@@ -1,0 +1,6 @@
+{
+	"threads": 32,
+	"log-errors": false,
+	"debug-allow": false,
+	"profile-allow": false
+}

@@ -1,0 +1,22 @@
+{
+	"template": {
+		"context": "/example",
+		"description": "This schema is valid",
+		"collections": [
+			"example"
+		],
+		"rows": [
+			{
+				"schemaName": "Example",
+				"viewName": "default",
+				"columns": [
+					{
+						"name": "IdUpdated",
+						"scalarType": "string",
+						"val": "IdUpdated"
+					}
+				]
+			}
+		]
+	}
+}

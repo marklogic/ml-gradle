@@ -1,0 +1,31 @@
+{
+  "pipeline-name": "sample-app-pipeline-1",
+  "pipeline-description": "Sample app pipeline",
+  "success-action": {
+    "module": "/MarkLogic/cpf/actions/success-action.xqy"
+  },
+  "failure-action": {
+    "module": "/marklogic/cpf/actions/failure-action.xqy"
+  },
+  "status-transition": [
+    {
+      "annotation": "Currently just a copy of the first transition in Status Change Handling",
+      "status": "created",
+      "on-success": "http://marklogic.com/states/initial",
+      "priority": 500,
+      "default-action": {
+        "module": "/marklogic/cpf/actions/set-updated-action.xqy"
+      },
+      "execute": [
+        {
+          "condition": {
+            "module": "/marklogic/cpf/actions/changed-type-condition.xqy"
+          },
+          "action": {
+            "module": "/marklogic/cpf/actions/success-action.xqy"
+          }
+        }
+      ]
+    }
+  ]
+}

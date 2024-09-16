@@ -1,0 +1,1 @@
+We don't need real CVS files here, as we expect the whole directory to be ignored.

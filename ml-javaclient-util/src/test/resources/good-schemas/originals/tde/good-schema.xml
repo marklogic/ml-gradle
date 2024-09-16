@@ -1,0 +1,17 @@
+<template xmlns="http://marklogic.com/xdmp/tde">
+	<description>Sample description</description>
+	<context>/Citation/Article</context>
+	<rows>
+		<row>
+			<schema-name>Medical2</schema-name>
+			<view-name>Publications</view-name>
+			<columns>
+				<column>
+					<name>ID</name>
+					<scalar-type>long</scalar-type>
+					<val>../ID</val>
+				</column>
+			</columns>
+		</row>
+	</rows>
+</template>

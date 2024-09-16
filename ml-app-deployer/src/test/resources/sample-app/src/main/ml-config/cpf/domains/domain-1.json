@@ -1,0 +1,10 @@
+{
+   "domain-name": "sample-app-domain-1",
+   "description": "Test domain for sample app",
+   "scope": "directory",
+   "uri": "/sample-app-1/",
+   "depth": "infinity",
+   "eval-module": "%%MODULES_DATABASE%%",
+   "eval-root": "/",
+   "pipeline":["sample-app-pipeline-1"]
+ }

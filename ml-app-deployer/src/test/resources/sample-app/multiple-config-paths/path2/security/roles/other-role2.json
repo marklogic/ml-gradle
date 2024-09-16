@@ -1,0 +1,6 @@
+{
+	"role-name": "sample-app-role2",
+	"role": [
+		"sample-app-role1"
+	]
+}

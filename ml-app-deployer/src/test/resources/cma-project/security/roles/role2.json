@@ -1,0 +1,13 @@
+{
+	"role-name": "sample-app-role2",
+	"role": [
+		"sample-app-role1"
+	],
+	"privilege": [
+		{
+			"privilege-name": "sample-app-execute-1",
+			"action": "sample-app-execute-1",
+			"kind": "execute"
+		}
+	]
+}

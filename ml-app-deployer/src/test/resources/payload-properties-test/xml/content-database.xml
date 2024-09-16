@@ -1,0 +1,4 @@
+<database-properties xmlns="http://marklogic.com/manage">
+	<database-name>%%DATABASE%%</database-name>
+	<triggers-database>%%TRIGGERS_DATABASE%%</triggers-database>
+</database-properties>

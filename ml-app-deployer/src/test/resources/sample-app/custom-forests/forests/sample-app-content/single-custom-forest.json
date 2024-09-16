@@ -1,0 +1,5 @@
+{
+	"forest-name": "sample-app-content-custom-3",
+	"enabled": true,
+	"database": "%%DATABASE%%"
+}

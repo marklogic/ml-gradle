@@ -1,0 +1,9 @@
+<partition xmlns="http://marklogic.com/manage">
+	<partition-name>myDate-2012</partition-name>
+	<lower-bound>2012-01-01</lower-bound>
+	<upper-bound>2012-12-31</upper-bound>
+	<forests-per-host>1</forests-per-host>
+	<hosts>
+		<host>mlHostName1</host>
+	</hosts>
+</partition>

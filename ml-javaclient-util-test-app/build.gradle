@@ -1,0 +1,10 @@
+/**
+ * It appears we need this in a separate project that isn't included in the
+ * root-level settings.gradle. Otherwise, we get classpath conflicts -
+ * ml-gradle/ml-app-deployer can't find LoggingHelper or presumably any other
+ * class in ml-javaclient-util.
+ */
+plugins {
+	id 'net.saliman.properties' version '1.5.2'
+	id "com.marklogic.ml-gradle" version "5.0.0"
+}

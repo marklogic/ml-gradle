@@ -1,0 +1,8 @@
+{
+	"privilege-name":"sample-app-execute-1",
+	"action": "urn:sample-app:privilege:1",
+	"kind":"execute",
+	"role": [
+		"rest-reader"
+	]
+}

@@ -1,0 +1,4 @@
+{
+  "role-name" : "xyz-writer",
+  "role" : [ "xyz-reader", "app-user" ]
+}

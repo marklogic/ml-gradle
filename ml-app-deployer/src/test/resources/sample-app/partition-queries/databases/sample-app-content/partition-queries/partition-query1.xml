@@ -1,0 +1,13 @@
+<partition-query-properties xmlns="http://marklogic.com/manage/partition-query/properties">
+	<partition-number>1</partition-number>
+	<query>
+		<cts:or-query xmlns:cts="http://marklogic.com/cts">
+			<cts:word-query>
+				<cts:text xml:lang="en">Manager</cts:text>
+			</cts:word-query>
+			<cts:word-query>
+				<cts:text xml:lang="en">Engineer</cts:text>
+			</cts:word-query>
+		</cts:or-query>
+	</query>
+</partition-query-properties>

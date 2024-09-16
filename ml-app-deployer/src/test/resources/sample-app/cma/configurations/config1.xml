@@ -1,0 +1,18 @@
+<configuration xmlns="http://marklogic.com/manage/config">
+	<name>ml-app-deployer-test-config</name>
+	<configs>
+		<config>
+			<forests>
+				<forest>
+					<forest-name>cma-test-f1</forest-name>
+				</forest>
+				<forest>
+					<forest-name>cma-test-f2</forest-name>
+				</forest>
+				<forest>
+					<forest-name>cma-test-f3</forest-name>
+				</forest>
+			</forests>
+		</config>
+	</configs>
+</configuration>

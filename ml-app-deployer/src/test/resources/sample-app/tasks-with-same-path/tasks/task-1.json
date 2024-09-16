@@ -1,0 +1,12 @@
+{
+   "task-enabled":true, 
+   "task-path":"/path/to/query.xqy",
+   "task-root":"/", 
+   "task-type":"weekly", 
+   "task-period":2, 
+   "task-day":["tuesday"], 
+   "task-start-time":"12:00:00", 
+   "task-database":"Documents",
+   "task-modules":"", 
+   "task-user":"nobody"
+}

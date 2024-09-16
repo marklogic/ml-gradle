@@ -6,5 +6,5 @@
  */
 plugins {
 	id 'net.saliman.properties' version '1.5.2'
-	id "com.marklogic.ml-gradle" version "4.8.0"
+	id "com.marklogic.ml-gradle" version "5.0.0"
 }

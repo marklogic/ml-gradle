@@ -18,9 +18,6 @@ apply plugin: "com.marklogic.ml-gradle"
 
 repositories {
 	mavenCentral()
-
-	// Needed for some mlcp dependencies, such as commons-csv:1.5.1-marklogic
-	maven { url "https://developer.marklogic.com/maven2/" }
 }
 
 

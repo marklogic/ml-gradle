@@ -25,16 +25,20 @@ Groovy - ml-gradle is then a fairly thin wrapper around ml-app-deployer to expos
 Compatibility guidelines
 =========
 
-If you are using ml-gradle 4.6.0 or higher, you must use Gradle 7.6 or higher. 
+The minimum required version of Gradle for use with ml-gradle is largely based on fixes to Gradle itself that are
+related to transitive dependencies in ml-gradle. Please adhere to the guideline below for determining the minimum
+version of Gradle to use based on the version of ml-gradle you are using.
 
-If you wish to use Gradle 7 or higher, you must use ml-gradle 4.3.0 or higher.
+| ml-gradle version | Minimum Gradle version | 
+|-------------------|------------------------|
+| 5.0.0 or higher | Gradle 7.6.4 or higher, with Gradle 8.0 or higher recommended. |
+| 4.6.0 to 4.8.0 | Gradle 7.6.0 or higher. |
+| Before 4.6.0 | Gradle 7.0 or higher is recommended, though earlier versions of Gradle 6.x may work as well. |
 
-For older versions of ml-gradle, Gradle 6 or higher is recommended.
+If you wish to use Gradle 7 or higher, you must use ml-gradle 4.3.0 or higher. 
 
-ml-gradle has been tested and used extensively on multiple versions of Gradle 7 and 8. As described below, 
-both ml-gradle and the [MarkLogic Java Client](https://github.com/marklogic/java-client-api) have been tested on 
-Java 8, 11, and 17.
-
+You will need Java 8 or higher to run Gradle and ml-gradle. Both ml-gradle and the underlying 
+[MarkLogic Java Client](https://github.com/marklogic/java-client-api) dependency are tested on Java 8, 11, and 17.
 
 Start using ml-gradle
 =========

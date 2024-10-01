@@ -27,7 +27,7 @@ class XqueryTransformGenerator extends TransformGenerator {
 			transform = transform.replace("%%REDACT_COMMAND%%", "rdt:redact($content, " + rulesetNameList + ")");
 			transform = transform.replace("%%REDACT_NAMESPACE%%", "\nimport module namespace rdt = \"http://marklogic.com/xdmp/redaction\" at \"/MarkLogic/redaction.xqy\";\n");
 		} else {
-			transform = transform.replace("%%REDACT_COMMAND%%", "()");
+			transform = transform.replace("%%REDACT_COMMAND%%", "$content");
 			transform = transform.replace("%%REDACT_NAMESPACE%%", "");
 		}
 		generateTransformFile(name, transform);

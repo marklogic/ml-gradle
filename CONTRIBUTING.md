@@ -57,3 +57,15 @@ You can then repeat this process as often as you want - i.e. make more changes i
 copy to your local Maven repo, and test it in the project you chose. 
 
 For a real example, see the "local-testing-project" project in the examples directory.
+
+## Automated Testing
+
+The ml-gradle tests now require access to a MarkLogic server with the ml-javaclient-util-test-app deployed to it. To
+deploy that application in a new docker container, run the following commands. If you don't need the docker container,
+skip the `docker compose` command.
+
+```
+cd ml-javaclient-util-test-app
+docker compose up -d --build
+../gradlew -i mlDeploy
+```

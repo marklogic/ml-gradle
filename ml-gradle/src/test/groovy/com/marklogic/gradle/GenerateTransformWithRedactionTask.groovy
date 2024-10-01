@@ -15,84 +15,147 @@
  */
 package com.marklogic.gradle
 
+import groovy.json.JsonSlurper
+import org.springframework.http.HttpMethod
+
 class GenerateTransformWithRedactionTask extends BaseTest {
 
-	final static String EXPECTED_XQY_REDACTION_IMPORT = "import module namespace rdt = \"http://marklogic.com/xdmp/redaction\" at \"/MarkLogic/redaction.xqy\";";
-	final static String EXPECTED_XQY_REDACTION_CODE = "  rdt:redact(\$content, ('email-rules','otherRules'))"
+	final static JsonSlurper parser = new JsonSlurper()
+	final static String BASE_DOCUMENTS_URL = "http://localhost:8028/v1/documents?uri=/jane.json&transform="
+
+	def reloadTransforms() {
+		print(runTask('mlReloadModules', '-PmlAppName=ml-javaclient-util-test', '-PmlUsername=admin', '-PmlPassword=admin', '-PmlRestPort=8028').output)
+	}
+
+	def retrieveDocumentWithTransform(String transformName) {
+		def url = BASE_DOCUMENTS_URL + transformName
+		def response = manageClient.getRestTemplate().exchange(url, HttpMethod.GET, null, String.class, [:])
+		printf response.getBody()
+		return parser.parseText(response.getBody())
+	}
+
+	def verifyEmailRedacted(String transformName) {
+		def docContents = retrieveDocumentWithTransform(transformName)
+		"NAME@DOMAIN".equals(docContents['email'])
+	}
+
+	def verifyEmailNotRedacted(String transformName) {
+		def docContents = retrieveDocumentWithTransform(transformName)
+		"jane@example.org".equals(docContents['email'])
+	}
+
+	final static String EXPECTED_XQY_REDACTION_IMPORT = "import module namespace rdt = \"http://marklogic.com/xdmp/redaction\" at \"/MarkLogic/redaction.xqy\";"
+	final static String EXPECTED_XQY_REDACTION_CODE = "  rdt:redact(\$content, ('email-rules'))"
 
 	def "generate an XQuery transform that includes a redaction rule"() {
 		when:
-		print(runTask('mlCreateTransform',  '-PtransformName=xqyRedactEmails', '-PtransformType=xqy', '-Prulesets=email-rules,otherRules').output)
+		print(runTask('mlCreateTransform', '-PtransformName=xqyRedactEmails', '-PtransformType=xqy', '-Prulesets=email-rules').output)
+		def transformPath = new File(testProjectDir.getRoot(), "src/main/ml-modules/transforms/xqyRedactEmails.xqy")
+		def transformLines = transformPath.readLines()
 
 		then:
-		def transformPath = new File(testProjectDir.getRoot(), "src/main/ml-modules/transforms/xqyRedactEmails.xqy")
-		transformPath.exists()
-		def transformLines = transformPath.readLines()
-		transformLines.each(line -> println(line))
 		transformLines.contains(EXPECTED_XQY_REDACTION_IMPORT)
 		transformLines.contains(EXPECTED_XQY_REDACTION_CODE)
 
 		when:
+		reloadTransforms()
+
+		then:
+		verifyEmailRedacted("xqyRedactEmails")
+	}
+
+	def "generate an XQuery transform that does not include a redaction rule"() {
+		when:
 		print(runTask('mlCreateTransform',  '-PtransformName=xqyRedactEmails', '-PtransformType=xqy').output)
-		transformPath = new File(testProjectDir.getRoot(), "src/main/ml-modules/transforms/xqyRedactEmails.xqy")
-		transformLines = transformPath.readLines()
+		def transformPath = new File(testProjectDir.getRoot(), "src/main/ml-modules/transforms/xqyRedactEmails.xqy")
+		def transformLines = transformPath.readLines()
 
 		then:
 		!transformLines.contains(EXPECTED_XQY_REDACTION_IMPORT)
 		!transformLines.contains(EXPECTED_XQY_REDACTION_CODE)
+
+		when:
+		reloadTransforms()
+
+		then:
+		verifyEmailNotRedacted("xqyRedactEmails")
 	}
 
-	final static String EXPECTED_SJS_REDACTION_IMPORT = "const rdt = require('/MarkLogic/redaction');";
-	final static String EXPECTED_SJS_REDACTION_CODE = "  return rdt.redact(content, ['email-rules', 'otherRules']);"
+	final static String EXPECTED_SJS_REDACTION_IMPORT = "const rdt = require('/MarkLogic/redaction');"
+	final static String EXPECTED_SJS_REDACTION_CODE = "  return rdt.redact(content, ['email-rules']);"
 
 	def "generate an SJS transform that includes a redaction rule"() {
 		when:
-		print(runTask('mlCreateTransform',  '-PtransformName=sjsRedactEmails', '-PtransformType=sjs', '-Prulesets=email-rules,otherRules').output)
+		print(runTask('mlCreateTransform',  '-PtransformName=sjsRedactEmails', '-PtransformType=sjs', '-Prulesets=email-rules').output)
+		def transformPath = new File(testProjectDir.getRoot(), "src/main/ml-modules/transforms/sjsRedactEmails.sjs")
+		def transformLines = transformPath.readLines()
 
 		then:
-		def transformPath = new File(testProjectDir.getRoot(), "src/main/ml-modules/transforms/sjsRedactEmails.sjs")
-		transformPath.exists()
-		def transformLines = transformPath.readLines()
-		transformLines.each(line -> println(line))
 		transformLines.contains(EXPECTED_SJS_REDACTION_IMPORT)
 		transformLines.contains(EXPECTED_SJS_REDACTION_CODE)
 
 		when:
+		reloadTransforms()
+
+		then:
+		verifyEmailRedacted("sjsRedactEmails")
+	}
+
+	def "generate an SJS transform that does not include a redaction rule"() {
+		when:
 		print(runTask('mlCreateTransform',  '-PtransformName=sjsRedactEmails', '-PtransformType=sjs').output)
-		transformPath = new File(testProjectDir.getRoot(), "src/main/ml-modules/transforms/sjsRedactEmails.sjs")
-		transformLines = transformPath.readLines()
+		def transformPath = new File(testProjectDir.getRoot(), "src/main/ml-modules/transforms/sjsRedactEmails.sjs")
+		def transformLines = transformPath.readLines()
 
 		then:
 		!transformLines.contains(EXPECTED_SJS_REDACTION_IMPORT)
 		!transformLines.contains(EXPECTED_SJS_REDACTION_CODE)
+
+		when:
+		reloadTransforms()
+
+		then:
+		verifyEmailNotRedacted("sjsRedactEmails")
 	}
 
 	final static String EXPECTED_XSL_REDACTION_NAMESPACE = "        xmlns:rdt=\"http://marklogic.com/xdmp/redaction\""
-	final static String EXPECTED_XSL_REDACTION_IMPORT = "  <xdmp:import-module namespace=\"http://marklogic.com/xdmp/redaction\" href=\"/MarkLogic/redaction.xqy\"/>";
-	final static String EXPECTED_XSL_REDACTION_CODE = "    <xsl:copy-of select=\"rdt:redact(., ('email-rules','otherRules'))\"/>"
+	final static String EXPECTED_XSL_REDACTION_IMPORT = "  <xdmp:import-module namespace=\"http://marklogic.com/xdmp/redaction\" href=\"/MarkLogic/redaction.xqy\"/>"
+	final static String EXPECTED_XSL_REDACTION_CODE = "    <xsl:copy-of select=\"rdt:redact(., ('email-rules'))\"/>"
 
 	def "generate an XSL transform that includes a redaction rule"() {
 		when:
-		print(runTask('mlCreateTransform',  '-PtransformName=xslRedactEmails', '-PtransformType=xsl', '-Prulesets=email-rules,otherRules').output)
+		print(runTask('mlCreateTransform',  '-PtransformName=xslRedactEmails', '-PtransformType=xsl', '-Prulesets=email-rules').output)
+		def transformPath = new File(testProjectDir.getRoot(), "src/main/ml-modules/transforms/xslRedactEmails.xsl")
+		def transformLines = transformPath.readLines()
 
 		then:
-		def transformPath = new File(testProjectDir.getRoot(), "src/main/ml-modules/transforms/xslRedactEmails.xsl")
-		transformPath.exists()
-		def transformLines = transformPath.readLines()
-		transformLines.each(line -> println(line))
 		transformLines.contains(EXPECTED_XSL_REDACTION_NAMESPACE)
 		transformLines.contains(EXPECTED_XSL_REDACTION_IMPORT)
 		transformLines.contains(EXPECTED_XSL_REDACTION_CODE)
 
 		when:
+		reloadTransforms()
+
+		then:
+		verifyEmailRedacted("xslRedactEmails")
+	}
+
+	def "generate an XSL transform that does not include a redaction rule"() {
+		when:
 		print(runTask('mlCreateTransform',  '-PtransformName=xslRedactEmails', '-PtransformType=xsl').output)
-		transformPath = new File(testProjectDir.getRoot(), "src/main/ml-modules/transforms/xslRedactEmails.xsl")
-		transformLines = transformPath.readLines()
+		def transformPath = new File(testProjectDir.getRoot(), "src/main/ml-modules/transforms/xslRedactEmails.xsl")
+		def transformLines = transformPath.readLines()
 
 		then:
 		!transformLines.contains(EXPECTED_XSL_REDACTION_NAMESPACE)
 		!transformLines.contains(EXPECTED_XSL_REDACTION_IMPORT)
 		!transformLines.contains(EXPECTED_XSL_REDACTION_CODE)
+
+		when:
+		reloadTransforms()
+
+		then:
+		verifyEmailNotRedacted("xslRedactEmails")
 	}
 
 }

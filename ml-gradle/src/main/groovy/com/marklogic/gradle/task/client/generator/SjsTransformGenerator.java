@@ -22,7 +22,7 @@ class SjsTransformGenerator extends TransformGenerator {
 			transform = SJS_TEMPLATE.replace("%%REDACT_COMMAND%%", "\n  return rdt.redact(content, " + Arrays.toString(rulesetNames) + ");");
 			transform = transform.replace("%%REDACT_NAMESPACE%%", "const rdt = require('/MarkLogic/redaction');\n");
 		} else {
-			transform = SJS_TEMPLATE.replace("%%REDACT_COMMAND%%", "");
+			transform = SJS_TEMPLATE.replace("%%REDACT_COMMAND%%", "\n  return content");
 			transform = transform.replace("%%REDACT_NAMESPACE%%", "");
 		}
 		generateTransformFile(name, transform);

@@ -11,7 +11,7 @@ class XslTransformGenerator extends TransformGenerator {
 		"    >\n" +
   		"  <xsl:param name=\"context\" as=\"map:map\"/>\n" +
         "  <xsl:param name=\"params\"  as=\"map:map\"/>%%REDACT_IMPORT%%\n" +
-  	    "  <xsl:template match=\"/*\">" +
+  	    "  <xsl:template match=\"/\">" +
         "  %%REDACT_COMMAND%%\n" +
         "  </xsl:template>\n" +
         "</xsl:stylesheet>";

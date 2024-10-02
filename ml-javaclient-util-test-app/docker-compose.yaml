@@ -12,5 +12,5 @@ services:
     volumes:
       - ./docker/marklogic/logs:/var/opt/MarkLogic/Logs
     ports:
-      - "8000-8003:8000-8003"
+      - "8000-8008:8000-8008"
       - "8028:8028"

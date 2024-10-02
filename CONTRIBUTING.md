@@ -60,12 +60,37 @@ For a real example, see the "local-testing-project" project in the examples dire
 
 ## Automated Testing
 
-The ml-gradle tests now require access to a MarkLogic server with the ml-javaclient-util-test-app deployed to it. To
-deploy that application in a new docker container, run the following commands. If you don't need the docker container,
-skip the `docker compose` command.
+The automated tests for each of the three subprojects require access to a MarkLogic server, and the ml-javaclient-util &
+ml-gradle subprojects also require the ml-javaclient-util-test-app application deployed to it. To deploy that
+application in a new docker container, run the following commands. If you don't need the docker container, skip the
+`docker compose` command.
+
+### MarkLogic Server Setup
 
 ```
 cd ml-javaclient-util-test-app
 docker compose up -d --build
 ../gradlew -i mlDeploy
+cd ..
+```
+
+Once the test server and application are setup, you are ready to run the tests for each subproject. Those tests can be
+run in multiple ways, but the easiest is to simply use Gradle on the command-line as shown below.
+
+### ml-javaclient-util
+
+```
+./gradlew ml-javaclient-util:clean  ml-javaclient-util:test
+```
+
+### ml-app-deployer
+
+```
+./gradlew ml-app-deployer:clean  ml-app-deployer:test
+```
+
+### ml-gradle
+
+```
+./gradlew ml-gradle:clean  ml-gradle:test
 ```

@@ -79,7 +79,7 @@ public class AdminManager extends AbstractManager {
 					logger.info("Initialization response: " + response);
 					// According to http://docs.marklogic.com/REST/POST/admin/v1/init, a 202 is sent back in the event a
 					// restart is needed. A 400 or 401 will be thrown as an error by RestTemplate.
-					return HttpStatus.ACCEPTED.equals(response.getStatusCode());
+					return HttpStatus.ACCEPTED.equals(HttpStatus.valueOf(response.getStatusCodeValue()));
 				} catch (HttpClientErrorException hcee) {
 					String body = hcee.getResponseBodyAsString();
 					if (logger.isTraceEnabled()) {
@@ -132,7 +132,7 @@ public class AdminManager extends AbstractManager {
 					logger.info("Admin installation response: " + response);
 					// According to http://docs.marklogic.com/REST/POST/admin/v1/init, a 202 is sent back in the event a
 					// restart is needed. A 400 or 401 will be thrown as an error by RestTemplate.
-					return HttpStatus.ACCEPTED.equals(response.getStatusCode());
+					return HttpStatus.ACCEPTED.equals(HttpStatus.valueOf(response.getStatusCodeValue()));
 				} catch (HttpClientErrorException hcee) {
 					if (HttpStatus.BAD_REQUEST.equals(hcee.getStatusCode())) {
 						logger.warn("Caught 400 error, assuming admin user already installed; response body: "
@@ -297,7 +297,7 @@ public class AdminManager extends AbstractManager {
 
 		HttpEntity<Resource> resourceEntity = new HttpEntity<>(new ByteArrayResource(clusterConfigZipBytes), headers);
 		ResponseEntity<String> response = getRestTemplate().exchange(clusterConfigUri, HttpMethod.POST, resourceEntity, String.class);
-		if (response.getStatusCode().value() == 202) {
+		if (response.getStatusCodeValue() == 202) {
 			waitForRestart();
 		}
 	}
@@ -308,7 +308,7 @@ public class AdminManager extends AbstractManager {
 	 */
 	public void leaveCluster() {
 		ResponseEntity<String> response = getRestTemplate().exchange(adminConfig.buildUri("/admin/v1/host-config"), HttpMethod.DELETE, null, String.class);
-		if (response.getStatusCode().value() == 202) {
+		if (response.getStatusCodeValue() == 202) {
 			waitForRestart();
 		}
 	}

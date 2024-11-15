@@ -95,7 +95,7 @@ public abstract class Resource extends ApiObject {
             getLogger().info(format("Saved %s %s", name, label));
         }
         return format("[Path: %s; Resource ID: %s; HTTP status: %s]", receipt.getPath(), receipt.getResourceId(),
-                receipt.getResponse() != null ? receipt.getResponse().getStatusCode() : "(none)");
+                receipt.getResponse() != null ? receipt.getResponse().getStatusCodeValue() : "(none)");
     }
 
     /**

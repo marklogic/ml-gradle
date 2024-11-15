@@ -42,7 +42,9 @@ public class MgmtResponseErrorHandler extends DefaultResponseErrorHandler {
 			super.handleError(response);
 		} catch (HttpClientErrorException | HttpServerErrorException ex) {
 			String message = "Logging HTTP response body to assist with debugging: " + ex.getResponseBodyAsString();
-			if (HttpStatus.SERVICE_UNAVAILABLE.equals(ex.getStatusCode())) {
+      // Using HttpStatus.valueOf() and ex.getRawStatusCode() to allow Spring 6 to be used inplace of Spring 5
+      // getRawStatusCode() is deprecated in Spring 6 and will be removed in Spring 7
+			if (HttpStatus.SERVICE_UNAVAILABLE.equals(HttpStatus.valueOf(ex.getRawStatusCode()))) {
 				if (logger.isDebugEnabled()) {
 					logger.debug(message);
 				}

@@ -42,7 +42,7 @@ public class MgmtResponseErrorHandler extends DefaultResponseErrorHandler {
 			super.handleError(response);
 		} catch (HttpClientErrorException | HttpServerErrorException ex) {
 			String message = "Logging HTTP response body to assist with debugging: " + ex.getResponseBodyAsString();
-			if (HttpStatus.SERVICE_UNAVAILABLE.equals(ex.getStatusCode())) {
+			if (HttpStatus.SERVICE_UNAVAILABLE.equals(SpringWebUtil.getHttpStatus(ex))) {
 				if (logger.isDebugEnabled()) {
 					logger.debug(message);
 				}

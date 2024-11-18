@@ -15,24 +15,24 @@
  */
 package com.marklogic.mgmt.admin;
 
-import org.junit.jupiter.api.Test;
-
 import com.marklogic.mgmt.AbstractMgmtTest;
+import com.marklogic.rest.util.SpringWebUtil;
+import org.junit.jupiter.api.Test;
 import org.springframework.web.client.HttpClientErrorException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class InstallAdminTest extends AbstractMgmtTest {
 
-    /**
-     * Since this test suite assumes that MarkLogic has already been properly initialized, including having an admin
-     * user installed, this is just a smoke test to ensure that we don't get an error when trying to install the admin
-     * again. Instead, a message should be logged and ML should not be restarted.
-     */
-    @Test
-    void adminAlreadyInstalled() {
+	/**
+	 * Since this test suite assumes that MarkLogic has already been properly initialized, including having an admin
+	 * user installed, this is just a smoke test to ensure that we don't get an error when trying to install the admin
+	 * again. Instead, a message should be logged and ML should not be restarted.
+	 */
+	@Test
+	void adminAlreadyInstalled() {
 		assertDoesNotThrow(() -> adminManager.installAdmin("admin", "admin"));
-    }
+	}
 
 	@Test
 	void withNullUsername() {
@@ -41,7 +41,7 @@ public class InstallAdminTest extends AbstractMgmtTest {
 			adminConfig.setUsername(null);
 			HttpClientErrorException exception = assertThrows(HttpClientErrorException.class, () -> adminManager.installAdmin("admin", "admin"));
 			assertTrue(exception.getMessage().contains("Unauthorized"));
-			assertEquals(401, exception.getStatusCode().value());
+			assertEquals(401, SpringWebUtil.getHttpStatusCode(exception));
 		} finally {
 			adminConfig.setUsername(originalUsername);
 		}
@@ -54,7 +54,7 @@ public class InstallAdminTest extends AbstractMgmtTest {
 			adminConfig.setPassword(null);
 			HttpClientErrorException exception = assertThrows(HttpClientErrorException.class, () -> adminManager.installAdmin("admin", "admin"));
 			assertTrue(exception.getMessage().contains("Unauthorized"));
-			assertEquals(401, exception.getStatusCode().value());
+			assertEquals(401, SpringWebUtil.getHttpStatusCode(exception));
 		} finally {
 			adminConfig.setPassword(originalPassword);
 		}

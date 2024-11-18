@@ -22,6 +22,7 @@ import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.util.ObjectMapperFactory;
+import com.marklogic.rest.util.SpringWebUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,8 +95,10 @@ public abstract class Resource extends ApiObject {
         if (getLogger().isInfoEnabled()) {
             getLogger().info(format("Saved %s %s", name, label));
         }
-        return format("[Path: %s; Resource ID: %s; HTTP status: %s]", receipt.getPath(), receipt.getResourceId(),
-                receipt.getResponse() != null ? receipt.getResponse().getStatusCode() : "(none)");
+        return format("[Path: %s; Resource ID: %s; HTTP status: %s]",
+			receipt.getPath(), receipt.getResourceId(),
+			receipt.getResponse() != null ? SpringWebUtil.getHttpStatusCode(receipt.getResponse()) : "(none)"
+		);
     }
 
     /**

@@ -69,7 +69,8 @@ public class PreviewInterceptor extends DefaultResponseErrorHandler implements C
 	 * @param statusCode
 	 * @return
 	 */
-	@Override
+	// This is no longer overriding a method in Spring 6.1.x, so we'd need to change this. 
+//	@Override
 	protected boolean hasError(HttpStatus statusCode) {
 		if (HttpStatus.NOT_FOUND.equals(statusCode)) {
 			logger.info("Received a 404 response, but ignoring while doing a preview");

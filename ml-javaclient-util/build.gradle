@@ -1,7 +1,7 @@
 dependencies {
 	api 'com.marklogic:marklogic-client-api:7.0.0'
 	api 'com.marklogic:marklogic-xcc:11.3.0'
-	api 'org.springframework:spring-context:5.3.39'
+	api 'org.springframework:spring-context:6.1.15'
 
 	implementation 'org.jdom:jdom2:2.0.6.1'
 
@@ -12,7 +12,7 @@ dependencies {
 	implementation 'org.slf4j:slf4j-api:2.0.16'
 
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.11.0'
-	testImplementation 'org.springframework:spring-test:5.3.39'
+	testImplementation 'org.springframework:spring-test:6.1.15'
 	testImplementation 'org.mockito:mockito-core:4.11.0'
 
 	// Used for testing loading modules from the classpath

@@ -16,20 +16,21 @@
 package com.marklogic.appdeployer;
 
 import com.marklogic.appdeployer.util.SimplePropertiesSource;
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 import java.util.Properties;
 
-public class PopulateCustomTokensTest  {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class PopulateCustomTokensTest {
 
 	private AppConfig appConfig;
 	private Properties props;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		appConfig = new AppConfig();
 
 		props = new Properties();
@@ -38,7 +39,7 @@ public class PopulateCustomTokensTest  {
 	}
 
 	@Test
-	public void defaultPrefixAndSuffix() {
+	void defaultPrefixAndSuffix() {
 		appConfig.populateCustomTokens(new SimplePropertiesSource(props));
 
 		Map<String, String> tokens = appConfig.getCustomTokens();
@@ -47,7 +48,7 @@ public class PopulateCustomTokensTest  {
 	}
 
 	@Test
-	public void customPrefixAndSuffix() {
+	void customPrefixAndSuffix() {
 		appConfig.populateCustomTokens(new SimplePropertiesSource(props), "!!", "!!");
 
 		Map<String, String> tokens = appConfig.getCustomTokens();
@@ -56,7 +57,7 @@ public class PopulateCustomTokensTest  {
 	}
 
 	@Test
-	public void onlyPrefix() {
+	void onlyPrefix() {
 		appConfig.populateCustomTokens(new SimplePropertiesSource(props), "!!", null);
 
 		Map<String, String> tokens = appConfig.getCustomTokens();
@@ -65,11 +66,20 @@ public class PopulateCustomTokensTest  {
 	}
 
 	@Test
-	public void onlySuffix() {
+	void onlySuffix() {
 		appConfig.populateCustomTokens(new SimplePropertiesSource(props), null, "!!");
 
 		Map<String, String> tokens = appConfig.getCustomTokens();
 		assertEquals("blue", tokens.get("color!!"));
 		assertEquals("M", tokens.get("size!!"));
+	}
+
+	@Test
+	void whitespace() {
+		props.setProperty("someProp", "has space ");
+
+		appConfig.populateCustomTokens(new SimplePropertiesSource(props));
+		Map<String, String> tokens = appConfig.getCustomTokens();
+		assertEquals("has space", tokens.get("%%someProp%%"));
 	}
 }

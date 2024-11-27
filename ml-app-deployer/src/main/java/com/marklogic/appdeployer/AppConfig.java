@@ -343,7 +343,7 @@ public class AppConfig {
 					if (suffix != null) {
 						token = token + suffix;
 					}
-					customTokens.put(token, value);
+					customTokens.put(token, value.trim());
 				}
 			}
 		}

@@ -38,16 +38,14 @@ version of Gradle to use based on the version of ml-gradle you are using.
 If you wish to use Gradle 7 or higher, you must use ml-gradle 4.3.0 or higher. 
 
 You will need Java 8 or higher to run Gradle and ml-gradle. Both ml-gradle and the underlying 
-[MarkLogic Java Client](https://github.com/marklogic/java-client-api) dependency are tested on Java 8, 11, and 17.
+[MarkLogic Java Client](https://github.com/marklogic/java-client-api) dependency are tested on Java 8, 11, 17, and 21.
 
 Start using ml-gradle
 =========
 
-ml-gradle depends on at least [Java 8](https://java.com/en/download/) and [MarkLogic 9 or higher](https://developer.marklogic.com/products), 
+ml-gradle depends on at least Java 8 or higher and [MarkLogic 9 or higher](https://developer.marklogic.com/products), 
 so if you have those installed, you're just a few minutes away from using ml-gradle to start a new project and deploy an 
-application from it. Note that in addition to Java 8, you can use Java 11 or Java 17, but please see 
-[the MarkLogic Java Client documentation](https://github.com/marklogic/java-client-api) for information on dependencies
-you may need when using Java 11 or Java 17. 
+application from it.
 
 First, [install Gradle](https://gradle.org/install/). 
 

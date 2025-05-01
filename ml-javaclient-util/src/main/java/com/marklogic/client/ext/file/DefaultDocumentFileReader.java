@@ -20,14 +20,12 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.FileVisitor;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Non-threadsafe implementation that implements FileVisitor as a way of descending one or more file paths.
@@ -68,8 +66,10 @@ public class DefaultDocumentFileReader extends AbstractDocumentFileReader implem
 			Path p = constructPath(path);
 			if (p != null) {
 				this.currentRootPath = p;
+				// Fixed in 5.0.1 / 5.1.0 - symlinks are now followed and thus work properly.
+				Set<FileVisitOption> options = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
 				try {
-					Files.walkFileTree(this.currentRootPath, this);
+					Files.walkFileTree(this.currentRootPath, options, Integer.MAX_VALUE, this);
 				} catch (IOException ie) {
 					throw new RuntimeException(format("IO error while walking file tree at path: %s", path), ie);
 				}

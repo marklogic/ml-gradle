@@ -20,6 +20,11 @@ import com.marklogic.client.ext.AbstractIntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public class CascadeCollectionsAndPermissionsTest extends AbstractIntegrationTest {
 
 	final private String PARENT_COLLECTION = "ParentCollection";
@@ -38,36 +43,49 @@ public class CascadeCollectionsAndPermissionsTest extends AbstractIntegrationTes
 		loader.setCascadePermissions(true);
 	}
 
+	/**
+	 * This test also verifies that a symlink can be resolved.
+	 */
 	@Test
-	void parentWithBothProperties() {
-		loader.loadFiles("src/test/resources/process-files/cascading-metadata-test/parent1-withCP");
+	void parentWithBothProperties() throws IOException {
+		final Path symlink = Paths.get(".", "src", "test", "resources", "parent1CP");
+		final Path target = Paths.get(".", "src", "test", "resources", "process-files", "cascading-metadata-test", "parent1-withCP")
+			.toAbsolutePath();
 
-		verifyCollections("/parent.json", PARENT_COLLECTION);
-		verifyPermissions("/parent.json", "rest-writer", "update");
+		try {
+			Files.createSymbolicLink(symlink, target);
 
-		// Should be same as parent as it doesn't have C/P files.
-		verifyCollections("/child1/child1.json", PARENT_COLLECTION);
-		verifyPermissions("/child1/child1.json", "rest-writer", "update");
+			loader.loadFiles("src/test/resources/parent1CP");
 
-		// Differs from parent because it has its own C/P files.
-		verifyCollections("/child2/child2.json", "child2");
-		verifyPermissions("/child2/child2.json", "app-user", "read");
+			verifyCollections("/parent.json", PARENT_COLLECTION);
+			verifyPermissions("/parent.json", "rest-writer", "update");
 
-		// Differs from parent because it has its own C/P files.
-		verifyCollections("/child3/child3.json", "child3");
-		verifyPermissions("/child3/child3.json", "rest-reader", "read");
+			// Should be same as parent as it doesn't have C/P files.
+			verifyCollections("/child1/child1.json", PARENT_COLLECTION);
+			verifyPermissions("/child1/child1.json", "rest-writer", "update");
 
-		// Should inherit from child3, not parent.
-		verifyCollections("/child3/grandchild3/grandchild3.json", "child3");
-		verifyPermissions("/child3/grandchild3/grandchild3.json", "rest-reader", "read");
+			// Differs from parent because it has its own C/P files.
+			verifyCollections("/child2/child2.json", "child2");
+			verifyPermissions("/child2/child2.json", "app-user", "read");
 
-		// Should inherit from parent.
-		verifyCollections("/child4/child4.json", PARENT_COLLECTION);
-		verifyPermissions("/child4/child4.json", "rest-writer", "update");
+			// Differs from parent because it has its own C/P files.
+			verifyCollections("/child3/child3.json", "child3");
+			verifyPermissions("/child3/child3.json", "rest-reader", "read");
 
-		// Should override parent.
-		verifyCollections("/child4/grandchild4/grandchild4.json", "grandchild4");
-		verifyPermissions("/child4/grandchild4/grandchild4.json", "qconsole-user", "read");
+			// Should inherit from child3, not parent.
+			verifyCollections("/child3/grandchild3/grandchild3.json", "child3");
+			verifyPermissions("/child3/grandchild3/grandchild3.json", "rest-reader", "read");
+
+			// Should inherit from parent.
+			verifyCollections("/child4/child4.json", PARENT_COLLECTION);
+			verifyPermissions("/child4/child4.json", "rest-writer", "update");
+
+			// Should override parent.
+			verifyCollections("/child4/grandchild4/grandchild4.json", "grandchild4");
+			verifyPermissions("/child4/grandchild4/grandchild4.json", "qconsole-user", "read");
+		} finally {
+			Files.deleteIfExists(symlink);
+		}
 	}
 
 	@Test

@@ -1,4 +1,4 @@
-name: marklogic-javaclient-util-test-app
+name: docker-tests-ml-gradle
 
 services:
 

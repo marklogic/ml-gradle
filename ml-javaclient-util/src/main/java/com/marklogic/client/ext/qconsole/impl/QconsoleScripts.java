@@ -16,26 +16,31 @@
 package com.marklogic.client.ext.qconsole.impl;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
 public class QconsoleScripts {
 
-	private final static String MODULE_PATH = "com/marklogic/client/ext/qconsole/impl/";
+	private static final String MODULE_PATH = "com/marklogic/client/ext/qconsole/impl/";
 	public static final String IMPORT;
-	public final static String EXPORT;
+	public static final String EXPORT;
+
 	static {
-		IMPORT = readFile( MODULE_PATH + "import-workspaces.xqy");
-		EXPORT = readFile(MODULE_PATH + "export-workspaces.xqy");
+		try {
+			IMPORT = readFile(MODULE_PATH + "import-workspaces.xqy");
+			EXPORT = readFile(MODULE_PATH + "export-workspaces.xqy");
+		} catch (IOException e) {
+			throw new RuntimeException("Unable to read qconsole scripts; cause: " + e.getMessage(), e);
+		}
 	}
 
-	private static String readFile(String fileName){
-		InputStream inputStream = QconsoleScripts.class.getClassLoader().getResourceAsStream(fileName);
-		return new BufferedReader(
-			new InputStreamReader(inputStream, StandardCharsets.UTF_8))
-			.lines()
-			.collect(Collectors.joining("\n"));
+	private static String readFile(String fileName) throws IOException {
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+			QconsoleScripts.class.getClassLoader().getResourceAsStream(fileName), StandardCharsets.UTF_8
+		))) {
+			return reader.lines().collect(Collectors.joining("\n"));
+		}
 	}
 }

@@ -393,7 +393,8 @@ public class API extends LoggingObject {
     protected <T extends Resource> T getResource(String resourceNameOrId, ResourceManager mgr, Class<T> resourceClass,
             String... resourceUrlParams) {
         if (mgr.exists(resourceNameOrId)) {
-            return buildFromJson(mgr.getAsJson(resourceNameOrId, resourceUrlParams), resourceClass);
+			String json = mgr.getAsJson(resourceNameOrId, resourceUrlParams);
+            return buildFromJson(json, resourceClass);
         }
         throw new RuntimeException("Could not find resource with name or ID: " + resourceNameOrId);
     }

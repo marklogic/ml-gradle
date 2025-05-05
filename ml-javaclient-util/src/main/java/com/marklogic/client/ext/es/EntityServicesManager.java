@@ -77,16 +77,19 @@ public class EntityServicesManager {
 			"declare variable $oldModelUri external; " +
 			"declare variable $newModelUri external; " +
 			"es:version-translator-generate(fn:doc($oldModelUri), fn:doc($newModelUri))";
-		return client.newServerEval().xquery(xquery).addVariable("oldModelUri", oldModelUri).addVariable("newModelUri", newModelUri).
-			eval().next().getString();
+		return client.newServerEval()
+			.xquery(xquery)
+			.addVariable("oldModelUri", oldModelUri)
+			.addVariable("newModelUri", newModelUri)
+			.evalAs(String.class);
 	}
 
 	protected GeneratedCode initializeGeneratedCode(String modelUri) {
 		String xquery = "import module namespace es = \"http://marklogic.com/entity-services\" at \"/MarkLogic/entity-services/entity-services.xqy\"; " +
 			"declare variable $URI external; " +
 			"es:model-to-xml(es:model-validate(fn:doc($URI)))";
-		String output = client.newServerEval().xquery(xquery).addVariable("URI", modelUri).eval().next().getString();
-		Element root = null;
+		String output = client.newServerEval().xquery(xquery).addVariable("URI", modelUri).evalAs(String.class);
+		Element root;
 		try {
 			root = new SAXBuilder().build(new StringReader(output)).getRootElement();
 		} catch (Exception e) {
@@ -105,7 +108,7 @@ public class EntityServicesManager {
 		String xquery = "import module namespace es = \"http://marklogic.com/entity-services\" at \"/MarkLogic/entity-services/entity-services.xqy\"; " +
 			"declare variable $URI external; " +
 			String.format("es:%s(es:model-validate(fn:doc($URI)))", functionName);
-		return client.newServerEval().xquery(xquery).addVariable("URI", modelUri).eval().next().getString();
+		return client.newServerEval().xquery(xquery).addVariable("URI", modelUri).evalAs(String.class);
 	}
 
 	public void setModelCollection(String modelCollection) {

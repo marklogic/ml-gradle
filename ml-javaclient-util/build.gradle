@@ -1,5 +1,5 @@
 dependencies {
-	api 'com.marklogic:marklogic-client-api:7.0.0'
+	api 'com.marklogic:marklogic-client-api:7.1.0'
 	api 'com.marklogic:marklogic-xcc:11.3.0'
 	api 'org.springframework:spring-context:5.3.39'
 
@@ -9,7 +9,7 @@ dependencies {
 
 	// This is currently an implementation dependency, though perhaps should be an api dependency due to its usage in
 	// LoggingObject; not clear yet on whether the protected Logger in that class should make this an api dependency or not
-	implementation 'org.slf4j:slf4j-api:2.0.16'
+	implementation 'org.slf4j:slf4j-api:2.0.17'
 
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.11.0'
 	testImplementation 'org.springframework:spring-test:5.3.39'

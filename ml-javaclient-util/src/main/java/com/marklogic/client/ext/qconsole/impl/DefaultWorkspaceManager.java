@@ -17,11 +17,12 @@ package com.marklogic.client.ext.qconsole.impl;
 
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.eval.EvalResultIterator;
+import com.marklogic.client.eval.ServerEvaluationCall;
 import com.marklogic.client.ext.helper.LoggingObject;
+import com.marklogic.client.ext.qconsole.WorkspaceManager;
 import com.marklogic.client.io.DOMHandle;
 import com.marklogic.client.io.FileHandle;
 import com.marklogic.client.io.Format;
-import com.marklogic.client.ext.qconsole.WorkspaceManager;
 import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
@@ -56,22 +57,23 @@ public class DefaultWorkspaceManager extends LoggingObject implements WorkspaceM
 		List<File> files = new ArrayList<>();
 
 		for (String workspaceName : workspaceNames) {
-			EvalResultIterator result = client.newServerEval()
-				.addVariable("user", user)
+			ServerEvaluationCall call = client.newServerEval().addVariable("user", user)
 				.addVariable("workspace", workspaceName)
-				.xquery(QconsoleScripts.EXPORT).eval();
+				.xquery(QconsoleScripts.EXPORT);
 
-			while (result.hasNext()) {
-				DOMHandle dom = result.next().get(new DOMHandle());
-				File f = new File(userDir, workspaceName + ".xml");
-				try {
-					FileCopyUtils.copy(dom.toBuffer(), f);
-					if (logger.isInfoEnabled()) {
-						logger.info(format("Exported workspace %s to %s", workspaceName, f.getAbsolutePath()));
+			try (EvalResultIterator result = call.eval()) {
+				while (result.hasNext()) {
+					DOMHandle dom = result.next().get(new DOMHandle());
+					File f = new File(userDir, workspaceName + ".xml");
+					try {
+						FileCopyUtils.copy(dom.toBuffer(), f);
+						if (logger.isInfoEnabled()) {
+							logger.info(format("Exported workspace %s to %s", workspaceName, f.getAbsolutePath()));
+						}
+						files.add(f);
+					} catch (IOException ie) {
+						throw new RuntimeException("Unable to write workspace XML to file, workspace: " + workspaceName + "; cause: " + ie.getMessage());
 					}
-					files.add(f);
-				} catch (IOException ie) {
-					throw new RuntimeException("Unable to write workspace XML to file, workspace: " + workspaceName + "; cause: " + ie.getMessage());
 				}
 			}
 		}
@@ -100,7 +102,7 @@ public class DefaultWorkspaceManager extends LoggingObject implements WorkspaceM
 				client.newServerEval()
 					.addVariable("user", user)
 					.addVariable("exported-workspace", new FileHandle(f).withFormat(Format.XML))
-					.xquery(importQuery).eval();
+					.xquery(importQuery).evalAs(String.class);
 
 				if (logger.isInfoEnabled()) {
 					logger.info(format("Imported workspace from %s", f.getAbsolutePath()));

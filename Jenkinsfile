@@ -22,12 +22,9 @@ pipeline{
           export PATH=$GRADLE_USER_HOME:$JAVA_HOME/bin:$PATH
           cd ml-gradle
           cd ml-javaclient-util-test-app
-          echo "mlPassword=admin" > gradle-local.properties
           ../gradlew -i mlDeploy
           cd ..
-          ./gradlew ml-javaclient-util:test || true
-          ./gradlew ml-app-deployer:test || true
-          ./gradlew ml-gradle:test || true
+          ./gradlew test || true
         '''
         junit '**/build/**/*.xml'
       }
@@ -43,7 +40,7 @@ pipeline{
           export PATH=$GRADLE_USER_HOME:$JAVA_HOME/bin:$PATH
           cp ~/.gradle/gradle.properties $GRADLE_USER_HOME;
           cd ml-gradle
-           ./gradlew publish
+          ./gradlew publish
         '''
       }
     }

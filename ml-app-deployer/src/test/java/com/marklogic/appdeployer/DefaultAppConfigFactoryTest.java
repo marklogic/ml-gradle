@@ -678,6 +678,19 @@ public class DefaultAppConfigFactoryTest {
 	}
 
 	@Test
+	void blankCloudApiKey() {
+		AppConfig config = configure(
+			"mlCloudApiKey", "",
+			"mlRestBasePath", ""
+		);
+
+		assertNull(config.getCloudApiKey(), "As of 5.0.0, the property factories were only checking for non-null " +
+			"values before applying a property. The expectation now is that an empty string won't result in the " +
+			"property being applied either.");
+		assertNull(config.getRestBasePath());
+	}
+
+	@Test
 	void cloudApiKeyAndBasePath() {
 		AppConfig config = configure(
 			"mlCloudApiKey", "my-key",

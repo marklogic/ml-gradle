@@ -48,7 +48,9 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		final AppConfig appConfig = new AppConfig(this.projectDir);
 		for (String propertyName : propertyConsumerMap.keySet()) {
 			String value = getProperty(propertyName);
-			if (value != null) {
+			// In 5.1.0, the value must not be whitespace. But we have this hack here to preserve documented and tested
+			// functionality for allowing for mlModuleTimestampsPath to be set to an empty string to disable its functionality.
+			if (StringUtils.hasText(value) || (value != null && "mlModuleTimestampsPath".equalsIgnoreCase(propertyName))) {
 				try {
 					propertyConsumerMap.get(propertyName).accept(appConfig, value);
 				} catch (Exception ex) {

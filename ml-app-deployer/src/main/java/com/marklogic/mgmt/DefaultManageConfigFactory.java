@@ -261,7 +261,7 @@ public class DefaultManageConfigFactory extends PropertySourceFactory implements
 
 	    for (String propertyName : propertyConsumerMap.keySet()) {
 		    String value = getProperty(propertyName);
-		    if (value != null) {
+		    if (StringUtils.hasText(value)) {
 			    propertyConsumerMap.get(propertyName).accept(config, value);
 		    }
 	    }

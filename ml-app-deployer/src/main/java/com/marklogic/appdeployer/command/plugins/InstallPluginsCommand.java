@@ -31,6 +31,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -108,9 +109,11 @@ public class InstallPluginsCommand extends AbstractUndoableCommand {
 		logger.info(format("Invoking command '%s' in directory: %s", command, dir.getAbsolutePath()));
 		try {
 			Process process = new ProcessBuilder(command).directory(dir).start();
-			byte[] output = FileCopyUtils.copyToByteArray(process.getInputStream());
-			process.waitFor();
-			logger.info(format("Output from executing command '%s': %s", command, new String(output)));
+			try (InputStream inputStream = process.getInputStream()) {
+				byte[] output = FileCopyUtils.copyToByteArray(inputStream);
+				process.waitFor();
+				logger.info(format("Output from executing command '%s': %s", command, new String(output)));
+			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

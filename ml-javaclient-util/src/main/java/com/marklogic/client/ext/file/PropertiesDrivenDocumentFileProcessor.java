@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
@@ -76,12 +77,25 @@ public abstract class PropertiesDrivenDocumentFileProcessor extends LoggingObjec
 	private void processProperties(DocumentFile documentFile, Properties properties) {
 		final Path filename = documentFile.getFile().toPath().getFileName();
 		Enumeration patterns = properties.propertyNames();
-		while (patterns.hasMoreElements()) {
-			String pattern = (String) patterns.nextElement();
-			PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + pattern);
-			if (matcher.matches(filename)) {
-				String value = getPropertyValue(properties, pattern);
-				this.applyPropertyMatch(documentFile, pattern, value);
+		FileSystem fileSystem = FileSystems.getDefault();
+		try {
+			while (patterns.hasMoreElements()) {
+				String pattern = (String) patterns.nextElement();
+				PathMatcher matcher = fileSystem.getPathMatcher("glob:" + pattern);
+				if (matcher.matches(filename)) {
+					String value = getPropertyValue(properties, pattern);
+					this.applyPropertyMatch(documentFile, pattern, value);
+				}
+			}
+		} finally {
+			try {
+				fileSystem.close();
+			} catch (Exception ex) {
+				// It's fine if the fileSystem doesn't support being closed, which may simply be due to not being
+				// supported.
+				if (logger.isDebugEnabled()) {
+					logger.debug("Unable to close file system; cause: {}", ex.getMessage());
+				}
 			}
 		}
 	}

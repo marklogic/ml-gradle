@@ -16,3 +16,4 @@ out
 gradle-local.properties
 snyk
 .vscode
+docker

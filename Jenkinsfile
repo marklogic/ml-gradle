@@ -21,7 +21,7 @@ pipeline{
           export GRADLE_USER_HOME=$WORKSPACE/$GRADLE_DIR
           export PATH=$GRADLE_USER_HOME:$JAVA_HOME/bin:$PATH
           cd ml-gradle
-          cd ml-javaclient-util-test-app
+          cd test-app
           ../gradlew -i mlDeploy
           cd ..
           ./gradlew test || true

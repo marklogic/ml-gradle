@@ -38,7 +38,8 @@ public class ResourcesFragment extends Fragment {
                 "/node()/*[local-name(.) = 'list-items']/*[local-name(.) = 'list-count']").get(0));
     }
 
-    public boolean resourceExists(String resourceIdOrName) {
+	public boolean resourceExists(String resourceIdOrName) {
+		resourceIdOrName = sanitizeValueForXPathExpression(resourceIdOrName);
         String xpath = "/node()/*[local-name(.) = 'list-items']/node()"
                 + "[*[local-name(.) = 'nameref'] = '%s' or *[local-name(.) = 'idref'] = '%s']";
         xpath = String.format(xpath, resourceIdOrName, resourceIdOrName);
@@ -54,6 +55,7 @@ public class ResourcesFragment extends Fragment {
     }
 
     public String getNameRefForUriRef(String uriRef) {
+		uriRef = sanitizeValueForXPathExpression(uriRef);
 	    String xpath = "/node()/*[local-name(.) = 'list-items']/node()"
 		    + "[*[local-name(.) = 'uriref'] = '%s']/*[local-name(.) = 'nameref']";
 	    xpath = String.format(xpath, uriRef);
@@ -61,6 +63,8 @@ public class ResourcesFragment extends Fragment {
     }
 
     public String getListItemValue(String resourceIdOrName, String elementLocalName) {
+		resourceIdOrName = sanitizeValueForXPathExpression(resourceIdOrName);
+		elementLocalName = sanitizeValueForXPathExpression(elementLocalName);
         String xpath = "/node()/*[local-name(.) = 'list-items']/node()"
                 + "[*[local-name(.) = 'nameref'] = '%s' or *[local-name(.) = 'idref'] = '%s']/*[local-name(.) = '%s']";
         xpath = String.format(xpath, resourceIdOrName, resourceIdOrName, elementLocalName);
@@ -76,6 +80,7 @@ public class ResourcesFragment extends Fragment {
     }
 
     public List<String> getListItemValues(String elementName) {
+		elementName = sanitizeValueForXPathExpression(elementName);
         String xpath = "/node()/*[local-name(.) = 'list-items']/node()/*[local-name(.) = '%s']";
         return getElementValues(String.format(xpath, elementName));
     }
@@ -83,5 +88,13 @@ public class ResourcesFragment extends Fragment {
     public List<Element> getListItems() {
     	return evaluateForElements("/node()/*[local-name(.) = 'list-items']/node()[local-name(.) = 'list-item']");
     }
+
+	private String sanitizeValueForXPathExpression(String resourceIdOrName) {
+		// MarkLogic generally the following characters in a resource name, and we know an ID will never have them.
+		// Removing them avoids issues with XPath queries.
+		return resourceIdOrName != null ?
+			resourceIdOrName.replace("'", "").replace("\"", "").replace("[", "").replace("]", "") :
+			null;
+	}
 
 }

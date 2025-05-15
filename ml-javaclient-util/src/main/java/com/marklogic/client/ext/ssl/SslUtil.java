@@ -15,6 +15,8 @@
  */
 package com.marklogic.client.ext.ssl;
 
+import org.slf4j.LoggerFactory;
+
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -26,10 +28,12 @@ import java.security.NoSuchAlgorithmException;
 
 public abstract class SslUtil {
 
-	public final static String DEFAULT_SSL_PROTOCOL = "TLSv1.2";
+	// Defaulting this to "TLS" in 5.1.0 so that clients connecting to MarkLogic 12 will default to TLSv1.3, while
+	// clients connecting to MarkLogic 11 or older will default to TLSv1.2.
+	public final static String DEFAULT_SSL_PROTOCOL = "TLS";
 
 	/**
-	 * Configure an SSLContext and X509TrustManager with TLSv1.2 as the default protocol and the default algorithm of
+	 * Configure an SSLContext and X509TrustManager with the default protocol and the default algorithm of
 	 * TrustManagerFactory.
 	 *
 	 * @return an SslConfig object based on default settings
@@ -85,7 +89,9 @@ public abstract class SslUtil {
 		try {
 			sslContext.init(null, new TrustManager[]{x509TrustManager}, null);
 		} catch (KeyManagementException e) {
-			throw new RuntimeException("Unable to initialize SSLContext, cause: " + e.getMessage(), e);
+			// Including this to make Polaris happy.
+			LoggerFactory.getLogger(SslUtil.class).error("Unable to initialize an SSLContext", e);
+			throw new RuntimeException(String.format("Unable to initialize SSLContext, cause: %s", e.getMessage()), e);
 		}
 
 		return new SslConfig(sslContext, x509TrustManager);

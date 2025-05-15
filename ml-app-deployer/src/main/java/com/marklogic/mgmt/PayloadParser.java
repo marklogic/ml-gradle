@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.mgmt.util.ObjectMapperFactory;
 import com.marklogic.rest.util.Fragment;
+import com.marklogic.rest.util.XPathUtil;
 import org.jdom2.Element;
 import org.jdom2.output.XMLOutputter;
 
@@ -67,7 +68,8 @@ public class PayloadParser {
             return node.get(fieldName).isTextual() ? node.get(fieldName).asText() : node.get(fieldName).toString();
         } else {
             Fragment f = new Fragment(payload);
-            String xpath = String.format("/node()/*[local-name(.) = '%s']", fieldName);
+			String value = XPathUtil.sanitizeValueForXPathExpression(fieldName);
+            String xpath = String.format("/node()/*[local-name(.) = '%s']", value);
             if (!f.elementExists(xpath)) {
             	if (throwErrorIfNotFound) {
 		            throw new RuntimeException("Cannot get field value from XML at path: " + xpath + "; XML: " + payload);

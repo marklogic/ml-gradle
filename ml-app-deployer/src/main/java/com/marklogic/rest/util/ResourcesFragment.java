@@ -90,11 +90,7 @@ public class ResourcesFragment extends Fragment {
     }
 
 	private String sanitizeValueForXPathExpression(String resourceIdOrName) {
-		// MarkLogic generally the following characters in a resource name, and we know an ID will never have them.
-		// Removing them avoids issues with XPath queries.
-		return resourceIdOrName != null ?
-			resourceIdOrName.replace("'", "").replace("\"", "").replace("[", "").replace("]", "") :
-			null;
+		return XPathUtil.sanitizeValueForXPathExpression(resourceIdOrName);
 	}
 
 }

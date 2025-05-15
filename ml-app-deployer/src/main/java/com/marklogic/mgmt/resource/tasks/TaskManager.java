@@ -23,6 +23,7 @@ import com.marklogic.mgmt.api.task.Task;
 import com.marklogic.mgmt.resource.AbstractResourceManager;
 import com.marklogic.mgmt.resource.requests.RequestManager;
 import com.marklogic.rest.util.Fragment;
+import com.marklogic.rest.util.XPathUtil;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -65,8 +66,11 @@ public class TaskManager extends AbstractResourceManager {
 		final String taskDatabase = payloadParser.getPayloadFieldValue(payload, "task-database", false);
 
 		final String xpath = taskDatabase != null ?
-			format("/t:tasks-default-list/t:list-items/t:list-item[t:task-path = '%s' and t:task-database = '%s']/t:idref", taskPath, taskDatabase) :
-			format("/t:tasks-default-list/t:list-items/t:list-item[t:task-path = '%s']/t:idref", taskPath);
+			format("/t:tasks-default-list/t:list-items/t:list-item[t:task-path = '%s' and t:task-database = '%s']/t:idref",
+				XPathUtil.sanitizeValueForXPathExpression(taskPath),
+				XPathUtil.sanitizeValueForXPathExpression(taskDatabase)) :
+			format("/t:tasks-default-list/t:list-items/t:list-item[t:task-path = '%s']/t:idref",
+				XPathUtil.sanitizeValueForXPathExpression(taskPath));
 
 		final List<String> resourceIds = getAsXml().getElementValues(xpath);
 		if (resourceIds == null || resourceIds.isEmpty()) {
@@ -136,8 +140,12 @@ public class TaskManager extends AbstractResourceManager {
 	 */
 	public String getTaskIdForTaskPath(String taskPathOrTaskId) {
 		Fragment f = getAsXml();
-		String xpath = "/t:tasks-default-list/t:list-items/t:list-item[t:task-path = '%s' or t:idref = '%s']/t:idref";
-		xpath = String.format(xpath, taskPathOrTaskId, taskPathOrTaskId);
+		final String valueForXPath = XPathUtil.sanitizeValueForXPathExpression(taskPathOrTaskId);
+		final String xpath = String.format(
+			"/t:tasks-default-list/t:list-items/t:list-item[t:task-path = '%s' or t:idref = '%s']/t:idref",
+			valueForXPath, valueForXPath
+		);
+
 		List<String> resourceIds = f.getElementValues(xpath);
 		if (resourceIds == null || resourceIds.isEmpty()) {
 			throw new RuntimeException("Could not find a scheduled task with a task-path or task-id of: " + taskPathOrTaskId);

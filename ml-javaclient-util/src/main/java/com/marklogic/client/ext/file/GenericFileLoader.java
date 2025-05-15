@@ -139,8 +139,8 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 			}
 			List<DocumentWriteOperation> documentWriteOperations = batch.stream().map(file -> {
 				if (logFileUris && infoEnabled) {
-					final String uri = file.getUri();
-					logger.info("Writing: " + uri != null ? uri : file.getTemporalDocumentURI());
+					final String uriToLog = file.getUri() != null ? file.getUri() : file.getTemporalDocumentURI();
+					logger.info("Writing: {}", uriToLog);
 				}
 				return file.toDocumentWriteOperation();
 			}).collect(Collectors.toList());

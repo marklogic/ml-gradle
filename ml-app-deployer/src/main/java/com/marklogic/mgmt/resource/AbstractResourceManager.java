@@ -144,6 +144,9 @@ public abstract class AbstractResourceManager extends AbstractManager implements
      * @return
      */
     protected String encodeResourceId(String idValue) {
+		// Polaris effectively complains that this is allowing server-side request forgery. However, we cannot perform
+		// a full URL encoding here as "/" is allowed in some resource names, such as MIME types. Polaris also is
+		// seemingly only seeing the path and not the fact that the ManageClient will always build an http or https URL.
         return idValue != null ? idValue.replace("+", "%2B") : idValue;
     }
 

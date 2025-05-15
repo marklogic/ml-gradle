@@ -17,7 +17,10 @@ package com.marklogic.appdeployer.command.temporal;
 
 import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.ConfigDir;
-import com.marklogic.appdeployer.command.*;
+import com.marklogic.appdeployer.command.AbstractCommand;
+import com.marklogic.appdeployer.command.CommandContext;
+import com.marklogic.appdeployer.command.ResourceFilenameFilter;
+import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.resource.temporal.TemporalCollectionLSQTManager;
 
 import java.io.File;
@@ -47,8 +50,7 @@ public class DeployTemporalCollectionsLSQTCommand extends AbstractCommand {
 		if (dir != null && dir.exists()) {
 			for (File f : dir.listFiles(new ResourceFilenameFilter())) {
 				String name = f.getName();
-				// use filename without suffix as temporal collection
-				String temporalCollectionName = name.replaceAll(".xml|.json", "");
+				String temporalCollectionName = makeTemporalCollectionName(name);
 				String payload = copyFileToString(f, context);
 				if (logger.isInfoEnabled()) {
 					logger.info(format("Extracted temporal collection name '%s' from filename '%s'", temporalCollectionName, name));
@@ -58,5 +60,11 @@ public class DeployTemporalCollectionsLSQTCommand extends AbstractCommand {
 		} else {
 			logResourceDirectoryNotFound(dir);
 		}
+	}
+
+	private String makeTemporalCollectionName(String filename) {
+		// use filename without suffix as temporal collection
+		return filename.endsWith(".xml") || filename.endsWith(".json") ?
+			filename.substring(0, filename.length() - 4) : filename;
 	}
 }

@@ -24,7 +24,10 @@ pipeline{
           cd test-app
           ../gradlew -i mlDeploy
           cd ..
-          ./gradlew test || true
+          # Running these separately to decrease likelihood of connection resets.
+          ./gradlew ml-javaclient-util:test || true
+					./gradlew ml-app-deployer:test || true
+					./gradlew ml-gradle:test || true
         '''
         junit '**/build/**/*.xml'
       }

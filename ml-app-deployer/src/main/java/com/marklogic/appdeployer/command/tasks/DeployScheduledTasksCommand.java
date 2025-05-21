@@ -61,10 +61,13 @@ public class DeployScheduledTasksCommand extends AbstractResourceCommand {
         String originalGroupName = this.groupName;
         for (File resourceDir : getResourceDirs(context)) {
         	if (resourceDir != null && resourceDir.isDirectory()) {
-		        for (File dir : resourceDir.listFiles(new IsDirectoryFilter())) {
-			        setGroupName(dir.getName());
-			        processExecuteOnResourceDir(context, dir);
-		        }
+				File[] dirs = resourceDir.listFiles(new IsDirectoryFilter());
+				if (dirs != null) {
+					for (File dir : dirs) {
+						setGroupName(dir.getName());
+						processExecuteOnResourceDir(context, dir);
+					}
+				}
 	        }
         }
         setGroupName(originalGroupName);
@@ -84,9 +87,12 @@ public class DeployScheduledTasksCommand extends AbstractResourceCommand {
 		String originalGroupName = this.groupName;
 		for (File resourceDir : getResourceDirs(context)) {
 			if (resourceDir != null && resourceDir.isDirectory()) {
-				for (File dir : resourceDir.listFiles(new IsDirectoryFilter())) {
-					setGroupName(dir.getName());
-					processUndoOnResourceDir(context, dir);
+				File[] dirs = resourceDir.listFiles(new IsDirectoryFilter());
+				if (dirs != null) {
+					for (File dir : dirs) {
+						setGroupName(dir.getName());
+						processUndoOnResourceDir(context, dir);
+					}
 				}
 			}
 		}

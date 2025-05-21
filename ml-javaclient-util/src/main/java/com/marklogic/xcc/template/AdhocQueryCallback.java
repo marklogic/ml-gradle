@@ -16,6 +16,7 @@
 package com.marklogic.xcc.template;
 
 import com.marklogic.xcc.AdhocQuery;
+import com.marklogic.xcc.ResultSequence;
 import com.marklogic.xcc.Session;
 import com.marklogic.xcc.exceptions.RequestException;
 
@@ -25,16 +26,17 @@ import com.marklogic.xcc.exceptions.RequestException;
  */
 public class AdhocQueryCallback implements XccCallback<String> {
 
-    private String xquery;
+	private String xquery;
 
-    public AdhocQueryCallback(String xquery) {
-        this.xquery = xquery;
-    }
+	public AdhocQueryCallback(String xquery) {
+		this.xquery = xquery;
+	}
 
-    @Override
-    public String execute(Session session) throws RequestException {
-        AdhocQuery q = session.newAdhocQuery(xquery);
-        return session.submitRequest(q).asString();
-    }
+	@Override
+	public String execute(Session session) throws RequestException {
+		AdhocQuery q = session.newAdhocQuery(xquery);
+		ResultSequence result = session.submitRequest(q);
+		return result != null ? result.asString() : null;
+	}
 
 }

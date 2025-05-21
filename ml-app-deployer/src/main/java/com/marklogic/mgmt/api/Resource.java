@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Base class for any class that we both want to read/write from/to JSON and make calls to the Management REST API.
@@ -86,12 +87,14 @@ public abstract class Resource extends ApiObject {
      * @return a receipt string containing the path and HTTP status code
      */
     public String save() {
-        String name = getResourceType();
-        String label = getResourceLabel();
+        final String name = getResourceType();
+        final String label = getResourceLabel();
         if (getLogger().isInfoEnabled()) {
             getLogger().info(format("Saving %s %s", name, label));
         }
-        SaveReceipt receipt = getResourceManager().save(getJson());
+		final String json = getJson();
+		Objects.requireNonNull(json);
+        SaveReceipt receipt = getResourceManager().save(json);
         if (getLogger().isInfoEnabled()) {
             getLogger().info(format("Saved %s %s", name, label));
         }

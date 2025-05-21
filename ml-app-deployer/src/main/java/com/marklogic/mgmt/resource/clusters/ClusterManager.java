@@ -111,7 +111,7 @@ public class ClusterManager extends AbstractManager {
 
 		// Make sure host has previously been initialized. If it hasn't, the host-id from the getServerConfig will be empty
 		String hostId = fragment.getElementValue("node()/m:host-id");
-		if (hostId.isEmpty()){
+		if (hostId == null || hostId.isEmpty()){
 			throw new IllegalStateException("New host [" + hostname + "] has not been initialized. Please initialize the host first.");
 		}
 

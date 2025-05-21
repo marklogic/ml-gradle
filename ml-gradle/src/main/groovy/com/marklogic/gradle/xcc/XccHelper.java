@@ -52,7 +52,8 @@ public class XccHelper extends LoggingObject {
                 logger.info("Executing XQuery: " + xquery);
             }
             AdhocQuery q = session.newAdhocQuery(xquery);
-            return session.submitRequest(q).asString();
+			ResultSequence result = session.submitRequest(q);
+			return result != null ? result.asString() : null;
         } catch (RequestException re) {
             throw new RuntimeException(re);
         } finally {

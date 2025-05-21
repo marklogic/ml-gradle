@@ -53,9 +53,12 @@ public class DeployCustomForestsCommand extends AbstractCommand {
 			File dir = new File(configDir.getBaseDir(), customForestsPath);
 			if (dir != null && dir.exists()) {
 				payloadParser = new PayloadParser();
-				for (File f : dir.listFiles()) {
-					if (f.isDirectory()) {
-						processDirectory(f, context);
+				File[] dirs = dir.listFiles();
+				if (dirs != null) {
+					for (File f : dirs) {
+						if (f.isDirectory()) {
+							processDirectory(f, context);
+						}
 					}
 				}
 			} else {

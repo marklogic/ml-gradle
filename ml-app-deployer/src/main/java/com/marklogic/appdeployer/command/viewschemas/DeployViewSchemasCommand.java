@@ -28,6 +28,7 @@ import com.marklogic.mgmt.resource.viewschemas.ViewManager;
 import com.marklogic.mgmt.resource.viewschemas.ViewSchemaManager;
 
 import java.io.File;
+import java.util.Objects;
 
 /**
  * Processes each file in the view-schemas directory. For each one, then checks for a (view schema name)-views
@@ -89,11 +90,14 @@ public class DeployViewSchemasCommand extends AbstractResourceCommand {
 			File resourceFile = reference.getLastFile();
 			PayloadParser parser = new PayloadParser();
 			String viewSchemaName = parser.getPayloadFieldValue(receipt.getPayload(), "view-schema-name");
-			File viewDir = new File(resourceFile.getParentFile(), viewSchemaName + "-views");
-			if (viewDir.exists()) {
-				ViewManager viewMgr = new ViewManager(context.getManageClient(), currentDatabaseIdOrName, viewSchemaName);
-				for (File viewFile : listFilesInDirectory(viewDir)) {
-					saveResource(viewMgr, context, viewFile);
+			File parentFile = resourceFile.getParentFile();
+			if (parentFile != null) {
+				File viewDir = new File(parentFile, viewSchemaName + "-views");
+				if (viewDir.exists()) {
+					ViewManager viewMgr = new ViewManager(context.getManageClient(), currentDatabaseIdOrName, viewSchemaName);
+					for (File viewFile : listFilesInDirectory(viewDir)) {
+						saveResource(viewMgr, context, viewFile);
+					}
 				}
 			}
 		} else {

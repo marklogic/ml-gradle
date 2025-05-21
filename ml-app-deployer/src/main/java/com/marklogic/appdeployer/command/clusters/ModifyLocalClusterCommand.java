@@ -39,10 +39,13 @@ public class ModifyLocalClusterCommand extends AbstractCommand {
 		for (ConfigDir configDir : context.getAppConfig().getConfigDirs()) {
 			File clustersDir = configDir.getClustersDir();
 			if (clustersDir != null && clustersDir.exists()) {
-				for (File f : clustersDir.listFiles()) {
-					if (f.isFile() && f.getName().startsWith("local-cluster")) {
-						String payload = copyFileToString(f, context);
-						new ClusterManager(context.getManageClient()).modifyLocalCluster(payload, context.getAdminManager());
+				File[] files = clustersDir.listFiles();
+				if (files != null) {
+					for (File f : files) {
+						if (f.isFile() && f.getName().startsWith("local-cluster")) {
+							String payload = copyFileToString(f, context);
+							new ClusterManager(context.getManageClient()).modifyLocalCluster(payload, context.getAdminManager());
+						}
 					}
 				}
 			} else {

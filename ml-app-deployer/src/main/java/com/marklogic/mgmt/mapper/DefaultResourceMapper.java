@@ -88,7 +88,7 @@ public class DefaultResourceMapper implements ResourceMapper {
 				}
 				resource = (T) context.createUnmarshaller().unmarshal(new StringReader(payload));
 			}
-			if (api != null) {
+			if (api != null && resource != null) {
 				resource.setApi(api);
 				resource.setObjectMapper(api.getObjectMapper());
 			}

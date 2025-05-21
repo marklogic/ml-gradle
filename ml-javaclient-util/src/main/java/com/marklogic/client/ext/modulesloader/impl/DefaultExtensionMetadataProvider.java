@@ -65,9 +65,9 @@ public class DefaultExtensionMetadataProvider extends LoggingObject implements E
                 Element root = new SAXBuilder().build(metadataResource.getInputStream()).getRootElement();
                 m.setTitle(root.getChildText("title"));
                 Element desc = root.getChild("description");
-                if (desc.getChildren() != null && desc.getChildren().size() == 1) {
+                if (desc != null && desc.getChildren() != null && desc.getChildren().size() == 1) {
                     m.setDescription(new XMLOutputter().outputString(desc.getChildren().get(0)));
-                } else {
+                } else if (desc != null) {
                     m.setDescription(desc.getText());
                 }
                 for (Element method : root.getChildren("method")) {

@@ -15,6 +15,7 @@
  */
 package com.marklogic.client.ext.schemasloader.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.eval.ServerEvaluationCall;
@@ -23,7 +24,6 @@ import com.marklogic.client.ext.file.DocumentFileProcessor;
 import com.marklogic.client.ext.helper.FilenameUtil;
 import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.client.io.Format;
-import com.marklogic.client.io.JacksonHandle;
 import com.marklogic.client.io.StringHandle;
 import org.springframework.util.FileCopyUtils;
 
@@ -106,7 +106,7 @@ class TdeDocumentFileProcessor extends LoggingObject implements DocumentFileProc
 				}
 
 				if (call != null) {
-					ObjectNode node = (ObjectNode) call.eval(new JacksonHandle()).get();
+					ObjectNode node = (ObjectNode) call.evalAs(JsonNode.class);
 					if (node.get("valid").asBoolean()) {
 						logger.info("TDE template passed validation: " + file);
 					} else {

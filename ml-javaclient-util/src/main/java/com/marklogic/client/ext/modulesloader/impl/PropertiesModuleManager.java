@@ -69,21 +69,13 @@ public class PropertiesModuleManager extends LoggingObject implements ModulesMan
 	    }
 
 	    if (propertiesFile.exists()) {
-            FileInputStream fis = null;
-            try {
-                fis = new FileInputStream(propertiesFile);
+			try (FileInputStream fis = new FileInputStream(propertiesFile)) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Loading properties from: " + propertiesFile.getAbsolutePath());
                 }
                 props.load(fis);
             } catch (Exception e) {
                 logger.warn("Unable to load properties, cause: " + e.getMessage());
-            } finally {
-                try {
-                    fis.close();
-                } catch (Exception e) {
-                    logger.warn(e.getMessage());
-                }
             }
 	    }
     }

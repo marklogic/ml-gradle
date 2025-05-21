@@ -295,6 +295,7 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 					nodes.add(convertPayloadToObjectNode(context, payload));
 				});
 				ObjectNode mergedNode = JsonNodeUtil.mergeObjectNodes(nodes.toArray(new ObjectNode[]{}));
+				Objects.requireNonNull(mergedNode);
 				reference.setMergedObjectNode(mergedNode);
 				try {
 					reference.setDatabaseForSorting(objectReader.readValue(mergedNode));
@@ -398,11 +399,12 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 		databasePlans.forEach(plan -> {
 			final DeployDatabaseCommand deployDatabaseCommand = plan.getDeployDatabaseCommand();
 			String payload = deployDatabaseCommand.buildPayloadForSaving(context);
-			dbConfig.addDatabase(convertPayloadToObjectNode(context, payload));
-
-			DeployForestsCommand deployForestsCommand = deployDatabaseCommand.buildDeployForestsCommand(plan.getDatabaseName(), context);
-			if (deployForestsCommand != null) {
-				deployForestsCommand.buildForests(context, false).forEach(forest -> forestConfig.addForest(forest.toObjectNode()));
+			if (payload != null) {
+				dbConfig.addDatabase(convertPayloadToObjectNode(context, payload));
+				DeployForestsCommand deployForestsCommand = deployDatabaseCommand.buildDeployForestsCommand(plan.getDatabaseName(), context);
+				if (deployForestsCommand != null) {
+					deployForestsCommand.buildForests(context, false).forEach(forest -> forestConfig.addForest(forest.toObjectNode()));
+				}
 			}
 		});
 

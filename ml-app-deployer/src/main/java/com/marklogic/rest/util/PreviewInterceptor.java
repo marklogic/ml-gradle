@@ -259,7 +259,7 @@ public class PreviewInterceptor extends DefaultResponseErrorHandler implements C
 
 			@Override
 			public String getStatusText() {
-				return null;
+				return "OK";
 			}
 
 			@Override

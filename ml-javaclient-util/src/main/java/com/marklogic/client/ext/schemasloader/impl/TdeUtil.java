@@ -28,10 +28,10 @@ abstract class TdeUtil {
 
 	public static boolean templateBatchInsertSupported(DatabaseClient client) {
 		final int markLogic10Dot9 = 10000900;
-		String result = client.newServerEval().javascript("xdmp.effectiveVersion()").eval(new StringHandle()).get();
+		String result = client.newServerEval().javascript("xdmp.effectiveVersion()").evalAs(String.class);
 		if (logger.isDebugEnabled()) {
 			logger.debug("Checking if templateBatchInsert is supported; MarkLogic version: " + result);
 		}
-		return Integer.parseInt(result) >= markLogic10Dot9;
+		return result != null ? Integer.parseInt(result) >= markLogic10Dot9 : false;
 	}
 }

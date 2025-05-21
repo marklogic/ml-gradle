@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Big facade-style class for the MarkLogic Management API. Use this to instantiate or access any resource, as it will
@@ -256,12 +257,17 @@ public class API extends LoggingObject {
     }
 
     public QueryRoleset queryRoleset(String... roleNames) {
-	    List<String> names = new ArrayList<>();
-		names.addAll(Arrays.asList(roleNames));
-    	QueryRoleset roleset = new QueryRoleset();
+		QueryRoleset roleset = new QueryRoleset();
 	    roleset.setApi(this);
-	    roleset.setRoleName(names);
-    	return roleNames != null && roleset.exists() ?
+		List<String> names = new ArrayList<>();
+		roleset.setRoleName(names);
+
+		if (roleNames == null) {
+			return roleset;
+		}
+		names.addAll(Arrays.asList(roleNames));
+
+		return roleset.exists() ?
 		    getResource(roleset.getRoleNamesAsJsonArrayString(), new QueryRolesetManager(getManageClient()), QueryRoleset.class) :
 		    roleset;
     }
@@ -402,6 +408,7 @@ public class API extends LoggingObject {
     protected <T extends Resource> T buildFromJson(String json, Class<T> clazz) {
         try {
             T resource = getObjectMapper().readerFor(clazz).readValue(json);
+			Objects.requireNonNull(resource);
             resource.setApi(this);
             resource.setObjectMapper(getObjectMapper());
             return resource;

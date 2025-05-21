@@ -24,6 +24,7 @@ import org.jdom2.Namespace;
 import org.jdom2.input.SAXBuilder;
 
 import java.io.StringReader;
+import java.util.Objects;
 
 /**
  * Handles loading a model and then making calls to generate code for it.
@@ -89,6 +90,7 @@ public class EntityServicesManager {
 			"declare variable $URI external; " +
 			"es:model-to-xml(es:model-validate(fn:doc($URI)))";
 		String output = client.newServerEval().xquery(xquery).addVariable("URI", modelUri).evalAs(String.class);
+		Objects.requireNonNull(output);
 		Element root;
 		try {
 			root = new SAXBuilder().build(new StringReader(output)).getRootElement();
@@ -96,8 +98,10 @@ public class EntityServicesManager {
 			throw new RuntimeException("Unable to parse model XML: " + e.getMessage(), e);
 		}
 		Namespace ns = Namespace.getNamespace("es", "http://marklogic.com/entity-services");
-		String title = root.getChild("info", ns).getChildText("title", ns);
-		String version = root.getChild("info", ns).getChildText("version", ns);
+		Element info = root.getChild("info", ns);
+		Objects.requireNonNull(info);
+		String title = info.getChildText("title", ns);
+		String version = info.getChildText("version", ns);
 		GeneratedCode code = new GeneratedCode();
 		code.setTitle(title);
 		code.setVersion(version);

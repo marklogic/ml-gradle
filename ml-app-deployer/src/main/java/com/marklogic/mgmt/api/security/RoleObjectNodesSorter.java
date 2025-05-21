@@ -50,8 +50,10 @@ public class RoleObjectNodesSorter implements ObjectNodesSorter {
 		for (ObjectNode objectNode : objectNodes) {
 			try {
 				Role role = reader.readValue(objectNode);
-				roles.add(role);
-				roleMap.put(role.getRoleName(), objectNode);
+				if (role != null && role.getRoleName() != null) {
+					roles.add(role);
+					roleMap.put(role.getRoleName(), objectNode);
+				}
 			} catch (IOException e) {
 				throw new RuntimeException("Unable to read ObjectNode into Role; JSON: " + objectNode, e);
 			}

@@ -135,7 +135,7 @@ public class InstallPluginsCommand extends AbstractUndoableCommand {
 
 	protected File findPluginZipInDirectory(File dir) {
 		File[] files = dir.listFiles((dir1, name) -> name.endsWith(".zip"));
-		if (files.length == 0) {
+		if (files == null || files.length == 0) {
 			logger.info("No files ending in .zip found in directory: " + dir.getAbsolutePath());
 			return null;
 		}
@@ -166,14 +166,17 @@ public class InstallPluginsCommand extends AbstractUndoableCommand {
 			return;
 		}
 
-		for (File dir : new File(path).listFiles()) {
-			if (!dir.isDirectory()) {
-				continue;
-			}
+		File[] files = pluginsDir.listFiles();
+		if (files != null) {
+			for (File file : files) {
+				if (!file.isDirectory()) {
+					continue;
+				}
 
-			final String pluginName = getPluginName(dir, appConfig);
-			if (pluginName != null) {
-				uninstallPlugin(pluginName, appConfig, client);
+				final String pluginName = getPluginName(file, appConfig);
+				if (pluginName != null) {
+					uninstallPlugin(pluginName, appConfig, client);
+				}
 			}
 		}
 	}

@@ -74,7 +74,7 @@ public abstract class AbstractNameMatchingResourceSelector implements ResourceSe
 			Namespace ns = Namespace.getNamespace("http://marklogic.com/manage/security");
 			for (Element amp : amps.getListItems()) {
 				String nameref = amp.getChildText("nameref", ns);
-				if (nameMatches(nameref)) {
+				if (nameref != null && nameMatches(nameref)) {
 					String uriref = amp.getChildText("uriref", ns);
 					selection.select(MapResourceSelection.AMPS, uriref);
 				}

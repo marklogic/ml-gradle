@@ -478,7 +478,8 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 		if (files != null && files.length > 1) {
 			Arrays.sort(files);
 		}
-		return files;
+		// dir.listFiles is allowed to return null, so we do this so callers don't have to worry about null.
+		return files != null ? files : new File[0];
 	}
 
 	protected void logResourceDirectoryNotFound(File dir) {

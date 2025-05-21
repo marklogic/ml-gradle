@@ -212,8 +212,11 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 	public void undo(CommandContext context) {
 		if (deleteResourcesOnUndo) {
 			setIncrementalMode(false);
-			for (File resourceDir : getResourceDirs(context)) {
-				processUndoOnResourceDir(context, resourceDir);
+			File[] dirs = getResourceDirs(context);
+			if (dirs != null) {
+				for (File resourceDir : dirs) {
+					processUndoOnResourceDir(context, resourceDir);
+				}
 			}
 		}
 	}

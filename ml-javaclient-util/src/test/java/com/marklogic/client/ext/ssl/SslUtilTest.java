@@ -31,7 +31,8 @@ public class SslUtilTest {
 		assertTrue(certs.length > 0);
 
 		SSLContext context = config.getSslContext();
-		assertEquals("TLSv1.2", context.getProtocol());
+		assertEquals("TLS", context.getProtocol(), "As of 5.1.0, the default is TLS so that clients connecting to " +
+			"MarkLogic 12 will default to TLSv1.3.");
 	}
 
 	@Test

@@ -19,6 +19,8 @@ import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.ext.SecurityContextType;
 import com.marklogic.client.ext.modulesloader.impl.PropertiesModuleManager;
+import com.marklogic.client.ext.ssl.SslUtil;
+import com.marklogic.client.impl.SSLUtil;
 import com.marklogic.mgmt.util.SimplePropertySource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -618,7 +620,7 @@ public class DefaultAppConfigFactoryTest {
 	@Test
 	public void appServicesSimpleSsl() {
 		AppConfig config = configure("mlAppServicesSimpleSsl", "true");
-		assertEquals("TLSv1.2", config.getAppServicesSslContext().getProtocol());
+		assertEquals(SslUtil.DEFAULT_SSL_PROTOCOL, config.getAppServicesSslContext().getProtocol());
 
 		config = configure("mlAppServicesSimpleSsl", "TLSv1.2");
 		assertEquals("TLSv1.2", config.getAppServicesSslContext().getProtocol());
@@ -636,7 +638,7 @@ public class DefaultAppConfigFactoryTest {
 	@Test
 	public void restSimpleSsl() {
 		AppConfig config = configure("mlSimpleSsl", "true");
-		assertEquals("TLSv1.2", config.getRestSslContext().getProtocol());
+		assertEquals(SslUtil.DEFAULT_SSL_PROTOCOL, config.getRestSslContext().getProtocol());
 
 		config = configure("mlSimpleSsl", "TLSv1.2");
 		assertEquals("TLSv1.2", config.getRestSslContext().getProtocol());

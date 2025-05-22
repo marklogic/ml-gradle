@@ -272,7 +272,9 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 		if (resourceMapper == null) {
 			resourceMapper = new DefaultResourceMapper(new API(context.getManageClient()));
 		}
-		return resourceMapper.readResource(payload, resourceClassType).getJson();
+		Resource resource = resourceMapper.readResource(payload, resourceClassType);
+		Objects.requireNonNull(resource);
+		return resource.getJson();
 	}
 
 	/**

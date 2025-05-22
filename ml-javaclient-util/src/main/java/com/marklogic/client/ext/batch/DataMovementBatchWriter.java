@@ -58,7 +58,7 @@ public class DataMovementBatchWriter extends LoggingObject implements BatchWrite
 		if (writeBatcher != null) {
 			writeBatcher.flushAndWait();
 			if (jobTicket != null) {
-				dataMovementManager.stopJob(writeBatcher);
+				dataMovementManager.stopJob(jobTicket);
 			} else {
 				dataMovementManager.stopJob(writeBatcher);
 			}

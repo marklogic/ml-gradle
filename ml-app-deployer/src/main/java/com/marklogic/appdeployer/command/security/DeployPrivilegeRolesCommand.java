@@ -68,7 +68,7 @@ public class DeployPrivilegeRolesCommand extends AbstractResourceCommand {
 				resourceMapper = new DefaultResourceMapper(new API(context.getManageClient()));
 			}
 			Privilege p = resourceMapper.readResource(payload, Privilege.class);
-			if (p.getRole() == null || p.getRole().isEmpty()) {
+			if (p == null || p.getRole() == null || p.getRole().isEmpty()) {
 				return null;
 			}
 		}

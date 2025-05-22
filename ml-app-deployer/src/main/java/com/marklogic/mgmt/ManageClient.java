@@ -269,8 +269,7 @@ public class ManageClient extends LoggingObject {
 
 	protected void logRequest(String path, String contentType, String method) {
 		if (logger.isInfoEnabled()) {
-			String username = manageConfig != null ?
-				String.format("as user '%s' ", manageConfig.getUsername()) : "";
+			String username = String.format("as user '%s' ", manageConfig.getUsername());
 			logger.info("Sending {} {} request {}to path: {}", contentType, method, username, buildUri(path));
 		}
 	}

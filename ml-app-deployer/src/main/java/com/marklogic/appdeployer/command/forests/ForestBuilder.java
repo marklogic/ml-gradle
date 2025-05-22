@@ -22,10 +22,7 @@ import com.marklogic.mgmt.api.forest.Forest;
 import com.marklogic.mgmt.mapper.DefaultResourceMapper;
 import com.marklogic.mgmt.mapper.ResourceMapper;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Based on a given ForestPlan object, builds a list of one or more Forest objects in memory - i.e. nothing is written
@@ -60,6 +57,8 @@ public class ForestBuilder extends LoggingObject {
 	 */
 	public List<Forest> buildForests(ForestPlan forestPlan, AppConfig appConfig) {
 		final String databaseName = forestPlan.getDatabaseName();
+		Objects.requireNonNull(databaseName);
+		Objects.requireNonNull(appConfig);
 
 		// Find out what forests we have already, keyed on host and then data directory
 		Map<String, Map<String, List<Forest>>> existingForestsMap = existingForestsMap(forestPlan);

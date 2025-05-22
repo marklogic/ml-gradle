@@ -21,8 +21,10 @@ import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.resource.AbstractResourceManager;
 import com.marklogic.rest.util.Fragment;
 import com.marklogic.rest.util.ResourcesFragment;
+import com.marklogic.rest.util.XPathUtil;
 import org.springframework.http.ResponseEntity;
 
+import javax.xml.xpath.XPath;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,12 +98,13 @@ public class AmpManager extends AbstractResourceManager {
 		String xpath = "/node()/*[local-name(.) = 'list-items']/node()[" +
 			"(*[local-name(.) = 'nameref'] = '%s' or *[local-name(.) = 'idref'] = '%s')" +
 			" and *[local-name(.) = 'document-uri'] = '%s'";
-		xpath = format(xpath, localName, localName, documentUri);
+		xpath = format(xpath, XPathUtil.sanitizeValueForXPathExpression(localName),
+			XPathUtil.sanitizeValueForXPathExpression(localName), XPathUtil.sanitizeValueForXPathExpression(documentUri));
 		if (namespace != null) {
-			xpath += format(" and *[local-name(.) = 'namespace'] = '%s'", namespace);
+			xpath += format(" and *[local-name(.) = 'namespace'] = '%s'", XPathUtil.sanitizeValueForXPathExpression(namespace));
 		}
 		if (modulesDatabase != null) {
-			xpath += format(" and *[local-name(.) = 'modules-database'] = '%s'", modulesDatabase);
+			xpath += format(" and *[local-name(.) = 'modules-database'] = '%s'", XPathUtil.sanitizeValueForXPathExpression(modulesDatabase));
 		} else {
 			xpath += format(" and *[local-name(.) = 'modules-database'] = 'filesystem'");
 		}

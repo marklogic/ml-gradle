@@ -24,10 +24,12 @@ import com.marklogic.mgmt.resource.AbstractResourceManager;
 import com.marklogic.mgmt.resource.requests.RequestManager;
 import com.marklogic.rest.util.Fragment;
 import com.marklogic.rest.util.XPathUtil;
+import org.springframework.http.ResponseEntity;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The "groupName" property of this class corresponds to the "group-id" querystring parameter. It's called
@@ -170,9 +172,10 @@ public class TaskManager extends AbstractResourceManager {
 			logger.info("Checking for existence of resource: " + resourceNameOrId);
 		}
 		Fragment f = getAsXml();
+		String valueForXPath = XPathUtil.sanitizeValueForXPathExpression(resourceNameOrId);
 		return f.elementExists(format(
 			"/t:tasks-default-list/t:list-items/t:list-item[t:task-path = '%s' or t:idref = '%s']",
-			resourceNameOrId, resourceNameOrId));
+			valueForXPath, valueForXPath));
 	}
 
 	/**
@@ -204,7 +207,10 @@ public class TaskManager extends AbstractResourceManager {
 		String enabled = payloadParser.getPayloadFieldValue(payload, "task-enabled", false);
 		if ("false".equalsIgnoreCase(enabled)) {
 			// We don't reuse updateResource here since that first deletes the task
-			URI uri = receipt.getResponse().getHeaders().getLocation();
+			ResponseEntity<String> response = receipt.getResponse();
+			Objects.requireNonNull(response);
+			URI uri = response.getHeaders().getLocation();
+			Objects.requireNonNull(uri, "Expecting the response to have a location header");
 			// Expecting a path of "/manage/(version)/tasks/(taskId)"
 			String[] tokens = uri.getPath().split("/");
 			final String taskId = tokens[tokens.length - 1];

@@ -285,6 +285,7 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 					String testPayload = payloadTokenReplacer.replaceTokens(copyFileToString(files.get(0)), context.getAppConfig(), true);
 					testDatabasePlan.setPayload(testPayload);
 					Database testDb = resourceMapper.readResource(payload, Database.class);
+					Objects.requireNonNull(testDb);
 					testDb.setDatabaseName(testContentDatabaseName);
 					testDatabasePlan.setDatabaseForSorting(testDb);
 				}

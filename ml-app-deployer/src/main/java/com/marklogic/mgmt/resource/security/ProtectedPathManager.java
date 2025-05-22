@@ -19,6 +19,7 @@ import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.resource.AbstractResourceManager;
 import com.marklogic.rest.util.Fragment;
 import com.marklogic.rest.util.ResourcesFragment;
+import com.marklogic.rest.util.XPathUtil;
 import org.springframework.web.client.ResourceAccessException;
 
 public class ProtectedPathManager extends AbstractResourceManager {
@@ -70,7 +71,7 @@ public class ProtectedPathManager extends AbstractResourceManager {
 		}
 		return getAsXml().elementExists(format(
 			"/node()/*[local-name(.) = 'list-items']/node()[*[local-name(.) = 'nameref'] = '%s']",
-			resourceNameOrId));
+			XPathUtil.sanitizeValueForXPathExpression(resourceNameOrId)));
 	}
 
 	public String getIdForPathExpression(String pathExpression) {

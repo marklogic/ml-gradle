@@ -55,7 +55,7 @@ public class ForestBuilder extends LoggingObject {
 	 * @param appConfig
 	 * @return
 	 */
-	public List<Forest> buildForests(ForestPlan forestPlan, AppConfig appConfig) {
+	public List<Forest> buildForests(ForestPlan forestPlan, final AppConfig appConfig) {
 		final String databaseName = forestPlan.getDatabaseName();
 		Objects.requireNonNull(databaseName);
 		Objects.requireNonNull(appConfig);
@@ -85,6 +85,7 @@ public class ForestBuilder extends LoggingObject {
 				for (int i = 0; i < forestsToCreate; i++) {
 					forestCounter++;
 					Forest forest = newForest(forestPlan);
+					Objects.requireNonNull(forest);
 					forest.setForestName(getForestName(databaseName, forestCounter, appConfig));
 					forest.setHost(hostName);
 					forest.setDatabase(databaseName);

@@ -17,11 +17,11 @@ package com.marklogic.client.ext.es;
 
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.document.GenericDocumentManager;
+import com.marklogic.client.ext.util.XmlUtil;
 import com.marklogic.client.io.BytesHandle;
 import com.marklogic.client.io.DocumentMetadataHandle;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
-import org.jdom2.input.SAXBuilder;
 
 import java.io.StringReader;
 import java.util.Objects;
@@ -93,7 +93,7 @@ public class EntityServicesManager {
 		Objects.requireNonNull(output);
 		Element root;
 		try {
-			root = new SAXBuilder().build(new StringReader(output)).getRootElement();
+			root = XmlUtil.newSAXBuilder().build(new StringReader(output)).getRootElement();
 		} catch (Exception e) {
 			throw new RuntimeException("Unable to parse model XML: " + e.getMessage(), e);
 		}

@@ -28,10 +28,10 @@ import com.marklogic.client.ext.helper.FilenameUtil;
 import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.client.ext.modulesloader.*;
 import com.marklogic.client.ext.tokenreplacer.TokenReplacer;
+import com.marklogic.client.ext.util.XmlUtil;
 import com.marklogic.client.io.Format;
 import com.marklogic.client.io.StringHandle;
 import org.jdom2.Element;
-import org.jdom2.input.SAXBuilder;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.io.Resource;
 import org.springframework.core.task.SyncTaskExecutor;
@@ -319,7 +319,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 	protected void applyXmlProperties(ServerConfigurationManager mgr, Resource r, File file) {
 		Element root;
 		try {
-			root = new SAXBuilder().build(r.getInputStream()).getRootElement();
+			root = XmlUtil.newSAXBuilder().build(r.getInputStream()).getRootElement();
 		} catch (Exception e) {
 			throw new RuntimeException("Unable to read XML REST properties file: " + file.getAbsolutePath(), e);
 		}

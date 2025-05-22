@@ -22,12 +22,12 @@ import com.marklogic.client.ext.file.DocumentFile;
 import com.marklogic.client.ext.file.DocumentFileProcessor;
 import com.marklogic.client.ext.helper.FilenameUtil;
 import com.marklogic.client.ext.helper.LoggingObject;
+import com.marklogic.client.ext.util.XmlUtil;
 import com.marklogic.client.extra.jdom.JDOMHandle;
 import com.marklogic.client.io.Format;
 import com.marklogic.client.io.StringHandle;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.input.SAXBuilder;
 import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
@@ -99,7 +99,7 @@ class QbvDocumentFileProcessor extends LoggingObject implements DocumentFileProc
 			if (Format.XML.equals(handleString.getFormat())) {
 				Document xmlDocument;
 				try {
-					xmlDocument = new SAXBuilder().build(new StringReader(handleString.get()));
+					xmlDocument = XmlUtil.newSAXBuilder().build(new StringReader(handleString.get()));
 				} catch (Exception e) {
 					throw new RuntimeException(format("Query-Based View generation failed for file: %s; cause: %s", qbvFile.getFile().getAbsolutePath(), e.getMessage()));
 				}

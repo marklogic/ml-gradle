@@ -24,7 +24,6 @@ import com.marklogic.rest.util.ResourcesFragment;
 import com.marklogic.rest.util.XPathUtil;
 import org.springframework.http.ResponseEntity;
 
-import javax.xml.xpath.XPath;
 import java.util.ArrayList;
 import java.util.List;
 

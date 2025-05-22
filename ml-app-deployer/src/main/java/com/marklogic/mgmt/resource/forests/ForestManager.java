@@ -26,8 +26,6 @@ import com.marklogic.mgmt.mapper.ResourceMapper;
 import com.marklogic.mgmt.resource.AbstractResourceManager;
 import com.marklogic.rest.util.Fragment;
 import com.marklogic.rest.util.XPathUtil;
-import org.springframework.http.HttpMethod;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
 import java.util.HashMap;

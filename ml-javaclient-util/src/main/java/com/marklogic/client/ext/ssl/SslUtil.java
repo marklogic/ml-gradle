@@ -15,6 +15,7 @@
  */
 package com.marklogic.client.ext.ssl;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
@@ -31,6 +32,8 @@ public abstract class SslUtil {
 	// Defaulting this to "TLS" in 5.1.0 so that clients connecting to MarkLogic 12 will default to TLSv1.3, while
 	// clients connecting to MarkLogic 11 or older will default to TLSv1.2.
 	public final static String DEFAULT_SSL_PROTOCOL = "TLS";
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(SslUtil.class);
 
 	/**
 	 * Configure an SSLContext and X509TrustManager with the default protocol and the default algorithm of
@@ -57,7 +60,7 @@ public abstract class SslUtil {
 		} catch (NoSuchAlgorithmException e) {
 			// Including this to make Polaris happy.
 			String message = String.format("Unable to instantiate SSLContext with protocol: %s; cause: %s", protocol, e.getMessage());
-			LoggerFactory.getLogger(SslUtil.class).error(message, e);
+			LOGGER.error(message, e);
 			throw new RuntimeException(message, e);
 		}
 
@@ -68,7 +71,10 @@ public abstract class SslUtil {
 		try {
 			trustManagerFactory = TrustManagerFactory.getInstance(algorithm);
 		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException("Unable to instantiate TrustManagerFactory, cause: " + e.getMessage(), e);
+			// Including this to make Polaris happy.
+			String message = String.format("Unable to instantiate TrustManagerFactory, cause: %s", e.getMessage());
+			LOGGER.error(message, e);
+			throw new RuntimeException(message, e);
 		}
 
 		try {
@@ -76,7 +82,7 @@ public abstract class SslUtil {
 		} catch (KeyStoreException e) {
 			// Including this to make Polaris happy.
 			String message = String.format("Unable to initialize TrustManagerFactory, cause: %s", e.getMessage());
-			LoggerFactory.getLogger(SslUtil.class).error(message, e);
+			LOGGER.error(message, e);
 			throw new RuntimeException(message, e);
 		}
 
@@ -97,7 +103,7 @@ public abstract class SslUtil {
 		} catch (KeyManagementException e) {
 			// Including this to make Polaris happy.
 			String message = String.format("Unable to initialize SSLContext, cause: %s", e.getMessage());
-			LoggerFactory.getLogger(SslUtil.class).error(message, e);
+			LOGGER.error(message, e);
 			throw new RuntimeException(message, e);
 		}
 

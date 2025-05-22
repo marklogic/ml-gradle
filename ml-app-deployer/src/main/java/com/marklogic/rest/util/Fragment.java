@@ -15,17 +15,15 @@
  */
 package com.marklogic.rest.util;
 
+import com.marklogic.client.ext.util.XmlUtil;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.filter.Filters;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.input.sax.XMLReaders;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
-import org.xml.sax.InputSource;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -45,19 +43,7 @@ public class Fragment {
 
 	public Fragment(String xml, Namespace... namespaces) {
 		try {
-			SAXBuilder builder = new SAXBuilder(XMLReaders.NONVALIDATING);
-
-			// Prevent DTDs from being loaded
-			builder.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-
-			// Disable external entities
-			builder.setFeature("http://xml.org/sax/features/external-general-entities", false);
-			builder.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-
-			// Set a no-op EntityResolver to block external DTDs
-			builder.setEntityResolver((publicId, systemId) -> new InputSource(new StringReader("")));
-
-			internalDoc = builder.build(new StringReader(xml));
+			internalDoc = XmlUtil.newSAXBuilder().build(new StringReader(xml));
 			List<Namespace> list = new ArrayList<>();
 			list.add(Namespace.getNamespace("arp", "http://marklogic.com/manage/alert-rule/properties"));
 			list.add(Namespace.getNamespace("c", "http://marklogic.com/manage/clusters"));

@@ -12,8 +12,8 @@ public abstract class XPathUtil {
 	 * @return
 	 */
 	public static String sanitizeValueForXPathExpression(String resourceIdOrName) {
-		// MarkLogic generally the following characters in a resource name, and we know an ID will never have them.
-		// Removing them avoids issues with XPath queries.
+		// MarkLogic generally prohibits the following characters in a resource name, and we know an ID will never
+		// have them. Removing them avoids issues with XPath injection attacks.
 		return resourceIdOrName != null ?
 			resourceIdOrName.replace("'", "").replace("\"", "").replace("[", "").replace("]", "") :
 			null;

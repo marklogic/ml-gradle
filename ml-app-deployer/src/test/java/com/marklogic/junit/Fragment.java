@@ -15,11 +15,11 @@
  */
 package com.marklogic.junit;
 
+import com.marklogic.client.ext.util.XmlUtil;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.filter.Filters;
-import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathExpression;
@@ -51,7 +51,7 @@ public class Fragment {
 
 	public Fragment(String xml, Namespace... namespaces) {
 		try {
-			internalDoc = new SAXBuilder().build(new StringReader(xml));
+			internalDoc = XmlUtil.newSAXBuilder().build(new StringReader(xml));
 			this.namespaces = namespaces;
 		} catch (Exception e) {
 			throw new RuntimeException(e);

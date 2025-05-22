@@ -23,8 +23,8 @@ import com.marklogic.client.ext.helper.FilenameUtil;
 import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.client.ext.modulesloader.ExtensionMetadataAndParams;
 import com.marklogic.client.ext.modulesloader.ExtensionMetadataProvider;
+import com.marklogic.client.ext.util.XmlUtil;
 import org.jdom2.Element;
-import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -62,7 +62,7 @@ public class DefaultExtensionMetadataProvider extends LoggingObject implements E
         Resource metadataResource = resolver.getResource(metadataFile);
         if (metadataResource != null) {
             try {
-                Element root = new SAXBuilder().build(metadataResource.getInputStream()).getRootElement();
+                Element root = XmlUtil.newSAXBuilder().build(metadataResource.getInputStream()).getRootElement();
                 m.setTitle(root.getChildText("title"));
                 Element desc = root.getChild("description");
                 if (desc != null && desc.getChildren() != null && desc.getChildren().size() == 1) {

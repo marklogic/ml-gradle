@@ -55,7 +55,7 @@ public class RoleManager extends AbstractResourceManager {
 
 		Role role = resourceMapper.readResource(payload, Role.class);
 
-		if (role.hasPermissionWithOwnRoleName()) {
+		if (role != null && role.hasPermissionWithOwnRoleName()) {
 			role.getPermission().clear();
 			if (logger.isInfoEnabled()) {
 				logger.info("Creating role '" + resourceId + "' that has permissions that refer to itself, " +

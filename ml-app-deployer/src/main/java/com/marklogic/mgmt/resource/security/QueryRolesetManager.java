@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.resource.AbstractResourceManager;
 import com.marklogic.rest.util.ResourcesFragment;
+import com.marklogic.rest.util.XPathUtil;
 import org.apache.commons.lang3.StringUtils;
 
 public class QueryRolesetManager extends AbstractResourceManager {
@@ -75,7 +76,7 @@ public class QueryRolesetManager extends AbstractResourceManager {
 		ResourcesFragment resourcesFragment = getAsXml();
 		return resourcesFragment.elementExists(format(
 			"/node()/*[local-name(.) = 'list-items']/node()[*[local-name(.) = 'idref'] = '%s']",
-			getIdForRoleNames(resourceNameOrId, resourcesFragment)));
+			XPathUtil.sanitizeValueForXPathExpression(getIdForRoleNames(resourceNameOrId, resourcesFragment))));
 	}
 
 	/**

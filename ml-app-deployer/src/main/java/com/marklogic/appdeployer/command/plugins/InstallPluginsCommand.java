@@ -90,15 +90,18 @@ public class InstallPluginsCommand extends AbstractUndoableCommand {
 			return;
 		}
 
-		for (File dir : new File(path).listFiles()) {
-			if (!dir.isDirectory()) {
-				continue;
-			}
+		File[] files = new File(path).listFiles();
+		if (files != null) {
+			for (File dir : files) {
+				if (!dir.isDirectory()) {
+					continue;
+				}
 
-			makePlugin(dir, appConfig);
-			final String binaryUri = insertPluginZip(dir, appConfig, client);
-			if (binaryUri != null) {
-				installPlugin(binaryUri, appConfig, client);
+				makePlugin(dir, appConfig);
+				final String binaryUri = insertPluginZip(dir, appConfig, client);
+				if (binaryUri != null) {
+					installPlugin(binaryUri, appConfig, client);
+				}
 			}
 		}
 	}

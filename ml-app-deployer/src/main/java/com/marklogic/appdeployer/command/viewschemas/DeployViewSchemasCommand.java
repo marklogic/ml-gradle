@@ -88,15 +88,17 @@ public class DeployViewSchemasCommand extends AbstractResourceCommand {
 	protected void afterResourceSaved(ResourceManager mgr, CommandContext context, ResourceReference reference, SaveReceipt receipt) {
 		if (reference != null) {
 			File resourceFile = reference.getLastFile();
-			PayloadParser parser = new PayloadParser();
-			String viewSchemaName = parser.getPayloadFieldValue(receipt.getPayload(), "view-schema-name");
-			File parentFile = resourceFile.getParentFile();
-			if (parentFile != null) {
-				File viewDir = new File(parentFile, viewSchemaName + "-views");
-				if (viewDir.exists()) {
-					ViewManager viewMgr = new ViewManager(context.getManageClient(), currentDatabaseIdOrName, viewSchemaName);
-					for (File viewFile : listFilesInDirectory(viewDir)) {
-						saveResource(viewMgr, context, viewFile);
+			if (resourceFile != null) {
+				PayloadParser parser = new PayloadParser();
+				String viewSchemaName = parser.getPayloadFieldValue(receipt.getPayload(), "view-schema-name");
+				File parentFile = resourceFile.getParentFile();
+				if (parentFile != null) {
+					File viewDir = new File(parentFile, viewSchemaName + "-views");
+					if (viewDir.exists()) {
+						ViewManager viewMgr = new ViewManager(context.getManageClient(), currentDatabaseIdOrName, viewSchemaName);
+						for (File viewFile : listFilesInDirectory(viewDir)) {
+							saveResource(viewMgr, context, viewFile);
+						}
 					}
 				}
 			}

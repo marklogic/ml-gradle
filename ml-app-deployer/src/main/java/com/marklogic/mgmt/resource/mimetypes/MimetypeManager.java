@@ -23,6 +23,8 @@ import com.marklogic.mgmt.mapper.DefaultResourceMapper;
 import com.marklogic.mgmt.mapper.ResourceMapper;
 import com.marklogic.mgmt.resource.AbstractResourceManager;
 
+import java.util.Objects;
+
 public class MimetypeManager extends AbstractResourceManager {
 
 	private boolean updateWhenPropertiesAreEqual = false;
@@ -63,6 +65,7 @@ public class MimetypeManager extends AbstractResourceManager {
 		}
 
 		Mimetype incomingMimetype = resourceMapper.readResource(payload, Mimetype.class);
+		Objects.requireNonNull(incomingMimetype);
 		final String name = incomingMimetype.getName();
 
 		String existingJson = super.getPropertiesAsJson(name);

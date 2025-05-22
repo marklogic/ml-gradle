@@ -25,6 +25,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import org.xml.sax.InputSource;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -44,11 +45,17 @@ public class Fragment {
 
 	public Fragment(String xml, Namespace... namespaces) {
 		try {
-			// As of 5.1.0, using same best practices as found in Java Client.
 			SAXBuilder builder = new SAXBuilder(XMLReaders.NONVALIDATING);
+
+			// Prevent DTDs from being loaded
 			builder.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+
+			// Disable external entities
 			builder.setFeature("http://xml.org/sax/features/external-general-entities", false);
 			builder.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+
+			// Set a no-op EntityResolver to block external DTDs
+			builder.setEntityResolver((publicId, systemId) -> new InputSource(new StringReader("")));
 
 			internalDoc = builder.build(new StringReader(xml));
 			List<Namespace> list = new ArrayList<>();

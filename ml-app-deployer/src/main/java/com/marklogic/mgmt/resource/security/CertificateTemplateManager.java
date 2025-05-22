@@ -21,7 +21,7 @@ import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.resource.AbstractResourceManager;
 import com.marklogic.mgmt.util.ObjectMapperFactory;
 import com.marklogic.rest.util.Fragment;
-
+import com.marklogic.rest.util.XPathUtil;
 import org.springframework.http.ResponseEntity;
 
 /**
@@ -144,9 +144,11 @@ public class CertificateTemplateManager extends AbstractResourceManager {
 	 */
 	public boolean certificateExists(String templateIdOrName, String certificateHostName) {
 		Fragment response = getCertificatesForTemplate(templateIdOrName);
-		return certificateHostName != null ?
-			response.elementExists(format("/msec:certificate-list/msec:certificate[msec:host-name = '%s']", certificateHostName)) :
-			response.elementExists("/msec:certificate-list/msec:certificate");
+		if (certificateHostName != null) {
+			String valueForXPath = XPathUtil.sanitizeValueForXPathExpression(certificateHostName);
+			return response.elementExists(format("/msec:certificate-list/msec:certificate[msec:host-name = '%s']", valueForXPath));
+		}
+		return response.elementExists("/msec:certificate-list/msec:certificate");
 	}
 
     public Fragment getCertificatesForTemplate(String templateIdOrName) {

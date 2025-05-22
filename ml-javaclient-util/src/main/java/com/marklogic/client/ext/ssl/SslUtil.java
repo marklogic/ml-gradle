@@ -55,7 +55,10 @@ public abstract class SslUtil {
 		try {
 			sslContext = SSLContext.getInstance(protocol);
 		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException("Unable to instantiate SSLContext with protocol: " + protocol + "; cause: " + e.getMessage(), e);
+			// Including this to make Polaris happy.
+			String message = String.format("Unable to instantiate SSLContext with protocol: %s; cause: %s", protocol, e.getMessage());
+			LoggerFactory.getLogger(SslUtil.class).error(message, e);
+			throw new RuntimeException(message, e);
 		}
 
 		if (algorithm == null || algorithm.trim().length() < 1) {
@@ -71,7 +74,10 @@ public abstract class SslUtil {
 		try {
 			trustManagerFactory.init((KeyStore) null);
 		} catch (KeyStoreException e) {
-			throw new RuntimeException("Unable to initialize TrustManagerFactory, cause: " + e.getMessage(), e);
+			// Including this to make Polaris happy.
+			String message = String.format("Unable to initialize TrustManagerFactory, cause: %s", e.getMessage());
+			LoggerFactory.getLogger(SslUtil.class).error(message, e);
+			throw new RuntimeException(message, e);
 		}
 
 		X509TrustManager x509TrustManager = null;
@@ -90,8 +96,9 @@ public abstract class SslUtil {
 			sslContext.init(null, new TrustManager[]{x509TrustManager}, null);
 		} catch (KeyManagementException e) {
 			// Including this to make Polaris happy.
-			LoggerFactory.getLogger(SslUtil.class).error("Unable to initialize an SSLContext", e);
-			throw new RuntimeException(String.format("Unable to initialize SSLContext, cause: %s", e.getMessage()), e);
+			String message = String.format("Unable to initialize SSLContext, cause: %s", e.getMessage());
+			LoggerFactory.getLogger(SslUtil.class).error(message, e);
+			throw new RuntimeException(message, e);
 		}
 
 		return new SslConfig(sslContext, x509TrustManager);

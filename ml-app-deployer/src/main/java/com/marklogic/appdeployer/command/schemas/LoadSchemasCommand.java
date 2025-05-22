@@ -164,7 +164,7 @@ public class LoadSchemasCommand extends AbstractCommand {
 					String payload = copyFileToString(f, context);
 					try {
 						Database db = resourceMapper.readResource(payload, Database.class);
-						if (schemasDatabaseName.equals(db.getSchemaDatabase())) {
+						if (db != null && schemasDatabaseName != null && schemasDatabaseName.equals(db.getSchemaDatabase())) {
 							tdeValidationDatabase = db.getDatabaseName();
 							break;
 						}

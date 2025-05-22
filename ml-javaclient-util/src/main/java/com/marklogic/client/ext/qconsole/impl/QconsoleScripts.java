@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class QconsoleScripts {
@@ -38,12 +39,20 @@ public class QconsoleScripts {
 	}
 
 	private static String readFile(String fileName) throws IOException {
-		try (InputStream inputStream = QconsoleScripts.class.getClassLoader().getResourceAsStream(fileName)) {
+		InputStream inputStream = null;
+		try {
+			ClassLoader classLoader = QconsoleScripts.class.getClassLoader();
+			Objects.requireNonNull(classLoader);
+			inputStream = classLoader.getResourceAsStream(fileName);
 			if (inputStream != null) {
 				return new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
 					.lines().collect(Collectors.joining("\n"));
 			} else {
 				throw new IOException("Unable to find file: " + fileName);
+			}
+		} finally {
+			if (inputStream != null) {
+				inputStream.close();
 			}
 		}
 	}

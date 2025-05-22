@@ -74,7 +74,7 @@ class TdeDocumentFileProcessor extends LoggingObject implements DocumentFileProc
 			// modified, in which case templateBatchInsertSupported is set to null
 			this.templateBatchInsertSupported = TdeUtil.templateBatchInsertSupported(contentDatabaseClient);
 		}
-		return this.templateBatchInsertSupported;
+		return this.templateBatchInsertSupported != null ? this.templateBatchInsertSupported : false;
 	}
 
 	/**
@@ -107,7 +107,7 @@ class TdeDocumentFileProcessor extends LoggingObject implements DocumentFileProc
 
 				if (call != null) {
 					ObjectNode node = (ObjectNode) call.evalAs(JsonNode.class);
-					if (node.get("valid").asBoolean()) {
+					if (node.has("valid") && node.get("valid").asBoolean()) {
 						logger.info("TDE template passed validation: " + file);
 					} else {
 						throw new RuntimeException(format("TDE template failed validation; file: %s; cause: %s", file, node.get("message").asText()));

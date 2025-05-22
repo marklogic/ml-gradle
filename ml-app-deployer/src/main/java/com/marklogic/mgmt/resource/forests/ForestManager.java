@@ -25,6 +25,7 @@ import com.marklogic.mgmt.mapper.DefaultResourceMapper;
 import com.marklogic.mgmt.mapper.ResourceMapper;
 import com.marklogic.mgmt.resource.AbstractResourceManager;
 import com.marklogic.rest.util.Fragment;
+import com.marklogic.rest.util.XPathUtil;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -162,8 +163,9 @@ public class ForestManager extends AbstractResourceManager {
 
 	public boolean forestExists(String nameOrId) {
 		Fragment f = getManageClient().getXml("/manage/v2/forests");
-		return f.elementExists(format("/node()/f:list-items/f:list-item[f:nameref = '%s' or f:idref = '%s']", nameOrId,
-			nameOrId));
+		String valueForXPath = XPathUtil.sanitizeValueForXPathExpression(nameOrId);
+		return f.elementExists(format("/node()/f:list-items/f:list-item[f:nameref = '%s' or f:idref = '%s']", valueForXPath,
+			valueForXPath));
 	}
 
 	public void attachForest(String forestIdOrName, String databaseIdOrName) {

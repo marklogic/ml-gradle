@@ -247,6 +247,9 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 			return;
 		}
 		File f = getFileFromResource(r);
+		if (f == null) {
+			return;
+		}
 		if (f != null && modulesManager != null && !modulesManager.hasFileBeenModifiedSinceLastLoaded(f)) {
 			return;
 		}
@@ -272,7 +275,7 @@ public class DefaultModulesLoader extends LoggingObject implements ModulesLoader
 
 		mgr.writeConfiguration();
 
-		if (f != null && modulesManager != null) {
+		if (modulesManager != null) {
 			modulesManager.saveLastLoadedTimestamp(f, new Date());
 		}
 

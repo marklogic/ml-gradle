@@ -29,6 +29,7 @@ import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Base class that provides some convenience methods for implementing ResourceExporter.
@@ -107,8 +108,12 @@ public abstract class AbstractResourceExporter extends LoggingObject implements 
 
 	protected File exportToXml(ResourceManager mgr, ExportInputs exportInputs, File resourceDir) throws IOException {
 		String xml = mgr.getPropertiesAsXmlString(exportInputs.getResourceName(), exportInputs.getResourceUrlParams());
+		Objects.requireNonNull(xml);
 		xml = beforeResourceWrittenToFile(exportInputs, xml);
-		File f = new File(resourceDir, exportInputs.buildFilename("xml"));
+
+		String filename = exportInputs.buildFilename("xml");
+		Objects.requireNonNull(filename);
+		File f = new File(resourceDir, filename);
 		logWritingFile(exportInputs, f);
 		FileCopyUtils.copy(xml.getBytes(), f);
 		return f;

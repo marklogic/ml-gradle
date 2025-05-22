@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiFunction;
 
 public class DefaultResourceWriter extends LoggingObject implements ResourceWriter {
@@ -77,7 +78,9 @@ public class DefaultResourceWriter extends LoggingObject implements ResourceWrit
 	public File writeResourceAsJson(Resource r, ConfigDir configDir) {
 		final File file = determineResourceFile(r, configDir, ".json");
 		try {
-			FileCopyUtils.copy(r.getJson().getBytes(), file);
+			String json = r.getJson();
+			Objects.requireNonNull(json);
+			FileCopyUtils.copy(json.getBytes(), file);
 			return file;
 		} catch (IOException ex) {
 			throw new RuntimeException("Unable to write to file: " + file.getAbsolutePath() + "; cause: " + ex.getMessage(), ex);

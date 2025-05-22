@@ -48,14 +48,17 @@ public class DeployTemporalCollectionsLSQTCommand extends AbstractCommand {
 	protected void deployTemporalCollectionsLsqt(CommandContext context, ConfigDir configDir, String databaseIdOrName) {
 		File dir = configDir.getTemporalCollectionsLsqtDir();
 		if (dir != null && dir.exists()) {
-			for (File f : dir.listFiles(new ResourceFilenameFilter())) {
-				String name = f.getName();
-				String temporalCollectionName = makeTemporalCollectionName(name);
-				String payload = copyFileToString(f, context);
-				if (logger.isInfoEnabled()) {
-					logger.info(format("Extracted temporal collection name '%s' from filename '%s'", temporalCollectionName, name));
+			File[] files = dir.listFiles(new ResourceFilenameFilter());
+			if (files != null) {
+				for (File f : files) {
+					String name = f.getName();
+					String temporalCollectionName = makeTemporalCollectionName(name);
+					String payload = copyFileToString(f, context);
+					if (logger.isInfoEnabled()) {
+						logger.info(format("Extracted temporal collection name '%s' from filename '%s'", temporalCollectionName, name));
+					}
+					new TemporalCollectionLSQTManager(context.getManageClient(), databaseIdOrName, temporalCollectionName).save(payload);
 				}
-				new TemporalCollectionLSQTManager(context.getManageClient(), databaseIdOrName, temporalCollectionName).save(payload);
 			}
 		} else {
 			logResourceDirectoryNotFound(dir);

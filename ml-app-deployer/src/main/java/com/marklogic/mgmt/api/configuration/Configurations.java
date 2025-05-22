@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Does not yet support XML marshalling via JAXB.
@@ -89,6 +90,7 @@ public class Configurations extends ApiObject {
 		}
 
 		final String json = getJson();
+		Objects.requireNonNull(json);
 
 		if (logger.isInfoEnabled()) {
 			if (json.contains("password")) {

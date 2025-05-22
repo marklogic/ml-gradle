@@ -58,9 +58,12 @@ public class DeployTargetsCommand extends AbstractCommand {
 	protected void deployTargets(CommandContext context, ConfigDir configDir, String databaseIdOrName) {
 		File configsDir = configDir.getFlexrepConfigsDir();
 		if (configsDir != null && configsDir.exists()) {
-			for (File f : configsDir.listFiles()) {
-				if (f.isDirectory() && f.getName().endsWith(targetDirectorySuffix)) {
-					deployTargetsInDirectory(f, context, databaseIdOrName);
+			File[] files = configsDir.listFiles();
+			if (files != null) {
+				for (File f : files) {
+					if (f.isDirectory() && f.getName().endsWith(targetDirectorySuffix)) {
+						deployTargetsInDirectory(f, context, databaseIdOrName);
+					}
 				}
 			}
 		} else {

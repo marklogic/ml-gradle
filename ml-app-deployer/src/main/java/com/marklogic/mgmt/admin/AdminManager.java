@@ -30,6 +30,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
+import java.util.Objects;
 
 public class AdminManager extends AbstractManager {
 
@@ -229,7 +230,9 @@ public class AdminManager extends AbstractManager {
 	}
 
 	public Fragment getServerConfig() {
-		return new Fragment(getRestTemplate().getForObject(adminConfig.buildUri("/admin/v1/server-config"), String.class));
+		String xml = getRestTemplate().getForObject(adminConfig.buildUri("/admin/v1/server-config"), String.class);
+		Objects.requireNonNull(xml);
+		return new Fragment(xml);
 	}
 
 	public String getServerVersion() {

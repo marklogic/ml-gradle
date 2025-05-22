@@ -60,9 +60,12 @@ public class DeployAlertActionsCommand extends AbstractCommand {
 	protected void deployActions(CommandContext context, ConfigDir configDir, String databaseIdOrName) {
 		File configsDir = configDir.getAlertConfigsDir();
 		if (configsDir != null && configsDir.exists()) {
-			for (File f : configsDir.listFiles()) {
-				if (f.isDirectory() && f.getName().endsWith(actionsDirectorySuffix)) {
-					deployActionsInDirectory(f, context, databaseIdOrName);
+			File[] files = configsDir.listFiles();
+			if (files != null) {
+				for (File f : files) {
+					if (f.isDirectory() && f.getName().endsWith(actionsDirectorySuffix)) {
+						deployActionsInDirectory(f, context, databaseIdOrName);
+					}
 				}
 			}
 		} else {

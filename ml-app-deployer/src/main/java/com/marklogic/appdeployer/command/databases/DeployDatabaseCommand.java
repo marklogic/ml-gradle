@@ -188,17 +188,16 @@ public class DeployDatabaseCommand extends AbstractCommand implements UndoableCo
 	@Override
     public void undo(CommandContext context) {
         String payload = buildPayload(context);
-
-        if (databasesToNotUndeploy != null) {
-        	final String dbName = new PayloadParser().getPayloadFieldValue(payload, "database-name", false);
-        	if (dbName != null && databasesToNotUndeploy.contains(dbName)) {
-        		logger.info(format("Not undeploying database %s because it is in the list of database names to not undeploy.", dbName));
-        		return;
-	        }
-        }
-
         if (payload != null) {
-        	DatabaseManager dbMgr = newDatabaseManageForDeleting(context);
+			if (databasesToNotUndeploy != null) {
+				final String dbName = new PayloadParser().getPayloadFieldValue(payload, "database-name", false);
+				if (dbName != null && databasesToNotUndeploy.contains(dbName)) {
+					logger.info(format("Not undeploying database %s because it is in the list of database names to not undeploy.", dbName));
+					return;
+				}
+			}
+
+			DatabaseManager dbMgr = newDatabaseManageForDeleting(context);
 
 	        // if this has sub-databases, detach/delete them first
 	        if (!isSubDatabase()) {

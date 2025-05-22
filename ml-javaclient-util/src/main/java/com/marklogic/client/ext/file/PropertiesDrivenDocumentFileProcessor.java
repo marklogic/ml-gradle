@@ -84,7 +84,9 @@ public abstract class PropertiesDrivenDocumentFileProcessor extends LoggingObjec
 				PathMatcher matcher = fileSystem.getPathMatcher("glob:" + pattern);
 				if (matcher.matches(filename)) {
 					String value = getPropertyValue(properties, pattern);
-					this.applyPropertyMatch(documentFile, pattern, value);
+					if (value != null) {
+						this.applyPropertyMatch(documentFile, pattern, value);
+					}
 				}
 			}
 		} finally {

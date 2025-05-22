@@ -71,7 +71,9 @@ public class ConfigDir {
 		File dbDir = getDatabasesDir();
 		if (dbDir != null && dbDir.exists()) {
 			File[] dirs = dbDir.listFiles(pathname -> pathname.isDirectory());
-			return Arrays.asList(dirs);
+			if (dirs != null) {
+				return Arrays.asList(dirs);
+			}
 		}
 		return new ArrayList<>();
 	}

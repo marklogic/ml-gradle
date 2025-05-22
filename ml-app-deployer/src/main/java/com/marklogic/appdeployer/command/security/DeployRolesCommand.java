@@ -214,7 +214,7 @@ public class DeployRolesCommand extends AbstractResourceCommand implements Suppo
 		roles.forEach(role -> {
 			try {
 				Role r = reader.readValue(role);
-				if (r.hasPermissionWithOwnRoleName() && !rolesXml.resourceExists(r.getRoleName())) {
+				if (r != null && r.hasPermissionWithOwnRoleName() && !rolesXml.resourceExists(r.getRoleName())) {
 					rolesThatReferenceThemselves.add(r);
 				}
 			} catch (IOException e) {

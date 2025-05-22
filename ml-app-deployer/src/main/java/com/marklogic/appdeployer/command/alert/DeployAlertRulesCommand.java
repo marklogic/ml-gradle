@@ -51,9 +51,12 @@ public class DeployAlertRulesCommand extends AbstractCommand {
 	protected void deployRules(CommandContext context, ConfigDir configDir, String databaseIdOrName) {
 		File configsDir = configDir.getAlertConfigsDir();
 		if (configsDir != null && configsDir.exists()) {
-			for (File f : configsDir.listFiles()) {
-				if (f.isDirectory() && f.getName().endsWith(rulesDirectorySuffix)) {
-					deployRulesInDirectory(f, context, databaseIdOrName);
+			File[] files = configsDir.listFiles();
+			if (files != null) {
+				for (File f : files) {
+					if (f.isDirectory() && f.getName().endsWith(rulesDirectorySuffix)) {
+						deployRulesInDirectory(f, context, databaseIdOrName);
+					}
 				}
 			}
 		} else {

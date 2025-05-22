@@ -33,7 +33,9 @@ public class RequireAtLeastMl8Command extends AbstractCommand {
             if (logger.isInfoEnabled()) {
                 logger.info("Verifying MarkLogic version is at least 8 or higher; version: " + version);
             }
-            major = Integer.parseInt(version.split("\\.")[0]);
+			if (version != null) {
+				major = Integer.parseInt(version.split("\\.")[0]);
+			}
         } catch (Exception e) {
             logger.warn("Unable to verify MarkLogic version is 8 or higher, will continue with deployment; error: "
                     + e.getMessage());

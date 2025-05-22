@@ -55,8 +55,11 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 			setIncrementalMode(isIncrementalDeploy);
 		}
 
-		for (File resourceDir : getResourceDirs(context)) {
-			processExecuteOnResourceDir(context, resourceDir);
+		File[] dirs = getResourceDirs(context);
+		if (dirs != null) {
+			for (File resourceDir : dirs) {
+				processExecuteOnResourceDir(context, resourceDir);
+			}
 		}
 
 		if (mergeResourcesBeforeSaving) {

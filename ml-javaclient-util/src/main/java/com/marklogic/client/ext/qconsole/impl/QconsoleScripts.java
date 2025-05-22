@@ -17,6 +17,7 @@ package com.marklogic.client.ext.qconsole.impl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
@@ -37,10 +38,13 @@ public class QconsoleScripts {
 	}
 
 	private static String readFile(String fileName) throws IOException {
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-			QconsoleScripts.class.getClassLoader().getResourceAsStream(fileName), StandardCharsets.UTF_8
-		))) {
-			return reader.lines().collect(Collectors.joining("\n"));
+		try (InputStream inputStream = QconsoleScripts.class.getClassLoader().getResourceAsStream(fileName)) {
+			if (inputStream != null) {
+				return new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
+					.lines().collect(Collectors.joining("\n"));
+			} else {
+				throw new IOException("Unable to find file: " + fileName);
+			}
 		}
 	}
 }

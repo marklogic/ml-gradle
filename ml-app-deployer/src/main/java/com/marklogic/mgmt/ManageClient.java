@@ -30,10 +30,12 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Wraps a RestTemplate with methods that should simplify accessing the Manage API with RestTemplate. Each NounManager
@@ -146,6 +148,7 @@ public class ManageClient extends LoggingObject {
 
 	public Fragment getXml(String path, String... namespacePrefixesAndUris) {
 		String xml = getXmlString(path);
+		Objects.requireNonNull(xml);
 		List<Namespace> list = new ArrayList<>();
 		for (int i = 0; i < namespacePrefixesAndUris.length; i += 2) {
 			list.add(Namespace.getNamespace(namespacePrefixesAndUris[i], namespacePrefixesAndUris[i + 1]));
@@ -160,6 +163,7 @@ public class ManageClient extends LoggingObject {
 
 	public Fragment getXmlAsSecurityUser(String path, String... namespacePrefixesAndUris) {
 		String xml = getXmlStringAsSecurityUser(path);
+		Objects.requireNonNull(xml);
 		List<Namespace> list = new ArrayList<>();
 		for (int i = 0; i < namespacePrefixesAndUris.length; i += 2) {
 			list.add(Namespace.getNamespace(namespacePrefixesAndUris[i], namespacePrefixesAndUris[i + 1]));

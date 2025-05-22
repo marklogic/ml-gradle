@@ -108,7 +108,10 @@ public class DeployForestsCommand extends AbstractCommand {
 	protected void createForestsViaForestEndpoint(CommandContext context, List<Forest> forests) {
 		ForestManager forestManager = new ForestManager(context.getManageClient());
 		for (Forest f : forests) {
-			forestManager.save(f.getJson());
+			String json = f.getJson();
+			if (json != null) {
+				forestManager.save(json);
+			}
 		}
 	}
 

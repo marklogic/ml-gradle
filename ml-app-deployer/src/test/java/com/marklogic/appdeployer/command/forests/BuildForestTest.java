@@ -20,7 +20,6 @@ import com.marklogic.appdeployer.DefaultAppConfigFactory;
 import com.marklogic.mgmt.api.forest.Forest;
 import com.marklogic.mgmt.api.forest.ForestReplica;
 import com.marklogic.mgmt.util.SimplePropertySource;
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -28,7 +27,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BuildForestTest  {
+import static org.junit.jupiter.api.Assertions.*;
+
+class BuildForestTest {
 
 	private ForestBuilder builder = new ForestBuilder();
 
@@ -70,14 +71,16 @@ public class BuildForestTest  {
 	}
 
 	@Test
-	public void multipleDataDirectoriesWithReplicas() {
+	void multipleDataDirectoriesWithReplicas() {
 		SimplePropertySource source = new SimplePropertySource(
 			"mlDatabaseDataDirectories", "testdb,/dir1|/dir2|/dir3"
 		);
 		AppConfig config = new DefaultAppConfigFactory(source).newAppConfig();
 
 		List<Forest> forests = builder.buildForests(
-			new ForestPlan("testdb", "host1", "host2", "host3").withReplicaCount(2).withForestsPerDataDirectory(2), config
+			new ForestPlan("testdb", "host1", "host2", "host3")
+				.withReplicaCount(2)
+				.withForestsPerDataDirectory(2), config
 		);
 		assertEquals(18, forests.size(),
 			"Should have 18 forests - 3 data directories, and 2 forests per data directory, and 3 hosts");
@@ -88,14 +91,20 @@ public class BuildForestTest  {
 		assertEquals("testdb", first.getDatabase());
 		assertEquals("/dir1", first.getDataDirectory());
 		assertEquals(2, first.getForestReplica().size());
+
 		ForestReplica r1 = first.getForestReplica().get(0);
 		assertEquals("host2", r1.getHost());
 		assertEquals("testdb-1-replica-1", r1.getReplicaName());
-		assertEquals("/dir2", r1.getDataDirectory());
+		// With the change in 6.0.0 to accounting for zones, the data directory for replicas is calculated separate
+		// from the data directory for the primary forest. So the first replica gets the first configured data directory.
+		// In practice, this should not matter much given that the replica data directories are not on the same
+		// host as the primary data directory.
+		assertEquals("/dir1", r1.getDataDirectory());
+
 		ForestReplica r2 = first.getForestReplica().get(1);
 		assertEquals("host3", r2.getHost());
 		assertEquals("testdb-1-replica-2", r2.getReplicaName());
-		assertEquals("/dir3", r2.getDataDirectory());
+		assertEquals("/dir2", r2.getDataDirectory());
 	}
 
 	@Test

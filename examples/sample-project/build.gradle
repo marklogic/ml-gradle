@@ -54,13 +54,13 @@ configurations {
  * using that library in tests that must invoke MarkLogic HTTP endpoints.
  */
 dependencies {
-	testImplementation "com.marklogic:marklogic-junit5:1.4.0"
+	testImplementation "com.marklogic:marklogic-junit5:1.5.0"
 	testImplementation "com.jayway.restassured:rest-assured:2.9.0"
 	testImplementation "javax.xml.bind:jaxb-api:2.3.1"
 	testImplementation "org.glassfish.jaxb:jaxb-runtime:2.3.2"
 	testImplementation "org.glassfish.jaxb:jaxb-core:2.3.0.1"
 
-	corb "com.marklogic:marklogic-corb:2.4.5"
+	corb "com.marklogic:marklogic-corb:2.5.5"
 }
 
 test {

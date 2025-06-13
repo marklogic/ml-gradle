@@ -9,7 +9,10 @@ dependencies {
 	api project(":ml-app-deployer")
 
 	// For MlcpTask
-	implementation "com.marklogic:mlcp-util:1.0.1"
+	implementation ("com.marklogic:mlcp-util:1.0.1") {
+		// Prefer the Spring version from ml-app-deployer.
+		exclude module: "spring-beans"
+	}
 
 	// For the data movement tasks.
 	implementation ("com.marklogic:marklogic-data-movement-components:2.8.0") {

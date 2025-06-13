@@ -19,10 +19,6 @@ plugins {
 
 	// The Java plugin is used to compile and run JUnit tests
 	id "java"
-
-	// These plugins are used to generate IDE files
-	id "eclipse"
-	id "idea"
 }
 
 apply plugin: "com.marklogic.ml-gradle"
@@ -48,17 +44,17 @@ configurations {
 	corb
 }
 
-/*
- * This expresses dependencies on the ml-java and ml-junit libraries. The former is typically used for application
- * code, and the latter supports writing JUnit-based tests. A dependency exists on RestAssured to show an option for
- * using that library in tests that must invoke MarkLogic HTTP endpoints.
- */
+configurations.all {
+	resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+		if (details.requested.group.startsWith('org.springframework')) {
+			details.useVersion '6.2.8'
+			details.because 'Forcing marklogic-junit5 to use the latest version of Spring to minimize security vulnerabilities.'
+		}
+	}
+}
+
 dependencies {
 	testImplementation "com.marklogic:marklogic-junit5:1.5.0"
-	testImplementation "javax.xml.bind:jaxb-api:2.3.1"
-	testImplementation "org.glassfish.jaxb:jaxb-runtime:2.3.2"
-	testImplementation "org.glassfish.jaxb:jaxb-core:2.3.0.1"
-
 	corb "com.marklogic:marklogic-corb:2.5.5"
 }
 

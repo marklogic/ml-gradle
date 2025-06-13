@@ -20,7 +20,6 @@ import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.ext.SecurityContextType;
 import com.marklogic.client.ext.modulesloader.impl.PropertiesModuleManager;
 import com.marklogic.client.ext.ssl.SslUtil;
-import com.marklogic.client.impl.SSLUtil;
 import com.marklogic.mgmt.util.SimplePropertySource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -43,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class DefaultAppConfigFactoryTest {
 
-	private DefaultAppConfigFactory sut;
+	private DefaultAppConfigFactory factory;
 
 	/**
 	 * Added in 3.12.0 to verify that if a projectDir is set on the factory, it's correctly applied to path-related
@@ -51,14 +50,14 @@ public class DefaultAppConfigFactoryTest {
 	 */
 	@Test
 	public void withProjectDir() {
-		sut = new DefaultAppConfigFactory(new SimplePropertySource(
+		factory = new DefaultAppConfigFactory(new SimplePropertySource(
 			"mlConfigPaths", "path1,path2",
 			"mlModulePaths", "modulesPath1,modulesPath2",
 			"mlSchemasPath", "schemasPath"));
 
 		final String testPath = new File("").getAbsolutePath();
 
-		AppConfig appConfig = sut.newAppConfig();
+		AppConfig appConfig = factory.newAppConfig();
 		assertEquals("modulesPath1", appConfig.getModulePaths().get(0));
 		assertEquals("modulesPath2", appConfig.getModulePaths().get(1));
 		assertEquals(testPath + "/path1", appConfig.getConfigDirs().get(0).getBaseDir().getAbsolutePath());
@@ -67,8 +66,8 @@ public class DefaultAppConfigFactoryTest {
 
 		File projectDir = new File("src/test/resources/sample-app");
 		final String projectPath = projectDir.getAbsolutePath();
-		sut.setProjectDir(projectDir);
-		appConfig = sut.newAppConfig();
+		factory.setProjectDir(projectDir);
+		appConfig = factory.newAppConfig();
 		assertEquals(projectPath + "/modulesPath1", appConfig.getModulePaths().get(0));
 		assertEquals(projectPath + "/modulesPath2", appConfig.getModulePaths().get(1));
 		assertEquals(projectPath + "/path1", appConfig.getConfigDirs().get(0).getBaseDir().getAbsolutePath());
@@ -84,19 +83,19 @@ public class DefaultAppConfigFactoryTest {
 	 */
 	@Test
 	public void withProjectDirAndDefaultPaths() {
-		sut = new DefaultAppConfigFactory();
+		factory = new DefaultAppConfigFactory();
 
 		final String testPath = new File("").getAbsolutePath();
 
-		AppConfig appConfig = sut.newAppConfig();
+		AppConfig appConfig = factory.newAppConfig();
 		assertEquals("src/main/ml-modules", appConfig.getModulePaths().get(0));
 		assertEquals(testPath + "/src/main/ml-config", appConfig.getConfigDirs().get(0).getBaseDir().getAbsolutePath());
 		assertEquals("src/main/ml-schemas", appConfig.getSchemaPaths().get(0));
 
 		File projectDir = new File("src/test/resources/sample-app");
 		final String projectPath = projectDir.getAbsolutePath();
-		sut.setProjectDir(projectDir);
-		appConfig = sut.newAppConfig();
+		factory.setProjectDir(projectDir);
+		appConfig = factory.newAppConfig();
 		assertEquals(projectPath + "/src/main/ml-modules", appConfig.getModulePaths().get(0));
 		assertEquals(projectPath + "/src/main/ml-config", appConfig.getConfigDirs().get(0).getBaseDir().getAbsolutePath());
 		assertEquals(projectPath + "/src/main/ml-schemas", appConfig.getSchemaPaths().get(0));
@@ -104,9 +103,9 @@ public class DefaultAppConfigFactoryTest {
 
 	@Test
 	public void invalidPropertyValue() {
-		sut = new DefaultAppConfigFactory(new SimplePropertySource("mlForestsPerHost", "3"));
+		factory = new DefaultAppConfigFactory(new SimplePropertySource("mlForestsPerHost", "3"));
 		try {
-			sut.newAppConfig();
+			factory.newAppConfig();
 			fail("The call should have failed because the property has an invalid value; it's expecting 'forestName,value'");
 		} catch (IllegalArgumentException ex) {
 			String message = ex.getMessage();
@@ -119,25 +118,25 @@ public class DefaultAppConfigFactoryTest {
 
 	@Test
 	public void trimProperties() {
-		sut = new DefaultAppConfigFactory(new SimplePropertySource("mlHost", "  has-spaces   ", "mlUsername", "has spaces"));
-		AppConfig config = sut.newAppConfig();
+		factory = new DefaultAppConfigFactory(new SimplePropertySource("mlHost", "  has-spaces   ", "mlUsername", "has spaces"));
+		AppConfig config = factory.newAppConfig();
 		assertEquals("has-spaces", config.getHost());
 		assertEquals("has spaces", config.getRestAdminUsername());
 	}
 
 	@Test
 	public void gradleStyleProperties() {
-		sut = new DefaultAppConfigFactory(new SimplePropertySource("mlHost", "somehost", "mlUsername", "someuser"));
-		AppConfig config = sut.newAppConfig();
+		factory = new DefaultAppConfigFactory(new SimplePropertySource("mlHost", "somehost", "mlUsername", "someuser"));
+		AppConfig config = factory.newAppConfig();
 		assertEquals("somehost", config.getHost());
 		assertEquals("someuser", config.getRestAdminUsername());
 	}
 
 	@Test
 	public void springStyleProperties() {
-		sut = new DefaultAppConfigFactory(
+		factory = new DefaultAppConfigFactory(
 			new SimplePropertySource("marklogic.mlHost", "springhost", "marklogic.mlUsername", "springuser"));
-		AppConfig config = sut.newAppConfig();
+		AppConfig config = factory.newAppConfig();
 		assertEquals("springhost", config.getHost());
 		assertEquals("springuser", config.getRestAdminUsername());
 	}
@@ -152,15 +151,15 @@ public class DefaultAppConfigFactoryTest {
 
 	@Test
 	public void unrecognizedProperties() {
-		sut = new DefaultAppConfigFactory(new SimplePropertySource("foo.mlHost", "host", "foo.mlUsername", "user"));
-		AppConfig config = sut.newAppConfig();
+		factory = new DefaultAppConfigFactory(new SimplePropertySource("foo.mlHost", "host", "foo.mlUsername", "user"));
+		AppConfig config = factory.newAppConfig();
 		assertEquals("localhost", config.getHost(), "Should use default");
 	}
 
 	@Test
 	public void appServicesDefaultsToDefaultUsernamePassword() {
-		sut = new DefaultAppConfigFactory(new SimplePropertySource("mlUsername", "someuser", "mlPassword", "somepassword"));
-		AppConfig config = sut.newAppConfig();
+		factory = new DefaultAppConfigFactory(new SimplePropertySource("mlUsername", "someuser", "mlPassword", "somepassword"));
+		AppConfig config = factory.newAppConfig();
 		assertEquals("someuser", config.getRestAdminUsername());
 		assertEquals("somepassword", config.getRestAdminPassword());
 		assertEquals("someuser", config.getAppServicesUsername());
@@ -169,8 +168,8 @@ public class DefaultAppConfigFactoryTest {
 
 	@Test
 	public void appServicesDefaultsToRestAdminUsernamePassword() {
-		sut = new DefaultAppConfigFactory(new SimplePropertySource("mlRestAdminUsername", "someuser", "mlRestAdminPassword", "somepassword"));
-		AppConfig config = sut.newAppConfig();
+		factory = new DefaultAppConfigFactory(new SimplePropertySource("mlRestAdminUsername", "someuser", "mlRestAdminPassword", "somepassword"));
+		AppConfig config = factory.newAppConfig();
 		assertEquals("someuser", config.getRestAdminUsername());
 		assertEquals("somepassword", config.getRestAdminPassword());
 		assertEquals("someuser", config.getAppServicesUsername());
@@ -179,10 +178,10 @@ public class DefaultAppConfigFactoryTest {
 
 	@Test
 	public void appServicesDiffersFromRestAdmin() {
-		sut = new DefaultAppConfigFactory(new SimplePropertySource(
+		factory = new DefaultAppConfigFactory(new SimplePropertySource(
 			"mlRestAdminUsername", "someuser", "mlRestAdminPassword", "somepassword",
 			"mlAppServicesUsername", "appuser", "mlAppServicesPassword", "appword"));
-		AppConfig config = sut.newAppConfig();
+		AppConfig config = factory.newAppConfig();
 		assertEquals("someuser", config.getRestAdminUsername());
 		assertEquals("somepassword", config.getRestAdminPassword());
 		assertEquals("appuser", config.getAppServicesUsername());
@@ -191,14 +190,14 @@ public class DefaultAppConfigFactoryTest {
 
 	@Test
 	public void cpfDatabaseName() {
-		sut = new DefaultAppConfigFactory(new SimplePropertySource("mlAppName", "test"));
-		AppConfig config = sut.newAppConfig();
+		factory = new DefaultAppConfigFactory(new SimplePropertySource("mlAppName", "test"));
+		AppConfig config = factory.newAppConfig();
 		assertEquals("test-triggers", config.getTriggersDatabaseName());
 		assertEquals("test-triggers", config.getCpfDatabaseName(),
 			"CPF database should default to the triggers database when not specified");
 
-		sut = new DefaultAppConfigFactory(new SimplePropertySource("mlAppName", "test", "mlCpfDatabaseName", "my-cpf-db"));
-		config = sut.newAppConfig();
+		factory = new DefaultAppConfigFactory(new SimplePropertySource("mlAppName", "test", "mlCpfDatabaseName", "my-cpf-db"));
+		config = factory.newAppConfig();
 		assertEquals("test-triggers", config.getTriggersDatabaseName());
 		assertEquals("my-cpf-db", config.getCpfDatabaseName());
 	}
@@ -215,11 +214,11 @@ public class DefaultAppConfigFactoryTest {
 		p.setProperty("mlDataLoadingEnabled", "false");
 		p.setProperty("mlDataLogUris", "false");
 
-		sut = new DefaultAppConfigFactory(new SimplePropertySource(p));
+		factory = new DefaultAppConfigFactory(new SimplePropertySource(p));
 		final File projectDir = new File("src/test/resources/sample-app");
-		sut.setProjectDir(projectDir);
+		factory.setProjectDir(projectDir);
 
-		DataConfig config = sut.newAppConfig().getDataConfig();
+		DataConfig config = factory.newAppConfig().getDataConfig();
 		assertEquals(new File(projectDir, "src/main/ml-data").getAbsolutePath(), config.getDataPaths().get(0));
 		assertEquals(new File(projectDir, "src/main/more-data").getAbsolutePath(), config.getDataPaths().get(1));
 		assertEquals("apple", config.getCollections()[0]);
@@ -240,11 +239,11 @@ public class DefaultAppConfigFactoryTest {
 		p.setProperty("mlPluginDatabaseName", "Documents");
 		p.setProperty("mlPluginUriPrefix", "/some/prefix/");
 
-		sut = new DefaultAppConfigFactory(new SimplePropertySource(p));
+		factory = new DefaultAppConfigFactory(new SimplePropertySource(p));
 		final File projectDir = new File("src/test/resources/plugin-project");
-		sut.setProjectDir(projectDir);
+		factory.setProjectDir(projectDir);
 
-		PluginConfig config = sut.newAppConfig().getPluginConfig();
+		PluginConfig config = factory.newAppConfig().getPluginConfig();
 		assertEquals(new File(projectDir, "src/main/ml-plugins").getAbsolutePath(), config.getPluginPaths().get(0));
 		assertEquals(new File(projectDir, "src/main/more-plugins").getAbsolutePath(), config.getPluginPaths().get(1));
 		assertFalse(config.isEnabled());
@@ -400,8 +399,8 @@ public class DefaultAppConfigFactoryTest {
 		p.setProperty("mlCascadeCollections", "true");
 		p.setProperty("mlCascadePermissions", "true");
 
-		sut = new DefaultAppConfigFactory(new SimplePropertySource(p));
-		AppConfig config = sut.newAppConfig();
+		factory = new DefaultAppConfigFactory(new SimplePropertySource(p));
+		AppConfig config = factory.newAppConfig();
 
 		assertFalse(config.isMergeResources());
 		assertTrue(config.isAddHostNameTokens());
@@ -585,8 +584,8 @@ public class DefaultAppConfigFactoryTest {
 		Properties p = new Properties();
 		p.setProperty("mlConfigDir", "src/test/resources/sample-app/empty-ml-config");
 
-		sut = new DefaultAppConfigFactory(new SimplePropertySource(p));
-		AppConfig config = sut.newAppConfig();
+		factory = new DefaultAppConfigFactory(new SimplePropertySource(p));
+		AppConfig config = factory.newAppConfig();
 		assertTrue(config.getFirstConfigDir().getBaseDir().getAbsolutePath().contains("empty-ml-config"));
 	}
 
@@ -961,6 +960,38 @@ public class DefaultAppConfigFactoryTest {
 			configure(propertyName, propertyValue);
 		});
 		assertTrue(exception.getMessage().contains(format("The property %s requires a numeric value; invalid value: ‘NaN'", propertyName)));
+	}
+
+	@Test
+	void hostCertificatePassphrases() {
+		AppConfig config = configure(
+			"mlHostCertificatePassphrases", "host1,pass1,host2,pass2"
+		);
+
+		assertEquals("pass1", config.getHostCertificatePassphrases().get("host1"));
+		assertEquals("pass2", config.getHostCertificatePassphrases().get("host2"));
+	}
+
+	@Test
+	void hostCertificatePassphrasesDelimiter() {
+		AppConfig config = configure(
+			"mlHostCertificatePassphrases", "host1:pass1:host2:pass2",
+			"mlHostCertificatePassphrasesDelimiter", ":"
+		);
+
+		assertEquals("pass1", config.getHostCertificatePassphrases().get("host1"));
+		assertEquals("pass2", config.getHostCertificatePassphrases().get("host2"));
+	}
+
+	@Test
+	void invalidHostCertificatePassphrases() {
+		IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> configure(
+			"mlHostCertificatePassphrases", "host1,pass1,host2"
+		));
+		assertEquals(
+			"Unable to parse value for property 'mlHostCertificatePassphrases'; cause: Must have an even number of values delimited by ',' in the property value",
+			ex.getMessage()
+		);
 	}
 
 	private AppConfig configure(String... properties) {

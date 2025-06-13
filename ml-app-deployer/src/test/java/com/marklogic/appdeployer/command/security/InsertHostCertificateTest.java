@@ -20,20 +20,23 @@ import com.marklogic.appdeployer.ConfigDir;
 import com.marklogic.mgmt.resource.security.CertificateTemplateManager;
 import com.marklogic.rest.util.Fragment;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 
-public class InsertHostCertificateTest extends AbstractAppDeployerTest {
+class InsertHostCertificateTest extends AbstractAppDeployerTest {
 
 	private final static String TEMPLATE_NAME = "sample-app-certificate-template";
 	private final static String CERTIFICATE_HOSTNAME = "host1.marklogic.com";
 
 	@Test
-	public void extractHostNameFromEvalResponse() {
+	void extractHostNameFromEvalResponse() {
 		String hostName = new InsertCertificateHostsTemplateCommand().extractHostNameFromEvalResponse("--8f04db15a117ed37\n" +
 			"Content-Type: text/plain\n" +
 			"X-Primitive: string\n" +
@@ -44,7 +47,7 @@ public class InsertHostCertificateTest extends AbstractAppDeployerTest {
 	}
 
 	@Test
-	public void unexpectedEvalResponse() {
+	void unexpectedEvalResponse() {
 		try {
 			new InsertCertificateHostsTemplateCommand().extractHostNameFromEvalResponse("--8f04db15a117ed37\n" +
 				"Content-Type: text/plain\n" +
@@ -58,7 +61,7 @@ public class InsertHostCertificateTest extends AbstractAppDeployerTest {
 	}
 
 	@Test
-	public void anotherUnexpectedEvalResponse() {
+	void anotherUnexpectedEvalResponse() {
 		try {
 			new InsertCertificateHostsTemplateCommand().extractHostNameFromEvalResponse("--8f04db15a117ed37\n" +
 				"Content-Type: text/plain\n" +
@@ -72,7 +75,7 @@ public class InsertHostCertificateTest extends AbstractAppDeployerTest {
 	}
 
 	@Test
-	public void extractHostNameFromFile() {
+	void extractHostNameFromFile() {
 		File certFile = new File("src/test/resources/sample-app/host-certificates/security/certificate-templates" +
 			"/host-certificates/sample-app-certificate-template/host1.marklogic.com.crt");
 		String hostName = new InsertCertificateHostsTemplateCommand().getCertificateHostName(certFile, manageClient);
@@ -80,13 +83,13 @@ public class InsertHostCertificateTest extends AbstractAppDeployerTest {
 	}
 
 	@Test
-	public void insertCertificateAndVerify() {
+	void insertCertificateAndVerify() {
 		appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/host-certificates")));
 
 		initializeAppDeployer(
-			new DeployCertificateAuthoritiesCommand(),
 			new DeployCertificateTemplatesCommand(),
-			new InsertCertificateHostsTemplateCommand());
+			new InsertCertificateHostsTemplateCommand()
+		);
 
 		CertificateTemplateManager mgr = new CertificateTemplateManager(manageClient);
 
@@ -98,14 +101,72 @@ public class InsertHostCertificateTest extends AbstractAppDeployerTest {
 			deploySampleApp();
 			verifyHostCertificateWasInserted(mgr);
 		} finally {
-			/**
-			 * TODO Deleting certificate authorities in ML 9.0-5 via the Manage API doesn't appear to be working, so
-			 * the certificate authority that's created by this class is left over.
-			 */
 			undeploySampleApp();
 
 			List<String> templateNames = mgr.getAsXml().getListItemNameRefs();
 			assertFalse(templateNames.contains(TEMPLATE_NAME));
+		}
+	}
+
+	// TODO Ideally don't log the request when it fails.
+	@Test
+	void encryptedPrivateKey() {
+		appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/encrypted-private-key")));
+		appConfig.setHostCertificatePassphrases(Map.of("host3.marklogic.com", "password"));
+
+		initializeAppDeployer(
+			new DeployCertificateTemplatesCommand(),
+			new InsertCertificateHostsTemplateCommand()
+		);
+
+		CertificateTemplateManager mgr = new CertificateTemplateManager(manageClient);
+
+		try {
+			deploySampleApp();
+			verifyHostCertificateWasInserted(mgr);
+		} finally {
+			undeploySampleApp();
+		}
+	}
+
+	@Test
+	void encryptedPrivateKeyWithWrongPassphrase() {
+		appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/encrypted-private-key")));
+		appConfig.setHostCertificatePassphrases(Map.of("host3.marklogic.com", "wrong-passphrase"));
+
+		initializeAppDeployer(
+			new DeployCertificateTemplatesCommand(),
+			new InsertCertificateHostsTemplateCommand()
+		);
+
+		try {
+			deploySampleApp();
+		} catch (HttpClientErrorException ex) {
+			assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
+			assertTrue(ex.getMessage().contains("PKI-BADPRIVATEKEY"), "Expected insertion of the host certificate to fail " +
+				"due to the invalid passphrase. Actual error message: " + ex.getMessage());
+		} finally {
+			undeploySampleApp();
+		}
+	}
+
+	@Test
+	void encryptedPrivateKeyWithNoPassphrase() {
+		appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/encrypted-private-key")));
+
+		initializeAppDeployer(
+			new DeployCertificateTemplatesCommand(),
+			new InsertCertificateHostsTemplateCommand()
+		);
+
+		try {
+			deploySampleApp();
+		} catch (HttpClientErrorException ex) {
+			assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
+			assertTrue(ex.getMessage().contains("PKI-PRIVATEKEYMISSINGPASSPHRASE"), "Expected insertion of the host certificate to fail " +
+				"due no passphrase being provided. Actual error message: " + ex.getMessage());
+		} finally {
+			undeploySampleApp();
 		}
 	}
 

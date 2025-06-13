@@ -96,14 +96,18 @@ public class CertificateTemplateManager extends AbstractResourceManager {
 	 *
 	 * Even though service allows multiple inserts in one call, this only inserts one host cert at a time.
 	 *
-	 * Note that the docs as of ML 9.0-5 are not correct for this operation - this method submits the correct JSON
-	 * structure.
-	 *
 	 * @param templateIdOrName The template name to insert the host certificates
 	 * @param pubCert the Public PEM formatted certificate
 	 * @param privateKey the Private PEM formatted certificate
 	 */
 	public ResponseEntity<String> insertHostCertificate(String templateIdOrName, String pubCert, String privateKey) {
+		return insertHostCertificate(templateIdOrName, pubCert, privateKey, null);
+	}
+
+	/**
+	 * @since 5.1.0
+	 */
+	public ResponseEntity<String> insertHostCertificate(String templateIdOrName, String pubCert, String privateKey, String passphrase) {
 		ObjectNode command = ObjectMapperFactory.getObjectMapper().createObjectNode();
 		command.put("operation", "insert-host-certificates");
 		ArrayNode certs = ObjectMapperFactory.getObjectMapper().createArrayNode();
@@ -113,6 +117,9 @@ public class CertificateTemplateManager extends AbstractResourceManager {
 
 		certificate.put("cert", pubCert);
 		certificate.put("pkey", privateKey);
+		if (passphrase != null) {
+			certificate.put("passphrase", passphrase);
+		}
 		cert.set("certificate", certificate);
 		certs.add(cert);
 
@@ -120,7 +127,6 @@ public class CertificateTemplateManager extends AbstractResourceManager {
 
 		String json = command.toString();
 		if (logger.isInfoEnabled()) {
-			// NOTE - should NOT print out private key - EVER
 			logger.info(format("Inserting host certificate for template %s", templateIdOrName));
 		}
 		return postPayload(getManageClient(), getResourcePath(templateIdOrName), json);

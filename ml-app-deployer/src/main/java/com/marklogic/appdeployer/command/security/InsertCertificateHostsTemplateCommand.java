@@ -26,6 +26,7 @@ import org.springframework.util.FileCopyUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Inserts host certificates for each certificate template returned by the Manage API. Host certificates are inserted
@@ -101,9 +102,15 @@ public class InsertCertificateHostsTemplateCommand extends AbstractCommand {
 	protected void insertHostCertificate(CommandContext context, String templateName, File publicCertFile, File privateKeyFile) {
 		if (!certificateExists(templateName, publicCertFile, context.getManageClient())) {
 			logger.info(format("Inserting host certificate for certificate template '%s'", templateName));
-			String pubCertString = copyFileToString(publicCertFile);
-			String privateKeyString = copyFileToString(privateKeyFile);
-			new CertificateTemplateManager(context.getManageClient()).insertHostCertificate(templateName, pubCertString, privateKeyString);
+
+			final String pubCertString = copyFileToString(publicCertFile);
+			final String privateKeyString = copyFileToString(privateKeyFile);
+			final Map<String, String> passphrases = context.getAppConfig().getHostCertificatePassphrases();
+			final String passphraseKey = privateKeyFile.getName().replace(privateKeyFileExtension, "");
+			final String passphrase = passphrases != null ? passphrases.get(passphraseKey) : null;
+
+			new CertificateTemplateManager(context.getManageClient()).insertHostCertificate(templateName, pubCertString, privateKeyString, passphrase);
+
 			logger.info(format("Inserted host certificate for certificate template '%s'", templateName));
 		} else {
 			logger.info(format("Host certificate already exists for certificate template '%s', so not inserting host certificate found at: %s",

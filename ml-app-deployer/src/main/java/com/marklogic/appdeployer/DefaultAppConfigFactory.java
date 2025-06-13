@@ -54,8 +54,12 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 				try {
 					propertyConsumerMap.get(propertyName).accept(appConfig, value);
 				} catch (Exception ex) {
-					throw new IllegalArgumentException(
-						format("Unable to parse value '%s' for property '%s'; cause: %s", value, propertyName, ex.getMessage()), ex);
+					String lowerCaseProperty = propertyName.toLowerCase();
+					boolean isSensitive = lowerCaseProperty.contains("password") || lowerCaseProperty.contains("passphrase");
+					String message = isSensitive ?
+						format("Unable to parse value for property '%s'; cause: %s", propertyName, ex.getMessage()) :
+						format("Unable to parse value '%s' for property '%s'; cause: %s", value, propertyName, ex.getMessage());
+					throw new IllegalArgumentException(message, ex);
 				}
 			}
 		}
@@ -996,6 +1000,15 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 
 		registerDataLoadingProperties();
 		registerPluginProperties();
+
+		// Added in 5.1.0
+		propertyConsumerMap.put("mlHostCertificatePassphrases", (config, prop) -> {
+			String customDelimiter = this.getPropertySource().getProperty("mlHostCertificatePassphrasesDelimiter");
+			final String delimiter = StringUtils.hasText(customDelimiter) ? customDelimiter : ",";
+			Map<String, String> hostPassphrases = buildMapFromDelimitedString(prop, delimiter);
+			logger.info("Setting host certificate passphrases; count: {}", hostPassphrases.size());
+			config.setHostCertificatePassphrases(hostPassphrases);
+		});
 	}
 
 	protected void registerDataLoadingProperties() {
@@ -1082,10 +1095,18 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		return list;
 	}
 
-	protected Map<String, String> buildMapFromCommaDelimitedString(String str) {
+	protected Map<String, String> buildMapFromCommaDelimitedString(String propertyValue) {
+		return buildMapFromDelimitedString(propertyValue, ",");
+	}
+
+	private Map<String, String> buildMapFromDelimitedString(String propertyValue, String delimiter) {
 		Map<String, String> map = new HashMap<>();
-		String[] tokens = str.split(",");
+		String[] tokens = propertyValue.split(delimiter);
 		for (int i = 0; i < tokens.length; i += 2) {
+			if (i + 1 >= tokens.length) {
+				String message = String.format("Must have an even number of values delimited by '%s' in the property value", delimiter);
+				throw new IllegalArgumentException(message);
+			}
 			map.put(tokens[i], tokens[i + 1]);
 		}
 		return map;

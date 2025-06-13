@@ -66,16 +66,16 @@ public class PreviewInterceptor extends DefaultResponseErrorHandler implements C
 	 * If the associated triggers database hasn't been created yet, a 404 will occur. But that shouldn't interrupt a
 	 * deployment process. So a 404 is logged but not treated as an error.
 	 *
-	 * @param statusCode
+	 * @param httpResponse
 	 * @return
 	 */
 	@Override
-	protected boolean hasError(HttpStatus statusCode) {
-		if (HttpStatus.NOT_FOUND.equals(statusCode)) {
+	public boolean hasError(ClientHttpResponse httpResponse) throws IOException {
+		if (HttpStatus.NOT_FOUND.equals(httpResponse.getStatusCode())) {
 			logger.info("Received a 404 response, but ignoring while doing a preview");
 			return false;
 		}
-		return super.hasError(statusCode);
+		return super.hasError(httpResponse);
 	}
 
 	@Override

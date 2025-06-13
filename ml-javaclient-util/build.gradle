@@ -1,7 +1,7 @@
 dependencies {
 	api 'com.marklogic:marklogic-client-api:7.1.0'
-	api 'com.marklogic:marklogic-xcc:11.3.0'
-	api 'org.springframework:spring-context:5.3.39'
+	api 'com.marklogic:marklogic-xcc:11.3.1'
+	api 'org.springframework:spring-context:6.2.7'
 
 	implementation 'org.jdom:jdom2:2.0.6.1'
 
@@ -11,8 +11,9 @@ dependencies {
 	// LoggingObject; not clear yet on whether the protected Logger in that class should make this an api dependency or not
 	implementation 'org.slf4j:slf4j-api:2.0.17'
 
-	testImplementation 'org.junit.jupiter:junit-jupiter:5.11.0'
-	testImplementation 'org.springframework:spring-test:5.3.39'
+	// With 5.12.x, tests are somehow not found by Gradle.
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.11.2'
+	testImplementation 'org.springframework:spring-test:6.2.7'
 	testImplementation 'org.mockito:mockito-core:4.11.0'
 
 	// Used for testing loading modules from the classpath

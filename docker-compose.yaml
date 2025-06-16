@@ -3,14 +3,14 @@ name: docker-tests-ml-gradle
 services:
 
   marklogic:
-    image: "progressofficial/marklogic-db:latest"
+    image: "${MARKLOGIC_IMAGE}"
     platform: linux/amd64
     environment:
       - MARKLOGIC_INIT=true
       - MARKLOGIC_ADMIN_USERNAME=admin
       - MARKLOGIC_ADMIN_PASSWORD=admin
     volumes:
-      - ./docker/marklogic/logs:/var/opt/MarkLogic/Logs
+      - ${MARKLOGIC_LOGS_PATH}:/var/opt/MarkLogic/Logs
     ports:
       - "8000-8008:8000-8008"
       - "8028:8028"

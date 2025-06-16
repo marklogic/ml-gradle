@@ -286,6 +286,8 @@ public class AppConfig {
 	private DataConfig dataConfig;
 	private PluginConfig pluginConfig;
 
+	private Map<String, String> hostCertificatePassphrases;
+
 	public AppConfig() {
 		this(null);
 	}
@@ -1868,5 +1870,19 @@ public class AppConfig {
 	 */
 	public void setAppServicesTrustStoreAlgorithm(String appServicesTrustStoreAlgorithm) {
 		this.appServicesTrustStoreAlgorithm = appServicesTrustStoreAlgorithm;
+	}
+
+	/**
+	 * @since 5.1.0
+	 */
+	public Map<String, String> getHostCertificatePassphrases() {
+		return hostCertificatePassphrases;
+	}
+
+	/**
+	 * @since 5.1.0
+	 */
+	public void setHostCertificatePassphrases(Map<String, String> hostCertificatePassphrases) {
+		this.hostCertificatePassphrases = hostCertificatePassphrases;
 	}
 }

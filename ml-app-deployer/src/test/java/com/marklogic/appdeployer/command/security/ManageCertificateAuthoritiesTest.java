@@ -30,6 +30,9 @@ import static org.junit.jupiter.api.Assertions.*;
  * 8.0-3 does not provide a way to update a certificate authority. And deleting one requires knowing its ID number, but
  * there's not a reliable way of determining that from a *.crt file. So it'll be up to a developer to delete a
  * certificate authority.
+ *
+ * This is still true as of MarkLogic 12 - the DELETE endpoint for certificate authorities requires an ID. Would need
+ * to provide an "undo" command that would first retrieve an ID for a certificate authority based on its name.
  */
 public class ManageCertificateAuthoritiesTest extends AbstractAppDeployerTest {
 

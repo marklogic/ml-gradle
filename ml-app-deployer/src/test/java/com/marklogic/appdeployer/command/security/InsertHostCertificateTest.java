@@ -17,9 +17,11 @@ package com.marklogic.appdeployer.command.security;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.ConfigDir;
+import com.marklogic.junit5.RequiresMarkLogic12;
 import com.marklogic.mgmt.resource.security.CertificateTemplateManager;
 import com.marklogic.rest.util.Fragment;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -108,8 +110,8 @@ class InsertHostCertificateTest extends AbstractAppDeployerTest {
 		}
 	}
 
-	// TODO Ideally don't log the request when it fails.
 	@Test
+	@ExtendWith(RequiresMarkLogic12.class)
 	void encryptedPrivateKey() {
 		appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/encrypted-private-key")));
 		appConfig.setHostCertificatePassphrases(Map.of("host3.marklogic.com", "password"));
@@ -130,6 +132,7 @@ class InsertHostCertificateTest extends AbstractAppDeployerTest {
 	}
 
 	@Test
+	@ExtendWith(RequiresMarkLogic12.class)
 	void encryptedPrivateKeyWithWrongPassphrase() {
 		appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/encrypted-private-key")));
 		appConfig.setHostCertificatePassphrases(Map.of("host3.marklogic.com", "wrong-passphrase"));
@@ -151,6 +154,7 @@ class InsertHostCertificateTest extends AbstractAppDeployerTest {
 	}
 
 	@Test
+	@ExtendWith(RequiresMarkLogic12.class)
 	void encryptedPrivateKeyWithNoPassphrase() {
 		appConfig.setConfigDir(new ConfigDir(new File("src/test/resources/sample-app/encrypted-private-key")));
 

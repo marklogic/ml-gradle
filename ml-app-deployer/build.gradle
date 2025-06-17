@@ -35,4 +35,9 @@ dependencies {
 	testImplementation 'org.springframework:spring-test:6.2.8'
 	testImplementation 'commons-io:commons-io:2.19.0'
 	testImplementation 'xmlunit:xmlunit:1.6'
+
+	testImplementation ("com.marklogic:marklogic-junit5:1.5.0") {
+		// Use the version of ml-javaclient-util within this repository.
+		exclude module: "ml-javaclient-util"
+	}
 }

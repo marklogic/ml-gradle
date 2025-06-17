@@ -16,11 +16,14 @@
 package com.marklogic.appdeployer.command.mimetypes;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
-import com.marklogic.junit.XmlHelper;
 import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.resource.mimetypes.MimetypeManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.util.FileCopyUtils;
+
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,7 +38,7 @@ public class DontRestartWhenMimetypePropertiesArentUpdatedTest extends AbstractA
 	}
 
 	@Test
-	public void test() {
+	public void test() throws IOException {
 		mimetypeManager = new MimetypeManager(manageClient);
 
 		initializeAppDeployer(new DeployMimetypesCommand());
@@ -47,7 +50,7 @@ public class DontRestartWhenMimetypePropertiesArentUpdatedTest extends AbstractA
 		deploySampleApp();
 
 		// But we can verify that MimetypeManager doesn't cause an update
-		String payload = new XmlHelper().readTestResource("sample-app/src/main/ml-config/mimetypes/ditamap.json");
+		String payload = new String(FileCopyUtils.copyToByteArray(new ClassPathResource("sample-app/src/main/ml-config/mimetypes/ditamap.json").getInputStream()));
 
 		SaveReceipt receipt = mimetypeManager.save(payload);
 		assertNull(receipt.getResponse(),

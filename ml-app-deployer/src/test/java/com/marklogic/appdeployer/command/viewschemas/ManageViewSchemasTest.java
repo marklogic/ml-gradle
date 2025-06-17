@@ -19,7 +19,7 @@ import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
-import com.marklogic.junit.Fragment;
+import com.marklogic.junit5.XmlNode;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.clusters.ClusterManager;
 import com.marklogic.mgmt.resource.viewschemas.ViewSchemaManager;
@@ -90,7 +90,7 @@ public class ManageViewSchemasTest extends AbstractManageResourceTest {
 		// This changed between ML8 and ML9
 		String expectedAmount = version != null && version.startsWith("8") ? "amount" : "main.ordertable.amount";
 
-		Fragment xml = new Fragment("<results>" + body + "</results>",
+		XmlNode xml = new XmlNode("<results>" + body + "</results>",
 			Namespace.getNamespace("json", "http://marklogic.com/xdmp/json"));
 		xml.assertElementValue("/results/json:array[1]/json:value", expectedAmount);
 		xml.assertElementValue("/results/json:array[2]/json:value", "111");

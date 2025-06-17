@@ -15,11 +15,12 @@
  */
 package com.marklogic.rest.util;
 
-import com.marklogic.junit.BaseTestHelper;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.ManageConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,9 +30,10 @@ import static org.junit.jupiter.api.Assertions.*;
  * still be out of scope due to the difficulty of using a certificate signed by an authority that's trusted by the
  * default keystore.
  */
-public class RestTemplateUtilTest extends BaseTestHelper {
+class RestTemplateUtilTest {
 
-	private boolean configurerInvoked = false;
+	private static final Logger logger = LoggerFactory.getLogger(RestTemplateUtilTest.class);
+
 	private ManageConfig manageConfig = new ManageConfig();
 
 	@BeforeEach

@@ -23,10 +23,11 @@ import com.marklogic.appdeployer.command.modules.DefaultModulesLoaderFactory;
 import com.marklogic.appdeployer.command.modules.LoadModulesCommand;
 import com.marklogic.appdeployer.command.security.GenerateTemporaryCertificateCommand;
 import com.marklogic.appdeployer.impl.SimpleAppDeployer;
+import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.ext.modulesloader.impl.DefaultModulesLoader;
 import com.marklogic.mgmt.AbstractMgmtTest;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
-import com.marklogic.xcc.template.XccTemplate;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.io.File;
@@ -38,81 +39,82 @@ import java.io.File;
  */
 public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
 
-    public final static String SAMPLE_APP_NAME = "sample-app";
+	public final static String SAMPLE_APP_NAME = "sample-app";
 
-    protected final static Integer SAMPLE_APP_REST_PORT = 8004;
-    protected final static Integer SAMPLE_APP_TEST_REST_PORT = 8005;
+	protected final static Integer SAMPLE_APP_REST_PORT = 8004;
+	protected final static Integer SAMPLE_APP_TEST_REST_PORT = 8005;
 
-    // Intended to be used by subclasses
-    protected AppDeployer appDeployer;
-    protected AppConfig appConfig;
+	// Intended to be used by subclasses
+	protected AppDeployer appDeployer;
+	protected AppConfig appConfig;
 
-    @BeforeEach
-    public void initialize() {
-        initializeAppConfig();
-    }
+	@BeforeEach
+	public void initialize() {
+		initializeAppConfig();
+	}
 
-    protected void initializeAppConfig() {
-    	initializeAppConfig(new File("src/test/resources/sample-app"));
-    }
+	protected void initializeAppConfig() {
+		initializeAppConfig(new File("src/test/resources/sample-app"));
+	}
 
-    protected void initializeAppConfig(File projectDir) {
-	    appConfig = new AppConfig(projectDir);
+	protected void initializeAppConfig(File projectDir) {
+		appConfig = new AppConfig(projectDir);
 		appConfig.setHost(this.manageConfig.getHost());
-	    appConfig.setName(SAMPLE_APP_NAME);
-	    appConfig.setRestPort(SAMPLE_APP_REST_PORT);
+		appConfig.setName(SAMPLE_APP_NAME);
+		appConfig.setRestPort(SAMPLE_APP_REST_PORT);
 
-	    // Assume that the manager user can also be used as the REST admin user
-	    appConfig.setRestAdminUsername(manageConfig.getUsername());
-	    appConfig.setRestAdminPassword(manageConfig.getPassword());
+		// Assume that the manager user can also be used as the REST admin user
+		appConfig.setRestAdminUsername(manageConfig.getUsername());
+		appConfig.setRestAdminPassword(manageConfig.getPassword());
 		appConfig.setAppServicesUsername(manageConfig.getUsername());
 		appConfig.setAppServicesPassword(manageConfig.getPassword());
-    }
+	}
 
-    /**
-     * Initialize an AppDeployer with the given set of commands. Avoids having to create a Spring configuration.
-     *
-     * @param commands
-     */
-    protected void initializeAppDeployer(Command... commands) {
-        appDeployer = new SimpleAppDeployer(manageClient, adminManager, commands);
-    }
+	/**
+	 * Initialize an AppDeployer with the given set of commands. Avoids having to create a Spring configuration.
+	 *
+	 * @param commands
+	 */
+	protected void initializeAppDeployer(Command... commands) {
+		appDeployer = new SimpleAppDeployer(manageClient, adminManager, commands);
+	}
 
-    protected void deploySampleApp() {
-        appDeployer.deploy(appConfig);
-    }
+	protected void deploySampleApp() {
+		appDeployer.deploy(appConfig);
+	}
 
-    protected void undeploySampleApp() {
-    	if (appDeployer != null) {
-		    try {
-			    appDeployer.undeploy(appConfig);
-		    } catch (Exception e) {
-			    throw new RuntimeException("Unexpected error while undeploying sample app: " + e.getMessage(), e);
-		    }
-	    }
-    }
+	protected void undeploySampleApp() {
+		if (appDeployer != null) {
+			try {
+				appDeployer.undeploy(appConfig);
+			} catch (Exception e) {
+				throw new RuntimeException("Unexpected error while undeploying sample app: " + e.getMessage(), e);
+			}
+		}
+	}
 
-    protected XccTemplate newModulesXccTemplate() {
-    	return new XccTemplate(appConfig.getHost(), appConfig.getAppServicesPort(), appConfig.getRestAdminUsername(),
-		    appConfig.getRestAdminPassword(), appConfig.getModulesDatabaseName());
-    }
+	protected final DatabaseClient newDatabaseClient(String databaseName) {
+		return DatabaseClientFactory.newClient(appConfig.getHost(), appConfig.getRestPort(),
+			databaseName, new DatabaseClientFactory.DigestAuthContext(appConfig.getRestAdminUsername(), appConfig.getRestAdminPassword()));
+	}
 
-    /**
-     * This command is configured to always load modules, ignoring the cache file in the build directory.
-     * @return
-     */
-    protected LoadModulesCommand buildLoadModulesCommand() {
-        LoadModulesCommand command = new LoadModulesCommand();
-        appConfig.setModuleTimestampsPath(null);
-        DefaultModulesLoader loader = (DefaultModulesLoader)(new DefaultModulesLoaderFactory().newModulesLoader(appConfig));
-        loader.setModulesManager(null);
-        command.setModulesLoader(loader);
-        return command;
-    }
+	/**
+	 * This command is configured to always load modules, ignoring the cache file in the build directory.
+	 *
+	 * @return
+	 */
+	protected LoadModulesCommand buildLoadModulesCommand() {
+		LoadModulesCommand command = new LoadModulesCommand();
+		appConfig.setModuleTimestampsPath(null);
+		DefaultModulesLoader loader = (DefaultModulesLoader) (new DefaultModulesLoaderFactory().newModulesLoader(appConfig));
+		loader.setModulesManager(null);
+		command.setModulesLoader(loader);
+		return command;
+	}
 
-    protected void setConfigBaseDir(String path) {
-        appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/" + path));
-    }
+	protected void setConfigBaseDir(String path) {
+		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/" + path));
+	}
 
 	/**
 	 * Intended to simplify testing app servers that require SSL.

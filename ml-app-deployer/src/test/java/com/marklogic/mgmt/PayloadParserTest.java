@@ -15,37 +15,35 @@
  */
 package com.marklogic.mgmt;
 
-import com.marklogic.junit.BaseTestHelper;
-import com.marklogic.junit.Fragment;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class PayloadParserTest extends BaseTestHelper {
+class PayloadParserTest {
 
-	PayloadParser parser = new PayloadParser();
+	private PayloadParser parser = new PayloadParser();
 
 	@Test
-	public void simpleRemove() {
+	void simpleRemove() {
 		String xml = "<test>" +
 			"<hello>world</hello>" +
 			"</test>";
 		String output = parser.excludeProperties(xml, "/test/hello");
-		assertFragmentIsIdentical(new Fragment(output), "<test/>");
+		assertEquals("<test />", output);
 	}
 
 	@Test
-	public void simpleRemoveWithNamespace() {
+	void simpleRemoveWithNamespace() {
 		String xml = "<test xmlns='test'>" +
 			"<hello>world</hello>" +
 			"</test>";
 
 		String output = parser.excludeProperties(xml, "/node()/node()[local-name(.) = 'hello']");
-		assertFragmentIsIdentical(new Fragment(output), "<test xmlns='test'/>");
+		assertEquals("<test xmlns=\"test\" />", output);
 	}
 
 	@Test
-	public void removeMultipleWithNamespaces() {
+	void removeMultipleWithNamespaces() {
 		String xml = "<test xmlns='test'>" +
 			"<hello>world</hello>" +
 			"<hello>again</hello>" +

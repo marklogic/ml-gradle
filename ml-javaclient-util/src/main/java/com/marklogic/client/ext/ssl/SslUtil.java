@@ -29,7 +29,7 @@ import java.security.NoSuchAlgorithmException;
 
 public abstract class SslUtil {
 
-	// Defaulting this to "TLS" in 5.1.0 so that clients connecting to MarkLogic 12 will default to TLSv1.3, while
+	// Defaulting this to "TLS" in 6.0.0 so that clients connecting to MarkLogic 12 will default to TLSv1.3, while
 	// clients connecting to MarkLogic 11 or older will default to TLSv1.2.
 	public final static String DEFAULT_SSL_PROTOCOL = "TLS";
 

@@ -105,7 +105,7 @@ public class CertificateTemplateManager extends AbstractResourceManager {
 	}
 
 	/**
-	 * @since 5.1.0
+	 * @since 6.0.0
 	 */
 	public ResponseEntity<String> insertHostCertificate(String templateIdOrName, String pubCert, String privateKey, String passphrase) {
 		ObjectNode command = ObjectMapperFactory.getObjectMapper().createObjectNode();

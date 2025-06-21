@@ -111,6 +111,9 @@ public class DefaultAdminConfigFactory extends PropertySourceFactory implements 
 		propertyConsumerMap.put("mlAdminSamlToken", (config, prop) -> {
 			config.setSamlToken(prop);
 		});
+		propertyConsumerMap.put("mlAdminOauthToken", (config, prop) -> {
+			config.setOauthToken(prop);
+		});
 
 		propertyConsumerMap.put("mlCloudBasePath", (config, prop) -> {
 			String defaultAdminPath = prop + "/admin";

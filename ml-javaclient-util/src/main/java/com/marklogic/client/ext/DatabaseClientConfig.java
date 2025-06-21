@@ -42,6 +42,7 @@ public class DatabaseClientConfig {
 	private String certPassword;
 	private String externalName;
 	private String samlToken;
+	private String oauthToken;
 
 	private X509TrustManager trustManager;
 	private DatabaseClient.ConnectionType connectionType;
@@ -388,5 +389,19 @@ public class DatabaseClientConfig {
 	 */
 	public void setTrustStoreAlgorithm(String trustStoreAlgorithm) {
 		this.trustStoreAlgorithm = trustStoreAlgorithm;
+	}
+
+	/**
+	 * @since 6.0.0
+	 */
+	public String getOauthToken() {
+		return oauthToken;
+	}
+
+	/**
+	 * @since 6.0.0
+	 */
+	public void setOauthToken(String oauthToken) {
+		this.oauthToken = oauthToken;
 	}
 }

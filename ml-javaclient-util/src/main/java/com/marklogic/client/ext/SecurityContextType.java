@@ -32,5 +32,9 @@ public enum SecurityContextType {
 	/**
 	 * @since 4.5.0
 	 */
-	SAML
+	SAML,
+	/**
+	 * @since 6.0.0
+	 */
+	OAUTH
 }

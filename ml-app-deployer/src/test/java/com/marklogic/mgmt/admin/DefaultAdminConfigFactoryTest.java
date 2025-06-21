@@ -15,17 +15,14 @@
  */
 package com.marklogic.mgmt.admin;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import org.junit.jupiter.api.Test;
-
 import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier;
 import com.marklogic.mgmt.util.SimplePropertySource;
+import org.junit.jupiter.api.Test;
 
-public class DefaultAdminConfigFactoryTest  {
+import static org.junit.jupiter.api.Assertions.*;
+
+class DefaultAdminConfigFactoryTest  {
 
 	@Test
 	public void mlUsername() {
@@ -153,6 +150,21 @@ public class DefaultAdminConfigFactoryTest  {
 		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
 		assertTrue(bean.getSecurityContext() instanceof DatabaseClientFactory.SAMLAuthContext);
 		assertEquals("my-token", ((DatabaseClientFactory.SAMLAuthContext)bean.getSecurityContext()).getToken());
+	}
+
+	@Test
+	void oauth() {
+		AdminConfig config = configure(
+			"mlAdminAuthentication", "oauth",
+			"mlAdminOauthToken", "my-token"
+		);
+
+		assertEquals("oauth", config.getAuthType());
+		assertEquals("my-token", config.getOauthToken());
+
+		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
+		assertTrue(bean.getSecurityContext() instanceof DatabaseClientFactory.OAuthContext);
+		assertEquals("my-token", ((DatabaseClientFactory.OAuthContext)bean.getSecurityContext()).getToken());
 	}
 
 	@Test

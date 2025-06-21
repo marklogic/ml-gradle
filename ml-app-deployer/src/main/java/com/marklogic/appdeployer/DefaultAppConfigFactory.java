@@ -291,6 +291,9 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		propertyConsumerMap.put("mlAppServicesSamlToken", (config, prop) -> {
 			config.setAppServicesSamlToken(prop);
 		});
+		propertyConsumerMap.put("mlAppServicesOauthToken", (config, prop) -> {
+			config.setAppServicesOauthToken(prop);
+		});
 
 		propertyConsumerMap.put("mlAppServicesSimpleSsl", (config, prop) -> {
 			if (StringUtils.hasText(prop) && !"false".equalsIgnoreCase(prop)) {
@@ -422,6 +425,9 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		});
 		propertyConsumerMap.put("mlRestSamlToken", (config, prop) -> {
 			config.setRestSamlToken(prop);
+		});
+		propertyConsumerMap.put("mlRestOauthToken", (config, prop) -> {
+			config.setRestOauthToken(prop);
 		});
 		propertyConsumerMap.put("mlRestBasePath", (config, prop) -> {
 			String cloudBasePath = getProperty("mlCloudBasePath");

@@ -20,11 +20,9 @@ import com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier;
 import com.marklogic.mgmt.util.SimplePropertySource;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class DefaultManageConfigFactoryTest  {
+class DefaultManageConfigFactoryTest {
 
 	@Test
 	public void mlUsername() {
@@ -134,7 +132,7 @@ public class DefaultManageConfigFactoryTest  {
 
 		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
 		assertTrue(bean.getSecurityContext() instanceof DatabaseClientFactory.MarkLogicCloudAuthContext);
-		assertEquals("my-key", ((DatabaseClientFactory.MarkLogicCloudAuthContext)bean.getSecurityContext()).getApiKey());
+		assertEquals("my-key", ((DatabaseClientFactory.MarkLogicCloudAuthContext) bean.getSecurityContext()).getApiKey());
 	}
 
 	@Test
@@ -162,7 +160,7 @@ public class DefaultManageConfigFactoryTest  {
 
 		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
 		assertTrue(bean.getSecurityContext() instanceof DatabaseClientFactory.KerberosAuthContext);
-		assertEquals("my-name", ((DatabaseClientFactory.KerberosAuthContext)bean.getSecurityContext()).getKrbOptions().get("principal"));
+		assertEquals("my-name", ((DatabaseClientFactory.KerberosAuthContext) bean.getSecurityContext()).getKrbOptions().get("principal"));
 	}
 
 	@Test
@@ -177,7 +175,22 @@ public class DefaultManageConfigFactoryTest  {
 
 		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
 		assertTrue(bean.getSecurityContext() instanceof DatabaseClientFactory.SAMLAuthContext);
-		assertEquals("my-token", ((DatabaseClientFactory.SAMLAuthContext)bean.getSecurityContext()).getToken());
+		assertEquals("my-token", ((DatabaseClientFactory.SAMLAuthContext) bean.getSecurityContext()).getToken());
+	}
+
+	@Test
+	void oauth() {
+		ManageConfig config = configure(
+			"mlManageAuthentication", "oauth",
+			"mlManageOauthToken", "my-token"
+		);
+
+		assertEquals("oauth", config.getAuthType());
+		assertEquals("my-token", config.getOauthToken());
+
+		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
+		assertTrue(bean.getSecurityContext() instanceof DatabaseClientFactory.OAuthContext);
+		assertEquals("my-token", ((DatabaseClientFactory.OAuthContext) bean.getSecurityContext()).getToken());
 	}
 
 	@Test

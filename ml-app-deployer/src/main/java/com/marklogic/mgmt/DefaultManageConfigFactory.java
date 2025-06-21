@@ -114,6 +114,9 @@ public class DefaultManageConfigFactory extends PropertySourceFactory implements
 		propertyConsumerMap.put("mlManageSamlToken", (config, prop) -> {
 			config.setSamlToken(prop);
 		});
+		propertyConsumerMap.put("mlManageOauthToken", (config, prop) -> {
+			config.setOauthToken(prop);
+		});
 
 		propertyConsumerMap.put("mlCloudBasePath", (config, prop) -> {
 			String defaultManagePath = prop + "/manage";

@@ -102,6 +102,7 @@ public class AppConfig {
 	private String restCertPassword;
 	private String restExternalName;
 	private String restSamlToken;
+	private String restOauthToken;
 	private X509TrustManager restTrustManager;
 	private boolean restUseDefaultKeystore;
 	private String restSslProtocol;
@@ -134,6 +135,7 @@ public class AppConfig {
 	private String appServicesCertPassword;
 	private String appServicesExternalName;
 	private String appServicesSamlToken;
+	private String appServicesOauthToken;
 	private X509TrustManager appServicesTrustManager;
 	private boolean appServicesUseDefaultKeystore;
 	private String appServicesSslProtocol;
@@ -421,6 +423,7 @@ public class AppConfig {
 		config.setConnectionType(restConnectionType);
 		config.setExternalName(restExternalName);
 		config.setSamlToken(restSamlToken);
+		config.setOauthToken(restOauthToken);
 		config.setSecurityContextType(restSecurityContextType);
 		config.setCloudApiKey(cloudApiKey);
 		config.setBasePath(restBasePath);
@@ -473,6 +476,7 @@ public class AppConfig {
 		config.setDatabase(databaseName);
 		config.setExternalName(appServicesExternalName);
 		config.setSamlToken(appServicesSamlToken);
+		config.setOauthToken(appServicesOauthToken);
 		config.setSecurityContextType(appServicesSecurityContextType);
 		config.setCloudApiKey(cloudApiKey);
 		config.setBasePath(appServicesBasePath);
@@ -1566,6 +1570,34 @@ public class AppConfig {
 
 	public void setAppServicesSamlToken(String appServicesSamlToken) {
 		this.appServicesSamlToken = appServicesSamlToken;
+	}
+
+	/**
+	 * @since 6.0.0
+	 */
+	public String getRestOauthToken() {
+		return restOauthToken;
+	}
+
+	/**
+	 * @since 6.0.0
+	 */
+	public void setRestOauthToken(String restOauthToken) {
+		this.restOauthToken = restOauthToken;
+	}
+
+	/**
+	 * @since 6.0.0
+	 */
+	public String getAppServicesOauthToken() {
+		return appServicesOauthToken;
+	}
+
+	/**
+	 * @since 6.0.0
+	 */
+	public void setAppServicesOauthToken(String appServicesOauthToken) {
+		this.appServicesOauthToken = appServicesOauthToken;
 	}
 
 	public boolean isCascadeCollections() {

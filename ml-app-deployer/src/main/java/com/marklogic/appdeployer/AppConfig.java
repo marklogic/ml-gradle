@@ -1873,14 +1873,14 @@ public class AppConfig {
 	}
 
 	/**
-	 * @since 5.1.0
+	 * @since 6.0.0
 	 */
 	public Map<String, String> getHostCertificatePassphrases() {
 		return hostCertificatePassphrases;
 	}
 
 	/**
-	 * @since 5.1.0
+	 * @since 6.0.0
 	 */
 	public void setHostCertificatePassphrases(Map<String, String> hostCertificatePassphrases) {
 		this.hostCertificatePassphrases = hostCertificatePassphrases;

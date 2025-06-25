@@ -66,7 +66,7 @@ public class DefaultDocumentFileReader extends AbstractDocumentFileReader implem
 			Path p = constructPath(path);
 			if (p != null) {
 				this.currentRootPath = p;
-				// Fixed in 5.0.1 / 5.1.0 - symlinks are now followed and thus work properly.
+				// Fixed in 6.0.0 - symlinks are now followed and thus work properly.
 				Set<FileVisitOption> options = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
 				try {
 					Files.walkFileTree(this.currentRootPath, options, Integer.MAX_VALUE, this);

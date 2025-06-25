@@ -783,6 +783,29 @@ public class DefaultAppConfigFactoryTest {
 	}
 
 	@Test
+	void oauthTokens() {
+		AppConfig config = configure(
+			"mlRestAuthentication", "oauth",
+			"mlRestOauthToken", "my-rest-token",
+			"mlAppServicesAuthentication", "oauth",
+			"mlAppServicesOauthToken", "my-app-token"
+		);
+
+		assertEquals(SecurityContextType.OAUTH, config.getRestSecurityContextType());
+		assertEquals("my-rest-token", config.getRestOauthToken());
+		assertEquals(SecurityContextType.OAUTH, config.getAppServicesSecurityContextType());
+		assertEquals("my-app-token", config.getAppServicesOauthToken());
+
+		DatabaseClientFactory.SecurityContext context = config.newDatabaseClient().getSecurityContext();
+		assertTrue(context instanceof DatabaseClientFactory.OAuthContext);
+		assertEquals("my-rest-token", ((DatabaseClientFactory.OAuthContext) context).getToken());
+
+		context = config.newAppServicesDatabaseClient("Documents").getSecurityContext();
+		assertTrue(context instanceof DatabaseClientFactory.OAuthContext);
+		assertEquals("my-app-token", ((DatabaseClientFactory.OAuthContext) context).getToken());
+	}
+
+	@Test
 	void mlAuthentication() {
 		AppConfig config = configure(
 			"mlAuthentication", "cloud"

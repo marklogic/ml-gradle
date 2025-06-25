@@ -40,6 +40,7 @@ public class RestConfig {
 	private String certPassword;
 	private String externalName;
 	private String samlToken;
+	private String oauthToken;
 
 	private String basePath;
 	private String scheme = "http";
@@ -116,6 +117,7 @@ public class RestConfig {
 			.withCertificatePassword(getCertPassword())
 			.withKerberosPrincipal(getExternalName())
 			.withSAMLToken(getSamlToken())
+			.withOAuthToken(getOauthToken())
 			.withSSLHostnameVerifier(getSslHostnameVerifier())
 			// These 8 were added in 4.7.0. They do not conflict with the SSL config below; if the user is setting
 			// these, they won't have a reason to provide their own SSLContext nor request that the default keystore
@@ -463,5 +465,19 @@ public class RestConfig {
 	 */
 	public void setTrustStoreAlgorithm(String trustStoreAlgorithm) {
 		this.trustStoreAlgorithm = trustStoreAlgorithm;
+	}
+
+	/**
+	 * @since 6.0.0
+	 */
+	public String getOauthToken() {
+		return oauthToken;
+	}
+
+	/**
+	 * @since 6.0.0
+	 */
+	public void setOauthToken(String oauthToken) {
+		this.oauthToken = oauthToken;
 	}
 }

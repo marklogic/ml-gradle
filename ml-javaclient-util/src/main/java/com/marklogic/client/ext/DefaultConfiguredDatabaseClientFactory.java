@@ -46,6 +46,7 @@ public class DefaultConfiguredDatabaseClientFactory implements ConfiguredDatabas
 			.withCertificatePassword(config.getCertPassword())
 			.withKerberosPrincipal(config.getExternalName())
 			.withSAMLToken(config.getSamlToken())
+			.withOAuth(config.getOauthToken())
 			.withCloudApiKey(config.getCloudApiKey())
 			.withSSLProtocol(config.getSslProtocol())
 			.withSSLHostnameVerifier(config.getSslHostnameVerifier())

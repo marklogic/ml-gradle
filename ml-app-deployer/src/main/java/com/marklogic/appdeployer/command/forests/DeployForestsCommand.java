@@ -166,6 +166,10 @@ public class DeployForestsCommand extends AbstractCommand {
 			if (map != null && map.containsKey(this.databaseName)) {
 				int count = map.get(this.databaseName);
 				if (count > 0) {
+					// Need to pass in host-to-zone mapping.
+					// And what to do about ConfigureForestReplicasCommand??? We may be better off removing that as part of
+					// the 6.0 release so that we only have replica creation in one place. Would need to verify that this command
+					// still works for OOTB databases.
 					forestPlan.withReplicaCount(count);
 				}
 			}

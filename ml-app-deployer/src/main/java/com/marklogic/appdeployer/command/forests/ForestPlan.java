@@ -20,6 +20,7 @@ import com.marklogic.mgmt.api.forest.Forest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class ForestPlan {
 
@@ -30,6 +31,7 @@ public class ForestPlan {
 	private int forestsPerDataDirectory = 1;
 	private List<Forest> existingForests = new ArrayList<>();
 	private int replicaCount = 0;
+	private Map<String, String> hostsToZones;
 
 	public ForestPlan(String databaseName, String... hostNames) {
 		this(databaseName, Arrays.asList(hostNames));
@@ -71,6 +73,11 @@ public class ForestPlan {
 		return this;
 	}
 
+	public ForestPlan withHostsToZones(Map<String, String> hostsToZones) {
+		this.hostsToZones = hostsToZones;
+		return this;
+	}
+
 	public String getDatabaseName() {
 		return databaseName;
 	}
@@ -97,5 +104,9 @@ public class ForestPlan {
 
 	public List<String> getReplicaHostNames() {
 		return replicaHostNames;
+	}
+
+	public Map<String, String> getHostsToZones() {
+		return hostsToZones;
 	}
 }

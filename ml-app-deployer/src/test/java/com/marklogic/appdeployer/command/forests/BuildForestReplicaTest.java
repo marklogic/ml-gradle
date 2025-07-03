@@ -32,9 +32,43 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BuildForestReplicaTest {
+class BuildForestReplicaTest {
 
 	private ForestBuilder builder = new ForestBuilder();
+
+	@Test
+	void fourHostsAcrossTwoZones() {
+		AppConfig appConfig = newAppConfig("mlForestsPerHost", "db,1");
+		Map<String, String> hostsToZones = new HashMap<>();
+		hostsToZones.put("host1", "zone1");
+		hostsToZones.put("host2", "zone1");
+		hostsToZones.put("host3", "zone2");
+		hostsToZones.put("host4", "zone2");
+
+		List<Forest> forests = builder.buildForests(
+			new ForestPlan("db", "host1", "host2", "host3", "host4")
+				.withHostsToZones(hostsToZones)
+				.withReplicaCount(1),
+			appConfig
+		);
+
+		Forest f1 = forests.get(0);
+		assertEquals("host1", f1.getHost());
+		// The first replica should be on a different zone
+		assertEquals("host3", f1.getForestReplica().get(0).getHost());
+
+		Forest f2 = forests.get(1);
+		assertEquals("host2", f2.getHost());
+		assertEquals("host4", f2.getForestReplica().get(0).getHost());
+
+		Forest f3 = forests.get(2);
+		assertEquals("host3", f3.getHost());
+		assertEquals("host1", f3.getForestReplica().get(0).getHost());
+
+		Forest f4 = forests.get(3);
+		assertEquals("host4", f4.getHost());
+		assertEquals("host2", f4.getForestReplica().get(0).getHost());
+	}
 
 	@Test
 	public void multipleForestsOnEachHost() {
@@ -155,12 +189,13 @@ public class BuildForestReplicaTest {
 	}
 
 	@Test
-	public void customNamingStrategyWithDistributedStrategy() {
+	public void customNamingStrategy() {
 		AppConfig appConfig = newAppConfig("mlForestsPerHost", "my-database,2");
 		addCustomNamingStrategy(appConfig);
 
 		List<Forest> forests = builder.buildForests(
 			new ForestPlan("my-database", "host1", "host2", "host3").withReplicaCount(2), appConfig);
+		assertEquals(6, forests.size(), "Should have 2 forests on each of the 3 hosts.");
 
 		Forest f1 = forests.get(0);
 		assertEquals("forest-1", f1.getForestName());
@@ -197,19 +232,25 @@ public class BuildForestReplicaTest {
 
 	@Test
 	public void hostIsAdded() {
-		AppConfig appConfig = newAppConfig();
+		final AppConfig appConfig = newAppConfig();
+
 		List<Forest> forests = builder.buildForests(new ForestPlan("testdb", "host1", "host2", "host3")
-			.withForestsPerDataDirectory(1).withReplicaCount(1), appConfig);
+			.withReplicaCount(1), appConfig);
 		assertEquals(3, forests.size());
+
 		assertEquals("testdb-1-replica-1", forests.get(0).getForestReplica().get(0).getReplicaName());
 		assertEquals("host2", forests.get(0).getForestReplica().get(0).getHost());
+
 		assertEquals("testdb-2-replica-1", forests.get(1).getForestReplica().get(0).getReplicaName());
 		assertEquals("host3", forests.get(1).getForestReplica().get(0).getHost());
+
 		assertEquals("testdb-3-replica-1", forests.get(2).getForestReplica().get(0).getReplicaName());
 		assertEquals("host1", forests.get(2).getForestReplica().get(0).getHost());
 
 		forests = builder.buildForests(new ForestPlan("testdb", "host1", "host2", "host3", "host4")
-			.withForestsPerDataDirectory(1).withExistingForests(forests).withReplicaCount(1), appConfig);
+			.withExistingForests(forests)
+			.withReplicaCount(1), appConfig
+		);
 		assertEquals(1, forests.size());
 		assertEquals("testdb-4-replica-1", forests.get(0).getForestReplica().get(0).getReplicaName());
 		assertEquals(
@@ -323,13 +364,6 @@ public class BuildForestReplicaTest {
 		assertEquals("my-database-3-replica-2", f3.getForestReplica().get(1).getReplicaName());
 		assertEquals("host2", f3.getForestReplica().get(1).getHost());
 		assertEquals("/path2", f3.getForestReplica().get(1).getDataDirectory());
-
-//		for (Forest forest : forests) {
-//			System.out.println(forest.getForestName());
-//			for (ForestReplica replica : forest.getForestReplica()) {
-//				System.out.println(replica.getHost() + ":" + replica.getDataDirectory());
-//			}
-//		}
 	}
 
 	private void addCustomNamingStrategy(AppConfig appConfig) {

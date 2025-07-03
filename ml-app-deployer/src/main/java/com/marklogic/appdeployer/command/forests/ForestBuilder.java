@@ -40,7 +40,7 @@ public class ForestBuilder extends LoggingObject {
 
 	public ForestBuilder(ForestNamingStrategy forestNamingStrategy) {
 		this.forestNamingStrategy = forestNamingStrategy;
-		this.replicaBuilderStrategy = new DistributedReplicaBuilderStrategy();
+		this.replicaBuilderStrategy = new ZoneAwareReplicaBuilderStrategy();
 		this.resourceMapper = new DefaultResourceMapper(new API(null));
 	}
 

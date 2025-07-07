@@ -166,7 +166,7 @@ class BuildForestReplicaTest {
 			assertEquals(2, forest.getForestReplica().size());
 			for (ForestReplica replica : forest.getForestReplica()) {
 				String host = replica.getHost();
-				assertTrue(host.equals("host2") || host.equals("host3"));
+				assertTrue(host.equals("host2") || host.equals("host3"), "Unexpected host for replica: " + host);
 			}
 		});
 	}
@@ -186,6 +186,48 @@ class BuildForestReplicaTest {
 		replica = forest.getForestReplica().get(1);
 		assertEquals("my-database-1-replica-2", replica.getReplicaName());
 		assertEquals("host3", replica.getHost());
+	}
+
+	/**
+	 * Verifies that when a database only has forests on one host, replicas are still created on hosts in a different
+	 * zone.
+	 */
+	@Test
+	void databaseHasPrimaryForestsOnOneHostWithTwoZones() {
+		AppConfig config = newAppConfig(
+			"mlDatabasesWithForestsOnOneHost", "my-database",
+			"mlForestsPerHost", "my-database,2"
+		);
+
+		List<Forest> forests = builder.buildForests(new ForestPlan("my-database", "host1", "host2", "host3", "host4")
+				.withReplicaCount(2)
+				.withHostsToZones(Map.of(
+					"host1", "zone1",
+					"host2", "zone1",
+					"host3", "zone2",
+					"host4", "zone2"
+				))
+			, config);
+
+		Forest firstForest = forests.get(0);
+		assertEquals("host1", firstForest.getHost(), "host1 should be selected since it's the first host");
+		assertEquals(2, firstForest.getForestReplica().size());
+		ForestReplica replica = firstForest.getForestReplica().get(0);
+		assertEquals("my-database-1-replica-1", replica.getReplicaName());
+		assertEquals("host3", replica.getHost());
+		replica = firstForest.getForestReplica().get(1);
+		assertEquals("my-database-1-replica-2", replica.getReplicaName());
+		assertEquals("host4", replica.getHost());
+
+		Forest secondForest = forests.get(1);
+		assertEquals("host1", secondForest.getHost(), "host1 should be selected since it's the first host");
+		assertEquals(2, secondForest.getForestReplica().size());
+		replica = secondForest.getForestReplica().get(0);
+		assertEquals("my-database-2-replica-1", replica.getReplicaName());
+		assertEquals("host3", replica.getHost());
+		replica = secondForest.getForestReplica().get(1);
+		assertEquals("my-database-2-replica-2", replica.getReplicaName());
+		assertEquals("host4", replica.getHost());
 	}
 
 	@Test

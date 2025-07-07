@@ -20,12 +20,9 @@ import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.databases.DeployDatabaseCommand;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.ManageConfig;
-import com.marklogic.mgmt.resource.hosts.HostManager;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Not an actual test, as this depends on an environment with multiple hosts, which is normally not the case on a
@@ -38,48 +35,34 @@ public class ConfigureForestReplicasDebug {
 	public static void main(String[] args) {
 		final String host = "localhost"; //args[0];
 		final String password = "admin"; //args[1];
+		final int managePort = 8102;
 		final String dbName = "testdb";
 		final int replicaCount = 2;
 
-		ManageConfig config = new ManageConfig(host, 8102, "admin", password);
-		ManageClient manageClient = new ManageClient(config);
+		ManageClient manageClient = new ManageClient(new ManageConfig(host, managePort, "admin", password));
 
-		AppConfig appConfig = new AppConfig();
+		final AppConfig appConfig = new AppConfig();
+		appConfig.setDatabasesWithForestsOnOneHost(Set.of(dbName));
 		appConfig.setDatabaseNamesAndReplicaCounts(Map.of(dbName, replicaCount));
 
-		List<String> hostNames = new HostManager(manageClient).getHostNames();
+		final CommandContext context = new CommandContext(appConfig, manageClient, null);
 
-		Map<String, List<String>> databaseHosts = new LinkedHashMap<>();
-		List<String> hosts = new ArrayList<>();
-		hosts.add(hostNames.get(0));
-		hosts.add(hostNames.get(1));
-		databaseHosts.put(dbName, hosts);
-		//appConfig.setDatabaseHosts(databaseHosts);
+		DeployDatabaseCommand deployDatabaseCommand = new DeployDatabaseCommand();
+		deployDatabaseCommand.setForestsPerHost(2);
+		deployDatabaseCommand.setCreateDatabaseWithoutFile(true);
+		deployDatabaseCommand.setDatabaseName(dbName);
 
-		Map<String, List<String>> databaseGroups = new LinkedHashMap<>();
-		List<String> groups = new ArrayList<>();
-		groups.add("Default");
-		databaseGroups.put(dbName, groups);
-		//appConfig.setDatabaseGroups(databaseGroups);
+		// Deploy the database.
+		deployDatabaseCommand.execute(context);
 
-		CommandContext context = new CommandContext(appConfig, manageClient, null);
-
-		DeployDatabaseCommand ddc = new DeployDatabaseCommand();
-		ddc.setForestsPerHost(2);
-		ddc.setCreateDatabaseWithoutFile(true);
-		ddc.setDatabaseName(dbName);
-
-		ConfigureForestReplicasCommand cfrc = new ConfigureForestReplicasCommand();
-
-		// Deploy the database, and then configure replicas
-		ddc.execute(context);
-		cfrc.execute(context);
-
+		// Configure replicas.
+		ConfigureForestReplicasCommand configureForestReplicasCommand = new ConfigureForestReplicasCommand();
+		configureForestReplicasCommand.execute(context);
 		// Deploy again to make sure there are no errors
-		cfrc.execute(context);
+		configureForestReplicasCommand.execute(context);
 
-		// Then delete the replicas, and then undeploy the database
-		cfrc.undo(context);
-		ddc.undo(context);
+		// Delete replicas, and then the database.
+		configureForestReplicasCommand.undo(context);
+		deployDatabaseCommand.undo(context);
 	}
 }

@@ -22,27 +22,30 @@ import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.ManageConfig;
 import com.marklogic.mgmt.resource.hosts.HostManager;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Not an actual test, as this depends on an environment with multiple hosts, which is normally not the case on a
  * development machine.
+ * <p>
+ * This is now intended to run against the multi-host cluster setup via docker-compose.yml.
  */
 public class ConfigureForestReplicasDebug {
 
 	public static void main(String[] args) {
 		final String host = "localhost"; //args[0];
 		final String password = "admin"; //args[1];
-
 		final String dbName = "testdb";
+		final int replicaCount = 2;
 
-		ManageConfig config = new ManageConfig(host, 8002, "admin", password);
+		ManageConfig config = new ManageConfig(host, 8102, "admin", password);
 		ManageClient manageClient = new ManageClient(config);
 
 		AppConfig appConfig = new AppConfig();
-		Map<String, Integer> map = new HashMap<>();
-		map.put(dbName, 2);
-		appConfig.setDatabaseNamesAndReplicaCounts(map);
+		appConfig.setDatabaseNamesAndReplicaCounts(Map.of(dbName, replicaCount));
 
 		List<String> hostNames = new HostManager(manageClient).getHostNames();
 

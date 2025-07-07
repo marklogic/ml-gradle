@@ -28,48 +28,67 @@ import java.util.Map;
 
 public class HostManager extends AbstractManager {
 
-    private ManageClient client;
+	private ManageClient manageClient;
 
-    public HostManager(ManageClient client) {
-        this.client = client;
-    }
+	public HostManager(ManageClient manageClient) {
+		this.manageClient = manageClient;
+	}
 
-    public List<String> getHostIds() {
-        return getHosts().getElementValues("/h:host-default-list/h:list-items/h:list-item/h:idref");
-    }
+	public List<String> getHostIds() {
+		return getHosts().getElementValues("/h:host-default-list/h:list-items/h:list-item/h:idref");
+	}
 
-    public List<String> getHostNames() {
-        return getHosts().getElementValues("/h:host-default-list/h:list-items/h:list-item/h:nameref");
-    }
+	public List<String> getHostNames() {
+		return getHosts().getElementValues("/h:host-default-list/h:list-items/h:list-item/h:nameref");
+	}
+
+	/**
+	 * @return a map of host names to optional zones. For performance reasons, as soon as a host is found to not have
+	 * a zone, then an empty map will be returned. Currently, the only use case for this map is to create forest replicas
+	 * across zones. But if any host does not have a zone, then zones do not matter.
+	 * @since 6.0.0
+	 */
+	public Map<String, String> getHostNamesAndZones() {
+		Map<String, String> map = new LinkedHashMap<>();
+		for (String hostName : getHostNames()) {
+			String json = manageClient.getJson("/manage/v2/hosts/%s/properties".formatted(hostName));
+			String zone = payloadParser.getPayloadFieldValue(json, "zone");
+			if (zone == null || zone.trim().isEmpty()) {
+				return map;
+			}
+			map.put(hostName, zone);
+		}
+		return map;
+	}
 
 	/**
 	 * @return a map with an entry for each host, with the key of the host being the host ID and the value being the
 	 * host name
 	 */
 	public Map<String, String> getHostIdsAndNames() {
-    	Fragment xml = getHosts();
-    	Map<String, String> map = new LinkedHashMap<>();
-	    Namespace ns = Namespace.getNamespace("http://marklogic.com/manage/hosts");
-    	for (Element el : xml.getElements("/h:host-default-list/h:list-items/h:list-item")) {
-    		String hostId = el.getChildText("idref", ns);
-    		String hostName = el.getChildText("nameref", ns);
-    		map.put(hostId, hostName);
-	    }
-    	return map;
-    }
+		Fragment xml = getHosts();
+		Map<String, String> map = new LinkedHashMap<>();
+		Namespace ns = Namespace.getNamespace("http://marklogic.com/manage/hosts");
+		for (Element el : xml.getElements("/h:host-default-list/h:list-items/h:list-item")) {
+			String hostId = el.getChildText("idref", ns);
+			String hostName = el.getChildText("nameref", ns);
+			map.put(hostId, hostName);
+		}
+		return map;
+	}
 
-    public Fragment getHosts() {
-        return client.getXml("/manage/v2/hosts");
-    }
+	public Fragment getHosts() {
+		return manageClient.getXml("/manage/v2/hosts");
+	}
 
-    public ResponseEntity<String> setHostToGroup(String hostIdOrName, String groupIdOrName) {
-        String json = format("{\"group\":\"%s\"}", groupIdOrName);
-        String url = format("/manage/v2/hosts/%s/properties", hostIdOrName);
-        return client.putJson(url, json);
-    }
+	public ResponseEntity<String> setHostToGroup(String hostIdOrName, String groupIdOrName) {
+		String json = format("{\"group\":\"%s\"}", groupIdOrName);
+		String url = format("/manage/v2/hosts/%s/properties", hostIdOrName);
+		return manageClient.putJson(url, json);
+	}
 
 	public String getAssignedGroupName(String hostIdOrName) {
 		String url = format("/manage/v2/hosts/%s/properties", hostIdOrName);
-		return payloadParser.getPayloadFieldValue(client.getJson(url), "group");
+		return payloadParser.getPayloadFieldValue(manageClient.getJson(url), "group");
 	}
 }

@@ -14,3 +14,103 @@ services:
     ports:
       - "8000-8008:8000-8008"
       - "8028:8028"
+
+  # The six-node cluster defined below is used for manual testing of operations that require a cluster of 3 or more
+  # hosts, such as creating forest replicas.
+  node1:
+    image: "progressofficial/marklogic-db:latest"
+    platform: linux/amd64
+    hostname: node1.local
+    environment:
+      - MARKLOGIC_INIT=true
+      - MARKLOGIC_ADMIN_USERNAME=admin
+      - MARKLOGIC_ADMIN_PASSWORD=admin
+    volumes:
+      - ./docker/marklogic/node1/logs:/var/opt/MarkLogic/Logs
+    ports:
+      - 8100-8103:8000-8003
+
+  node2:
+    image: "progressofficial/marklogic-db:latest"
+    platform: linux/amd64
+    hostname: node2.local
+    depends_on:
+      - node1
+    environment:
+      - MARKLOGIC_INIT=true
+      - MARKLOGIC_ADMIN_USERNAME=admin
+      - MARKLOGIC_ADMIN_PASSWORD=admin
+      - MARKLOGIC_JOIN_CLUSTER=true
+      - MARKLOGIC_BOOTSTRAP_HOST=node1.local
+    volumes:
+      - ./docker/marklogic/node2/logs:/var/opt/MarkLogic/Logs
+    ports:
+      - 8200-8203:8000-8003
+
+  node3:
+    image: "progressofficial/marklogic-db:latest"
+    platform: linux/amd64
+    hostname: node3.local
+    depends_on:
+      - node1
+    environment:
+      - MARKLOGIC_INIT=true
+      - MARKLOGIC_ADMIN_USERNAME=admin
+      - MARKLOGIC_ADMIN_PASSWORD=admin
+      - MARKLOGIC_JOIN_CLUSTER=true
+      - MARKLOGIC_BOOTSTRAP_HOST=node1.local
+    volumes:
+      - ./docker/marklogic/node3/logs:/var/opt/MarkLogic/Logs
+    ports:
+      - 8300-8303:8000-8003
+
+  node4:
+    image: "progressofficial/marklogic-db:latest"
+    platform: linux/amd64
+    hostname: node4.local
+    depends_on:
+      - node1
+    environment:
+      - MARKLOGIC_INIT=true
+      - MARKLOGIC_ADMIN_USERNAME=admin
+      - MARKLOGIC_ADMIN_PASSWORD=admin
+      - MARKLOGIC_JOIN_CLUSTER=true
+      - MARKLOGIC_BOOTSTRAP_HOST=node1.local
+    volumes:
+      - ./docker/marklogic/node4/logs:/var/opt/MarkLogic/Logs
+    ports:
+      - 8500-8503:8000-8003
+
+  node5:
+    image: "progressofficial/marklogic-db:latest"
+    platform: linux/amd64
+    hostname: node5.local
+    depends_on:
+      - node1
+    environment:
+      - MARKLOGIC_INIT=true
+      - MARKLOGIC_ADMIN_USERNAME=admin
+      - MARKLOGIC_ADMIN_PASSWORD=admin
+      - MARKLOGIC_JOIN_CLUSTER=true
+      - MARKLOGIC_BOOTSTRAP_HOST=node1.local
+    volumes:
+      - ./docker/marklogic/node5/logs:/var/opt/MarkLogic/Logs
+    ports:
+      - 8600-8603:8000-8003
+
+  node6:
+    image: "progressofficial/marklogic-db:latest"
+    platform: linux/amd64
+    hostname: node6.local
+    depends_on:
+      - node1
+    environment:
+      - MARKLOGIC_INIT=true
+      - MARKLOGIC_ADMIN_USERNAME=admin
+      - MARKLOGIC_ADMIN_PASSWORD=admin
+      - MARKLOGIC_JOIN_CLUSTER=true
+      - MARKLOGIC_BOOTSTRAP_HOST=node1.local
+    volumes:
+      - ./docker/marklogic/node6/logs:/var/opt/MarkLogic/Logs
+    ports:
+      - 8700-8703:8000-8003

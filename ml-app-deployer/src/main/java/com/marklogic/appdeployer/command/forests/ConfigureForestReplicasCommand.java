@@ -34,19 +34,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
- * Command for configuring - i.e. creating and setting - replica forests for existing databases.
- * <p>
- * Very useful for the out-of-the-box forests such as Security, Schemas, App-Services, and Meters, which normally need
- * replicas for failover in a cluster.
+ * Command for configuring - i.e. creating and setting - replica forests for existing databases. The expectation is that
+ * {@code DeployForestsCommand} is used for creating primary forests, while this command is used for creating replica
+ * forests based on existing primary forests.
  */
 public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 
 	private Map<String, Integer> databaseNamesAndReplicaCounts = new HashMap<>();
 	private boolean deleteReplicasOnUndo = true;
 	private GroupHostNamesProvider groupHostNamesProvider;
+	private ForestBuilder forestBuilder = new ForestBuilder();
 
 	public ConfigureForestReplicasCommand() {
 		setExecuteSortOrder(SortOrderConstants.DEPLOY_FOREST_REPLICAS);
@@ -128,39 +127,47 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 	 * @param hostNames
 	 * @param context
 	 */
-	protected void configureDatabaseReplicaForests(String databaseName, int replicaCount, List<String> hostNames, CommandContext context) {
+	private void configureDatabaseReplicaForests(String databaseName, int replicaCount, List<String> hostNames, CommandContext context) {
 		List<Forest> forestsNeedingReplicas = determineForestsNeedingReplicas(databaseName, context);
 
-		ForestBuilder forestBuilder = new ForestBuilder();
 		List<String> selectedHostNames = getHostNamesForDatabaseForests(databaseName, hostNames, context);
-		ForestPlan forestPlan = new ForestPlan(databaseName, selectedHostNames).withReplicaCount(replicaCount);
 		List<String> dataDirectories = forestBuilder.determineDataDirectories(databaseName, context.getAppConfig());
+
+		final ForestPlan forestPlan = new ForestPlan(databaseName, selectedHostNames)
+			.withHostsToZones(new HostManager(context.getManageClient()).getHostNamesAndZones())
+			.withReplicaCount(replicaCount);
+
 		forestBuilder.addReplicasToForests(forestsNeedingReplicas, forestPlan, context.getAppConfig(), dataDirectories);
 
+		// Trim off all forests details so only the replicas are saved.
 		List<Forest> forestsWithOnlyReplicas = forestsNeedingReplicas.stream().map(forest -> {
 			Forest forestWithOnlyReplicas = new Forest();
 			forestWithOnlyReplicas.setForestName(forest.getForestName());
 			forestWithOnlyReplicas.setForestReplica(forest.getForestReplica());
 			return forestWithOnlyReplicas;
-		}).collect(Collectors.toList());
+		}).toList();
 
 		// As of 4.5.3, try CMA first so that this can be done in a single request instead of one request per forest.
 		if (context.getAppConfig().getCmaConfig().isDeployForests()) {
 			try {
-				Configuration config = new Configuration();
-				forestsWithOnlyReplicas.forEach(forest -> {
-					config.addForest(forest.toObjectNode());
-				});
-				new Configurations(config).submit(context.getManageClient());
+				saveReplicasViaCma(forestsWithOnlyReplicas, context);
 				return;
 			} catch (Exception ex) {
-				logger.warn("Unable to create forest replicas via CMA; cause: " + ex.getMessage() + "; will " +
-					"fall back to using /manage/v2.");
+				logger.warn("Unable to create forest replicas via CMA; cause: {}; will fall back to using /manage/v2.", ex.getMessage());
 			}
 		}
 
-		// If we get here, either CMA usage is disabled or an error occurred with CMA. Just use /manage/v2 to submit
-		// each forest one-by-one.
+		// If we get here, either CMA usage is disabled or an error occurred with CMA.
+		saveReplicasOneByOne(forestsWithOnlyReplicas, context);
+	}
+
+	private void saveReplicasViaCma(List<Forest> forestsWithOnlyReplicas, CommandContext context) {
+		Configuration config = new Configuration();
+		forestsWithOnlyReplicas.forEach(forest -> config.addForest(forest.toObjectNode()));
+		new Configurations(config).submit(context.getManageClient());
+	}
+
+	private void saveReplicasOneByOne(List<Forest> forestsWithOnlyReplicas, CommandContext context) {
 		ForestManager forestManager = new ForestManager(context.getManageClient());
 		forestsWithOnlyReplicas.forEach(forest -> {
 			String forestName = forest.getForestName();

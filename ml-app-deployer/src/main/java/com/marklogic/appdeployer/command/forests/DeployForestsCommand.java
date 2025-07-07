@@ -28,6 +28,7 @@ import com.marklogic.mgmt.mapper.ResourceMapper;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.forests.ForestManager;
 import com.marklogic.mgmt.resource.hosts.DefaultHostNameProvider;
+import com.marklogic.mgmt.resource.hosts.HostManager;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
@@ -122,11 +123,11 @@ public class DeployForestsCommand extends AbstractCommand {
 	 * these commands to construct a list of many forests that can be created via CMA in one request.
 	 *
 	 * @param context
-	 * @param includeReplicas This command currently doesn't make use of this feature; it's here so that other clients
-	 *                        can get a preview of the forests to be created, including replicas.
+	 * @param previewingForestCreation When previewing forest creation, replicas will be built. If not previewing
+	 *                                 forest creation, then only primary forests will be built.
 	 * @return
 	 */
-	public List<Forest> buildForests(CommandContext context, boolean includeReplicas) {
+	public List<Forest> buildForests(CommandContext context, boolean previewingForestCreation) {
 		// Need to know what primary forests exist already in case more need to be added, or a new host has been added
 		List<Forest> existingPrimaryForests = null;
 
@@ -141,36 +142,35 @@ public class DeployForestsCommand extends AbstractCommand {
 			existingPrimaryForests = getExistingPrimaryForests(context, this.databaseName);
 		}
 
-		return buildForests(context, includeReplicas, existingPrimaryForests);
+		return buildForests(context, previewingForestCreation, existingPrimaryForests);
 	}
 
 	/**
 	 * @param context
-	 * @param includeReplicas
+	 * @param previewingForestCreation
 	 * @param existingPrimaryForests
 	 * @return
 	 */
-	protected List<Forest> buildForests(CommandContext context, boolean includeReplicas, List<Forest> existingPrimaryForests) {
+	protected List<Forest> buildForests(CommandContext context, boolean previewingForestCreation, List<Forest> existingPrimaryForests) {
 		ForestHostNames forestHostNames = determineHostNamesForForest(context, existingPrimaryForests);
 
 		final String template = buildForestTemplate(context, new ForestManager(context.getManageClient()));
 
 		ForestPlan forestPlan = new ForestPlan(this.databaseName, forestHostNames.getPrimaryForestHostNames())
-			.withReplicaHostNames(forestHostNames.getReplicaForestHostNames())
 			.withTemplate(template)
 			.withForestsPerDataDirectory(this.forestsPerHost)
 			.withExistingForests(existingPrimaryForests);
 
-		if (includeReplicas) {
+		if (previewingForestCreation) {
 			Map<String, Integer> map = context.getAppConfig().getDatabaseNamesAndReplicaCounts();
 			if (map != null && map.containsKey(this.databaseName)) {
 				int count = map.get(this.databaseName);
 				if (count > 0) {
-					// Need to pass in host-to-zone mapping.
-					// And what to do about ConfigureForestReplicasCommand??? We may be better off removing that as part of
-					// the 6.0 release so that we only have replica creation in one place. Would need to verify that this command
-					// still works for OOTB databases.
-					forestPlan.withReplicaCount(count);
+					// If replicas are needed while previewing forest creation, we need to fetch some additional data
+					// to ensure the correct replicas are previewed.
+					forestPlan.withReplicaCount(count)
+						.withHostsToZones(new HostManager(context.getManageClient()).getHostNamesAndZones())
+						.withReplicaHostNames(forestHostNames.getReplicaForestHostNames());
 				}
 			}
 		}
@@ -232,7 +232,7 @@ public class DeployForestsCommand extends AbstractCommand {
 	 * @param existingPrimaryForests
 	 * @return a ForestHostNames instance that defines the list of host names that can be used for primary forests and
 	 * that can be used for replica forests. As of 4.1.0, the only reason these will differ is when a database is
-	 * configured to only have forests on one host, or when the deprecated setCreateForestsOnOneHost method is used.
+	 * configured to only have forests on one host.
 	 */
 	protected ForestHostNames determineHostNamesForForest(CommandContext context, List<Forest> existingPrimaryForests) {
 		if (hostCalculator == null) {

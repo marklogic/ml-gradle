@@ -68,11 +68,23 @@ public class ForestPlan {
 		return this;
 	}
 
+	/**
+	 * Confusingly, this is only used - at least as of 6.0.0 - when previewing forest creation. It is not used when
+	 * actually configuring forest replicas.
+	 *
+	 * @param replicaHostNames
+	 * @return
+	 */
 	public ForestPlan withReplicaHostNames(List<String> replicaHostNames) {
 		this.replicaHostNames = replicaHostNames;
 		return this;
 	}
 
+	/**
+	 * @param hostsToZones a mapping of each host name to an optional zone value for each host. The zone value can be
+	 *                     null for a host.
+	 * @since 6.0.0
+	 */
 	public ForestPlan withHostsToZones(Map<String, String> hostsToZones) {
 		this.hostsToZones = hostsToZones;
 		return this;
@@ -106,6 +118,10 @@ public class ForestPlan {
 		return replicaHostNames;
 	}
 
+	/**
+	 * @return
+	 * @since 6.0.0
+	 */
 	public Map<String, String> getHostsToZones() {
 		return hostsToZones;
 	}

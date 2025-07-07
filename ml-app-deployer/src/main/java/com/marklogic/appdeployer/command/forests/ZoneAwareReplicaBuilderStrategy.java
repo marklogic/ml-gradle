@@ -30,13 +30,22 @@ class ZoneAwareReplicaBuilderStrategy extends AbstractReplicaBuilderStrategy {
 			}
 		}
 
-		List<ForestReplicaPlanner.Host> hosts = new ArrayList<>();
+		final List<ForestReplicaPlanner.Host> hosts = new ArrayList<>();
 		hostToForests.forEach((host, hostForests) -> {
 			final String zone = forestPlan.getHostsToZones() != null ? forestPlan.getHostsToZones().get(host) : null;
 			hosts.add(new ForestReplicaPlanner.Host(host, zone, hostForests));
 		});
 
-		ForestReplicaPlanner.assignReplicas(hosts, forestPlan.getReplicaCount(), forestPlan.getReplicaHostNames());
+		List<ForestReplicaPlanner.Host> allAvailableHosts = null;
+		if (forestPlan.getReplicaHostNames() != null) {
+			allAvailableHosts = new ArrayList<>();
+			for (String hostName : forestPlan.getReplicaHostNames()) {
+				final String zone = forestPlan.getHostsToZones() != null ? forestPlan.getHostsToZones().get(hostName) : null;
+				allAvailableHosts.add(new ForestReplicaPlanner.Host(hostName, zone));
+			}
+		}
+
+		ForestReplicaPlanner.assignReplicas(hosts, forestPlan.getReplicaCount(), allAvailableHosts);
 
 		for (Forest forest : forests) {
 			if (forest.getForestReplica() == null) {

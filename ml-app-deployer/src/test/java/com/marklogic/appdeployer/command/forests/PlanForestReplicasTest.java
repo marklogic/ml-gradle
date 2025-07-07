@@ -216,8 +216,6 @@ class PlanForestReplicasTest {
 		List<ForestReplicaPlanner.ReplicaAssignment> results = ForestReplicaPlanner.assignReplicas(hosts, 1);
 		assertEquals(18, results.size());
 
-		results.forEach(System.out::println);
-
 		// ZoneA forests
 		verifyAssignment(results.get(0), "host3");
 		verifyAssignment(results.get(1), "host4");

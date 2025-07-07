@@ -42,12 +42,10 @@ public class CreateForestsOnOneHostTest {
 
 		ForestHostNames hostNames = command.determineHostNamesForForest(context, new ArrayList<>());
 		assertEquals(3, hostNames.getPrimaryForestHostNames().size());
-		assertEquals(3, hostNames.getReplicaForestHostNames().size());
 
 		appConfig.addDatabaseWithForestsOnOneHost("test-db");
 		hostNames = command.determineHostNamesForForest(context, new ArrayList<>());
 		assertEquals(1, hostNames.getPrimaryForestHostNames().size());
-		assertEquals(3, hostNames.getReplicaForestHostNames().size());
 	}
 
 	/**
@@ -74,7 +72,7 @@ public class CreateForestsOnOneHostTest {
 		assertEquals("host2", hostNames.getPrimaryForestHostNames().get(0), "Because there's already a forest on " +
 			"host2, that should be the primary forest host name, even though host1 is first in the list");
 
-		List<Forest> forestsToCreate = command.buildForests(context, false, existingForests);
+		List<Forest> forestsToCreate = command.buildForests(context, existingForests);
 		assertEquals(1, forestsToCreate.size(), "Because forests per host is 2 and host2 already has 1 forest, 1 more " +
 			"forest needs to be created");
 		assertEquals("host2", forestsToCreate.get(0).getHost());

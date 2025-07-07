@@ -38,29 +38,25 @@ public class DefaultHostCalculator extends LoggingObject implements HostCalculat
 		if (candidateHostNames.isEmpty()) {
 			throw new RuntimeException("Unable to determine host names for forests for database: " + databaseName + "; please check the " +
 				"properties you've set for creating forests for this database to ensure that forests can be created on at " +
-				"least one host in your cluster");
+				"least one host in your cluster.");
 		}
 
 		final List<String> primaryForestHostNames = new ArrayList<>();
-		final List<String> replicaForestHostNames = new ArrayList<>();
 
 		if (context.getAppConfig().isDatabaseWithForestsOnOneHost(databaseName)) {
 			if (existingPrimaryForests.size() > 0) {
 				primaryForestHostNames.add(existingPrimaryForests.get(0).getHost());
-				replicaForestHostNames.addAll(candidateHostNames);
 			} else {
 				primaryForestHostNames.add(candidateHostNames.get(0));
-				replicaForestHostNames.addAll(candidateHostNames);
 			}
 		} else {
 			primaryForestHostNames.addAll(candidateHostNames);
-			replicaForestHostNames.addAll(candidateHostNames);
 		}
 
-		return new ForestHostNames(primaryForestHostNames, replicaForestHostNames);
+		return new ForestHostNames(primaryForestHostNames);
 	}
 
-	protected List<String> getCandidateHostNames(String databaseName, CommandContext context) {
+	private List<String> getCandidateHostNames(String databaseName, CommandContext context) {
 		if (logger.isInfoEnabled()) {
 			logger.info("Finding eligible hosts for forests for database: " + databaseName);
 		}
@@ -83,7 +79,7 @@ public class DefaultHostCalculator extends LoggingObject implements HostCalculat
 	 * @param context
 	 * @return
 	 */
-	protected List<String> determineHostNamesBasedOnDatabaseGroups(String databaseName, CommandContext context) {
+	private List<String> determineHostNamesBasedOnDatabaseGroups(String databaseName, CommandContext context) {
 		Map<String, List<String>> databaseGroups = context.getAppConfig().getDatabaseGroups();
 		if (databaseGroups != null) {
 			List<String> selectedGroupNames = databaseGroups.get(databaseName);
@@ -134,7 +130,7 @@ public class DefaultHostCalculator extends LoggingObject implements HostCalculat
 	 * @param hostNames
 	 * @return
 	 */
-	protected List<String> determineHostNamesBasedOnDatabaseHosts(String databaseName, CommandContext context, List<String> hostNames) {
+	private List<String> determineHostNamesBasedOnDatabaseHosts(String databaseName, CommandContext context, List<String> hostNames) {
 		Map<String, List<String>> databaseHosts = context.getAppConfig().getDatabaseHosts();
 		if (databaseHosts != null) {
 			List<String> databaseHostNames = databaseHosts.get(databaseName);

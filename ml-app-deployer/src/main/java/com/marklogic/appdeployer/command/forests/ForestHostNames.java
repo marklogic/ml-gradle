@@ -17,21 +17,17 @@ package com.marklogic.appdeployer.command.forests;
 
 import java.util.List;
 
+// This is no longer needed now that it doesn't capture replica host names as well.
+// Will remove this in favor of a List<String> in the next PR.
 public class ForestHostNames {
 
 	private List<String> primaryForestHostNames;
-	private List<String> replicaForestHostNames;
 
-	public ForestHostNames(List<String> primaryForestHostNames, List<String> replicaForestHostNames) {
+	public ForestHostNames(List<String> primaryForestHostNames) {
 		this.primaryForestHostNames = primaryForestHostNames;
-		this.replicaForestHostNames = replicaForestHostNames;
 	}
 
 	public List<String> getPrimaryForestHostNames() {
 		return primaryForestHostNames;
-	}
-
-	public List<String> getReplicaForestHostNames() {
-		return replicaForestHostNames;
 	}
 }

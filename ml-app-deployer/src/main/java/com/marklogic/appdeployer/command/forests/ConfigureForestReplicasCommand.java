@@ -20,6 +20,7 @@ import com.marklogic.appdeployer.command.AbstractUndoableCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.mgmt.ManageClient;
+import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.configuration.Configuration;
 import com.marklogic.mgmt.api.configuration.Configurations;
@@ -33,6 +34,7 @@ import com.marklogic.mgmt.resource.groups.GroupManager;
 import com.marklogic.mgmt.resource.hosts.HostManager;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -138,12 +140,32 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 
 		List<String> selectedHostNames = getHostNamesForDatabaseForests(databaseName, allHostNames, context);
 		List<String> dataDirectories = forestBuilder.determineDataDirectories(databaseName, context.getAppConfig());
+		Map<String, String> hostNamesAndZones = getHostNamesAndZones(context.getManageClient());
 
 		final ForestPlan forestPlan = new ForestPlan(databaseName, selectedHostNames)
-			.withHostsToZones(new HostManager(context.getManageClient()).getHostNamesAndZones())
+			.withHostsToZones(hostNamesAndZones)
 			.withReplicaCount(replicaCount);
 
 		forestBuilder.addReplicasToForests(forests, forestPlan, context.getAppConfig(), dataDirectories);
+	}
+
+	/**
+	 * @return a map of host names to optional zones. For performance reasons, as soon as a host is found to not have
+	 * a zone, then an empty map will be returned, as zones will not matter in that scenario.
+	 */
+	private Map<String, String> getHostNamesAndZones(ManageClient manageClient) {
+		HostManager hostManager = new HostManager(manageClient);
+		PayloadParser payloadParser = new PayloadParser();
+		Map<String, String> map = new LinkedHashMap<>();
+		for (String hostName : hostManager.getHostNames()) {
+			String json = manageClient.getJson("/manage/v2/hosts/%s/properties".formatted(hostName));
+			String zone = payloadParser.getPayloadFieldValue(json, "zone");
+			if (zone == null || zone.trim().isEmpty()) {
+				return map;
+			}
+			map.put(hostName, zone);
+		}
+		return map;
 	}
 
 	public List<Forest> removeForestDetails(List<Forest> forests) {

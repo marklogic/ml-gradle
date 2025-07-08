@@ -404,7 +404,7 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 				dbConfig.addDatabase(convertPayloadToObjectNode(context, payload));
 				DeployForestsCommand deployForestsCommand = deployDatabaseCommand.buildDeployForestsCommand(plan.getDatabaseName(), context);
 				if (deployForestsCommand != null) {
-					deployForestsCommand.buildForests(context, false).forEach(forest -> forestConfig.addForest(forest.toObjectNode()));
+					deployForestsCommand.buildForests(context).forEach(forest -> forestConfig.addForest(forest.toObjectNode()));
 				}
 			}
 		});
@@ -430,7 +430,7 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 		databasePlans.forEach(plan -> {
 			DeployForestsCommand dfc = plan.getDeployDatabaseCommand().getDeployForestsCommand();
 			if (dfc != null) {
-				allForests.addAll(dfc.buildForests(context, false));
+				allForests.addAll(dfc.buildForests(context));
 			}
 		});
 		if (!allForests.isEmpty()) {

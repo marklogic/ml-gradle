@@ -22,7 +22,6 @@ import com.marklogic.mgmt.api.forest.ForestReplica;
 import com.marklogic.mgmt.util.SimplePropertySource;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +29,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BuildForestReplicaTest {
 
@@ -140,34 +138,6 @@ class BuildForestReplicaTest {
 		assertEquals(120, replicaCount.get(), "Expecting 120 replicas; we have 40 forests, and we expect 3 replicas for each");
 		Stream.of("host1", "host2", "host3", "host4").forEach(host -> {
 			assertEquals(30, hostToReplicaCounts.get(host).get(), "Each host should have 30 replicas, as there are 120 total");
-		});
-	}
-
-	/**
-	 * Verifies that replicaHostNames is used for generating the replicas. This is for databases that are configured
-	 * to have their primary forests on a single host, which is often the case for modules, schemas, and triggers.
-	 */
-	@Test
-	public void primaryForestsOnOneHost() {
-		AppConfig appConfig = newAppConfig("mlForestsPerHost", "db,2");
-
-		ForestPlan plan = new ForestPlan("db", "host1").withReplicaCount(2);
-		assertEquals(1, plan.getHostNames().size());
-		assertEquals(1, plan.getReplicaHostNames().size());
-		plan.withReplicaHostNames(Arrays.asList("host1", "host2", "host3"));
-		assertEquals(1, plan.getHostNames().size());
-		assertEquals(3, plan.getReplicaHostNames().size());
-
-		List<Forest> forests = builder.buildForests(plan, appConfig);
-
-		assertEquals(2, forests.size());
-		forests.forEach(forest -> {
-			assertEquals("host1", forest.getHost());
-			assertEquals(2, forest.getForestReplica().size());
-			for (ForestReplica replica : forest.getForestReplica()) {
-				String host = replica.getHost();
-				assertTrue(host.equals("host2") || host.equals("host3"), "Unexpected host for replica: " + host);
-			}
 		});
 	}
 

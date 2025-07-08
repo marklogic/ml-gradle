@@ -26,7 +26,6 @@ public class ForestPlan {
 
 	private String databaseName;
 	private List<String> hostNames;
-	private List<String> replicaHostNames;
 	private String template;
 	private int forestsPerDataDirectory = 1;
 	private List<Forest> existingForests = new ArrayList<>();
@@ -37,15 +36,9 @@ public class ForestPlan {
 		this(databaseName, Arrays.asList(hostNames));
 	}
 
-	/**
-	 * @param databaseName
-	 * @param hostNames    the list of hosts that primary and replica forests can be created on. If the list of replica
-	 *                     forest host names differs, use withReplicaHostNames
-	 */
 	public ForestPlan(String databaseName, List<String> hostNames) {
 		this.databaseName = databaseName;
 		this.hostNames = hostNames;
-		this.replicaHostNames = hostNames;
 	}
 
 	public ForestPlan withTemplate(String template) {
@@ -65,18 +58,6 @@ public class ForestPlan {
 
 	public ForestPlan withReplicaCount(int count) {
 		this.replicaCount = count;
-		return this;
-	}
-
-	/**
-	 * Confusingly, this is only used - at least as of 6.0.0 - when previewing forest creation. It is not used when
-	 * actually configuring forest replicas.
-	 *
-	 * @param replicaHostNames
-	 * @return
-	 */
-	public ForestPlan withReplicaHostNames(List<String> replicaHostNames) {
-		this.replicaHostNames = replicaHostNames;
 		return this;
 	}
 
@@ -112,10 +93,6 @@ public class ForestPlan {
 
 	public List<Forest> getExistingForests() {
 		return existingForests;
-	}
-
-	public List<String> getReplicaHostNames() {
-		return replicaHostNames;
 	}
 
 	/**

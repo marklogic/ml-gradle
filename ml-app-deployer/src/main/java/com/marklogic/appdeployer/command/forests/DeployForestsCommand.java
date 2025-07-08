@@ -28,7 +28,6 @@ import com.marklogic.mgmt.mapper.ResourceMapper;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.forests.ForestManager;
 import com.marklogic.mgmt.resource.hosts.DefaultHostNameProvider;
-import com.marklogic.mgmt.resource.hosts.HostManager;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
@@ -90,9 +89,7 @@ public class DeployForestsCommand extends AbstractCommand {
 	 */
 	@Override
 	public void execute(CommandContext context) {
-		// Replicas are currently handled by ConfigureForestReplicasCommand
-		List<Forest> forests = buildForests(context, false);
-
+		List<Forest> forests = buildForests(context);
 		if (context.getAppConfig().getCmaConfig().isDeployForests() && !forests.isEmpty() && cmaEndpointExists(context)) {
 			createForestsViaCma(context, forests);
 		} else {
@@ -123,11 +120,9 @@ public class DeployForestsCommand extends AbstractCommand {
 	 * these commands to construct a list of many forests that can be created via CMA in one request.
 	 *
 	 * @param context
-	 * @param previewingForestCreation When previewing forest creation, replicas will be built. If not previewing
-	 *                                 forest creation, then only primary forests will be built.
 	 * @return
 	 */
-	public List<Forest> buildForests(CommandContext context, boolean previewingForestCreation) {
+	public List<Forest> buildForests(CommandContext context) {
 		// Need to know what primary forests exist already in case more need to be added, or a new host has been added
 		List<Forest> existingPrimaryForests = null;
 
@@ -142,16 +137,15 @@ public class DeployForestsCommand extends AbstractCommand {
 			existingPrimaryForests = getExistingPrimaryForests(context, this.databaseName);
 		}
 
-		return buildForests(context, previewingForestCreation, existingPrimaryForests);
+		return buildForests(context, existingPrimaryForests);
 	}
 
 	/**
 	 * @param context
-	 * @param previewingForestCreation
 	 * @param existingPrimaryForests
 	 * @return
 	 */
-	protected List<Forest> buildForests(CommandContext context, boolean previewingForestCreation, List<Forest> existingPrimaryForests) {
+	protected final List<Forest> buildForests(CommandContext context, List<Forest> existingPrimaryForests) {
 		ForestHostNames forestHostNames = determineHostNamesForForest(context, existingPrimaryForests);
 
 		final String template = buildForestTemplate(context, new ForestManager(context.getManageClient()));
@@ -160,20 +154,6 @@ public class DeployForestsCommand extends AbstractCommand {
 			.withTemplate(template)
 			.withForestsPerDataDirectory(this.forestsPerHost)
 			.withExistingForests(existingPrimaryForests);
-
-		if (previewingForestCreation) {
-			Map<String, Integer> map = context.getAppConfig().getDatabaseNamesAndReplicaCounts();
-			if (map != null && map.containsKey(this.databaseName)) {
-				int count = map.get(this.databaseName);
-				if (count > 0) {
-					// If replicas are needed while previewing forest creation, we need to fetch some additional data
-					// to ensure the correct replicas are previewed.
-					forestPlan.withReplicaCount(count)
-						.withHostsToZones(new HostManager(context.getManageClient()).getHostNamesAndZones())
-						.withReplicaHostNames(forestHostNames.getReplicaForestHostNames());
-				}
-			}
-		}
 
 		return forestBuilder.buildForests(forestPlan, context.getAppConfig());
 	}
@@ -242,10 +222,6 @@ public class DeployForestsCommand extends AbstractCommand {
 		return hostCalculator.calculateHostNames(this.databaseName, context, existingPrimaryForests);
 	}
 
-	public int getForestsPerHost() {
-		return forestsPerHost;
-	}
-
 	public void setForestsPerHost(int forestsPerHost) {
 		this.forestsPerHost = forestsPerHost;
 	}
@@ -254,16 +230,8 @@ public class DeployForestsCommand extends AbstractCommand {
 		return databaseName;
 	}
 
-	public String getForestFilename() {
-		return forestFilename;
-	}
-
 	public void setForestFilename(String forestFilename) {
 		this.forestFilename = forestFilename;
-	}
-
-	public String getForestPayload() {
-		return forestPayload;
 	}
 
 	public void setForestPayload(String forestPayload) {
@@ -281,9 +249,5 @@ public class DeployForestsCommand extends AbstractCommand {
 	 */
 	public void setDatabaseName(String databaseName) {
 		this.databaseName = databaseName;
-	}
-
-	public void setForestBuilder(ForestBuilder forestBuilder) {
-		this.forestBuilder = forestBuilder;
 	}
 }

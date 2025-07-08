@@ -43,25 +43,6 @@ public class HostManager extends AbstractManager {
 	}
 
 	/**
-	 * @return a map of host names to optional zones. For performance reasons, as soon as a host is found to not have
-	 * a zone, then an empty map will be returned. Currently, the only use case for this map is to create forest replicas
-	 * across zones. But if any host does not have a zone, then zones do not matter.
-	 * @since 6.0.0
-	 */
-	public Map<String, String> getHostNamesAndZones() {
-		Map<String, String> map = new LinkedHashMap<>();
-		for (String hostName : getHostNames()) {
-			String json = manageClient.getJson("/manage/v2/hosts/%s/properties".formatted(hostName));
-			String zone = payloadParser.getPayloadFieldValue(json, "zone");
-			if (zone == null || zone.trim().isEmpty()) {
-				return map;
-			}
-			map.put(hostName, zone);
-		}
-		return map;
-	}
-
-	/**
 	 * @return a map with an entry for each host, with the key of the host being the host ID and the value being the
 	 * host name
 	 */

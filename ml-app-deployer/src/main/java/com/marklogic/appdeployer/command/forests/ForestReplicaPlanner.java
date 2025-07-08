@@ -59,37 +59,31 @@ class ForestReplicaPlanner {
 		}
 	}
 
-	static List<ReplicaAssignment> assignReplicas(List<Host> hosts, int replicaCount) {
-		return assignReplicas(hosts, replicaCount, null);
-	}
-
 	/**
-	 * @param hosts             list of hosts containing primary forests.
+	 * @param forestHosts       list of hosts containing primary forests.
+	 * @param allAvailableHosts will differ from forestHosts in a scenario where e.g. forests are on a single host,
+	 *                          which is common for modules/schemas databases.
 	 * @param replicaCount      number of replica forests to create for each primary forest.
-	 * @param allAvailableHosts is not null for a scenario where e.g. forests for a database are only created on one
-	 *                          host, such as for a modules or schemas database. In that scenario, the caller needs to
-	 *                          pass in a list of all available hosts in the cluster, so that replicas can be created
-	 *                          on those hosts.
 	 * @return
 	 */
-	static List<ReplicaAssignment> assignReplicas(List<Host> hosts, int replicaCount, List<Host> allAvailableHosts) {
-		final List<Host> replicaHosts = buildReplicaHostsList(hosts, allAvailableHosts);
+	static List<ReplicaAssignment> assignReplicas(List<Host> forestHosts, List<Host> allAvailableHosts, int replicaCount) {
+		final List<Host> replicaHosts = allAvailableHosts;
 		final boolean ignoreZones = shouldIgnoreZones(replicaHosts);
 
 		int differentZoneIndex = 0;
 		int sameZoneIndex = 0;
 		final List<ReplicaAssignment> assignments = new ArrayList<>();
 
-		for (final Host host : hosts) {
+		for (final Host forestHost : forestHosts) {
 			int forestIndex = 0;
-			for (Forest forest : host.forests) {
-				ReplicaAssignment assignment = new ReplicaAssignment(forest.getForestName(), host.name);
-				List<Host> eligibleHosts = buildEligibleHostsList(host, replicaHosts, ignoreZones);
+			for (Forest forest : forestHost.forests) {
+				ReplicaAssignment assignment = new ReplicaAssignment(forest.getForestName(), forestHost.name);
+				List<Host> eligibleHosts = buildEligibleHostsList(forestHost, replicaHosts, ignoreZones);
 
 				if (ignoreZones) {
 					assignReplicasIgnoringZones(assignment, eligibleHosts, replicaCount, forestIndex);
 				} else {
-					assignReplicasWithZoneAwareness(assignment, eligibleHosts, host, replicaCount, differentZoneIndex, sameZoneIndex);
+					assignReplicasWithZoneAwareness(assignment, eligibleHosts, forestHost, replicaCount, differentZoneIndex, sameZoneIndex);
 					differentZoneIndex += replicaCount;
 					sameZoneIndex += replicaCount;
 				}
@@ -101,19 +95,6 @@ class ForestReplicaPlanner {
 		}
 
 		return assignments;
-	}
-
-	private static List<Host> buildReplicaHostsList(List<Host> hosts, List<Host> allAvailableHosts) {
-		List<Host> replicaHosts = new ArrayList<>(hosts);
-		if (allAvailableHosts != null) {
-			for (Host availableHost : allAvailableHosts) {
-				boolean hostAlreadyExists = hosts.stream().anyMatch(h -> h.name.equals(availableHost.name));
-				if (!hostAlreadyExists) {
-					replicaHosts.add(availableHost);
-				}
-			}
-		}
-		return replicaHosts;
 	}
 
 	private static boolean shouldIgnoreZones(List<Host> replicaHosts) {
@@ -154,9 +135,19 @@ class ForestReplicaPlanner {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Assigning replicas while taking host zones into account.");
 		}
+
+		ZoneHosts zoneHosts = separateHostsByZone(eligibleHosts, sourceHost);
+
+		int replicasAssigned = 0;
+		// Try to assign to hosts in different zones first.
+		replicasAssigned = assignFromHostList(assignment, zoneHosts.differentZoneHosts, replicaCount, differentZoneIndex, replicasAssigned);
+		// If we still need more replicas, use hosts in the same zone.
+		assignFromHostList(assignment, zoneHosts.sameZoneHosts, replicaCount, sameZoneIndex, replicasAssigned);
+	}
+
+	private static ZoneHosts separateHostsByZone(List<Host> eligibleHosts, Host sourceHost) {
 		List<Host> differentZoneHosts = new ArrayList<>();
 		List<Host> sameZoneHosts = new ArrayList<>();
-
 		for (Host h : eligibleHosts) {
 			if (h.zone.equals(sourceHost.zone)) {
 				sameZoneHosts.add(h);
@@ -164,22 +155,14 @@ class ForestReplicaPlanner {
 				differentZoneHosts.add(h);
 			}
 		}
-
-		Set<String> usedHosts = new HashSet<>();
-		int replicasAssigned = 0;
-
-		// First, try to assign from different zones
-		replicasAssigned = assignFromHostList(assignment, differentZoneHosts, replicaCount, differentZoneIndex, usedHosts, replicasAssigned);
-
-		// If we still need more replicas, use same-zone hosts
-		assignFromHostList(assignment, sameZoneHosts, replicaCount, sameZoneIndex, usedHosts, replicasAssigned);
+		return new ZoneHosts(differentZoneHosts, sameZoneHosts);
 	}
 
-	private static int assignFromHostList(ReplicaAssignment assignment, List<Host> hostList, int replicaCount, int startIndex, Set<String> usedHosts, int replicasAssigned) {
+	private static int assignFromHostList(ReplicaAssignment assignment, List<Host> hostList, int replicaCount, int startIndex, int replicasAssigned) {
+		Set<String> usedHosts = new HashSet<>();
 		while (replicasAssigned < replicaCount && !hostList.isEmpty() && usedHosts.size() < hostList.size()) {
 			Host targetHost = hostList.get(startIndex % hostList.size());
 			startIndex++;
-
 			if (!usedHosts.contains(targetHost.name)) {
 				assignment.addReplicaHost(targetHost.name);
 				usedHosts.add(targetHost.name);
@@ -196,5 +179,15 @@ class ForestReplicaPlanner {
 			replica.setHost(replicaHost);
 			forest.getForestReplica().add(replica);
 		});
+	}
+
+	private static class ZoneHosts {
+		final List<Host> differentZoneHosts;
+		final List<Host> sameZoneHosts;
+
+		ZoneHosts(List<Host> differentZoneHosts, List<Host> sameZoneHosts) {
+			this.differentZoneHosts = differentZoneHosts;
+			this.sameZoneHosts = sameZoneHosts;
+		}
 	}
 }

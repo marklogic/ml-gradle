@@ -5,6 +5,7 @@ package com.marklogic.appdeployer.command.forests;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,7 +21,7 @@ class PlanForestReplicasTest {
 			new ForestReplicaPlanner.Host("host3", null, "forest3")
 		);
 
-		List<ForestReplicaPlanner.ReplicaAssignment> results = ForestReplicaPlanner.assignReplicas(hosts, 1);
+		List<ForestReplicaPlanner.ReplicaAssignment> results = assignReplicas(hosts, 1);
 		assertEquals(3, results.size());
 
 		verifyAssignment(results.get(0), "host2");
@@ -36,7 +37,7 @@ class PlanForestReplicasTest {
 			new ForestReplicaPlanner.Host("host3", null, "forest5", "forest6")
 		);
 
-		List<ForestReplicaPlanner.ReplicaAssignment> results = ForestReplicaPlanner.assignReplicas(hosts, 1);
+		List<ForestReplicaPlanner.ReplicaAssignment> results = assignReplicas(hosts, 1);
 		assertEquals(6, results.size());
 
 		verifyAssignment(results.get(0), "host2");
@@ -55,7 +56,7 @@ class PlanForestReplicasTest {
 			new ForestReplicaPlanner.Host("host3", null, "forest3")
 		);
 
-		List<ForestReplicaPlanner.ReplicaAssignment> results = ForestReplicaPlanner.assignReplicas(hosts, 2);
+		List<ForestReplicaPlanner.ReplicaAssignment> results = assignReplicas(hosts, 2);
 		assertEquals(3, results.size());
 
 		verifyAssignment(results.get(0), "host2", "host3");
@@ -71,7 +72,7 @@ class PlanForestReplicasTest {
 			new ForestReplicaPlanner.Host("host3", null, "forest5", "forest6")
 		);
 
-		List<ForestReplicaPlanner.ReplicaAssignment> results = ForestReplicaPlanner.assignReplicas(hosts, 2);
+		List<ForestReplicaPlanner.ReplicaAssignment> results = assignReplicas(hosts, 2);
 		assertEquals(6, results.size());
 
 		// This shows how replicas are assigned in a round-robin fashion, with each forest starting with the next
@@ -94,7 +95,7 @@ class PlanForestReplicasTest {
 			new ForestReplicaPlanner.Host("host3", "zoneC", "forest5", "forest6")
 		);
 
-		List<ForestReplicaPlanner.ReplicaAssignment> results = ForestReplicaPlanner.assignReplicas(hosts, 1);
+		List<ForestReplicaPlanner.ReplicaAssignment> results = assignReplicas(hosts, 1);
 		assertEquals(6, results.size());
 
 		verifyAssignment(results.get(0), "host2");
@@ -106,6 +107,24 @@ class PlanForestReplicasTest {
 	}
 
 	@Test
+	void threeHostsTwoReplicasTwoZones() {
+		List<ForestReplicaPlanner.Host> hosts = Arrays.asList(
+			new ForestReplicaPlanner.Host("host1", "zoneA", "forest1"),
+			new ForestReplicaPlanner.Host("host2", "zoneA", "forest2"),
+			new ForestReplicaPlanner.Host("host3", "zoneB", "forest3")
+		);
+
+		List<ForestReplicaPlanner.ReplicaAssignment> results = assignReplicas(hosts, 2);
+		assertEquals(3, results.size());
+
+		// For the hosts in zone A, they should both use the host in zone B first, and then use the other host in
+		// zone A since there aren't any other eligible hosts in zone B.
+		verifyAssignment(results.get(0), "host3", "host2");
+		verifyAssignment(results.get(1), "host3", "host1");
+		verifyAssignment(results.get(2), "host1", "host2");
+	}
+
+	@Test
 	void threeHostsTwoReplicasThreeZones() {
 		List<ForestReplicaPlanner.Host> hosts = Arrays.asList(
 			new ForestReplicaPlanner.Host("host1", "zoneA", "forest1", "forest2"),
@@ -113,7 +132,7 @@ class PlanForestReplicasTest {
 			new ForestReplicaPlanner.Host("host3", "zoneC", "forest5", "forest6")
 		);
 
-		List<ForestReplicaPlanner.ReplicaAssignment> results = ForestReplicaPlanner.assignReplicas(hosts, 2);
+		List<ForestReplicaPlanner.ReplicaAssignment> results = assignReplicas(hosts, 2);
 		assertEquals(6, results.size());
 		verifyAssignment(results.get(0), "host2", "host3");
 		verifyAssignment(results.get(1), "host2", "host3");
@@ -131,7 +150,7 @@ class PlanForestReplicasTest {
 			new ForestReplicaPlanner.Host("host3", "zoneA", "forest5", "forest6")
 		);
 
-		List<ForestReplicaPlanner.ReplicaAssignment> results = ForestReplicaPlanner.assignReplicas(hosts, 1);
+		List<ForestReplicaPlanner.ReplicaAssignment> results = assignReplicas(hosts, 1);
 		assertEquals(6, results.size());
 		verifyAssignment(results.get(0), "host2");
 		verifyAssignment(results.get(1), "host3");
@@ -152,7 +171,7 @@ class PlanForestReplicasTest {
 			new ForestReplicaPlanner.Host("host6", "zoneA", "forest11", "forest12")
 		);
 
-		List<ForestReplicaPlanner.ReplicaAssignment> results = ForestReplicaPlanner.assignReplicas(hosts, 2);
+		List<ForestReplicaPlanner.ReplicaAssignment> results = assignReplicas(hosts, 2);
 		assertEquals(12, results.size());
 
 		// Host1 forests
@@ -189,7 +208,7 @@ class PlanForestReplicasTest {
 			new ForestReplicaPlanner.Host("host4", "zoneB", "forest7", "forest8")
 		);
 
-		List<ForestReplicaPlanner.ReplicaAssignment> results = ForestReplicaPlanner.assignReplicas(hosts, 1);
+		List<ForestReplicaPlanner.ReplicaAssignment> results = assignReplicas(hosts, 1);
 		results.forEach(System.out::println);
 
 		verifyAssignment(results.get(0), "host3");
@@ -213,7 +232,7 @@ class PlanForestReplicasTest {
 			new ForestReplicaPlanner.Host("host6", "zoneC", "forest16", "forest17", "forest18")
 		);
 
-		List<ForestReplicaPlanner.ReplicaAssignment> results = ForestReplicaPlanner.assignReplicas(hosts, 1);
+		List<ForestReplicaPlanner.ReplicaAssignment> results = assignReplicas(hosts, 1);
 		assertEquals(18, results.size());
 
 		// ZoneA forests
@@ -241,6 +260,10 @@ class PlanForestReplicasTest {
 		verifyAssignment(results.get(17), "host2");
 	}
 
+	static List<ForestReplicaPlanner.ReplicaAssignment> assignReplicas(List<ForestReplicaPlanner.Host> hosts, int replicaCount) {
+		return ForestReplicaPlanner.assignReplicas(hosts, new ArrayList<>(hosts), replicaCount);
+	}
+
 	private void verifyAssignment(ForestReplicaPlanner.ReplicaAssignment assignment, String... expectedReplicaHosts) {
 		assertEquals(expectedReplicaHosts.length, assignment.replicaHosts.size());
 		for (int i = 0; i < assignment.replicaHosts.size(); i++) {
@@ -248,4 +271,5 @@ class PlanForestReplicasTest {
 				"Unexpected replica host for: " + assignment);
 		}
 	}
+
 }

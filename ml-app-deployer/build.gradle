@@ -4,8 +4,8 @@ dependencies {
 	// For RestTemplate, which wraps OkHttpClient.
 	api 'org.springframework:spring-web:6.2.8'
 
-	// For wrangling JSON. Matching the version used by the Java Client.
-	api 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
+	// For wrangling JSON.
+	api "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
 
 	// For resolving XPath expressions against XML documents.
 	implementation 'jaxen:jaxen:2.0.0'

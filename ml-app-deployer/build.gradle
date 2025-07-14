@@ -18,7 +18,7 @@ dependencies {
 	implementation 'org.jdom:jdom2:2.0.6.1'
 
 	// For EqualsBuilder; added in 3.8.1 to support detecting if a mimetype's properties have changed or not
-	implementation "org.apache.commons:commons-lang3:3.17.0"
+	implementation "org.apache.commons:commons-lang3:3.18.0"
 
 	// For PreviewInterceptor; can be excluded if that feature is not used
 	implementation("com.flipkart.zjsonpatch:zjsonpatch:0.4.16") {

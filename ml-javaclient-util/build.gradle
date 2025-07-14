@@ -1,15 +1,15 @@
 dependencies {
-	api 'com.marklogic:marklogic-client-api:7.1.0'
+	api 'com.marklogic:marklogic-client-api:7.2-SNAPSHOT'
 	api 'com.marklogic:marklogic-xcc:11.3.1'
+
+	// API dependency as some Spring classes, like Resource, are used throughout this project.
 	api 'org.springframework:spring-context:6.2.8'
 
+	// This is an API dependency due to LoggingObject and ml-app-deployer's use of that class.
+	api 'org.slf4j:slf4j-api:2.0.17'
+
 	implementation 'org.jdom:jdom2:2.0.6.1'
-
-	implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
-
-	// This is currently an implementation dependency, though perhaps should be an api dependency due to its usage in
-	// LoggingObject; not clear yet on whether the protected Logger in that class should make this an api dependency or not
-	implementation 'org.slf4j:slf4j-api:2.0.17'
+	implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
 
 	// With 5.12.x, tests are somehow not found by Gradle.
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.11.2'

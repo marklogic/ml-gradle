@@ -8,12 +8,6 @@ dependencies {
 
 	api project(":ml-app-deployer")
 
-	// For MlcpTask
-	implementation ("com.marklogic:mlcp-util:1.0.1") {
-		// Prefer the Spring version from ml-app-deployer.
-		exclude module: "spring-beans"
-	}
-
 	// For tasks that need to fiddle with the filesystem.
 	implementation "commons-io:commons-io:2.19.0"
 

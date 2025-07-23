@@ -4,6 +4,7 @@
 package com.marklogic.client.ext;
 
 import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.client.io.DocumentMetadataHandle;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestConfig.class})
-public abstract class AbstractIntegrationTest {
+public abstract class AbstractIntegrationTest extends LoggingObject {
 
 	protected final static String CONTENT_DATABASE = "ml-javaclient-util-test-content";
 	protected final static String MODULES_DATABASE = "ml-javaclient-util-test-modules";

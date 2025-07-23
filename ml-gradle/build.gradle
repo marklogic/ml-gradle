@@ -14,12 +14,6 @@ dependencies {
 		exclude module: "spring-beans"
 	}
 
-	// For the data movement tasks.
-	implementation ("com.marklogic:marklogic-data-movement-components:2.8.0") {
-		// Prefer the Java Client version coming from ml-javaclient-util.
-		exclude module: "marklogic-client-api"
-	}
-
 	// For tasks that need to fiddle with the filesystem.
 	implementation "commons-io:commons-io:2.19.0"
 

@@ -6,7 +6,6 @@ package com.marklogic.rest.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.InvalidMediaTypeException;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.HttpClientErrorException;
@@ -38,14 +37,6 @@ public class MgmtResponseErrorHandler extends DefaultResponseErrorHandler {
 				logger.error(message);
 			}
 			throw ex;
-		} catch (InvalidMediaTypeException ex) {
-			// In at least one scenario - when deleting a REST API server whose modules database has been set to be
-			// the filesystem (which is not a valid setup, but a user may still do it), MarkLogic returns a mime type
-			// containing commas - e.g. "text/plain, application/json". And Spring does not like that and throws this
-			// error. That obscures the actual error. So a runtime exception is thrown with the mime type error but
-			// also the response body from MarkLogic, which will contain the actual error.
-			String body = new String(getResponseBody(response));
-			throw new RuntimeException("Unable to parse mime type: " + ex.getMessage() + "; response body from MarkLogic: " + body);
 		}
 	}
 

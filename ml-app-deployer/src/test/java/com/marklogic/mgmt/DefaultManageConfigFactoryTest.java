@@ -119,8 +119,8 @@ class DefaultManageConfigFactoryTest {
 		assertEquals("https", config.getScheme());
 
 		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
-		assertTrue(bean.getSecurityContext() instanceof DatabaseClientFactory.MarkLogicCloudAuthContext);
-		assertEquals("my-key", ((DatabaseClientFactory.MarkLogicCloudAuthContext) bean.getSecurityContext()).getApiKey());
+		assertTrue(bean.getSecurityContext() instanceof DatabaseClientFactory.ProgressDataCloudAuthContext);
+		assertEquals("my-key", ((DatabaseClientFactory.ProgressDataCloudAuthContext) bean.getSecurityContext()).getApiKey());
 	}
 
 	@Test

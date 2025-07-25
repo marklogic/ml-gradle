@@ -25,9 +25,21 @@ public class RestTemplateUtil {
 		OkHttpClient client;
 		try {
 			DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
-			client = OkHttpClientBuilderFactory
-				.newOkHttpClientBuilder(bean.getHost(), bean.getSecurityContext())
-				.build();
+
+			OkHttpClient.Builder builder = OkHttpClientBuilderFactory
+				.newOkHttpClientBuilder(bean.getHost(), bean.getSecurityContext());
+
+			if (config.isRetryOnConnectionFailure()) {
+				RetryInterceptor retryInterceptor = new RetryInterceptor(
+					config.getMaxRetries(),
+					config.getInitialRetryDelayMs(),
+					config.getRetryBackoffMultiplier(),
+					config.getMaxRetryDelayMs()
+				);
+				builder = builder.addInterceptor(retryInterceptor);
+			}
+
+			client = builder.build();
 		} catch (RuntimeException ex) {
 			throw new RuntimeException(String.format("Unable to connect to the MarkLogic app server at %s; cause: %s", config.toString(), ex.getMessage()));
 		}

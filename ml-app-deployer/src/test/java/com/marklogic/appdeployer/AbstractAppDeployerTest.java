@@ -16,9 +16,11 @@ import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.ext.modulesloader.impl.DefaultModulesLoader;
 import com.marklogic.mgmt.AbstractMgmtTest;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
+import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.io.File;
+import java.util.stream.Stream;
 
 /**
  * Base class for tests that depend on an AppDeployer instance. You can extend this directly to write a test for a
@@ -39,6 +41,27 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
 	@BeforeEach
 	public void initialize() {
 		initializeAppConfig();
+		deleteKnownResources();
+	}
+
+	private void deleteKnownResources() {
+		// Deleting known resources that may have been left behind due to intermittent connection failures
+		// when running tests on Jenkins.
+		ServerManager serverManager = new ServerManager(manageClient);
+		Stream.of("sample-app", "sample-app-test").forEach(serverName -> {
+			if (serverManager.exists(serverName)) {
+				logger.warn("Deleting app server {} before running test", serverName);
+				serverManager.deleteByIdField(serverName);
+			}
+		});
+		DatabaseManager databaseManager = new DatabaseManager(manageClient);
+		databaseManager.setForestDelete(DatabaseManager.DELETE_FOREST_DATA);
+		Stream.of("sample-app-content", "sample-app-test-content", "sample-app-modules", "sample-app-schemas").forEach(dbName -> {
+			if (databaseManager.exists(dbName)) {
+				logger.warn("Deleting database {} before running test", dbName);
+				databaseManager.deleteByIdField(dbName);
+			}
+		});
 	}
 
 	protected void initializeAppConfig() {

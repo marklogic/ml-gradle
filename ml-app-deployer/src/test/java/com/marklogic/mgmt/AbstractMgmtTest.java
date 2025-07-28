@@ -9,6 +9,7 @@ import com.marklogic.junit5.MarkLogicVersionSupplier;
 import com.marklogic.mgmt.admin.AdminConfig;
 import com.marklogic.mgmt.admin.AdminManager;
 import com.marklogic.mgmt.resource.clusters.ClusterManager;
+import com.marklogic.rest.util.TestConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -29,14 +29,8 @@ public class RestTemplateUtil {
 			OkHttpClient.Builder builder = OkHttpClientBuilderFactory
 				.newOkHttpClientBuilder(bean.getHost(), bean.getSecurityContext());
 
-			if (config.isRetryOnConnectionFailure()) {
-				RetryInterceptor retryInterceptor = new RetryInterceptor(
-					config.getMaxRetries(),
-					config.getInitialRetryDelayMs(),
-					config.getRetryBackoffMultiplier(),
-					config.getMaxRetryDelayMs()
-				);
-				builder = builder.addInterceptor(retryInterceptor);
+			if (config.getClientConfigurator() != null) {
+				config.getClientConfigurator().configure(builder);
 			}
 
 			client = builder.build();

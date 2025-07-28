@@ -43,7 +43,7 @@ public class DeleteRestApiTest extends AbstractAppDeployerTest {
     }
 
 	@Test
-	@Disabled("This fails due to a server bug - BUG-60358")
+	@Disabled("This fails due to a server bug - BUG-60358; now MLE-547")
 	void deleteWithFilesystemAsModulesDatabase() {
 		initializeAppDeployer(new DeployRestApiServersCommand(true));
 		appDeployer.deploy(appConfig);

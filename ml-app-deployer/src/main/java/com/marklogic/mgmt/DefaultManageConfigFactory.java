@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 public class DefaultManageConfigFactory extends PropertySourceFactory implements ManageConfigFactory {
 
@@ -236,6 +237,8 @@ public class DefaultManageConfigFactory extends PropertySourceFactory implements
 			logger.info("Manage scheme: " + prop);
 			config.setScheme(prop);
 		});
+
+		applyRetryProperties(propertyConsumerMap);
 
 		// Processed last so that it can override scheme/port
 		propertyConsumerMap.put("mlCloudApiKey", (config, prop) -> {

@@ -29,12 +29,12 @@ public class RestTemplateUtil {
 			OkHttpClient.Builder builder = OkHttpClientBuilderFactory
 				.newOkHttpClientBuilder(bean.getHost(), bean.getSecurityContext());
 
-			if (config.isRetryOnConnectionFailure()) {
+			if (config.getRetryConfig() != null && config.getRetryConfig().isRetryConnectionFailure()) {
 				RetryInterceptor retryInterceptor = new RetryInterceptor(
-					config.getMaxRetries(),
-					config.getInitialRetryDelayMs(),
-					config.getRetryBackoffMultiplier(),
-					config.getMaxRetryDelayMs()
+					config.getRetryConfig().getRetryMaxAttempts(),
+					config.getRetryConfig().getRetryInitialDelay(),
+					config.getRetryConfig().getRetryDelayMultiplier(),
+					config.getRetryConfig().getRetryMaxDelay()
 				);
 				builder = builder.addInterceptor(retryInterceptor);
 			}

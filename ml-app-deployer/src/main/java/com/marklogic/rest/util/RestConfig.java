@@ -50,11 +50,7 @@ public class RestConfig {
 	private String trustStoreType;
 	private String trustStoreAlgorithm;
 
-	private boolean retryOnConnectionFailure = false;
-	private int maxRetries = 3;
-	private long initialRetryDelayMs = 1000;
-	private double retryBackoffMultiplier = 2;
-	private long maxRetryDelayMs = 10000;
+	private RetryConfig retryConfig = new RetryConfig();
 
 	public RestConfig() {
 	}
@@ -475,44 +471,17 @@ public class RestConfig {
 		this.oauthToken = oauthToken;
 	}
 
-
-	public boolean isRetryOnConnectionFailure() {
-		return retryOnConnectionFailure;
+	/**
+	 * @since 6.0.0
+	 */
+	public RetryConfig getRetryConfig() {
+		return retryConfig;
 	}
 
-	public void setRetryOnConnectionFailure(boolean retryOnConnectionFailure) {
-		this.retryOnConnectionFailure = retryOnConnectionFailure;
-	}
-
-	public int getMaxRetries() {
-		return maxRetries;
-	}
-
-	public void setMaxRetries(int maxRetries) {
-		this.maxRetries = maxRetries;
-	}
-
-	public long getInitialRetryDelayMs() {
-		return initialRetryDelayMs;
-	}
-
-	public void setInitialRetryDelayMs(long initialRetryDelayMs) {
-		this.initialRetryDelayMs = initialRetryDelayMs;
-	}
-
-	public double getRetryBackoffMultiplier() {
-		return retryBackoffMultiplier;
-	}
-
-	public void setRetryBackoffMultiplier(double retryBackoffMultiplier) {
-		this.retryBackoffMultiplier = retryBackoffMultiplier;
-	}
-
-	public long getMaxRetryDelayMs() {
-		return maxRetryDelayMs;
-	}
-
-	public void setMaxRetryDelayMs(long maxRetryDelayMs) {
-		this.maxRetryDelayMs = maxRetryDelayMs;
+	/**
+	 * @since 6.0.0
+	 */
+	public void setRetryConfig(RetryConfig retryConfig) {
+		this.retryConfig = retryConfig;
 	}
 }

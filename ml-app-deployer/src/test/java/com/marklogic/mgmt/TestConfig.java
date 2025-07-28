@@ -67,15 +67,16 @@ public class TestConfig {
 			"mlManageBasePath", basePath,
 			"mlCloudApiKey", cloudApiKey,
 			"mlManageScheme", scheme,
-			"mlManageSimpleSsl", simpleSsl != null ? simpleSsl.toString() : null
+			"mlManageSimpleSsl", simpleSsl != null ? simpleSsl.toString() : null,
+			"mlRetryConnectionFailure", "true",
+			"mlRetryDelayMultiplier", "2",
+			"mlRetryMaxAttempts", "3",
+			"mlRetryMaxDelay", "5000"
 		)).newManageConfig();
+
 		// Clean the JSON by default
 		config.setCleanJsonPayloads(true);
 
-		config.setRetryOnConnectionFailure(true);
-		config.setRetryBackoffMultiplier(2);
-		config.setMaxRetries(3);
-		config.setMaxRetryDelayMs(5000);
 		return config;
 	}
 
@@ -92,7 +93,11 @@ public class TestConfig {
 			"mlAdminBasePath", basePath,
 			"mlCloudApiKey", cloudApiKey,
 			"mlAdminScheme", scheme,
-			"mlAdminSimpleSsl", simpleSsl != null ? simpleSsl.toString() : null
+			"mlAdminSimpleSsl", simpleSsl != null ? simpleSsl.toString() : null,
+			"mlRetryConnectionFailure", "true",
+			"mlRetryDelayMultiplier", "2",
+			"mlRetryMaxAttempts", "3",
+			"mlRetryMaxDelay", "5000"
 		)).newAdminConfig();
 	}
 }

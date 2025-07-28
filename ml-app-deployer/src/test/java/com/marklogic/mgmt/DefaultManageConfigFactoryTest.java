@@ -6,6 +6,7 @@ package com.marklogic.mgmt;
 import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier;
 import com.marklogic.mgmt.util.SimplePropertySource;
+import com.marklogic.rest.util.RetryConfig;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -317,6 +318,31 @@ class DefaultManageConfigFactoryTest {
 			configure("mlManagePort", "NaN");
 		});
 		assertEquals("The property mlManagePort requires a numeric value; invalid value: ‘NaN'", exception.getMessage());
+	}
+
+	@Test
+	void retryProperties() {
+		RetryConfig config = configure(
+			"mlRetryConnectionFailure", "true",
+			"mlRetryMaxAttempts", "5",
+			"mlRetryInitialDelay", "1000",
+			"mlRetryDelayMultiplier", "2.1",
+			"mlRetryMaxDelay", "5000"
+		).getRetryConfig();
+
+		assertTrue(config.isRetryConnectionFailure());
+		assertEquals(5, config.getRetryMaxAttempts());
+		assertEquals(1000, config.getRetryInitialDelay());
+		assertEquals(2.1, config.getRetryDelayMultiplier());
+		assertEquals(5000, config.getRetryMaxDelay());
+	}
+
+	@Test
+	void invalidDelayMultiplier() {
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+			configure("mlRetryDelayMultiplier", "abc");
+		});
+		assertEquals("The property mlRetryDelayMultiplier requires a numeric value; invalid value: ‘abc'", exception.getMessage());
 	}
 
 	private ManageConfig configure(String... properties) {

@@ -4,6 +4,7 @@
 package com.marklogic.mgmt.admin;
 
 import com.marklogic.appdeployer.util.JavaClientUtil;
+import com.marklogic.mgmt.ManageConfig;
 import com.marklogic.mgmt.util.PropertySource;
 import com.marklogic.mgmt.util.PropertySourceFactory;
 import org.springframework.util.StringUtils;
@@ -219,6 +220,8 @@ public class DefaultAdminConfigFactory extends PropertySourceFactory implements 
 			logger.info("Admin scheme: " + prop);
 			config.setScheme(prop);
 		});
+
+		applyRetryProperties(propertyConsumerMap);
 
 		// Processed last so that it can override scheme/port
 		propertyConsumerMap.put("mlCloudApiKey", (config, prop) -> {

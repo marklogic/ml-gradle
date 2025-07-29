@@ -8,7 +8,7 @@ import com.marklogic.appdeployer.command.Command;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.security.ExternalSecurityManager;
 
-public class ManageExternalSecurityTest extends AbstractManageResourceTest {
+class ManageExternalSecurityTest extends AbstractManageResourceTest {
 
     @Override
     protected ResourceManager newResourceManager() {

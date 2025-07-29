@@ -23,7 +23,8 @@ public class ExternalSecurityTemplateBuilder extends GenericTemplateBuilder {
 		ls.setLdapDefaultUser("CHANGEME");
 		ls.setLdapPassword("CHANGEME");
 		ls.setLdapServerUri("ldap://CHANGEME:389");
-		ls.setLdapBindMethod("MD5");
+		// No longer setting ldapBindMethod, as doing so in MarkLogic 12 causes
+		// a SEC-LDAPMD5DEPRECATED error.
 		addDefaultPropertyValue("ldap-server", ls);
 	}
 }

@@ -11,10 +11,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class WriteExternalSecurityTest extends AbstractResourceWriterTest {
+class WriteExternalSecurityTest extends AbstractResourceWriterTest {
 
 	@Test
-	public void defaultValues() {
+	void defaultValues() {
 		initializeAppDeployer(new DeployExternalSecurityCommand());
 		buildResourceAndDeploy(new ExternalSecurityTemplateBuilder());
 
@@ -22,7 +22,7 @@ public class WriteExternalSecurityTest extends AbstractResourceWriterTest {
 		System.out.println(es.getJson());
 		assertEquals("CHANGEME description of external security", es.getDescription());
 		assertEquals("ldap", es.getAuthentication());
-		assertEquals(new Integer(300), es.getCacheTimeout());
+		assertEquals(300, es.getCacheTimeout());
 		assertEquals("internal", es.getAuthorization());
 
 		LdapServer ls = es.getLdapServer();
@@ -30,6 +30,5 @@ public class WriteExternalSecurityTest extends AbstractResourceWriterTest {
 		assertEquals("CHANGEME", ls.getLdapBase());
 		assertEquals("CHANGEME", ls.getLdapAttribute());
 		assertEquals("CHANGEME", ls.getLdapDefaultUser());
-		assertEquals("MD5", ls.getLdapBindMethod());
 	}
 }

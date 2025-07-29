@@ -17,7 +17,7 @@ public class NewDatabaseClientTest {
 
 	@BeforeEach
 	void setup() {
-		config = new DatabaseClientConfig("localhost", 8028);
+		config = new DatabaseClientConfig("localhost", 8006);
 	}
 
 	@Test

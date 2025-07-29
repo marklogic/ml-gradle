@@ -9,10 +9,10 @@ import org.springframework.http.HttpMethod
 class GenerateTransformWithRedactionTask extends BaseTest {
 
 	final static JsonSlurper parser = new JsonSlurper()
-	final static String BASE_DOCUMENTS_URL = "http://localhost:8028/v1/documents?uri=/jane.json&transform="
+	final static String BASE_DOCUMENTS_URL = "http://localhost:8006/v1/documents?uri=/jane.json&transform="
 
 	def reloadTransforms() {
-		print(runTask('mlReloadModules', '-PmlAppName=ml-javaclient-util-test', '-PmlUsername=admin', '-PmlPassword=admin', '-PmlRestPort=8028').output)
+		print(runTask('mlReloadModules', '-PmlAppName=ml-javaclient-util-test', '-PmlUsername=admin', '-PmlPassword=admin', '-PmlRestPort=8006').output)
 	}
 
 	def retrieveDocumentWithTransform(String transformName) {

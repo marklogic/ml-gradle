@@ -1,8 +1,10 @@
 /*
  * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
-package com.marklogic.mgmt;
+package com.marklogic.rest.util;
 
+import com.marklogic.mgmt.DefaultManageConfigFactory;
+import com.marklogic.mgmt.ManageConfig;
 import com.marklogic.mgmt.admin.AdminConfig;
 import com.marklogic.mgmt.admin.DefaultAdminConfigFactory;
 import com.marklogic.mgmt.util.SimplePropertySource;
@@ -72,10 +74,9 @@ public class TestConfig {
 		// Clean the JSON by default
 		config.setCleanJsonPayloads(true);
 
-		config.setRetryOnConnectionFailure(true);
-		config.setRetryBackoffMultiplier(2);
-		config.setMaxRetries(3);
-		config.setMaxRetryDelayMs(5000);
+		config.setClientConfigurator(builder ->
+			builder.addInterceptor(new com.marklogic.rest.util.RetryInterceptor(3, 1000, 2, 5000)));
+
 		return config;
 	}
 

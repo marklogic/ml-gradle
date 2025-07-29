@@ -9,6 +9,7 @@ import com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier;
 import com.marklogic.client.ext.modulesloader.ssl.SimpleX509TrustManager;
 import com.marklogic.client.ext.ssl.SslConfig;
 import com.marklogic.client.ext.ssl.SslUtil;
+import okhttp3.OkHttpClient;
 import org.springframework.util.StringUtils;
 
 import javax.net.ssl.SSLContext;
@@ -50,11 +51,9 @@ public class RestConfig {
 	private String trustStoreType;
 	private String trustStoreAlgorithm;
 
-	private boolean retryOnConnectionFailure = false;
-	private int maxRetries = 3;
-	private long initialRetryDelayMs = 1000;
-	private double retryBackoffMultiplier = 2;
-	private long maxRetryDelayMs = 10000;
+	// Added in 6.0.0 as an extension mechanism until this is available
+	// in DatabaseClientBuilder in the MarkLogic Java Client.
+	private DatabaseClientFactory.ClientConfigurator<OkHttpClient.Builder> clientConfigurator;
 
 	public RestConfig() {
 	}
@@ -475,44 +474,11 @@ public class RestConfig {
 		this.oauthToken = oauthToken;
 	}
 
-
-	public boolean isRetryOnConnectionFailure() {
-		return retryOnConnectionFailure;
+	protected DatabaseClientFactory.ClientConfigurator<OkHttpClient.Builder> getClientConfigurator() {
+		return clientConfigurator;
 	}
 
-	public void setRetryOnConnectionFailure(boolean retryOnConnectionFailure) {
-		this.retryOnConnectionFailure = retryOnConnectionFailure;
-	}
-
-	public int getMaxRetries() {
-		return maxRetries;
-	}
-
-	public void setMaxRetries(int maxRetries) {
-		this.maxRetries = maxRetries;
-	}
-
-	public long getInitialRetryDelayMs() {
-		return initialRetryDelayMs;
-	}
-
-	public void setInitialRetryDelayMs(long initialRetryDelayMs) {
-		this.initialRetryDelayMs = initialRetryDelayMs;
-	}
-
-	public double getRetryBackoffMultiplier() {
-		return retryBackoffMultiplier;
-	}
-
-	public void setRetryBackoffMultiplier(double retryBackoffMultiplier) {
-		this.retryBackoffMultiplier = retryBackoffMultiplier;
-	}
-
-	public long getMaxRetryDelayMs() {
-		return maxRetryDelayMs;
-	}
-
-	public void setMaxRetryDelayMs(long maxRetryDelayMs) {
-		this.maxRetryDelayMs = maxRetryDelayMs;
+	protected void setClientConfigurator(DatabaseClientFactory.ClientConfigurator<OkHttpClient.Builder> clientConfigurator) {
+		this.clientConfigurator = clientConfigurator;
 	}
 }

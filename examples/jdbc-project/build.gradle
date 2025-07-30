@@ -8,8 +8,8 @@ repositories {
 }
 
 dependencies {
-	implementation "org.springframework:spring-jdbc:6.2.8"
-	implementation "org.postgresql:postgresql:42.6.2"
+	implementation "org.springframework:spring-jdbc:6.2.9"
+	implementation "org.postgresql:postgresql:42.7.7"
 }
 
 task selectFromSysTables(type: JavaExec) {

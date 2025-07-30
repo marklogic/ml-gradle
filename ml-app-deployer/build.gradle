@@ -2,7 +2,7 @@ dependencies {
 	api project(":ml-javaclient-util")
 
 	// For RestTemplate, which wraps OkHttpClient.
-	api 'org.springframework:spring-web:6.2.8'
+	api "org.springframework:spring-web:${springVersion}"
 
 	// For wrangling JSON.
 	api "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
@@ -28,7 +28,7 @@ dependencies {
 
 	// With 5.12.x, tests are somehow not found by Gradle.
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.11.2'
-	testImplementation 'org.springframework:spring-test:6.2.8'
+	testImplementation "org.springframework:spring-test:${springVersion}"
 	testImplementation 'commons-io:commons-io:2.19.0'
 	testImplementation 'xmlunit:xmlunit:1.6'
 

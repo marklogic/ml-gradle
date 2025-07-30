@@ -2,7 +2,7 @@ plugins {
 	id "java"
 	id "net.saliman.properties" version "1.5.2"
 	id "com.marklogic.ml-gradle" version "5.0.0"
-	id 'com.marklogic.ml-development-tools' version '7.1.0'
+	id 'com.marklogic.ml-development-tools' version '7.2.0'
 }
 
 task generateHelloWorld(type: com.marklogic.client.tools.gradle.EndpointProxiesGenTask) {
@@ -20,7 +20,7 @@ test {
 
 dependencies {
 	implementation 'org.slf4j:slf4j-api:2.0.17'
-	implementation 'com.marklogic:marklogic-client-api:7.1.0'
+	implementation 'com.marklogic:marklogic-client-api:7.2.0'
 
 	testImplementation "org.junit.jupiter:junit-jupiter:5.12.2"
 

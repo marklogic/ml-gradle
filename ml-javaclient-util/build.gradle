@@ -1,9 +1,9 @@
 dependencies {
-	api 'com.marklogic:marklogic-client-api:7.2-SNAPSHOT'
+	api 'com.marklogic:marklogic-client-api:7.2.0'
 	api 'com.marklogic:marklogic-xcc:11.3.1'
 
 	// API dependency as some Spring classes, like Resource, are used throughout this project.
-	api 'org.springframework:spring-context:6.2.8'
+	api "org.springframework:spring-context:${springVersion}"
 
 	// This is an API dependency due to LoggingObject and ml-app-deployer's use of that class.
 	api 'org.slf4j:slf4j-api:2.0.17'
@@ -13,7 +13,7 @@ dependencies {
 
 	// With 5.12.x, tests are somehow not found by Gradle.
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.11.2'
-	testImplementation 'org.springframework:spring-test:6.2.8'
+	testImplementation "org.springframework:spring-test:${springVersion}"
 	testImplementation 'org.mockito:mockito-core:4.11.0'
 
 	// Used for testing loading modules from the classpath

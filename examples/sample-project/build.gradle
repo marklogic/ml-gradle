@@ -47,7 +47,7 @@ configurations {
 configurations.all {
 	resolutionStrategy.eachDependency { DependencyResolveDetails details ->
 		if (details.requested.group.startsWith('org.springframework')) {
-			details.useVersion '6.2.8'
+			details.useVersion '6.2.9'
 			details.because 'Forcing marklogic-junit5 to use the latest version of Spring to minimize security vulnerabilities.'
 		}
 	}

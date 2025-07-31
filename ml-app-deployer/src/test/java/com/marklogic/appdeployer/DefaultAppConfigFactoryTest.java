@@ -41,7 +41,7 @@ public class DefaultAppConfigFactoryTest {
 		factory = new DefaultAppConfigFactory(new SimplePropertySource(
 			"mlConfigPaths", "path1,path2",
 			"mlModulePaths", "modulesPath1,modulesPath2",
-			"mlSchemasPath", "schemasPath"));
+			"mlSchemaPaths", "schemasPath"));
 
 		final String testPath = new File("").getAbsolutePath();
 
@@ -562,19 +562,6 @@ public class DefaultAppConfigFactoryTest {
 
 		assertTrue(config.isCascadeCollections());
 		assertTrue(config.isCascadePermissions());
-	}
-
-	/**
-	 * Verifies that mlConfigDir is still supported, though mlConfigPath is preferred.
-	 */
-	@Test
-	public void mlConfigDir() {
-		Properties p = new Properties();
-		p.setProperty("mlConfigDir", "src/test/resources/sample-app/empty-ml-config");
-
-		factory = new DefaultAppConfigFactory(new SimplePropertySource(p));
-		AppConfig config = factory.newAppConfig();
-		assertTrue(config.getFirstConfigDir().getBaseDir().getAbsolutePath().contains("empty-ml-config"));
 	}
 
 	@Test

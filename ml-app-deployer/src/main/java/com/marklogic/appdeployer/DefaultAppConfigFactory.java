@@ -88,13 +88,6 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			}
 		});
 
-		propertyConsumerMap.put("mlOptimizeWithCma", (config, prop) -> {
-			logger.info("mlOptimizeWithCma is DEPRECATED; please use a property specific to the resource that you want to deploy with CMA");
-			// mlOptimizeWithCma was deprecated in 3.11; it was only used for deploying forests, so if the
-			// property is still used, the client in theory expects forests to still be deployed with CMA
-			config.getCmaConfig().setDeployForests(true);
-		});
-
 		propertyConsumerMap.put("mlCombineCmaRequests", (config, prop) -> {
 			logger.info("Combine requests" + cmaMessage + prop);
 			config.getCmaConfig().setCombineRequests(Boolean.parseBoolean(prop));
@@ -161,29 +154,16 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 
 		/**
 		 * The path to the directory containing all the resource configuration files. Defaults to src/main/ml-config.
-		 * mlConfigPath is the preferred one, as its name is consistent with other properties that refer to a path.
-		 * mlConfigDir is deprecated but still supported.
 		 *
-		 * As of 3.3.0, mlConfigPaths is the preferred property, and mlConfigDir and mlConfigPath will be ignored if
-		 * it's set.
+		 * As of 3.3.0, mlConfigPaths is the preferred property, and mlConfigPath will be ignored if it's set.
 		 */
 		propertyConsumerMap.put("mlConfigPaths", (config, prop) -> {
-			logger.info("Config paths: " + prop);
+			logger.info("Config paths: {}", prop);
 			List<ConfigDir> list = new ArrayList<>();
 			for (String path : prop.split(",")) {
 				list.add(buildConfigDir(path));
 			}
 			config.setConfigDirs(list);
-		});
-
-		// TODO Only process if mlConfigPaths not set?
-		propertyConsumerMap.put("mlConfigDir", (config, prop) -> {
-			logger.info("mlConfigDir is deprecated; please use mlConfigPath; Config dir: " + prop);
-			config.setConfigDir(buildConfigDir(prop));
-		});
-		propertyConsumerMap.put("mlConfigPath", (config, prop) -> {
-			logger.info("Config path: " + prop);
-			config.setConfigDir(buildConfigDir(prop));
 		});
 
 		/**
@@ -569,12 +549,6 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		propertyConsumerMap.put("mlTestContentDatabaseName", (config, prop) -> {
 			logger.info("Test content database name: " + prop);
 			config.setTestContentDatabaseName(prop);
-		});
-
-		// Deprecated - use mlSchemaPaths instead
-		propertyConsumerMap.put("mlSchemasPath", (config, prop) -> {
-			logger.info("mlSchemasPath is deprecated as of version 3.13.0; please use mlSchemaPaths instead; schemas path: " + prop);
-			config.setSchemaPaths(buildPathListFromCommaDelimitedString(prop));
 		});
 
 		propertyConsumerMap.put("mlSchemaPaths", (config, prop) -> {

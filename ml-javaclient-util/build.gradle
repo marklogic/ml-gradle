@@ -1,6 +1,6 @@
 dependencies {
 	api 'com.marklogic:marklogic-client-api:7.2.0'
-	api 'com.marklogic:marklogic-xcc:11.3.1'
+	api 'com.marklogic:marklogic-xcc:12.0.0'
 
 	// API dependency as some Spring classes, like Resource, are used throughout this project.
 	api "org.springframework:spring-context:${springVersion}"

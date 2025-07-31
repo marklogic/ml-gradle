@@ -9,7 +9,7 @@ dependencies {
 	api project(":ml-app-deployer")
 
 	// For tasks that need to fiddle with the filesystem.
-	implementation "commons-io:commons-io:2.19.0"
+	implementation "commons-io:commons-io:2.20.0"
 
 	// For UnitTestTask.
 	compileOnly ("com.marklogic:marklogic-unit-test-client:1.5.0") {

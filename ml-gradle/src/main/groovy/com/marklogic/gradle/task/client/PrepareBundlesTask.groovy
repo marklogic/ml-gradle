@@ -19,7 +19,6 @@ class PrepareBundlesTask extends MarkLogicTask {
 
 	@TaskAction
 	void prepareBundles() {
-		prepareBundlesForConfiguration("mlRestApi")
 		prepareBundlesForConfiguration("mlBundle")
 	}
 
@@ -30,10 +29,6 @@ class PrepareBundlesTask extends MarkLogicTask {
 
 				getLogger().info("Found " + configurationName + " configuration, will extract all of its dependencies to build/" + configurationName)
 
-				if ("mlRestApi".equals(configurationName)) {
-					println "\nWARNING: mlRestApi is deprecated as of release 3.13.0, please use mlBundle instead, which is a drop-in replacement.\n"
-				}
-				
 				def buildDir = new File(getProject().getProjectDir(), "build")
 				buildDir.mkdirs()
 				def bundleDir = new File(buildDir, configurationName)

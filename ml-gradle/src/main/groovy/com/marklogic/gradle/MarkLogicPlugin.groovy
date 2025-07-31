@@ -98,8 +98,6 @@ class MarkLogicPlugin implements Plugin<Project> {
 		copyGradlePropertiesToCustomTokensIfRequested(project)
 
 		project.getConfigurations().create("mlBundle")
-		// Per #420, this is deprecated, but still need to create it
-		project.getConfigurations().create("mlRestApi")
 
 		// No group or description on these so they don't show up in "gradle tasks"
 		project.task("mlDeployApp", type: DeployAppTask, dependsOn: ["mlDeleteModuleTimestampsFile"])
@@ -188,7 +186,6 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlCreateTransform", type: CreateTransformTask, group: devGroup, description: "Create a new transform in the modules transforms directory; use -PtransformName and -PtransformType to set the transform name and type (xqy, xsl, or sjs)")
 		project.task("mlExportResources", type: ExportResourcesTask, group: devGroup, description: "Export resources based on a properties file specified via -PpropertiesFile, -Pprefix, or -Pregex; use -PincludeTypes to select resource types to export via a comma-delimited string; use -PexportPath to specify where to export resources to")
 		project.task("mlPrepareBundles", type: PrepareBundlesTask, group: devGroup, dependsOn: project.configurations["mlBundle"], description: "Downloads (if necessary) and unzips in the build directory all mlBundle dependencies")
-		project.task("mlPrepareRestApiDependencies", type: PrepareBundlesTask, group: devGroup, dependsOn: project.configurations["mlBundle"], description: "Deprecated in 3.13.0; please use mlPrepareBundles instead")
 		project.task("mlPrintCommands", type: PrintCommandsTask, group: devGroup, description: "Print information about each command used by mlDeploy and mlUndeploy")
 		project.task("mlPrintProperties", type: PrintPropertiesTask, group: devGroup, description: "Print all of the properties supported by ml-gradle")
 		project.task("mlPrintTokens", type: PrintTokensTask, group: devGroup, description: "Print the customTokens map on the mlAppConfig object (typically for debugging purposes)")
@@ -220,10 +217,10 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlEnableAllFlexrepTargets", type: EnableAllFlexrepTargetsTask, group: flexrepGroup, description: "Enable every target on every flexrep config")
 
 		String forestGroup = "ml-gradle Forest"
-		project.task("mlConfigureForestReplicas", type: ConfigureForestReplicasTask, group: forestGroup, description: "Deprecated - configure forest replicas via the command.forestNamesAndReplicaCounts map")
-		project.task("mlDeleteForestReplicas", type: DeleteForestReplicasTask, group: forestGroup, description: "Deprecated - delete forest replicas via the command.forestNamesAndReplicaCounts map; requires -Pconfirm=true to be set so this isn't accidentally executed")
+		project.task("mlConfigureForestReplicas", type: ConfigureForestReplicasTask, group: forestGroup, description: "Configures forest replicas based on ml-gradle properties")
+		project.task("mlDeleteForestReplicas", type: DeleteForestReplicasTask, group: forestGroup, description: "Deletes forest replicas based on ml-gradle properties; requires -Pconfirm=true to be set so this isn't accidentally executed")
 		project.task("mlDeployCustomForests", type: DeployCustomForestsTask, group: forestGroup, description: "Deploy custom forests as defined in subdirectories of the forests configuration directory")
-		project.task("mlDeployForestReplicas", type: DeployForestReplicasTask, group: forestGroup, description: "Prefer this over mlConfigureForestReplicas; it does the same thing, but uses the ConfigureForestReplicasCommand that is used by mlDeploy")
+		project.task("mlDeployForestReplicas", type: DeployForestReplicasTask, group: forestGroup, description: "Alias for mlConfigureForestReplicas for naming consistency")
 		project.task("mlPrintForestPlan", type: PrintForestPlanTask, group: forestGroup, description: "Print a list of primary forests to be created for a database specified by -Pdatabase=(name of database) when the database is next deployed. " +
 			"This is only intended to be used when forests are created dynamically via properties.")
 

@@ -1,5 +1,5 @@
 dependencies {
-	api project(":ml-javaclient-util")
+	api "com.marklogic:ml-javaclient-util:6.0.0"
 
 	// For RestTemplate, which wraps OkHttpClient.
 	api "org.springframework:spring-web:${springVersion}"

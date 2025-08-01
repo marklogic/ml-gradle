@@ -20,6 +20,13 @@ subprojects {
 	}
 
 	dependencies {
+		// Without this, once using JUnit 5.12 or higher, Gradle will not find any tests and report an error of:
+		// org.junit.platform.commons.JUnitException: TestEngine with ID 'junit-jupiter' failed to discover tests
+		testRuntimeOnly "org.junit.platform:junit-platform-launcher:1.13.4"
+
+		testImplementation 'org.junit.jupiter:junit-jupiter:5.13.4'
+		testImplementation "org.springframework:spring-test:${springVersion}"
+
 		// Forcing Spring to use logback instead of commons-logging
 		testImplementation "ch.qos.logback:logback-classic:1.5.18"
 		testImplementation 'org.slf4j:jcl-over-slf4j:2.0.17'

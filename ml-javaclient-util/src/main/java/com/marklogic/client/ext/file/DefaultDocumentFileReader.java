@@ -25,11 +25,6 @@ public class DefaultDocumentFileReader extends AbstractDocumentFileReader implem
 	private List<DocumentFile> documentFiles;
 	private String uriPrefix = "/";
 
-	// As of 4.6.0, these no longer need to be class fields but are being kept for backwards compatibility.
-	// They should be removed in 5.0.0.
-	private CollectionsFileDocumentFileProcessor collectionsFileDocumentFileProcessor;
-	private PermissionsFileDocumentFileProcessor permissionsFileDocumentFileProcessor;
-
 	/**
 	 * Calls initialize to instantiate some default DocumentFileProcessor objects.
 	 */
@@ -175,8 +170,8 @@ public class DefaultDocumentFileReader extends AbstractDocumentFileReader implem
 	}
 
 	protected void initialize() {
-		collectionsFileDocumentFileProcessor = new CollectionsFileDocumentFileProcessor();
-		permissionsFileDocumentFileProcessor = new PermissionsFileDocumentFileProcessor();
+		CollectionsFileDocumentFileProcessor collectionsFileDocumentFileProcessor = new CollectionsFileDocumentFileProcessor();
+		PermissionsFileDocumentFileProcessor permissionsFileDocumentFileProcessor = new PermissionsFileDocumentFileProcessor();
 
 		addFileFilter(collectionsFileDocumentFileProcessor);
 		addFileFilter(permissionsFileDocumentFileProcessor);

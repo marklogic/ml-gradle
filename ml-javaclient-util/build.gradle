@@ -11,11 +11,7 @@ dependencies {
 	implementation 'org.jdom:jdom2:2.0.6.1'
 	implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
 
-	// With 5.12.x, tests are somehow not found by Gradle.
-	testImplementation 'org.junit.jupiter:junit-jupiter:5.11.2'
-	testImplementation "org.springframework:spring-test:${springVersion}"
 	testImplementation 'org.mockito:mockito-core:4.11.0'
-
 	// Used for testing loading modules from the classpath
 	testImplementation files("lib/modules.jar")
 }

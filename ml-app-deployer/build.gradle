@@ -26,9 +26,6 @@ dependencies {
 		exclude module: "jackson-databind"
 	}
 
-	// With 5.12.x, tests are somehow not found by Gradle.
-	testImplementation 'org.junit.jupiter:junit-jupiter:5.11.2'
-	testImplementation "org.springframework:spring-test:${springVersion}"
 	testImplementation 'commons-io:commons-io:2.19.0'
 	testImplementation 'xmlunit:xmlunit:1.6'
 

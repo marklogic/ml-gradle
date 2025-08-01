@@ -5,6 +5,7 @@ package com.marklogic.client.ext.datamovement.listener;
 
 import com.marklogic.client.datamovement.ExportToWriterListener;
 import com.marklogic.client.document.DocumentRecord;
+import com.marklogic.client.impl.XmlFactories;
 import com.marklogic.client.io.DOMHandle;
 import com.marklogic.client.io.Format;
 import com.marklogic.client.io.StringHandle;
@@ -31,7 +32,11 @@ public class XmlOutputListener implements ExportToWriterListener.OutputListener 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	private boolean omitXmlDeclaration = true;
-	private TransformerFactory transformerFactory = TransformerFactory.newInstance();
+	private final TransformerFactory transformerFactory;
+
+	public XmlOutputListener() {
+		transformerFactory = XmlFactories.makeNewTransformerFactory();
+	}
 
 	@Override
 	public String generateOutput(DocumentRecord documentRecord) {

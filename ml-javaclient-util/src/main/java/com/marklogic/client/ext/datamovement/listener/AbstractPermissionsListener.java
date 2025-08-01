@@ -60,6 +60,6 @@ public abstract class AbstractPermissionsListener implements QueryBatchListener 
 		}
 
 		call.xquery(sb.toString());
-		call.eval();
+		call.evalAs(String.class);
 	}
 }

@@ -72,6 +72,7 @@ pipeline {
     }
 
     stage('publish'){
+      agent {label 'devExpLinuxPool'}
 			when {
       	branch 'dev'
       }

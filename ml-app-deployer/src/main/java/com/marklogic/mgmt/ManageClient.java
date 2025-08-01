@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.mgmt;
 
@@ -30,10 +18,12 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Wraps a RestTemplate with methods that should simplify accessing the Manage API with RestTemplate. Each NounManager
@@ -146,6 +136,7 @@ public class ManageClient extends LoggingObject {
 
 	public Fragment getXml(String path, String... namespacePrefixesAndUris) {
 		String xml = getXmlString(path);
+		Objects.requireNonNull(xml);
 		List<Namespace> list = new ArrayList<>();
 		for (int i = 0; i < namespacePrefixesAndUris.length; i += 2) {
 			list.add(Namespace.getNamespace(namespacePrefixesAndUris[i], namespacePrefixesAndUris[i + 1]));
@@ -160,6 +151,7 @@ public class ManageClient extends LoggingObject {
 
 	public Fragment getXmlAsSecurityUser(String path, String... namespacePrefixesAndUris) {
 		String xml = getXmlStringAsSecurityUser(path);
+		Objects.requireNonNull(xml);
 		List<Namespace> list = new ArrayList<>();
 		for (int i = 0; i < namespacePrefixesAndUris.length; i += 2) {
 			list.add(Namespace.getNamespace(namespacePrefixesAndUris[i], namespacePrefixesAndUris[i + 1]));
@@ -265,8 +257,7 @@ public class ManageClient extends LoggingObject {
 
 	protected void logRequest(String path, String contentType, String method) {
 		if (logger.isInfoEnabled()) {
-			String username = manageConfig != null ?
-				String.format("as user '%s' ", manageConfig.getUsername()) : "";
+			String username = String.format("as user '%s' ", manageConfig.getUsername());
 			logger.info("Sending {} {} request {}to path: {}", contentType, method, username, buildUri(path));
 		}
 	}

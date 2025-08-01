@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.gradle.task.client
 
@@ -31,7 +19,6 @@ class PrepareBundlesTask extends MarkLogicTask {
 
 	@TaskAction
 	void prepareBundles() {
-		prepareBundlesForConfiguration("mlRestApi")
 		prepareBundlesForConfiguration("mlBundle")
 	}
 
@@ -42,10 +29,6 @@ class PrepareBundlesTask extends MarkLogicTask {
 
 				getLogger().info("Found " + configurationName + " configuration, will extract all of its dependencies to build/" + configurationName)
 
-				if ("mlRestApi".equals(configurationName)) {
-					println "\nWARNING: mlRestApi is deprecated as of release 3.13.0, please use mlBundle instead, which is a drop-in replacement.\n"
-				}
-				
 				def buildDir = new File(getProject().getProjectDir(), "build")
 				buildDir.mkdirs()
 				def bundleDir = new File(buildDir, configurationName)

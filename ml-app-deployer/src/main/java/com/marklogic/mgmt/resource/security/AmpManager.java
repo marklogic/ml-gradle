@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.mgmt.resource.security;
 
@@ -21,6 +9,7 @@ import com.marklogic.mgmt.SaveReceipt;
 import com.marklogic.mgmt.resource.AbstractResourceManager;
 import com.marklogic.rest.util.Fragment;
 import com.marklogic.rest.util.ResourcesFragment;
+import com.marklogic.rest.util.XPathUtil;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
@@ -96,12 +85,13 @@ public class AmpManager extends AbstractResourceManager {
 		String xpath = "/node()/*[local-name(.) = 'list-items']/node()[" +
 			"(*[local-name(.) = 'nameref'] = '%s' or *[local-name(.) = 'idref'] = '%s')" +
 			" and *[local-name(.) = 'document-uri'] = '%s'";
-		xpath = format(xpath, localName, localName, documentUri);
+		xpath = format(xpath, XPathUtil.sanitizeValueForXPathExpression(localName),
+			XPathUtil.sanitizeValueForXPathExpression(localName), XPathUtil.sanitizeValueForXPathExpression(documentUri));
 		if (namespace != null) {
-			xpath += format(" and *[local-name(.) = 'namespace'] = '%s'", namespace);
+			xpath += format(" and *[local-name(.) = 'namespace'] = '%s'", XPathUtil.sanitizeValueForXPathExpression(namespace));
 		}
 		if (modulesDatabase != null) {
-			xpath += format(" and *[local-name(.) = 'modules-database'] = '%s'", modulesDatabase);
+			xpath += format(" and *[local-name(.) = 'modules-database'] = '%s'", XPathUtil.sanitizeValueForXPathExpression(modulesDatabase));
 		} else {
 			xpath += format(" and *[local-name(.) = 'modules-database'] = 'filesystem'");
 		}

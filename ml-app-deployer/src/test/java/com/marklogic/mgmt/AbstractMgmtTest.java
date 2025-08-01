@@ -1,23 +1,15 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.mgmt;
 
 import com.marklogic.client.ext.helper.LoggingObject;
+import com.marklogic.junit5.MarkLogicVersion;
+import com.marklogic.junit5.MarkLogicVersionSupplier;
 import com.marklogic.mgmt.admin.AdminConfig;
 import com.marklogic.mgmt.admin.AdminManager;
+import com.marklogic.mgmt.resource.clusters.ClusterManager;
+import com.marklogic.rest.util.TestConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +21,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  */
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestConfig.class})
-public abstract class AbstractMgmtTest extends LoggingObject {
+public abstract class AbstractMgmtTest extends LoggingObject implements MarkLogicVersionSupplier {
 
 	@Autowired
 	protected ManageConfig manageConfig;
@@ -43,7 +35,23 @@ public abstract class AbstractMgmtTest extends LoggingObject {
 
 	@BeforeEach
 	public void initializeManageClient() {
-		manageClient = new ManageClient(manageConfig);
+		if (manageClient == null) {
+			manageClient = new ManageClient(manageConfig);
+		}
 		adminManager = new AdminManager(adminConfig);
+	}
+
+	/**
+	 * Allows for marklogic-junit5 annotations to be used that control test execution based on the MarkLogic version.
+	 *
+	 * @return
+	 */
+	@Override
+	public MarkLogicVersion getMarkLogicVersion() {
+		if (manageClient == null) {
+			manageClient = new ManageClient(manageConfig);
+		}
+		String version = new ClusterManager(manageClient).getVersion();
+		return new MarkLogicVersion(version);
 	}
 }

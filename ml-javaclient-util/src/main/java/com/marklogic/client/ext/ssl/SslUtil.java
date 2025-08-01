@@ -1,19 +1,10 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.client.ext.ssl;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -26,10 +17,14 @@ import java.security.NoSuchAlgorithmException;
 
 public abstract class SslUtil {
 
-	public final static String DEFAULT_SSL_PROTOCOL = "TLSv1.2";
+	// Defaulting this to "TLS" in 6.0.0 so that clients connecting to MarkLogic 12 will default to TLSv1.3, while
+	// clients connecting to MarkLogic 11 or older will default to TLSv1.2.
+	public final static String DEFAULT_SSL_PROTOCOL = "TLS";
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(SslUtil.class);
 
 	/**
-	 * Configure an SSLContext and X509TrustManager with TLSv1.2 as the default protocol and the default algorithm of
+	 * Configure an SSLContext and X509TrustManager with the default protocol and the default algorithm of
 	 * TrustManagerFactory.
 	 *
 	 * @return an SslConfig object based on default settings
@@ -51,7 +46,10 @@ public abstract class SslUtil {
 		try {
 			sslContext = SSLContext.getInstance(protocol);
 		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException("Unable to instantiate SSLContext with protocol: " + protocol + "; cause: " + e.getMessage(), e);
+			// Including this to make Polaris happy.
+			String message = String.format("Unable to instantiate SSLContext with protocol: %s; cause: %s", protocol, e.getMessage());
+			LOGGER.error(message, e);
+			throw new RuntimeException(message, e);
 		}
 
 		if (algorithm == null || algorithm.trim().length() < 1) {
@@ -61,13 +59,19 @@ public abstract class SslUtil {
 		try {
 			trustManagerFactory = TrustManagerFactory.getInstance(algorithm);
 		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException("Unable to instantiate TrustManagerFactory, cause: " + e.getMessage(), e);
+			// Including this to make Polaris happy.
+			String message = String.format("Unable to instantiate TrustManagerFactory, cause: %s", e.getMessage());
+			LOGGER.error(message, e);
+			throw new RuntimeException(message, e);
 		}
 
 		try {
 			trustManagerFactory.init((KeyStore) null);
 		} catch (KeyStoreException e) {
-			throw new RuntimeException("Unable to initialize TrustManagerFactory, cause: " + e.getMessage(), e);
+			// Including this to make Polaris happy.
+			String message = String.format("Unable to initialize TrustManagerFactory, cause: %s", e.getMessage());
+			LOGGER.error(message, e);
+			throw new RuntimeException(message, e);
 		}
 
 		X509TrustManager x509TrustManager = null;
@@ -85,11 +89,13 @@ public abstract class SslUtil {
 		try {
 			sslContext.init(null, new TrustManager[]{x509TrustManager}, null);
 		} catch (KeyManagementException e) {
-			throw new RuntimeException("Unable to initialize SSLContext, cause: " + e.getMessage(), e);
+			// Including this to make Polaris happy.
+			String message = String.format("Unable to initialize SSLContext, cause: %s", e.getMessage());
+			LOGGER.error(message, e);
+			throw new RuntimeException(message, e);
 		}
 
 		return new SslConfig(sslContext, x509TrustManager);
 	}
 
 }
-

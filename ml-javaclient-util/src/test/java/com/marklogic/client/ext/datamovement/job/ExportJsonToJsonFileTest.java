@@ -1,0 +1,115 @@
+/*
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
+ */
+package com.marklogic.client.ext.datamovement.job;
+
+import com.marklogic.client.document.DocumentWriteOperation;
+import com.marklogic.client.ext.datamovement.AbstractDataMovementTest;
+import com.marklogic.client.impl.DocumentWriteOperationImpl;
+import com.marklogic.client.io.DocumentMetadataHandle;
+import com.marklogic.client.io.Format;
+import com.marklogic.client.io.StringHandle;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.springframework.util.FileCopyUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class ExportJsonToJsonFileTest extends AbstractDataMovementTest {
+
+	private ExportToFileJob job;
+	private File exportFile;
+
+	private void setup(Path tempDir) {
+		exportFile = new File(tempDir.toFile(), "exportToFileTest.json");
+		job = new ExportToFileJob(exportFile);
+		job.setWhereUris("test1.json", "test2.json");
+	}
+
+	@Test
+	void omitLastRecordSuffix(@TempDir Path tempDir) {
+		setup(tempDir);
+
+		job.setFileHeader("[");
+		job.setFileFooter("]");
+		job.setRecordSuffix(",");
+		job.setOmitLastRecordSuffix(true);
+
+		String exportedJson = runJobAndGetJson();
+		assertTrue(exportedJson.contains("{\"uri\":\"test1.json\"},{\"uri\":\"test2.json\"}]"));
+	}
+
+	@Test
+	void dontOmitLastRecordSuffix(@TempDir Path tempDir) {
+		setup(tempDir);
+
+		job.setFileHeader("[");
+		job.setFileFooter("]");
+		job.setRecordSuffix(",");
+		job.setOmitLastRecordSuffix(false);
+
+		String exportedJson = runJobAndGetJson();
+		assertTrue(exportedJson.contains("{\"uri\":\"test1.json\"},{\"uri\":\"test2.json\"},]"));
+	}
+
+	@Test
+	void useDefaultConstructorAndOmitLastRecordSuffix(@TempDir Path tempDir) {
+		setup(tempDir);
+
+		job = new ExportToFileJob();
+		job.setWhereUris("test1.json", "test2.json");
+		job.setFileHeader("[");
+		job.setFileFooter("]");
+		job.setRecordSuffix(",");
+		job.setOmitLastRecordSuffix(true);
+		job.setExportFile(exportFile);
+
+		String exportedJson = runJobAndGetJson();
+		assertTrue(exportedJson.contains("{\"uri\":\"test1.json\"},{\"uri\":\"test2.json\"}]"));
+	}
+
+	@Test
+	void omitLastRecordSuffixWithNoFileFooter(@TempDir Path tempDir) {
+		setup(tempDir);
+
+		job.setRecordSuffix(",");
+		job.setOmitLastRecordSuffix(true);
+
+		String exportedJson = runJobAndGetJson();
+		assertTrue(
+			exportedJson.contains("{\"uri\":\"test1.json\"},{\"uri\":\"test2.json\"} "),
+			"Since no file footer was set, whitespace should be used to overwrite the last record suffix"
+		);
+	}
+
+	@Override
+	protected void writeDocuments(String... uris) {
+		List<DocumentWriteOperation> list = new ArrayList<>();
+		uris = new String[]{"test1.json", "test2.json"};
+		DocumentMetadataHandle metadata = new DocumentMetadataHandle();
+		metadata.getCollections().add(COLLECTION);
+		for (String uri : uris) {
+			list.add(new DocumentWriteOperationImpl(DocumentWriteOperation.OperationType.DOCUMENT_WRITE, uri, metadata,
+				new StringHandle("{\"uri\":\"" + uri + "\"}").withFormat(Format.XML)));
+		}
+		writeDocuments(list);
+	}
+
+	protected String runJobAndGetJson() {
+		job.run(client);
+		String exportedJson;
+		try {
+			exportedJson = new String(FileCopyUtils.copyToByteArray(exportFile));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		logger.info("Exported JSON: " + exportedJson);
+		return exportedJson;
+	}
+}

@@ -3,7 +3,7 @@
   "server-type": "odbc",
   "root": "/",
   "group-name": "%%GROUP%%",
-  "port": 8441,
+  "port": 8005,
   "modules-database": "%%MODULES_DATABASE%%",
   "content-database": "%%DATABASE%%",
   "authentication": "basic"

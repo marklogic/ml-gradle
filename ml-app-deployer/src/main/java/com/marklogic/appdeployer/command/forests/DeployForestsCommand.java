@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.appdeployer.command.forests;
 
@@ -89,9 +77,7 @@ public class DeployForestsCommand extends AbstractCommand {
 	 */
 	@Override
 	public void execute(CommandContext context) {
-		// Replicas are currently handled by ConfigureForestReplicasCommand
-		List<Forest> forests = buildForests(context, false);
-
+		List<Forest> forests = buildForests(context);
 		if (context.getAppConfig().getCmaConfig().isDeployForests() && !forests.isEmpty() && cmaEndpointExists(context)) {
 			createForestsViaCma(context, forests);
 		} else {
@@ -108,7 +94,10 @@ public class DeployForestsCommand extends AbstractCommand {
 	protected void createForestsViaForestEndpoint(CommandContext context, List<Forest> forests) {
 		ForestManager forestManager = new ForestManager(context.getManageClient());
 		for (Forest f : forests) {
-			forestManager.save(f.getJson());
+			String json = f.getJson();
+			if (json != null) {
+				forestManager.save(json);
+			}
 		}
 	}
 
@@ -119,11 +108,9 @@ public class DeployForestsCommand extends AbstractCommand {
 	 * these commands to construct a list of many forests that can be created via CMA in one request.
 	 *
 	 * @param context
-	 * @param includeReplicas This command currently doesn't make use of this feature; it's here so that other clients
-	 *                        can get a preview of the forests to be created, including replicas.
 	 * @return
 	 */
-	public List<Forest> buildForests(CommandContext context, boolean includeReplicas) {
+	public List<Forest> buildForests(CommandContext context) {
 		// Need to know what primary forests exist already in case more need to be added, or a new host has been added
 		List<Forest> existingPrimaryForests = null;
 
@@ -138,35 +125,23 @@ public class DeployForestsCommand extends AbstractCommand {
 			existingPrimaryForests = getExistingPrimaryForests(context, this.databaseName);
 		}
 
-		return buildForests(context, includeReplicas, existingPrimaryForests);
+		return buildForests(context, existingPrimaryForests);
 	}
 
 	/**
 	 * @param context
-	 * @param includeReplicas
 	 * @param existingPrimaryForests
 	 * @return
 	 */
-	protected List<Forest> buildForests(CommandContext context, boolean includeReplicas, List<Forest> existingPrimaryForests) {
+	protected final List<Forest> buildForests(CommandContext context, List<Forest> existingPrimaryForests) {
 		ForestHostNames forestHostNames = determineHostNamesForForest(context, existingPrimaryForests);
 
 		final String template = buildForestTemplate(context, new ForestManager(context.getManageClient()));
 
 		ForestPlan forestPlan = new ForestPlan(this.databaseName, forestHostNames.getPrimaryForestHostNames())
-			.withReplicaHostNames(forestHostNames.getReplicaForestHostNames())
 			.withTemplate(template)
 			.withForestsPerDataDirectory(this.forestsPerHost)
 			.withExistingForests(existingPrimaryForests);
-
-		if (includeReplicas) {
-			Map<String, Integer> map = context.getAppConfig().getDatabaseNamesAndReplicaCounts();
-			if (map != null && map.containsKey(this.databaseName)) {
-				int count = map.get(this.databaseName);
-				if (count > 0) {
-					forestPlan.withReplicaCount(count);
-				}
-			}
-		}
 
 		return forestBuilder.buildForests(forestPlan, context.getAppConfig());
 	}
@@ -225,7 +200,7 @@ public class DeployForestsCommand extends AbstractCommand {
 	 * @param existingPrimaryForests
 	 * @return a ForestHostNames instance that defines the list of host names that can be used for primary forests and
 	 * that can be used for replica forests. As of 4.1.0, the only reason these will differ is when a database is
-	 * configured to only have forests on one host, or when the deprecated setCreateForestsOnOneHost method is used.
+	 * configured to only have forests on one host.
 	 */
 	protected ForestHostNames determineHostNamesForForest(CommandContext context, List<Forest> existingPrimaryForests) {
 		if (hostCalculator == null) {
@@ -233,10 +208,6 @@ public class DeployForestsCommand extends AbstractCommand {
 		}
 
 		return hostCalculator.calculateHostNames(this.databaseName, context, existingPrimaryForests);
-	}
-
-	public int getForestsPerHost() {
-		return forestsPerHost;
 	}
 
 	public void setForestsPerHost(int forestsPerHost) {
@@ -247,16 +218,8 @@ public class DeployForestsCommand extends AbstractCommand {
 		return databaseName;
 	}
 
-	public String getForestFilename() {
-		return forestFilename;
-	}
-
 	public void setForestFilename(String forestFilename) {
 		this.forestFilename = forestFilename;
-	}
-
-	public String getForestPayload() {
-		return forestPayload;
 	}
 
 	public void setForestPayload(String forestPayload) {
@@ -274,9 +237,5 @@ public class DeployForestsCommand extends AbstractCommand {
 	 */
 	public void setDatabaseName(String databaseName) {
 		this.databaseName = databaseName;
-	}
-
-	public void setForestBuilder(ForestBuilder forestBuilder) {
-		this.forestBuilder = forestBuilder;
 	}
 }

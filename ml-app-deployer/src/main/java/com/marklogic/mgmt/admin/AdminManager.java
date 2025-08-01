@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.mgmt.admin;
 
@@ -19,6 +7,7 @@ import com.marklogic.mgmt.AbstractManager;
 import com.marklogic.rest.util.Fragment;
 import com.marklogic.rest.util.RestConfig;
 import com.marklogic.rest.util.RestTemplateUtil;
+import com.marklogic.rest.util.SpringWebUtil;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -29,6 +18,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
+import java.util.Objects;
 
 public class AdminManager extends AbstractManager {
 
@@ -79,7 +69,7 @@ public class AdminManager extends AbstractManager {
 					logger.info("Initialization response: " + response);
 					// According to http://docs.marklogic.com/REST/POST/admin/v1/init, a 202 is sent back in the event a
 					// restart is needed. A 400 or 401 will be thrown as an error by RestTemplate.
-					return HttpStatus.ACCEPTED.equals(response.getStatusCode());
+					return HttpStatus.ACCEPTED.equals(SpringWebUtil.getHttpStatus(response));
 				} catch (HttpClientErrorException hcee) {
 					String body = hcee.getResponseBodyAsString();
 					if (logger.isTraceEnabled()) {
@@ -132,9 +122,9 @@ public class AdminManager extends AbstractManager {
 					logger.info("Admin installation response: " + response);
 					// According to http://docs.marklogic.com/REST/POST/admin/v1/init, a 202 is sent back in the event a
 					// restart is needed. A 400 or 401 will be thrown as an error by RestTemplate.
-					return HttpStatus.ACCEPTED.equals(response.getStatusCode());
+					return HttpStatus.ACCEPTED.equals(SpringWebUtil.getHttpStatus(response));
 				} catch (HttpClientErrorException hcee) {
-					if (HttpStatus.BAD_REQUEST.equals(hcee.getStatusCode())) {
+					if (HttpStatus.BAD_REQUEST.equals(SpringWebUtil.getHttpStatus(hcee))) {
 						logger.warn("Caught 400 error, assuming admin user already installed; response body: "
 							+ hcee.getResponseBodyAsString());
 						return false;
@@ -228,7 +218,9 @@ public class AdminManager extends AbstractManager {
 	}
 
 	public Fragment getServerConfig() {
-		return new Fragment(getRestTemplate().getForObject(adminConfig.buildUri("/admin/v1/server-config"), String.class));
+		String xml = getRestTemplate().getForObject(adminConfig.buildUri("/admin/v1/server-config"), String.class);
+		Objects.requireNonNull(xml);
+		return new Fragment(xml);
 	}
 
 	public String getServerVersion() {
@@ -297,7 +289,7 @@ public class AdminManager extends AbstractManager {
 
 		HttpEntity<Resource> resourceEntity = new HttpEntity<>(new ByteArrayResource(clusterConfigZipBytes), headers);
 		ResponseEntity<String> response = getRestTemplate().exchange(clusterConfigUri, HttpMethod.POST, resourceEntity, String.class);
-		if (response.getStatusCode().value() == 202) {
+		if (SpringWebUtil.getHttpStatusCode(response) == 202) {
 			waitForRestart();
 		}
 	}
@@ -308,7 +300,7 @@ public class AdminManager extends AbstractManager {
 	 */
 	public void leaveCluster() {
 		ResponseEntity<String> response = getRestTemplate().exchange(adminConfig.buildUri("/admin/v1/host-config"), HttpMethod.DELETE, null, String.class);
-		if (response.getStatusCode().value() == 202) {
+		if (SpringWebUtil.getHttpStatusCode(response) == 202) {
 			waitForRestart();
 		}
 	}

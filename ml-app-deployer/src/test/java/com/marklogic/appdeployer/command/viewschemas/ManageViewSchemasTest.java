@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.appdeployer.command.viewschemas;
 
@@ -19,7 +7,7 @@ import com.marklogic.appdeployer.command.AbstractManageResourceTest;
 import com.marklogic.appdeployer.command.Command;
 import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
-import com.marklogic.junit.Fragment;
+import com.marklogic.junit5.XmlNode;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.clusters.ClusterManager;
 import com.marklogic.mgmt.resource.viewschemas.ViewSchemaManager;
@@ -90,7 +78,7 @@ public class ManageViewSchemasTest extends AbstractManageResourceTest {
 		// This changed between ML8 and ML9
 		String expectedAmount = version != null && version.startsWith("8") ? "amount" : "main.ordertable.amount";
 
-		Fragment xml = new Fragment("<results>" + body + "</results>",
+		XmlNode xml = new XmlNode("<results>" + body + "</results>",
 			Namespace.getNamespace("json", "http://marklogic.com/xdmp/json"));
 		xml.assertElementValue("/results/json:array[1]/json:value", expectedAmount);
 		xml.assertElementValue("/results/json:array[2]/json:value", "111");

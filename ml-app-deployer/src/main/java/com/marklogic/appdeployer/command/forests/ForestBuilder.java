@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.appdeployer.command.forests;
 
@@ -22,10 +10,7 @@ import com.marklogic.mgmt.api.forest.Forest;
 import com.marklogic.mgmt.mapper.DefaultResourceMapper;
 import com.marklogic.mgmt.mapper.ResourceMapper;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Based on a given ForestPlan object, builds a list of one or more Forest objects in memory - i.e. nothing is written
@@ -58,8 +43,10 @@ public class ForestBuilder extends LoggingObject {
 	 * @param appConfig
 	 * @return
 	 */
-	public List<Forest> buildForests(ForestPlan forestPlan, AppConfig appConfig) {
+	public List<Forest> buildForests(ForestPlan forestPlan, final AppConfig appConfig) {
 		final String databaseName = forestPlan.getDatabaseName();
+		Objects.requireNonNull(databaseName);
+		Objects.requireNonNull(appConfig);
 
 		// Find out what forests we have already, keyed on host and then data directory
 		Map<String, Map<String, List<Forest>>> existingForestsMap = existingForestsMap(forestPlan);
@@ -86,6 +73,7 @@ public class ForestBuilder extends LoggingObject {
 				for (int i = 0; i < forestsToCreate; i++) {
 					forestCounter++;
 					Forest forest = newForest(forestPlan);
+					Objects.requireNonNull(forest);
 					forest.setForestName(getForestName(databaseName, forestCounter, appConfig));
 					forest.setHost(hostName);
 					forest.setDatabase(databaseName);
@@ -158,7 +146,7 @@ public class ForestBuilder extends LoggingObject {
 	 */
 	public void addReplicasToForests(List<Forest> forests, ForestPlan forestPlan, AppConfig appConfig, List<String> dataDirectories) {
 		final String databaseName = forestPlan.getDatabaseName();
-		final List<String> hostNames = forestPlan.getReplicaHostNames();
+		final List<String> hostNames = forestPlan.getHostNames();
 		final int replicaCount = forestPlan.getReplicaCount();
 
 		if (replicaCount >= hostNames.size()) {

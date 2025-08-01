@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
+ */
 package com.marklogic.appdeployer.command;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
@@ -7,12 +10,9 @@ import com.marklogic.mgmt.ManageClient;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class TestConnectionsTest extends AbstractAppDeployerTest {
+class TestConnectionsTest extends AbstractAppDeployerTest {
 
 	private TestConnectionsCommand command = new TestConnectionsCommand();
 
@@ -109,12 +109,15 @@ public class TestConnectionsTest extends AbstractAppDeployerTest {
 			results = command.testConnections(new CommandContext(appConfig, manageClient, adminManager));
 			restResult = results.getRestServerTestResult();
 			assertFalse(restResult.isSucceeded());
-			assertEquals("Received 403: Forbidden", restResult.getMessage(), "Unfortunately, the Java Client receives " +
-				"nothing indicating an SSL issue; the request doesn't even show up in the app server's AccessLog. " +
-				"All the user gets is a 403 back when SSL is required by the client is not using it.");
+			assertTrue(restResult.getMessage().contains("java.io.IOException: unexpected end of stream"),
+				"Starting in MarkLogic 12, trying to connect to an app server that requires SSL without the " +
+					"client using SSL results in an IOException, which is a change from earlier versions of MarkLogic. " +
+					"Actual message: " + restResult.getMessage());
+
 			testRestResult = results.getTestRestServerTestResult();
 			assertFalse(testRestResult.isSucceeded());
-			assertEquals("Received 403: Forbidden", testRestResult.getMessage());
+			assertTrue(testRestResult.getMessage().contains("java.io.IOException: unexpected end of stream"),
+				"Actual error: " + testRestResult.getMessage());
 		} finally {
 			configureRestServersToNotRequireSSL();
 			appConfig.setRestSslContext(null);

@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.client.ext.file;
 
@@ -20,14 +8,12 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.FileVisitor;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Non-threadsafe implementation that implements FileVisitor as a way of descending one or more file paths.
@@ -38,11 +24,6 @@ public class DefaultDocumentFileReader extends AbstractDocumentFileReader implem
 	private List<FileFilter> fileFilters;
 	private List<DocumentFile> documentFiles;
 	private String uriPrefix = "/";
-
-	// As of 4.6.0, these no longer need to be class fields but are being kept for backwards compatibility.
-	// They should be removed in 5.0.0.
-	private CollectionsFileDocumentFileProcessor collectionsFileDocumentFileProcessor;
-	private PermissionsFileDocumentFileProcessor permissionsFileDocumentFileProcessor;
 
 	/**
 	 * Calls initialize to instantiate some default DocumentFileProcessor objects.
@@ -68,8 +49,10 @@ public class DefaultDocumentFileReader extends AbstractDocumentFileReader implem
 			Path p = constructPath(path);
 			if (p != null) {
 				this.currentRootPath = p;
+				// Fixed in 6.0.0 - symlinks are now followed and thus work properly.
+				Set<FileVisitOption> options = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
 				try {
-					Files.walkFileTree(this.currentRootPath, this);
+					Files.walkFileTree(this.currentRootPath, options, Integer.MAX_VALUE, this);
 				} catch (IOException ie) {
 					throw new RuntimeException(format("IO error while walking file tree at path: %s", path), ie);
 				}
@@ -187,8 +170,8 @@ public class DefaultDocumentFileReader extends AbstractDocumentFileReader implem
 	}
 
 	protected void initialize() {
-		collectionsFileDocumentFileProcessor = new CollectionsFileDocumentFileProcessor();
-		permissionsFileDocumentFileProcessor = new PermissionsFileDocumentFileProcessor();
+		CollectionsFileDocumentFileProcessor collectionsFileDocumentFileProcessor = new CollectionsFileDocumentFileProcessor();
+		PermissionsFileDocumentFileProcessor permissionsFileDocumentFileProcessor = new PermissionsFileDocumentFileProcessor();
 
 		addFileFilter(collectionsFileDocumentFileProcessor);
 		addFileFilter(permissionsFileDocumentFileProcessor);

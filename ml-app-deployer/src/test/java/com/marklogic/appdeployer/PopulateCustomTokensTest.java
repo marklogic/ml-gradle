@@ -1,35 +1,24 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.appdeployer;
 
 import com.marklogic.appdeployer.util.SimplePropertiesSource;
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 import java.util.Properties;
 
-public class PopulateCustomTokensTest  {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class PopulateCustomTokensTest {
 
 	private AppConfig appConfig;
 	private Properties props;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		appConfig = new AppConfig();
 
 		props = new Properties();
@@ -38,7 +27,7 @@ public class PopulateCustomTokensTest  {
 	}
 
 	@Test
-	public void defaultPrefixAndSuffix() {
+	void defaultPrefixAndSuffix() {
 		appConfig.populateCustomTokens(new SimplePropertiesSource(props));
 
 		Map<String, String> tokens = appConfig.getCustomTokens();
@@ -47,7 +36,7 @@ public class PopulateCustomTokensTest  {
 	}
 
 	@Test
-	public void customPrefixAndSuffix() {
+	void customPrefixAndSuffix() {
 		appConfig.populateCustomTokens(new SimplePropertiesSource(props), "!!", "!!");
 
 		Map<String, String> tokens = appConfig.getCustomTokens();
@@ -56,7 +45,7 @@ public class PopulateCustomTokensTest  {
 	}
 
 	@Test
-	public void onlyPrefix() {
+	void onlyPrefix() {
 		appConfig.populateCustomTokens(new SimplePropertiesSource(props), "!!", null);
 
 		Map<String, String> tokens = appConfig.getCustomTokens();
@@ -65,11 +54,20 @@ public class PopulateCustomTokensTest  {
 	}
 
 	@Test
-	public void onlySuffix() {
+	void onlySuffix() {
 		appConfig.populateCustomTokens(new SimplePropertiesSource(props), null, "!!");
 
 		Map<String, String> tokens = appConfig.getCustomTokens();
 		assertEquals("blue", tokens.get("color!!"));
 		assertEquals("M", tokens.get("size!!"));
+	}
+
+	@Test
+	void whitespace() {
+		props.setProperty("someProp", "has space ");
+
+		appConfig.populateCustomTokens(new SimplePropertiesSource(props));
+		Map<String, String> tokens = appConfig.getCustomTokens();
+		assertEquals("has space", tokens.get("%%someProp%%"));
 	}
 }

@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.appdeployer;
 
@@ -102,6 +90,7 @@ public class AppConfig {
 	private String restCertPassword;
 	private String restExternalName;
 	private String restSamlToken;
+	private String restOauthToken;
 	private X509TrustManager restTrustManager;
 	private boolean restUseDefaultKeystore;
 	private String restSslProtocol;
@@ -134,6 +123,7 @@ public class AppConfig {
 	private String appServicesCertPassword;
 	private String appServicesExternalName;
 	private String appServicesSamlToken;
+	private String appServicesOauthToken;
 	private X509TrustManager appServicesTrustManager;
 	private boolean appServicesUseDefaultKeystore;
 	private String appServicesSslProtocol;
@@ -286,6 +276,8 @@ public class AppConfig {
 	private DataConfig dataConfig;
 	private PluginConfig pluginConfig;
 
+	private Map<String, String> hostCertificatePassphrases;
+
 	public AppConfig() {
 		this(null);
 	}
@@ -343,7 +335,7 @@ public class AppConfig {
 					if (suffix != null) {
 						token = token + suffix;
 					}
-					customTokens.put(token, value);
+					customTokens.put(token, value.trim());
 				}
 			}
 		}
@@ -419,6 +411,7 @@ public class AppConfig {
 		config.setConnectionType(restConnectionType);
 		config.setExternalName(restExternalName);
 		config.setSamlToken(restSamlToken);
+		config.setOauthToken(restOauthToken);
 		config.setSecurityContextType(restSecurityContextType);
 		config.setCloudApiKey(cloudApiKey);
 		config.setBasePath(restBasePath);
@@ -471,6 +464,7 @@ public class AppConfig {
 		config.setDatabase(databaseName);
 		config.setExternalName(appServicesExternalName);
 		config.setSamlToken(appServicesSamlToken);
+		config.setOauthToken(appServicesOauthToken);
 		config.setSecurityContextType(appServicesSecurityContextType);
 		config.setCloudApiKey(cloudApiKey);
 		config.setBasePath(appServicesBasePath);
@@ -1566,6 +1560,34 @@ public class AppConfig {
 		this.appServicesSamlToken = appServicesSamlToken;
 	}
 
+	/**
+	 * @since 6.0.0
+	 */
+	public String getRestOauthToken() {
+		return restOauthToken;
+	}
+
+	/**
+	 * @since 6.0.0
+	 */
+	public void setRestOauthToken(String restOauthToken) {
+		this.restOauthToken = restOauthToken;
+	}
+
+	/**
+	 * @since 6.0.0
+	 */
+	public String getAppServicesOauthToken() {
+		return appServicesOauthToken;
+	}
+
+	/**
+	 * @since 6.0.0
+	 */
+	public void setAppServicesOauthToken(String appServicesOauthToken) {
+		this.appServicesOauthToken = appServicesOauthToken;
+	}
+
 	public boolean isCascadeCollections() {
 		return cascadeCollections;
 	}
@@ -1868,5 +1890,19 @@ public class AppConfig {
 	 */
 	public void setAppServicesTrustStoreAlgorithm(String appServicesTrustStoreAlgorithm) {
 		this.appServicesTrustStoreAlgorithm = appServicesTrustStoreAlgorithm;
+	}
+
+	/**
+	 * @since 6.0.0
+	 */
+	public Map<String, String> getHostCertificatePassphrases() {
+		return hostCertificatePassphrases;
+	}
+
+	/**
+	 * @since 6.0.0
+	 */
+	public void setHostCertificatePassphrases(Map<String, String> hostCertificatePassphrases) {
+		this.hostCertificatePassphrases = hostCertificatePassphrases;
 	}
 }

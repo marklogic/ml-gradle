@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.mgmt.resource.tasks;
 
@@ -23,10 +11,13 @@ import com.marklogic.mgmt.api.task.Task;
 import com.marklogic.mgmt.resource.AbstractResourceManager;
 import com.marklogic.mgmt.resource.requests.RequestManager;
 import com.marklogic.rest.util.Fragment;
+import com.marklogic.rest.util.XPathUtil;
+import org.springframework.http.ResponseEntity;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The "groupName" property of this class corresponds to the "group-id" querystring parameter. It's called
@@ -65,8 +56,11 @@ public class TaskManager extends AbstractResourceManager {
 		final String taskDatabase = payloadParser.getPayloadFieldValue(payload, "task-database", false);
 
 		final String xpath = taskDatabase != null ?
-			format("/t:tasks-default-list/t:list-items/t:list-item[t:task-path = '%s' and t:task-database = '%s']/t:idref", taskPath, taskDatabase) :
-			format("/t:tasks-default-list/t:list-items/t:list-item[t:task-path = '%s']/t:idref", taskPath);
+			format("/t:tasks-default-list/t:list-items/t:list-item[t:task-path = '%s' and t:task-database = '%s']/t:idref",
+				XPathUtil.sanitizeValueForXPathExpression(taskPath),
+				XPathUtil.sanitizeValueForXPathExpression(taskDatabase)) :
+			format("/t:tasks-default-list/t:list-items/t:list-item[t:task-path = '%s']/t:idref",
+				XPathUtil.sanitizeValueForXPathExpression(taskPath));
 
 		final List<String> resourceIds = getAsXml().getElementValues(xpath);
 		if (resourceIds == null || resourceIds.isEmpty()) {
@@ -136,8 +130,12 @@ public class TaskManager extends AbstractResourceManager {
 	 */
 	public String getTaskIdForTaskPath(String taskPathOrTaskId) {
 		Fragment f = getAsXml();
-		String xpath = "/t:tasks-default-list/t:list-items/t:list-item[t:task-path = '%s' or t:idref = '%s']/t:idref";
-		xpath = String.format(xpath, taskPathOrTaskId, taskPathOrTaskId);
+		final String valueForXPath = XPathUtil.sanitizeValueForXPathExpression(taskPathOrTaskId);
+		final String xpath = String.format(
+			"/t:tasks-default-list/t:list-items/t:list-item[t:task-path = '%s' or t:idref = '%s']/t:idref",
+			valueForXPath, valueForXPath
+		);
+
 		List<String> resourceIds = f.getElementValues(xpath);
 		if (resourceIds == null || resourceIds.isEmpty()) {
 			throw new RuntimeException("Could not find a scheduled task with a task-path or task-id of: " + taskPathOrTaskId);
@@ -162,9 +160,10 @@ public class TaskManager extends AbstractResourceManager {
 			logger.info("Checking for existence of resource: " + resourceNameOrId);
 		}
 		Fragment f = getAsXml();
+		String valueForXPath = XPathUtil.sanitizeValueForXPathExpression(resourceNameOrId);
 		return f.elementExists(format(
 			"/t:tasks-default-list/t:list-items/t:list-item[t:task-path = '%s' or t:idref = '%s']",
-			resourceNameOrId, resourceNameOrId));
+			valueForXPath, valueForXPath));
 	}
 
 	/**
@@ -196,7 +195,10 @@ public class TaskManager extends AbstractResourceManager {
 		String enabled = payloadParser.getPayloadFieldValue(payload, "task-enabled", false);
 		if ("false".equalsIgnoreCase(enabled)) {
 			// We don't reuse updateResource here since that first deletes the task
-			URI uri = receipt.getResponse().getHeaders().getLocation();
+			ResponseEntity<String> response = receipt.getResponse();
+			Objects.requireNonNull(response);
+			URI uri = response.getHeaders().getLocation();
+			Objects.requireNonNull(uri, "Expecting the response to have a location header");
 			// Expecting a path of "/manage/(version)/tasks/(taskId)"
 			String[] tokens = uri.getPath().split("/");
 			final String taskId = tokens[tokens.length - 1];

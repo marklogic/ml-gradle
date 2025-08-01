@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
+ */
 package example;
 
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -10,7 +13,7 @@ public class Main {
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		dataSource.setDriverClassName("org.postgresql.Driver");
 		// preferQueryMode=simple is required; readonly is optional, but makes sense since updates aren't allowed
-		dataSource.setUrl("jdbc:postgresql://localhost:8441/?preferQueryMode=simple&readonly=true");
+		dataSource.setUrl("jdbc:postgresql://localhost:8005/?preferQueryMode=simple&readonly=true");
 		dataSource.setUsername("admin");
 		dataSource.setPassword("admin");
 

@@ -1,23 +1,14 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.appdeployer.command.forests;
 
+import com.marklogic.appdeployer.AppConfig;
 import com.marklogic.appdeployer.command.AbstractUndoableCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
+import com.marklogic.mgmt.ManageClient;
+import com.marklogic.mgmt.PayloadParser;
 import com.marklogic.mgmt.api.API;
 import com.marklogic.mgmt.api.configuration.Configuration;
 import com.marklogic.mgmt.api.configuration.Configurations;
@@ -31,22 +22,20 @@ import com.marklogic.mgmt.resource.groups.GroupManager;
 import com.marklogic.mgmt.resource.hosts.HostManager;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
- * Command for configuring - i.e. creating and setting - replica forests for existing databases.
- * <p>
- * Very useful for the out-of-the-box forests such as Security, Schemas, App-Services, and Meters, which normally need
- * replicas for failover in a cluster.
+ * Command for configuring - i.e. creating and setting - replica forests for existing databases. The expectation is that
+ * {@code DeployForestsCommand} is used for creating primary forests, while this command is used for creating replica
+ * forests based on existing primary forests.
  */
 public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 
-	private Map<String, Integer> databaseNamesAndReplicaCounts = new HashMap<>();
 	private boolean deleteReplicasOnUndo = true;
 	private GroupHostNamesProvider groupHostNamesProvider;
+	private ForestBuilder forestBuilder = new ForestBuilder();
 
 	public ConfigureForestReplicasCommand() {
 		setExecuteSortOrder(SortOrderConstants.DEPLOY_FOREST_REPLICAS);
@@ -55,38 +44,31 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 
 	@Override
 	public void execute(CommandContext context) {
-		if (context.getAppConfig().getDatabaseNamesAndReplicaCounts() != null) {
-			this.databaseNamesAndReplicaCounts = context.getAppConfig().getDatabaseNamesAndReplicaCounts();
-		}
-
+		Map<String, Integer> databaseNamesAndReplicaCounts = context.getAppConfig().getDatabaseNamesAndReplicaCounts();
 		if (databaseNamesAndReplicaCounts == null || databaseNamesAndReplicaCounts.isEmpty()) {
-			logger.info("No database names and replica counts defined, so not configuring any forest replicas");
+			logger.info("No database names and replica counts defined, so not configuring any forest replicas.");
 			return;
 		}
 
-		List<String> hostNames = new HostManager(context.getManageClient()).getHostNames();
-		if (hostNames.size() < 2) {
+		List<String> allHostNames = new HostManager(context.getManageClient()).getHostNames();
+		if (allHostNames.size() < 2) {
 			if (logger.isInfoEnabled()) {
-				logger.info("Only found one host, so not configuring any replica forests; host: " + hostNames.get(0));
+				logger.info("Only found one host, so not configuring any replica forests; host: {}", allHostNames.get(0));
 			}
 			return;
 		}
 
 		for (String databaseName : databaseNamesAndReplicaCounts.keySet()) {
-			int replicaCount = databaseNamesAndReplicaCounts.get(databaseName);
-			if (replicaCount > 0) {
-				configureDatabaseReplicaForests(databaseName, replicaCount, hostNames, context);
+			if (databaseNamesAndReplicaCounts.get(databaseName) > 0) {
+				configureDatabaseReplicaForests(databaseName, allHostNames, context);
 			}
 		}
 	}
 
 	@Override
 	public void undo(CommandContext context) {
-		if (deleteReplicasOnUndo) {
-			if (context.getAppConfig().getDatabaseNamesAndReplicaCounts() != null) {
-				setDatabaseNamesAndReplicaCounts(context.getAppConfig().getDatabaseNamesAndReplicaCounts());
-			}
-
+		if (deleteReplicasOnUndo && context.getAppConfig().getDatabaseNamesAndReplicaCounts() != null) {
+			Map<String, Integer> databaseNamesAndReplicaCounts = context.getAppConfig().getDatabaseNamesAndReplicaCounts();
 			DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
 			ForestManager forestMgr = new ForestManager(context.getManageClient());
 
@@ -103,7 +85,7 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 				}
 			}
 		} else {
-			logger.info("deleteReplicasOnUndo is set to false, so not deleting any replicas");
+			logger.info("Not deleting any replicas.");
 		}
 	}
 
@@ -111,7 +93,7 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 	 * @param forestName
 	 * @param forestMgr
 	 */
-	protected void deleteReplicas(String forestName, ForestManager forestMgr) {
+	private void deleteReplicas(String forestName, ForestManager forestMgr) {
 		if (forestMgr.exists(forestName)) {
 			ForestStatus status = forestMgr.getForestStatus(forestName);
 			if (status.isPrimary() && status.hasReplicas()) {
@@ -122,50 +104,98 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 		}
 	}
 
-	/**
-	 * @param databaseName
-	 * @param replicaCount
-	 * @param hostNames
-	 * @param context
-	 */
-	protected void configureDatabaseReplicaForests(String databaseName, int replicaCount, List<String> hostNames, CommandContext context) {
+	private void configureDatabaseReplicaForests(String databaseName, List<String> allHostNames, CommandContext context) {
 		List<Forest> forestsNeedingReplicas = determineForestsNeedingReplicas(databaseName, context);
+		addReplicasToForests(databaseName, forestsNeedingReplicas, allHostNames, context);
+		createForestReplicas(forestsNeedingReplicas, context.getAppConfig(), context.getManageClient());
+	}
 
-		ForestBuilder forestBuilder = new ForestBuilder();
-		List<String> selectedHostNames = getHostNamesForDatabaseForests(databaseName, hostNames, context);
-		ForestPlan forestPlan = new ForestPlan(databaseName, selectedHostNames).withReplicaCount(replicaCount);
+	/**
+	 * Allows for ForestPlanner to preview the list of forest replicas to create. Ultimately, all this code should move
+	 * out of the command hierarchy so it's much more easily reused.
+	 */
+	public void addReplicasToForests(String databaseName, List<Forest> forests, List<String> allHostNames, CommandContext context) {
+		int replicaCount = 0;
+		if (context.getAppConfig().getDatabaseNamesAndReplicaCounts() != null &&
+			context.getAppConfig().getDatabaseNamesAndReplicaCounts().containsKey(databaseName)) {
+			replicaCount = context.getAppConfig().getDatabaseNamesAndReplicaCounts().get(databaseName);
+		}
+
+		if (replicaCount < 1) {
+			logger.info("No replicas for: {}", databaseName);
+			return;
+		}
+
+		List<String> selectedHostNames = getHostNamesForDatabaseForests(databaseName, allHostNames, context);
 		List<String> dataDirectories = forestBuilder.determineDataDirectories(databaseName, context.getAppConfig());
-		forestBuilder.addReplicasToForests(forestsNeedingReplicas, forestPlan, context.getAppConfig(), dataDirectories);
+		Map<String, String> hostNamesAndZones = getHostNamesAndZones(context.getManageClient());
 
-		List<Forest> forestsWithOnlyReplicas = forestsNeedingReplicas.stream().map(forest -> {
+		final ForestPlan forestPlan = new ForestPlan(databaseName, selectedHostNames)
+			.withHostsToZones(hostNamesAndZones)
+			.withReplicaCount(replicaCount);
+
+		forestBuilder.addReplicasToForests(forests, forestPlan, context.getAppConfig(), dataDirectories);
+	}
+
+	/**
+	 * @return a map of host names to optional zones. For performance reasons, as soon as a host is found to not have
+	 * a zone, then an empty map will be returned, as zones will not matter in that scenario.
+	 */
+	private Map<String, String> getHostNamesAndZones(ManageClient manageClient) {
+		HostManager hostManager = new HostManager(manageClient);
+		PayloadParser payloadParser = new PayloadParser();
+		Map<String, String> map = new LinkedHashMap<>();
+		for (String hostName : hostManager.getHostNames()) {
+			String json = manageClient.getJson("/manage/v2/hosts/%s/properties".formatted(hostName));
+			String zone = payloadParser.getPayloadFieldValue(json, "zone");
+			if (zone == null || zone.trim().isEmpty()) {
+				return map;
+			}
+			map.put(hostName, zone);
+		}
+		return map;
+	}
+
+	public List<Forest> removeForestDetails(List<Forest> forests) {
+		return forests.stream().map(forest -> {
 			Forest forestWithOnlyReplicas = new Forest();
 			forestWithOnlyReplicas.setForestName(forest.getForestName());
+			forestWithOnlyReplicas.setHost(forest.getHost());
 			forestWithOnlyReplicas.setForestReplica(forest.getForestReplica());
 			return forestWithOnlyReplicas;
-		}).collect(Collectors.toList());
+		}).toList();
+	}
+
+	private void createForestReplicas(List<Forest> forestsNeedingReplicas, AppConfig appConfig, ManageClient manageClient) {
+		// Trim off all forests details so only the replicas are saved.
+		List<Forest> forestsWithOnlyReplicas = removeForestDetails(forestsNeedingReplicas);
 
 		// As of 4.5.3, try CMA first so that this can be done in a single request instead of one request per forest.
-		if (context.getAppConfig().getCmaConfig().isDeployForests()) {
+		if (appConfig.getCmaConfig().isDeployForests()) {
 			try {
-				Configuration config = new Configuration();
-				forestsWithOnlyReplicas.forEach(forest -> {
-					config.addForest(forest.toObjectNode());
-				});
-				new Configurations(config).submit(context.getManageClient());
+				saveReplicasViaCma(forestsWithOnlyReplicas, manageClient);
 				return;
 			} catch (Exception ex) {
-				logger.warn("Unable to create forest replicas via CMA; cause: " + ex.getMessage() + "; will " +
-					"fall back to using /manage/v2.");
+				logger.warn("Unable to create forest replicas via CMA; cause: {}; will fall back to using /manage/v2.", ex.getMessage());
 			}
 		}
 
-		// If we get here, either CMA usage is disabled or an error occurred with CMA. Just use /manage/v2 to submit
-		// each forest one-by-one.
-		ForestManager forestManager = new ForestManager(context.getManageClient());
+		// If we get here, either CMA usage is disabled or an error occurred with CMA.
+		saveReplicasOneByOne(forestsWithOnlyReplicas, manageClient);
+	}
+
+	private void saveReplicasViaCma(List<Forest> forestsWithOnlyReplicas, ManageClient manageClient) {
+		Configuration config = new Configuration();
+		forestsWithOnlyReplicas.forEach(forest -> config.addForest(forest.toObjectNode()));
+		new Configurations(config).submit(manageClient);
+	}
+
+	private void saveReplicasOneByOne(List<Forest> forestsWithOnlyReplicas, ManageClient manageClient) {
+		ForestManager forestManager = new ForestManager(manageClient);
 		forestsWithOnlyReplicas.forEach(forest -> {
 			String forestName = forest.getForestName();
 			logger.info(format("Creating forest replicas for primary forest %s", forestName));
-			context.getManageClient().putJson(forestManager.getPropertiesPath(forestName), forest.getJson());
+			manageClient.putJson(forestManager.getPropertiesPath(forestName), forest.getJson());
 			logger.info(format("Finished creating forest replicas for primary forest %s", forestName));
 		});
 	}
@@ -173,18 +203,22 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 	/**
 	 * Per #389, the list of replicas needs to be calculated for all forests at once so that ForestBuilder produces the
 	 * correct results.
+	 * <p>
+	 * For 6.0.0, made this public so it can be reused by ForestPlanner. This should be much cleaner once all this logic
+	 * is moved out of the command hierarchy and into a more reusable class.
 	 *
 	 * @param databaseName
 	 * @param context
 	 * @return
 	 */
-	protected List<Forest> determineForestsNeedingReplicas(String databaseName, CommandContext context) {
+	public List<Forest> determineForestsNeedingReplicas(String databaseName, CommandContext context) {
 		ForestManager forestManager = new ForestManager(context.getManageClient());
 		DatabaseManager dbMgr = new DatabaseManager(context.getManageClient());
 		API api = new API(context.getManageClient());
 		ResourceMapper resourceMapper = new DefaultResourceMapper(api);
 
 		List<Forest> forestsNeedingReplicas = new ArrayList<>();
+
 		Map<String, List<Forest>> mapOfPrimaryForests = context.getMapOfPrimaryForests();
 
 		/**
@@ -201,18 +235,20 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 				boolean forestHasReplicasAlready = forest.getForestReplica() != null && !forest.getForestReplica().isEmpty();
 				if (!forestHasReplicasAlready) {
 					forestsNeedingReplicas.add(forest);
+				} else {
+					logger.info("Forest {} already has replicas, so not configuring replica forests.", forest.getForestName());
 				}
 			});
 		} else {
 			for (String forestName : dbMgr.getForestNames(databaseName)) {
-				logger.info(format("Checking the status of forest %s to determine if it is a primary forest and whether or not it has replicas already.", forestName));
+				logger.info("Checking the status of forest {} to determine if it is a primary forest and whether or not it has replicas already.", forestName);
 				ForestStatus status = forestManager.getForestStatus(forestName);
 				if (!status.isPrimary()) {
-					logger.info(format("Forest %s is not a primary forest, so not configuring replica forests", forestName));
+					logger.info("Forest {} is not a primary forest, so not configuring replica forests.", forestName);
 					continue;
 				}
 				if (status.hasReplicas()) {
-					logger.info(format("Forest %s already has replicas, so not configuring replica forests", forestName));
+					logger.info("Forest {} already has replicas, so not configuring replica forests.", forestName);
 					continue;
 				}
 
@@ -225,17 +261,7 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 		return forestsNeedingReplicas;
 	}
 
-	/**
-	 * If databaseHosts has been populated on the AppConfig object inside the CommandContext, and there's an entry for
-	 * the given database name, then this will only return the hosts that have been set for the given database name.
-	 * Otherwise, all hosts are returned.
-	 *
-	 * @param databaseName
-	 * @param hostNames
-	 * @param context
-	 * @return
-	 */
-	protected List<String> getHostNamesForDatabaseForests(String databaseName, List<String> hostNames, CommandContext context) {
+	protected List<String> getHostNamesForDatabaseForests(String databaseName, List<String> allHostNames, CommandContext context) {
 		List<String> selectedHostNames = new ArrayList<>();
 
 		Map<String, List<String>> databaseGroupMap = context.getAppConfig().getDatabaseGroups();
@@ -256,11 +282,11 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 			for (String groupName : databaseGroups) {
 				List<String> groupHostNames = groupHostNamesProvider.getGroupHostNames(groupName);
 				if (groupHostNames == null || groupHostNames.isEmpty()) {
-					logger.warn("No hosts found for group: " + groupName);
+					logger.warn("No hosts found for group: {}", groupName);
 					continue;
 				}
 
-				for (String hostName : hostNames) {
+				for (String hostName : allHostNames) {
 					if (groupHostNames.contains(hostName)) {
 						selectedHostNames.add(hostName);
 					}
@@ -278,14 +304,14 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 				return selectedHostNames;
 			}
 
-			logger.warn("Did not find any valid hosts in selected groups: " + databaseGroups);
+			logger.warn("Did not find any valid hosts in selected groups: {}", databaseGroups);
 		}
 
 		/**
 		 * If no database groups were specified, then retain any host that is either in the set of database hosts, or
 		 * all hosts in case no database hosts were specified.
 		 */
-		for (String hostName : hostNames) {
+		for (String hostName : allHostNames) {
 			if ((databaseHosts == null || databaseHosts.contains(hostName))) {
 				selectedHostNames.add(hostName);
 			}
@@ -296,14 +322,6 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 
 	public void setDeleteReplicasOnUndo(boolean deleteReplicasOnUndo) {
 		this.deleteReplicasOnUndo = deleteReplicasOnUndo;
-	}
-
-	public Map<String, Integer> getDatabaseNamesAndReplicaCounts() {
-		return databaseNamesAndReplicaCounts;
-	}
-
-	public void setDatabaseNamesAndReplicaCounts(Map<String, Integer> databaseNamesAndReplicaCounts) {
-		this.databaseNamesAndReplicaCounts = databaseNamesAndReplicaCounts;
 	}
 
 	public void setGroupHostNamesProvider(GroupHostNamesProvider groupHostNamesProvider) {

@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.appdeployer.command.forests;
 
@@ -42,12 +30,10 @@ public class CreateForestsOnOneHostTest {
 
 		ForestHostNames hostNames = command.determineHostNamesForForest(context, new ArrayList<>());
 		assertEquals(3, hostNames.getPrimaryForestHostNames().size());
-		assertEquals(3, hostNames.getReplicaForestHostNames().size());
 
 		appConfig.addDatabaseWithForestsOnOneHost("test-db");
 		hostNames = command.determineHostNamesForForest(context, new ArrayList<>());
 		assertEquals(1, hostNames.getPrimaryForestHostNames().size());
-		assertEquals(3, hostNames.getReplicaForestHostNames().size());
 	}
 
 	/**
@@ -74,7 +60,7 @@ public class CreateForestsOnOneHostTest {
 		assertEquals("host2", hostNames.getPrimaryForestHostNames().get(0), "Because there's already a forest on " +
 			"host2, that should be the primary forest host name, even though host1 is first in the list");
 
-		List<Forest> forestsToCreate = command.buildForests(context, false, existingForests);
+		List<Forest> forestsToCreate = command.buildForests(context, existingForests);
 		assertEquals(1, forestsToCreate.size(), "Because forests per host is 2 and host2 already has 1 forest, 1 more " +
 			"forest needs to be created");
 		assertEquals("host2", forestsToCreate.get(0).getHost());

@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.appdeployer.command.restapis;
 
@@ -22,6 +10,7 @@ import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.appdeployer.command.UndoableCommand;
 import com.marklogic.appdeployer.util.RestApiUtil;
+import com.marklogic.mgmt.DeleteReceipt;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.admin.ActionRequiringRestart;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
@@ -206,13 +195,24 @@ public class DeployRestApiServersCommand extends AbstractCommand implements Undo
 	 * @return
 	 */
 	protected boolean deleteRestApi(String serverName, String groupName, ManageClient manageClient,
-	                                boolean includeModules, boolean includeContent) {
+									boolean includeModules, boolean includeContent) {
 		RestApiDeletionRequest request = new RestApiDeletionRequest(serverName, groupName);
 		request.setIncludeContent(includeContent);
 		request.setIncludeModules(includeModules);
 		request.setDeleteContentReplicaForests(isDeleteContentReplicaForests());
 		request.setDeleteModulesReplicaForests(isDeleteModulesReplicaForests());
-		return new RestApiManager(manageClient, groupName).deleteRestApi(request);
+
+		RestApiManager mgr = new RestApiManager(manageClient, groupName);
+		try {
+			// This can fail due to bug MLE-547 when the modules database is set to "filesystem".
+			return mgr.deleteRestApi(request);
+		} catch (Exception ex) {
+			logger.warn("Could not delete REST API server: {}; cause: {}; will try to delete it via manage/v2/servers endpoint.",
+				serverName, ex.getMessage());
+			ServerManager serverManager = new ServerManager(manageClient, groupName);
+			DeleteReceipt receipt = serverManager.deleteByIdField(serverName);
+			return receipt != null && receipt.isDeleted();
+		}
 	}
 
 	public boolean isDeleteModulesDatabase() {

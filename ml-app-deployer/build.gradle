@@ -2,10 +2,10 @@ dependencies {
 	api project(":ml-javaclient-util")
 
 	// For RestTemplate, which wraps OkHttpClient.
-	api 'org.springframework:spring-web:5.3.39'
+	api "org.springframework:spring-web:${springVersion}"
 
 	// For wrangling JSON.
-	api 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
+	api "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
 
 	// For resolving XPath expressions against XML documents.
 	implementation 'jaxen:jaxen:2.0.0'
@@ -18,7 +18,7 @@ dependencies {
 	implementation 'org.jdom:jdom2:2.0.6.1'
 
 	// For EqualsBuilder; added in 3.8.1 to support detecting if a mimetype's properties have changed or not
-	implementation "org.apache.commons:commons-lang3:3.16.0"
+	implementation "org.apache.commons:commons-lang3:3.18.0"
 
 	// For PreviewInterceptor; can be excluded if that feature is not used
 	implementation("com.flipkart.zjsonpatch:zjsonpatch:0.4.16") {
@@ -26,12 +26,11 @@ dependencies {
 		exclude module: "jackson-databind"
 	}
 
-	// Don't want to include this in the published jar, just the executable jar
-	compileOnly "com.beust:jcommander:1.82"
-	compileOnly "ch.qos.logback:logback-classic:1.3.14"
-
-	testImplementation 'org.junit.jupiter:junit-jupiter:5.11.0'
-	testImplementation 'org.springframework:spring-test:5.3.39'
-	testImplementation 'commons-io:commons-io:2.16.1'
+	testImplementation 'commons-io:commons-io:2.19.0'
 	testImplementation 'xmlunit:xmlunit:1.6'
+
+	testImplementation ("com.marklogic:marklogic-junit5:1.5.0") {
+		// Use the version of ml-javaclient-util within this repository.
+		exclude module: "ml-javaclient-util"
+	}
 }

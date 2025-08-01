@@ -1,7 +1,7 @@
 plugins {
 	id "java"
 	id "eclipse"
-	id "com.marklogic.ml-gradle" version "5.0.0"
+	id "com.marklogic.ml-gradle" version "6.0.0"
 }
 
 repositories {
@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-	testImplementation "com.marklogic:marklogic-junit5:1.1.0"
+	testImplementation "com.marklogic:marklogic-junit5:1.5.0"
 }
 
 test {

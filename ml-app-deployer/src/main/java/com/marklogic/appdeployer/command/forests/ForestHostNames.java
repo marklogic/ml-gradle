@@ -1,37 +1,21 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.appdeployer.command.forests;
 
 import java.util.List;
 
+// This is no longer needed now that it doesn't capture replica host names as well.
+// Will remove this in favor of a List<String> in the next PR.
 public class ForestHostNames {
 
 	private List<String> primaryForestHostNames;
-	private List<String> replicaForestHostNames;
 
-	public ForestHostNames(List<String> primaryForestHostNames, List<String> replicaForestHostNames) {
+	public ForestHostNames(List<String> primaryForestHostNames) {
 		this.primaryForestHostNames = primaryForestHostNames;
-		this.replicaForestHostNames = replicaForestHostNames;
 	}
 
 	public List<String> getPrimaryForestHostNames() {
 		return primaryForestHostNames;
-	}
-
-	public List<String> getReplicaForestHostNames() {
-		return replicaForestHostNames;
 	}
 }

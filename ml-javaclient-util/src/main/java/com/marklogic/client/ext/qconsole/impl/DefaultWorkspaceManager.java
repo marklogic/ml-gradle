@@ -1,27 +1,16 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.client.ext.qconsole.impl;
 
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.eval.EvalResultIterator;
+import com.marklogic.client.eval.ServerEvaluationCall;
 import com.marklogic.client.ext.helper.LoggingObject;
+import com.marklogic.client.ext.qconsole.WorkspaceManager;
 import com.marklogic.client.io.DOMHandle;
 import com.marklogic.client.io.FileHandle;
 import com.marklogic.client.io.Format;
-import com.marklogic.client.ext.qconsole.WorkspaceManager;
 import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
@@ -56,22 +45,23 @@ public class DefaultWorkspaceManager extends LoggingObject implements WorkspaceM
 		List<File> files = new ArrayList<>();
 
 		for (String workspaceName : workspaceNames) {
-			EvalResultIterator result = client.newServerEval()
-				.addVariable("user", user)
+			ServerEvaluationCall call = client.newServerEval().addVariable("user", user)
 				.addVariable("workspace", workspaceName)
-				.xquery(QconsoleScripts.EXPORT).eval();
+				.xquery(QconsoleScripts.EXPORT);
 
-			while (result.hasNext()) {
-				DOMHandle dom = result.next().get(new DOMHandle());
-				File f = new File(userDir, workspaceName + ".xml");
-				try {
-					FileCopyUtils.copy(dom.toBuffer(), f);
-					if (logger.isInfoEnabled()) {
-						logger.info(format("Exported workspace %s to %s", workspaceName, f.getAbsolutePath()));
+			try (EvalResultIterator result = call.eval()) {
+				while (result.hasNext()) {
+					DOMHandle dom = result.next().get(new DOMHandle());
+					File f = new File(userDir, workspaceName + ".xml");
+					try {
+						FileCopyUtils.copy(dom.toBuffer(), f);
+						if (logger.isInfoEnabled()) {
+							logger.info(format("Exported workspace %s to %s", workspaceName, f.getAbsolutePath()));
+						}
+						files.add(f);
+					} catch (IOException ie) {
+						throw new RuntimeException("Unable to write workspace XML to file, workspace: " + workspaceName + "; cause: " + ie.getMessage());
 					}
-					files.add(f);
-				} catch (IOException ie) {
-					throw new RuntimeException("Unable to write workspace XML to file, workspace: " + workspaceName + "; cause: " + ie.getMessage());
 				}
 			}
 		}
@@ -100,7 +90,7 @@ public class DefaultWorkspaceManager extends LoggingObject implements WorkspaceM
 				client.newServerEval()
 					.addVariable("user", user)
 					.addVariable("exported-workspace", new FileHandle(f).withFormat(Format.XML))
-					.xquery(importQuery).eval();
+					.xquery(importQuery).evalAs(String.class);
 
 				if (logger.isInfoEnabled()) {
 					logger.info(format("Imported workspace from %s", f.getAbsolutePath()));

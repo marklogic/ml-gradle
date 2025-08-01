@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.client.ext.modulesloader.impl;
 
@@ -23,8 +11,8 @@ import com.marklogic.client.ext.helper.FilenameUtil;
 import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.client.ext.modulesloader.ExtensionMetadataAndParams;
 import com.marklogic.client.ext.modulesloader.ExtensionMetadataProvider;
+import com.marklogic.client.ext.util.XmlUtil;
 import org.jdom2.Element;
-import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -62,12 +50,12 @@ public class DefaultExtensionMetadataProvider extends LoggingObject implements E
         Resource metadataResource = resolver.getResource(metadataFile);
         if (metadataResource != null) {
             try {
-                Element root = new SAXBuilder().build(metadataResource.getInputStream()).getRootElement();
+                Element root = XmlUtil.newSAXBuilder().build(metadataResource.getInputStream()).getRootElement();
                 m.setTitle(root.getChildText("title"));
                 Element desc = root.getChild("description");
-                if (desc.getChildren() != null && desc.getChildren().size() == 1) {
+                if (desc != null && desc.getChildren() != null && desc.getChildren().size() == 1) {
                     m.setDescription(new XMLOutputter().outputString(desc.getChildren().get(0)));
-                } else {
+                } else if (desc != null) {
                     m.setDescription(desc.getText());
                 }
                 for (Element method : root.getChildren("method")) {

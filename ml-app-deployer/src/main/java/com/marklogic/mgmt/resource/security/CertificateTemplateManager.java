@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.mgmt.resource.security;
 
@@ -21,7 +9,7 @@ import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.resource.AbstractResourceManager;
 import com.marklogic.mgmt.util.ObjectMapperFactory;
 import com.marklogic.rest.util.Fragment;
-
+import com.marklogic.rest.util.XPathUtil;
 import org.springframework.http.ResponseEntity;
 
 /**
@@ -96,14 +84,18 @@ public class CertificateTemplateManager extends AbstractResourceManager {
 	 *
 	 * Even though service allows multiple inserts in one call, this only inserts one host cert at a time.
 	 *
-	 * Note that the docs as of ML 9.0-5 are not correct for this operation - this method submits the correct JSON
-	 * structure.
-	 *
 	 * @param templateIdOrName The template name to insert the host certificates
 	 * @param pubCert the Public PEM formatted certificate
 	 * @param privateKey the Private PEM formatted certificate
 	 */
 	public ResponseEntity<String> insertHostCertificate(String templateIdOrName, String pubCert, String privateKey) {
+		return insertHostCertificate(templateIdOrName, pubCert, privateKey, null);
+	}
+
+	/**
+	 * @since 6.0.0
+	 */
+	public ResponseEntity<String> insertHostCertificate(String templateIdOrName, String pubCert, String privateKey, String passphrase) {
 		ObjectNode command = ObjectMapperFactory.getObjectMapper().createObjectNode();
 		command.put("operation", "insert-host-certificates");
 		ArrayNode certs = ObjectMapperFactory.getObjectMapper().createArrayNode();
@@ -113,6 +105,9 @@ public class CertificateTemplateManager extends AbstractResourceManager {
 
 		certificate.put("cert", pubCert);
 		certificate.put("pkey", privateKey);
+		if (passphrase != null) {
+			certificate.put("passphrase", passphrase);
+		}
 		cert.set("certificate", certificate);
 		certs.add(cert);
 
@@ -120,7 +115,6 @@ public class CertificateTemplateManager extends AbstractResourceManager {
 
 		String json = command.toString();
 		if (logger.isInfoEnabled()) {
-			// NOTE - should NOT print out private key - EVER
 			logger.info(format("Inserting host certificate for template %s", templateIdOrName));
 		}
 		return postPayload(getManageClient(), getResourcePath(templateIdOrName), json);
@@ -144,9 +138,11 @@ public class CertificateTemplateManager extends AbstractResourceManager {
 	 */
 	public boolean certificateExists(String templateIdOrName, String certificateHostName) {
 		Fragment response = getCertificatesForTemplate(templateIdOrName);
-		return certificateHostName != null ?
-			response.elementExists(format("/msec:certificate-list/msec:certificate[msec:host-name = '%s']", certificateHostName)) :
-			response.elementExists("/msec:certificate-list/msec:certificate");
+		if (certificateHostName != null) {
+			String valueForXPath = XPathUtil.sanitizeValueForXPathExpression(certificateHostName);
+			return response.elementExists(format("/msec:certificate-list/msec:certificate[msec:host-name = '%s']", valueForXPath));
+		}
+		return response.elementExists("/msec:certificate-list/msec:certificate");
 	}
 
     public Fragment getCertificatesForTemplate(String templateIdOrName) {

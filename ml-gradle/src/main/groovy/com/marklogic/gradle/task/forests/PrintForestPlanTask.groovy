@@ -1,28 +1,12 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.gradle.task.forests
 
-import com.marklogic.appdeployer.command.databases.DatabasePlan
-import com.marklogic.appdeployer.command.databases.DeployDatabaseCommand
-import com.marklogic.appdeployer.command.databases.DeployOtherDatabasesCommand
-import com.marklogic.appdeployer.command.forests.DeployForestsCommand
-import com.marklogic.appdeployer.impl.SimpleAppDeployer
+
+import com.marklogic.appdeployer.command.forests.ForestPlanner
 import com.marklogic.gradle.task.MarkLogicTask
 import com.marklogic.mgmt.api.forest.Forest
-import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -41,27 +25,7 @@ class PrintForestPlanTask extends MarkLogicTask {
 		}
 
 		String database = project.property("database")
-
-		SimpleAppDeployer appDeployer = getAppDeployer()
-		DeployOtherDatabasesCommand command = appDeployer.getCommandOfType(DeployOtherDatabasesCommand.class)
-		List<DatabasePlan> plans = command.buildDatabasePlans(getCommandContext())
-
-		DeployDatabaseCommand deployDatabaseCommand
-		for (DatabasePlan plan : plans) {
-			if (database.equals(plan.getDatabaseName())) {
-				deployDatabaseCommand = plan.getDeployDatabaseCommand()
-				break
-			}
-		}
-
-		if (deployDatabaseCommand == null) {
-			throw new GradleException("Did not find any database plan with a database name of: " + database)
-		}
-
-		DeployForestsCommand deployForestsCommand = deployDatabaseCommand.buildDeployForestsCommand(database, getCommandContext())
-		List<Forest> forests = deployForestsCommand != null ?
-			deployForestsCommand.buildForests(getCommandContext(), true) :
-			new ArrayList<>()
+		List<Forest> forests = new ForestPlanner(getManageClient()).previewForestPlan(database, getAppConfig())
 
 		if (forests.isEmpty()) {
 			println "\nNo primary forests will be created the next time the database '" + database + "' is deployed. This is " +

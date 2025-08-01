@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.appdeployer;
 
@@ -23,13 +11,16 @@ import com.marklogic.appdeployer.command.modules.DefaultModulesLoaderFactory;
 import com.marklogic.appdeployer.command.modules.LoadModulesCommand;
 import com.marklogic.appdeployer.command.security.GenerateTemporaryCertificateCommand;
 import com.marklogic.appdeployer.impl.SimpleAppDeployer;
+import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.ext.modulesloader.impl.DefaultModulesLoader;
 import com.marklogic.mgmt.AbstractMgmtTest;
 import com.marklogic.mgmt.resource.appservers.ServerManager;
-import com.marklogic.xcc.template.XccTemplate;
+import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.io.File;
+import java.util.stream.Stream;
 
 /**
  * Base class for tests that depend on an AppDeployer instance. You can extend this directly to write a test for a
@@ -38,81 +29,103 @@ import java.io.File;
  */
 public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
 
-    public final static String SAMPLE_APP_NAME = "sample-app";
+	public final static String SAMPLE_APP_NAME = "sample-app";
 
-    protected final static Integer SAMPLE_APP_REST_PORT = 8004;
-    protected final static Integer SAMPLE_APP_TEST_REST_PORT = 8005;
+	protected final static Integer SAMPLE_APP_REST_PORT = 8004;
+	protected final static Integer SAMPLE_APP_TEST_REST_PORT = 8005;
 
-    // Intended to be used by subclasses
-    protected AppDeployer appDeployer;
-    protected AppConfig appConfig;
+	// Intended to be used by subclasses
+	protected AppDeployer appDeployer;
+	protected AppConfig appConfig;
 
-    @BeforeEach
-    public void initialize() {
-        initializeAppConfig();
-    }
+	@BeforeEach
+	public void initialize() {
+		initializeAppConfig();
+		deleteKnownResources();
+	}
 
-    protected void initializeAppConfig() {
-    	initializeAppConfig(new File("src/test/resources/sample-app"));
-    }
+	private void deleteKnownResources() {
+		// Deleting known resources that may have been left behind due to intermittent connection failures
+		// when running tests on Jenkins.
+		ServerManager serverManager = new ServerManager(manageClient);
+		Stream.of("sample-app", "sample-app-test").forEach(serverName -> {
+			if (serverManager.exists(serverName)) {
+				logger.warn("Deleting app server {} before running test", serverName);
+				serverManager.deleteByIdField(serverName);
+			}
+		});
+		DatabaseManager databaseManager = new DatabaseManager(manageClient);
+		databaseManager.setForestDelete(DatabaseManager.DELETE_FOREST_DATA);
+		Stream.of("sample-app-content", "sample-app-test-content", "sample-app-modules", "sample-app-schemas").forEach(dbName -> {
+			if (databaseManager.exists(dbName)) {
+				logger.warn("Deleting database {} before running test", dbName);
+				databaseManager.deleteByIdField(dbName);
+			}
+		});
+	}
 
-    protected void initializeAppConfig(File projectDir) {
-	    appConfig = new AppConfig(projectDir);
+	protected void initializeAppConfig() {
+		initializeAppConfig(new File("src/test/resources/sample-app"));
+	}
+
+	protected void initializeAppConfig(File projectDir) {
+		appConfig = new AppConfig(projectDir);
 		appConfig.setHost(this.manageConfig.getHost());
-	    appConfig.setName(SAMPLE_APP_NAME);
-	    appConfig.setRestPort(SAMPLE_APP_REST_PORT);
+		appConfig.setName(SAMPLE_APP_NAME);
+		appConfig.setRestPort(SAMPLE_APP_REST_PORT);
 
-	    // Assume that the manager user can also be used as the REST admin user
-	    appConfig.setRestAdminUsername(manageConfig.getUsername());
-	    appConfig.setRestAdminPassword(manageConfig.getPassword());
+		// Assume that the manager user can also be used as the REST admin user
+		appConfig.setRestAdminUsername(manageConfig.getUsername());
+		appConfig.setRestAdminPassword(manageConfig.getPassword());
 		appConfig.setAppServicesUsername(manageConfig.getUsername());
 		appConfig.setAppServicesPassword(manageConfig.getPassword());
-    }
+	}
 
-    /**
-     * Initialize an AppDeployer with the given set of commands. Avoids having to create a Spring configuration.
-     *
-     * @param commands
-     */
-    protected void initializeAppDeployer(Command... commands) {
-        appDeployer = new SimpleAppDeployer(manageClient, adminManager, commands);
-    }
+	/**
+	 * Initialize an AppDeployer with the given set of commands. Avoids having to create a Spring configuration.
+	 *
+	 * @param commands
+	 */
+	protected void initializeAppDeployer(Command... commands) {
+		appDeployer = new SimpleAppDeployer(manageClient, adminManager, commands);
+	}
 
-    protected void deploySampleApp() {
-        appDeployer.deploy(appConfig);
-    }
+	protected void deploySampleApp() {
+		appDeployer.deploy(appConfig);
+	}
 
-    protected void undeploySampleApp() {
-    	if (appDeployer != null) {
-		    try {
-			    appDeployer.undeploy(appConfig);
-		    } catch (Exception e) {
-			    throw new RuntimeException("Unexpected error while undeploying sample app: " + e.getMessage(), e);
-		    }
-	    }
-    }
+	protected void undeploySampleApp() {
+		if (appDeployer != null) {
+			try {
+				appDeployer.undeploy(appConfig);
+			} catch (Exception e) {
+				throw new RuntimeException("Unexpected error while undeploying sample app: " + e.getMessage(), e);
+			}
+		}
+	}
 
-    protected XccTemplate newModulesXccTemplate() {
-    	return new XccTemplate(appConfig.getHost(), appConfig.getAppServicesPort(), appConfig.getRestAdminUsername(),
-		    appConfig.getRestAdminPassword(), appConfig.getModulesDatabaseName());
-    }
+	protected final DatabaseClient newDatabaseClient(String databaseName) {
+		return DatabaseClientFactory.newClient(appConfig.getHost(), appConfig.getRestPort(),
+			databaseName, new DatabaseClientFactory.DigestAuthContext(appConfig.getRestAdminUsername(), appConfig.getRestAdminPassword()));
+	}
 
-    /**
-     * This command is configured to always load modules, ignoring the cache file in the build directory.
-     * @return
-     */
-    protected LoadModulesCommand buildLoadModulesCommand() {
-        LoadModulesCommand command = new LoadModulesCommand();
-        appConfig.setModuleTimestampsPath(null);
-        DefaultModulesLoader loader = (DefaultModulesLoader)(new DefaultModulesLoaderFactory().newModulesLoader(appConfig));
-        loader.setModulesManager(null);
-        command.setModulesLoader(loader);
-        return command;
-    }
+	/**
+	 * This command is configured to always load modules, ignoring the cache file in the build directory.
+	 *
+	 * @return
+	 */
+	protected LoadModulesCommand buildLoadModulesCommand() {
+		LoadModulesCommand command = new LoadModulesCommand();
+		appConfig.setModuleTimestampsPath(null);
+		DefaultModulesLoader loader = (DefaultModulesLoader) (new DefaultModulesLoaderFactory().newModulesLoader(appConfig));
+		loader.setModulesManager(null);
+		command.setModulesLoader(loader);
+		return command;
+	}
 
-    protected void setConfigBaseDir(String path) {
-        appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/" + path));
-    }
+	protected void setConfigBaseDir(String path) {
+		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/" + path));
+	}
 
 	/**
 	 * Intended to simplify testing app servers that require SSL.

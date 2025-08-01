@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.mgmt.resource.security;
 
@@ -19,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.resource.AbstractResourceManager;
 import com.marklogic.rest.util.ResourcesFragment;
+import com.marklogic.rest.util.XPathUtil;
 import org.apache.commons.lang3.StringUtils;
 
 public class QueryRolesetManager extends AbstractResourceManager {
@@ -75,7 +64,7 @@ public class QueryRolesetManager extends AbstractResourceManager {
 		ResourcesFragment resourcesFragment = getAsXml();
 		return resourcesFragment.elementExists(format(
 			"/node()/*[local-name(.) = 'list-items']/node()[*[local-name(.) = 'idref'] = '%s']",
-			getIdForRoleNames(resourceNameOrId, resourcesFragment)));
+			XPathUtil.sanitizeValueForXPathExpression(getIdForRoleNames(resourceNameOrId, resourcesFragment))));
 	}
 
 	/**

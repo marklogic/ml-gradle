@@ -1,29 +1,18 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.client.ext.es;
 
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.document.GenericDocumentManager;
+import com.marklogic.client.ext.util.XmlUtil;
 import com.marklogic.client.io.BytesHandle;
 import com.marklogic.client.io.DocumentMetadataHandle;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
-import org.jdom2.input.SAXBuilder;
 
 import java.io.StringReader;
+import java.util.Objects;
 
 /**
  * Handles loading a model and then making calls to generate code for it.
@@ -77,24 +66,30 @@ public class EntityServicesManager {
 			"declare variable $oldModelUri external; " +
 			"declare variable $newModelUri external; " +
 			"es:version-translator-generate(fn:doc($oldModelUri), fn:doc($newModelUri))";
-		return client.newServerEval().xquery(xquery).addVariable("oldModelUri", oldModelUri).addVariable("newModelUri", newModelUri).
-			eval().next().getString();
+		return client.newServerEval()
+			.xquery(xquery)
+			.addVariable("oldModelUri", oldModelUri)
+			.addVariable("newModelUri", newModelUri)
+			.evalAs(String.class);
 	}
 
 	protected GeneratedCode initializeGeneratedCode(String modelUri) {
 		String xquery = "import module namespace es = \"http://marklogic.com/entity-services\" at \"/MarkLogic/entity-services/entity-services.xqy\"; " +
 			"declare variable $URI external; " +
 			"es:model-to-xml(es:model-validate(fn:doc($URI)))";
-		String output = client.newServerEval().xquery(xquery).addVariable("URI", modelUri).eval().next().getString();
-		Element root = null;
+		String output = client.newServerEval().xquery(xquery).addVariable("URI", modelUri).evalAs(String.class);
+		Objects.requireNonNull(output);
+		Element root;
 		try {
-			root = new SAXBuilder().build(new StringReader(output)).getRootElement();
+			root = XmlUtil.newSAXBuilder().build(new StringReader(output)).getRootElement();
 		} catch (Exception e) {
 			throw new RuntimeException("Unable to parse model XML: " + e.getMessage(), e);
 		}
 		Namespace ns = Namespace.getNamespace("es", "http://marklogic.com/entity-services");
-		String title = root.getChild("info", ns).getChildText("title", ns);
-		String version = root.getChild("info", ns).getChildText("version", ns);
+		Element info = root.getChild("info", ns);
+		Objects.requireNonNull(info);
+		String title = info.getChildText("title", ns);
+		String version = info.getChildText("version", ns);
 		GeneratedCode code = new GeneratedCode();
 		code.setTitle(title);
 		code.setVersion(version);
@@ -105,7 +100,7 @@ public class EntityServicesManager {
 		String xquery = "import module namespace es = \"http://marklogic.com/entity-services\" at \"/MarkLogic/entity-services/entity-services.xqy\"; " +
 			"declare variable $URI external; " +
 			String.format("es:%s(es:model-validate(fn:doc($URI)))", functionName);
-		return client.newServerEval().xquery(xquery).addVariable("URI", modelUri).eval().next().getString();
+		return client.newServerEval().xquery(xquery).addVariable("URI", modelUri).evalAs(String.class);
 	}
 
 	public void setModelCollection(String modelCollection) {

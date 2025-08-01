@@ -1,20 +1,9 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.client.ext.schemasloader.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.eval.ServerEvaluationCall;
@@ -23,7 +12,6 @@ import com.marklogic.client.ext.file.DocumentFileProcessor;
 import com.marklogic.client.ext.helper.FilenameUtil;
 import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.client.io.Format;
-import com.marklogic.client.io.JacksonHandle;
 import com.marklogic.client.io.StringHandle;
 import org.springframework.util.FileCopyUtils;
 
@@ -74,7 +62,7 @@ class TdeDocumentFileProcessor extends LoggingObject implements DocumentFileProc
 			// modified, in which case templateBatchInsertSupported is set to null
 			this.templateBatchInsertSupported = TdeUtil.templateBatchInsertSupported(contentDatabaseClient);
 		}
-		return this.templateBatchInsertSupported;
+		return this.templateBatchInsertSupported != null ? this.templateBatchInsertSupported : false;
 	}
 
 	/**
@@ -106,11 +94,14 @@ class TdeDocumentFileProcessor extends LoggingObject implements DocumentFileProc
 				}
 
 				if (call != null) {
-					ObjectNode node = (ObjectNode) call.eval(new JacksonHandle()).get();
-					if (node.get("valid").asBoolean()) {
-						logger.info("TDE template passed validation: " + file);
+					ObjectNode node = (ObjectNode) call.evalAs(JsonNode.class);
+					if (node != null && node.has("valid") && node.get("valid") != null && node.get("valid").asBoolean()) {
+						logger.info("TDE template passed validation: {}", file);
 					} else {
-						throw new RuntimeException(format("TDE template failed validation; file: %s; cause: %s", file, node.get("message").asText()));
+						String message = node != null && node.has("message") ?
+							node.get("message").asText() :
+							"Unknown error validating TDE template";
+						throw new RuntimeException(format("TDE template failed validation; file: %s; cause: %s", file, message));
 					}
 				}
 			}

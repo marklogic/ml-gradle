@@ -1,21 +1,10 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.client.ext;
 
 import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.client.io.DocumentMetadataHandle;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestConfig.class})
-public abstract class AbstractIntegrationTest {
+public abstract class AbstractIntegrationTest extends LoggingObject {
 
 	protected final static String CONTENT_DATABASE = "ml-javaclient-util-test-content";
 	protected final static String MODULES_DATABASE = "ml-javaclient-util-test-modules";
@@ -112,8 +101,8 @@ public abstract class AbstractIntegrationTest {
 
 @Configuration
 @PropertySource(value = {
-	"file:../ml-javaclient-util-test-app/gradle.properties",
-	"file:../ml-javaclient-util-test-app/gradle-local.properties"},
+	"file:../test-app/gradle.properties",
+	"file:../test-app/gradle-local.properties"},
 	ignoreResourceNotFound = true
 )
 class TestConfig extends DatabaseClientConfig {

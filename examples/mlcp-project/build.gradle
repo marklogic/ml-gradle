@@ -10,7 +10,7 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath "com.marklogic:ml-gradle:5.0.0"
+		classpath "com.marklogic:ml-gradle:6.0.0"
 	}
 }
 
@@ -21,24 +21,17 @@ repositories {
 }
 
 
-// For MLCP 11.1.0 and higher, Gradle needs to be told which version of the guava dependency to use.
-// Per https://stackoverflow.com/questions/76897459/how-can-i-make-gradle-pick-the-right-guava-variant/77399208#77399208,
-// the following will achieve that.
 configurations {
-	mlcp {
-		attributes {
-			attribute(TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE, objects.named(TargetJvmEnvironment.class, TargetJvmEnvironment.STANDARD_JVM))
-		}
-	}
+	mlcp
 }
 
 dependencies {
-	mlcp "com.marklogic:mlcp:11.3.0"
+	mlcp "com.marklogic:mlcp:11.3.1"
 
 	// Since MLCP 11.2, have not been able to get logging to work via a log4j2.xml or
 	// log4j2.properties file. MLCP 11.2 removed logback as a direct dependency. Adding it back
 	// results in logging working correctly.
-	mlcp "ch.qos.logback:logback-classic:1.3.14"
+	mlcp "ch.qos.logback:logback-classic:1.5.18"
 
 	/**
 	 * mlcp uses logback for logging, and without a logback configuration file, no MLCP logging will appear.
@@ -69,7 +62,7 @@ task importSampleData(type: com.marklogic.gradle.task.MlcpTask) {
 	 * The args array can be used for any MLCP parameters that are not supported by the MlcpBean class that MlcpTask
 	 * delegates to. input_file_path is supported by MlcpTask; this is just included as an example of using the args
 	 * array.
- 	 */
+	 */
 	args = ["-input_file_path", "data/import"]
 }
 

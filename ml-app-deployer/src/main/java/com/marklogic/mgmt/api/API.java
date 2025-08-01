@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.mgmt.api;
 
@@ -51,6 +39,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Big facade-style class for the MarkLogic Management API. Use this to instantiate or access any resource, as it will
@@ -256,12 +245,17 @@ public class API extends LoggingObject {
     }
 
     public QueryRoleset queryRoleset(String... roleNames) {
-	    List<String> names = new ArrayList<>();
-		names.addAll(Arrays.asList(roleNames));
-    	QueryRoleset roleset = new QueryRoleset();
+		QueryRoleset roleset = new QueryRoleset();
 	    roleset.setApi(this);
-	    roleset.setRoleName(names);
-    	return roleNames != null && roleset.exists() ?
+		List<String> names = new ArrayList<>();
+		roleset.setRoleName(names);
+
+		if (roleNames == null) {
+			return roleset;
+		}
+		names.addAll(Arrays.asList(roleNames));
+
+		return roleset.exists() ?
 		    getResource(roleset.getRoleNamesAsJsonArrayString(), new QueryRolesetManager(getManageClient()), QueryRoleset.class) :
 		    roleset;
     }
@@ -393,7 +387,8 @@ public class API extends LoggingObject {
     protected <T extends Resource> T getResource(String resourceNameOrId, ResourceManager mgr, Class<T> resourceClass,
             String... resourceUrlParams) {
         if (mgr.exists(resourceNameOrId)) {
-            return buildFromJson(mgr.getAsJson(resourceNameOrId, resourceUrlParams), resourceClass);
+			String json = mgr.getAsJson(resourceNameOrId, resourceUrlParams);
+            return buildFromJson(json, resourceClass);
         }
         throw new RuntimeException("Could not find resource with name or ID: " + resourceNameOrId);
     }
@@ -401,6 +396,7 @@ public class API extends LoggingObject {
     protected <T extends Resource> T buildFromJson(String json, Class<T> clazz) {
         try {
             T resource = getObjectMapper().readerFor(clazz).readValue(json);
+			Objects.requireNonNull(resource);
             resource.setApi(this);
             resource.setObjectMapper(getObjectMapper());
             return resource;

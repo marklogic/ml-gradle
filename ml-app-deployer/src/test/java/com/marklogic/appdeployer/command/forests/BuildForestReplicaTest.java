@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.appdeployer.command.forests;
 
@@ -22,7 +10,6 @@ import com.marklogic.mgmt.api.forest.ForestReplica;
 import com.marklogic.mgmt.util.SimplePropertySource;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,11 +17,44 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BuildForestReplicaTest {
+class BuildForestReplicaTest {
 
 	private ForestBuilder builder = new ForestBuilder();
+
+	@Test
+	void fourHostsAcrossTwoZones() {
+		AppConfig appConfig = newAppConfig("mlForestsPerHost", "db,1");
+		Map<String, String> hostsToZones = new HashMap<>();
+		hostsToZones.put("host1", "zone1");
+		hostsToZones.put("host2", "zone1");
+		hostsToZones.put("host3", "zone2");
+		hostsToZones.put("host4", "zone2");
+
+		List<Forest> forests = builder.buildForests(
+			new ForestPlan("db", "host1", "host2", "host3", "host4")
+				.withHostsToZones(hostsToZones)
+				.withReplicaCount(1),
+			appConfig
+		);
+
+		Forest f1 = forests.get(0);
+		assertEquals("host1", f1.getHost());
+		// The first replica should be on a different zone
+		assertEquals("host3", f1.getForestReplica().get(0).getHost());
+
+		Forest f2 = forests.get(1);
+		assertEquals("host2", f2.getHost());
+		assertEquals("host4", f2.getForestReplica().get(0).getHost());
+
+		Forest f3 = forests.get(2);
+		assertEquals("host3", f3.getHost());
+		assertEquals("host1", f3.getForestReplica().get(0).getHost());
+
+		Forest f4 = forests.get(3);
+		assertEquals("host4", f4.getHost());
+		assertEquals("host2", f4.getForestReplica().get(0).getHost());
+	}
 
 	@Test
 	public void multipleForestsOnEachHost() {
@@ -109,34 +129,6 @@ public class BuildForestReplicaTest {
 		});
 	}
 
-	/**
-	 * Verifies that replicaHostNames is used for generating the replicas. This is for databases that are configured
-	 * to have their primary forests on a single host, which is often the case for modules, schemas, and triggers.
-	 */
-	@Test
-	public void primaryForestsOnOneHost() {
-		AppConfig appConfig = newAppConfig("mlForestsPerHost", "db,2");
-
-		ForestPlan plan = new ForestPlan("db", "host1").withReplicaCount(2);
-		assertEquals(1, plan.getHostNames().size());
-		assertEquals(1, plan.getReplicaHostNames().size());
-		plan.withReplicaHostNames(Arrays.asList("host1", "host2", "host3"));
-		assertEquals(1, plan.getHostNames().size());
-		assertEquals(3, plan.getReplicaHostNames().size());
-
-		List<Forest> forests = builder.buildForests(plan, appConfig);
-
-		assertEquals(2, forests.size());
-		forests.forEach(forest -> {
-			assertEquals("host1", forest.getHost());
-			assertEquals(2, forest.getForestReplica().size());
-			for (ForestReplica replica : forest.getForestReplica()) {
-				String host = replica.getHost();
-				assertTrue(host.equals("host2") || host.equals("host3"));
-			}
-		});
-	}
-
 	@Test
 	void databaseHasPrimaryForestsOnOneHost() {
 		AppConfig config = newAppConfig("mlDatabasesWithForestsOnOneHost", "my-database");
@@ -154,13 +146,56 @@ public class BuildForestReplicaTest {
 		assertEquals("host3", replica.getHost());
 	}
 
+	/**
+	 * Verifies that when a database only has forests on one host, replicas are still created on hosts in a different
+	 * zone.
+	 */
 	@Test
-	public void customNamingStrategyWithDistributedStrategy() {
+	void databaseHasPrimaryForestsOnOneHostWithTwoZones() {
+		AppConfig config = newAppConfig(
+			"mlDatabasesWithForestsOnOneHost", "my-database",
+			"mlForestsPerHost", "my-database,2"
+		);
+
+		List<Forest> forests = builder.buildForests(new ForestPlan("my-database", "host1", "host2", "host3", "host4")
+				.withReplicaCount(2)
+				.withHostsToZones(Map.of(
+					"host1", "zone1",
+					"host2", "zone1",
+					"host3", "zone2",
+					"host4", "zone2"
+				))
+			, config);
+
+		Forest firstForest = forests.get(0);
+		assertEquals("host1", firstForest.getHost(), "host1 should be selected since it's the first host");
+		assertEquals(2, firstForest.getForestReplica().size());
+		ForestReplica replica = firstForest.getForestReplica().get(0);
+		assertEquals("my-database-1-replica-1", replica.getReplicaName());
+		assertEquals("host3", replica.getHost());
+		replica = firstForest.getForestReplica().get(1);
+		assertEquals("my-database-1-replica-2", replica.getReplicaName());
+		assertEquals("host4", replica.getHost());
+
+		Forest secondForest = forests.get(1);
+		assertEquals("host1", secondForest.getHost(), "host1 should be selected since it's the first host");
+		assertEquals(2, secondForest.getForestReplica().size());
+		replica = secondForest.getForestReplica().get(0);
+		assertEquals("my-database-2-replica-1", replica.getReplicaName());
+		assertEquals("host3", replica.getHost());
+		replica = secondForest.getForestReplica().get(1);
+		assertEquals("my-database-2-replica-2", replica.getReplicaName());
+		assertEquals("host4", replica.getHost());
+	}
+
+	@Test
+	public void customNamingStrategy() {
 		AppConfig appConfig = newAppConfig("mlForestsPerHost", "my-database,2");
 		addCustomNamingStrategy(appConfig);
 
 		List<Forest> forests = builder.buildForests(
 			new ForestPlan("my-database", "host1", "host2", "host3").withReplicaCount(2), appConfig);
+		assertEquals(6, forests.size(), "Should have 2 forests on each of the 3 hosts.");
 
 		Forest f1 = forests.get(0);
 		assertEquals("forest-1", f1.getForestName());
@@ -197,19 +232,25 @@ public class BuildForestReplicaTest {
 
 	@Test
 	public void hostIsAdded() {
-		AppConfig appConfig = newAppConfig();
+		final AppConfig appConfig = newAppConfig();
+
 		List<Forest> forests = builder.buildForests(new ForestPlan("testdb", "host1", "host2", "host3")
-			.withForestsPerDataDirectory(1).withReplicaCount(1), appConfig);
+			.withReplicaCount(1), appConfig);
 		assertEquals(3, forests.size());
+
 		assertEquals("testdb-1-replica-1", forests.get(0).getForestReplica().get(0).getReplicaName());
 		assertEquals("host2", forests.get(0).getForestReplica().get(0).getHost());
+
 		assertEquals("testdb-2-replica-1", forests.get(1).getForestReplica().get(0).getReplicaName());
 		assertEquals("host3", forests.get(1).getForestReplica().get(0).getHost());
+
 		assertEquals("testdb-3-replica-1", forests.get(2).getForestReplica().get(0).getReplicaName());
 		assertEquals("host1", forests.get(2).getForestReplica().get(0).getHost());
 
 		forests = builder.buildForests(new ForestPlan("testdb", "host1", "host2", "host3", "host4")
-			.withForestsPerDataDirectory(1).withExistingForests(forests).withReplicaCount(1), appConfig);
+			.withExistingForests(forests)
+			.withReplicaCount(1), appConfig
+		);
 		assertEquals(1, forests.size());
 		assertEquals("testdb-4-replica-1", forests.get(0).getForestReplica().get(0).getReplicaName());
 		assertEquals(
@@ -323,13 +364,6 @@ public class BuildForestReplicaTest {
 		assertEquals("my-database-3-replica-2", f3.getForestReplica().get(1).getReplicaName());
 		assertEquals("host2", f3.getForestReplica().get(1).getHost());
 		assertEquals("/path2", f3.getForestReplica().get(1).getDataDirectory());
-
-//		for (Forest forest : forests) {
-//			System.out.println(forest.getForestName());
-//			for (ForestReplica replica : forest.getForestReplica()) {
-//				System.out.println(replica.getHost() + ":" + replica.getDataDirectory());
-//			}
-//		}
 	}
 
 	private void addCustomNamingStrategy(AppConfig appConfig) {

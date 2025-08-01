@@ -14,7 +14,7 @@ buildscript {
 plugins {
 	id 'java' //optional - delete if not needed
 	id 'net.saliman.properties' version '1.5.2'
-	id 'com.marklogic.ml-gradle' version "5.0.0"
+	id 'com.marklogic.ml-gradle' version "6.0.0"
 }
 
 repositories {
@@ -26,15 +26,6 @@ repositories {
 		println "Using online dependency repositories"
 		mavenCentral()
 	}
-}
-
-configurations {
-	mlcp //example if you want to use mlcp. Delete otherwise
-}
-
-dependencies {
-	//sample mlcp dependency. Remove if not required
-	mlcp "com.marklogic:mlcp:10.0.6.2"
 }
 
 /**
@@ -57,7 +48,6 @@ task downloadToProjectMavenRepo(type: Copy) {
 	 * These are defined in the 'dependencies' block. E.g. you need to include
 	 * configurations.implementation.files if you want your java 'implementation' dependencies downloaded
 	 */
-	configurations.mlcp.files //includes 'mlcp' dependencies. Remove if not needed
 
 	from new File(gradle.gradleUserHomeDir, 'caches/modules-2/files-2.1') // correct as of gradle 4.7
 	into new File(rootDir, projectMavenRepo)
@@ -71,8 +61,8 @@ task downloadToProjectMavenRepo(type: Copy) {
 task makeOfflineZip(type: Zip, dependsOn: downloadToProjectMavenRepo) {
 	from rootDir
 	excludes = ['.tmp', '.gradle', 'build/gradle-home', 'build/distributions', 'build/offline/gradle/wrapper/dists']
-	destinationDir(file('build/distributions'))
-	archiveName = 'offline.zip'
+	destinationDirectory = file('build/distributions')
+	archiveFileName = 'offline.zip'
 	doLast {
 		println "Created offline project zip at build/distributions/offline.zip"
 	}

@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.client.ext.file;
 
@@ -22,6 +10,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
@@ -76,12 +65,27 @@ public abstract class PropertiesDrivenDocumentFileProcessor extends LoggingObjec
 	private void processProperties(DocumentFile documentFile, Properties properties) {
 		final Path filename = documentFile.getFile().toPath().getFileName();
 		Enumeration patterns = properties.propertyNames();
-		while (patterns.hasMoreElements()) {
-			String pattern = (String) patterns.nextElement();
-			PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + pattern);
-			if (matcher.matches(filename)) {
-				String value = getPropertyValue(properties, pattern);
-				this.applyPropertyMatch(documentFile, pattern, value);
+		FileSystem fileSystem = FileSystems.getDefault();
+		try {
+			while (patterns.hasMoreElements()) {
+				String pattern = (String) patterns.nextElement();
+				PathMatcher matcher = fileSystem.getPathMatcher("glob:" + pattern);
+				if (matcher.matches(filename)) {
+					String value = getPropertyValue(properties, pattern);
+					if (value != null) {
+						this.applyPropertyMatch(documentFile, pattern, value);
+					}
+				}
+			}
+		} finally {
+			try {
+				fileSystem.close();
+			} catch (Exception ex) {
+				// It's fine if the fileSystem doesn't support being closed, which may simply be due to not being
+				// supported.
+				if (logger.isDebugEnabled()) {
+					logger.debug("Unable to close file system; cause: {}", ex.getMessage());
+				}
 			}
 		}
 	}

@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.rest.util;
 
@@ -38,7 +26,8 @@ public class ResourcesFragment extends Fragment {
                 "/node()/*[local-name(.) = 'list-items']/*[local-name(.) = 'list-count']").get(0));
     }
 
-    public boolean resourceExists(String resourceIdOrName) {
+	public boolean resourceExists(String resourceIdOrName) {
+		resourceIdOrName = sanitizeValueForXPathExpression(resourceIdOrName);
         String xpath = "/node()/*[local-name(.) = 'list-items']/node()"
                 + "[*[local-name(.) = 'nameref'] = '%s' or *[local-name(.) = 'idref'] = '%s']";
         xpath = String.format(xpath, resourceIdOrName, resourceIdOrName);
@@ -54,6 +43,7 @@ public class ResourcesFragment extends Fragment {
     }
 
     public String getNameRefForUriRef(String uriRef) {
+		uriRef = sanitizeValueForXPathExpression(uriRef);
 	    String xpath = "/node()/*[local-name(.) = 'list-items']/node()"
 		    + "[*[local-name(.) = 'uriref'] = '%s']/*[local-name(.) = 'nameref']";
 	    xpath = String.format(xpath, uriRef);
@@ -61,6 +51,8 @@ public class ResourcesFragment extends Fragment {
     }
 
     public String getListItemValue(String resourceIdOrName, String elementLocalName) {
+		resourceIdOrName = sanitizeValueForXPathExpression(resourceIdOrName);
+		elementLocalName = sanitizeValueForXPathExpression(elementLocalName);
         String xpath = "/node()/*[local-name(.) = 'list-items']/node()"
                 + "[*[local-name(.) = 'nameref'] = '%s' or *[local-name(.) = 'idref'] = '%s']/*[local-name(.) = '%s']";
         xpath = String.format(xpath, resourceIdOrName, resourceIdOrName, elementLocalName);
@@ -76,6 +68,7 @@ public class ResourcesFragment extends Fragment {
     }
 
     public List<String> getListItemValues(String elementName) {
+		elementName = sanitizeValueForXPathExpression(elementName);
         String xpath = "/node()/*[local-name(.) = 'list-items']/node()/*[local-name(.) = '%s']";
         return getElementValues(String.format(xpath, elementName));
     }
@@ -83,5 +76,9 @@ public class ResourcesFragment extends Fragment {
     public List<Element> getListItems() {
     	return evaluateForElements("/node()/*[local-name(.) = 'list-items']/node()[local-name(.) = 'list-item']");
     }
+
+	private String sanitizeValueForXPathExpression(String resourceIdOrName) {
+		return XPathUtil.sanitizeValueForXPathExpression(resourceIdOrName);
+	}
 
 }

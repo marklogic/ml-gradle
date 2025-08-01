@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.mgmt;
 
@@ -20,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marklogic.mgmt.util.ObjectMapperFactory;
 import com.marklogic.rest.util.Fragment;
+import com.marklogic.rest.util.XPathUtil;
 import org.jdom2.Element;
 import org.jdom2.output.XMLOutputter;
 
@@ -67,7 +56,8 @@ public class PayloadParser {
             return node.get(fieldName).isTextual() ? node.get(fieldName).asText() : node.get(fieldName).toString();
         } else {
             Fragment f = new Fragment(payload);
-            String xpath = String.format("/node()/*[local-name(.) = '%s']", fieldName);
+			String value = XPathUtil.sanitizeValueForXPathExpression(fieldName);
+            String xpath = String.format("/node()/*[local-name(.) = '%s']", value);
             if (!f.elementExists(xpath)) {
             	if (throwErrorIfNotFound) {
 		            throw new RuntimeException("Cannot get field value from XML at path: " + xpath + "; XML: " + payload);

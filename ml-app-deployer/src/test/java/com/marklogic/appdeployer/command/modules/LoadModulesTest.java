@@ -1,58 +1,50 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.appdeployer.command.modules;
 
 import com.marklogic.appdeployer.AbstractAppDeployerTest;
 import com.marklogic.appdeployer.command.restapis.DeployRestApiServersCommand;
+import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.document.XMLDocumentManager;
+import com.marklogic.client.eval.EvalResultIterator;
 import com.marklogic.client.ext.modulesloader.impl.DefaultFileFilter;
 import com.marklogic.client.ext.modulesloader.impl.DefaultModulesLoader;
 import com.marklogic.client.ext.modulesloader.impl.PropertiesModuleManager;
-import com.marklogic.junit.BaseTestHelper;
-import com.marklogic.junit.Fragment;
-import com.marklogic.junit.PermissionsFragment;
-import com.marklogic.junit.XmlHelper;
-import com.marklogic.xcc.template.XccTemplate;
+import com.marklogic.client.io.DocumentMetadataHandle;
+import com.marklogic.client.io.StringHandle;
+import com.marklogic.junit5.PermissionsTester;
+import com.marklogic.junit5.XmlNode;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class LoadModulesTest extends AbstractAppDeployerTest {
+class LoadModulesTest extends AbstractAppDeployerTest {
 
-	private XccTemplate modulesXccTemplate;
+	private DatabaseClient modulesClient;
 
 	@BeforeEach
 	public void setup() {
-		modulesXccTemplate = new XccTemplate(appConfig.getHost(), appConfig.getAppServicesPort(), appConfig.getRestAdminUsername(),
-			appConfig.getRestAdminPassword(), appConfig.getModulesDatabaseName());
+		modulesClient = newDatabaseClient("sample-app-modules");
 	}
 
 	@AfterEach
 	public void teardown() {
 		undeploySampleApp();
+		if (modulesClient != null) {
+			modulesClient.release();
+		}
 	}
 
 	@Test
-	public void loadModulesWithStaticCheck() {
+	void loadModulesWithStaticCheck() {
 		appConfig.getModulePaths().clear();
 		appConfig.getModulePaths().add("src/test/resources/sample-app/static-check-modules");
 		appConfig.setStaticCheckAssets(false);
@@ -78,7 +70,7 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 	}
 
 	@Test
-	public void customModuleTimestampsPath() {
+	void customModuleTimestampsPath() {
 		String path = "build/custom-path.properties";
 		File customFile = new File(path);
 		customFile.mkdirs();
@@ -100,7 +92,7 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 	}
 
 	@Test
-	public void loadModulesFromMultiplePaths() {
+	void loadModulesFromMultiplePaths() {
 		// Setting batch size just to verify that nothing blows up when doing so
 		appConfig.setModulesLoaderBatchSize(1);
 		appConfig.getModulePaths().add("src/test/resources/sample-app/other-modules");
@@ -115,25 +107,30 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 	}
 
 	@Test
-	public void loadModulesWithCustomPermissions() {
+	void loadModulesWithCustomPermissions() {
 		appConfig.setModulePermissions(appConfig.getModulePermissions() + ",app-user,execute");
 
 		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
 
 		appDeployer.deploy(appConfig);
 
-		PermissionsFragment perms = new BaseTestHelper().getDocumentPermissions("/ext/sample-lib.xqy", modulesXccTemplate);
-		// Default permissions set by AppConfig
-		perms.assertPermissionExists("rest-admin", "read");
-		perms.assertPermissionExists("rest-admin", "update");
-		perms.assertPermissionExists("rest-extension-user", "execute");
+		try (DatabaseClient client = newDatabaseClient("sample-app-modules")) {
+			DocumentMetadataHandle metadata = new DocumentMetadataHandle();
+			client.newXMLDocumentManager().read("/ext/sample-lib.xqy", metadata, new StringHandle());
+			PermissionsTester perms = new PermissionsTester(metadata.getPermissions());
 
-		// Custom permission
-		perms.assertPermissionExists("app-user", "execute");
+			// Default permissions set by AppConfig
+			perms.assertReadPermissionExists("rest-admin");
+			perms.assertUpdatePermissionExists("rest-admin");
+			perms.assertExecutePermissionExists("rest-extension-user");
+
+			// Custom permission
+			perms.assertExecutePermissionExists("app-user");
+		}
 	}
 
 	@Test
-	public void loadModulesWithAssetFileFilterAndTokenReplacement() {
+	void loadModulesWithAssetFileFilterAndTokenReplacement() {
 		appConfig.setAssetFileFilter(new TestFileFilter());
 
 		/**
@@ -149,17 +146,17 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
 		appDeployer.deploy(appConfig);
 
-		assertEquals("true", modulesXccTemplate.executeAdhocQuery("doc-available('/ext/lib/test.xqy')"));
-		assertEquals("false", modulesXccTemplate.executeAdhocQuery("doc-available('/ext/lib/test2.xqy')"));
+		assertEquals("true", modulesClient.newServerEval().xquery("doc-available('/ext/lib/test.xqy')").evalAs(String.class));
+		assertEquals("false", modulesClient.newServerEval().xquery("doc-available('/ext/lib/test2.xqy')").evalAs(String.class));
 
-		String xml = modulesXccTemplate.executeAdhocQuery("doc('/ext/lib/test.xqy')");
-		Fragment f = new XmlHelper().parse(xml);
-		f.assertElementValue("/test/color", "red");
-		f.assertElementValue("/test/description", "red description");
+		String xml = modulesClient.newServerEval().xquery("doc('/ext/lib/test.xqy')").evalAs(String.class);
+		XmlNode result = new XmlNode(xml);
+		result.assertElementValue("/test/color", "red");
+		result.assertElementValue("/test/description", "red description");
 	}
 
 	@Test
-	public void testServerExists() {
+	void testServerExists() {
 		appConfig.getFirstConfigDir().setBaseDir(new File(("src/test/resources/sample-app/db-only-config")));
 		appConfig.setTestRestPort(8003);
 		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
@@ -169,12 +166,12 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 		String[] uris = new String[]{"/Default/sample-app/rest-api/options/sample-app-options.xml",
 			"/Default/sample-app/rest-api/options/sample-app-options.xml"};
 		for (String uri : uris) {
-			assertEquals("true", modulesXccTemplate.executeAdhocQuery(format("doc-available('%s')", uri)));
+			assertEquals("true", modulesClient.newServerEval().xquery(format("doc-available('%s')", uri)).evalAs(String.class));
 		}
 	}
 
 	@Test
-	public void deleteTestModules() {
+	void deleteTestModules() {
 		appConfig.setDeleteTestModules(true);
 		appConfig.setDeleteTestModulesPattern("/ext/lib/*.xqy");
 
@@ -183,18 +180,18 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 		appDeployer.deploy(appConfig);
 
 		String xquery = "fn:count(cts:uri-match('/ext/**.xqy'))";
-		assertEquals(1, Integer.parseInt(modulesXccTemplate.executeAdhocQuery(xquery)));
+		assertEquals(1, Integer.parseInt(modulesClient.newServerEval().xquery(xquery).evalAs(String.class)));
 	}
 
 	@Test
-	public void includeModulesPattern() {
+	void includeModulesPattern() {
 		appConfig.setModuleFilenamesIncludePattern(Pattern.compile(".*/ext.*"));
 
 		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
 		deploySampleApp();
 
 		String xquery = "fn:count(cts:uris((), (), cts:true-query()))";
-		assertEquals(4, Integer.parseInt(modulesXccTemplate.executeAdhocQuery(xquery)),
+		assertEquals(4, Integer.parseInt(modulesClient.newServerEval().xquery(xquery).evalAs(String.class)),
 			"Should have the 3 /ext modules plus the REST API properties file, which was loaded when the REST server was created");
 	}
 
@@ -204,25 +201,36 @@ public class LoadModulesTest extends AbstractAppDeployerTest {
 		initializeAppDeployer(new DeployRestApiServersCommand(true), buildLoadModulesCommand());
 		deploySampleApp();
 
-		String[] uris = modulesXccTemplate
-			.executeAdhocQuery("cts:uris((), (), cts:directory-query('/example/prefix/', 'infinity'))")
-			.split("\n");
+		List<String> uris = new ArrayList<>();
+		try (EvalResultIterator iterator = modulesClient.newServerEval()
+			.xquery("cts:uris((), (), cts:directory-query('/example/prefix/', 'infinity'))").eval()) {
+			while (iterator.hasNext()) {
+				uris.add(iterator.next().getAs(String.class));
+			}
+		}
 
-		assertEquals(3, uris.length, "The trailing space is expected to be trimmed off to avoid errors from a user " +
+		assertEquals(3, uris.size(), "The trailing space is expected to be trimmed off to avoid errors from a user " +
 			"accidentally including a trailing space e.g. in their gradle.properties file");
 
-		List<String> uriList = Arrays.asList(uris);
-		assertTrue(uriList.contains("/example/prefix/ext/lib/test2.xqy"));
-		assertTrue(uriList.contains("/example/prefix/ext/lib/test.xqy"));
-		assertTrue(uriList.contains("/example/prefix/ext/sample-lib.xqy"));
+		assertTrue(uris.contains("/example/prefix/ext/lib/test2.xqy"));
+		assertTrue(uris.contains("/example/prefix/ext/lib/test.xqy"));
+		assertTrue(uris.contains("/example/prefix/ext/sample-lib.xqy"));
 	}
 
 	private void assertModuleExistsWithDefaultPermissions(String message, String uri) {
-		assertEquals("true", modulesXccTemplate.executeAdhocQuery(format("fn:doc-available('%s')", uri)), message);
-		PermissionsFragment perms = new BaseTestHelper().getDocumentPermissions(uri, modulesXccTemplate);
-		perms.assertPermissionExists("rest-admin", "read");
-		perms.assertPermissionExists("rest-admin", "update");
-		perms.assertPermissionExists("rest-extension-user", "execute");
+		try (DatabaseClient client = newDatabaseClient("sample-app-modules")) {
+
+			XMLDocumentManager mgr = client.newXMLDocumentManager();
+			assertNotNull(mgr.exists(uri), message);
+
+			DocumentMetadataHandle metadata = new DocumentMetadataHandle();
+			mgr.read(uri, metadata, new StringHandle());
+			PermissionsTester perms = new PermissionsTester(metadata.getPermissions());
+
+			perms.assertReadPermissionExists("rest-admin");
+			perms.assertUpdatePermissionExists("rest-admin");
+			perms.assertExecutePermissionExists("rest-extension-user");
+		}
 	}
 }
 

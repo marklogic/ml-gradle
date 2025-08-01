@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.appdeployer.command;
 
@@ -272,7 +260,9 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 		if (resourceMapper == null) {
 			resourceMapper = new DefaultResourceMapper(new API(context.getManageClient()));
 		}
-		return resourceMapper.readResource(payload, resourceClassType).getJson();
+		Resource resource = resourceMapper.readResource(payload, resourceClassType);
+		Objects.requireNonNull(resource);
+		return resource.getJson();
 	}
 
 	/**
@@ -478,7 +468,8 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 		if (files != null && files.length > 1) {
 			Arrays.sort(files);
 		}
-		return files;
+		// dir.listFiles is allowed to return null, so we do this so callers don't have to worry about null.
+		return files != null ? files : new File[0];
 	}
 
 	protected void logResourceDirectoryNotFound(File dir) {

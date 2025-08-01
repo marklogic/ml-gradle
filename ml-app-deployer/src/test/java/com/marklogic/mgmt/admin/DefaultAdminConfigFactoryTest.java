@@ -1,31 +1,16 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.mgmt.admin;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import org.junit.jupiter.api.Test;
 
 import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier;
 import com.marklogic.mgmt.util.SimplePropertySource;
+import org.junit.jupiter.api.Test;
 
-public class DefaultAdminConfigFactoryTest  {
+import static org.junit.jupiter.api.Assertions.*;
+
+class DefaultAdminConfigFactoryTest  {
 
 	@Test
 	public void mlUsername() {
@@ -108,8 +93,8 @@ public class DefaultAdminConfigFactoryTest  {
 		assertEquals("https", config.getScheme());
 
 		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
-		assertTrue(bean.getSecurityContext() instanceof DatabaseClientFactory.MarkLogicCloudAuthContext);
-		assertEquals("my-key", ((DatabaseClientFactory.MarkLogicCloudAuthContext)bean.getSecurityContext()).getApiKey());
+		assertTrue(bean.getSecurityContext() instanceof DatabaseClientFactory.ProgressDataCloudAuthContext);
+		assertEquals("my-key", ((DatabaseClientFactory.ProgressDataCloudAuthContext)bean.getSecurityContext()).getApiKey());
 	}
 
 	@Test
@@ -153,6 +138,21 @@ public class DefaultAdminConfigFactoryTest  {
 		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
 		assertTrue(bean.getSecurityContext() instanceof DatabaseClientFactory.SAMLAuthContext);
 		assertEquals("my-token", ((DatabaseClientFactory.SAMLAuthContext)bean.getSecurityContext()).getToken());
+	}
+
+	@Test
+	void oauth() {
+		AdminConfig config = configure(
+			"mlAdminAuthentication", "oauth",
+			"mlAdminOauthToken", "my-token"
+		);
+
+		assertEquals("oauth", config.getAuthType());
+		assertEquals("my-token", config.getOauthToken());
+
+		DatabaseClientFactory.Bean bean = config.newDatabaseClientBuilder().buildBean();
+		assertTrue(bean.getSecurityContext() instanceof DatabaseClientFactory.OAuthContext);
+		assertEquals("my-token", ((DatabaseClientFactory.OAuthContext)bean.getSecurityContext()).getToken());
 	}
 
 	@Test
@@ -297,4 +297,3 @@ public class DefaultAdminConfigFactoryTest  {
 		assertEquals("The property mlAdminPort requires a numeric value; invalid value: ‘NaN'", exception.getMessage());
 	}
 }
-

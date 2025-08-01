@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.appdeployer;
 
@@ -48,12 +36,18 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		final AppConfig appConfig = new AppConfig(this.projectDir);
 		for (String propertyName : propertyConsumerMap.keySet()) {
 			String value = getProperty(propertyName);
-			if (value != null) {
+			// In 6.0.0, the value must not be whitespace. But we have this hack here to preserve documented and tested
+			// functionality for allowing for mlModuleTimestampsPath to be set to an empty string to disable its functionality.
+			if (StringUtils.hasText(value) || (value != null && "mlModuleTimestampsPath".equalsIgnoreCase(propertyName))) {
 				try {
 					propertyConsumerMap.get(propertyName).accept(appConfig, value);
 				} catch (Exception ex) {
-					throw new IllegalArgumentException(
-						format("Unable to parse value '%s' for property '%s'; cause: %s", value, propertyName, ex.getMessage()), ex);
+					String lowerCaseProperty = propertyName.toLowerCase();
+					boolean isSensitive = lowerCaseProperty.contains("password") || lowerCaseProperty.contains("passphrase");
+					String message = isSensitive ?
+						format("Unable to parse value for property '%s'; cause: %s", propertyName, ex.getMessage()) :
+						format("Unable to parse value '%s' for property '%s'; cause: %s", value, propertyName, ex.getMessage());
+					throw new IllegalArgumentException(message, ex);
 				}
 			}
 		}
@@ -92,13 +86,6 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 			} else {
 				config.setCmaConfig(new CmaConfig());
 			}
-		});
-
-		propertyConsumerMap.put("mlOptimizeWithCma", (config, prop) -> {
-			logger.info("mlOptimizeWithCma is DEPRECATED; please use a property specific to the resource that you want to deploy with CMA");
-			// mlOptimizeWithCma was deprecated in 3.11; it was only used for deploying forests, so if the
-			// property is still used, the client in theory expects forests to still be deployed with CMA
-			config.getCmaConfig().setDeployForests(true);
 		});
 
 		propertyConsumerMap.put("mlCombineCmaRequests", (config, prop) -> {
@@ -167,29 +154,16 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 
 		/**
 		 * The path to the directory containing all the resource configuration files. Defaults to src/main/ml-config.
-		 * mlConfigPath is the preferred one, as its name is consistent with other properties that refer to a path.
-		 * mlConfigDir is deprecated but still supported.
 		 *
-		 * As of 3.3.0, mlConfigPaths is the preferred property, and mlConfigDir and mlConfigPath will be ignored if
-		 * it's set.
+		 * As of 3.3.0, mlConfigPaths is the preferred property, and mlConfigPath will be ignored if it's set.
 		 */
 		propertyConsumerMap.put("mlConfigPaths", (config, prop) -> {
-			logger.info("Config paths: " + prop);
+			logger.info("Config paths: {}", prop);
 			List<ConfigDir> list = new ArrayList<>();
 			for (String path : prop.split(",")) {
 				list.add(buildConfigDir(path));
 			}
 			config.setConfigDirs(list);
-		});
-
-		// TODO Only process if mlConfigPaths not set?
-		propertyConsumerMap.put("mlConfigDir", (config, prop) -> {
-			logger.info("mlConfigDir is deprecated; please use mlConfigPath; Config dir: " + prop);
-			config.setConfigDir(buildConfigDir(prop));
-		});
-		propertyConsumerMap.put("mlConfigPath", (config, prop) -> {
-			logger.info("Config path: " + prop);
-			config.setConfigDir(buildConfigDir(prop));
 		});
 
 		/**
@@ -284,6 +258,9 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		});
 		propertyConsumerMap.put("mlAppServicesSamlToken", (config, prop) -> {
 			config.setAppServicesSamlToken(prop);
+		});
+		propertyConsumerMap.put("mlAppServicesOauthToken", (config, prop) -> {
+			config.setAppServicesOauthToken(prop);
 		});
 
 		propertyConsumerMap.put("mlAppServicesSimpleSsl", (config, prop) -> {
@@ -416,6 +393,9 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		});
 		propertyConsumerMap.put("mlRestSamlToken", (config, prop) -> {
 			config.setRestSamlToken(prop);
+		});
+		propertyConsumerMap.put("mlRestOauthToken", (config, prop) -> {
+			config.setRestOauthToken(prop);
 		});
 		propertyConsumerMap.put("mlRestBasePath", (config, prop) -> {
 			String cloudBasePath = getProperty("mlCloudBasePath");
@@ -569,12 +549,6 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		propertyConsumerMap.put("mlTestContentDatabaseName", (config, prop) -> {
 			logger.info("Test content database name: " + prop);
 			config.setTestContentDatabaseName(prop);
-		});
-
-		// Deprecated - use mlSchemaPaths instead
-		propertyConsumerMap.put("mlSchemasPath", (config, prop) -> {
-			logger.info("mlSchemasPath is deprecated as of version 3.13.0; please use mlSchemaPaths instead; schemas path: " + prop);
-			config.setSchemaPaths(buildPathListFromCommaDelimitedString(prop));
 		});
 
 		propertyConsumerMap.put("mlSchemaPaths", (config, prop) -> {
@@ -994,6 +968,14 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 
 		registerDataLoadingProperties();
 		registerPluginProperties();
+
+		propertyConsumerMap.put("mlHostCertificatePassphrases", (config, prop) -> {
+			String customDelimiter = this.getPropertySource().getProperty("mlHostCertificatePassphrasesDelimiter");
+			final String delimiter = StringUtils.hasText(customDelimiter) ? customDelimiter : ",";
+			Map<String, String> hostPassphrases = buildMapFromDelimitedString(prop, delimiter);
+			logger.info("Setting host certificate passphrases; count: {}", hostPassphrases.size());
+			config.setHostCertificatePassphrases(hostPassphrases);
+		});
 	}
 
 	protected void registerDataLoadingProperties() {
@@ -1080,10 +1062,18 @@ public class DefaultAppConfigFactory extends PropertySourceFactory implements Ap
 		return list;
 	}
 
-	protected Map<String, String> buildMapFromCommaDelimitedString(String str) {
+	protected Map<String, String> buildMapFromCommaDelimitedString(String propertyValue) {
+		return buildMapFromDelimitedString(propertyValue, ",");
+	}
+
+	private Map<String, String> buildMapFromDelimitedString(String propertyValue, String delimiter) {
 		Map<String, String> map = new HashMap<>();
-		String[] tokens = str.split(",");
+		String[] tokens = propertyValue.split(delimiter);
 		for (int i = 0; i < tokens.length; i += 2) {
+			if (i + 1 >= tokens.length) {
+				String message = String.format("Must have an even number of values delimited by '%s' in the property value", delimiter);
+				throw new IllegalArgumentException(message);
+			}
 			map.put(tokens[i], tokens[i + 1]);
 		}
 		return map;

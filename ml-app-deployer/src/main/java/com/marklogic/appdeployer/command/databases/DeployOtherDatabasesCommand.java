@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.appdeployer.command.databases;
 
@@ -285,6 +273,7 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 					String testPayload = payloadTokenReplacer.replaceTokens(copyFileToString(files.get(0)), context.getAppConfig(), true);
 					testDatabasePlan.setPayload(testPayload);
 					Database testDb = resourceMapper.readResource(payload, Database.class);
+					Objects.requireNonNull(testDb);
 					testDb.setDatabaseName(testContentDatabaseName);
 					testDatabasePlan.setDatabaseForSorting(testDb);
 				}
@@ -295,6 +284,7 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 					nodes.add(convertPayloadToObjectNode(context, payload));
 				});
 				ObjectNode mergedNode = JsonNodeUtil.mergeObjectNodes(nodes.toArray(new ObjectNode[]{}));
+				Objects.requireNonNull(mergedNode);
 				reference.setMergedObjectNode(mergedNode);
 				try {
 					reference.setDatabaseForSorting(objectReader.readValue(mergedNode));
@@ -398,11 +388,12 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 		databasePlans.forEach(plan -> {
 			final DeployDatabaseCommand deployDatabaseCommand = plan.getDeployDatabaseCommand();
 			String payload = deployDatabaseCommand.buildPayloadForSaving(context);
-			dbConfig.addDatabase(convertPayloadToObjectNode(context, payload));
-
-			DeployForestsCommand deployForestsCommand = deployDatabaseCommand.buildDeployForestsCommand(plan.getDatabaseName(), context);
-			if (deployForestsCommand != null) {
-				deployForestsCommand.buildForests(context, false).forEach(forest -> forestConfig.addForest(forest.toObjectNode()));
+			if (payload != null) {
+				dbConfig.addDatabase(convertPayloadToObjectNode(context, payload));
+				DeployForestsCommand deployForestsCommand = deployDatabaseCommand.buildDeployForestsCommand(plan.getDatabaseName(), context);
+				if (deployForestsCommand != null) {
+					deployForestsCommand.buildForests(context).forEach(forest -> forestConfig.addForest(forest.toObjectNode()));
+				}
 			}
 		});
 
@@ -427,7 +418,7 @@ public class DeployOtherDatabasesCommand extends AbstractUndoableCommand {
 		databasePlans.forEach(plan -> {
 			DeployForestsCommand dfc = plan.getDeployDatabaseCommand().getDeployForestsCommand();
 			if (dfc != null) {
-				allForests.addAll(dfc.buildForests(context, false));
+				allForests.addAll(dfc.buildForests(context));
 			}
 		});
 		if (!allForests.isEmpty()) {

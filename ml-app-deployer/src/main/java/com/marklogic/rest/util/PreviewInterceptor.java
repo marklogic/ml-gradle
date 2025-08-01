@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.rest.util;
 
@@ -66,16 +54,16 @@ public class PreviewInterceptor extends DefaultResponseErrorHandler implements C
 	 * If the associated triggers database hasn't been created yet, a 404 will occur. But that shouldn't interrupt a
 	 * deployment process. So a 404 is logged but not treated as an error.
 	 *
-	 * @param statusCode
+	 * @param httpResponse
 	 * @return
 	 */
 	@Override
-	protected boolean hasError(HttpStatus statusCode) {
-		if (HttpStatus.NOT_FOUND.equals(statusCode)) {
+	public boolean hasError(ClientHttpResponse httpResponse) throws IOException {
+		if (HttpStatus.NOT_FOUND.equals(httpResponse.getStatusCode())) {
 			logger.info("Received a 404 response, but ignoring while doing a preview");
 			return false;
 		}
-		return super.hasError(statusCode);
+		return super.hasError(httpResponse);
 	}
 
 	@Override
@@ -259,7 +247,7 @@ public class PreviewInterceptor extends DefaultResponseErrorHandler implements C
 
 			@Override
 			public String getStatusText() {
-				return null;
+				return "OK";
 			}
 
 			@Override

@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
+ */
 package sample;
 
 import com.marklogic.client.ext.DatabaseClientConfig;
@@ -20,7 +23,7 @@ public class GetClientConfigTest extends AbstractSampleProjectTest {
 	public void testConfig() {
 		DatabaseClientConfig config = applicationContext.getBean(DatabaseClientConfig.class);
 		assertEquals("localhost", config.getHost());
-		assertEquals(8051, config.getPort());
+		assertEquals(8005, config.getPort());
 	}
 
 }

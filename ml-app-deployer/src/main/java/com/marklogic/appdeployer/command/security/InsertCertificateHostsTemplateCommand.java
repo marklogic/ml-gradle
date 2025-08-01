@@ -1,17 +1,5 @@
 /*
- * Copyright (c) 2023 MarkLogic Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.appdeployer.command.security;
 
@@ -26,6 +14,7 @@ import org.springframework.util.FileCopyUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Inserts host certificates for each certificate template returned by the Manage API. Host certificates are inserted
@@ -101,9 +90,15 @@ public class InsertCertificateHostsTemplateCommand extends AbstractCommand {
 	protected void insertHostCertificate(CommandContext context, String templateName, File publicCertFile, File privateKeyFile) {
 		if (!certificateExists(templateName, publicCertFile, context.getManageClient())) {
 			logger.info(format("Inserting host certificate for certificate template '%s'", templateName));
-			String pubCertString = copyFileToString(publicCertFile);
-			String privateKeyString = copyFileToString(privateKeyFile);
-			new CertificateTemplateManager(context.getManageClient()).insertHostCertificate(templateName, pubCertString, privateKeyString);
+
+			final String pubCertString = copyFileToString(publicCertFile);
+			final String privateKeyString = copyFileToString(privateKeyFile);
+			final Map<String, String> passphrases = context.getAppConfig().getHostCertificatePassphrases();
+			final String passphraseKey = privateKeyFile.getName().replace(privateKeyFileExtension, "");
+			final String passphrase = passphrases != null ? passphrases.get(passphraseKey) : null;
+
+			new CertificateTemplateManager(context.getManageClient()).insertHostCertificate(templateName, pubCertString, privateKeyString, passphrase);
+
 			logger.info(format("Inserted host certificate for certificate template '%s'", templateName));
 		} else {
 			logger.info(format("Host certificate already exists for certificate template '%s', so not inserting host certificate found at: %s",

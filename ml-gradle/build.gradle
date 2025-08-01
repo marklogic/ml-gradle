@@ -6,7 +6,7 @@ plugins {
 dependencies {
 	implementation localGroovy()
 
-	api project(":ml-app-deployer")
+	api "com.marklogic:ml-app-deployer:6.0.0"
 
 	// For tasks that need to fiddle with the filesystem.
 	implementation "commons-io:commons-io:2.20.0"

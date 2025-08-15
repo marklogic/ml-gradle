@@ -9,6 +9,7 @@ import com.marklogic.mgmt.util.ObjectMapperFactory;
 import com.marklogic.rest.util.Fragment;
 import com.marklogic.rest.util.RestConfig;
 import com.marklogic.rest.util.RestTemplateUtil;
+import com.marklogic.rest.util.UriConfig;
 import org.jdom2.Namespace;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
@@ -31,13 +32,18 @@ import java.util.Objects;
  */
 public class ManageClient extends LoggingObject {
 
+	// Added in 6.1.0 to allow for the RestTemplate constructor to work.
+	private UriConfig uriConfig;
+
 	private ManageConfig manageConfig;
-	private RestTemplate restTemplate;
-	private RestTemplate securityUserRestTemplate;
+	private final RestTemplate restTemplate;
+	private final RestTemplate securityUserRestTemplate;
 	private PayloadParser payloadParser;
 
 	public ManageClient(ManageConfig config) {
 		setManageConfig(config);
+		this.restTemplate = RestTemplateUtil.newRestTemplate(config);
+		this.securityUserRestTemplate = initializeSecurityUserRestTemplate(config);
 	}
 
 	/**
@@ -47,8 +53,11 @@ public class ManageClient extends LoggingObject {
 	 * often an admin user.
 	 *
 	 * @param config
+	 * @deprecated Should be provided via the constructor instead.
 	 */
+	@Deprecated(since = "6.1.0", forRemoval = true)
 	public void setManageConfig(ManageConfig config) {
+		this.uriConfig = config;
 		this.manageConfig = config;
 		if (logger.isInfoEnabled()) {
 			logger.info("Initializing ManageClient with manage config of: " + config);
@@ -59,20 +68,25 @@ public class ManageClient extends LoggingObject {
 	 * Use this when you want to provide your own RestTemplate as opposed to using the one that's constructed via a
 	 * ManageConfig instance.
 	 *
+	 * @since 6.1.0 The previous constructor did not work because it did not provide a ManageConfig instance.
+	 * @param uriConfig
 	 * @param restTemplate
 	 */
-	public ManageClient(RestTemplate restTemplate) {
-		this(restTemplate, restTemplate);
+	public ManageClient(UriConfig uriConfig, RestTemplate restTemplate) {
+		this(uriConfig, restTemplate, restTemplate);
 	}
 
 	/**
 	 * Use this when you want to provide your own RestTemplate as opposed to using the one that's constructed via a
 	 * ManageConfig instance.
 	 *
+	 * @since 6.1.0 The previous constructor did not work because it did not provide a ManageConfig instance.
+	 * @param uriConfig
 	 * @param restTemplate
 	 * @param adminRestTemplate
 	 */
-	public ManageClient(RestTemplate restTemplate, RestTemplate adminRestTemplate) {
+	public ManageClient(UriConfig uriConfig, RestTemplate restTemplate, RestTemplate adminRestTemplate) {
+		this.uriConfig = uriConfig;
 		this.restTemplate = restTemplate;
 		this.securityUserRestTemplate = adminRestTemplate;
 	}
@@ -255,14 +269,20 @@ public class ManageClient extends LoggingObject {
 		return new HttpEntity<>(xml, headers);
 	}
 
-	protected void logRequest(String path, String contentType, String method) {
+	protected final void logRequest(String path, String contentType, String method) {
 		if (logger.isInfoEnabled()) {
-			String username = String.format("as user '%s' ", manageConfig.getUsername());
-			logger.info("Sending {} {} request {}to path: {}", contentType, method, username, buildUri(path));
+			final URI uri = buildUri(path);
+			final String username = manageConfig != null ? manageConfig.getUsername() : null;
+			if (StringUtils.hasText(username)) {
+				String usernameToLog = String.format("as user '%s' ", username);
+				logger.info("Sending {} {} request {}to path: {}", contentType, method, usernameToLog, uri);
+			} else {
+				logger.info("Sending {} {} request to path: {}", contentType, method, uri);
+			}
 		}
 	}
 
-	protected void logSecurityUserRequest(String path, String contentType, String method) {
+	protected final void logSecurityUserRequest(String path, String contentType, String method) {
 		if (logger.isInfoEnabled()) {
 			String username = determineUsernameForSecurityUserRequest();
 			if (!"".equals(username)) {
@@ -272,7 +292,7 @@ public class ManageClient extends LoggingObject {
 		}
 	}
 
-	protected String determineUsernameForSecurityUserRequest() {
+	protected final String determineUsernameForSecurityUserRequest() {
 		String username = "";
 		if (manageConfig != null) {
 			username = manageConfig.getSecurityUsername();
@@ -283,37 +303,34 @@ public class ManageClient extends LoggingObject {
 		return username;
 	}
 
-	private void initializeSecurityUserRestTemplate() {
-		String securityUsername = this.manageConfig.getSecurityUsername();
-		if (securityUsername != null && securityUsername.trim().length() > 0 && !securityUsername.equals(this.manageConfig.getUsername())) {
+	private RestTemplate initializeSecurityUserRestTemplate(ManageConfig config) {
+		String securityUsername = config.getSecurityUsername();
+		if (securityUsername != null && securityUsername.trim().length() > 0 && !securityUsername.equals(config.getUsername())) {
 			if (logger.isInfoEnabled()) {
 				logger.info(format("Initializing separate connection to Manage API with user '%s' that should have the 'manage-admin' and 'security' roles", securityUsername));
 			}
 
-			RestConfig rc = new RestConfig(this.manageConfig);
+			final RestConfig restConfig = new RestConfig(config);
 			// Override settings based on the 3 "security user"-specific properties known by ManageConfig.
 			// Note that in 4.5.0, with the addition of cloud/certificate/kerberos/saml auth, this will only have any
 			// impact if the user is using digest or basic auth. There's no equivalent of a separate "security" user
 			// yet for the other 4 authentication types.
-			rc.setUsername(this.manageConfig.getSecurityUsername());
-			rc.setPassword(this.manageConfig.getSecurityPassword());
-			if (this.manageConfig.getSecuritySslContext() != null) {
-				rc.setSslContext(this.manageConfig.getSecuritySslContext());
+			restConfig.setUsername(config.getSecurityUsername());
+			restConfig.setPassword(config.getSecurityPassword());
+			if (config.getSecuritySslContext() != null) {
+				restConfig.setSslContext(config.getSecuritySslContext());
 			}
-			this.securityUserRestTemplate = RestTemplateUtil.newRestTemplate(rc);
+			return RestTemplateUtil.newRestTemplate(restConfig);
 		} else {
-			this.securityUserRestTemplate = getRestTemplate();
+			return getRestTemplate();
 		}
 	}
 
 	public URI buildUri(String path) {
-		return manageConfig.buildUri(path);
+		return uriConfig.buildUri(path);
 	}
 
 	public RestTemplate getRestTemplate() {
-		if (this.restTemplate == null) {
-			this.restTemplate = RestTemplateUtil.newRestTemplate(this.manageConfig);
-		}
 		return restTemplate;
 	}
 
@@ -321,18 +338,18 @@ public class ManageClient extends LoggingObject {
 		return manageConfig;
 	}
 
-	public void setRestTemplate(RestTemplate restTemplate) {
-		this.restTemplate = restTemplate;
-	}
+//	public void setRestTemplate(RestTemplate restTemplate) {
+//		this.restTemplate = restTemplate;
+//	}
 
 	public RestTemplate getSecurityUserRestTemplate() {
-		if (this.securityUserRestTemplate == null) {
-			initializeSecurityUserRestTemplate();
-		}
+//		if (this.securityUserRestTemplate == null) {
+//			initializeSecurityUserRestTemplate();
+//		}
 		return securityUserRestTemplate;
 	}
 
-	public void setSecurityUserRestTemplate(RestTemplate restTemplate) {
-		this.securityUserRestTemplate = restTemplate;
-	}
+//	public void setSecurityUserRestTemplate(RestTemplate restTemplate) {
+//		this.securityUserRestTemplate = restTemplate;
+//	}
 }

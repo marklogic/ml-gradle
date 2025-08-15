@@ -16,10 +16,8 @@ import javax.net.ssl.SSLContext;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class RestConfig {
+public class RestConfig extends UriConfig {
 
-	private String host;
-	private int port;
 	// Defaulting this for backwards-compatibility reasons in 4.5.0
 	private String authType = "digest";
 	private String username;
@@ -30,9 +28,6 @@ public class RestConfig {
 	private String externalName;
 	private String samlToken;
 	private String oauthToken;
-
-	private String basePath;
-	private String scheme = "http";
 
 	private boolean configureSimpleSsl;
 	private boolean useDefaultKeystore;
@@ -59,20 +54,19 @@ public class RestConfig {
 	}
 
 	public RestConfig(String host, int port, String username, String password) {
-		this.host = host;
-		this.port = port;
+		super(host, port);
 		this.username = username;
 		this.password = password;
 	}
 
 	public RestConfig(RestConfig other) {
-		this(other.host, other.port, other.username, other.password);
-		if (other.scheme != null) {
-			this.scheme = other.scheme;
+		this(other.getHost(), other.getPort(), other.username, other.password);
+		if (other.getScheme() != null) {
+			setScheme(other.getScheme());
 		}
 
 		this.cloudApiKey = other.cloudApiKey;
-		this.basePath = other.basePath;
+		setBasePath(other.getBasePath());
 
 		this.authType = other.authType;
 		this.certFile = other.certFile;
@@ -157,51 +151,9 @@ public class RestConfig {
 		return String.format("%s://%s:%d", getScheme(), getHost(), getPort());
 	}
 
-	/**
-	 * Using the java.net.URI constructor that takes a string. Using any other constructor runs into encoding problems,
-	 * e.g. when a mimetype has a plus in it, that plus needs to be encoded, but doing as %2B will result in the % being
-	 * double encoded. Unfortunately, it seems some encoding is still needed - e.g. for a pipeline like "Flexible Replication"
-	 * with a space in its name, the space must be encoded properly as a "+".
-	 *
-	 * @param path
-	 * @return
-	 */
-	public URI buildUri(String path) {
-		String basePathToAppend = "";
-		if (basePath != null) {
-			if (!basePath.startsWith("/")) {
-				basePathToAppend = "/";
-			}
-			basePathToAppend += basePath;
-			if (path.startsWith("/") && basePathToAppend.endsWith("/")) {
-				basePathToAppend = basePathToAppend.substring(0, basePathToAppend.length() - 1);
-			}
-		}
-		try {
-			return new URI(String.format("%s://%s:%d%s%s", getScheme(), getHost(), getPort(), basePathToAppend, path.replace(" ", "+")));
-		} catch (URISyntaxException ex) {
-			throw new RuntimeException("Unable to build URI for path: " + path + "; cause: " + ex.getMessage(), ex);
-		}
-	}
-
+	@Deprecated
 	public String getBaseUrl() {
-		return String.format("%s://%s:%d", scheme, host, port);
-	}
-
-	public String getHost() {
-		return host;
-	}
-
-	public void setHost(String host) {
-		this.host = host;
-	}
-
-	public int getPort() {
-		return port;
-	}
-
-	public void setPort(int port) {
-		this.port = port;
+		return String.format("%s://%s:%d", getScheme(), getHost(), getPort());
 	}
 
 	public String getUsername() {
@@ -218,14 +170,6 @@ public class RestConfig {
 
 	public void setPassword(String password) {
 		this.password = password;
-	}
-
-	public String getScheme() {
-		return scheme;
-	}
-
-	public void setScheme(String scheme) {
-		this.scheme = scheme;
 	}
 
 	public boolean isConfigureSimpleSsl() {
@@ -282,14 +226,6 @@ public class RestConfig {
 
 	public void setCloudApiKey(String cloudApiKey) {
 		this.cloudApiKey = cloudApiKey;
-	}
-
-	public String getBasePath() {
-		return basePath;
-	}
-
-	public void setBasePath(String basePath) {
-		this.basePath = basePath;
 	}
 
 	public String getAuthType() {

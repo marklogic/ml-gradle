@@ -1,0 +1,14 @@
+# COPYRIGHT VALIDATION CONFIG
+# ---------------------------------
+# Required start year (keep fixed; end year auto-updates in check output)
+startyear: 2015
+
+# Optional exclusions list (comma-separated). Leave commented if none.
+# Rules:
+#   - Relative paths (no leading ./)
+#   - Simple * wildcard only (no recursive **)
+#   - Use sparingly (third_party, generated, binary assets)
+#   - Dotfiles already skipped automatically
+# Enable by removing the leading '# ' from the next line and editing values.
+# filesexcluded: third_party/*, docs/generated/*.md, assets/*.png, scripts/temp_*.py, vendor/lib.js
+filesexcluded: .github/*, README.md, Jenkinsfile, gradle/*, docker-compose.yml, *.gradle, gradle.properties, gradlew, gradlew.bat

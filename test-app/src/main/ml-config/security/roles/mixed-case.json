@@ -1,0 +1,4 @@
+{
+	"role-name": "Mixed-CASE",
+	"description": "Verifies that role names aren't improperly lowercased by any ml-gradle feature."
+}

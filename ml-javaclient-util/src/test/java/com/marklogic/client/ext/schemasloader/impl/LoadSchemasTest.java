@@ -12,15 +12,14 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class LoadSchemasTest extends AbstractSchemasTest {
+class LoadSchemasTest extends AbstractSchemasTest {
 
 	@Test
-	public void test() {
+	void test() {
 		DefaultSchemasLoader loader = new DefaultSchemasLoader(client, null);
 		RestBatchWriter writer = (RestBatchWriter) loader.getBatchWriter();
 		assertEquals(1, writer.getThreadCount(), "Should default to 1 so that any error from loading a document " +
@@ -42,7 +41,7 @@ public class LoadSchemasTest extends AbstractSchemasTest {
 	}
 
 	@Test
-	public void testTemplateBatchInsert() {
+	void testTemplateBatchInsert() {
 		DefaultSchemasLoader loader = new DefaultSchemasLoader(client, newContentClient());
 		List<DocumentFile> files = loader.loadSchemas(Paths.get("src", "test", "resources", "good-schemas", "originals").toString());
 		assertEquals(2, files.size());
@@ -53,21 +52,20 @@ public class LoadSchemasTest extends AbstractSchemasTest {
 		assertTrue(uris.contains("/tde/good-schema.json"));
 		assertTrue(uris.contains("/tde/good-schema.xml"));
 
-		DocumentMetadataHandle handle = helper.getMetadata("/tde/good-schema.json");
-		assertTrue(handle.getPermissions().get("rest-reader").contains(DocumentMetadataHandle.Capability.READ),
-			"Permissions defined in permissions.properties should be applied on the document");
-		assertTrue(handle.getPermissions().get("rest-writer").contains(DocumentMetadataHandle.Capability.UPDATE),
-			"Permissions defined in permissions.properties should be applied on the document");
 
-		handle = helper.getMetadata("/tde/good-schema.xml");
-		assertTrue(handle.getPermissions().get("rest-reader").contains(DocumentMetadataHandle.Capability.READ),
-			"Permissions defined in permissions.properties should be applied on the document");
-		assertTrue(handle.getPermissions().get("rest-writer").contains(DocumentMetadataHandle.Capability.UPDATE),
-			"Permissions defined in permissions.properties should be applied on the document");
+		Stream.of("/tde/good-schema.json", "/tde/good-schema.xml").forEach(uri -> {
+			DocumentMetadataHandle.DocumentPermissions perms = helper.getMetadata(uri).getPermissions();
+			String message = "Permissions defined in permissions.properties should be applied on the document";
+			assertTrue(perms.get("rest-reader").contains(DocumentMetadataHandle.Capability.READ), message);
+			assertTrue(perms.get("rest-writer").contains(DocumentMetadataHandle.Capability.UPDATE), message);
+			assertTrue(perms.get("Mixed-CASE").contains(DocumentMetadataHandle.Capability.READ),
+				"This feature from its inception through 6.0.0 was improperly lower-casing not just the " +
+					"capability but also the role name. Role names should not be lower-cased.");
+		});
 	}
 
 	@Test
-	public void invalidClientAndNoFilesToLoad() {
+	void invalidClientAndNoFilesToLoad() {
 		DefaultSchemasLoader loader = new DefaultSchemasLoader(newClient("invalid-database-doesnt-exist"), null);
 		List<DocumentFile> files = loader.loadSchemas(Paths.get("src", "test", "resources", "no-schemas").toString());
 		assertEquals(0, files.size(),
@@ -76,7 +74,7 @@ public class LoadSchemasTest extends AbstractSchemasTest {
 	}
 
 	@Test
-	public void invalidClientWithFilesToLoad() {
+	void invalidClientWithFilesToLoad() {
 		DefaultSchemasLoader loader = new DefaultSchemasLoader(newClient("invalid-database-doesnt-exist"), null);
 		FailedRequestException ex = assertThrows(FailedRequestException.class,
 			() -> loader.loadSchemas(Paths.get("src", "test", "resources", "good-schemas").toString()));

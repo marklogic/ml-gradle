@@ -22,7 +22,7 @@ public class TemporalCollectionManager extends AbstractResourceManager {
 
 	@Override
 	public String getResourcePath(String resourceNameOrId, String... resourceUrlParams) {
-		resourceNameOrId = encodeResourceId(resourceNameOrId);
+		resourceNameOrId = encodeResourceIdBeforeAddingToPath(resourceNameOrId);
 		return appendParamsAndValuesToPath(format("%s?collection=%s", getResourcesPath(), resourceNameOrId), resourceUrlParams);
 	}
 

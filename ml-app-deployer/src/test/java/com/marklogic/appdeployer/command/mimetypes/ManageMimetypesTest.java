@@ -8,7 +8,7 @@ import com.marklogic.appdeployer.command.Command;
 import com.marklogic.mgmt.resource.ResourceManager;
 import com.marklogic.mgmt.resource.mimetypes.MimetypeManager;
 
-public class ManageMimetypesTest extends AbstractManageResourceTest {
+class ManageMimetypesTest extends AbstractManageResourceTest {
 
 	@Override
 	protected ResourceManager newResourceManager() {

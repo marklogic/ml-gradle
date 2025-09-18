@@ -36,13 +36,14 @@ public abstract class AbstractResourceManager extends AbstractManager implements
     }
 
     public String getResourcePath(String resourceNameOrId, String... resourceUrlParams) {
-        resourceNameOrId = encodeResourceId(resourceNameOrId);
+        resourceNameOrId = encodeResourceIdBeforeAddingToPath(resourceNameOrId);
         return appendParamsAndValuesToPath(format("%s/%s", getResourcesPath(), resourceNameOrId), resourceUrlParams);
     }
 
     public String getPropertiesPath(String resourceNameOrId, String... resourceUrlParams) {
-        return appendParamsAndValuesToPath(format("%s/properties", getResourcePath(resourceNameOrId)),
-                resourceUrlParams);
+		String resourcePath = getResourcePath(resourceNameOrId);
+		String propertiesPath = format("%s/properties", resourcePath);
+        return appendParamsAndValuesToPath(propertiesPath,  resourceUrlParams);
     }
 
     /**
@@ -62,27 +63,27 @@ public abstract class AbstractResourceManager extends AbstractManager implements
     }
 
     public Fragment getAsXml(String resourceNameOrId, String... resourceUrlParams) {
-        String path = appendParamsAndValuesToPath(getResourcePath(resourceNameOrId, resourceUrlParams));
+        String path = getResourcePath(resourceNameOrId, resourceUrlParams);
 	    return useSecurityUser() ? manageClient.getXmlAsSecurityUser(path) : manageClient.getXml(path);
     }
 
     public Fragment getPropertiesAsXml(String resourceNameOrId, String... resourceUrlParams) {
-        String path = appendParamsAndValuesToPath(getPropertiesPath(resourceNameOrId, resourceUrlParams));
+        String path = getPropertiesPath(resourceNameOrId, resourceUrlParams);
 	    return useSecurityUser() ? manageClient.getXmlAsSecurityUser(path) : manageClient.getXml(path);
     }
 
     public String getPropertiesAsXmlString(String resourceNameOrId, String... resourceUrlParams) {
-        String path = appendParamsAndValuesToPath(getPropertiesPath(resourceNameOrId, resourceUrlParams));
+        String path = getPropertiesPath(resourceNameOrId, resourceUrlParams);
 	    return useSecurityUser() ? manageClient.getXmlStringAsSecurityUser(path) : manageClient.getXmlString(path);
     }
 
     public String getAsJson(String resourceNameOrId, String... resourceUrlParams) {
-        String path = appendParamsAndValuesToPath(getPropertiesPath(resourceNameOrId, resourceUrlParams));
+        String path = getPropertiesPath(resourceNameOrId, resourceUrlParams);
 	    return useSecurityUser() ? manageClient.getJsonAsSecurityUser(path) : manageClient.getJson(path);
     }
 
     public String getPropertiesAsJson(String resourceNameOrId, String... resourceUrlParams) {
-        String path = appendParamsAndValuesToPath(getPropertiesPath(resourceNameOrId, resourceUrlParams));
+        String path = getPropertiesPath(resourceNameOrId, resourceUrlParams);
 	    return useSecurityUser() ? manageClient.getJsonAsSecurityUser(path) : manageClient.getJson(path);
     }
 
@@ -123,18 +124,17 @@ public abstract class AbstractResourceManager extends AbstractManager implements
     }
 
     /**
-     * Mimetypes are likely to have a "+" in them, which the Management REST API won't support in a path - it needs to
-     * be encoded. Other resources could have a "+" in their ID value as well. However, doing a full encoding doesn't
-     * seem to be a great idea, as that will e.g. encode a forward slash in a mimetype as well, which will result in a
-     * 404.
+	 * The resource ID needs to be encoded for one known reason, which was first discovered in May 2016 - mimetypes
+	 * can have "+" in them, but the server erroneously does not support a "+" in the path part of a URI. So the "+"
+	 * needs to be encoded. For example, "http://localhost:8002/manage/v2/mimetypes/text/foo+bar" doesn't work,
+	 * but "http://localhost:8002/manage/v2/mimetypes/text/foo%2Bbar" does work.
+	 *
+	 * See MLE-24380 for the internal server bug.
      *
      * @param idValue
      * @return
      */
-    protected String encodeResourceId(String idValue) {
-		// Polaris effectively complains that this is allowing server-side request forgery. However, we cannot perform
-		// a full URL encoding here as "/" is allowed in some resource names, such as MIME types. Polaris also is
-		// seemingly only seeing the path and not the fact that the ManageClient will always build an http or https URL.
+    protected final String encodeResourceIdBeforeAddingToPath(String idValue) {
         return idValue != null ? idValue.replace("+", "%2B") : idValue;
     }
 

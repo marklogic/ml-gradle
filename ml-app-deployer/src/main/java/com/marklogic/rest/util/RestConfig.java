@@ -11,10 +11,10 @@ import com.marklogic.client.ext.ssl.SslConfig;
 import com.marklogic.client.ext.ssl.SslUtil;
 import okhttp3.OkHttpClient;
 import org.springframework.util.StringUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.net.ssl.SSLContext;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 public class RestConfig {
 
@@ -158,28 +158,61 @@ public class RestConfig {
 	}
 
 	/**
-	 * Using the java.net.URI constructor that takes a string. Using any other constructor runs into encoding problems,
-	 * e.g. when a mimetype has a plus in it, that plus needs to be encoded, but doing as %2B will result in the % being
-	 * double encoded. Unfortunately, it seems some encoding is still needed - e.g. for a pipeline like "Flexible Replication"
-	 * with a space in its name, the space must be encoded properly as a "+".
+	 * Builds a URI using Spring's UriComponentsBuilder to prevent URL manipulation attacks.
+	 * This replaces the previous vulnerable implementation that allowed user-controllable URL construction.
+	 * Handles query parameters that may be included in the path for backwards compatibility.
 	 *
 	 * @param path
 	 * @return
 	 */
 	public URI buildUri(String path) {
-		String basePathToAppend = "";
-		if (basePath != null) {
-			if (!basePath.startsWith("/")) {
-				basePathToAppend = "/";
-			}
-			basePathToAppend += basePath;
-			if (path.startsWith("/") && basePathToAppend.endsWith("/")) {
-				basePathToAppend = basePathToAppend.substring(0, basePathToAppend.length() - 1);
-			}
-		}
 		try {
-			return new URI(String.format("%s://%s:%d%s%s", getScheme(), getHost(), getPort(), basePathToAppend, path.replace(" ", "+")));
-		} catch (URISyntaxException ex) {
+			UriComponentsBuilder builder = UriComponentsBuilder.newInstance()
+				.scheme(getScheme())
+				.host(getHost())
+				.port(getPort());
+
+			// Handle base path
+			String fullPath = path;
+			if (basePath != null) {
+				String normalizedBasePath = basePath.startsWith("/") ? basePath : "/" + basePath;
+				if (path.startsWith("/") && normalizedBasePath.endsWith("/")) {
+					normalizedBasePath = normalizedBasePath.substring(0, normalizedBasePath.length() - 1);
+				}
+				fullPath = normalizedBasePath + path;
+			}
+
+			// Check if the path contains query parameters
+			int queryIndex = fullPath.indexOf('?');
+			if (queryIndex != -1) {
+				// Split path and query parameters
+				String pathPart = fullPath.substring(0, queryIndex);
+				String queryPart = fullPath.substring(queryIndex + 1);
+
+				builder.path(pathPart);
+
+				// Parse and add query parameters
+				if (!queryPart.isEmpty()) {
+					String[] params = queryPart.split("&");
+					for (String param : params) {
+						int equalIndex = param.indexOf('=');
+						if (equalIndex != -1) {
+							String key = param.substring(0, equalIndex);
+							String value = param.substring(equalIndex + 1);
+							builder.queryParam(key, value);
+						} else {
+							// Handle parameters without values
+							builder.queryParam(param, "");
+						}
+					}
+				}
+			} else {
+				// No query parameters, just set the path
+				builder.path(fullPath);
+			}
+
+			return builder.build().toUri();
+		} catch (Exception ex) {
 			throw new RuntimeException("Unable to build URI for path: " + path + "; cause: " + ex.getMessage(), ex);
 		}
 	}

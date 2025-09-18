@@ -78,9 +78,11 @@ public class DeployViewSchemasCommand extends AbstractResourceCommand {
 			File resourceFile = reference.getLastFile();
 			if (resourceFile != null) {
 				PayloadParser parser = new PayloadParser();
-				String viewSchemaName = parser.getPayloadFieldValue(receipt.getPayload(), "view-schema-name");
+				final String viewSchemaName = parser.getPayloadFieldValue(receipt.getPayload(), "view-schema-name");
 				File parentFile = resourceFile.getParentFile();
 				if (parentFile != null) {
+					// Polaris flags this as a warning because viewSchemaName is user-provided - but we know it's been
+					// validated by MarkLogic already.
 					File viewDir = new File(parentFile, viewSchemaName + "-views");
 					if (viewDir.exists()) {
 						ViewManager viewMgr = new ViewManager(context.getManageClient(), currentDatabaseIdOrName, viewSchemaName);

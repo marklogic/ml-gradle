@@ -42,8 +42,11 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 	private int executeSortOrder = Integer.MAX_VALUE;
 	private boolean storeResourceIdsAsCustomTokens = false;
 
+	// In 6.1.0, changing this from FilenameFilter to ResourceFilenameFilter based on Polaris warnings on
+	// FilenameFilter. And all uses of this in the codebase involve ResourceFilenameFilter.
+	private ResourceFilenameFilter resourceFilenameFilter = new ResourceFilenameFilter();
+
 	protected PayloadTokenReplacer payloadTokenReplacer = new DefaultPayloadTokenReplacer();
-	private FilenameFilter resourceFilenameFilter = new ResourceFilenameFilter();
 	private PayloadParser payloadParser = new PayloadParser();
 
 	private Class<? extends Resource> resourceClassType;
@@ -564,7 +567,11 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 	}
 
 	public void setResourceFilenameFilter(FilenameFilter resourceFilenameFilter) {
-		this.resourceFilenameFilter = resourceFilenameFilter;
+		if (!(resourceFilenameFilter instanceof ResourceFilenameFilter)) {
+			throw new IllegalArgumentException("resourceFilenameFilter must be an instanceof " +
+				ResourceFilenameFilter.class.getName());
+		}
+		this.resourceFilenameFilter = (ResourceFilenameFilter) resourceFilenameFilter;
 	}
 
 	public FilenameFilter getResourceFilenameFilter() {

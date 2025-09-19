@@ -101,7 +101,7 @@ public abstract class AbstractDataMovementTest extends AbstractIntegrationTest {
 			throw new RuntimeException(ie);
 		}
 
-		logger.info("Entry names: {}", names);
+		logger.info("Entry names: {}", Arrays.asList(names));
 		for (String name : names) {
 			assertTrue(entryNames.contains(name));
 		}

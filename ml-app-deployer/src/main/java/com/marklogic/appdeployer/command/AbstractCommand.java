@@ -206,8 +206,13 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 	 */
 	protected void storeResourceInCommandContextMap(CommandContext context, File resourceFile, String payload) {
 		final String contextKey = getContextKeyForResourcesToSave();
-		List<ResourceReference> references = (List<ResourceReference>) context.getContextMap().get(contextKey);
-		if (references == null) {
+		Object referencesObj = context.getContextMap().get(contextKey);
+		List<ResourceReference> references;
+		if (referencesObj != null) {
+			@SuppressWarnings("unchecked")
+			List<ResourceReference> existingReferences = (List<ResourceReference>) referencesObj;
+			references = existingReferences;
+		} else {
 			references = new ArrayList<>();
 			context.getContextMap().put(contextKey, references);
 		}

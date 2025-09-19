@@ -91,11 +91,11 @@ public class DefaultDocumentFileReader extends AbstractDocumentFileReader implem
 		boolean accept = acceptPath(dir, attrs);
 		if (accept) {
 			if (logger.isDebugEnabled()) {
-				logger.debug("Visiting directory: " + dir);
+				logger.debug("Visiting directory: {}", dir);
 			}
 			for (DocumentFileProcessor processor : getDocumentFileProcessors()) {
-				if (processor instanceof FileVisitor) {
-					((FileVisitor) processor).preVisitDirectory(dir, attrs);
+				if (processor instanceof DocumentFileProcessorWithFileVisitor fileVisitorProcessor) {
+					fileVisitorProcessor.preVisitDirectory(dir, attrs);
 				}
 			}
 			return FileVisitResult.CONTINUE;
@@ -121,8 +121,8 @@ public class DefaultDocumentFileReader extends AbstractDocumentFileReader implem
 			logger.warn("Error in postVisitDirectory: " + exc.getMessage(), exc);
 		}
 		for (DocumentFileProcessor processor : getDocumentFileProcessors()) {
-			if (processor instanceof FileVisitor) {
-				((FileVisitor) processor).postVisitDirectory(dir, exc);
+			if (processor instanceof DocumentFileProcessorWithFileVisitor fileVisitorProcessor) {
+				fileVisitorProcessor.postVisitDirectory(dir, exc);
 			}
 		}
 		return FileVisitResult.CONTINUE;

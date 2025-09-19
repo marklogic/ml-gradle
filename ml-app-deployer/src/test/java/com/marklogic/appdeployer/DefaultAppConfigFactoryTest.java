@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class DefaultAppConfigFactoryTest {
+class DefaultAppConfigFactoryTest {
 
 	private DefaultAppConfigFactory factory;
 
@@ -211,7 +211,7 @@ public class DefaultAppConfigFactoryTest {
 		assertEquals(new File(projectDir, "src/main/more-data").getAbsolutePath(), config.getDataPaths().get(1));
 		assertEquals("apple", config.getCollections()[0]);
 		assertEquals("banana", config.getCollections()[1]);
-		assertEquals(new Integer(123), config.getBatchSize());
+		assertEquals(123, config.getBatchSize());
 		assertEquals("Documents", config.getDatabaseName());
 		assertEquals("manage-user,read,manage-user,update", config.getPermissions());
 		assertFalse(config.isReplaceTokensInData());
@@ -497,8 +497,8 @@ public class DefaultAppConfigFactoryTest {
 		assertEquals("dev-.*", config.getResourceFilenamesExcludePattern().pattern());
 		assertEquals("qa-.*", config.getResourceFilenamesIncludePattern().pattern());
 
-		assertEquals(new Integer(1), config.getDatabaseNamesAndReplicaCounts().get("Documents"));
-		assertEquals(new Integer(2), config.getDatabaseNamesAndReplicaCounts().get("Security"));
+		assertEquals(1, config.getDatabaseNamesAndReplicaCounts().get("Documents"));
+		assertEquals(2, config.getDatabaseNamesAndReplicaCounts().get("Security"));
 
 		Set<String> set = config.getDatabasesWithForestsOnOneHost();
 		assertEquals(2, set.size());

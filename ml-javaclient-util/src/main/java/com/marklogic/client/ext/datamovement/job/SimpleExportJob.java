@@ -15,6 +15,7 @@ public class SimpleExportJob extends AbstractQueryBatcherJob {
 
 	private ExportListener exportListener;
 
+	@SafeVarargs
 	public SimpleExportJob(Consumer<DocumentRecord>... consumers) {
 		exportListener = new ExportListener();
 		for (Consumer<DocumentRecord> consumer : consumers) {

@@ -32,7 +32,7 @@ public class RoleObjectNodesSorter implements ObjectNodesSorter {
 		// This is to resolve bug #441, where capability-query's are being dropped because the Role class doesn't
 		// support them. It may be better to refactor this to not deserialize into Role instances so that ObjectNodes
 		// are used the entire time, even though we'd lose some of the convenience methods provided by the Role class.
-		final Map<String, ObjectNode> roleMap = new HashMap();
+		final Map<String, ObjectNode> roleMap = new HashMap<>();
 
 		ObjectReader reader = ObjectMapperFactory.getObjectMapper().readerFor(Role.class);
 		for (ObjectNode objectNode : objectNodes) {

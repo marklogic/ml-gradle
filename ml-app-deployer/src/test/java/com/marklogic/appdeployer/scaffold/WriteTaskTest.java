@@ -12,10 +12,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class WriteTaskTest extends AbstractResourceWriterTest {
+class WriteTaskTest extends AbstractResourceWriterTest {
 
 	@Test
-	public void defaultValues() {
+	void defaultValues() {
 		initializeAppDeployer(new DeployScheduledTasksCommand());
 
 		buildResourceAndDeploy(new TaskTemplateBuilder());
@@ -26,7 +26,7 @@ public class WriteTaskTest extends AbstractResourceWriterTest {
 		assertEquals("/CHANGEME-path-to-module.sjs", task.getTaskPath());
 		assertEquals("/", task.getTaskRoot());
 		assertEquals("daily", task.getTaskType());
-		assertEquals(new Integer(1), task.getTaskPeriod());
+		assertEquals(1, task.getTaskPeriod());
 		assertEquals("01:00:00", task.getTaskStartTime());
 		assertEquals("Documents", task.getTaskDatabase());
 		assertEquals("Modules", task.getTaskModules());

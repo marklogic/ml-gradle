@@ -65,7 +65,7 @@ public class GenerateModelArtifactsCommand extends AbstractCommand {
 
 	protected DatabaseClient buildDatabaseClient(AppConfig appConfig) {
 		String db = appConfig.getModelsDatabase();
-		if (StringUtils.isEmpty(db)) {
+		if (!StringUtils.hasText(db)) {
 			db = appConfig.getContentDatabaseName();
 		}
 		if (logger.isInfoEnabled()) {

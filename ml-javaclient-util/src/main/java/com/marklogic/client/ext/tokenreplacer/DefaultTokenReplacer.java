@@ -33,7 +33,7 @@ public class DefaultTokenReplacer extends LoggingObject implements TokenReplacer
 	protected void initializeHelper() {
 		helper = new PropertyPlaceholderHelper(PlaceholderConfigurerSupport.DEFAULT_PLACEHOLDER_PREFIX,
 			PlaceholderConfigurerSupport.DEFAULT_PLACEHOLDER_SUFFIX,
-			PlaceholderConfigurerSupport.DEFAULT_VALUE_SEPARATOR, true);
+			PlaceholderConfigurerSupport.DEFAULT_VALUE_SEPARATOR, null, true);
 	}
 
 	/**

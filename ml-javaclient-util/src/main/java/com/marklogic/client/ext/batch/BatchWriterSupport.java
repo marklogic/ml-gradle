@@ -5,15 +5,15 @@ package com.marklogic.client.ext.batch;
 
 import com.marklogic.client.document.DocumentWriteOperation;
 import com.marklogic.client.ext.helper.LoggingObject;
-import org.springframework.core.task.AsyncListenableTaskExecutor;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ExecutorConfigurationSupport;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 /**
  * Support class for BatchWriter implementations that uses Spring's TaskExecutor interface for parallelizing writes to
@@ -74,23 +74,21 @@ public abstract class BatchWriterSupport extends LoggingObject implements BatchW
 	}
 
 	/**
-	 * Will use the WriteListener if the TaskExecutor is an instance of AsyncListenableTaskExecutor. The WriteListener
+	 * Will use the WriteListener if the TaskExecutor is an instance of AsyncTaskExecutor. The WriteListener
 	 * will then be used to listen for failures.
 	 *
 	 * @param runnable
 	 * @param items
 	 */
 	protected void executeRunnable(Runnable runnable, final List<? extends DocumentWriteOperation> items) {
-		if (writeListener != null && taskExecutor instanceof AsyncListenableTaskExecutor) {
-			AsyncListenableTaskExecutor asyncListenableTaskExecutor = (AsyncListenableTaskExecutor)taskExecutor;
-			ListenableFuture<?> future = asyncListenableTaskExecutor.submitListenable(runnable);
-			future.addCallback(new ListenableFutureCallback<Object>() {
-				@Override
-				public void onFailure(Throwable ex) {
+		if (writeListener != null && taskExecutor instanceof AsyncTaskExecutor asyncTaskExecutor) {
+			CompletableFuture<?> future = asyncTaskExecutor.submitCompletable(runnable);
+			future.whenComplete((result, ex) -> {
+				if (ex != null) {
+					if (ex instanceof CompletionException ce && ce.getCause() != null) {
+						ex = ce.getCause();
+					}
 					writeListener.onWriteFailure(ex, items);
-				}
-				@Override
-				public void onSuccess(Object result) {
 				}
 			});
 		} else {

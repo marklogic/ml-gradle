@@ -37,8 +37,8 @@ gradlePlugin {
       id = 'com.marklogic.ml-gradle'
       displayName = 'ml-gradle for MarkLogic'
       description = 'Gradle plugin for configuring and deploying applications to MarkLogic'
-			tags.set(['marklogic', 'progress'])
-			implementationClass = 'com.marklogic.gradle.MarkLogicPlugin'
+      tags = ['marklogic', 'progress']
+      implementationClass = 'com.marklogic.gradle.MarkLogicPlugin'
     }
   }
 }

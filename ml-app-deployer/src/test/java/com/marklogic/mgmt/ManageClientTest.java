@@ -26,7 +26,7 @@ class ManageClientTest {
 
 	@Test
 	void nullManageConfig() {
-		ManageClient client = new ManageClient(null);
+		ManageClient client = new ManageClient((ManageConfig) null);
 		NullPointerException npe = assertThrows(NullPointerException.class, () -> new DatabaseManager(client).getAsXml());
 		assertEquals("A ManageConfig instance must be provided", npe.getMessage(),
 			"It's possible to pass in null as the ManageConfig since there's still a setManageConfig method, but that's been " +

@@ -159,7 +159,6 @@ public class RestConfig {
 
 	/**
 	 * Builds a URI using Spring's UriComponentsBuilder to prevent URL manipulation attacks.
-	 * This replaces the previous vulnerable implementation that allowed user-controllable URL construction.
 	 * Handles query parameters that may be included in the path for backwards compatibility.
 	 *
 	 * @param path

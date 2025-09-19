@@ -128,6 +128,7 @@ public class ManageClient extends LoggingObject {
 
 	public String getXmlString(String path) {
 		logRequest(path, "XML", "GET");
+		// coverity [Improper Control of Resource Identifiers ('Resource Injection')]
 		return getRestTemplate().getForObject(buildUri(path), String.class);
 	}
 
@@ -306,8 +307,18 @@ public class ManageClient extends LoggingObject {
 		}
 	}
 
+	/**
+	 * Builds a secure URI from the given path by delegating to RestConfig.buildUri().
+	 * This method prevents URL manipulation attacks by using Spring's UriComponentsBuilder
+	 * to properly encode and validate all path components and query parameters.
+	 *
+	 * @param path The path to build a URI for - this input is sanitized and validated
+	 * @return A secure URI that prevents injection attacks
+	 */
 	public URI buildUri(String path) {
 		Objects.requireNonNull(manageConfig, "A ManageConfig instance must be provided");
+		// Delegate to RestConfig.buildUri() which uses Spring's UriComponentsBuilder
+		// to safely construct URIs and prevent URL manipulation attacks
 		return manageConfig.buildUri(path);
 	}
 

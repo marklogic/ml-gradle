@@ -128,7 +128,6 @@ public class ManageClient extends LoggingObject {
 
 	public String getXmlString(String path) {
 		logRequest(path, "XML", "GET");
-		// coverity [Improper Control of Resource Identifiers ('Resource Injection')]
 		return getRestTemplate().getForObject(buildUri(path), String.class);
 	}
 

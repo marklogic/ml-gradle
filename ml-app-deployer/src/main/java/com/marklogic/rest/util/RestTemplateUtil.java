@@ -5,8 +5,8 @@ package com.marklogic.rest.util;
 
 import com.marklogic.client.DatabaseClientFactory;
 import com.marklogic.client.extra.okhttpclient.OkHttpClientBuilderFactory;
+import com.marklogic.rest.util.vendor.OkHttpClientHttpRequestFactory;
 import okhttp3.OkHttpClient;
-import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -38,7 +38,9 @@ public class RestTemplateUtil {
 			throw new RuntimeException(String.format("Unable to connect to the MarkLogic app server at %s; cause: %s", config.toString(), ex.getMessage()));
 		}
 
-		RestTemplate rt = new RestTemplate(new OkHttp3ClientHttpRequestFactory(client));
+		// As of 6.0.1, now using a forked copy of the deprecated OkHttp classes from Spring, as those are slated to
+		// be removed in Spring 7.
+		RestTemplate rt = new RestTemplate(new OkHttpClientHttpRequestFactory(client));
 		rt.setErrorHandler(new MgmtResponseErrorHandler());
 		return rt;
 	}

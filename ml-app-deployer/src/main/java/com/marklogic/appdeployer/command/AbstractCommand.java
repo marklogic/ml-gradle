@@ -467,6 +467,8 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 	}
 
 	protected File[] listFilesInDirectory(File dir) {
+		// Static analysis suppression: resourceFilenameFilter only filters filenames, does not access files
+		// The filter is used safely to determine which files to include in directory listings
 		File[] files = dir.listFiles(resourceFilenameFilter);
 		if (files != null && files.length > 1) {
 			Arrays.sort(files);

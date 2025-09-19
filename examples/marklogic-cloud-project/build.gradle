@@ -1,8 +1,10 @@
+// Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
+
 buildscript {
   repositories {
 	  mavenLocal()
 		maven {
-			url "https://bed-artifactory.bedford.progress.com:443/artifactory/ml-maven-snapshots/"
+			url = "https://bed-artifactory.bedford.progress.com:443/artifactory/ml-maven-snapshots/"
 		}
 		mavenCentral()
   }

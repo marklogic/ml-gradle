@@ -48,7 +48,6 @@ class OkHttpClientHttpRequest extends AbstractStreamingClientHttpRequest {
 	}
 
 	@Override
-	@SuppressWarnings("removal")
 	protected ClientHttpResponse executeInternal(HttpHeaders headers, @Nullable Body body) throws IOException {
 
 		RequestBody requestBody;
@@ -57,7 +56,7 @@ class OkHttpClientHttpRequest extends AbstractStreamingClientHttpRequest {
 		} else if (okhttp3.internal.http.HttpMethod.requiresRequestBody(getMethod().name())) {
 			String header = headers.getFirst(HttpHeaders.CONTENT_TYPE);
 			MediaType contentType = (header != null) ? MediaType.parse(header) : null;
-			requestBody = RequestBody.create(contentType, new byte[0]);
+			requestBody = RequestBody.create(new byte[0], contentType);
 		} else {
 			requestBody = null;
 		}

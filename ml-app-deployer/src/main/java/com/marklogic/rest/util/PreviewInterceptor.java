@@ -241,11 +241,6 @@ public class PreviewInterceptor extends DefaultResponseErrorHandler implements C
 			}
 
 			@Override
-			public int getRawStatusCode() {
-				return 200;
-			}
-
-			@Override
 			public String getStatusText() {
 				return "OK";
 			}

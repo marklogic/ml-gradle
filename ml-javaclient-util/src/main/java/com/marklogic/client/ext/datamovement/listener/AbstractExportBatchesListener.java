@@ -27,7 +27,7 @@ public abstract class AbstractExportBatchesListener extends ExportListener {
 	private ServerTransform transform;
 	private Format nonDocumentFormat;
 	private boolean consistentSnapshot;
-	private Set<DocumentManager.Metadata> categories = new HashSet();
+	private Set<DocumentManager.Metadata> categories = new HashSet<>();
 
 	protected abstract void exportBatch(QueryBatch queryBatch);
 

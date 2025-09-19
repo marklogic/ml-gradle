@@ -51,13 +51,17 @@ public abstract class AbstractResourceCommand extends AbstractUndoableCommand {
 		}
 
 		if (mergeResourcesBeforeSaving) {
-			List<ResourceReference> references = (List<ResourceReference>) context.getContextMap().get(getContextKeyForResourcesToSave());
-			if (references != null && !references.isEmpty()) {
-				List<ResourceReference> mergedReferences = mergeResources(references);
-				if (useCmaForDeployingResources(context)) {
-					saveMergedResourcesViaCma(context, mergedReferences);
-				} else {
-					saveMergedResources(context, getResourceManager(context), mergedReferences);
+			Object referencesObj = context.getContextMap().get(getContextKeyForResourcesToSave());
+			if (referencesObj != null) {
+				@SuppressWarnings("unchecked")
+				List<ResourceReference> references = (List<ResourceReference>) referencesObj;
+				if (!references.isEmpty()) {
+					List<ResourceReference> mergedReferences = mergeResources(references);
+					if (useCmaForDeployingResources(context)) {
+						saveMergedResourcesViaCma(context, mergedReferences);
+					} else {
+						saveMergedResources(context, getResourceManager(context), mergedReferences);
+					}
 				}
 			}
 		}

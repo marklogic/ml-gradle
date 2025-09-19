@@ -65,10 +65,15 @@ public class CommandContext {
 		if (!appConfig.getCmaConfig().isDeployForests()) {
 			return null;
 		}
+
 		final String key = "ml-app-deployer-mapOfPrimaryForests";
-		if (contextMap.containsKey(key)) {
-			return (Map<String, List<Forest>>) contextMap.get(key);
+		if (contextMap.containsKey(key) && contextMap.get(key) instanceof Map) {
+			Object mapObj = contextMap.get(key);
+			@SuppressWarnings("unchecked")
+			Map<String, List<Forest>> forestMap = (Map<String, List<Forest>>) mapObj;
+			return forestMap;
 		}
+
 		Logger logger = LoggerFactory.getLogger(getClass());
 		try {
 			logger.info("Retrieving all forest details via CMA");

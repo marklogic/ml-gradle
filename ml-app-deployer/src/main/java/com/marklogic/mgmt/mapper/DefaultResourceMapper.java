@@ -74,7 +74,9 @@ public class DefaultResourceMapper implements ResourceMapper {
 					}
 					jaxbContextMap.put(resourceType, context);
 				}
-				resource = (T) context.createUnmarshaller().unmarshal(new StringReader(payload));
+				@SuppressWarnings("unchecked")
+				T unmarshalledResource = (T) context.createUnmarshaller().unmarshal(new StringReader(payload));
+				resource = unmarshalledResource;
 			}
 			if (api != null && resource != null) {
 				resource.setApi(api);

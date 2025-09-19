@@ -34,9 +34,9 @@ subprojects {
 		testImplementation 'org.slf4j:slf4j-api:2.0.17'
 	}
 
-	// Allows for quickly identifying compiler warnings.
+	// Allows for quickly identifying compiler warnings and treating them as errors.
 	tasks.withType(JavaCompile) {
-		options.compilerArgs += ["-Xlint:unchecked", "-Xlint:deprecation"]
+		options.compilerArgs += ["-Xlint:unchecked", "-Xlint:deprecation", "-Werror"]
 		options.deprecation = true
 		options.warnings = true
 	}

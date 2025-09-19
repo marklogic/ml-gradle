@@ -18,7 +18,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
 import java.util.ArrayList;
@@ -37,41 +36,39 @@ public class ManageClient extends LoggingObject {
 	private PayloadParser payloadParser;
 
 	public ManageClient(ManageConfig config) {
-		setManageConfig(config);
-	}
-
-	/**
-	 * Uses the given ManageConfig instance to construct a Spring RestTemplate for communicating with the Manage API.
-	 * In addition, if adminUsername on the ManageConfig instance differs from username, then a separate RestTemplate is
-	 * constructed for making calls to the Manage API that need user with the manage-admin and security roles, which is
-	 * often an admin user.
-	 *
-	 * @param config
-	 */
-	public void setManageConfig(ManageConfig config) {
 		this.manageConfig = config;
 		if (logger.isInfoEnabled()) {
-			logger.info("Initializing ManageClient with manage config of: " + config);
+			logger.info("Initializing ManageClient with manage config of: {}", config);
 		}
 	}
 
 	/**
-	 * Use this when you want to provide your own RestTemplate as opposed to using the one that's constructed via a
-	 * ManageConfig instance.
+	 * Deprecated in 6.0.1 with the intention of removing in 7.0.0 so that the underlying ManageConfig can be declared
+	 * as final.
 	 *
-	 * @param restTemplate
+	 * @deprecated
 	 */
+	@Deprecated(since = "6.0.1", forRemoval = true)
+	public void setManageConfig(ManageConfig config) {
+		this.manageConfig = config;
+	}
+
+	/**
+	 * Deprecated in 6.0.1 as it will not work without a ManageConfig instance being set, which is then unlikely to
+	 * be consistent with the given RestTemplate.
+	 * @deprecated
+	 */
+	@Deprecated(since = "6.0.1", forRemoval = true)
 	public ManageClient(RestTemplate restTemplate) {
 		this(restTemplate, restTemplate);
 	}
 
 	/**
-	 * Use this when you want to provide your own RestTemplate as opposed to using the one that's constructed via a
-	 * ManageConfig instance.
-	 *
-	 * @param restTemplate
-	 * @param adminRestTemplate
+	 * Deprecated in 6.0.1 as it will not work without a ManageConfig instance being set, which is then unlikely to
+	 * be consistent with the given RestTemplate.
+	 * @deprecated
 	 */
+	@Deprecated(since = "6.0.1", forRemoval = true)
 	public ManageClient(RestTemplate restTemplate, RestTemplate adminRestTemplate) {
 		this.restTemplate = restTemplate;
 		this.securityUserRestTemplate = adminRestTemplate;
@@ -257,8 +254,10 @@ public class ManageClient extends LoggingObject {
 
 	protected void logRequest(String path, String contentType, String method) {
 		if (logger.isInfoEnabled()) {
-			String username = String.format("as user '%s' ", manageConfig.getUsername());
-			logger.info("Sending {} {} request {}to path: {}", contentType, method, username, buildUri(path));
+			String username = manageConfig != null && StringUtils.hasText(manageConfig.getUsername()) ?
+				String.format("as user '%s' ", manageConfig.getUsername()) : "";
+			URI uri = buildUri(path);
+			logger.info("Sending {} {} request {}to path: {}", contentType, method, username, uri);
 		}
 	}
 
@@ -268,7 +267,8 @@ public class ManageClient extends LoggingObject {
 			if (!"".equals(username)) {
 				username = String.format("as user '%s' (who should have the 'manage-admin' and 'security' roles) ", username);
 			}
-			logger.info("Sending {} {} request {}to path: {}", contentType, method, username, buildUri(path));
+			URI uri = buildUri(path);
+			logger.info("Sending {} {} request {}to path: {}", contentType, method, username, uri);
 		}
 	}
 
@@ -307,6 +307,7 @@ public class ManageClient extends LoggingObject {
 	}
 
 	public URI buildUri(String path) {
+		Objects.requireNonNull(manageConfig, "A ManageConfig instance must be provided");
 		return manageConfig.buildUri(path);
 	}
 
@@ -321,6 +322,7 @@ public class ManageClient extends LoggingObject {
 		return manageConfig;
 	}
 
+	@Deprecated(since = "6.0.1", forRemoval = true)
 	public void setRestTemplate(RestTemplate restTemplate) {
 		this.restTemplate = restTemplate;
 	}
@@ -332,6 +334,7 @@ public class ManageClient extends LoggingObject {
 		return securityUserRestTemplate;
 	}
 
+	@Deprecated(since = "6.0.1", forRemoval = true)
 	public void setSecurityUserRestTemplate(RestTemplate restTemplate) {
 		this.securityUserRestTemplate = restTemplate;
 	}

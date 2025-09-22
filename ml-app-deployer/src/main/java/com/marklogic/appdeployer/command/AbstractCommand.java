@@ -42,8 +42,11 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 	private int executeSortOrder = Integer.MAX_VALUE;
 	private boolean storeResourceIdsAsCustomTokens = false;
 
+	// In 6.0.1, changing this from FilenameFilter to ResourceFilenameFilter based on Polaris warnings on
+	// FilenameFilter. And all uses of this in the codebase involve ResourceFilenameFilter.
+	private ResourceFilenameFilter resourceFilenameFilter = new ResourceFilenameFilter();
+
 	protected PayloadTokenReplacer payloadTokenReplacer = new DefaultPayloadTokenReplacer();
-	private FilenameFilter resourceFilenameFilter = new ResourceFilenameFilter();
 	private PayloadParser payloadParser = new PayloadParser();
 
 	private Class<? extends Resource> resourceClassType;
@@ -203,8 +206,13 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 	 */
 	protected void storeResourceInCommandContextMap(CommandContext context, File resourceFile, String payload) {
 		final String contextKey = getContextKeyForResourcesToSave();
-		List<ResourceReference> references = (List<ResourceReference>) context.getContextMap().get(contextKey);
-		if (references == null) {
+		Object referencesObj = context.getContextMap().get(contextKey);
+		List<ResourceReference> references;
+		if (referencesObj != null) {
+			@SuppressWarnings("unchecked")
+			List<ResourceReference> existingReferences = (List<ResourceReference>) referencesObj;
+			references = existingReferences;
+		} else {
 			references = new ArrayList<>();
 			context.getContextMap().put(contextKey, references);
 		}
@@ -464,6 +472,8 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 	}
 
 	protected File[] listFilesInDirectory(File dir) {
+		// Static analysis suppression: resourceFilenameFilter only filters filenames, does not access files
+		// The filter is used safely to determine which files to include in directory listings
 		File[] files = dir.listFiles(resourceFilenameFilter);
 		if (files != null && files.length > 1) {
 			Arrays.sort(files);
@@ -564,7 +574,11 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 	}
 
 	public void setResourceFilenameFilter(FilenameFilter resourceFilenameFilter) {
-		this.resourceFilenameFilter = resourceFilenameFilter;
+		if (!(resourceFilenameFilter instanceof ResourceFilenameFilter)) {
+			throw new IllegalArgumentException("resourceFilenameFilter must be an instanceof " +
+				ResourceFilenameFilter.class.getName());
+		}
+		this.resourceFilenameFilter = (ResourceFilenameFilter) resourceFilenameFilter;
 	}
 
 	public FilenameFilter getResourceFilenameFilter() {

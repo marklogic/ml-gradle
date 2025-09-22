@@ -289,7 +289,7 @@ public class TestConnectionsCommand extends AbstractCommand {
 			String version = new ClusterManager(client).getVersion();
 			return new TestResult(client.getManageConfig(), true, "MarkLogic version: " + version);
 		} catch (Exception ex) {
-			if (ex instanceof HttpClientErrorException && ((HttpClientErrorException) ex).getRawStatusCode() == 404) {
+			if (ex instanceof HttpClientErrorException && ((HttpClientErrorException) ex).getStatusCode().value() == 404) {
 				return new TestResult(client.getManageConfig(), false,
 					"Unable to access /manage/v2; received 404; unexpected response: " + ex.getMessage());
 			} else {

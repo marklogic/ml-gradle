@@ -10,10 +10,7 @@ import com.marklogic.client.ext.datamovement.*;
 import com.marklogic.client.ext.datamovement.listener.SimpleBatchLoggingListener;
 import com.marklogic.client.ext.datamovement.util.TransformPropertyValueParser;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -62,6 +59,7 @@ public abstract class AbstractQueryBatcherJob extends BatcherConfig implements Q
 		}
 
 		QueryBatcherBuilder builder = newQueryBatcherBuilder();
+		Objects.requireNonNull(builder, "builder cannot be null");
 		QueryBatcher queryBatcher = builder.buildQueryBatcher(databaseClient, dmm);
 
 		prepareQueryBatcher(queryBatcher);

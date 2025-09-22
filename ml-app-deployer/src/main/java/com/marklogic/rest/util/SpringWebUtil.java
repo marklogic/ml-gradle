@@ -16,10 +16,7 @@ import org.springframework.web.client.RestClientResponseException;
 public abstract class SpringWebUtil {
 
 	public static int getHttpStatusCode(ResponseEntity<?> response) {
-		// This method is deprecated in Spring 6.0 and slated to be removed in Spring 7.0. But it can be safely used
-		// by both Spring 5.x and 6.x. We'll need to revisit this when we want to support ml-gradle when Spring 7.0 is
-		// on the classpath as well.
-		return response.getStatusCodeValue();
+		return response.getStatusCode().value();
 	}
 
 	public static HttpStatus getHttpStatus(ResponseEntity<?> response) {
@@ -27,10 +24,7 @@ public abstract class SpringWebUtil {
 	}
 
 	public static int getHttpStatusCode(RestClientResponseException ex) {
-		// This method is deprecated in Spring 6.0 and slated to be removed in Spring 7.0. But it can be safely used
-		// by both Spring 5.x and 6.x. We'll need to revisit this when we want to support ml-gradle when Spring 7.0 is
-		// on the classpath as well.
-		return ex.getRawStatusCode();
+		return ex.getStatusCode().value();
 	}
 
 	public static HttpStatus getHttpStatus(RestClientResponseException ex) {

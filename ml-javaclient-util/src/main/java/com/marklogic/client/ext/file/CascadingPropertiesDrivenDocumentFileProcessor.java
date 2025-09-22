@@ -6,7 +6,6 @@ package com.marklogic.client.ext.file;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
-import java.nio.file.FileVisitor;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Properties;
@@ -21,7 +20,7 @@ import java.util.Stack;
  *
  * @since 4.6.0
  */
-abstract class CascadingPropertiesDrivenDocumentFileProcessor extends PropertiesDrivenDocumentFileProcessor implements FileVisitor<Path> {
+abstract class CascadingPropertiesDrivenDocumentFileProcessor extends PropertiesDrivenDocumentFileProcessor implements DocumentFileProcessorWithFileVisitor {
 
 	final private Stack<Properties> propertiesStack = new Stack<>();
 	private boolean cascadingEnabled = false;

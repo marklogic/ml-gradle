@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -54,7 +55,10 @@ public class WriteDocumentToFileConsumer implements Consumer<DocumentRecord> {
 	}
 
 	protected void writeDocumentToFile(DocumentRecord documentRecord, File file) throws IOException {
-		file.getParentFile().mkdirs();
+		Objects.requireNonNull(file);
+		if (file.getParentFile() != null) {
+			file.getParentFile().mkdirs();
+		}
 		FileOutputStream fos = new FileOutputStream(file);
 		try {
 			InputStream in = documentRecord.getContent(new InputStreamHandle()).get();

@@ -4,17 +4,16 @@
 package com.marklogic.client.ext.jaxb;
 
 import com.marklogic.client.io.JAXBHandle;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledForJreRange;
 import org.junit.jupiter.api.condition.JRE;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.annotation.XmlRootElement;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class JAXBHandleTest {
+class JAXBHandleTest {
 
 	/**
 	 * Included solely to verify that when the test is run using Java 11 or Java 17, it will succeed given that the
@@ -25,14 +24,14 @@ public class JAXBHandleTest {
 	@Test
 	@EnabledForJreRange(min = JRE.JAVA_11)
 	void simpleTest() throws JAXBException {
-		JAXBHandle handle = new JAXBHandle(JAXBContext.newInstance(Product.class));
+		JAXBHandle<Product> handle = new JAXBHandle<>(JAXBContext.newInstance(Product.class));
 		Product p = new Product();
 		p.setName("My name");
 		p.setIndustry("My industry");
 		handle.set(p);
 		String xml = handle.toString();
 
-		Product p2 = (Product) handle.bytesToContent(xml.getBytes());
+		Product p2 = handle.bytesToContent(xml.getBytes());
 		assertEquals("My name", p2.getName());
 		assertEquals("My industry", p2.getIndustry());
 	}

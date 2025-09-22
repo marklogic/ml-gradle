@@ -59,6 +59,6 @@ public abstract class AbstractCollectionsListener implements QueryBatchListener 
 		}
 
 		call.xquery(sb.toString());
-		call.eval();
+		call.evalAs(String.class);
 	}
 }

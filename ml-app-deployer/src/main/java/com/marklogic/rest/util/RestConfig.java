@@ -11,10 +11,10 @@ import com.marklogic.client.ext.ssl.SslConfig;
 import com.marklogic.client.ext.ssl.SslUtil;
 import okhttp3.OkHttpClient;
 import org.springframework.util.StringUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.net.ssl.SSLContext;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 public class RestConfig {
 
@@ -158,30 +158,93 @@ public class RestConfig {
 	}
 
 	/**
-	 * Using the java.net.URI constructor that takes a string. Using any other constructor runs into encoding problems,
-	 * e.g. when a mimetype has a plus in it, that plus needs to be encoded, but doing as %2B will result in the % being
-	 * double encoded. Unfortunately, it seems some encoding is still needed - e.g. for a pipeline like "Flexible Replication"
-	 * with a space in its name, the space must be encoded properly as a "+".
+	 * Builds a URI using Spring's UriComponentsBuilder to prevent URL manipulation attacks.
+	 * Handles query parameters that may be included in the path for backwards compatibility.
 	 *
 	 * @param path
 	 * @return
 	 */
 	public URI buildUri(String path) {
-		String basePathToAppend = "";
-		if (basePath != null) {
-			if (!basePath.startsWith("/")) {
-				basePathToAppend = "/";
-			}
-			basePathToAppend += basePath;
-			if (path.startsWith("/") && basePathToAppend.endsWith("/")) {
-				basePathToAppend = basePathToAppend.substring(0, basePathToAppend.length() - 1);
-			}
-		}
 		try {
-			return new URI(String.format("%s://%s:%d%s%s", getScheme(), getHost(), getPort(), basePathToAppend, path.replace(" ", "+")));
-		} catch (URISyntaxException ex) {
+			UriComponentsBuilder builder = UriComponentsBuilder.newInstance()
+				.scheme(getScheme())
+				.host(getHost())
+				.port(getPort());
+
+			final String fullPath = determineFullPath(path);
+
+			int queryIndex = fullPath.indexOf('?');
+			if (queryIndex != -1) {
+				String pathPart = fullPath.substring(0, queryIndex);
+				builder.path(pathPart);
+				String queryPart = fullPath.substring(queryIndex + 1);
+				applyQueryParams(builder, queryPart);
+			} else {
+				builder.path(fullPath);
+			}
+
+			URI uri = builder.build().toUri();
+			uri = fixDoubleEncodingOfPlusSign(uri);
+			return uri;
+		} catch (Exception ex) {
 			throw new RuntimeException("Unable to build URI for path: " + path + "; cause: " + ex.getMessage(), ex);
 		}
+	}
+
+	private String determineFullPath(String path) {
+		String fullPath = path;
+		if (basePath != null) {
+			String normalizedBasePath = basePath.startsWith("/") ? basePath : "/" + basePath;
+			if (path.startsWith("/") && normalizedBasePath.endsWith("/")) {
+				normalizedBasePath = normalizedBasePath.substring(0, normalizedBasePath.length() - 1);
+			}
+			fullPath = normalizedBasePath + path;
+		}
+		return fullPath;
+	}
+
+	private UriComponentsBuilder applyQueryParams(UriComponentsBuilder builder, String queryPart) {
+		// Parse and add query parameters
+		if (!queryPart.isEmpty()) {
+			String[] params = queryPart.split("&");
+			for (String param : params) {
+				int equalIndex = param.indexOf('=');
+				if (equalIndex != -1) {
+					String key = param.substring(0, equalIndex);
+					String value = param.substring(equalIndex + 1);
+					builder.queryParam(key, value);
+				} else {
+					// Handle parameters without values
+					builder.queryParam(param, "");
+				}
+			}
+		}
+		return builder;
+	}
+
+	private URI fixDoubleEncodingOfPlusSign(final URI uri) {
+		// Fix double-encoding issue: MarkLogic requires "+" to be encoded as "%2B" in paths (at least for mimetypes),
+		// but UriComponentsBuilder double-encodes it to "%252B".
+		String uriString = uri.toString();
+		if (uriString.contains("%252B")) {
+			try {
+				// Split the URI to handle path and query separately
+				String[] parts = uriString.split("\\?", 2);
+				String pathPart = parts[0];
+				String queryPart = parts.length > 1 ? parts[1] : null;
+
+				// Only fix double-encoding in the path part
+				if (pathPart.contains("%252B")) {
+					pathPart = pathPart.replace("%252B", "%2B");
+					String fixedUriString = queryPart != null ? pathPart + "?" + queryPart : pathPart;
+					return new URI(fixedUriString);
+				}
+			} catch (Exception e) {
+				// If URI reconstruction fails, return the original URI
+				// This preserves existing behavior in case of unexpected issues
+			}
+		}
+		return uri;
 	}
 
 	public String getBaseUrl() {

@@ -30,7 +30,7 @@ public class GenericTemplateBuilder extends LoggingObject implements TemplateBui
 	public Resource buildTemplate(Map<String, Object> propertyMap) {
 		Resource r;
 		try {
-			r = (Resource) this.resourceClass.newInstance();
+			r = (Resource) this.resourceClass.getDeclaredConstructor().newInstance();
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}

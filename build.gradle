@@ -1,10 +1,11 @@
+// Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
+
 // Defines common configuration for each of the 3 subprojects.
 subprojects {
 	apply plugin: "java-library"
 	apply plugin: "maven-publish"
 
 	group = "com.marklogic"
-	version = "6.0.0"
 
 	java {
 		sourceCompatibility = 17
@@ -15,7 +16,7 @@ subprojects {
 		mavenCentral()
 		mavenLocal()
 		maven {
-			url "https://bed-artifactory.bedford.progress.com:443/artifactory/ml-maven-snapshots/"
+			url = "https://bed-artifactory.bedford.progress.com:443/artifactory/ml-maven-snapshots/"
 		}
 	}
 
@@ -33,7 +34,17 @@ subprojects {
 		testImplementation 'org.slf4j:slf4j-api:2.0.17'
 	}
 
-	javadoc.failOnError = false
+	// Allows for quickly identifying compiler warnings and treating them as errors.
+	tasks.withType(JavaCompile) {
+		options.compilerArgs += ["-Xlint:unchecked", "-Xlint:deprecation", "-Werror"]
+		options.deprecation = true
+		options.warnings = true
+	}
+
+	javadoc {
+		failOnError = false
+	}
+
 	// Ignores warnings on params that don't have descriptions, which is a little too noisy
 	javadoc.options.addStringOption('Xdoclint:none', '-quiet')
 
@@ -41,7 +52,7 @@ subprojects {
 		useJUnitPlatform()
 		testLogging {
 			events 'started','passed', 'skipped', 'failed'
-			exceptionFormat 'full'
+			exceptionFormat = 'full'
 		}
 	}
 
@@ -90,8 +101,8 @@ subprojects {
 			maven {
 				if (project.hasProperty("mavenUser")) {
 					credentials {
-						username mavenUser
-						password mavenPassword
+						username = mavenUser
+						password = mavenPassword
 					}
 					url publishUrl
 					allowInsecureProtocol = true
@@ -99,8 +110,8 @@ subprojects {
 					name = "central"
 					url = mavenCentralUrl
 					credentials {
-						username mavenCentralUsername
-						password mavenCentralPassword
+						username = mavenCentralUsername
+						password = mavenCentralPassword
 					}
 				}
 			}

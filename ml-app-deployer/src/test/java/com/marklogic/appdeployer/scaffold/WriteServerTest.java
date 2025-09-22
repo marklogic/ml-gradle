@@ -11,16 +11,16 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class WriteServerTest extends AbstractResourceWriterTest {
+class WriteServerTest extends AbstractResourceWriterTest {
 
 	@Test
-	public void defaultValues() {
+	void defaultValues() {
 		initializeAppDeployer(new DeployOtherServersCommand());
 
 		buildResourceAndDeploy(new ServerTemplateBuilder());
 
 		Server s = api.server("CHANGEME-name-of-server");
-		assertEquals(new Integer(8099), s.getPort());
+		assertEquals(8099, s.getPort());
 		assertEquals("Modules", s.getModulesDatabase());
 		assertEquals("Documents", s.getContentDatabase());
 		assertEquals("digest", s.getAuthentication());

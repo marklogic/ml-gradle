@@ -24,11 +24,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class LoadModulesTest extends AbstractIntegrationTest {
+class LoadModulesTest extends AbstractIntegrationTest {
 
 	private DatabaseClient modulesClient;
 	private DefaultModulesLoader modulesLoader;
@@ -76,7 +74,7 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 			assertTrue(mgr.getQueryOptionValidation());
 			assertEquals(ServerConfigurationManager.UpdatePolicy.OVERWRITE_METADATA, mgr.getUpdatePolicy());
 			assertTrue(mgr.getServerRequestLogging());
-			assertTrue(StringUtils.isEmpty(mgr.getDefaultDocumentReadTransform()));
+			assertFalse(StringUtils.hasText(mgr.getDefaultDocumentReadTransform()));
 			assertTrue(mgr.getDefaultDocumentReadTransformAll());
 		} finally {
 			setRestPropertiesToMarkLogicDefaults();
@@ -100,7 +98,7 @@ public class LoadModulesTest extends AbstractIntegrationTest {
 			assertTrue(mgr.getQueryOptionValidation());
 			assertEquals(ServerConfigurationManager.UpdatePolicy.OVERWRITE_METADATA, mgr.getUpdatePolicy());
 			assertTrue(mgr.getServerRequestLogging());
-			assertTrue(StringUtils.isEmpty(mgr.getDefaultDocumentReadTransform()));
+			assertFalse(StringUtils.hasText(mgr.getDefaultDocumentReadTransform()));
 			assertTrue(mgr.getDefaultDocumentReadTransformAll());
 		} finally {
 			setRestPropertiesToMarkLogicDefaults();

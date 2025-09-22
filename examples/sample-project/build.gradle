@@ -8,7 +8,7 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath "com.marklogic:ml-gradle:6.0.0"
+		classpath "com.marklogic:ml-gradle:6.0.1"
 	}
 }
 
@@ -47,7 +47,7 @@ configurations {
 configurations.all {
 	resolutionStrategy.eachDependency { DependencyResolveDetails details ->
 		if (details.requested.group.startsWith('org.springframework')) {
-			details.useVersion '6.2.10'
+			details.useVersion '6.2.11'
 			details.because 'Forcing marklogic-junit5 to use the latest version of Spring to minimize security vulnerabilities.'
 		}
 	}

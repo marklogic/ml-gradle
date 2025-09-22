@@ -42,7 +42,7 @@ public abstract class AbstractCommand extends LoggingObject implements Command {
 	private int executeSortOrder = Integer.MAX_VALUE;
 	private boolean storeResourceIdsAsCustomTokens = false;
 
-	// In 6.1.0, changing this from FilenameFilter to ResourceFilenameFilter based on Polaris warnings on
+	// In 6.0.1, changing this from FilenameFilter to ResourceFilenameFilter based on Polaris warnings on
 	// FilenameFilter. And all uses of this in the codebase involve ResourceFilenameFilter.
 	private ResourceFilenameFilter resourceFilenameFilter = new ResourceFilenameFilter();
 

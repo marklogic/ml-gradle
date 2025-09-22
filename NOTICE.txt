@@ -19,12 +19,12 @@ marklogic-client-api 7.2.0 (Apache-2.0)
 marklogic-xcc 12.0.0 (Apache-2.0)
 okhttp 4.12.0 (Apache-2.0)
 slf4j-api 2.0.17 (MIT)
-spring-web 5.3.39 (Apache-2.0)
+spring-web 6.2.11 (Apache-2.0)
 zjsonpatch 0.4.16 (Apache-2.0)
 
 Third-Party Components
 
-The following is a list of the third-party components used by Progress® MarkLogic® Ml-gradle 6.0.0 (last updated July 31, 2025):
+The following is a list of the third-party components used by Progress® MarkLogic® Ml-gradle 6.0.1 (last updated September 22nd, 2025):
 
 commons-io 2.20.0 (Apache-2.0)
 https://repo1.maven.org/maven2/commons-io/commons-io/
@@ -62,7 +62,7 @@ slf4j-api 2.0.17 (MIT)
 https://repo1.maven.org/maven2/org/slf4j/slf4j-api/
 For the full text of the MIT license, see MIT license (MIT)
 
-spring-web 5.3.39 (Apache-2.0)
+spring-web 6.2.11 (Apache-2.0)
 https://repo1.maven.org/maven2/org/springframework/spring-web/
 For the full text of the Apache-2.0 license, see Apache License 2.0 (Apache-2.0)
 
@@ -72,7 +72,7 @@ For the full text of the Apache-2.0 license, see Apache License 2.0 (Apache-2.0)
 
 Common Licenses
 
-The following is a list of the common licenses used by Progress® MarkLogic® Ml-gradle 6.0.0 (last updated July 31, 2025):
+The following is a list of the common licenses used by Progress® MarkLogic® Ml-gradle 6.0.1 (last updated September 22nd, 2025):
 
 Apache License 2.0 (Apache-2.0)
 https://spdx.org/licenses/Apache-2.0.html

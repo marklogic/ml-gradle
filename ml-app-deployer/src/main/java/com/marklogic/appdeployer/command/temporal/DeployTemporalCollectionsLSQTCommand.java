@@ -54,8 +54,8 @@ public class DeployTemporalCollectionsLSQTCommand extends AbstractCommand {
 	}
 
 	private String makeTemporalCollectionName(String filename) {
-		// use filename without suffix as temporal collection
-		return filename.endsWith(".xml") || filename.endsWith(".json") ?
-			filename.substring(0, filename.length() - 4) : filename;
+		// The convention is for the filename to be the temporal collection name with .xml or .json.
+		int pos = filename.lastIndexOf(".");
+		return pos > -1 ? filename.substring(0, pos) : filename;
 	}
 }

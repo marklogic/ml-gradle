@@ -1,7 +1,0 @@
-{
-	"lsqt-enabled": true,
-	"automation": {
-		"enabled": true,
-		"period": 5000
-	}
-}

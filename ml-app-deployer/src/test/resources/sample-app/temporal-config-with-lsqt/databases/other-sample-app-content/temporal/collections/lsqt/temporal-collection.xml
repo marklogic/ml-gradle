@@ -1,0 +1,8 @@
+<temporal-lsqt-properties xmlns="http://marklogic.com/manage/temporal-collection/lsqt/properties">
+	<lsqt-enabled>true</lsqt-enabled>
+	<automation>
+		<enabled>true</enabled>
+		<period>5000</period>
+		<lag>1000</lag>
+	</automation>
+</temporal-lsqt-properties>

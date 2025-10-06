@@ -3,6 +3,7 @@
  */
 package com.marklogic.rest.util;
 
+import com.marklogic.client.impl.okhttp.RetryIOExceptionInterceptor;
 import com.marklogic.mgmt.DefaultManageConfigFactory;
 import com.marklogic.mgmt.ManageConfig;
 import com.marklogic.mgmt.admin.AdminConfig;
@@ -75,7 +76,7 @@ public class TestConfig {
 		config.setCleanJsonPayloads(true);
 
 		config.setClientConfigurator(builder ->
-			builder.addInterceptor(new com.marklogic.rest.util.RetryInterceptor(3, 1000, 2, 5000)));
+			builder.addInterceptor(new RetryIOExceptionInterceptor(3, 1000, 2, 5000)));
 
 		return config;
 	}

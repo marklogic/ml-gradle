@@ -7,6 +7,9 @@ dependencies {
 	// For wrangling JSON.
 	api "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
 
+	// For compiling JAXB code; marklogic-client-api brings this in at runtime.
+	compileOnly "jakarta.xml.bind:jakarta.xml.bind-api:4.0.4"
+
 	// For resolving XPath expressions against XML documents.
 	implementation 'jaxen:jaxen:2.0.0'
 
@@ -25,6 +28,9 @@ dependencies {
 		// Prefer the api version declared above
 		exclude module: "jackson-databind"
 	}
+
+	// Need this for compiling tests too.
+	testCompileOnly "jakarta.xml.bind:jakarta.xml.bind-api:4.0.4"
 
 	testImplementation 'commons-io:commons-io:2.19.0'
 	testImplementation 'xmlunit:xmlunit:1.6'

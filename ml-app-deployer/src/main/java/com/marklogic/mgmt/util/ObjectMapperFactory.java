@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +50,7 @@ public abstract class ObjectMapperFactory {
 		// standardizes on.
 		objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.KEBAB_CASE);
 
-		objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+		objectMapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		// This is needed at least for localname on Element instances

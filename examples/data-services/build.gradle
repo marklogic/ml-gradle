@@ -1,8 +1,8 @@
 plugins {
 	id "java"
 	id "net.saliman.properties" version "1.5.2"
-	id "com.marklogic.ml-gradle" version "6.0.0"
-	id 'com.marklogic.ml-development-tools' version '7.2.0'
+	id "com.marklogic.ml-gradle" version "6.0.1"
+	id 'com.marklogic.ml-development-tools' version '8.0.0'
 }
 
 task generateHelloWorld(type: com.marklogic.client.tools.gradle.EndpointProxiesGenTask) {
@@ -20,12 +20,12 @@ test {
 
 dependencies {
 	implementation 'org.slf4j:slf4j-api:2.0.17'
-	implementation 'com.marklogic:marklogic-client-api:7.2.0'
+	implementation 'com.marklogic:marklogic-client-api:8.0.0'
 
 	testImplementation "org.junit.jupiter:junit-jupiter:5.12.2"
 
 	// Force usage of logback for logging
-	testImplementation "ch.qos.logback:logback-classic:1.5.18"
+	testImplementation "ch.qos.logback:logback-classic:1.5.19"
 	testImplementation "org.slf4j:jcl-over-slf4j:2.0.17"
 	testImplementation "org.slf4j:slf4j-api:2.0.17"
 }

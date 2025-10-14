@@ -11,13 +11,13 @@ product and version for which you are requesting source code.
 Third Party Notices
 
 commons-io 2.20.0 (Apache-2.0)
-commons-lang3 3.18.0 (Apache-2.0)
-jackson-databind 2.19.0 (Apache-2.0)
+commons-lang3 3.19.0 (Apache-2.0)
+jackson-databind 2.20.0 (Apache-2.0)
 jaxen 2.0.0 (Apache-2.0)
 jdom2 2.0.6.1 (Apache-2.0)
-marklogic-client-api 7.2.0 (Apache-2.0)
+marklogic-client-api 8.0.0 (Apache-2.0)
 marklogic-xcc 12.0.0 (Apache-2.0)
-okhttp 4.12.0 (Apache-2.0)
+okhttp 5.2.0 (Apache-2.0)
 slf4j-api 2.0.17 (MIT)
 spring-web 6.2.11 (Apache-2.0)
 zjsonpatch 0.4.16 (Apache-2.0)

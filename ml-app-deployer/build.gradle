@@ -35,8 +35,6 @@ dependencies {
 	testImplementation 'commons-io:commons-io:2.19.0'
 	testImplementation 'xmlunit:xmlunit:1.6'
 
-	testImplementation ("com.marklogic:marklogic-junit5:1.5.0") {
-		// Use the version of ml-javaclient-util within this repository.
-		exclude module: "ml-javaclient-util"
-	}
+	// Gradle will alter this to use the ml-javaclient-util project in this repository.
+	testImplementation "com.marklogic:marklogic-junit5:2.0-SNAPSHOT"
 }

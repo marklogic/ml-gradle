@@ -12,7 +12,7 @@ include this by default (not every ml-gradle user will use marklogic-unit-test),
         mavenCentral()
       }
       dependencies {
-        classpath "com.marklogic:marklogic-unit-test-client:1.1.0"
+        classpath "com.marklogic:marklogic-unit-test-client:1.5.0"
       }
     }
 

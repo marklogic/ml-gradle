@@ -11,4 +11,4 @@ startyear: 2015
 #   - Dotfiles already skipped automatically
 # Enable by removing the leading '# ' from the next line and editing values.
 # filesexcluded: third_party/*, docs/generated/*.md, assets/*.png, scripts/temp_*.py, vendor/lib.js
-filesexcluded: .github/*, README.md, Jenkinsfile, gradle/*, docker-compose.yml, *.gradle, gradle.properties, gradlew, gradlew.bat
+filesexcluded: .github/*, Jenkinsfile, gradle/*, docker-compose.yml, *.gradle, gradle.properties, gradlew, gradlew.bat, **test/resources/**, *.md

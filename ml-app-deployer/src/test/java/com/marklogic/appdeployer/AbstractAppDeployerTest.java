@@ -105,7 +105,11 @@ public abstract class AbstractAppDeployerTest extends AbstractMgmtTest {
 	}
 
 	protected final DatabaseClient newDatabaseClient(String databaseName) {
-		return DatabaseClientFactory.newClient(appConfig.getHost(), appConfig.getRestPort(),
+		return newDatabaseClient(databaseName, appConfig.getRestPort());
+	}
+
+	protected final DatabaseClient newDatabaseClient(String databaseName, int port) {
+		return DatabaseClientFactory.newClient(appConfig.getHost(), port,
 			databaseName, new DatabaseClientFactory.DigestAuthContext(appConfig.getRestAdminUsername(), appConfig.getRestAdminPassword()));
 	}
 

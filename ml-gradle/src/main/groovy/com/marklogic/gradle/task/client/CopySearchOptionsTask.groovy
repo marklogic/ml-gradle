@@ -19,8 +19,15 @@ class CopySearchOptionsTask extends MarkLogicTask {
 	@Optional
 	DatabaseClient client
 
+	// Deprecated as it conflicts with the "group" property on a custom task definition.
 	@Input
-	String group = "Default"
+	@Optional
+	@Deprecated(since = "6.1.0", forRemoval = true)
+	String group
+
+	@Input
+	@Optional
+	String groupName = "Default"
 
 	@Input
 	String sourceServer
@@ -40,8 +47,14 @@ class CopySearchOptionsTask extends MarkLogicTask {
 			databaseClient = getAppConfig().newModulesDatabaseClient()
 		}
 
-		def script = "declareUpdate();\nconst uri = '/${group}/${sourceServer}/rest-api/options/${optionsFilename}';\n"
-		script += "xdmp.documentInsert('/${group}/${targetServer}/rest-api/options/${optionsFilename}', cts.doc(uri), " +
+		def groupToUse = groupName
+		if (group != null) {
+			logger.warn("\nThe 'group' property is deprecated on the CopySearchOptionsTask task; use 'groupName' instead.\n")
+			groupToUse = group
+		}
+
+		def script = "declareUpdate();\nconst uri = '/${groupToUse}/${sourceServer}/rest-api/options/${optionsFilename}';\n"
+		script += "xdmp.documentInsert('/${groupToUse}/${targetServer}/rest-api/options/${optionsFilename}', cts.doc(uri), " +
 			"xdmp.documentGetPermissions(uri), xdmp.documentGetCollections(uri))";
 		println "Copying search options via:\n" + script
 		databaseClient.newServerEval().javascript(script).eval()

@@ -7,18 +7,21 @@ dependencies {
 	// For wrangling JSON.
 	api "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
 
+	// For compiling JAXB code; marklogic-client-api brings this in at runtime.
+	compileOnly "jakarta.xml.bind:jakarta.xml.bind-api:4.0.4"
+
 	// For resolving XPath expressions against XML documents.
 	implementation 'jaxen:jaxen:2.0.0'
 
 	// Must depend on this as it's not an API dependency of the Java Client, and we have some code
 	// that requires OkHttp for compilation.
-	implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+	implementation 'com.squareup.okhttp3:okhttp:5.2.0'
 
 	// For parsing/manipulating XML.
 	implementation 'org.jdom:jdom2:2.0.6.1'
 
 	// For EqualsBuilder; added in 3.8.1 to support detecting if a mimetype's properties have changed or not
-	implementation "org.apache.commons:commons-lang3:3.18.0"
+	implementation "org.apache.commons:commons-lang3:3.19.0"
 
 	// For PreviewInterceptor; can be excluded if that feature is not used
 	implementation("com.flipkart.zjsonpatch:zjsonpatch:0.4.16") {
@@ -26,11 +29,12 @@ dependencies {
 		exclude module: "jackson-databind"
 	}
 
+	// Need this for compiling tests too.
+	testCompileOnly "jakarta.xml.bind:jakarta.xml.bind-api:4.0.4"
+
 	testImplementation 'commons-io:commons-io:2.19.0'
 	testImplementation 'xmlunit:xmlunit:1.6'
 
-	testImplementation ("com.marklogic:marklogic-junit5:1.5.0") {
-		// Use the version of ml-javaclient-util within this repository.
-		exclude module: "ml-javaclient-util"
-	}
+	// Gradle will alter this to use the ml-javaclient-util project in this repository.
+	testImplementation "com.marklogic:marklogic-junit5:2.0-SNAPSHOT"
 }

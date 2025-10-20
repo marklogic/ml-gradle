@@ -14,6 +14,7 @@ import com.marklogic.appdeployer.util.SimplePropertiesSource
 import com.marklogic.gradle.task.*
 import com.marklogic.gradle.task.admin.InitTask
 import com.marklogic.gradle.task.admin.InstallAdminTask
+import com.marklogic.gradle.task.admin.WaitTillReadyTask
 import com.marklogic.gradle.task.alert.DeleteAllAlertConfigsTask
 import com.marklogic.gradle.task.alert.DeployAlertingTask
 import com.marklogic.gradle.task.client.*
@@ -125,6 +126,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlInit", type: InitTask, group: adminGroup, description: "Perform a one-time initialization of a MarkLogic server; uses the properties 'mlLicenseKey' and 'mlLicensee'")
 		project.task("mlInstallAdmin", type: InstallAdminTask, group: adminGroup, description: "Perform a one-time installation of an admin user; uses the properties 'mlUsername' and 'mlPassword'; " +
 			"the realm, which defaults to 'public', can optionally be specified on the command line via '-Prealm='")
+		project.task("mlWaitTillReady", type: WaitTillReadyTask, group: adminGroup, description: "Wait until MarkLogic is ready and accessible; useful in CI/CD pipelines after installing or restarting MarkLogic.")
 
 		String alertGroup = "ml-gradle Alert"
 		project.task("mlDeleteAllAlertConfigs", type: DeleteAllAlertConfigsTask, group: alertGroup, description: "Delete all alert configs, which also deletes all of the actions rules associated with them")

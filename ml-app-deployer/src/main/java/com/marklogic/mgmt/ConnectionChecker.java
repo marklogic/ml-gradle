@@ -1,45 +1,46 @@
 /*
  * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
-package com.marklogic.client.ext.util;
+package com.marklogic.mgmt;
 
-import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.ext.helper.LoggingObject;
 
 import java.util.function.Supplier;
 
 /**
- * Immutable utility class for checking if a MarkLogic DatabaseClient connection is ready and functional.
+ * Immutable utility class for checking if a MarkLogic ManageClient connection is ready and functional.
  * This is particularly useful in CI/CD pipelines where MarkLogic may have just been installed
- * or restarted, and you need to wait until it's ready to handle database requests.
+ * or restarted, and you need to wait until it's ready to handle management requests.
+ * <p>
+ * Uses ManageClient instead of DatabaseClient because ManageClient calls will continue to fail
+ * until MarkLogic is truly ready, whereas DatabaseClient ping operations can succeed prematurely.
  */
-
 public class ConnectionChecker extends LoggingObject {
 
-	private final Supplier<DatabaseClient> clientSupplier;
+	private final Supplier<ManageClient> manageClientSupplier;
 	private final long waitInterval;  // milliseconds
 	private final int maxAttempts;
 
 	/**
-	 * Create a new ConnectionChecker with the given DatabaseClient supplier and default settings.
+	 * Create a new ConnectionChecker with the given ManageClient supplier and default settings.
 	 * Default wait interval is 3000ms, default max attempts is 20.
 	 *
-	 * @param clientSupplier a Supplier that creates a new DatabaseClient for each attempt
+	 * @param manageClientSupplier a Supplier that creates a new ManageClient for each attempt
 	 */
-	public ConnectionChecker(Supplier<DatabaseClient> clientSupplier) {
-		this(clientSupplier, 3000L, 20);
+	public ConnectionChecker(Supplier<ManageClient> manageClientSupplier) {
+		this(manageClientSupplier, 3000L, 20);
 	}
 
 	/**
-	 * Create a new ConnectionChecker with the given DatabaseClient supplier and custom settings.
+	 * Create a new ConnectionChecker with the given ManageClient supplier and custom settings.
 	 *
-	 * @param clientSupplier a Supplier that creates a new DatabaseClient for each attempt
-	 * @param waitIntervalMs wait interval in milliseconds (must be positive)
-	 * @param maxAttempts    maximum number of attempts (must be positive)
+	 * @param manageClientSupplier a Supplier that creates a new ManageClient for each attempt
+	 * @param waitIntervalMs       wait interval in milliseconds (must be positive)
+	 * @param maxAttempts          maximum number of attempts (must be positive)
 	 */
-	public ConnectionChecker(Supplier<DatabaseClient> clientSupplier, long waitIntervalMs, int maxAttempts) {
-		if (clientSupplier == null) {
-			throw new IllegalArgumentException("DatabaseClient supplier cannot be null");
+	public ConnectionChecker(Supplier<ManageClient> manageClientSupplier, long waitIntervalMs, int maxAttempts) {
+		if (manageClientSupplier == null) {
+			throw new IllegalArgumentException("ManageClient supplier cannot be null");
 		}
 		if (waitIntervalMs <= 0) {
 			throw new IllegalArgumentException("Wait interval must be positive");
@@ -47,29 +48,26 @@ public class ConnectionChecker extends LoggingObject {
 		if (maxAttempts <= 0) {
 			throw new IllegalArgumentException("Max attempts must be positive");
 		}
-		this.clientSupplier = clientSupplier;
+		this.manageClientSupplier = manageClientSupplier;
 		this.waitInterval = waitIntervalMs;
 		this.maxAttempts = maxAttempts;
 	}
 
 	/**
-	 * Wait until the DatabaseClient connection is ready, retrying up to maxAttempts times.
+	 * Wait until the ManageClient connection is ready, retrying up to maxAttempts times.
+	 * This checks the /manage/v2 endpoint, which will continue to fail until MarkLogic is truly ready.
 	 *
-	 * @return true when the connection becomes ready
 	 * @throws RuntimeException if the connection is not ready after maxAttempts
 	 */
-	public boolean waitUntilReady() {
+	public void waitUntilReady() {
 		logger.info("Waiting for MarkLogic to be ready (checking every {}ms, max attempts: {})", waitInterval, maxAttempts);
 
 		for (int attempt = 1; attempt <= maxAttempts; attempt++) {
 			String errorMessage;
-			try (DatabaseClient client = clientSupplier.get()) {
-				DatabaseClient.ConnectionResult result = client.checkConnection();
-				if (result.isConnected()) {
-					logger.info("MarkLogic is ready (connected on attempt {})", attempt);
-					return true;
-				}
-				errorMessage = "Attempt %d failed with status code %d: %s".formatted(attempt, result.getStatusCode(), result.getErrorMessage());
+			try {
+				manageClientSupplier.get().getJson("/manage/v2");
+				logger.info("MarkLogic is ready (connected on attempt {})", attempt);
+				return;
 			} catch (Exception e) {
 				errorMessage = "Attempt %d failed: %s".formatted(attempt, e.getMessage());
 			}

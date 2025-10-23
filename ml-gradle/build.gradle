@@ -20,7 +20,7 @@ dependencies {
 
 	testImplementation localGroovy()
 	testImplementation gradleTestKit()
-	testImplementation 'xmlunit:xmlunit:1.6'
+	testImplementation 'org.xmlunit:xmlunit-legacy:2.10.4'
 
 	// Force spock-core to use 4.13.2 to avoid security issue in 4.11
 	testImplementation 'junit:junit:4.13.2'

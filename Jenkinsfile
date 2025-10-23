@@ -28,6 +28,10 @@ def tearDownDocker() {
 pipeline {
   agent {label 'devExpLinuxPool'}
 
+  parameters {
+    booleanParam(name: 'ONLY_PUBLISH', defaultValue: false, description: 'Skip tests and only run publish stage')
+  }
+
   options {
     checkoutToSubdirectory 'ml-gradle'
     buildDiscarder logRotator(artifactDaysToKeepStr: '7', artifactNumToKeepStr: '', daysToKeepStr: '7', numToKeepStr: '5')
@@ -43,6 +47,9 @@ pipeline {
   stages {
 
     stage('tests') {
+      when {
+        expression { params.ONLY_PUBLISH == false }
+      }
       steps {
       	cleanupDocker()
       	setupDockerMarkLogic("ml-docker-db-dev-tierpoint.bed-artifactory.bedford.progress.com/marklogic/marklogic-server-ubi-rootless:latest-12")

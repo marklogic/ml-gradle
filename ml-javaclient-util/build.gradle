@@ -14,7 +14,7 @@ dependencies {
 	// For compiling JAXB code; marklogic-client-api brings this in at runtime.
 	testCompileOnly "jakarta.xml.bind:jakarta.xml.bind-api:4.0.4"
 
-	testImplementation 'org.mockito:mockito-core:4.11.0'
+	testImplementation 'org.mockito:mockito-core:5.20.0'
 	// Used for testing loading modules from the classpath
 	testImplementation files("lib/modules.jar")
 }

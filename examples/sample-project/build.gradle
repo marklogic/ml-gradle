@@ -47,14 +47,14 @@ configurations {
 configurations.all {
 	resolutionStrategy.eachDependency { DependencyResolveDetails details ->
 		if (details.requested.group.startsWith('org.springframework')) {
-			details.useVersion '6.2.11'
+			details.useVersion '6.2.12'
 			details.because 'Forcing marklogic-junit5 to use the latest version of Spring to minimize security vulnerabilities.'
 		}
 	}
 }
 
 dependencies {
-	testImplementation "com.marklogic:marklogic-junit5:1.5.0"
+	testImplementation "com.marklogic:marklogic-junit5:2.0.0"
 	corb "com.marklogic:marklogic-corb:2.5.5"
 }
 

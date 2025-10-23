@@ -10,6 +10,7 @@ import com.marklogic.appdeployer.command.CommandContext
 import com.marklogic.appdeployer.impl.SimpleAppDeployer
 import com.marklogic.client.DatabaseClient
 import com.marklogic.mgmt.ManageClient
+import com.marklogic.mgmt.ManageConfig
 import com.marklogic.mgmt.admin.AdminManager
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -34,6 +35,11 @@ class MarkLogicTask extends DefaultTask {
     ManageClient getManageClient() {
         getProject().property("mlManageClient")
     }
+
+	@Internal
+	ManageConfig getManageConfig() {
+		getProject().property("mlManageConfig")
+	}
 
 	@Internal
     AppDeployer getAppDeployer() {

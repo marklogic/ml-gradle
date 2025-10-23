@@ -3,17 +3,18 @@
  */
 package com.marklogic.gradle.task.admin
 
-
-import com.marklogic.client.ext.util.ConnectionChecker
 import com.marklogic.gradle.task.MarkLogicTask
+import com.marklogic.mgmt.ConnectionChecker
+import com.marklogic.mgmt.ManageClient
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 
 /**
- * Waits until MarkLogic is ready by using ConnectionChecker to verify database connectivity via the App-Services port (8000).
+ * Waits until MarkLogic is ready by using ConnectionChecker to verify management API connectivity.
  * This is useful in CI/CD pipelines where MarkLogic may have just been installed or restarted.
- * Delegates to ConnectionChecker for the actual connection testing logic.
+ * Uses ManageClient instead of DatabaseClient because ManageClient calls will continue to fail
+ * until MarkLogic is truly ready, whereas DatabaseClient ping operations can succeed prematurely.
  */
 class WaitTillReadyTask extends MarkLogicTask {
 
@@ -28,7 +29,7 @@ class WaitTillReadyTask extends MarkLogicTask {
 	@TaskAction
 	void waitTillReady() {
 		new ConnectionChecker(
-			{ -> getAppConfig().newAppServicesDatabaseClient(null) } as java.util.function.Supplier,
+			{ -> new ManageClient(getManageConfig()) } as java.util.function.Supplier,
 			waitInterval,
 			maxAttempts
 		).waitUntilReady()

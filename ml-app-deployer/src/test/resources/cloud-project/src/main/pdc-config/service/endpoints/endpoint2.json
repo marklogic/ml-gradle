@@ -1,0 +1,8 @@
+{
+	"name": "ragplus-digestbasic",
+	"displayName": "ragplus-digestbasic",
+	"port": 8005,
+	"type": "http",
+	"path": "ragplus-digestbasic/",
+	"supportedByCloud": true
+}

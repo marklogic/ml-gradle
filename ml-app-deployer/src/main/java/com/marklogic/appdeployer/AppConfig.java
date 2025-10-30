@@ -60,6 +60,7 @@ public class AppConfig {
 	 */
 	public final static String DEFAULT_MODULES_PATH = "src/main/ml-modules";
 	public final static String DEFAULT_SCHEMAS_PATH = "src/main/ml-schemas";
+	public final static String DEFAULT_PDC_CONFIG_PATH = "src/main/pdc-config";
 
 	public final static String DEFAULT_HOST = "localhost";
 	public final static String DEFAULT_GROUP = "Default";
@@ -177,6 +178,8 @@ public class AppConfig {
 	private boolean tdeValidationEnabled = true;
 
 	private List<ConfigDir> configDirs;
+
+	private List<String> pdcConfigPaths;
 
 	// Passed into the PayloadTokenReplacer that subclasses of AbstractCommand use
 	private Map<String, String> customTokens = new HashMap<>();
@@ -300,6 +303,10 @@ public class AppConfig {
 		String defaultSchemasPath = projectDir != null ? new File(projectDir, DEFAULT_SCHEMAS_PATH).getAbsolutePath() : DEFAULT_SCHEMAS_PATH;
 		schemaPaths = new ArrayList<>();
 		schemaPaths.add(defaultSchemasPath);
+
+		String defaultPdcConfigPath = projectDir != null ? new File(projectDir, DEFAULT_PDC_CONFIG_PATH).getAbsolutePath() : DEFAULT_PDC_CONFIG_PATH;
+		pdcConfigPaths = new ArrayList<>();
+		pdcConfigPaths.add(defaultPdcConfigPath);
 
 		configDirs = new ArrayList<>();
 		configDirs.add(ConfigDir.withProjectDir(projectDir));
@@ -1414,6 +1421,14 @@ public class AppConfig {
 
 	public void setSchemaPaths(List<String> schemaPaths) {
 		this.schemaPaths = schemaPaths;
+	}
+
+	public List<String> getPdcConfigPaths() {
+		return pdcConfigPaths;
+	}
+
+	public void setPdcConfigPaths(List<String> pdcConfigPaths) {
+		this.pdcConfigPaths = pdcConfigPaths;
 	}
 
 	public boolean isMergeResources() {

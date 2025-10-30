@@ -40,6 +40,7 @@ public abstract class SortOrderConstants {
 	public static Integer DEPLOY_REST_API_SERVERS = 200;
 	public static Integer UPDATE_REST_API_SERVERS = 250;
 	public static Integer DEPLOY_OTHER_SERVERS = 300;
+	public static Integer DEPLOY_PDC_MARKLOGIC_ENDPOINTS = 310;
 
 	public static Integer MODIFY_LOCAL_CLUSTER = 350;
 

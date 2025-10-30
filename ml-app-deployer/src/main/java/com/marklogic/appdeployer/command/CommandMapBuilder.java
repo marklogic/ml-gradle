@@ -25,6 +25,7 @@ import com.marklogic.appdeployer.command.hosts.AssignHostsToGroupsCommand;
 import com.marklogic.appdeployer.command.mimetypes.DeployMimetypesCommand;
 import com.marklogic.appdeployer.command.modules.DeleteTestModulesCommand;
 import com.marklogic.appdeployer.command.modules.LoadModulesCommand;
+import com.marklogic.appdeployer.command.pdc.DeployPdcEndpointsCommand;
 import com.marklogic.appdeployer.command.plugins.InstallPluginsCommand;
 import com.marklogic.appdeployer.command.rebalancer.DeployPartitionQueriesCommand;
 import com.marklogic.appdeployer.command.rebalancer.DeployPartitionsCommand;
@@ -139,6 +140,10 @@ public class CommandMapBuilder {
 		List<Command> restApiCommands = new ArrayList<>();
 		restApiCommands.add(new DeployRestApiServersCommand());
 		map.put("mlRestApiCommands", restApiCommands);
+
+		List<Command> pdcCommands = new ArrayList<>();
+		pdcCommands.add(new DeployPdcEndpointsCommand());
+		map.put("mlPdcCommands", pdcCommands);
 
 		List<Command> securityCommands = new ArrayList<>();
 		securityCommands.add(new DeployRolesCommand());

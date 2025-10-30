@@ -29,6 +29,8 @@ dependencies {
 		exclude module: "jackson-databind"
 	}
 
+	implementation "com.progress:pdc-client-api:1.0-SNAPSHOT"
+
 	// Need this for compiling tests too.
 	testCompileOnly "jakarta.xml.bind:jakarta.xml.bind-api:4.0.4"
 

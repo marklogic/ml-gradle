@@ -1,0 +1,7 @@
+{
+	"name": "ragplus",
+	"displayName": "ragplus",
+	"port": 8006,
+	"supportedByCloud": true,
+	"path": "ragplus/"
+}

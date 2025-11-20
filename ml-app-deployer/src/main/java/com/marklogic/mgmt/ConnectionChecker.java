@@ -20,25 +20,27 @@ public class ConnectionChecker extends LoggingObject {
 	private final Supplier<ManageClient> manageClientSupplier;
 	private final long waitInterval;  // milliseconds
 	private final int maxAttempts;
+	private final int minSuccessfulAttempts;
 
 	/**
 	 * Create a new ConnectionChecker with the given ManageClient supplier and default settings.
-	 * Default wait interval is 3000ms, default max attempts is 20.
+	 * Default wait interval is 3000ms, default max attempts is 20, default min successful attempts is 2.
 	 *
 	 * @param manageClientSupplier a Supplier that creates a new ManageClient for each attempt
 	 */
 	public ConnectionChecker(Supplier<ManageClient> manageClientSupplier) {
-		this(manageClientSupplier, 3000L, 20);
+		this(manageClientSupplier, 3000L, 20, 2);
 	}
 
 	/**
 	 * Create a new ConnectionChecker with the given ManageClient supplier and custom settings.
 	 *
-	 * @param manageClientSupplier a Supplier that creates a new ManageClient for each attempt
-	 * @param waitIntervalMs       wait interval in milliseconds (must be positive)
-	 * @param maxAttempts          maximum number of attempts (must be positive)
+	 * @param manageClientSupplier  a Supplier that creates a new ManageClient for each attempt
+	 * @param waitIntervalMs        wait interval in milliseconds (must be positive)
+	 * @param maxAttempts           maximum number of attempts (must be positive)
+	 * @param minSuccessfulAttempts minimum number of consecutive successful attempts required (must be positive)
 	 */
-	public ConnectionChecker(Supplier<ManageClient> manageClientSupplier, long waitIntervalMs, int maxAttempts) {
+	public ConnectionChecker(Supplier<ManageClient> manageClientSupplier, long waitIntervalMs, int maxAttempts, int minSuccessfulAttempts) {
 		if (manageClientSupplier == null) {
 			throw new IllegalArgumentException("ManageClient supplier cannot be null");
 		}
@@ -48,42 +50,67 @@ public class ConnectionChecker extends LoggingObject {
 		if (maxAttempts <= 0) {
 			throw new IllegalArgumentException("Max attempts must be positive");
 		}
+		if (minSuccessfulAttempts <= 0) {
+			throw new IllegalArgumentException("Min successful attempts must be positive");
+		}
 		this.manageClientSupplier = manageClientSupplier;
 		this.waitInterval = waitIntervalMs;
 		this.maxAttempts = maxAttempts;
+		this.minSuccessfulAttempts = minSuccessfulAttempts;
 	}
 
 	/**
-	 * Wait until the ManageClient connection is ready, retrying up to maxAttempts times.
+	 * Wait until the ManageClient connection is ready, requiring a minimum number of consecutive successful attempts.
 	 * This checks the /manage/v2 endpoint, which will continue to fail until MarkLogic is truly ready.
+	 * Requiring multiple consecutive successes helps ensure MarkLogic is fully initialized and stable.
 	 *
 	 * @throws RuntimeException if the connection is not ready after maxAttempts
 	 */
 	public void waitUntilReady() {
-		logger.info("Waiting for MarkLogic to be ready (checking every {}ms, max attempts: {})", waitInterval, maxAttempts);
+		logger.info("Waiting for MarkLogic to be ready (checking every {}ms, max attempts: {}, min successful attempts: {})",
+			waitInterval, maxAttempts, minSuccessfulAttempts);
 
+		int consecutiveSuccesses = 0;
 		for (int attempt = 1; attempt <= maxAttempts; attempt++) {
-			String errorMessage;
 			try {
 				manageClientSupplier.get().getJson("/manage/v2");
-				logger.info("MarkLogic is ready (connected on attempt {})", attempt);
-				return;
-			} catch (Exception e) {
-				errorMessage = "Attempt %d failed: %s".formatted(attempt, e.getMessage());
-			}
+				consecutiveSuccesses++;
+				logger.info("Connection successful (attempt {}, consecutive successes: {})", attempt, consecutiveSuccesses);
 
-			if (attempt < maxAttempts) {
-				logger.info("{}; waiting {}ms before retry...", errorMessage, waitInterval);
-				try {
-					Thread.sleep(waitInterval);
-				} catch (InterruptedException e) {
-					Thread.currentThread().interrupt();
-					throw new RuntimeException("Connection check was interrupted", e);
+				if (consecutiveSuccesses >= minSuccessfulAttempts) {
+					logger.info("MarkLogic is ready ({} consecutive successful connections)", consecutiveSuccesses);
+					return;
 				}
+
+				if (attempt < maxAttempts) {
+					logger.info("Waiting {}ms before next verification...", waitInterval);
+					sleep();
+				}
+			} catch (Exception e) {
+				consecutiveSuccesses = 0;
+				handleConnectionFailure(attempt, e);
 			}
 		}
 
-		throw new RuntimeException(format("Failed to connect to MarkLogic after %d attempts (waited %dms between attempts)", maxAttempts, waitInterval));
+		throw new RuntimeException("Failed to connect to MarkLogic after %d attempts (waited %dms between attempts)".formatted(maxAttempts, waitInterval));
+	}
+
+	private void handleConnectionFailure(int attempt, Exception e) {
+		String errorMessage = "Attempt %d failed: %s".formatted(attempt, e.getMessage());
+
+		if (attempt < maxAttempts) {
+			logger.info("{}; waiting {}ms before retry...", errorMessage, waitInterval);
+			sleep();
+		}
+	}
+
+	private void sleep() {
+		try {
+			Thread.sleep(waitInterval);
+		} catch (InterruptedException ie) {
+			Thread.currentThread().interrupt();
+			throw new RuntimeException("Connection check was interrupted", ie);
+		}
 	}
 
 	public long getWaitInterval() {
@@ -92,5 +119,9 @@ public class ConnectionChecker extends LoggingObject {
 
 	public int getMaxAttempts() {
 		return maxAttempts;
+	}
+
+	public int getMinSuccessfulAttempts() {
+		return minSuccessfulAttempts;
 	}
 }

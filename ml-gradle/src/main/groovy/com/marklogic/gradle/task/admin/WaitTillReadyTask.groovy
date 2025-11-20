@@ -26,12 +26,15 @@ class WaitTillReadyTask extends MarkLogicTask {
 	@Optional
 	Integer maxAttempts = 20
 
+	@Input
+	@Optional
+	Integer minSuccessfulAttempts = 2
+
 	@TaskAction
 	void waitTillReady() {
 		new ConnectionChecker(
 			{ -> new ManageClient(getManageConfig()) } as java.util.function.Supplier,
-			waitInterval,
-			maxAttempts
+			waitInterval, maxAttempts, minSuccessfulAttempts
 		).waitUntilReady()
 	}
 }

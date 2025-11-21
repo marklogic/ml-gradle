@@ -1,10 +1,11 @@
 /*
  * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
-package com.marklogic.appdeployer;
+package com.marklogic.appdeployer.command.pdc;
 
+import com.marklogic.appdeployer.AppConfig;
+import com.marklogic.appdeployer.DefaultAppConfigFactory;
 import com.marklogic.appdeployer.command.CommandContext;
-import com.marklogic.appdeployer.command.pdc.DeployPdcEndpointsCommand;
 import com.marklogic.mgmt.DefaultManageConfigFactory;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.ManageConfig;
@@ -14,7 +15,7 @@ import java.io.File;
 import java.util.Properties;
 
 // For manual testing of deploying integration endpoints to PDC.
-public class CloudDebug {
+public class DeployPdcEndpointsDebug {
 
 	public static void main(String[] args) {
 		Properties props = new Properties();

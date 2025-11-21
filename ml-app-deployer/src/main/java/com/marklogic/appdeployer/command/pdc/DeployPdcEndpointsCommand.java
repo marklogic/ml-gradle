@@ -8,13 +8,11 @@ import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.progress.pdc.client.PdcClient;
-import com.progress.pdc.client.generated.ApiClient;
 import com.progress.pdc.client.generated.ApiException;
 import com.progress.pdc.client.generated.api.ServiceApi;
-import com.progress.pdc.client.generated.api.ServiceGroupApi;
 import com.progress.pdc.client.generated.model.MarkLogicApp;
 import com.progress.pdc.client.generated.model.MarkLogicHttpEndpoint;
-import com.progress.pdc.client.generated.model.ServiceGroupViewModel;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,18 +39,19 @@ public class DeployPdcEndpointsCommand extends AbstractCommand {
 	public void execute(CommandContext context) {
 		final List<String> pdcConfigPaths = context.getAppConfig().getPdcConfigPaths();
 		if (pdcConfigPaths == null || pdcConfigPaths.isEmpty()) {
-			if (logger.isInfoEnabled()) {
-				logger.info("No PDC config paths configured");
-			}
 			return;
 		}
 
 		final List<MarkLogicHttpEndpoint> endpoints = readEndpointDefinitionsFromFiles(pdcConfigPaths);
 		if (!endpoints.isEmpty()) {
-			if (logger.isInfoEnabled()) {
-				logger.info("Deploying {} PDC endpoint(s)", endpoints.size());
+			if (!StringUtils.hasText(context.getAppConfig().getCloudApiKey())) {
+				logger.warn("Found configuration for {} PDC endpoint(s), but not deploying them because no cloud API key has been specified.", endpoints.size());
+			} else {
+				if (logger.isInfoEnabled()) {
+					logger.info("Deploying {} PDC endpoint(s)", endpoints.size());
+				}
+				deployEndpoints(context, endpoints);
 			}
-			deployEndpoints(context, endpoints);
 		}
 	}
 
@@ -104,8 +103,7 @@ public class DeployPdcEndpointsCommand extends AbstractCommand {
 	private void deployEndpoints(CommandContext context, List<MarkLogicHttpEndpoint> endpoints) {
 		final String host = context.getManageClient().getManageConfig().getHost();
 		try (PdcClient pdcClient = new PdcClient(host, context.getAppConfig().getCloudApiKey())) {
-			final UUID environmentId = getEnvironmentId(pdcClient.getApiClient());
-			final UUID markLogicServiceId = getFirstMarkLogicServiceId(pdcClient.getApiClient(), environmentId, host);
+			final UUID markLogicServiceId = getFirstMarkLogicServiceId(pdcClient);
 			try {
 				new ServiceApi(pdcClient.getApiClient()).apiServiceMlendpointsIdHttpPut(markLogicServiceId, endpoints);
 			} catch (ApiException e) {
@@ -114,20 +112,12 @@ public class DeployPdcEndpointsCommand extends AbstractCommand {
 		}
 	}
 
-	private UUID getEnvironmentId(ApiClient apiClient) {
+	private UUID getFirstMarkLogicServiceId(PdcClient pdcClient) {
 		try {
-			ServiceGroupViewModel viewModel = new ServiceGroupApi(apiClient).apiServicegroupGet(null).get(0);
-			return viewModel.getId();
-		} catch (ApiException e) {
-			throw new RuntimeException("Unable to get service groups from PDC; cause: %s".formatted(e.getMessage()), e);
-		}
-	}
-
-	private UUID getFirstMarkLogicServiceId(ApiClient apiClient, UUID environmentId, String host) {
-		try {
-			List<MarkLogicApp> apps = new ServiceApi(apiClient).apiServiceAppsGet(environmentId).getMarkLogic();
+			final UUID environmentId = pdcClient.getEnvironmentId();
+			List<MarkLogicApp> apps = new ServiceApi(pdcClient.getApiClient()).apiServiceAppsGet(environmentId).getMarkLogic();
 			if (apps == null || apps.isEmpty()) {
-				throw new RuntimeException("No instances of MarkLogic found in PDC tenancy; host: %s".formatted(host));
+				throw new RuntimeException("No instances of MarkLogic found in PDC tenancy; host: %s".formatted(pdcClient.getHost()));
 			}
 			return apps.get(0).getId();
 		} catch (ApiException e) {

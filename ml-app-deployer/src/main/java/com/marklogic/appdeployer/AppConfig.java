@@ -5,6 +5,7 @@ package com.marklogic.appdeployer;
 
 import com.marklogic.appdeployer.command.forests.ForestNamingStrategy;
 import com.marklogic.appdeployer.command.forests.ReplicaBuilderStrategy;
+import com.marklogic.appdeployer.util.LogUtil;
 import com.marklogic.appdeployer.util.MapPropertiesSource;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
@@ -389,13 +390,24 @@ public class AppConfig {
 	}
 
 	/**
-	 * Convenience method for constructing a MarkLogic Java API DatabaseClient based on the the host and rest*
+	 * Convenience method for constructing a MarkLogic Java API DatabaseClient based on the host and rest*
 	 * properties defined on this class.
 	 *
 	 * @return
 	 */
 	public DatabaseClient newDatabaseClient() {
-		return configuredDatabaseClientFactory.newDatabaseClient(newRestDatabaseClientConfig(getRestPort()));
+		DatabaseClientConfig config = newRestDatabaseClientConfig(getRestPort());
+		DatabaseClient client = configuredDatabaseClientFactory.newDatabaseClient(config);
+		if (StringUtils.hasText(client.getBasePath())) {
+			LogUtil.APP_DEPLOYER_LOGGER.info("Connecting to REST API server with base path: {}", client.getBasePath());
+		} else {
+			boolean isCloudDeployment = client.getSecurityContext() instanceof DatabaseClientFactory.ProgressDataCloudAuthContext;
+			if (isCloudDeployment) {
+				LogUtil.APP_DEPLOYER_LOGGER.warn("Connecting to a REST API server in Progress Data Cloud without a base path may not work; " +
+					"if you encounter an error, you likely need to configure a base path via the 'mlRestBasePath' property.");
+			}
+		}
+		return client;
 	}
 
 	/**

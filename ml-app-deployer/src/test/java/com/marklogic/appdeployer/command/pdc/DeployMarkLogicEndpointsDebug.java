@@ -15,7 +15,7 @@ import java.io.File;
 import java.util.Properties;
 
 // For manual testing of deploying integration endpoints to PDC.
-public class DeployPdcEndpointsDebug {
+public class DeployMarkLogicEndpointsDebug {
 
 	public static void main(String[] args) {
 		Properties props = new Properties();
@@ -29,13 +29,12 @@ public class DeployPdcEndpointsDebug {
 			new SimplePropertySource(props)
 		).newManageConfig();
 		final ManageClient manageClient = new ManageClient(manageConfig);
-
-
+		
 		DefaultAppConfigFactory factory = new DefaultAppConfigFactory(new SimplePropertySource(props));
 		factory.setProjectDir(new File("ml-app-deployer/src/test/resources/cloud-project"));
 		AppConfig appConfig = factory.newAppConfig();
 
 		CommandContext context = new CommandContext(appConfig, manageClient, null);
-		new DeployPdcEndpointsCommand().execute(context);
+		new DeployMarkLogicEndpointsCommand().execute(context);
 	}
 }

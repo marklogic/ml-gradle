@@ -25,6 +25,14 @@ class ManageClientTest {
 	}
 
 	@Test
+	void nullUsername() {
+		// Will be the case when doing cloud auth.
+		ManageConfig config = new ManageConfig("localhost", 8002, null, null);
+		ManageClient client = new ManageClient(config);
+		assertEquals("", client.determineUsernameForSecurityUserRequest());
+	}
+
+	@Test
 	void nullManageConfig() {
 		ManageClient client = new ManageClient((ManageConfig) null);
 		NullPointerException npe = assertThrows(NullPointerException.class, () -> new DatabaseManager(client).getAsXml());

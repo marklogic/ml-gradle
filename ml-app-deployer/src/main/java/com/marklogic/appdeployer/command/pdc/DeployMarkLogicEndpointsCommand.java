@@ -23,15 +23,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-/**
- * Deploys Progress Data Cloud (PDC) integration endpoints by reading JSON configuration files
- * from the src/main/pdc-config/service/endpoints directory.
- */
-public class DeployPdcEndpointsCommand extends AbstractCommand {
+public class DeployMarkLogicEndpointsCommand extends AbstractCommand {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-	public DeployPdcEndpointsCommand() {
+	public DeployMarkLogicEndpointsCommand() {
 		setExecuteSortOrder(SortOrderConstants.DEPLOY_PDC_MARKLOGIC_ENDPOINTS);
 	}
 
@@ -45,10 +41,10 @@ public class DeployPdcEndpointsCommand extends AbstractCommand {
 		final List<MarkLogicHttpEndpoint> endpoints = readEndpointDefinitionsFromFiles(pdcConfigPaths);
 		if (!endpoints.isEmpty()) {
 			if (!StringUtils.hasText(context.getAppConfig().getCloudApiKey())) {
-				logger.warn("Found configuration for {} PDC endpoint(s), but not deploying them because no cloud API key has been specified.", endpoints.size());
+				logger.warn("Found configuration for {} MarkLogic endpoint(s), but not deploying them because no cloud API key has been specified.", endpoints.size());
 			} else {
 				if (logger.isInfoEnabled()) {
-					logger.info("Deploying {} PDC endpoint(s)", endpoints.size());
+					logger.info("Deploying {} MarkLogic endpoint(s)", endpoints.size());
 				}
 				deployEndpoints(context, endpoints);
 			}
@@ -60,16 +56,16 @@ public class DeployPdcEndpointsCommand extends AbstractCommand {
 
 		for (String pdcConfigPath : pdcConfigPaths) {
 			File serviceDir = new File(pdcConfigPath, "service");
-			File endpointsDir = new File(serviceDir, "endpoints");
+			File endpointsDir = new File(serviceDir, "mlendpoints");
 			if (!endpointsDir.exists()) {
 				if (logger.isDebugEnabled()) {
-					logger.debug("PDC endpoints directory does not exist: {}", endpointsDir.getAbsolutePath());
+					logger.debug("MarkLogic endpoints directory does not exist: {}", endpointsDir.getAbsolutePath());
 				}
 				continue;
 			}
 
 			if (logger.isInfoEnabled()) {
-				logger.info("Reading PDC integration endpoints from: {}", endpointsDir.getAbsolutePath());
+				logger.info("Reading MarkLogic endpoints from: {}", endpointsDir.getAbsolutePath());
 			}
 
 			try (Stream<Path> paths = Files.walk(endpointsDir.toPath())) {
@@ -77,7 +73,7 @@ public class DeployPdcEndpointsCommand extends AbstractCommand {
 					.filter(path -> path.toString().endsWith(".json"))
 					.forEach(path -> endpoints.add(buildEndpointFromFile(path.toFile())));
 			} catch (IOException e) {
-				throw new RuntimeException("Failed to read PDC endpoint configuration files from: " +
+				throw new RuntimeException("Failed to read MarkLogic endpoint configuration files from: " +
 					endpointsDir.getAbsolutePath(), e);
 			}
 		}
@@ -88,14 +84,14 @@ public class DeployPdcEndpointsCommand extends AbstractCommand {
 	private MarkLogicHttpEndpoint buildEndpointFromFile(File endpointFile) {
 		try {
 			MarkLogicHttpEndpoint endpoint = OBJECT_MAPPER.readValue(endpointFile, MarkLogicHttpEndpoint.class);
-			if (logger.isInfoEnabled()) {
-				logger.info("Built PDC endpoint: name={}, displayName={}, port={}, type={}, path={}",
+			if (logger.isDebugEnabled()) {
+				logger.debug("Built MarkLogic endpoint: name={}, displayName={}, port={}, type={}, path={}",
 					endpoint.getName(), endpoint.getDisplayName(), endpoint.getPort(),
 					endpoint.getType(), endpoint.getPath());
 			}
 			return endpoint;
 		} catch (IOException e) {
-			throw new RuntimeException("Failed to parse PDC endpoint configuration file: " +
+			throw new RuntimeException("Failed to parse MarkLogic endpoint configuration file: " +
 				endpointFile.getAbsolutePath(), e);
 		}
 	}
@@ -107,7 +103,7 @@ public class DeployPdcEndpointsCommand extends AbstractCommand {
 			try {
 				new ServiceApi(pdcClient.getApiClient()).apiServiceMlendpointsIdHttpPut(markLogicServiceId, endpoints);
 			} catch (ApiException e) {
-				throw new RuntimeException("Unable to create MarkLogic HTTP endpoints in PDC; cause: %s".formatted(e.getMessage()), e);
+				throw new RuntimeException("Unable to create MarkLogic endpoints in PDC; cause: %s".formatted(e.getMessage()), e);
 			}
 		}
 	}

@@ -12,12 +12,12 @@ import java.io.File;
  * We don't yet have a PDC instance for automated tests, so this test does what it can in the absence of that.
  * For now, relying on manual testing via the DeployPdcEndpointsDebug class.
  */
-class DeployPdcEndpointsTest extends AbstractAppDeployerTest {
+class DeployMarkLogicEndpointsTest extends AbstractAppDeployerTest {
 
 	@Test
 	void dontDeployWhenCloudApiKeyIsNotSet() {
 		initializeAppConfig(new File("src/test/resources/cloud-project"));
-		initializeAppDeployer(new DeployPdcEndpointsCommand());
+		initializeAppDeployer(new DeployMarkLogicEndpointsCommand());
 
 		deploySampleApp();
 	}

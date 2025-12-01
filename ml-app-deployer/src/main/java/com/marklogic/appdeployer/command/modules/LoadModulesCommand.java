@@ -62,16 +62,13 @@ public class LoadModulesCommand extends AbstractCommand {
 		}
 
 		AppConfig config = context.getAppConfig();
-		DatabaseClient client = config.newDatabaseClient();
 
 		final List<String> pathsList = config.getModulePaths();
 		final String[] pathsArray = pathsList.toArray(new String[]{});
 
-		try {
-			logger.info("Loading modules from paths: " + pathsList);
+		try (DatabaseClient client = config.newDatabaseClient()) {
+			logger.info("Loading modules from paths: {}", pathsList);
 			modulesLoader.loadModules(client, new DefaultModulesFinder(), pathsArray);
-		} finally {
-			client.release();
 		}
 	}
 

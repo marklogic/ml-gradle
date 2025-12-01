@@ -17,18 +17,30 @@ import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.function.Supplier;
 
 class TdeDocumentFileProcessor extends LoggingObject implements DocumentFileProcessor {
 
-	private final DatabaseClient contentDatabaseClient;
+	private final Supplier<DatabaseClient> contentDatabaseClientSupplier;
 	private Boolean templateBatchInsertSupported;
+
+	/**
+	 * @param contentDatabaseClientSupplier supplier for the database to run a script against for validating a TDE. If null, TDE validation
+	 *                                      will not be performed.
+	 * @since 6.2.0
+	 */
+	TdeDocumentFileProcessor(Supplier<DatabaseClient> contentDatabaseClientSupplier) {
+		this.contentDatabaseClientSupplier = contentDatabaseClientSupplier;
+	}
 
 	/**
 	 * @param contentDatabaseClient the database to run a script against for validating a TDE. If null, TDE validation
 	 *                              will not be performed.
+	 * @deprecated since 6.2.0, use {@link #TdeDocumentFileProcessor(Supplier)} instead
 	 */
+	@Deprecated
 	TdeDocumentFileProcessor(DatabaseClient contentDatabaseClient) {
-		this.contentDatabaseClient = contentDatabaseClient;
+		this(() -> contentDatabaseClient);
 	}
 
 	@Override
@@ -57,10 +69,13 @@ class TdeDocumentFileProcessor extends LoggingObject implements DocumentFileProc
 	}
 
 	private boolean isTemplateBatchInsertSupported() {
-		if (this.templateBatchInsertSupported == null && contentDatabaseClient != null) {
-			// Memoize this to avoid repeated calls; the result will always be the same unless the databaseClient is
-			// modified, in which case templateBatchInsertSupported is set to null
-			this.templateBatchInsertSupported = TdeUtil.templateBatchInsertSupported(contentDatabaseClient);
+		if (this.templateBatchInsertSupported == null) {
+			DatabaseClient contentClient = contentDatabaseClientSupplier.get();
+			if (contentClient != null) {
+				// Memoize this to avoid repeated calls; the result will always be the same unless the databaseClient is
+				// modified, in which case templateBatchInsertSupported is set to null
+				this.templateBatchInsertSupported = TdeUtil.templateBatchInsertSupported(contentClient);
+			}
 		}
 		return this.templateBatchInsertSupported != null ? this.templateBatchInsertSupported : false;
 	}
@@ -72,7 +87,9 @@ class TdeDocumentFileProcessor extends LoggingObject implements DocumentFileProc
 	 */
 	private void validateTdeTemplate(DocumentFile documentFile) {
 		final File file = documentFile.getFile();
-		if (contentDatabaseClient == null) {
+
+		DatabaseClient contentClient = contentDatabaseClientSupplier.get();
+		if (contentClient == null) {
 			logger.info("No content database client provided, so will not validate TDE templates.");
 		} else if (isTemplateBatchInsertSupported()) {
 			logger.debug("Not performing TDE validation; it will be performed automatically via tde.templateBatchInsert.");
@@ -81,16 +98,16 @@ class TdeDocumentFileProcessor extends LoggingObject implements DocumentFileProc
 			try {
 				fileContent = new String(FileCopyUtils.copyToByteArray(file));
 			} catch (IOException e) {
-				logger.warn("Could not read TDE template from file, will not validate; cause: " + e.getMessage());
+				logger.warn("Could not read TDE template from file, will not validate; cause: {}", e.getMessage());
 			}
 			if (fileContent != null) {
 				ServerEvaluationCall call = null;
 				if (Format.XML.equals(documentFile.getFormat())) {
-					call = buildXqueryCall(documentFile, fileContent);
+					call = buildXqueryCall(documentFile, fileContent, contentClient);
 				} else if (Format.JSON.equals(documentFile.getFormat())) {
-					call = buildJavascriptCall(documentFile, fileContent);
+					call = buildJavascriptCall(documentFile, fileContent, contentClient);
 				} else {
-					logger.info("Unrecognized file format, will not try to validate TDE template in file: " + file + "; format: " + documentFile.getFormat());
+					logger.info("Unrecognized file format, will not try to validate TDE template in file: {}; format: {}", file, documentFile.getFormat());
 				}
 
 				if (call != null) {
@@ -108,17 +125,17 @@ class TdeDocumentFileProcessor extends LoggingObject implements DocumentFileProc
 		}
 	}
 
-	private ServerEvaluationCall buildJavascriptCall(DocumentFile documentFile, String fileContent) {
+	private ServerEvaluationCall buildJavascriptCall(DocumentFile documentFile, String fileContent, DatabaseClient client) {
 		StringBuilder script = new StringBuilder("const tde = require('/MarkLogic/tde.xqy'); var template; ");
 		script.append(format("\ntde.validate([xdmp.toJSON(template)], ['%s'])", documentFile.getUri()));
-		return contentDatabaseClient.newServerEval().javascript(script.toString())
+		return client.newServerEval().javascript(script.toString())
 			.addVariable("template", new StringHandle(fileContent).withFormat(Format.JSON));
 	}
 
-	private ServerEvaluationCall buildXqueryCall(DocumentFile documentFile, String fileContent) {
+	private ServerEvaluationCall buildXqueryCall(DocumentFile documentFile, String fileContent, DatabaseClient client) {
 		StringBuilder script = new StringBuilder("import module namespace tde = 'http://marklogic.com/xdmp/tde' at '/MarkLogic/tde.xqy'; ");
 		script.append("\ndeclare variable $template external; ");
 		script.append(format("\ntde:validate($template, '%s')", documentFile.getUri()));
-		return contentDatabaseClient.newServerEval().xquery(script.toString()).addVariable("template", new StringHandle(fileContent).withFormat(Format.XML));
+		return client.newServerEval().xquery(script.toString()).addVariable("template", new StringHandle(fileContent).withFormat(Format.XML));
 	}
 }

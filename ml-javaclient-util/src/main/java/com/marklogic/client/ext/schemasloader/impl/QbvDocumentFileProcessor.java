@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * @since 4.6.0
@@ -33,18 +34,28 @@ class QbvDocumentFileProcessor extends LoggingObject implements DocumentFileProc
 	private static final String QBV_XML_PLAN_NAMESPACE = "http://marklogic.com/plan";
 	private static final String QBV_XML_ROOT_ELEMENT = "query-based-view";
 
-	final private DatabaseClient contentDatabaseClient;
+	final private Supplier<DatabaseClient> schemasDatabaseClientSupplier;
+	final private Supplier<DatabaseClient> contentDatabaseClientSupplier;
 	final private List<DocumentFile> qbvFiles = new ArrayList<>();
-	final private XMLDocumentManager schemasDocumentManager;
 
+	/**
+	 * @param schemasDatabaseClientSupplier supplier used to write the QBV XML document to the application's schemas database
+	 * @param contentDatabaseClientSupplier supplier used to generate the QBV based on a user-provided script
+	 * @since 6.2.0
+	 */
+	QbvDocumentFileProcessor(Supplier<DatabaseClient> schemasDatabaseClientSupplier, Supplier<DatabaseClient> contentDatabaseClientSupplier) {
+		this.schemasDatabaseClientSupplier = schemasDatabaseClientSupplier;
+		this.contentDatabaseClientSupplier = contentDatabaseClientSupplier;
+	}
 
 	/**
 	 * @param schemasDatabaseClient used to write the QBV XML document to the application's schemas database
 	 * @param contentDatabaseClient used to generate the QBV based on a user-provided script
+	 * @deprecated since 6.2.0, use {@link #QbvDocumentFileProcessor(Supplier, Supplier)} instead
 	 */
+	@Deprecated
 	QbvDocumentFileProcessor(DatabaseClient schemasDatabaseClient, DatabaseClient contentDatabaseClient) {
-		this.schemasDocumentManager = schemasDatabaseClient.newXMLDocumentManager();
-		this.contentDatabaseClient = contentDatabaseClient;
+		this(() -> schemasDatabaseClient, () -> contentDatabaseClient);
 	}
 
 	@Override
@@ -74,16 +85,19 @@ class QbvDocumentFileProcessor extends LoggingObject implements DocumentFileProc
 
 	private void processQbvFile(DocumentFile qbvFile) {
 		if (logger.isInfoEnabled()) {
-			logger.info(format("Generating Query-Based View for file: %s", qbvFile.getFile().getName()));
+			logger.info("Generating Query-Based View for file: {}", qbvFile.getFile().getName());
 		}
-		ServerEvaluationCall call = getServerEvaluationCall(qbvFile);
+
+		ServerEvaluationCall call = getServerEvaluationCall(qbvFile, contentDatabaseClientSupplier.get());
 		if (call != null) {
 			StringHandle handleString = new StringHandle();
 			try {
 				call.eval(handleString);
 			} catch (Exception e) {
-				throw new RuntimeException(format("Query-Based View generation failed for file: %s; cause: %s", qbvFile.getFile().getAbsolutePath(), e.getMessage()));
+				throw new RuntimeException(format("Query-Based View generation failed for file: %s; cause: %s",
+					qbvFile.getFile().getAbsolutePath(), e.getMessage()));
 			}
+
 			if (Format.XML.equals(handleString.getFormat())) {
 				Document xmlDocument;
 				try {
@@ -95,6 +109,7 @@ class QbvDocumentFileProcessor extends LoggingObject implements DocumentFileProc
 				if (QBV_XML_ROOT_ELEMENT.equals(root.getName()) & (root.getNamespace() != null && root.getNamespace().getURI().equals(QBV_XML_PLAN_NAMESPACE))) {
 					qbvFile.getDocumentMetadata().getCollections().add(QBV_COLLECTION);
 					String uri = qbvFile.getUri() + ".xml";
+					XMLDocumentManager schemasDocumentManager = schemasDatabaseClientSupplier.get().newXMLDocumentManager();
 					schemasDocumentManager.write(uri, qbvFile.getDocumentMetadata(), new JDOMHandle(xmlDocument));
 				} else {
 					throw new RuntimeException(format("Query-Based view generation failed for file: %s; received unexpected response from server: %s", qbvFile.getFile().getAbsolutePath(), handleString.get()));
@@ -105,7 +120,7 @@ class QbvDocumentFileProcessor extends LoggingObject implements DocumentFileProc
 		}
 	}
 
-	private ServerEvaluationCall getServerEvaluationCall(DocumentFile qbvFile) {
+	private ServerEvaluationCall getServerEvaluationCall(DocumentFile qbvFile, DatabaseClient contentClient) {
 		String fileContent;
 		try {
 			fileContent = new String(FileCopyUtils.copyToByteArray(qbvFile.getFile()));
@@ -113,7 +128,7 @@ class QbvDocumentFileProcessor extends LoggingObject implements DocumentFileProc
 			throw new RuntimeException(format("Unable to generate Query-Based View; could not read from file %s; cause: %s", qbvFile.getFile().getAbsolutePath(), e.getMessage()));
 		}
 		return FilenameUtil.isXqueryFile(qbvFile.getFile().getName()) ?
-			contentDatabaseClient.newServerEval().xquery(fileContent) :
-			contentDatabaseClient.newServerEval().javascript(fileContent);
+			contentClient.newServerEval().xquery(fileContent) :
+			contentClient.newServerEval().javascript(fileContent);
 	}
 }

@@ -10,6 +10,7 @@ import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.FailedRequestException;
+import com.marklogic.client.ext.helper.DatabaseClientSupplier;
 import com.marklogic.client.ext.schemasloader.SchemasLoader;
 import com.marklogic.client.ext.schemasloader.impl.DefaultSchemasLoader;
 import com.marklogic.mgmt.api.API;
@@ -68,22 +69,21 @@ public class LoadSchemasCommand extends AbstractCommand {
 
 	protected void loadSchemas(String schemasPath, String schemasDatabaseName, CommandContext context) {
 		logger.info(format("Loading schemas into database %s from: %s", schemasDatabaseName, schemasPath));
-		DatabaseClient schemasClient = context.getAppConfig().newAppServicesDatabaseClient(schemasDatabaseName);
-		DatabaseClient contentClient = buildContentClient(context, schemasDatabaseName);
-		try {
-			SchemasLoader schemasLoader = buildSchemasLoader(context, schemasClient, contentClient);
+
+		final String contentDatabaseName = getContentDatabaseName(context, schemasDatabaseName);
+
+		try (DatabaseClientSupplier schemasClientSupplier = new DatabaseClientSupplier(() -> context.getAppConfig().newAppServicesDatabaseClient(schemasDatabaseName))) {
+			DatabaseClientSupplier contentClientSupplier = contentDatabaseName != null ?
+				new DatabaseClientSupplier(() -> context.getAppConfig().newAppServicesDatabaseClient(contentDatabaseName)) : null;
+
+			SchemasLoader schemasLoader = buildSchemasLoader(context, schemasClientSupplier, contentClientSupplier);
 			schemasLoader.loadSchemas(schemasPath);
-			logger.info("Finished loading schemas from: " + schemasPath);
+			logger.info("Finished loading schemas from: {}", schemasPath);
 		} catch (FailedRequestException fre) {
 			if (fre.getMessage().contains("NOSUCHDB")) {
-				logger.warn("Unable to load schemas because no schemas database exists; cause: " + fre.getMessage());
+				logger.warn("Unable to load schemas because no schemas database exists; cause: {}", fre.getMessage());
 			} else {
 				throw fre;
-			}
-		} finally {
-			schemasClient.release();
-			if (contentClient != null) {
-				contentClient.release();
 			}
 		}
 	}
@@ -95,11 +95,11 @@ public class LoadSchemasCommand extends AbstractCommand {
 	 * @param schemasDatabase
 	 * @return
 	 */
-	private DatabaseClient buildContentClient(CommandContext context, String schemasDatabase) {
+	private String getContentDatabaseName(CommandContext context, String schemasDatabase) {
 		String contentDatabase = findContentDatabaseAssociatedWithSchemasDatabase(context, schemasDatabase);
 		if (contentDatabase != null) {
 			logger.info(format("Will use %s as a content database when loading into schemas database: %s", contentDatabase, schemasDatabase));
-			return context.getAppConfig().newAppServicesDatabaseClient(contentDatabase);
+			return contentDatabase;
 		}
 		logger.warn(format("Unable to find a content database associated with schemas database: %s; this may " +
 			"result in errors when loading TDE templates and Query-Based-View scripts.", schemasDatabase));
@@ -115,7 +115,7 @@ public class LoadSchemasCommand extends AbstractCommand {
 	 * @param schemasClient
 	 * @return
 	 */
-	protected SchemasLoader buildSchemasLoader(CommandContext context, DatabaseClient schemasClient, DatabaseClient contentClient) {
+	protected SchemasLoader buildSchemasLoader(CommandContext context, DatabaseClientSupplier schemasClient, DatabaseClientSupplier contentClient) {
 		AppConfig appConfig = context.getAppConfig();
 		DefaultSchemasLoader schemasLoader = new DefaultSchemasLoader(schemasClient, contentClient, context.getAppConfig().isTdeValidationEnabled());
 		schemasLoader.setCascadeCollections(appConfig.isCascadeCollections());
@@ -125,7 +125,6 @@ public class LoadSchemasCommand extends AbstractCommand {
 			schemasLoader.addFileFilter(filter);
 		}
 
-		// TODO Should rename this method to something more generic than "modules"; not sure what that should be yet
 		if (appConfig.isReplaceTokensInModules()) {
 			schemasLoader.setTokenReplacer(appConfig.buildTokenReplacer());
 		}

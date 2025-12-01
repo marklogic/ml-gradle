@@ -23,7 +23,7 @@ public class GenerateQbvTest extends AbstractSchemasTest {
 	@BeforeEach
 	void beforeEach() {
 		// As a sanity check, verify that QBVs get generated when we tell DSL not to validate TDEs.
-		loader = new DefaultSchemasLoader(client, newContentClient(), false);
+		loader = new DefaultSchemasLoader(() -> client, () -> newContentClient(), false);
 	}
 
 	@Test

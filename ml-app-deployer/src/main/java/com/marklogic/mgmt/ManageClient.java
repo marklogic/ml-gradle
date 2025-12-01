@@ -280,7 +280,7 @@ public class ManageClient extends LoggingObject {
 				username = manageConfig.getUsername();
 			}
 		}
-		return username;
+		return username == null ? "" : username;
 	}
 
 	private void initializeSecurityUserRestTemplate() {

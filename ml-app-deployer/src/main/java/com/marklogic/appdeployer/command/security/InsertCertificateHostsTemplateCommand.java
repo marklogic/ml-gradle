@@ -37,10 +37,12 @@ public class InsertCertificateHostsTemplateCommand extends AbstractCommand {
 
 	@Override
 	public void execute(CommandContext context) {
+		// A query has to be made to MarkLogic here to get the list of certificate template names, because otherwise,
+		// we don't know what template names to look for in the user's project directory.
 		List<String> templateNames = new CertificateTemplateManager(context.getManageClient()).getAsXml().getListItemNameRefs();
 		if (templateNames != null && !templateNames.isEmpty()) {
 			if (logger.isInfoEnabled()) {
-				logger.info("Looking for host certificates to insert for certificate templates: " + templateNames);
+				logger.info("Looking for host certificates to insert for certificate templates: {}", templateNames);
 			}
 			for (String templateName : templateNames) {
 				insertHostCertificatesForTemplate(context, templateName);

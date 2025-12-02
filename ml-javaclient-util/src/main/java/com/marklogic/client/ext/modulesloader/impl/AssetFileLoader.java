@@ -21,7 +21,7 @@ public class AssetFileLoader extends GenericFileLoader {
 	}
 
 	public AssetFileLoader(DatabaseClient modulesDatabaseClient, ModulesManager modulesManager) {
-		super(modulesDatabaseClient);
+		super(() -> modulesDatabaseClient);
 		initializeAssetFileLoader(modulesManager);
 	}
 

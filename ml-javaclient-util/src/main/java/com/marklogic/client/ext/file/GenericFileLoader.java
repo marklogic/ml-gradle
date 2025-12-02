@@ -7,12 +7,15 @@ import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.document.DocumentWriteOperation;
 import com.marklogic.client.ext.batch.BatchWriter;
 import com.marklogic.client.ext.batch.RestBatchWriter;
+import com.marklogic.client.ext.helper.DatabaseClientSupplier;
 import com.marklogic.client.ext.helper.LoggingObject;
 import com.marklogic.client.ext.tokenreplacer.TokenReplacer;
 
 import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -28,6 +31,7 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 
 	private DocumentFileReader documentFileReader;
 	private BatchWriter batchWriter;
+	private Supplier<DatabaseClient> databaseClientSupplier;
 	private boolean waitForCompletion = true;
 	private boolean logFileUris = true;
 	private Integer batchSize;
@@ -45,6 +49,20 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 	private boolean cascadePermissions;
 
 	/**
+	 * The given DatabaseClientSupplier is used to lazily construct a BatchWriter that writes to MarkLogic via the REST API.
+	 * The DatabaseClient will only be created when files are actually written, avoiding unnecessary client creation.
+	 * <p>
+	 * The expectation is that the client will then either call setDocumentFileReader or will rely on the default one
+	 * that's created by this class if one has not yet been set.
+	 *
+	 * @param databaseClientSupplier supplier for lazy client creation
+	 * @since 6.2.0
+	 */
+	public GenericFileLoader(Supplier<DatabaseClient> databaseClientSupplier) {
+		this.databaseClientSupplier = databaseClientSupplier;
+	}
+
+	/**
 	 * The given DatabaseClient is used to construct a BatchWriter that writes to MarkLogic via the REST API. The
 	 * expectation is that the client will then either call setDocumentFileReader or will rely on the default one
 	 * that's created by this class if one has not yet been set.
@@ -52,9 +70,7 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 	 * @param client
 	 */
 	public GenericFileLoader(DatabaseClient client) {
-		RestBatchWriter restBatchWriter = new RestBatchWriter(client);
-		restBatchWriter.setReleaseDatabaseClients(false);
-		this.batchWriter = restBatchWriter;
+		this(new DatabaseClientSupplier(() -> client));
 	}
 
 	/**
@@ -87,7 +103,7 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 
 	protected final void writeDocumentFiles(List<DocumentFile> documentFiles) {
 		if (documentFiles != null && !documentFiles.isEmpty()) {
-			batchWriter.initialize();
+			initializeBatchWriter();
 			writeBatchOfDocuments(documentFiles, 0);
 			if (waitForCompletion) {
 				batchWriter.waitForCompletion();
@@ -138,6 +154,21 @@ public class GenericFileLoader extends LoggingObject implements FileLoader {
 		if (endPosition < documentFilesSize) {
 			writeBatchOfDocuments(documentFiles, endPosition);
 		}
+	}
+
+	/**
+	 * Lazily initializes the BatchWriter from the DatabaseClientSupplier if needed.
+	 * This ensures the DatabaseClient is only created when files actually need to be written.
+	 */
+	private void initializeBatchWriter() {
+		if (batchWriter == null) {
+			Objects.requireNonNull(databaseClientSupplier, "A DatabaseClient supplier is required to lazily create a BatchWriter.");
+			RestBatchWriter restBatchWriter = new RestBatchWriter(databaseClientSupplier.get());
+			restBatchWriter.setReleaseDatabaseClients(false);
+			this.batchWriter = restBatchWriter;
+		}
+
+		batchWriter.initialize();
 	}
 
 	/**

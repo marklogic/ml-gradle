@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 
 /**
  * Preferred mechanism for lazy instantiation of a DatabaseClient. Will eventually deprecate DatabaseClientProvider in
- * favor of this.
+ * favor of this. Wraps a {@code Supplier<DatabaseClient>} and handles releasing the client if it was created.
  *
  * @since 6.2.0
  */
@@ -27,6 +27,10 @@ public class DatabaseClientSupplier implements Closeable, Supplier<DatabaseClien
 		this.databaseClientSupplier = databaseClientSupplier;
 	}
 
+	/**
+	 * @return the DatabaseClient, creating it via the supplier if it hasn't already been created. May return null if
+	 * the supplier is not able to create a client.
+	 */
 	public DatabaseClient get() {
 		if (databaseClient == null) {
 			databaseClient = databaseClientSupplier.get();

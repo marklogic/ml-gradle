@@ -39,7 +39,7 @@ public class DeployMarkLogicEndpointsCommand extends AbstractCommand {
 			return;
 		}
 
-		final List<MarkLogicHttpEndpoint> endpoints = readEndpointDefinitionsFromFiles(pdcConfigPaths);
+		final List<MarkLogicHttpEndpoint> endpoints = readEndpointDefinitionsFromFiles(context, pdcConfigPaths);
 		if (!endpoints.isEmpty()) {
 			if (!StringUtils.hasText(context.getAppConfig().getCloudApiKey())) {
 				logger.warn("Found configuration for {} MarkLogic endpoint(s), but not deploying them because no cloud API key has been specified.", endpoints.size());
@@ -49,7 +49,7 @@ public class DeployMarkLogicEndpointsCommand extends AbstractCommand {
 		}
 	}
 
-	private List<MarkLogicHttpEndpoint> readEndpointDefinitionsFromFiles(List<String> pdcConfigPaths) {
+	private List<MarkLogicHttpEndpoint> readEndpointDefinitionsFromFiles(CommandContext context, List<String> pdcConfigPaths) {
 		List<MarkLogicHttpEndpoint> endpoints = new ArrayList<>();
 
 		for (String pdcConfigPath : pdcConfigPaths) {
@@ -69,7 +69,7 @@ public class DeployMarkLogicEndpointsCommand extends AbstractCommand {
 			try (Stream<Path> paths = Files.walk(endpointsDir.toPath())) {
 				paths.filter(Files::isRegularFile)
 					.filter(path -> path.toString().endsWith(".json"))
-					.forEach(path -> endpoints.add(buildEndpointFromFile(path.toFile())));
+					.forEach(path -> endpoints.add(buildEndpointFromFile(context, path.toFile())));
 			} catch (IOException e) {
 				throw new RuntimeException("Failed to read MarkLogic endpoint configuration files from: " +
 					endpointsDir.getAbsolutePath(), e);
@@ -79,9 +79,10 @@ public class DeployMarkLogicEndpointsCommand extends AbstractCommand {
 		return endpoints;
 	}
 
-	private MarkLogicHttpEndpoint buildEndpointFromFile(File endpointFile) {
+	private MarkLogicHttpEndpoint buildEndpointFromFile(CommandContext context, File endpointFile) {
 		try {
-			MarkLogicHttpEndpoint endpoint = OBJECT_MAPPER.readValue(endpointFile, MarkLogicHttpEndpoint.class);
+			String content = readResourceFromFile(context, endpointFile);
+			MarkLogicHttpEndpoint endpoint = OBJECT_MAPPER.readValue(content, MarkLogicHttpEndpoint.class);
 			if (logger.isDebugEnabled()) {
 				logger.debug("Built MarkLogic endpoint: name={}, displayName={}, port={}, type={}, path={}",
 					endpoint.getName(), endpoint.getDisplayName(), endpoint.getPort(),

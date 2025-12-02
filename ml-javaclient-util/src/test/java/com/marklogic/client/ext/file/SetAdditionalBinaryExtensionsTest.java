@@ -10,14 +10,14 @@ import org.junit.jupiter.api.Test;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class SetAdditionalBinaryExtensionsTest extends AbstractIntegrationTest {
+class SetAdditionalBinaryExtensionsTest extends AbstractIntegrationTest {
 
 	@Test
-	public void test() {
+	void test() {
 		client = newClient(CONTENT_DATABASE);
-		client.newServerEval().xquery("cts:uris((), (), cts:not-query(cts:collection-query('test-data'))) ! xdmp:document-delete(.)").eval();
+		client.newServerEval().xquery("cts:uris((), (), cts:not-query(cts:collection-query('test-data'))) ! xdmp:document-delete(.)").evalAs(String.class);
 
 		GenericFileLoader loader = new GenericFileLoader(client);
 		loader.setAdditionalBinaryExtensions("test1", "test2");

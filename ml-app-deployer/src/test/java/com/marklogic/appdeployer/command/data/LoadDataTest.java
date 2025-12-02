@@ -16,16 +16,12 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class LoadDataTest extends AbstractAppDeployerTest {
+class LoadDataTest extends AbstractAppDeployerTest {
 
 	@AfterEach
-	public void teardown() {
+	void teardown() {
 		undeploySampleApp();
 	}
 
@@ -34,7 +30,7 @@ public class LoadDataTest extends AbstractAppDeployerTest {
 	 * just does some basic assertions to make sure all is well.
 	 */
 	@Test
-	public void multiplePaths() {
+	void multiplePaths() {
 		DataConfig dataConfig = appConfig.getDataConfig();
 		dataConfig.getDataPaths().add(new File(dataConfig.getProjectDir(), "src/main/more-data").getAbsolutePath());
 
@@ -72,7 +68,7 @@ public class LoadDataTest extends AbstractAppDeployerTest {
 	}
 
 	@Test
-	public void databaseNameIsSet() {
+	void databaseNameIsSet() {
 		LoadDataCommand command = new LoadDataCommand();
 		DatabaseClient client = command.determineDatabaseClient(appConfig);
 		assertNull(client.getDatabase(), "The database property isn't set on a DatabaseClient when no value is provided when the " +
@@ -94,7 +90,7 @@ public class LoadDataTest extends AbstractAppDeployerTest {
 		appConfig.setCascadePermissions(true);
 		appConfig.setCascadeCollections(true);
 
-		GenericFileLoader loader = (GenericFileLoader) new LoadDataCommand().buildFileLoader(appConfig);
+		GenericFileLoader loader = (GenericFileLoader) new LoadDataCommand().buildFileLoader(appConfig, null);
 
 		assertTrue(loader.isCascadeCollections());
 		assertTrue(loader.isCascadePermissions());

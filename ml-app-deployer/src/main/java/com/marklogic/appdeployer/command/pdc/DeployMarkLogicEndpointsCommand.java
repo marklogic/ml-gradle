@@ -56,15 +56,11 @@ public class DeployMarkLogicEndpointsCommand extends AbstractCommand {
 			File serviceDir = new File(pdcConfigPath, "service");
 			File endpointsDir = new File(serviceDir, "mlendpoints");
 			if (!endpointsDir.exists()) {
-				if (logger.isDebugEnabled()) {
-					logger.debug("MarkLogic endpoints directory does not exist: {}", endpointsDir.getAbsolutePath());
-				}
+				logger.info("MarkLogic endpoints directory does not exist: {}", endpointsDir.getAbsolutePath());
 				continue;
 			}
 
-			if (logger.isInfoEnabled()) {
-				logger.info("Reading MarkLogic endpoints from: {}", endpointsDir.getAbsolutePath());
-			}
+			logger.info("Reading MarkLogic endpoints from: {}", endpointsDir.getAbsolutePath());
 
 			try (Stream<Path> paths = Files.walk(endpointsDir.toPath())) {
 				paths.filter(Files::isRegularFile)
@@ -106,9 +102,7 @@ public class DeployMarkLogicEndpointsCommand extends AbstractCommand {
 				if (endpointsToDeploy.isEmpty()) {
 					logger.info("All {} endpoint(s) are up to date; nothing to deploy.", endpoints.size());
 				} else {
-					if (logger.isInfoEnabled()) {
-						logger.info("Deploying {} new or updated endpoint(s) out of {} total.", endpointsToDeploy.size(), endpoints.size());
-					}
+					logger.info("Deploying {} new or updated endpoint(s) out of {} total.", endpointsToDeploy.size(), endpoints.size());
 					serviceApi.apiServiceMlendpointsIdHttpPut(markLogicServiceId, endpointsToDeploy);
 					logger.info("Successfully deployed {} endpoint(s).", endpointsToDeploy.size());
 				}

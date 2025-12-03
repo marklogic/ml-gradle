@@ -16,7 +16,9 @@ import java.util.Objects;
 
 /**
  * Handles loading a model and then making calls to generate code for it.
+ * @deprecated since 6.2.0
  */
+@Deprecated
 public class EntityServicesManager {
 
 	private String modelCollection = "http://marklogic.com/entity-services/models";

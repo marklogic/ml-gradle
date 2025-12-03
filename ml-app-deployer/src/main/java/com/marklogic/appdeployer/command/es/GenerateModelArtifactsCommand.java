@@ -22,7 +22,10 @@ import java.util.List;
  * Generates Entity Services model artifacts based on model definitions. This is implemented as a command, though it's
  * not likely to be invoked as part of e.g. an "mlDeploy" call in ml-gradle. But implementing it as a command does
  * allow for that possibility, and it's also easy to invoke by itself in ml-gradle too.
+ *
+ * @deprecated since 6.2.0
  */
+@Deprecated
 public class GenerateModelArtifactsCommand extends AbstractCommand {
 
 	// Should be very rare to need to override this, but just in case

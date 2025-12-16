@@ -8,6 +8,7 @@ import com.marklogic.appdeployer.command.AbstractCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.progress.pdc.client.PdcClient;
+import com.progress.pdc.client.RetryOn404Interceptor;
 import com.progress.pdc.client.generated.ApiException;
 import com.progress.pdc.client.generated.api.ServiceApi;
 import com.progress.pdc.client.generated.model.MarkLogicApp;
@@ -119,7 +120,7 @@ public class DeployMarkLogicEndpointsCommand extends AbstractCommand {
 
 		PdcClient.Builder clientBuilder = PdcClient.newBuilder(host, apiKey)
 			// Need retry-on-404 support here due to a possible load balancer restart after endpoint creation.
-			.retryOn404(5, 1000);
+			.okHttpInterceptor(new RetryOn404Interceptor(5, 1000));
 
 		try (PdcClient pdcClient = clientBuilder.build()) {
 			for (Map.Entry<String, List<MarkLogicHttpEndpoint>> entry : endpointsByDnsName.entrySet()) {

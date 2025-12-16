@@ -28,6 +28,11 @@ public class DeployMarkLogicEndpointsCommand extends AbstractCommand {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
+	// OOTB endpoints that PDC GET returns but PUT doesn't manage. These are filtered out when comparing
+	// to avoid unnecessary deployments. These names are stable, but if they change, worst case is an
+	// unnecessary deployment, not a failure.
+	private static final Set<String> OOTB_PDC_ENDPOINT_NAMES = Set.of("Admin", "App-services", "Manage");
+
 	public DeployMarkLogicEndpointsCommand() {
 		setExecuteSortOrder(SortOrderConstants.DEPLOY_PDC_MARKLOGIC_ENDPOINTS);
 	}
@@ -160,17 +165,22 @@ public class DeployMarkLogicEndpointsCommand extends AbstractCommand {
 
 		List<MarkLogicHttpEndpoint> existingEndpoints = existingEndpointData.getEndpoints().getHttpEndpoints();
 
+		// Filter out OOTB endpoints that PDC GET returns but PUT doesn't manage
+		List<MarkLogicHttpEndpoint> customExistingEndpoints = existingEndpoints.stream()
+			.filter(e -> !OOTB_PDC_ENDPOINT_NAMES.contains(e.getName()))
+			.collect(Collectors.toList());
+
 		// If counts don't match, something changed
-		if (endpoints.size() != existingEndpoints.size()) {
+		if (endpoints.size() != customExistingEndpoints.size()) {
 			return false;
 		}
 
-		Map<String, MarkLogicHttpEndpoint> existingEndpointsByName = existingEndpoints.stream()
+		Map<String, MarkLogicHttpEndpoint> existingEndpointsByName = customExistingEndpoints.stream()
 			.collect(Collectors.toMap(MarkLogicHttpEndpoint::getName, Function.identity()));
 
-		// Check if all endpoints exist and match
+		// Check if all endpoints exist and match - returns true only if none need deployment
 		return endpoints.stream()
-			.allMatch(endpoint -> !needsDeployment(endpoint, existingEndpointsByName.get(endpoint.getName())));
+			.noneMatch(endpoint -> needsDeployment(endpoint, existingEndpointsByName.get(endpoint.getName())));
 	}
 
 	/**

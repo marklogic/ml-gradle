@@ -115,7 +115,13 @@ public class DeployMarkLogicEndpointsCommand extends AbstractCommand {
 
 	private void deployEndpointsByService(CommandContext context, Map<String, List<MarkLogicHttpEndpoint>> endpointsByDnsName) {
 		final String host = context.getManageClient().getManageConfig().getHost();
-		try (PdcClient pdcClient = new PdcClient(host, context.getAppConfig().getCloudApiKey())) {
+		final String apiKey = context.getAppConfig().getCloudApiKey();
+
+		PdcClient.Builder clientBuilder = PdcClient.newBuilder(host, apiKey)
+			// Need retry-on-404 support here due to a possible load balancer restart after endpoint creation.
+			.retryOn404(5, 1000);
+
+		try (PdcClient pdcClient = clientBuilder.build()) {
 			for (Map.Entry<String, List<MarkLogicHttpEndpoint>> entry : endpointsByDnsName.entrySet()) {
 				String dnsName = entry.getKey();
 				List<MarkLogicHttpEndpoint> endpoints = entry.getValue();

@@ -39,18 +39,19 @@ public class DeployMarkLogicEndpointsCommand extends AbstractCommand {
 			return;
 		}
 
-		final List<MarkLogicHttpEndpoint> endpoints = readEndpointDefinitionsFromFiles(context, pdcConfigPaths);
-		if (!endpoints.isEmpty()) {
+		final Map<String, List<MarkLogicHttpEndpoint>> endpointsByDnsName = readEndpointDefinitionsFromFiles(context, pdcConfigPaths);
+		if (!endpointsByDnsName.isEmpty()) {
 			if (!StringUtils.hasText(context.getAppConfig().getCloudApiKey())) {
-				logger.warn("Found configuration for {} MarkLogic endpoint(s), but not deploying them because no cloud API key has been specified.", endpoints.size());
+				int totalEndpoints = endpointsByDnsName.values().stream().mapToInt(List::size).sum();
+				logger.warn("Found configuration for {} MarkLogic endpoint(s), but not deploying them because no cloud API key has been specified.", totalEndpoints);
 			} else {
-				deployEndpoints(context, endpoints);
+				deployEndpointsByService(context, endpointsByDnsName);
 			}
 		}
 	}
 
-	private List<MarkLogicHttpEndpoint> readEndpointDefinitionsFromFiles(CommandContext context, List<String> pdcConfigPaths) {
-		List<MarkLogicHttpEndpoint> endpoints = new ArrayList<>();
+	private Map<String, List<MarkLogicHttpEndpoint>> readEndpointDefinitionsFromFiles(CommandContext context, List<String> pdcConfigPaths) {
+		Map<String, List<MarkLogicHttpEndpoint>> endpointsByDnsName = new HashMap<>();
 
 		for (String pdcConfigPath : pdcConfigPaths) {
 			File serviceDir = new File(pdcConfigPath, "service");
@@ -62,17 +63,33 @@ public class DeployMarkLogicEndpointsCommand extends AbstractCommand {
 
 			logger.info("Reading MarkLogic endpoints from: {}", endpointsDir.getAbsolutePath());
 
-			try (Stream<Path> paths = Files.walk(endpointsDir.toPath())) {
-				paths.filter(Files::isRegularFile)
-					.filter(path -> path.toString().endsWith(".json"))
-					.forEach(path -> endpoints.add(buildEndpointFromFile(context, path.toFile())));
-			} catch (IOException e) {
-				throw new RuntimeException("Failed to read MarkLogic endpoint configuration files from: " +
-					endpointsDir.getAbsolutePath(), e);
+			File[] dnsNameDirs = endpointsDir.listFiles(File::isDirectory);
+			if (dnsNameDirs == null || dnsNameDirs.length == 0) {
+				logger.warn("No dnsName directories found under: {}. Endpoints should be organized under mlendpoints/<dnsName>/*.json", endpointsDir.getAbsolutePath());
+				continue;
+			}
+
+			for (File dnsNameDir : dnsNameDirs) {
+				String dnsName = dnsNameDir.getName();
+				List<MarkLogicHttpEndpoint> endpoints = new ArrayList<>();
+
+				try (Stream<Path> paths = Files.walk(dnsNameDir.toPath())) {
+					paths.filter(Files::isRegularFile)
+						.filter(path -> path.toString().endsWith(".json"))
+						.forEach(path -> endpoints.add(buildEndpointFromFile(context, path.toFile())));
+				} catch (IOException e) {
+					throw new RuntimeException("Failed to read MarkLogic endpoint configuration files from: " +
+						dnsNameDir.getAbsolutePath(), e);
+				}
+
+				if (!endpoints.isEmpty()) {
+					endpointsByDnsName.put(dnsName, endpoints);
+					logger.info("Found {} endpoint(s) for MarkLogic service: {}", endpoints.size(), dnsName);
+				}
 			}
 		}
 
-		return endpoints;
+		return endpointsByDnsName;
 	}
 
 	private MarkLogicHttpEndpoint buildEndpointFromFile(CommandContext context, File endpointFile) {
@@ -91,55 +108,69 @@ public class DeployMarkLogicEndpointsCommand extends AbstractCommand {
 		}
 	}
 
-	private void deployEndpoints(CommandContext context, List<MarkLogicHttpEndpoint> endpoints) {
+	private void deployEndpointsByService(CommandContext context, Map<String, List<MarkLogicHttpEndpoint>> endpointsByDnsName) {
 		final String host = context.getManageClient().getManageConfig().getHost();
 		try (PdcClient pdcClient = new PdcClient(host, context.getAppConfig().getCloudApiKey())) {
-			final UUID markLogicServiceId = getFirstMarkLogicServiceId(pdcClient);
-			final ServiceApi serviceApi = new ServiceApi(pdcClient.getApiClient());
-			try {
-				MarkLogicEndpointMappingData existingEndpoints = serviceApi.apiServiceMlendpointsIdGet(markLogicServiceId);
-				List<MarkLogicHttpEndpoint> endpointsToDeploy = filterOutExistingEndpoints(endpoints, existingEndpoints);
-				if (endpointsToDeploy.isEmpty()) {
-					logger.info("All {} endpoint(s) are up to date; nothing to deploy.", endpoints.size());
-				} else {
-					logger.info("Deploying {} new or updated endpoint(s) out of {} total.", endpointsToDeploy.size(), endpoints.size());
-					serviceApi.apiServiceMlendpointsIdHttpPut(markLogicServiceId, endpointsToDeploy);
-					logger.info("Successfully deployed {} endpoint(s).", endpointsToDeploy.size());
-				}
-			} catch (ApiException e) {
-				throw new RuntimeException("Unable to create MarkLogic endpoints in PDC; cause: %s".formatted(e.getMessage()), e);
+			for (Map.Entry<String, List<MarkLogicHttpEndpoint>> entry : endpointsByDnsName.entrySet()) {
+				String dnsName = entry.getKey();
+				List<MarkLogicHttpEndpoint> endpoints = entry.getValue();
+				logger.info("Processing {} endpoint(s) for MarkLogic service: {}", endpoints.size(), dnsName);
+				deployEndpoints(pdcClient, dnsName, endpoints);
 			}
 		}
 	}
 
+	private void deployEndpoints(PdcClient pdcClient, String dnsName, List<MarkLogicHttpEndpoint> endpoints) {
+		final UUID markLogicServiceId = getMarkLogicServiceIdByDnsName(pdcClient, dnsName);
+		final ServiceApi serviceApi = new ServiceApi(pdcClient.getApiClient());
+		try {
+			MarkLogicEndpointMappingData existingEndpointData = serviceApi.apiServiceMlendpointsIdGet(markLogicServiceId);
+			if (allEndpointsMatch(endpoints, existingEndpointData)) {
+				logger.info("All {} endpoint(s) for '{}' are up to date; nothing to deploy.", endpoints.size(), dnsName);
+			} else {
+				logger.info("Deploying all {} endpoint(s) for '{}' due to changes or count mismatch.", endpoints.size(), dnsName);
+				serviceApi.apiServiceMlendpointsIdHttpPut(markLogicServiceId, endpoints);
+				logger.info("Successfully deployed {} endpoint(s) for '{}'.", endpoints.size(), dnsName);
+			}
+		} catch (ApiException e) {
+			throw new RuntimeException("Unable to create MarkLogic endpoints for '%s' in PDC; cause: %s".formatted(dnsName, e.getMessage()), e);
+		}
+	}
+
 	/**
-	 * Filters out endpoints that don't need to be deployed. An endpoint needs to be deployed if:
-	 * 1. It doesn't exist in PDC (based on name, which is unique), OR
-	 * 2. It exists but has different properties (needs to be updated)
+	 * Checks if all endpoints match the existing endpoints in PDC. Returns true only if:
+	 * 1. The count of endpoints matches, AND
+	 * 2. Every endpoint exists with identical properties
 	 * <p>
-	 * An endpoint can take a surprisingly long time to create, so we only want to deploy ones that
-	 * are new or have changed.
+	 * If any endpoint is new, modified, or removed, this returns false and all endpoints
+	 * will be deployed. The PDC API requires sending the complete list of endpoints.
 	 *
 	 * @param endpoints            the list of endpoints to potentially deploy
 	 * @param existingEndpointData the existing endpoint data from PDC
-	 * @return a list of endpoints that need to be deployed (new or updated)
+	 * @return true if all endpoints are up to date, false if deployment is needed
 	 */
-	private List<MarkLogicHttpEndpoint> filterOutExistingEndpoints(
+	private boolean allEndpointsMatch(
 		List<MarkLogicHttpEndpoint> endpoints,
 		MarkLogicEndpointMappingData existingEndpointData
 	) {
 		if (existingEndpointData == null || existingEndpointData.getEndpoints() == null
 			|| existingEndpointData.getEndpoints().getHttpEndpoints() == null) {
-			return endpoints;
+			return false;
 		}
 
-		Map<String, MarkLogicHttpEndpoint> existingEndpointsByName = existingEndpointData.getEndpoints()
-			.getHttpEndpoints().stream()
+		List<MarkLogicHttpEndpoint> existingEndpoints = existingEndpointData.getEndpoints().getHttpEndpoints();
+
+		// If counts don't match, something changed
+		if (endpoints.size() != existingEndpoints.size()) {
+			return false;
+		}
+
+		Map<String, MarkLogicHttpEndpoint> existingEndpointsByName = existingEndpoints.stream()
 			.collect(Collectors.toMap(MarkLogicHttpEndpoint::getName, Function.identity()));
 
+		// Check if all endpoints exist and match
 		return endpoints.stream()
-			.filter(endpoint -> needsDeployment(endpoint, existingEndpointsByName.get(endpoint.getName())))
-			.collect(Collectors.toList());
+			.allMatch(endpoint -> !needsDeployment(endpoint, existingEndpointsByName.get(endpoint.getName())));
 	}
 
 	/**
@@ -162,14 +193,24 @@ public class DeployMarkLogicEndpointsCommand extends AbstractCommand {
 			|| !Objects.equals(endpoint.getSupportedByCloud(), existingEndpoint.getSupportedByCloud());
 	}
 
-	private UUID getFirstMarkLogicServiceId(PdcClient pdcClient) {
+	private UUID getMarkLogicServiceIdByDnsName(PdcClient pdcClient, String dnsName) {
 		try {
 			final UUID environmentId = pdcClient.getEnvironmentId();
 			List<MarkLogicApp> apps = new ServiceApi(pdcClient.getApiClient()).apiServiceAppsGet(environmentId).getMarkLogic();
 			if (apps == null || apps.isEmpty()) {
 				throw new RuntimeException("No instances of MarkLogic found in PDC tenancy; host: %s".formatted(pdcClient.getHost()));
 			}
-			return apps.get(0).getId();
+
+			return apps.stream()
+				.filter(app -> dnsName.equals(app.getDnsName()))
+				.findFirst()
+				.map(MarkLogicApp::getId)
+				.orElseThrow(() -> new RuntimeException(
+					"No MarkLogic service found with dnsName '%s'. Available services: %s".formatted(
+						dnsName,
+						apps.stream().map(MarkLogicApp::getDnsName).collect(Collectors.joining(", "))
+					)
+				));
 		} catch (ApiException e) {
 			throw new RuntimeException("Unable to lookup instances of MarkLogic in PDC; cause: %s".formatted(e), e);
 		}

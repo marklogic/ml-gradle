@@ -40,5 +40,5 @@ dependencies {
 	testImplementation 'org.mockito:mockito-core:5.20.0'
 
 	// Gradle will alter this to use the ml-javaclient-util project in this repository.
-	testImplementation "com.marklogic:marklogic-junit5:2.0-SNAPSHOT"
+	testImplementation "com.marklogic:marklogic-junit5:2.0.0"
 }

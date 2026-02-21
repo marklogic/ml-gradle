@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
+ * Copyright (c) 2015-2026 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.rest.util.vendor;
 
@@ -8,7 +8,6 @@ import okhttp3.ResponseBody;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import java.io.IOException;
@@ -22,7 +21,6 @@ class OkHttpClientHttpResponse implements ClientHttpResponse {
 
 	private final Response response;
 
-	@Nullable
 	private volatile HttpHeaders headers;
 
 	public OkHttpClientHttpResponse(Response response) {

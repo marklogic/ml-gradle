@@ -1,12 +1,13 @@
 /*
- * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
+ * Copyright (c) 2015-2026 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.gradle
 
 import org.junit.Test
+import static org.junit.Assert.assertEquals
 import com.marklogic.gradle.task.test.UnitTestTask
 
-class UnitTestTaskTest extends GroovyTestCase {
+class UnitTestTaskTest {
 
 
 	@Test

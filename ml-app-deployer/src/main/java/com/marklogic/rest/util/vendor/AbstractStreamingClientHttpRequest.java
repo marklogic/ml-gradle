@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
+ * Copyright (c) 2015-2026 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.rest.util.vendor;
 
@@ -7,7 +7,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.StreamingHttpOutputMessage;
 import org.springframework.http.client.AbstractClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.FastByteArrayOutputStream;
 
@@ -17,10 +16,8 @@ import java.io.OutputStream;
 abstract class AbstractStreamingClientHttpRequest extends AbstractClientHttpRequest
 	implements StreamingHttpOutputMessage {
 
-	@Nullable
 	private Body body;
 
-	@Nullable
 	private FastByteArrayOutputStream bodyStream;
 
 
@@ -61,6 +58,6 @@ abstract class AbstractStreamingClientHttpRequest extends AbstractClientHttpRequ
 	 * @return the response object for the executed request
 	 * @since 6.1
 	 */
-	protected abstract ClientHttpResponse executeInternal(HttpHeaders headers, @Nullable Body body) throws IOException;
+	protected abstract ClientHttpResponse executeInternal(HttpHeaders headers, Body body) throws IOException;
 
 }

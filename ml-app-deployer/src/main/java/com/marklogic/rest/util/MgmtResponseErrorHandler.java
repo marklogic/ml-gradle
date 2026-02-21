@@ -1,17 +1,20 @@
 /*
- * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
+ * Copyright (c) 2015-2026 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.rest.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 
 import java.io.IOException;
+import java.net.URI;
 
 public class MgmtResponseErrorHandler extends DefaultResponseErrorHandler {
 
@@ -24,9 +27,9 @@ public class MgmtResponseErrorHandler extends DefaultResponseErrorHandler {
 	public static boolean errorLoggingEnabled = true;
 
 	@Override
-	public void handleError(ClientHttpResponse response) throws IOException {
+	public void handleError(ClientHttpResponse response, HttpStatusCode statusCode, URI url, HttpMethod method) throws IOException {
 		try {
-			super.handleError(response);
+			super.handleError(response, statusCode, url, method);
 		} catch (HttpClientErrorException | HttpServerErrorException ex) {
 			String message = "Logging HTTP response body to assist with debugging: " + ex.getResponseBodyAsString();
 			if (HttpStatus.SERVICE_UNAVAILABLE.equals(SpringWebUtil.getHttpStatus(ex))) {

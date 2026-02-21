@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
+ * Copyright (c) 2015-2026 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.client.ext.jaxb;
 
@@ -8,21 +8,18 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledForJreRange;
-import org.junit.jupiter.api.condition.JRE;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class JAXBHandleTest {
 
 	/**
-	 * Included solely to verify that when the test is run using Java 11 or Java 17, it will succeed given that the
+	 * Included solely to verify that when the test is run using Java 17 or higher, it will succeed given that the
 	 * testImplementation configuration in Gradle imports the necessary "old" JAXB libraries.
 	 *
 	 * @throws JAXBException
 	 */
 	@Test
-	@EnabledForJreRange(min = JRE.JAVA_11)
 	void simpleTest() throws JAXBException {
 		JAXBHandle<Product> handle = new JAXBHandle<>(JAXBContext.newInstance(Product.class));
 		Product p = new Product();

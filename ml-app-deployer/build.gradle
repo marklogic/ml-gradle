@@ -23,6 +23,8 @@ dependencies {
 	// For EqualsBuilder; added in 3.8.1 to support detecting if a mimetype's properties have changed or not
 	implementation "org.apache.commons:commons-lang3:3.19.0"
 
+	testImplementation 'org.junit-pioneer:junit-pioneer:2.3.0'
+
 	// For PreviewInterceptor; can be excluded if that feature is not used
 	implementation("com.flipkart.zjsonpatch:zjsonpatch:0.4.16") {
 		// Prefer the api version declared above

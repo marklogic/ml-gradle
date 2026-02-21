@@ -1,6 +1,6 @@
 Progress® MarkLogic® Ml-gradle
 
-Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
+Copyright (c) 2015-2026 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
 
 To the extent required by the applicable open-source license, a complete machine-readable copy of the source code
 corresponding to such code is available upon request. This offer is valid to anyone in receipt of this information and
@@ -19,7 +19,7 @@ marklogic-client-api 8.0.0 (Apache-2.0)
 marklogic-xcc 12.0.0 (Apache-2.0)
 okhttp 5.2.0 (Apache-2.0)
 slf4j-api 2.0.17 (MIT)
-spring-web 6.2.12 (Apache-2.0)
+spring-web 7.0.5 (Apache-2.0)
 zjsonpatch 0.4.16 (Apache-2.0)
 
 Third-Party Components
@@ -62,7 +62,7 @@ slf4j-api 2.0.17 (MIT)
 https://repo1.maven.org/maven2/org/slf4j/slf4j-api/
 For the full text of the MIT license, see MIT license (MIT)
 
-spring-web 6.2.12 (Apache-2.0)
+spring-web 7.0.5 (Apache-2.0)
 https://repo1.maven.org/maven2/org/springframework/spring-web/
 For the full text of the Apache-2.0 license, see Apache License 2.0 (Apache-2.0)
 

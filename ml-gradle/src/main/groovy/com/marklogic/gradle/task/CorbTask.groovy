@@ -1,8 +1,9 @@
 /*
- * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
+ * Copyright (c) 2015-2026 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.gradle.task
 
+import javax.inject.Inject
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.Optional
@@ -10,7 +11,12 @@ import org.gradle.api.tasks.TaskAction
 
 import java.lang.reflect.Modifier
 
-class CorbTask extends JavaExec {
+/*
+ * This class is defined as abstract following the recommendation in the Gradle documentation for tasks that use @Inject on the constructor. 
+ * Gradle will create a concrete subclass of this task at runtime, and the @Inject annotation is used to indicate that the constructor should be used for dependency injection.
+ * https://docs.gradle.org/current/userguide/implementing_custom_tasks.html#task_implementation_by_extending_defaulttask
+ */
+abstract class CorbTask extends JavaExec {
 
 	@Input
   def corbOptions = [:]
@@ -45,6 +51,7 @@ XCC-HOSTNAME,XCC-HTTPCOMPLIANT,XCC-PASSWORD,XCC-PORT,XCC-PROTOCOL,XCC-TIME-ZONE,
 XML-FILE,XML-METADATA,XML-NODE,XML-SCHEMA,XML-TEMP-DIR,ZIP-FILE\
 XQUERY-MODULE".tokenize(',')
 
+  @Inject
   CorbTask() {
 	  mainClass.set("com.marklogic.developer.corb.Manager")
 

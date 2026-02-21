@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
+ * Copyright (c) 2015-2026 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.rest.util.vendor;
 
@@ -11,7 +11,6 @@ import okio.BufferedSink;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -48,7 +47,7 @@ class OkHttpClientHttpRequest extends AbstractStreamingClientHttpRequest {
 	}
 
 	@Override
-	protected ClientHttpResponse executeInternal(HttpHeaders headers, @Nullable Body body) throws IOException {
+	protected ClientHttpResponse executeInternal(HttpHeaders headers, Body body) throws IOException {
 
 		RequestBody requestBody;
 		if (body != null) {
@@ -90,7 +89,6 @@ class OkHttpClientHttpRequest extends AbstractStreamingClientHttpRequest {
 			return this.headers.getContentLength();
 		}
 
-		@Nullable
 		@Override
 		public MediaType contentType() {
 			String contentType = this.headers.getFirst(HttpHeaders.CONTENT_TYPE);

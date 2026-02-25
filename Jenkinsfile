@@ -1,5 +1,15 @@
 @Library('shared-libraries') _
 
+def getJavaHomePath() {
+	if (env.JAVA_VERSION == "JAVA25") {
+		return "/home/builder/java/jdk-25.0.1"
+	} else if (env.JAVA_VERSION == "JAVA21") {
+		return "/home/builder/java/jdk-21.0.1"
+	} else {
+		return "/home/builder/java/jdk-17.0.2"
+	}
+}
+
 def setupDockerMarkLogic(String image) {
 	sh label:'mlsetup', script: '''#!/bin/bash
 	echo "Removing any running MarkLogic server and clean up MarkLogic data directory"
@@ -30,6 +40,7 @@ pipeline {
 
   parameters {
     booleanParam(name: 'ONLY_PUBLISH', defaultValue: false, description: 'Skip tests and only run publish stage')
+    string(name: 'JAVA_VERSION', defaultValue: 'JAVA17', description: 'Either JAVA17, JAVA21, or JAVA25')
   }
 
   options {
@@ -38,10 +49,10 @@ pipeline {
   }
 
   environment {
-    JAVA_HOME_DIR="/home/builder/java/jdk-17.0.2"
-    GRADLE_DIR   =".gradle"
-    DMC_USER     = credentials('MLBUILD_USER')
-    DMC_PASSWORD = credentials('MLBUILD_PASSWORD')
+    JAVA_HOME_DIR = getJavaHomePath()
+    GRADLE_DIR    = ".gradle"
+    DMC_USER      = credentials('MLBUILD_USER')
+    DMC_PASSWORD  = credentials('MLBUILD_PASSWORD')
   }
 
   stages {

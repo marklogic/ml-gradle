@@ -14,13 +14,6 @@ subprojects {
 
 	repositories {
 		mavenCentral()
-
-		mavenLocal()
-
-		// Temporarily using to depend on marklogic-junit5 snapshot until it's released.
-		maven {
-			url = "https://bed-artifactory.bedford.progress.com:443/artifactory/ml-maven-snapshots/"
-		}
 	}
 
 	dependencies {

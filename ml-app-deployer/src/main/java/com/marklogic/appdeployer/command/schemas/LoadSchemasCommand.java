@@ -66,24 +66,25 @@ public class LoadSchemasCommand extends AbstractCommand {
 		});
 	}
 
-	protected void loadSchemas(String schemasPath, String schemasDatabaseName, CommandContext context) {
-		logger.info(format("Loading schemas into database %s from: %s", schemasDatabaseName, schemasPath));
-		DatabaseClient schemasClient = context.getAppConfig().newAppServicesDatabaseClient(schemasDatabaseName);
-		DatabaseClient contentClient = buildContentClient(context, schemasDatabaseName);
-		try {
-			SchemasLoader schemasLoader = buildSchemasLoader(context, schemasClient, contentClient);
+	private void loadSchemas(String schemasPath, String schemasDatabaseName, CommandContext context) {
+		logger.info("Loading schemas into database {} from: {}", schemasDatabaseName, schemasPath);
+
+		final DatabaseClient optionalContentClient = buildContentClient(context, schemasDatabaseName);
+
+		try (DatabaseClient schemasClient = context.getAppConfig().newAppServicesDatabaseClient(schemasDatabaseName)) {
+			SchemasLoader schemasLoader = buildSchemasLoader(context, schemasClient, optionalContentClient);
 			schemasLoader.loadSchemas(schemasPath);
-			logger.info("Finished loading schemas from: " + schemasPath);
+			logger.info("Finished loading schemas from: {}", schemasPath);
 		} catch (FailedRequestException fre) {
 			if (fre.getMessage().contains("NOSUCHDB")) {
-				logger.warn("Unable to load schemas because no schemas database exists; cause: " + fre.getMessage());
+				String message = "Unable to load schemas, as schemas database %s does not exist".formatted(schemasDatabaseName);
+				throw new RuntimeException(message, fre);
 			} else {
 				throw fre;
 			}
 		} finally {
-			schemasClient.release();
-			if (contentClient != null) {
-				contentClient.release();
+			if (optionalContentClient != null) {
+				optionalContentClient.release();
 			}
 		}
 	}
@@ -142,7 +143,7 @@ public class LoadSchemasCommand extends AbstractCommand {
 	 * @param schemasDatabaseName
 	 * @return
 	 */
-	protected String findContentDatabaseAssociatedWithSchemasDatabase(CommandContext context, String schemasDatabaseName) {
+	private String findContentDatabaseAssociatedWithSchemasDatabase(CommandContext context, String schemasDatabaseName) {
 		String tdeValidationDatabase = null;
 		ResourceMapper resourceMapper = new DefaultResourceMapper(new API(context.getManageClient()));
 		for (ConfigDir configDir : context.getAppConfig().getConfigDirs()) {
@@ -157,7 +158,7 @@ public class LoadSchemasCommand extends AbstractCommand {
 							break;
 						}
 					} catch (Exception ex) {
-						logger.warn("Unexpected error when reading database file to determine database for TDE validation: " + ex.getMessage());
+						logger.warn("Unexpected error when reading database file to determine database for TDE validation: {}", ex.getMessage());
 					}
 				}
 			}

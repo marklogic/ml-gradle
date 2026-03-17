@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
+ * Copyright (c) 2015-2026 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.appdeployer.command.schemas;
 
@@ -17,21 +17,17 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.FileFilter;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class LoadSchemasTest extends AbstractAppDeployerTest {
+class LoadSchemasTest extends AbstractAppDeployerTest {
 
 	@AfterEach
-	public void cleanup() {
+	void cleanup() {
 		undeploySampleApp();
 	}
 
 	@Test
-	public void databaseSpecificPaths() {
+	void databaseSpecificPaths() {
 		initializeAppDeployer(new DeployOtherDatabasesCommand(), newCommand());
 
 		File configDir = new File("src/test/resources/sample-app/multiple-schema-databases/ml-config");
@@ -63,11 +59,22 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 	}
 
 	@Test
-	public void testSchemaLoading() {
+	void noSchemasDatabase() {
+		initializeAppDeployer(newCommand());
+		RuntimeException ex = assertThrows(RuntimeException.class, () -> deploySampleApp());
+		assertEquals("Unable to load schemas, as schemas database sample-app-schemas does not exist", ex.getMessage(),
+			"Prior to 6.2.0, a warning was logged when schemas could not be loaded due to the schemas database " +
+				"not existing. That behavior dates back to the 2015/2016 timeframe, presumably because at the time, " +
+				"schemas were not frequently used. But schemas have been commonly used for many years, so the user " +
+				"expects an error to be thrown here when something they want to deploy cannot be deployed.");
+	}
+
+	@Test
+	void testSchemaLoading() {
 		initializeAppDeployer(new DeployOtherDatabasesCommand(1), newCommand());
 
 		appConfig.getCustomTokens().put("%%replaceMe%%", "world");
-		appDeployer.deploy(appConfig);
+		deploySampleApp();
 
 		DatabaseClient client = appConfig.newSchemasDatabaseClient();
 
@@ -85,7 +92,7 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 	}
 
 	@Test
-	public void testCustomSchemasPathWithCustomFileFilter() {
+	void testCustomSchemasPathWithCustomFileFilter() {
 		initializeAppDeployer(new DeployOtherDatabasesCommand(1), newCommand());
 
 		appConfig.getSchemaPaths().clear();
@@ -111,7 +118,7 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 	}
 
 	@Test
-	public void nullSchemaPath() {
+	void nullSchemaPath() {
 		initializeAppDeployer(newCommand());
 		appConfig.setSchemaPaths(null);
 		deploySampleApp();
@@ -119,7 +126,7 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 	}
 
 	@Test
-	public void tdeValidationEnabled() {
+	void tdeValidationEnabled() {
 		initializeAppDeployer(new DeployOtherDatabasesCommand(1), newCommand());
 		appConfig.getFirstConfigDir().setBaseDir(new File("src/test/resources/sample-app/tde-validation"));
 		try {
@@ -137,7 +144,7 @@ public class LoadSchemasTest extends AbstractAppDeployerTest {
 	}
 
 	@Test
-	public void multipleSchemaPaths() {
+	void multipleSchemaPaths() {
 		File projectDir = new File("src/test/resources/schemas-project");
 
 		initializeAppConfig(projectDir);

@@ -26,12 +26,12 @@ configurations {
 }
 
 dependencies {
-	mlcp "com.marklogic:mlcp:11.3.1"
+	mlcp "com.marklogic:mlcp:12.0.1"
 
 	// Since MLCP 11.2, have not been able to get logging to work via a log4j2.xml or
 	// log4j2.properties file. MLCP 11.2 removed logback as a direct dependency. Adding it back
 	// results in logging working correctly.
-	mlcp "ch.qos.logback:logback-classic:1.5.19"
+	mlcp "ch.qos.logback:logback-classic:1.5.32"
 
 	/**
 	 * mlcp uses logback for logging, and without a logback configuration file, no MLCP logging will appear.

@@ -11,6 +11,7 @@ import com.marklogic.appdeployer.command.SortOrderConstants;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.ext.file.FileLoader;
 import com.marklogic.client.ext.file.GenericFileLoader;
+import com.marklogic.client.ext.helper.DatabaseClientSupplier;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -42,21 +43,16 @@ public class LoadDataCommand extends AbstractCommand {
 			return;
 		}
 
-		final FileLoader fileLoader = buildFileLoader(context.getAppConfig());
-		for (String dataPath : dataPaths) {
-			fileLoader.loadFiles(dataPath);
+		try (DatabaseClientSupplier clientSupplier = new DatabaseClientSupplier(() -> determineDatabaseClient(context.getAppConfig()))) {
+			final FileLoader fileLoader = buildFileLoader(context.getAppConfig(), clientSupplier);
+			for (String dataPath : dataPaths) {
+				fileLoader.loadFiles(dataPath);
+			}
 		}
 	}
 
-	/**
-	 * Build a FileLoader based on the configuration in the given AppConfig object.
-	 *
-	 * @param appConfig
-	 * @return
-	 */
-	protected FileLoader buildFileLoader(AppConfig appConfig) {
-		final DatabaseClient client = determineDatabaseClient(appConfig);
-		final GenericFileLoader loader = new GenericFileLoader(client);
+	protected final FileLoader buildFileLoader(AppConfig appConfig, DatabaseClientSupplier supplier) {
+		final GenericFileLoader loader = new GenericFileLoader(supplier);
 
 		loader.setCascadeCollections(appConfig.isCascadeCollections());
 		loader.setCascadePermissions(appConfig.isCascadePermissions());
@@ -97,11 +93,11 @@ public class LoadDataCommand extends AbstractCommand {
 	 * @param appConfig
 	 * @return
 	 */
-	protected DatabaseClient determineDatabaseClient(AppConfig appConfig) {
+	protected final DatabaseClient determineDatabaseClient(AppConfig appConfig) {
 		DataConfig dataConfig = appConfig.getDataConfig();
 		final String databaseName = dataConfig.getDatabaseName();
 		if (StringUtils.hasText(databaseName)) {
-			logger.info("Will load data via App-Services port into database: " + databaseName);
+			logger.info("Will load data via App-Services port into database: {}", databaseName);
 			return appConfig.newAppServicesDatabaseClient(databaseName);
 		}
 		return appConfig.newDatabaseClient();

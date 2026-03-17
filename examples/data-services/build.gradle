@@ -20,12 +20,12 @@ test {
 
 dependencies {
 	implementation 'org.slf4j:slf4j-api:2.0.17'
-	implementation 'com.marklogic:marklogic-client-api:8.0.0'
+	implementation 'com.marklogic:marklogic-client-api:8.1.0'
 
 	testImplementation "org.junit.jupiter:junit-jupiter:5.12.2"
 
 	// Force usage of logback for logging
-	testImplementation "ch.qos.logback:logback-classic:1.5.19"
+	testImplementation "ch.qos.logback:logback-classic:1.5.32"
 	testImplementation "org.slf4j:jcl-over-slf4j:2.0.17"
 	testImplementation "org.slf4j:slf4j-api:2.0.17"
 }

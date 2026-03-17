@@ -3,6 +3,10 @@
  */
 package com.marklogic.client.ext.es;
 
+/**
+ * @deprecated since 6.2.0
+ */
+@Deprecated
 public class CodeGenerationRequest {
 
 	private boolean generateDatabaseProperties = true;

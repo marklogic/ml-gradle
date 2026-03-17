@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
+// Copyright (c) 2015-2026 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
 
 // Defines common configuration for each of the 3 subprojects.
 subprojects {
@@ -14,23 +14,18 @@ subprojects {
 
 	repositories {
 		mavenCentral()
-
-		// Temporarily using to depend on marklogic-junit5 snapshot until it's released.
-		maven {
-			url = "https://bed-artifactory.bedford.progress.com:443/artifactory/ml-maven-snapshots/"
-		}
 	}
 
 	dependencies {
 		// Without this, once using JUnit 5.12 or higher, Gradle will not find any tests and report an error of:
 		// org.junit.platform.commons.JUnitException: TestEngine with ID 'junit-jupiter' failed to discover tests
-		testRuntimeOnly "org.junit.platform:junit-platform-launcher:1.14.0"
+		testRuntimeOnly "org.junit.platform:junit-platform-launcher:${junitVersion}"
 
-		testImplementation 'org.junit.jupiter:junit-jupiter:5.14.0'
+		testImplementation "org.junit.jupiter:junit-jupiter:${junitVersion}"
 		testImplementation "org.springframework:spring-test:${springVersion}"
 
 		// Forcing Spring to use logback instead of commons-logging
-		testImplementation "ch.qos.logback:logback-classic:1.5.19"
+		testImplementation "ch.qos.logback:logback-classic:1.5.32"
 		testImplementation 'org.slf4j:jcl-over-slf4j:2.0.17'
 		testImplementation 'org.slf4j:slf4j-api:2.0.17'
 	}

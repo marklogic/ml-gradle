@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Tests against the default Documents database. Doesn't clear it out before or after.
  */
+@Deprecated
 public class EntityServicesTest extends AbstractIntegrationTest {
 
 	private final static String MODEL = "{\n" +

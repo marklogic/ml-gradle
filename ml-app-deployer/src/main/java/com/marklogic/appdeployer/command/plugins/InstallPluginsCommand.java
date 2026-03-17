@@ -8,6 +8,7 @@ import com.marklogic.appdeployer.PluginConfig;
 import com.marklogic.appdeployer.command.AbstractUndoableCommand;
 import com.marklogic.appdeployer.command.CommandContext;
 import com.marklogic.appdeployer.command.SortOrderConstants;
+import com.marklogic.client.ext.helper.DatabaseClientSupplier;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.document.BinaryDocumentManager;
 import com.marklogic.client.eval.ServerEvaluationCall;
@@ -39,9 +40,10 @@ public class InstallPluginsCommand extends AbstractUndoableCommand {
 			return;
 		}
 
-		DatabaseClient client = determineDatabaseClient(context.getAppConfig());
-		for (String path : paths) {
-			installPluginsInPath(path, context.getAppConfig(), client);
+		try (DatabaseClientSupplier clientSupplier = new DatabaseClientSupplier(() -> determineDatabaseClient(context.getAppConfig()))) {
+			for (String path : paths) {
+				installPluginsInPath(path, context.getAppConfig(), clientSupplier);
+			}
 		}
 	}
 
@@ -52,9 +54,10 @@ public class InstallPluginsCommand extends AbstractUndoableCommand {
 			return;
 		}
 
-		DatabaseClient client = determineDatabaseClient(context.getAppConfig());
-		for (String path : paths) {
-			uninstallPluginsInPath(path, context.getAppConfig(), client);
+		try (DatabaseClientSupplier clientSupplier = new DatabaseClientSupplier(() -> determineDatabaseClient(context.getAppConfig()))) {
+			for (String path : paths) {
+				uninstallPluginsInPath(path, context.getAppConfig(), clientSupplier);
+			}
 		}
 	}
 
@@ -72,7 +75,7 @@ public class InstallPluginsCommand extends AbstractUndoableCommand {
 		return config.getPluginPaths();
 	}
 
-	protected void installPluginsInPath(String path, AppConfig appConfig, DatabaseClient client) {
+	protected void installPluginsInPath(String path, AppConfig appConfig, DatabaseClientSupplier clientSupplier) {
 		File pluginsDir = new File(path);
 		if (pluginsDir == null || !pluginsDir.exists()) {
 			return;
@@ -86,9 +89,9 @@ public class InstallPluginsCommand extends AbstractUndoableCommand {
 				}
 
 				makePlugin(dir, appConfig);
-				final String binaryUri = insertPluginZip(dir, appConfig, client);
+				final String binaryUri = insertPluginZip(dir, appConfig, clientSupplier.get());
 				if (binaryUri != null) {
-					installPlugin(binaryUri, appConfig, client);
+					installPlugin(binaryUri, appConfig, clientSupplier.get());
 				}
 			}
 		}
@@ -151,7 +154,7 @@ public class InstallPluginsCommand extends AbstractUndoableCommand {
 		logger.info(format("Installed plugin with scope '%s', result: %s", scope, result));
 	}
 
-	protected void uninstallPluginsInPath(String path, AppConfig appConfig, DatabaseClient client) {
+	protected void uninstallPluginsInPath(String path, AppConfig appConfig, DatabaseClientSupplier clientSupplier) {
 		File pluginsDir = new File(path);
 		if (pluginsDir == null || !pluginsDir.exists()) {
 			return;
@@ -166,7 +169,7 @@ public class InstallPluginsCommand extends AbstractUndoableCommand {
 
 				final String pluginName = getPluginName(file, appConfig);
 				if (pluginName != null) {
-					uninstallPlugin(pluginName, appConfig, client);
+					uninstallPlugin(pluginName, appConfig, clientSupplier.get());
 				}
 			}
 		}
@@ -174,7 +177,7 @@ public class InstallPluginsCommand extends AbstractUndoableCommand {
 
 	protected String getPluginName(File dir, AppConfig appConfig) {
 		File manifestFile = new File(dir, "manifest.xml");
-		if (manifestFile == null || !manifestFile.exists()) {
+		if (!manifestFile.exists()) {
 			// Need to make the plugin so the metadata file is guaranteed to exist
 			makePlugin(dir, appConfig);
 			manifestFile = new File(dir, "manifest.xml");

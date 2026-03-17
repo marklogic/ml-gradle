@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
+ * Copyright (c) 2015-2026 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.gradle.task
 
@@ -7,6 +7,7 @@ import com.marklogic.appdeployer.AppConfig
 import com.marklogic.client.DatabaseClient
 import com.marklogic.client.io.FileHandle
 import com.marklogic.contentpump.bean.MlcpBean
+import javax.inject.Inject
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.*
@@ -22,8 +23,13 @@ import org.gradle.api.tasks.*
  * Note that this defaults to using appConfig.restAdminUsername and appConfig.restAdminPassword. That user may not
  * have permission to perform the mlcp operation you wish to perform. In that case, just set the username/password
  * parameters of this task for the appropriate user.
+ * 
+ * This class is defined as abstract following the recommendation in the Gradle documentation for tasks that use @Inject on the constructor. 
+ * Gradle will create a concrete subclass of this task at runtime, and the @Inject annotation is used to indicate that the constructor should be used for dependency injection.
+ * https://docs.gradle.org/current/userguide/implementing_custom_tasks.html#task_implementation_by_extending_defaulttask
+ * 
  */
-class MlcpTask extends JavaExec {
+abstract class MlcpTask extends JavaExec {
 
 	@Input String command = "IMPORT"
 	@Input @Optional String host
@@ -130,6 +136,7 @@ class MlcpTask extends JavaExec {
 		return Logging.getLogger(MlcpTask.class)
 	}
 
+	@Inject
 	MlcpTask() {
 		super.getMainClass().set("com.marklogic.contentpump.ContentPump")
 	}

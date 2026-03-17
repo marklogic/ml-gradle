@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2025 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
+ * Copyright (c) 2015-2026 Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.
  */
 package com.marklogic.rest.util;
 
@@ -19,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
@@ -40,9 +41,8 @@ public class PreviewInterceptor extends DefaultResponseErrorHandler implements C
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
-	private ManageClient manageClient;
-
-	private ArrayNode results;
+	private final ManageClient manageClient;
+	private final ArrayNode results;
 
 	public PreviewInterceptor(ManageClient manageClient) {
 		this.manageClient = manageClient;
@@ -53,9 +53,6 @@ public class PreviewInterceptor extends DefaultResponseErrorHandler implements C
 	 * A 404 can happen during a preview when deploying database-specific resources like CPF pipelines or domains.
 	 * If the associated triggers database hasn't been created yet, a 404 will occur. But that shouldn't interrupt a
 	 * deployment process. So a 404 is logged but not treated as an error.
-	 *
-	 * @param httpResponse
-	 * @return
 	 */
 	@Override
 	public boolean hasError(ClientHttpResponse httpResponse) throws IOException {
@@ -82,11 +79,6 @@ public class PreviewInterceptor extends DefaultResponseErrorHandler implements C
 	 * For a PUT request, need to get the existing resource as JSON; merge the incoming payload, represented by the byte
 	 * array, into that JSON; and then compare the results to the existing JSON to produce a diff as a JSON patch. The
 	 * results of this are then added to the report.
-	 *
-	 * @param request
-	 * @param bytes
-	 * @return
-	 * @throws IOException
 	 */
 	protected ClientHttpResponse previewPut(HttpRequest request, byte[] bytes) throws IOException {
 		logger.info("Previewing PUT to: " + request.getURI());
@@ -112,11 +104,6 @@ public class PreviewInterceptor extends DefaultResponseErrorHandler implements C
 
 	/**
 	 * Uses zjsonpatch to capture the difference between the incoming request and the existing resource as a JSON patch.
-	 *
-	 * @param existingResource
-	 * @param payload
-	 * @return
-	 * @throws IOException
 	 */
 	protected JsonNode buildJsonPatch(ObjectNode existingResource, String payload) throws IOException {
 		ObjectNode payloadResource = (ObjectNode) ObjectMapperFactory.getObjectMapper().readTree(payload);
@@ -129,7 +116,7 @@ public class PreviewInterceptor extends DefaultResponseErrorHandler implements C
 
 	protected void includeJsonPatchInReport(HttpRequest request, ObjectNode existingResource, JsonNode jsonPatch) {
 		ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
-		if (jsonPatch instanceof ArrayNode && jsonPatch.size() > 0) {
+		if (jsonPatch instanceof ArrayNode && !jsonPatch.isEmpty()) {
 			ObjectNode result = mapper.createObjectNode();
 			result.set("message", new TextNode("Will update resource at: " + request.getURI()));
 			result.set("existingResource", existingResource);
@@ -145,10 +132,6 @@ public class PreviewInterceptor extends DefaultResponseErrorHandler implements C
 	/**
 	 * A PUT request is made to a "properties" endpoint for a resource that can also be used for getting the JSON for
 	 * the existing resource.
-	 *
-	 * @param request
-	 * @return
-	 * @throws IOException
 	 */
 	protected ObjectNode getExistingResource(HttpRequest request) throws IOException {
 		String existingJson = manageClient.getJson(request.getURI());
@@ -159,8 +142,6 @@ public class PreviewInterceptor extends DefaultResponseErrorHandler implements C
 	 * Some resources need to be modified to account for difference that will always exist with an incoming request,
 	 * as that request may have properties that won't ever exist in the resource JSON retrieved from the Manage API,
 	 * such as a user's password.
-	 *
-	 * @param payload
 	 */
 	protected void modifyPayloadBeforePreview(ObjectNode payload) {
 		// Passwords will never be present in the source, so remove from the target
@@ -177,10 +158,6 @@ public class PreviewInterceptor extends DefaultResponseErrorHandler implements C
 	/**
 	 * For a POST operation, a new resource is being created, so just need to include the resource in the report - no
 	 * diff is needed.
-	 *
-	 * @param request
-	 * @param bytes
-	 * @return
 	 */
 	protected ClientHttpResponse previewPost(HttpRequest request, byte[] bytes) throws IOException {
 		ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
@@ -217,12 +194,8 @@ public class PreviewInterceptor extends DefaultResponseErrorHandler implements C
 	/**
 	 * For a DELETE operation, a resource is being deleted, so just need to include the resource URI in the report - no
 	 * diff is needed.
-	 *
-	 * @param request
-	 * @param bytes
-	 * @return
 	 */
-	protected ClientHttpResponse previewDelete(HttpRequest request, byte[] bytes) throws IOException {
+	protected ClientHttpResponse previewDelete(HttpRequest request, byte[] bytes) {
 		logger.info("Previewing, so not sending DELETE to: " + request.getURI());
 		return newFakeResponse();
 	}
@@ -230,13 +203,11 @@ public class PreviewInterceptor extends DefaultResponseErrorHandler implements C
 	/**
 	 * Creates a "fake" response for PUT and POST requests. Testing so far shows that simply returning a 200/OK
 	 * suffices during a preview.
-	 *
-	 * @return
 	 */
 	protected ClientHttpResponse newFakeResponse() {
 		return new ClientHttpResponse() {
 			@Override
-			public HttpStatus getStatusCode() {
+			public HttpStatusCode getStatusCode() {
 				return HttpStatus.OK;
 			}
 

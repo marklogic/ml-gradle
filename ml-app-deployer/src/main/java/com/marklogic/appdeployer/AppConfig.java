@@ -5,6 +5,7 @@ package com.marklogic.appdeployer;
 
 import com.marklogic.appdeployer.command.forests.ForestNamingStrategy;
 import com.marklogic.appdeployer.command.forests.ReplicaBuilderStrategy;
+import com.marklogic.appdeployer.util.LogUtil;
 import com.marklogic.appdeployer.util.MapPropertiesSource;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
@@ -60,6 +61,7 @@ public class AppConfig {
 	 */
 	public final static String DEFAULT_MODULES_PATH = "src/main/ml-modules";
 	public final static String DEFAULT_SCHEMAS_PATH = "src/main/ml-schemas";
+	public final static String DEFAULT_PDC_CONFIG_PATH = "src/main/pdc-config";
 
 	public final static String DEFAULT_HOST = "localhost";
 	public final static String DEFAULT_GROUP = "Default";
@@ -177,6 +179,8 @@ public class AppConfig {
 	private boolean tdeValidationEnabled = true;
 
 	private List<ConfigDir> configDirs;
+
+	private List<String> pdcConfigPaths;
 
 	// Passed into the PayloadTokenReplacer that subclasses of AbstractCommand use
 	private Map<String, String> customTokens = new HashMap<>();
@@ -301,6 +305,10 @@ public class AppConfig {
 		schemaPaths = new ArrayList<>();
 		schemaPaths.add(defaultSchemasPath);
 
+		String defaultPdcConfigPath = projectDir != null ? new File(projectDir, DEFAULT_PDC_CONFIG_PATH).getAbsolutePath() : DEFAULT_PDC_CONFIG_PATH;
+		pdcConfigPaths = new ArrayList<>();
+		pdcConfigPaths.add(defaultPdcConfigPath);
+
 		configDirs = new ArrayList<>();
 		configDirs.add(ConfigDir.withProjectDir(projectDir));
 
@@ -382,13 +390,24 @@ public class AppConfig {
 	}
 
 	/**
-	 * Convenience method for constructing a MarkLogic Java API DatabaseClient based on the the host and rest*
+	 * Convenience method for constructing a MarkLogic Java API DatabaseClient based on the host and rest*
 	 * properties defined on this class.
 	 *
 	 * @return
 	 */
 	public DatabaseClient newDatabaseClient() {
-		return configuredDatabaseClientFactory.newDatabaseClient(newRestDatabaseClientConfig(getRestPort()));
+		DatabaseClientConfig config = newRestDatabaseClientConfig(getRestPort());
+		DatabaseClient client = configuredDatabaseClientFactory.newDatabaseClient(config);
+		if (StringUtils.hasText(client.getBasePath())) {
+			LogUtil.APP_DEPLOYER_LOGGER.info("Connecting to REST API server with base path: {}", client.getBasePath());
+		} else {
+			boolean isCloudDeployment = client.getSecurityContext() instanceof DatabaseClientFactory.ProgressDataCloudAuthContext;
+			if (isCloudDeployment) {
+				LogUtil.APP_DEPLOYER_LOGGER.warn("Connecting to a REST API server in Progress Data Cloud without a base path may not work; " +
+					"if you encounter an error, you likely need to configure a base path via the 'mlRestBasePath' property.");
+			}
+		}
+		return client;
 	}
 
 	/**
@@ -1414,6 +1433,14 @@ public class AppConfig {
 
 	public void setSchemaPaths(List<String> schemaPaths) {
 		this.schemaPaths = schemaPaths;
+	}
+
+	public List<String> getPdcConfigPaths() {
+		return pdcConfigPaths;
+	}
+
+	public void setPdcConfigPaths(List<String> pdcConfigPaths) {
+		this.pdcConfigPaths = pdcConfigPaths;
 	}
 
 	public boolean isMergeResources() {

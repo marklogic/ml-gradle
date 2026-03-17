@@ -14,6 +14,7 @@ import com.marklogic.appdeployer.util.SimplePropertiesSource
 import com.marklogic.gradle.task.*
 import com.marklogic.gradle.task.admin.InitTask
 import com.marklogic.gradle.task.admin.InstallAdminTask
+import com.marklogic.gradle.task.admin.WaitTillReadyTask
 import com.marklogic.gradle.task.alert.DeleteAllAlertConfigsTask
 import com.marklogic.gradle.task.alert.DeployAlertingTask
 import com.marklogic.gradle.task.client.*
@@ -37,6 +38,7 @@ import com.marklogic.gradle.task.groups.SetTraceEventsTask
 import com.marklogic.gradle.task.hosts.AssignHostsToGroupsTask
 import com.marklogic.gradle.task.mimetypes.DeployMimetypesTask
 import com.marklogic.gradle.task.mimetypes.UndeployMimetypesTask
+import com.marklogic.gradle.task.pdc.DeployMarkLogicEndpointsTask
 import com.marklogic.gradle.task.plugins.InstallPluginsTask
 import com.marklogic.gradle.task.plugins.UninstallPluginsTask
 import com.marklogic.gradle.task.qconsole.ExportWorkspacesTask
@@ -125,6 +127,7 @@ class MarkLogicPlugin implements Plugin<Project> {
 		project.task("mlInit", type: InitTask, group: adminGroup, description: "Perform a one-time initialization of a MarkLogic server; uses the properties 'mlLicenseKey' and 'mlLicensee'")
 		project.task("mlInstallAdmin", type: InstallAdminTask, group: adminGroup, description: "Perform a one-time installation of an admin user; uses the properties 'mlUsername' and 'mlPassword'; " +
 			"the realm, which defaults to 'public', can optionally be specified on the command line via '-Prealm='")
+		project.task("mlWaitTillReady", type: WaitTillReadyTask, group: adminGroup, description: "Wait until MarkLogic is ready and accessible; useful in CI/CD pipelines after installing or restarting MarkLogic.")
 
 		String alertGroup = "ml-gradle Alert"
 		project.task("mlDeleteAllAlertConfigs", type: DeleteAllAlertConfigsTask, group: alertGroup, description: "Delete all alert configs, which also deletes all of the actions rules associated with them")
@@ -339,7 +342,12 @@ class MarkLogicPlugin implements Plugin<Project> {
 			"Use -PrunCodeCoverage to enable code coverage support when running the tests. " +
 			"Use -PrunTeardown and -PrunSuiteTeardown to control whether teardown and suite teardown scripts are run; these default to 'true' and can be set to 'false' instead. ")
 
-		// Any granular task that deploys/undeploys resources may need to do so for a resource in a bundle, so these
+		String pdcGroup = "PDC"
+		project.tasks.register("pdcDeployMarkLogicEndpoints", DeployMarkLogicEndpointsTask.class) {
+			group = pdcGroup
+			description = "Deploy MarkLogic endpoints to a PDC instance. Endpoints default to being defined at src/main/pdc-config/service/mlendpoints/(dnsName)."
+		}
+
 		// tasks must all depend on mlPrepareBundles
 		project.tasks.each { task ->
 			if (task.name.startsWith("mlDeploy") || task.name.startsWith("mlUndeploy")) {

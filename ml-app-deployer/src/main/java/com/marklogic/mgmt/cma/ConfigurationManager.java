@@ -3,10 +3,13 @@
  */
 package com.marklogic.mgmt.cma;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.marklogic.mgmt.AbstractManager;
 import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.SaveReceipt;
+import com.marklogic.mgmt.util.ObjectMapperFactory;
 import com.marklogic.rest.util.MgmtResponseErrorHandler;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -101,6 +104,22 @@ public class ConfigurationManager extends AbstractManager {
 			.encode()
 			.toUriString();
 
-		return manageClient.getRestTemplate().exchange(uri, HttpMethod.GET, null, JsonNode.class);
+		// Asking for a String back instead of a JsonNode due to odd issues in some environments where asking for a
+		// JsonNode will result in this sort of error:
+		// Type definition error: [simple type, class com.fasterxml.jackson.databind.JsonNode]
+		// One such instance is when reusing this library in an environment where Apache Spark is present, though it is
+		// not yet known why Jackson encounters that error. This has not been seen in ml-gradle usage before.
+		ResponseEntity<String> response = manageClient.getRestTemplate().exchange(uri, HttpMethod.GET, null, String.class);
+		JsonNode json;
+		if (response.getBody() == null || response.getBody().isBlank()) {
+			json = NullNode.getInstance();
+		} else {
+			try {
+				json = ObjectMapperFactory.getObjectMapper().readTree(response.getBody());
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException("Unable to read JSON response from CMA endpoint, cause: " + e.getMessage(), e);
+			}
+		}
+		return ResponseEntity.status(response.getStatusCode()).headers(response.getHeaders()).body(json);
 	}
 }

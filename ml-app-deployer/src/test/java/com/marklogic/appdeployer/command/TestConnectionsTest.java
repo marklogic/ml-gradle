@@ -109,14 +109,15 @@ class TestConnectionsTest extends AbstractAppDeployerTest {
 			results = command.testConnections(new CommandContext(appConfig, manageClient, adminManager));
 			restResult = results.getRestServerTestResult();
 			assertFalse(restResult.isSucceeded());
-			assertTrue(restResult.getMessage().contains("java.io.IOException: unexpected end of stream"),
+			assertTrue(restResult.getMessage().contains("Received 403: Forbidden"),
 				"Starting in MarkLogic 12, trying to connect to an app server that requires SSL without the " +
 					"client using SSL results in an IOException, which is a change from earlier versions of MarkLogic. " +
+					"But then for 12.1.0, or possibly in 12.0.3, the behavior changed to returning a 403 Forbidden. " +
 					"Actual message: " + restResult.getMessage());
 
 			testRestResult = results.getTestRestServerTestResult();
 			assertFalse(testRestResult.isSucceeded());
-			assertTrue(testRestResult.getMessage().contains("java.io.IOException: unexpected end of stream"),
+			assertTrue(testRestResult.getMessage().contains("Received 403: Forbidden"),
 				"Actual error: " + testRestResult.getMessage());
 		} finally {
 			configureRestServersToNotRequireSSL();
